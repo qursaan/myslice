@@ -27,3 +27,14 @@ WARNING: version 1.3 !!
 $ sudo apt-get install python-django
 -> 1.4.1_2
 
+NOTE. (this has more to do with my own vserver-based technique to
+create debian VM's)
+
+I found it useful to also do the following at some point 
+# apt-get install locales
+# dpkg-reconfigure locales
+-> en_US.UTF-8
+
+The thing is I enter my debian box from a MAC through ssh, and the
+MAC has this set: LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+and I was getting a lot of warnings relating to that anyways
