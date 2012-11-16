@@ -1,0 +1,29 @@
+versions collected as of nov 14 2012
+
+======================================== MAC
+I'm using macports 
+$ sudo port install python27 py27-pip py27-django
+(not even sure if pip is needed then...)
+-> 1.4.1_0
+
+NOTE: I haven't found the magic sentence to expose django-admin-2.7.py
+as simply django-admin.py
+There's this 'port select' command that can be used for selecting
+which python to use, which I believe would come in handy here too
+Except that it insists on taking a so-called 'group' name and I can't
+find out what to use here
+
+~/git/django-playground $ port select --list django
+Warning: Unable to get active selected version: The specified group
+'django' does not exist.
+
+======================================== fedora(16)
+$ sudo yum install Django
+WARNING: version 1.3 !!
+-> 1.3.4-1
+
+(Fedora17 has 1.4.2)
+======================================== debian(wheezy)
+$ sudo apt-get install python-django
+-> 1.4.1_2
+
