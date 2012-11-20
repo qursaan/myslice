@@ -38,3 +38,7 @@ I found it useful to also do the following at some point
 The thing is I enter my debian box from a MAC through ssh, and the
 MAC has this set: LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 and I was getting a lot of warnings relating to that anyways
+
+==================== postinstall
+. manage.py syncdb
+. manage.py collectstatic --noinput
