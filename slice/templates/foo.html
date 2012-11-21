@@ -1,8 +1,10 @@
 {% extends 'foo-base.html' %}
 
 {% block content %}
-{% insert_str media "js/mathjax.js" %}
-{% insert_str media "css/mathjax.css" %}
-{{ content_string }}
-{% endblock %}
+{{ content_string|safe }}
+{% endblock content %}
 
+{% block menu %}
+{% include 'foo-menu.html' %}
+  
+{% endblock menu %}

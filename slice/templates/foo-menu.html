@@ -1,5 +1,23 @@
-<ul>
-{% for k,v in menu_items.iteritems %}
-  <li> <a href="{{ v }}"> {{ k }} </a> </li>
+{% insert_str media "js/mymenu.js" %}
+{% insert_str media "css/mymenu.css" %}
+{% insert raw_js %} "some script useful for mymenu" {% endinsert %}
+{% insert raw_css %}
+ul#mymenu { position: fixed; display: block; padding:0; margin:0;
+	  bottom: 10px; right: 10px; }
+{% endinsert %}
+
+<ul id='mymenu'>
+{% for d in menu_items %}
+  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
 {% endfor %}
 </ul>
+
+<!--
+<ul id='mymenu'>
+  <li class="other"> other text </li>
+  <li class="other"> another non-current text </li>
+  <li class="current" title="the title for the current item">
+    <span>"The label of the current menu" </span>
+  </li>
+</ul>
+-->

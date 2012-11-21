@@ -1,13 +1,23 @@
 {% insert_handler %}
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
-<title>Foo - experimental page with foo= {{ foo }} </title>
+<title> Foo - an experimental slice page with foo= {{ foo }} </title>
 {% media_container media %}
-
+<script>
+{% container raw_js %}
+</script>
+<style>
+{% container raw_css %}
+</style>
 </head>
 
 <body>
-<h1>Again, foo = {{ foo }} </h1>
+{% block menu %} <div class='menu'> {{ menu }} </div> {% endblock %}
+{% block float %} <div class='float'> {{ float|default:"The float area" }} </div> {% endblock %}
+{% block main %}
+<div class='main'>  <h1>Again, foo = {{ foo }} </h1> {{ main }} </div>
 <hr>
 {% block content %} and more stuff if needed {% endblock %}
-</body> </html>
+{% endblock %}
+</body>
+</html>
