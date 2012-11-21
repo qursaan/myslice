@@ -2,4 +2,4 @@ TAGS
 *.pyc
 *.sqlite3
 *~
-
+all-static/

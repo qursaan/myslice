@@ -173,4 +173,5 @@ AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', )
 
 #################### for insert_above
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"
-IA_MEDIA_PREFIX = '/code/'
+# put stuff under static/
+# IA_MEDIA_PREFIX = '/code/'

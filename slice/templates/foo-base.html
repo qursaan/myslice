@@ -1,8 +1,10 @@
+{# This is required by insert_above #}
 {% insert_handler %}
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
 <title> Foo - an experimental slice page with foo= {{ foo }} </title>
-{% media_container media %}
+{# This is where insert_str will end up #}
+{% media_container prelude %}
 <script>
 {% container raw_js %}
 </script>
@@ -13,7 +15,9 @@
 
 <body>
 {% block menu %} <div class='menu'> {{ menu }} </div> {% endblock %}
-{% block float %} <div class='float'> {{ float|default:"The float area" }} </div> {% endblock %}
+{% block float %} <div class='float'>
+  <img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" />
+  {{ float|default:"The float area" }} </div> {% endblock %}
 {% block main %}
 <div class='main'>  <h1>Again, foo = {{ foo }} </h1> {{ main }} </div>
 <hr>

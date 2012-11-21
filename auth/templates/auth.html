@@ -12,7 +12,7 @@ body{
 </head>
 <body>
 	{{ state }}
-          <a href="/" alt="Home"><img class="logo" src="{{ STATIC_URL }}myslice-logo.png" alt="MySlice" /></a>
+          <a href="/" alt="Home"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
 	<form action="/login/" method="post">
 		{% csrf_token %}
 		{% if next %}

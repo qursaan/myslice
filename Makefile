@@ -5,3 +5,6 @@ tags:
 # however sometimes we have stuff not yet added, so in this case
 ftags:
 	find . -type f | fgrep -v '/.git/' | xargs etags
+
+static:
+	./manage.py collectstatic --noinput 

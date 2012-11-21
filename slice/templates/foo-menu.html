@@ -1,10 +1,8 @@
-{% insert_str media "js/mymenu.js" %}
-{% insert_str media "css/mymenu.css" %}
+{% insert_str prelude "js/mymenu.js" %}
+{% insert_str prelude "css/mymenu.css" %}
+{# this shows how to add raw js code #}
 {% insert raw_js %} "some script useful for mymenu" {% endinsert %}
-{% insert raw_css %}
-ul#mymenu { position: fixed; display: block; padding:0; margin:0;
-	  bottom: 10px; right: 10px; }
-{% endinsert %}
+{# use the raw_css container for css style #}
 
 <ul id='mymenu'>
 {% for d in menu_items %}
@@ -12,12 +10,3 @@ ul#mymenu { position: fixed; display: block; padding:0; margin:0;
 {% endfor %}
 </ul>
 
-<!--
-<ul id='mymenu'>
-  <li class="other"> other text </li>
-  <li class="other"> another non-current text </li>
-  <li class="current" title="the title for the current item">
-    <span>"The label of the current menu" </span>
-  </li>
-</ul>
--->
