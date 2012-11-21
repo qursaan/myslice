@@ -4,7 +4,12 @@ from django.conf.urls import patterns, include, url
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+# to enable insert_above stuff
+from django.template.loader import add_to_builtins
+add_to_builtins('insert_above.templatetags.insert_tags')
+
+urlpatterns = patterns(
+    '',
     # Examples:
     # url(r'^$', 'myslice.views.home', name='home'),
     # url(r'^myslice/', include('myslice.foo.urls')),
@@ -15,4 +20,5 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     (r'^login/$', 'auth.views.login_user'),
+    (r'^slice/$', 'slice.views.foo'),
 )

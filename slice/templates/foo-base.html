@@ -1,0 +1,13 @@
+{% insert_handler %}
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Foo - experimental page with foo= {{ foo }} </title>
+{% media_container media %}
+
+</head>
+
+<body>
+<h1>Again, foo = {{ foo }} </h1>
+<hr>
+{% block content %} and more stuff if needed {% endblock %}
+</body> </html>

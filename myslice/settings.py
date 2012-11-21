@@ -9,7 +9,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-## guess if we run on the 'prod' site (:) or on a working laptop
+####################
+# guess if we run on the 'prod' site (:) that for now uses /root/myslice and run manage.py
+# or on a working laptop, in which case we use ~/git/myslice-django
 import os, os.path
 ROOT=''
 def init_root ():
@@ -127,7 +129,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # see details in devel/django-insert-above-1.0-4
+    'insert_above',
     'myslice',
+    'auth',
+    'slice',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -164,3 +170,7 @@ LOGGING = {
 }
 
 AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', )
+
+#################### for insert_above
+#IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"
+IA_MEDIA_PREFIX = '/code/'

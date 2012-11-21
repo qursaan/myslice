@@ -42,3 +42,9 @@ and I was getting a lot of warnings relating to that anyways
 ==================== postinstall
 . manage.py syncdb
 . manage.py collectstatic --noinput
+
+======================================== django-insert-above
+this package was downloaded in source doce from github and installed
+as-is as insert_above, and enabled as the README has it
+
+======================================== 
