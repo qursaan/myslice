@@ -1,10 +1,10 @@
-{% extends 'foo-base.html' %}
+{% extends 'myslice-base.html' %}
 
 {% block content %}
+<p>The URL variable name= {{ name }} </p>
 {{ content_string|safe }}
 {% endblock content %}
 
 {% block menu %}
-{% include 'foo-menu.html' %}
-  
+{% include 'mymenu.html' %}
 {% endblock menu %}

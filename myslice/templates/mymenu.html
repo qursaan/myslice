@@ -4,6 +4,7 @@
 {% insert raw_js %} "some script useful for mymenu" {% endinsert %}
 {# use the raw_css container for css style #}
 
+<img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" />
 <ul id='mymenu'>
 {% for d in menu_items %}
   <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
