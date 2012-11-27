@@ -1,0 +1,28 @@
+#header {
+    position: fixed; 
+    display: block;
+    margin:0;
+    top: 0px;
+    left: 0px;
+    right: 0px; 
+    height: 60px;
+    background-color: #fc9;
+}
+
+#column-wrap {
+    margin-top: 60px;
+    display: table;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+#content-main, #content-related {
+    display: table-cell;
+    position: static;
+    padding: 10px;
+}
+#content-main {
+    width: 100%;
+}
+#content-related {
+    width: 200px;
+}

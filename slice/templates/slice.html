@@ -1,10 +1,7 @@
-{% extends 'myslice-base.html' %}
+{% extends 'myslice.html' %}
 
 {% block content %}
 <p>The URL variable name= {{ name }} </p>
 {{ content_string|safe }}
 {% endblock content %}
 
-{% block menu %}
-{% include 'mymenu.html' %}
-{% endblock menu %}

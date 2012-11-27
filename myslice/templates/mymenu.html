@@ -1,13 +1,21 @@
 {% insert_str prelude "js/mymenu.js" %}
 {% insert_str prelude "css/mymenu.css" %}
 {# this shows how to add raw js code #}
-{% insert raw_js %} "some script useful for mymenu" {% endinsert %}
+{# {% insert raw_js %} "some script useful for mymenu" {% endinsert %} #}
 {# use the raw_css container for css style #}
 
-<img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" />
+<div id='mymenu'>
 <ul id='mymenu'>
+<li>
+  <a href="/"><img class="logo mymenu" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
+</li>
 {% for d in menu_items %}
+  {% if d.current %}
+  <li class='current'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
+  {% else %}
   <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-{% endfor %}
+  {% endif %}
+  {% endfor %}
 </ul>
+</div>
 

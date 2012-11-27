@@ -1,0 +1,46 @@
+The contents of this module:
+
+==================== 1st level subdirs
+* myslice: 
+  this is the sjango project', where to look for
+  . settings
+  . urls
+  . common static files 
+
+* insert_above: 
+  a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
+  much like our past drupal_set_html_head() 
+
+* auth: 
+  a django 'app' that deals with authentication
+
+* slice:
+  a django app for dealing with slice views
+
+* devel:
+  only for various notes and other utiliy scripts
+
+* all-static: (generated, no need to source-control)
+  this is where 'manage.py collectstatic' will gather all your static contents if you run a local server
+  make has convenience targets to refresh this area
+  $ make clean-static 
+  $ make static 
+==================== conventions 
+
+* templates:
+  we store this under templates/ within the corresponding app, e.g.
+  auth/templates/login.html
+  for now this is only about html, but the engine can be used for rendering anything including json or whatever..
+
+* static files:
+  we chose to have all static files (images, but also javascript and stylesheets) in the various
+  proj or app where they belong, under a static/ subdir that has this structure:
+  where-it-belongs/
+    static/
+      img/
+      css/
+      js/
+  the stuff I have so far is in myslice/ because it looks common to all apps..
+
+
+

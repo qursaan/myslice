@@ -19,3 +19,11 @@ Lorem <span class='bold'>ipsum dolor</span> sit amet, consectetuer adipiscing el
                               context_instance=RequestContext(request))
 
     return result
+
+def sample (request):
+    return render_to_response ('sample.html',
+                               { 'menu_items':
+                                     [ { 'label':'Some label', 'href': '/url1/','current':True, },
+                                       { 'label':'Another topic ', 'href': '/other/'},
+                                       ]},
+                               context_instance=RequestContext(request))

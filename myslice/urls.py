@@ -22,4 +22,5 @@ urlpatterns = patterns(
     (r'^login/?$', 'auth.views.login_user'),
     (r'^slice/?$', 'slice.views.fake_view'),
     (r'^slice/(?P<name>\w+)/?$', 'slice.views.fake_view'),
+    (r'^sample/?$', 'slice.views.sample'),
 )
