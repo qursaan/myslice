@@ -11,7 +11,7 @@ Lorem <span class='bold'>ipsum dolor</span> sit amet, consectetuer adipiscing el
 
     result=render_to_response('slice.html',{'foo':'bar', 
                                             'name':name,
-                                            'content_string' : content_string,
+                                            'content_main' : content_string,
                                             'menu_items' : 
                                             [ { 'label':'item1', 'href': '/url1/'},
                                               { 'label':'Other item', 'href': '/other/'},
