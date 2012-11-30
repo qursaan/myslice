@@ -1,0 +1,74 @@
+{% extends 'myslice.html' %}
+
+{% block content_main %}
+
+{% insert_str prelude "css/sample.css" %}
+{% insert_str prelude "js/sample.js" %}
+
+{% insert raw_js %}
+function myinit () {
+alert ('initing'); 
+$('#foo a#name1').click(function (e) { e.preventDefault(); $(this).tab('show');})
+$('#foo a#name2').click(function (e) { e.preventDefault(); $(this).tab('show');})
+};
+$(document).ready (function () {
+alert ('initing'); 
+$('#foo a#name1').click(function (e) { e.preventDefault(); $(this).tab('show');})
+$('#foo a#name2').click(function (e) { e.preventDefault(); $(this).tab('show');})
+});
+{% endinsert %}
+
+<div onclick="alert('yes');"> manual alert </div>
+<div onclick="init1();">manual init </div>
+
+<div style='border:1'>
+<ul class="nav nav-tabs" id='foo'>
+  <li class="active"><a href="#name1">Here</a></li>
+  <li><a href="#name2">Other</a></li>
+  </ul>
+<div class="tab-content">
+   <div class="tab-pane fade active in" id="name1">
+     <p> text for tab 1 </p>
+   </div>
+   <div class="tab-pane fade in" id="name2">
+     <p> Lorem <span class='bold'>ipsum dolor</span> sit amet, consectetuer
+    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+    laoreet dolore magna aliquam erat volutpat. Ut wisi enim </p>
+   </div>
+</div>   
+</div>
+
+<div class='well'> quis nostrud exerci tation </div>
+
+<div>
+  Lorem <span class='bold'>ipsum dolor</span> <code> counter += 1
+  </code> sit amet, consectetuer
+    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+    laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim
+    veniam,  ullamcorper suscipit lobortis
+    nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure
+    dolor in hendrerit in vulputate velit esse molestie consequat, vel
+    illum dolore eu feugiat nulla facilisis at vero eros et accumsan
+    et iusto odio dignissim qui blandit praesent luptatum zzril
+    delenit augue duis dolore te feugait nulla facilisi. Nam liber
+    tempor cum soluta nobis eleifend option congue nihil imperdiet
+    doming id quod mazim placerat facer possim assum. Typi non habent
+    claritatem insitam; est usus legentis in iis qui facit eorum
+    claritatem. Investigationes demonstraverunt lectores legere me
+    lius quod ii legunt saepius. Claritas est etiam processus
+    dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum
+    est notare quam littera gothica, quam nunc putamus parum claram,
+    anteposuerit litterarum formas humanitatis per seacula quarta
+    decima et quinta decima. Eodem modo typi, qui nunc nobis videntur
+    parum clari, fiant sollemnes in futurum.
+  </div>
+{% endblock content_main %}
+
+{% block content_related %}
+This text is shorter on purpose Lorem <span class='bold'>ipsum
+   dolor</span> sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation
+   ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo
+   consequat.
+{% endblock content_related %}
