@@ -20,6 +20,8 @@ static: force
 clean-static: force
 	rm -rf ./all-static/
 
+allst: clean-static static
+
 #################### sync : push current code on a (devel) box running myslice
 SSHURL:=root@$(MYSLICEBOX):/
 SSHCOMMAND:=ssh root@$(MYSLICEBOX)
@@ -55,4 +57,3 @@ ifeq (,$(MYSLICEBOX))
 else
 	@echo "$@" target not yet implemented; exit; @$(SSHCOMMAND) /etc/init.d/apache2 restart
 endif
-
