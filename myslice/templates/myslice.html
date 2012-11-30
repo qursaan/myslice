@@ -5,6 +5,8 @@
 <title> MySlice - slice page with python var foo = {{ foo|default:"foo is undefined"}} </title>
 {# This is where insert_str will end up #}
 {% media_container prelude %}
+{% insert_str prelude "jquery/jquery.js" %}
+{% insert_str prelude "bootstrap/css/bootstrap.css" %}
 <script type="text/javascript">
 {# In case we need to add raw js code #}
 {% container raw_js %}
