@@ -40,3 +40,7 @@ ul#menu>li { display: block;
 #sidebar {
     width: 200px;
 }
+#sample-tabs {
+    border-style: solid; 
+    padding: 20px;
+}
