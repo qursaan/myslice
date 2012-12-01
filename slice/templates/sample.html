@@ -5,25 +5,17 @@
 {% insert_str prelude "css/sample.css" %}
 {% insert_str prelude "js/sample.js" %}
 
-{% insert raw_js %}
-$(document).ready (function () {
-window.console.log ('initing 1 & 2'); 
-$('#foo a#name1').click(function (e) { window.console.log('click 1'); e.preventDefault(); $('#foo a#name1').tab('show');})
-$('#foo a#name2').click(function (e) { window.console.log('click 2'); e.preventDefault(); $('#foo a#name2').tab('show');})
-});
-{% endinsert %}
-
 <div id=sample-tabs>
 <ul class="nav nav-tabs" id='foo'>
-  <li class="active">	<a href="#name1" data-toggle="tab">Here</a></li>
-  <li>			<a href="#name2" data-toggle="tab">Other</a></li>
+  <li >				<a href="#name1" data-toggle="tab">Here</a></li>
+  <li class="active">		<a href="#name2" data-toggle="tab">Other</a></li>
   </ul>
 <div class="tab-content">
-   <div class="tab-pane fade active in" id="name1">
+   <div class="tab-pane fade in" id="name1">
      <p> {{ lorem }} </p>
    </div>
-   <div class="tab-pane fade in" id="name2">
-     <p> A shorter Lorem <code> with embedded code </code> <span class='bold'>ipsum dolor</span> sit amet, consectetuer
+   <div class="tab-pane fade in active" id="name2">
+     <p> Sample tabs, this one is the active one; A shorter Lorem <code> with embedded code </code> <span class='bold'>ipsum dolor</span> sit amet, consectetuer
     adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
     laoreet dolore magna aliquam erat volutpat. Ut wisi enim </p>
    </div>
