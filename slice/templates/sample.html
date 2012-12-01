@@ -12,7 +12,7 @@
   </ul>
 <div class="tab-content">
    <div class="tab-pane fade in" id="name1">
-     <p> {{ lorem }} </p>
+     <p> {{ lorem|safe }} </p>
    </div>
    <div class="tab-pane fade in active" id="name2">
      <p> Sample tabs, this one is the active one; A shorter Lorem <code> with embedded code </code> <span class='bold'>ipsum dolor</span> sit amet, consectetuer
@@ -23,13 +23,7 @@
 </div>
 
 
-<script>
- $(function () {
-    $('#myTab a:last').tab('show');
-  })
-</script>
-
-<div class='well'> quis nostrud exerci tation </div>
+<div class='well'> a sample of the 'well' class quis nostrud exerci tation </div>
 
 <div>
  {{ lorem }}   Lorem <span class='bold'>ipsum dolor</span> <code> counter += 1

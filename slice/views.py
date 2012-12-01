@@ -23,7 +23,7 @@ def sample (request):
     return render_to_response ('sample.html',
                                { 'lorem': lorem,
                                  'menu_items':
-                                     [ { 'label':'Some label', 'href': '/url1/','current':True, },
+                                     [ { 'label':'Some label', 'href': '/url1/','active':True, },
                                        { 'label':'Another topic ', 'href': '/other/'},
                                        ]},
                                context_instance=RequestContext(request))

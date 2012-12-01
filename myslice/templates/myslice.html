@@ -10,11 +10,11 @@
 {% insert_str prelude "bootstrap/css/bootstrap.css" %}
 <script type="text/javascript">
 {# In case we need to add raw js code #}
-{% container raw_js %}
+{% container prelude_js %}
 </script>
 <style type="text/css">
 {# In case we need to add raw css code #}
-{% container raw_css %}
+{% container prelude_css %}
 </style>
 </head>
 
@@ -30,6 +30,7 @@
     <div id='header'>
     {% block header %}
       {% include 'mymenu.html' %}
+      {% include 'logo.html' %}
     {% endblock header %}
     </div>
 

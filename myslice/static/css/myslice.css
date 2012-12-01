@@ -6,7 +6,7 @@
     left: 0px;
     right: 0px; 
     height: 60px;
-    background-color: #fc9;
+    background-color: #f8f8f8;
 }
 
 #column-wrap {
@@ -25,4 +25,8 @@
 }
 #content-related {
     width: 200px;
+}
+
+img.logo {
+    right:0px;
 }
