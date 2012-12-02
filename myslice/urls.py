@@ -20,7 +20,7 @@ urlpatterns = patterns(
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     (r'^login/?$', 'auth.views.login_user'),
-    (r'^slice/?$', 'slice.views.fake_view'),
-    (r'^slice/(?P<name>\w+)/?$', 'slice.views.fake_view'),
-    (r'^sample/?$', 'slice.views.sample'),
+    (r'^slice/?$', 'slice.views.fake_slice_view'),
+    (r'^slice/(?P<name>\w+)/?$', 'slice.views.fake_slice_view'),
+    (r'^sample/?$', 'slice.views.sample_view'),
 )
