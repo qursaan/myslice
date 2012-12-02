@@ -1,10 +1,7 @@
 {% insert_str prelude "js/mymenu.js" %}
 {% insert_str prelude "css/mymenu.css" %}
-{# this shows how to add raw js or css code #}
-{# {% insert prelude_js %} "some script useful for mymenu" {% endinsert %} #}
-{# use the prelude_css container for css style #}
 
-<div class="nav nav-pills">
+<ul class="nav nav-pills" id='menu_ul'>
 {% for d in menu_items %}
   {% if d.active %}
   <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
@@ -13,4 +10,3 @@
   {% endif %}
   {% endfor %}
 </ul>
-</div>

@@ -5,9 +5,13 @@ all:
 force:
 
 #################### compute emacs tags
+# list files under git but exclude third-party stuff like bootstrap and jquery
+myfiles: force
+	@git ls-files | egrep -v 'insert_above/|/bootstrap/|/jquery/'
+
 # in general it's right to rely on the contents as reported by git
 tags: force
-	git ls-files | xargs etags
+	$(MAKE) myfiles | xargs etags
 
 # however sometimes we have stuff not yet added, so in this case
 ftags: force

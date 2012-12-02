@@ -1,32 +1,26 @@
 #header {
     position: fixed; 
     display: block;
-    margin:0;
+    margin:0px;
     top: 0px;
     left: 0px;
     right: 0px; 
     height: 60px;
-    background-color: #f8f8f8;
+/*    background-color: #f8f8f8; */
+    background-color: #ccc;
 }
 
-#column-wrap {
-    margin-top: 60px;
-    display: table;
-    table-layout: fixed;
-    border-collapse: collapse;
-}
-#content-main, #content-related {
-    display: table-cell;
-    position: static;
-    padding: 10px;
-}
 #content-main {
-    width: 100%;
+    margin: 60 200 0 0;
+    padding: 0;
 }
 #content-related {
-    width: 200px;
-}
-
-img.logo {
-    right:0px;
+    margin-top: 60;
+    padding: 0;
+    width: 200;
+    position: fixed;
+    display: block;
+    right: 0px;
+    top: 0px;
+    background-color: #d0d0f8;
 }

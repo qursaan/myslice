@@ -9,7 +9,7 @@
 {% insert_str prelude "bootstrap/js/bootstrap.js" %}
 {% insert_str prelude "bootstrap/css/bootstrap.css" %}
 <script type="text/javascript">
-{# In case we need to add raw js code #}
+{# In case we need to add raw js code - use {% insert prelude_js %} ... {% endinsert %} #}
 {% container prelude_js %}
 </script>
 <style type="text/css">
@@ -29,13 +29,11 @@
 
     <div id='header'>
     {% block header %}
+      <a id='menu_logo' href="/"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
       {% include 'mymenu.html' %}
-      {% include 'logo.html' %}
     {% endblock header %}
     </div>
 
-    {% block column_wrap %}
-    <div id='column-wrap'>
     <div id='content-main'>
       {% block content_main %}
       "The main content area (set block 'content_main')"
@@ -47,8 +45,6 @@
       "The related content area (set block 'related_main')"
       {% endblock content_related %}
     </div>
-    </div>
-    {% endblock column_wrap %}
 
 </div>
 {% endblock container %}

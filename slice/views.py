@@ -13,7 +13,7 @@ def fake_slice_view (request, name=None):
                                             'content_main' : lorem,
                                             'menu_items' : 
                                             [ { 'label':'Sample', 'href': '/sample/'},
-                                              { 'label':'Slice', 'href': '/other/', 'active':True},
+                                              { 'label':'Slice', 'href': '/slice/', 'active':True},
                                               ]},
                               context_instance=RequestContext(request))
 

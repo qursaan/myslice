@@ -1,23 +1,11 @@
-ul#mymenu { display: block; }
-ul#mymenu>li { display: block; 
-	       float: left;
-	       padding: 5px;
+#menu_ul {
+    position: absolute;
+    left: 0px;
+    margin: 15px;
+}
+#menu_logo {
+    position: absolute;
+    right:0px;
+    margin: 15px;
 }
 
-/*
-div.mymenu {
-    position: fixed; 
-    display: block;
-    padding:0;
-    margin:0;
-    top: 10px;
-    right: 10px; 
-    background-color: #abc;
-}
-
-ul.mymenu {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-*/
