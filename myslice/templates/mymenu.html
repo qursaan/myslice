@@ -4,23 +4,6 @@
 {# {% insert prelude_js %} "some script useful for mymenu" {% endinsert %} #}
 {# use the prelude_css container for css style #}
 
-<!--
-<div id='mymenu'>
-<ul id='mymenu'>
-<li>
-  <a href="/"><img class="logo mymenu" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
-</li>
-{% for d in menu_items %}
-  {% if d.active %}
-  <li class='current'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-  {% else %}
-  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-  {% endif %}
-  {% endfor %}
-</ul>
-</div>
--->
-
 <div class="nav nav-pills">
 {% for d in menu_items %}
   {% if d.active %}
@@ -30,3 +13,4 @@
   {% endif %}
   {% endfor %}
 </ul>
+</div>
