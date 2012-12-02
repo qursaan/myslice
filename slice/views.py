@@ -12,18 +12,30 @@ def fake_slice_view (request, name=None):
                                             'name':name,
                                             'content_main' : lorem,
                                             'menu_items' : 
-                                            [ { 'label':'Sample', 'href': '/sample/'},
-                                              { 'label':'Slice', 'href': '/slice/', 'active':True},
+                                            [ { 'label':'Sample view', 'href': '/sample/'},
+                                              { 'label':'Slice view', 'href': '/slice/', 'active':True},
+                                              { 'label':'Scroll view', 'href': '/scroll/'},
                                               ]},
                               context_instance=RequestContext(request))
 
     return result
 
-def sample_view (request):
-    return render_to_response ('sample.html',
+def sample_tab (request):
+    return render_to_response ('sample-tab.html',
                                { 'lorem': lorem,
                                  'menu_items':
                                      [ { 'label':'Sample', 'href': '/sample/','active':True, },
                                        { 'label':'Slice', 'href': '/slice/'},
+                                       { 'label':'Scroll view', 'href': '/scroll/'},
+                                       ]},
+                               context_instance=RequestContext(request))
+
+def sample_scroll (request):
+    return render_to_response ('sample-scroll.html',
+                               { 'lorem':lorem,
+                                 'menu_items':
+                                     [ { 'label':'Sample', 'href': '/sample/', },
+                                       { 'label':'Slice', 'href': '/slice/'},
+                                       { 'label':'Scroll view', 'href': '/scroll/', 'active':True, },
                                        ]},
                                context_instance=RequestContext(request))

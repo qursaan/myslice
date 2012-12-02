@@ -1,0 +1,24 @@
+{% extends 'myslice.html' %}
+
+{% block content_main %}
+
+{% insert_str prelude "css/sample.css" %}
+
+<!--<div id='scrolls' data-spy="scroll" data-target=".foo">-->
+<div id='scrollDiv1'> scroll1 area {{ lorem }} {{ lorem }} {{ lorem }} </div>
+<div id='scrollDiv2'> scroll2 area {{ lorem }} {{ lorem }} </div>
+<div id='scrollDiv3'> scroll3 area {{ lorem }}  </div>
+<div id='scrollDiv4'> scroll4 area {{ lorem }} {{ lorem }} {{ lorem }} </div>
+<!--</div>-->
+{% endblock content_main %}
+
+{% block content_related %}
+<div id="foo">
+<ul class="nav nav-list">
+  <li><a href="#scrollDiv1"><!--<i class="icon-chevron-right"/>--> scroll1 </a></li>
+  <li><a href="#scrollDiv2"> scroll2 </a></li>
+  <li><a href="#scrollDiv3"> scroll3 </a></li>
+  <li><a href="#scrollDiv4"> scroll4 </a></li>
+</ul>
+</div>
+{% endblock content_related %}
