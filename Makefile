@@ -41,7 +41,8 @@ RSYNC_COND_DRY_RUN	:= $(if $(findstring n,$(MAKEFLAGS)),--dry-run,)
 RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 
 # xxx until we come up with a packaging this is going to be a wild guess
-INSTALLED=/usr/share/myslice
+#INSTALLED=/usr/share/myslice
+INSTALLED=/root/myslice
 
 sync:
 ifeq (,$(MYSLICEBOX))
@@ -59,5 +60,5 @@ ifeq (,$(MYSLICEBOX))
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	@echo "$@" target not yet implemented; exit; @$(SSHCOMMAND) /etc/init.d/apache2 restart
+	@echo "$@" target not yet implemented - for an apache based depl it would read ...; exit; @$(SSHCOMMAND) /etc/init.d/apache2 restart
 endif
