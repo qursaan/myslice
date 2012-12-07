@@ -10,14 +10,15 @@
 {% insert_str prelude "datatables/js/dataTables.js" %}
 {% insert_str prelude "css/slice.css" %}
 {% insert prelude_js %}
-$(document).ready(function () { window.console.log('hi'); $('#datatable').dataTable()})
+$(document).ready(function () { $('#datatable').dataTable() } )
 {% endinsert %}
 
 <table id='datatable'>
   <thead> <tr> <th>slice</th> </tr> </thead>
   <tbody>
-    <tr><td> ple.inria.foo </td></tr>
-    <tr><td>ple.inria.bar</td></tr>
+    {% for slicename in slices %}
+    <tr><td> <a href="/slice/{{ slicename }}/">{{ slicename }}</a></td></tr>
+    {% endfor %}
   </tbody>
 </table>
 {% endblock content_related %}
