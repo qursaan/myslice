@@ -17,15 +17,27 @@ The contents of this module:
 * slice:
   a django app for dealing with slice views
 
+* templates/
+* static/
+  initially I had started to keep:
+   * templates (html templates with embedded python-like django chunks) 
+   * static files (css, js, images..)
+  locally in the app were they belong
+  but I ended up with having the need to move up and down the tree endlessly
+  so for the beginning at least, I have moved everything in a unique place
+  this convention is subject to change
+
+---
 * devel:
-  only for various notes and other utiliy scripts
+  no code in there, only various notes and other scripts useful for developers
 
 * all-static: (generated, no need to source-control)
   this is where 'manage.py collectstatic' will gather all your static contents if you run a local server
   make has convenience targets to refresh this area
   $ make clean-static 
   $ make static 
-==================== conventions 
+
+==================== initial conventions for templates and static
 
 * templates:
   we store this under templates/ within the corresponding app, e.g.
