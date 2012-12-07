@@ -13,6 +13,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
 standard_menu_items = [ { 'label':'Tab view', 'href': '/tab/'},
                         { 'label':'Slice view',  'href': '/slice/'},
                         { 'label':'Scroll view', 'href': '/scroll/'},
+                        { 'label':'Login', 'href':'/login/'},
                         ]
 
 def menu_items (current):
