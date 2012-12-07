@@ -10,7 +10,7 @@ lorem="""
 Lorem <span class='bold'>ipsum dolor</span> sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod <code>mazim placerat</code> facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.
 """
 
-standard_menu_items = [ { 'label':'Sample view', 'href': '/sample/'},
+standard_menu_items = [ { 'label':'Tab view', 'href': '/tab/'},
                         { 'label':'Slice view',  'href': '/slice/'},
                         { 'label':'Scroll view', 'href': '/scroll/'},
                         ]
@@ -29,7 +29,7 @@ for site in [ 'inria', 'upmc' , 'ibbt' ]:
         hard_wired_slice_names.append ("ple.%s.%s"%(site,slice))
 
 def fake_slice_view (request, name=None):
-    result=render_to_response('slice.html',
+    result=render_to_response('slice-view.html',
                               {'foo':'var_foo_set_in_view', 
                                'name':name,
                                'slices': hard_wired_slice_names,
@@ -40,15 +40,15 @@ def fake_slice_view (request, name=None):
 
     return result
 
-def sample_tab (request):
-    return render_to_response ('sample-tab.html',
+def tab_view (request):
+    return render_to_response ('tab-view.html',
                                { 'lorem': lorem,
                                  'menu_items': menu_items('sample'),
                                  },
                                context_instance=RequestContext(request))
 
-def sample_scroll (request):
-    return render_to_response ('sample-scroll.html',
+def scroll_view (request):
+    return render_to_response ('scroll-view.html',
                                { 'lorem':lorem,
                                  'menu_items': menu_items('scroll'),
                                  },
