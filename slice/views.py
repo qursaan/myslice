@@ -24,15 +24,9 @@ def menu_items (current):
     
 
 hard_wired_slice_names = []
-hard_wired_slice_names.append ('ple.inria.foo')
-hard_wired_slice_names.append ('ple.inria.bar')
-hard_wired_slice_names.append ('ple.inria.tutu')
-hard_wired_slice_names.append ('ple.upmc.foo')
-hard_wired_slice_names.append ('ple.upmc.bar')
-hard_wired_slice_names.append ('ple.upmc.tutu')
-hard_wired_slice_names.append ('ple.ibbt.foo')
-hard_wired_slice_names.append ('ple.ibbt.bar')
-hard_wired_slice_names.append ('ple.ibbt.tutu')
+for site in [ 'inria', 'upmc' , 'ibbt' ]:
+    for slice in [ 'foo', 'bar', 'tutu', 'test', 'omf', 'heartbeat' ]:
+        hard_wired_slice_names.append ("ple.%s.%s"%(site,slice))
 
 def fake_slice_view (request, name=None):
     result=render_to_response('slice.html',
