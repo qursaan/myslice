@@ -22,7 +22,7 @@ urlpatterns = patterns(
     (r'^/?$', 'slice.views.fake_slice_view'),
     (r'^login/?$', 'auth.views.login_user'),
     (r'^slice/?$', 'slice.views.fake_slice_view'),
-    (r'^slice/(?P<name>\w+)/?$', 'slice.views.fake_slice_view'),
+    (r'^slice/(?P<name>[\w\.]+)/?$', 'slice.views.fake_slice_view'),
     (r'^sample/?$', 'slice.views.sample_tab'),
     (r'^scroll/?$', 'slice.views.sample_scroll'),
 )
