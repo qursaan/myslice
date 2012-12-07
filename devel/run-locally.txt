@@ -1,0 +1,20 @@
+In order to run this module in standalone mode
+
+ * install python and django for your OS (see devel/django-install.txt)
+
+ * make syncdb
+ that won't hurt
+
+ * make collectstatic
+ although this is not really needed anymore now that we have a single
+ location for tempaltes and static, but if any static file gets added
+ in some other place, this will be important
+
+ * manage.py runserver 0.0.0.0:8080
+ for a one-shot run of the local server
+
+ * if you need to often restart the server, you can use 
+ devel/server-loop.sh
+ that runs 'manage runserver ...' in an endless loop, just hit ctrl-C
+ to kill the current server instance and run another one
+ 
