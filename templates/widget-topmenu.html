@@ -16,7 +16,12 @@
 	  {% endif %}
 	  {% endfor %}
 	</ul>
-	<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>
+	<p class="navbar-text pull-right">
+	  {% if username %}
+	Logged in as <a href="/logout/">{{ username }}</a></p>
+	  {% else %}
+	  Not logged in
+	  {% endif %}
       </div><!--/.nav-collapse -->
     </div><!--container-fluid-->
   </div><!--navbar-inner-->
