@@ -26,8 +26,11 @@ class MyCustomBackend:
             # Check if the user exists in Django's local database
             user = User.objects.get(email=username)
         except User.DoesNotExist:
+            print 'creating django user',username
             # Create a user in Django's local database
-            user = User.objects.create_user(time.time(), username, 'passworddoesntmatter')
+            # warning: the trick here is pass current time as an id, and name as email
+            # create_user(username, email=None, password=None)
+            user = User.objects.create_user(time.time(), username, 'password-doesnt-matter')
 
         return user
 

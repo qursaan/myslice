@@ -12,7 +12,7 @@ from myslice.viewutils import menu_items, the_user
 def test_plugin_view (request):
     
     test_plugin = SimpleList (visible=True, hidable=True)
-    plugin_content = test_plugin.render ()
+    plugin_content = test_plugin.render (request)
 
     print '--------------------'
     print plugin_content

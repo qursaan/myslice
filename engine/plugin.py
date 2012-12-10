@@ -28,10 +28,10 @@ class Plugin:
 
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
-    def render (self):
+    def render (self, request):
         uuid = self.uuid
         title = self.get_class()
-        plugin_content = self.render_content ()
+        plugin_content = self.render_content (request)
 
         # xxx missing from the php version
         # compute an 'optionstr' from the set of available settings/options as a json string
@@ -48,3 +48,7 @@ class Plugin:
 
         return result
         
+    ### abstract interface
+    def render_content (self, request):
+        """Should return an HTML fragment"""
+        return "Your plugin needs to redefine 'render_content(self, request)'"

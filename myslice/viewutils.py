@@ -8,8 +8,8 @@ standard_menu_items = [ { 'label':'Slice view',  'href': '/slice/'},
                         { 'label':'Mini plugin', 'href': '/plugin/'},
                         ]
 
-login_out_items = { False: { 'label':'Login', 'href':'/login/'},
-                    True:  { 'label':'Logout', 'href':'/logout/'}}
+#login_out_items = { False: { 'label':'Login', 'href':'/login/'},
+#                    True:  { 'label':'Logout', 'href':'/logout/'}}
 
 def menu_items (current,request=None):
     result=deepcopy(standard_menu_items)
@@ -17,15 +17,16 @@ def menu_items (current,request=None):
         if d['label'].lower().find(current)>=0: d['active']=True
     if not request: return result
     has_user=request.user.is_authenticated()
-    result.append (login_out_items [ has_user] )
+#    result.append (login_out_items [ has_user] )
     return result
 
 def the_user (request):
     "This code below is broken"
-    return 'user-xxx-name'
-    if not request.user.is_authenticated (): return ''
-    else: return request.user.username
-
+    if not request.user.is_authenticated (): 
+        print 'void'
+        return ''
+    else: 
+        return request.user.email
 
 # temporary for sample views
 lorem="""

@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 
 from auth.backend import MyCustomBackend
 
+from myslice.viewutils import the_user
+
 def login_user(request):
     state = "Please log in below..."
     username = password = ''
@@ -30,7 +32,8 @@ def login_user(request):
             return render_to_response('view-login.html',env, context_instance=RequestContext(request))
     else:
         state='Welcome to MySlice'
-        env['state']=state; env['username']=''
+        env['state']=state
+        env['username']=the_user(request)
         return render_to_response('view-login.html',env, context_instance=RequestContext(request))
 
 # hard question : where should we redirect requests to logout if user is not logged in ?
@@ -38,7 +41,8 @@ def logout_user (request):
     # xxx check that we're indeed logged in
     if not request.user.is_authenticated():
         return HttpResponseRedirect ('/')
-    return render_to_response('view-logout.html',{},context_instance=RequestContext(request))
+    return render_to_response('view-logout.html',{'username':the_user(request)},
+                              context_instance=RequestContext(request))
 
 def do_logout_user (request):
     # xxx check that we're indeed logged in
