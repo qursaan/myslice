@@ -1,14 +1,6 @@
 #content-main {
-    margin: 60 200 0 0;
-    padding: 0;
 }
 #content-related {
-    margin-top: 60;
-    padding: 0;
-    width: 200;
-    position: fixed;
-    display: block;
-    right: 0px;
-    top: 0px;
-    background-color: #d0d0f8;
+    padding: 10;
+    background-color: #fff2ff;
 }

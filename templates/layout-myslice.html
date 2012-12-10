@@ -26,25 +26,28 @@
 <body>
 
 {% block container %}
-<div id='container'>
+<div id="container">
 
-    {% block topmenu %}
-    {% include 'widget-topmenu.html' %}
-    {% endblock topmenu %}
+  
+  {% block topmenu %}
+  {% include 'widget-topmenu.html' %}
+  {% endblock topmenu %}
 
-    <div id='content-main'>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div id="content-main" class="span9 columns">
       {% block content_main %}
-      "The main content area (set block 'content_main')"
+      "The main content area (define block 'content_main')"
       {% endblock content_main %}
-    </div>
-
-    <div id='content-related'>
+    </div><!--span9-->
+    
+    <div id='content-related' class='span3'>
       {% block content_related %}
-      "The related content area (set block 'related_main')"
+      "The related content area (define block 'related_main')"
       {% endblock content_related %}
-    </div>
-
-</div>
+    </div><!--span3-->
+  </div><!--raw-fluid-->
+</div><!--container-fluid-->
 {% endblock container %}
 
 </body>
