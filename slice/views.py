@@ -14,15 +14,19 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
 standard_menu_items = [ { 'label':'Tab view', 'href': '/tab/'},
                         { 'label':'Slice view',  'href': '/slice/'},
                         { 'label':'Scroll view', 'href': '/scroll/'},
-                        { 'label':'Login', 'href':'/login/'},
                         ]
 
-def menu_items (current):
+login_out_items = { False: { 'label':'Login', 'href':'/login/'},
+                    True:  { 'label':'Logout', 'href':'/logout/'}}
+
+def menu_items (current,request=None):
     result=deepcopy(standard_menu_items)
     for d in result:
         if d['label'].lower().find(current)>=0: d['active']=True
+    if not request: return result
+    has_user=request.user.is_authenticated()
+    result.append (login_out_items [ has_user] )
     return result
-    
 
 hard_wired_slice_names = []
 for site in [ 'inria', 'upmc' , 'ibbt' ]:
@@ -36,7 +40,7 @@ def fake_slice_view (request, name=None):
                                'name':name,
                                'slices': hard_wired_slice_names,
                                'content_main' : lorem,
-                               'menu_items' : menu_items('slice'),
+                               'menu_items' : menu_items('slice',request),
                                },
                               context_instance=RequestContext(request))
 
@@ -46,7 +50,7 @@ def fake_slice_view (request, name=None):
 def tab_view (request):
     return render_to_response ('view-tab.html',
                                { 'lorem': lorem,
-                                 'menu_items': menu_items('tab'),
+                                 'menu_items': menu_items('tab',request),
                                  },
                                context_instance=RequestContext(request))
 
@@ -54,6 +58,6 @@ def tab_view (request):
 def scroll_view (request):
     return render_to_response ('view-scroll.html',
                                { 'lorem':lorem,
-                                 'menu_items': menu_items('scroll'),
+                                 'menu_items': menu_items('scroll',request),
                                  },
                                context_instance=RequestContext(request))

@@ -2,7 +2,7 @@
 from django.core.context_processors import csrf
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 
 from auth.backend import MyCustomBackend
@@ -34,3 +34,19 @@ def login_user(request):
         state='Welcome to MySlice'
         env['state']=state; env['username']=''
         return render_to_response('view-login.html',env, context_instance=RequestContext(request))
+
+# hard question : where should we redirect requests to logout if user is not logged in ?
+def logout_user (request):
+    # xxx check that we're indeed logged in
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect ('/')
+    return render_to_response('view-logout.html',{},context_instance=RequestContext(request))
+
+def do_logout_user (request):
+    # xxx check that we're indeed logged in
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect ('/')
+    logout(request)
+    return HttpResponseRedirect ('/')
+        
+

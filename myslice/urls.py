@@ -20,7 +20,11 @@ urlpatterns = patterns(
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     (r'^/?$', 'slice.views.fake_slice_view'),
+    # seems to be what login_required uses to redirect ...
+    (r'^accounts/login/$', 'auth.views.login_user'),
     (r'^login/?$', 'auth.views.login_user'),
+    (r'^logout/?$', 'auth.views.logout_user'),
+    (r'^logout/confirm/?$', 'auth.views.do_logout_user'),
     (r'^slice/?$', 'slice.views.fake_slice_view'),
     (r'^slice/(?P<name>[\w\.]+)/?$', 'slice.views.fake_slice_view'),
     (r'^tab/?$', 'slice.views.tab_view'),
