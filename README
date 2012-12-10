@@ -14,7 +14,10 @@ See devel/ for more devel-oriented doc.
   much like our past drupal_set_html_head() 
 
 * auth: 
-  a django 'app' that deals with authentication
+  a django 'app' that deals with authentication; see especially
+  auth.backend.MyCustomBackend 
+  for how to use a separate authentication system, 
+  as well as settings.py for how to enable it
 
 * slice:
   a django app for dealing with slice views
