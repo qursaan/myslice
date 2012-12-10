@@ -37,7 +37,7 @@ class Plugin:
         # compute an 'optionstr' from the set of available settings/options as a json string
         # that gets passed to jquery somehow
         # see the bottom of 
-        result = render_to_string ('plugin-wrap.html',
+        result = render_to_string ('widget-plugin.html',
                                    {'uuid':uuid, 'title':title,
                                     'visible':self.is_visible(),
                                     'hidable':self.is_hidable(),

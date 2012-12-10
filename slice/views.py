@@ -13,6 +13,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
 standard_menu_items = [ { 'label':'Slice view',  'href': '/slice/'},
                         { 'label':'Scroll view', 'href': '/scroll/'},
                         { 'label':'Tab view', 'href': '/tab/'},
+                        { 'label':'Mini plugin', 'href': '/plugin/'},
                         ]
 
 login_out_items = { False: { 'label':'Login', 'href':'/login/'},
