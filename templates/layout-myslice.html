@@ -28,12 +28,9 @@
 {% block container %}
 <div id='container'>
 
-    <div id='header'>
-    {% block header %}
-      <a id='menu_logo' href="/"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
-      {% include 'widget-topmenu.html' %}
-    {% endblock header %}
-    </div>
+    {% block topmenu %}
+    {% include 'widget-topmenu.html' %}
+    {% endblock topmenu %}
 
     <div id='content-main'>
       {% block content_main %}

@@ -1,12 +1,23 @@
+{# <a id='menu_logo' href="/"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a> #}
 {# {% insert_str prelude "js/mymenu.js" %} #}
-{% insert_str prelude "css/mymenu.css" %}
+{# {% insert_str prelude "css/mymenu.css" %} #}
 
-<ul class="nav nav-pills" id='menu_ul'>
-{% for d in menu_items %}
-  {% if d.active %}
-  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-  {% else %}
-  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-  {% endif %}
-  {% endfor %}
-</ul>
+<div id='topmenu' class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="brand" href="/"><img src="{{ STATIC_URL }}img/myslice-logo.png" height="30" alt="MySlice logo" /></a>
+      <div class="nav-collapse">
+	<ul class="nav nav-pills" id='menu_ul'>
+	  {% for d in menu_items %}
+	  {% if d.active %}
+	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
+	  {% else %}
+	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
+	  {% endif %}
+	  {% endfor %}
+	</ul>
+	<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>
+      </div><!--/.nav-collapse -->
+    </div><!--container-fluid-->
+  </div><!--navbar-inner-->
+</div><!--topmenu-->
