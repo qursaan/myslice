@@ -134,6 +134,8 @@ INSTALLED_APPS = (
     'insert_above',
     'myslice',
     'auth',
+    'engine',
+    'plugins',
     'slice',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

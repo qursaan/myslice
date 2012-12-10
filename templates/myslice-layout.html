@@ -9,6 +9,7 @@
 {% insert_str prelude "jquery/js/jquery.js" %}
 {% insert_str prelude "bootstrap/js/bootstrap.js" %}
 {% insert_str prelude "bootstrap/css/bootstrap.css" %}
+{% insert_str prelude "js/plugin.js" %}
 <script type="text/javascript">
 {# In case we need to add raw js code - use {% insert prelude_js %} ... {% endinsert %} #}
 {% container prelude_js %}
@@ -22,7 +23,7 @@
 {# let's add this one no matter what #}
 {% insert_str prelude "css/myslice.css" %}
 
-<body data-spy="scroll" data-target=".foo">
+<body>
 
 {% block container %}
 <div id='container'>

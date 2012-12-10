@@ -1,0 +1,49 @@
+{% if visible %}
+<div class='plugin-manage'>
+{% if hidable %}
+  {% if hidden %}
+<p id='show-{{ uuid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ title }}</span></a></p>
+<p id='hide-{{ uuid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ title }}</span></a></p>
+  {% else %}
+<p id='show-{{ uuid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ title }}</span></a></p>
+<p id='hide-{{ uuid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ title }}</span></a></p>
+  {% endif %}
+{% endif %}
+{% endif %}
+
+<div class='plugin {{ title }}' id='plugin-{{ uuid }}' plugin-type='{{ title }}'>
+{{ plugin_content|safe }}
+</div><!--plugin {{ title }}-->
+
+{% if visible %}
+</div>
+{% endif %}
+
+{% if visible and hidable %}
+{# xxx sounds like this could be optimized by a single call performed on document.ready #}
+{# that would do that on all DOM elements that require it #}
+
+{% insert prelude_js %}
+/* Show / hide plugin */
+
+jQuery('#show_{{ uuid }}').click(function() {
+jQuery('#{{ uuid }}').show();
+if (typeof jQuery('#{{ uuid }}').{{ title }} != 'undefined') {
+jQuery('#{{ uuid }}').{{ title }}('show');
+}; 
+jQuery('#hide_{{ uuid }}').show();
+jQuery('#show_{{ uuid }}').hide(); 
+event.preventDefault();
+}); 
+jQuery('#hide_{{ uuid }}').click(function() {
+jQuery('#{{ uuid }}').hide();
+jQuery('#hide_{{ uuid }}').hide();
+jQuery('#show_{{ uuid }}').show(); 
+event.preventDefault();
+});
+{% if hidden %}
+jQuery('#{{ uuid }}').hide()
+{% endif %}
+/* {{ optionstr }} optionstr needs more work */
+{% endinsert %}
+{% endif %}

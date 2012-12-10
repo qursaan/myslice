@@ -25,4 +25,5 @@ urlpatterns = patterns(
     (r'^slice/(?P<name>[\w\.]+)/?$', 'slice.views.fake_slice_view'),
     (r'^tab/?$', 'slice.views.tab_view'),
     (r'^scroll/?$', 'slice.views.scroll_view'),
+    (r'^plugin/?$', 'engine.views.test_plugin_view'),
 )
