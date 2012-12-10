@@ -18,3 +18,9 @@ In order to run this module in standalone mode
  that runs 'manage runserver ...' in an endless loop, just hit ctrl-C
  to kill the current server instance and run another one
  
+
+ * as a final note, it is explained here
+https://docs.djangoproject.com/en/dev/ref/django-admin/#createsuperuser
+how it seems easily possible to have 'make syncdb', or at least the
+part that prompts for login/password, run non-interactively
+for example as part of the packaging install
