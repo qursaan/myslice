@@ -21,5 +21,5 @@ def login_user(request):
         else:
             state = "Your username and/or password were incorrect."
 
-    return render_to_response('login-view.html',{'state':state, 'username': username},
+    return render_to_response('view-login.html',{'state':state, 'username': username},
                               context_instance=RequestContext(request))

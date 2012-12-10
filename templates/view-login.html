@@ -1,8 +1,7 @@
-{% extends 'myslice-layout.html' %}
+{% extends 'layout-myslice.html' %}
 
 {% block content_related %}
 <p class='login-status'> {{ state }} </p>
-<code>Current exp. login is based on hard-wired users</code>
 <a href="/" alt="Home"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>
 <form action="/login/" method="post">
   {% csrf_token %}
@@ -16,3 +15,10 @@
   <input type="submit" value="Log In" />
 </form>
 {% endblock content_related %}
+
+{% block content_main %}
+<code>
+This page is currently not connected to any useful authentication system, but instead, as a proof of concept, it uses a set of hardwired user accounts, see auth/backend.py for more details.
+</code>
+
+{% endblock content_main %}

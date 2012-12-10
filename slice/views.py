@@ -30,7 +30,7 @@ for site in [ 'inria', 'upmc' , 'ibbt' ]:
         hard_wired_slice_names.append ("ple.%s.%s"%(site,slice))
 
 def fake_slice_view (request, name=None):
-    result=render_to_response('slice-view.html',
+    result=render_to_response('view-slice.html',
                               {'foo':'var_foo_set_in_view', 
                                'name':name,
                                'slices': hard_wired_slice_names,
@@ -49,7 +49,7 @@ def tab_view (request):
                                context_instance=RequestContext(request))
 
 def scroll_view (request):
-    return render_to_response ('scroll-view.html',
+    return render_to_response ('view-scroll.html',
                                { 'lorem':lorem,
                                  'menu_items': menu_items('scroll'),
                                  },
