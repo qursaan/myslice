@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 
 from plugins.simplelist import SimpleList
 
-from slice.views import menu_items, the_user
+from myslice.viewutils import menu_items, the_user
 
 def test_plugin_view (request):
     

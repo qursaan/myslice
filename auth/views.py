@@ -20,15 +20,13 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                state = "You're successfully logged in!"
+                #state = "You're successfully logged in!"
                 return HttpResponseRedirect ('/')
             else:
-                state = "Your account is not active, please contact the site admin."
-                env['state']=state; env['username']=username
+                env['state'] = "Your account is not active, please contact the site admin."
                 return render_to_response('view-login.html',env, context_instance=RequestContext(request))
         else:
-            state = "Your username and/or password were incorrect."
-            env['state']=state; env['username']=username
+            env['state'] = "Your username and/or password were incorrect."
             return render_to_response('view-login.html',env, context_instance=RequestContext(request))
     else:
         state='Welcome to MySlice'
