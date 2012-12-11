@@ -24,3 +24,15 @@ https://docs.djangoproject.com/en/dev/ref/django-admin/#createsuperuser
 how it seems easily possible to have 'make syncdb', or at least the
 part that prompts for login/password, run non-interactively
 for example as part of the packaging install
+
+manage.py createsuperuser --username root --email support@myslice.info --noinput
+
+-- or --
+
+django-admin.py createsuperuser --username root --email support@myslice.info  --noinput
+except that on my MAC for now I haven't been able to find the port command to select this
+version, to for me it's still django-admin-2.7.py
+
+a caveat though is, this cannot be run several times (it fails the second time, duplicate column of course)
+it's still doable to redirect >& /dev/null and not worry about the result I guess
+I'm not even sure it's really useful ?!?
