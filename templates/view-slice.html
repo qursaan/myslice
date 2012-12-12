@@ -1,3 +1,4 @@
+{# -*-django-html-mumamo-mode-*- #}
 {% extends 'layout-myslice.html' %}
 
 {% block content_main %}
@@ -13,12 +14,4 @@
 $(document).ready(function () { $('#datatable').dataTable() } )
 {% endinsert %}
 
-<table id='datatable'>
-  <thead> <tr> <th>slice</th> </tr> </thead>
-  <tbody>
-    {% for slicename in slices %}
-    <tr><td> <a href="/slice/{{ slicename }}/">{{ slicename }}</a></td></tr>
-    {% endfor %}
-  </tbody>
-</table>
 {% endblock content_related %}

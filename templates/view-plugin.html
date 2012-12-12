@@ -1,5 +1,13 @@
 {% extends 'layout-myslice.html' %}
 
 {% block content_main %}
-{{ content_main }}
+{{ content_main|safe }}
 {% endblock content_main %}
+
+{% block content_related %}
+{% insert_str prelude "datatables/js/dataTables.js" %}
+{% insert_str prelude "js/need-datatables.js" %}
+{% insert_str prelude "css/simplelist.css" %}
+
+{{ content_related|safe }}
+{% endblock content_related %}
