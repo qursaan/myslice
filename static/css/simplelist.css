@@ -1,3 +1,6 @@
 select { 
     width: auto;
 }
+div.dataTables_filter input[type=text] {
+    width: 60;
+}
