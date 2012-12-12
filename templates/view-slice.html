@@ -2,6 +2,10 @@
 {% extends 'layout-myslice.html' %}
 
 {% block content_main %}
-<p>We're getting the URL variable name= {{ name }} </p>
+{% if name %}
+<p class='well'>We're getting the variable <code>name= {{ name }}</code> from the URL </p>
+{% else %}
+<p class='well'>This URL is not valid, you need to pass a slice name like in <a href="/slice/my.slice.name">/slice/my.slice.name</a></p>
+{% endif %}
 {% endblock content_main %}
 
