@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 
 from plugins.simplelist import SimpleList
 
-from myslice.viewutils import menu_items, the_user, hard_wired_slice_names
+from myslice.viewutils import topmenu_items, the_user, hard_wired_slice_names
 
 def test_plugin_view (request):
     
@@ -40,7 +40,7 @@ def test_plugin_view (request):
 
     return render_to_response ('view-plugin.html',
                                {'title': 'Test Plugin View',
-                                'menu_items': menu_items('plugin', request),
+                                'topmenu_items': topmenu_items('plugin', request),
                                 'content_main' : content_main,
                                 'content_related' : content_related,
                                 'username' : the_user (request),

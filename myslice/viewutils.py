@@ -2,17 +2,17 @@
 
 from copy import deepcopy
 
-standard_menu_items = [ { 'label':'Slice view',  'href': '/slice/'},
-                        { 'label':'Scroll view', 'href': '/scroll/'},
-                        { 'label':'Tab view', 'href': '/tab/'},
-                        { 'label':'Mini plugin', 'href': '/plugin/'},
+standard_topmenu_items = [ { 'label':'Slice',  'href': '/slice/'},
+                        { 'label':'Scroll', 'href': '/scroll/'},
+                        { 'label':'Tab', 'href': '/tab/'},
+                        { 'label':'Plugin', 'href': '/plugin/'},
                         ]
 
 #login_out_items = { False: { 'label':'Login', 'href':'/login/'},
 #                    True:  { 'label':'Logout', 'href':'/logout/'}}
 
-def menu_items (current,request=None):
-    result=deepcopy(standard_menu_items)
+def topmenu_items (current,request=None):
+    result=deepcopy(standard_topmenu_items)
     for d in result:
         if d['label'].lower().find(current)>=0: d['active']=True
     if not request: return result

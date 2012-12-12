@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
-from myslice.viewutils import menu_items, the_user
+from myslice.viewutils import topmenu_items, the_user
 # tmp
 from myslice.viewutils import lorem, hard_wired_slice_names
 
@@ -15,7 +15,7 @@ def fake_slice_view (request, name=None):
     result=render_to_response ('view-slice.html',
                                {'name':name,
                                 'title':title,
-                                'menu_items' : menu_items('slice',request),
+                                'topmenu_items' : topmenu_items('slice',request),
                                 'username':the_user (request),
                                 'slices': hard_wired_slice_names,
                                 'content_main' : lorem,
@@ -28,7 +28,7 @@ def fake_slice_view (request, name=None):
 def tab_view (request):
     return render_to_response ('view-tab.html',
                                {'title':'Page for playing with Tabs',
-                                'menu_items': menu_items('tab',request),
+                                'topmenu_items': topmenu_items('tab',request),
                                 'username':the_user (request),
                                 'lorem': lorem,                                
                                 },
@@ -38,7 +38,7 @@ def tab_view (request):
 def scroll_view (request):
     return render_to_response ('view-scroll.html',
                                {'title':'Toy page for scrolling',
-                                'menu_items': menu_items('scroll',request),
+                                'topmenu_items': topmenu_items('scroll',request),
                                 'username':the_user (request),
                                 'lorem':lorem,
                                 },
