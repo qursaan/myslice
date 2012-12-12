@@ -2,16 +2,6 @@
 {% extends 'layout-myslice.html' %}
 
 {% block content_main %}
-<p>The URL variable name= {{ name }} </p>
-{{ content_main|safe }}
+<p>We're getting the URL variable name= {{ name }} </p>
 {% endblock content_main %}
 
-{% block content_related %}
-
-{% insert_str prelude "datatables/js/dataTables.js" %}
-{% insert_str prelude "css/slice.css" %}
-{% insert prelude_js %}
-$(document).ready(function () { $('#datatable').dataTable() } )
-{% endinsert %}
-
-{% endblock content_related %}
