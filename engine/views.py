@@ -5,18 +5,20 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 
+from plugins.verticallayout import VerticalLayout
 from plugins.simplelist import SimpleList
 
 from myslice.viewutils import topmenu_items, the_user, hard_wired_slice_names
 
 def test_plugin_view (request):
     
+    # having html tags right here is not a real use case
     hard_wired_list=[]
     hard_wired_list.append("this hard-wired list")
     hard_wired_list.append("is defined")
-    hard_wired_list.append("in <code>plugins.simplelist.py</code>")
+    hard_wired_list.append("in plugins.simplelist.py")
     hard_wired_list.append("which in turn relies on")
-    hard_wired_list.append("template <code>widget-template.html</code>")
+    hard_wired_list.append("template widget-template.html")
     hard_wired_list.append("while it should of course")
     hard_wired_list.append("instead issue a query")
     hard_wired_list.append("and fill the DOM in js from there")
@@ -27,12 +29,16 @@ def test_plugin_view (request):
     hard_wired_list.append("")    
     hard_wired_list.append("OTOH and IMHO, there should be two separate and explicit subclasses of SimpleList for slices or testbeds")
 
-    plugin_main = SimpleList (visible=True, 
-                              hidable=True, 
-                              list=hard_wired_list, 
-                              header='Hard wired', 
-                              foo='the value for foo')
-    content_main = plugin_main.render (request)
+    plugin_main1 = SimpleList (list=hard_wired_list, 
+                               header='Hard wired', 
+                               foo='the value for foo')
+    plugin_main2 = SimpleList (hidable=True, 
+                               list=hard_wired_slice_names,
+                               headers='Slices in main content')
+    layout = VerticalLayout (hidable=True, visible=True,
+                             sons=[plugin_main1, plugin_main2]
+                             )
+    content_main = layout.render (request)
 
     # lacks a/href to /slice/%s
     plugin_related = SimpleList (visible=True, hidable=True,

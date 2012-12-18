@@ -1,0 +1,8 @@
+<div id='{{ uuid }}'>
+{% for son in sons %}
+<h3>{{ son.title }}</h3>
+<div id='{{ uuid }}-{{ son.id }}'>
+{{ son.rendered }}
+</div>
+{% endfor %}
+</div>
