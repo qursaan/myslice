@@ -27,13 +27,18 @@ def test_plugin_view (request):
     hard_wired_list.append("")    
     hard_wired_list.append("OTOH and IMHO, there should be two separate and explicit subclasses of SimpleList for slices or testbeds")
 
-    plugin_main = SimpleList (visible=True, hidable=True, list=hard_wired_list, header='Hard wired')
+    plugin_main = SimpleList (visible=True, 
+                              hidable=True, 
+                              list=hard_wired_list, 
+                              header='Hard wired', 
+                              foo='the value for foo')
     content_main = plugin_main.render (request)
 
     # lacks a/href to /slice/%s
     plugin_related = SimpleList (visible=True, hidable=True,
                                  need_datatables='yes', 
-                                 list=hard_wired_slice_names, header='Slices' )
+                                 list=hard_wired_slice_names, 
+                                 header='Slices' )
     content_related = plugin_related.render (request)
 
     
