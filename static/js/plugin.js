@@ -1,12 +1,6 @@
 /* upon document completion, we locate all the hide and show areas, 
  * and configure their behaviour 
  */
-/* xxx missing - see plugin.php 
- * if (typeof jQuery('#$uuid').$title != 'undefined') {
- * jQuery('#$uuid').$title('show');
- * }; 
- */
-
 $(document).ready(function() {
     $('.plugin-hide').each(function() {
 	$(this).click(function () { 
