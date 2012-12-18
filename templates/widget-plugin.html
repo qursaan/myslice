@@ -19,13 +19,12 @@
 </div>
 {% endif %}
 
+{% insert prelude_js %}
 {% if visible and hidable %}
 {# xxx sounds like this could be optimized by a single call performed on document.ready #}
 {# that would do that on all DOM elements that require it #}
 
-{% insert prelude_js %}
 /* Show / hide plugin */
-
 jQuery('#show_{{ uuid }}').click(function() {
 jQuery('#{{ uuid }}').show();
 if (typeof jQuery('#{{ uuid }}').{{ title }} != 'undefined') {
@@ -44,6 +43,10 @@ event.preventDefault();
 {% if hidden %}
 jQuery('#{{ uuid }}').hide()
 {% endif %}
-/* {{ optionstr }} optionstr needs more work */
-{% endinsert %}
 {% endif %}
+/* Plugin initialization (if the plugin has the right structure) - from plugin.php */
+if (typeof jQuery('#{{ uuid }}').$title != 'undefined') {
+  jQuery('#{{ uuid }}').$title({ {{ settings }} plugin_uuid: '{{ uuid }}' });
+  //jQuery('#{{ uuid }}').$title('show');
+  }; 
+{% endinsert %}

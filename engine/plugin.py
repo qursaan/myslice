@@ -2,6 +2,8 @@
 # so it should be specialized in real plugin classes
 # like e.g. plugins.simplelist.SimpleList
 
+import json
+
 from django.template.loader import render_to_string
 
 class Plugin:
@@ -33,6 +35,9 @@ class Plugin:
         title = self.get_class()
         plugin_content = self.render_content (request)
 
+        # expose _settings in json format to js
+        settings_json = json.dumps(self._settings, separators=(',',':'))
+
         # xxx missing from the php version
         # compute an 'optionstr' from the set of available settings/options as a json string
         # that gets passed to jquery somehow
@@ -43,12 +48,17 @@ class Plugin:
                                     'hidable':self.is_hidable(),
                                     'hidden':self.is_hidden_by_default(),
                                     'plugin_content' : plugin_content,
-                                    'optionstr' : 'xxx-todo',
+                                    'settings' : settings_json,
                                     })
 
         return result
         
     ### abstract interface
+    # you may redefine this completely, but if you don't we'll just use method 
+    # template() to find out which template to use, and env() to find out which 
+    # dictionary to pass the templating system
     def render_content (self, request):
         """Should return an HTML fragment"""
-        return "Your plugin needs to redefine 'render_content(self, request)'"
+        template = self.template()
+        env=self.env()
+        return render_to_string (template, env)
