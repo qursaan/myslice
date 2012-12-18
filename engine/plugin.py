@@ -17,7 +17,9 @@ class Plugin:
         # e.g. SimpleList (visible=True) => _settings = {'visible':True}
         self._settings=settings
 
-    def get_class (self): return type(self).__name__
+    def get_class (self): 
+        try:    return self.__class__.__name__
+        except: return 'Plugin'
 
     # shorthands to inspect _settings
     def get_setting (self, setting, default):
