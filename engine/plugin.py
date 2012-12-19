@@ -70,9 +70,9 @@ class Plugin:
 
         return result
         
-    # you may redefine this completely, but if you don't we'll just use method 
-    # template() to find out which template to use, and render_env() to compute
-    # a dictionary to pass along to the templating system
+    # you may redefine this completely, but if you don't we'll just use methods 
+    # . template() to find out which template to use, and 
+    # . render_env() to compute a dictionary to pass along to the templating system
     def render_content (self, request):
         """Should return an HTML fragment"""
         template = self.template()
