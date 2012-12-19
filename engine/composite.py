@@ -1,5 +1,4 @@
 from engine.plugin import Plugin
-from engine.requirements import Requirements
 
 class Composite (Plugin):
 
