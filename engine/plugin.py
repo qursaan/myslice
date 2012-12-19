@@ -8,6 +8,13 @@ from django.template.loader import render_to_string
 
 from engine.prelude import Prelude
 
+# set to
+# . False : silent
+# [ 'SliceList', 'TabbedView' ] : to debug these classes
+# True : to debug all slices
+
+DEBUG= [ 'SliceList' ]
+
 class Plugin:
 
     uid=0
@@ -23,7 +30,14 @@ class Plugin:
         # e.g. SimpleList (list=[1,2,3]) => _settings = { 'list':[1,2,3] }
         # our own settings are not made part of _settings but could be..
         self._settings=settings
-#        print "Created plugin with settings %s"%self._settings.keys()
+        if self.need_debug():
+            print "Plugin.__init__ Created plugin with settings %s"%self._settings.keys()
+
+    # subclasses might handle some fields in their own way, 
+    # in which case this call is needed to capture that setting
+    # see e.g. SimpleList or SliceList for an example of that
+    def add_to_settings (self, setting_name):
+        self._settings[setting_name]=getattr(self,setting_name)
 
     def classname (self): 
         try:    return self.__class__.__name__
@@ -38,6 +52,12 @@ class Plugin:
     def is_hidable (self): return self.hidable
     def is_hidden_by_default (self): return self.hidden_by_default
 
+    ##########
+    def need_debug (self):
+        if not DEBUG:           return False
+        if DEBUG is True:       return True
+        else:                   return self.classname() in DEBUG
+
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
@@ -49,10 +69,11 @@ class Plugin:
         # call render_content
         plugin_content = self.render_content (request)
         # expose _settings in json format to js
-        settings_json = json.dumps(self._settings, separators=(',',':'))
+        settings_json = json.dumps (self._settings, separators=(',',':'))
 
         result = render_to_string ('widget-plugin.html',
-                                   {'uuid':uuid, 'classname':classname,
+                                   {'uuid':uuid, 
+                                    'classname':classname,
                                     'visible':self.is_visible(),
                                     'hidable':self.is_hidable(),
                                     'hidden':self.is_hidden_by_default(),
@@ -63,7 +84,10 @@ class Plugin:
         # handle requirements() if defined on this class
         try: 
             self.handle_requirements (request, self.requirements())
-        except: 
+        except AttributeError: 
+            # most likely the object does not have that method defined, which is fine
+            pass
+        except:
             import traceback
             traceback.print_exc()
             pass
@@ -83,10 +107,12 @@ class Plugin:
         # xxx we might need to check that this does not overwrite env..
         env.update(self._settings)
         result=render_to_string (template, env)
-        print "%s.render_content: BEG --------------------"%self.classname()
-        print "env=%s"%env.keys()
-        print result
-        print "%s.render_content: END --------------------"%self.classname()
+        if self.need_debug():
+            print "%s.render_content: BEG --------------------"%self.classname()
+            print "template=%s"%template
+            print "env=%s"%env.keys()
+            # print result
+            print "%s.render_content: END --------------------"%self.classname()
         return result
 
     #################### requirements/prelude management
@@ -116,7 +142,8 @@ class Plugin:
     # or from the result of self.requirements()
     def handle_requirements (self, request, d):
         for (k,v) in d.iteritems():
-            print "%s: handling requirement %s"%(self.classname(),v)
+            if self.need_debug():
+                print "%s: handling requirement %s"%(self.classname(),v)
             method_name='add_'+k
             method=Plugin.__dict__[method_name]
             method(self,request,v)

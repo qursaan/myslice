@@ -7,6 +7,7 @@ from django.shortcuts import render_to_response
 
 from plugins.verticallayout import VerticalLayout
 from plugins.simplelist import SimpleList
+from plugins.slicelist import SliceList
 
 from myslice.viewutils import topmenu_items, the_user, hard_wired_slice_names
 
@@ -34,7 +35,8 @@ def test_plugin_view (request):
 
     plugin_main1 = SimpleList (list=hard_wired_list, 
                                header='Hard wired', 
-                               foo='the value for foo')
+                               foo='the value for foo',
+                               with_datatables=True)
     plugin_main2 = SimpleList (hidable=True, 
                                list=hard_wired_slice_names,
                                headers='Slices in main content')
@@ -49,10 +51,11 @@ def test_plugin_view (request):
 
     ##########
     # lacks a/href to /slice/%s
-    plugin_related = SimpleList (visible=True, hidable=True,
-                                 need_datatables='yes', 
-                                 list=hard_wired_slice_names, 
-                                 header='Slices' )
+    plugin_related = SliceList (visible=True, 
+                                hidable=True,
+                                with_datatables='yes', 
+                                list=hard_wired_slice_names, 
+                                header='Slices' )
     content_related = plugin_related.render (request)
     # likewise but on the side view
     template_env [ 'content_related' ] = content_related
@@ -65,6 +68,7 @@ def test_plugin_view (request):
     # request.plugin_prelude holds a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
     prelude_env = request.plugin_prelude.render_env()
+    print 'prelude_env',prelude_env
     template_env.update(prelude_env)
 
     return render_to_response ('view-plugin.html',template_env,
