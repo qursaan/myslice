@@ -6,22 +6,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {# This is where insert_str will end up #}
 {% media_container prelude %}
-{% insert_str prelude "jquery/js/jquery.js" %}
-{% insert_str prelude "bootstrap/js/bootstrap.js" %}
-{% insert_str prelude "bootstrap/css/bootstrap.css" %}
-{% insert_str prelude "js/plugin.js" %}
 <script type="text/javascript">
 {# In case we need to add raw js code - use {% insert prelude_js %} ... {% endinsert %} #}
 {% container prelude_js %}
+{{ js_chunks }}
 </script>
 <style type="text/css">
 {# In case we need to add raw css code #}
 {% container prelude_css %}
+{{ css_chunks }}
 </style>
 </head>
 
-{# let's add this one no matter what #}
+{# let's add these ones no matter what #}
+{% insert_str prelude "jquery/js/jquery.js" %}
+{% insert_str prelude "bootstrap/js/bootstrap.js" %}
+{% insert_str prelude "bootstrap/css/bootstrap.css" %}
+{% insert_str prelude "js/plugin.js" %}
 {% insert_str prelude "css/myslice.css" %}
+
+{# also add the stuff as collected in a Prelude class #}
+{% for js_file in js_files %} {% insert_str prelude js_file %} {% endfor %}
+{% for css_file in css_files %} {% insert_str prelude css_file %} {% endfor %}
 
 <body>
 

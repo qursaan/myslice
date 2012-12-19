@@ -6,6 +6,8 @@ import json
 
 from django.template.loader import render_to_string
 
+from engine.prelude import Prelude
+
 class Plugin:
 
     uid=0
@@ -41,15 +43,14 @@ class Plugin:
     def render (self, request):
         uuid = self.uuid
         classname = self.classname()
+        # initialize prelude placeholder 
+        self._init_request (request)
+        
+        # call render_content
         plugin_content = self.render_content (request)
-
         # expose _settings in json format to js
         settings_json = json.dumps(self._settings, separators=(',',':'))
 
-        # xxx missing from the php version
-        # compute an 'optionstr' from the set of available settings/options as a json string
-        # that gets passed to jquery somehow
-        # see the bottom of 
         result = render_to_string ('widget-plugin.html',
                                    {'uuid':uuid, 'classname':classname,
                                     'visible':self.is_visible(),
@@ -59,17 +60,27 @@ class Plugin:
                                     'settings_json' : settings_json,
                                     })
 
+        # handle requirements() if defined on this class
+        try: 
+            self.handle_requirements (request, self.requirements())
+        except: 
+            import traceback
+            traceback.print_exc()
+            pass
+
         return result
         
     # you may redefine this completely, but if you don't we'll just use method 
-    # template() to find out which template to use, and env() to find out which 
-    # dictionary to pass the templating system
+    # template() to find out which template to use, and render_env() to compute
+    # a dictionary to pass along to the templating system
     def render_content (self, request):
         """Should return an HTML fragment"""
         template = self.template()
         env=self.render_env(request)
         if not isinstance (env,dict):
             raise Exception, "%s.render_env returns wrong type"%self.classname()
+        # expose this class's settings to the template
+        # xxx we might need to check that this does not overwrite env..
         env.update(self._settings)
         result=render_to_string (template, env)
         print "%s.render_content: BEG --------------------"%self.classname()
@@ -78,18 +89,65 @@ class Plugin:
         print "%s.render_content: END --------------------"%self.classname()
         return result
 
-    def render_env (self, request): return {}
+    #################### requirements/prelude management
+    def _init_request (self, request):
+        if not hasattr (request, 'plugin_prelude'): 
+            request.plugin_prelude=Prelude()
+
+    def inspect_request (self, request, message):
+        has=hasattr(request,'plugin_prelude')
+        get=getattr(request,'plugin_prelude','none-defined')
+        print "INSPECT (%s), hasattr %s, getattr %s"%(message,has,get)
+
+    # can be used directly in render_content()
+    def add_js_files (self, request, files):
+        self._init_request (request)
+        request.plugin_prelude.add_js_files (files)
+    def add_css_files (self, request, files):
+        self._init_request (request)
+        request.plugin_prelude.add_css_files (files)
+    def add_js_chunks (self, request, chunks):
+        self._init_request (request)
+        request.plugin_prelude.add_js_chunks (chunks)
+    def add_css_chunks (self, request, chunks):
+        self._init_request (request)
+        request.plugin_prelude.add_css_chunks (chunks)
+
+    # or from the result of self.requirements()
+    def handle_requirements (self, request, d):
+        for (k,v) in d.iteritems():
+            print "%s: handling requirement %s"%(self.classname(),v)
+            method_name='add_'+k
+            method=Plugin.__dict__[method_name]
+            method(self,request,v)
+
     ######################################## abstract interface
+    def title (self): return "you should redefine title()"
 
     # your plugin is expected to implement either 
     # (*) def render_content(self, request) -> html fragment
     # -- or --
     # (*) def template(self) -> filename
+    #   relative to STATIC 
     # (*) def render_env (self, request) -> dict
     #   this is the variable->value association used to render the template
     # in which case the html template will be used
 
-    def title (self): return "you should redefine title()"
+    # if you see this string somewhere your template() code is not kicking in
+    def template (self):                return "undefined_template"
+    def render_env (self, request):     return {}
 
-    # tell the framework about requirements in the document header
-    def media_js (self): pass
+#    # tell the framework about requirements (for the document <header>)
+#    # the notion of 'Media' in django provides for medium-dependant
+#    # selection of css files
+#    # as a first attempt however we keep a flat model for now
+#    # can use one string instead of a list or tuple if needed, 
+#    # see requirements.py for details
+#    def requirements (self): 
+#        return { 'js_files' : [],       # a list of relative paths for js input files
+#                 'css_files': [],       # ditto for css, could have been a dict keyed on
+#                                        # media instead
+#                 'js_chunk' : [],       # (lines of) verbatim javascript code 
+#                 'css_chunk': [],       # likewise for css scripts
+#                 }
+    
