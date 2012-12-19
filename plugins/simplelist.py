@@ -1,5 +1,3 @@
-from django.template.loader import render_to_string
-
 from engine.plugin import Plugin
 
 class SimpleList (Plugin) :
