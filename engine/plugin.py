@@ -44,7 +44,7 @@ class Plugin:
         except: return 'Plugin'
 
     # shorthands to inspect _settings
-    def get_setting (self, setting, default):
+    def get_setting (self, setting, default=None):
         if setting not in self._settings: return default
         else:                             return self._settings[setting]
 

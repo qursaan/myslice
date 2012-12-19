@@ -7,12 +7,12 @@ class Prelude:
     """A class for collecting dependencies on js/css files or fragments"""
 
     keys=[ 'js_files','css_files','js_chunks', 'css_chunks' ]
-    def __init__ (self):
+    def __init__ (self, js_files=[], css_files=[], js_chunks=[], css_chunks=[]):
         # it's tempting to use sets but sets are not ordered..
-        self.js_files  =[]
-        self.css_files =[]
-        self.js_chunks =[]
-        self.css_chunks=[]
+        self.js_files  = Prelude._normalize(js_files)
+        self.css_files = Prelude._normalize(css_files)
+        self.js_chunks = Prelude._normalize(js_chunks)
+        self.css_chunks= Prelude._normalize(css_chunks)
 
     @staticmethod
     def _normalize (input):

@@ -4,6 +4,8 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
+from engine.prelude import Prelude
+
 from myslice.viewutils import topmenu_items, the_user
 # tmp
 from myslice.viewutils import lorem, hard_wired_slice_names
@@ -26,12 +28,16 @@ def fake_slice_view (request, name=None):
 
 @login_required
 def tab_view (request):
-    return render_to_response ('view-tab.html',
-                               {'title':'Page for playing with Tabs',
-                                'topmenu_items': topmenu_items('tab',request),
-                                'username':the_user (request),
-                                'lorem': lorem,                                
-                                },
+    prelude=Prelude( js_files='bootstrap/js/bootstrap.js', css_files='bootstrap/css/bootstrap.css')
+    prelude_env = prelude.render_env()
+    tab_env = {'title':'Page for playing with Tabs',
+               'topmenu_items': topmenu_items('tab',request),
+               'username':the_user (request),
+               'lorem': lorem,                                
+               }
+    tab_env.update (prelude_env)
+
+    return render_to_response ('view-tab.html', tab_env,
                                context_instance=RequestContext(request))
 
 @login_required
