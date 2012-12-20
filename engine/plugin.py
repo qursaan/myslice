@@ -17,12 +17,17 @@ DEBUG= [ 'SliceList' ]
 
 class Plugin:
 
-    uid=0
+    # using a simple incremental scheme to generate uuids for now
+    uuid=0
+
+    @staticmethod
+    def newuuid():
+        Plugin.uuid += 1
+        return Plugin.uuid
 
     def __init__ (self, visible=True, hidable=True, hidden_by_default=False, **settings):
         # xxx should generate some random id
-        self.uuid=Plugin.uid
-        Plugin.uid += 1
+        self.uuid=Plugin.newuuid()
         self.visible=visible
         self.hidable=hidable
         self.hidden_by_default=hidden_by_default
@@ -95,11 +100,11 @@ class Plugin:
         return result
         
     # you may redefine this completely, but if you don't we'll just use methods 
-    # . template() to find out which template to use, and 
+    # . template_file() to find out which template to use, and 
     # . template_env() to compute a dictionary to pass along to the templating system
     def render_content (self, request):
         """Should return an HTML fragment"""
-        template = self.template()
+        template = self.template_file()
         env=self.template_env(request)
         if not isinstance (env,dict):
             raise Exception, "%s.template_env returns wrong type"%self.classname()
@@ -155,14 +160,14 @@ class Plugin:
     # your plugin is expected to implement either 
     # (*) def render_content(self, request) -> html fragment
     # -- or --
-    # (*) def template(self) -> filename
+    # (*) def template_file(self) -> filename
     #   relative to STATIC 
     # (*) def template_env (self, request) -> dict
     #   this is the variable->value association used to render the template
     # in which case the html template will be used
 
-    # if you see this string somewhere your template() code is not kicking in
-    def template (self):                return "undefined_template"
+    # if you see this string somewhere your template_file() code is not kicking in
+    def template_file (self):                return "undefined_template"
     def template_env (self, request):     return {}
 
 #    # tell the framework about requirements (for the document <header>)

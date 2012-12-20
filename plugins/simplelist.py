@@ -15,7 +15,7 @@ class SimpleList (Plugin) :
     # SimpleList is useless per se anyways
     def title (self) : return "Title for Simple List"
 
-    def template (self): return "simplelist.html"
+    def template_file (self): return "simplelist.html"
 
     def requirements (self):
         reqs = { 'js_files' : [ "js/simplelist.js" ],

@@ -11,6 +11,6 @@ class Tabs (Composite):
                                    'css/tabs.css',
                                    ] }
 
-    def template (self):
+    def template_file (self):
         return "tabs.html"
 

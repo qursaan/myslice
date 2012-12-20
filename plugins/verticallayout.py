@@ -6,4 +6,4 @@ class VerticalLayout (Composite) :
     
     def title (self) : return "VLayout title"
 
-    def template (self):        return "verticallayout.html"
+    def template_file (self):        return "verticallayout.html"
