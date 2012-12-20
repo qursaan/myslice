@@ -17,6 +17,13 @@ tags: force
 ftags: force
 	find . -type f | fgrep -v '/.git/' | xargs etags
 
+list-html: force
+	@find . -type f -name '*.html'
+list-js: force
+	@find . -type f -name '*.js' | grep -v '/all-static/'
+list-css: force
+	@find . -type f -name '*.css' | grep -v '/all-static/'
+
 #################### manage static contents (extract from all the modules into the single all-static location)
 static: force
 	./manage.py collectstatic --noinput 

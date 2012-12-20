@@ -71,7 +71,7 @@ class Plugin:
         # expose _settings in json format to js
         settings_json = json.dumps (self._settings, separators=(',',':'))
 
-        result = render_to_string ('widget-plugin.html',
+        result = render_to_string ('plugin.html',
                                    {'uuid':uuid, 
                                     'classname':classname,
                                     'visible':self.is_visible(),
