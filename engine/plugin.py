@@ -118,7 +118,8 @@ class Plugin:
     #################### requirements/prelude management
     def _init_request (self, request):
         if not hasattr (request, 'plugin_prelude'): 
-            request.plugin_prelude=Prelude()
+            # include css/plugins.css
+            request.plugin_prelude=Prelude(css_files='css/plugin.css')
 
     def inspect_request (self, request, message):
         has=hasattr(request,'plugin_prelude')
