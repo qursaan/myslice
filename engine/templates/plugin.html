@@ -1,12 +1,13 @@
+{#<!--begin {{ classname }}{{ name }}{{ uuid }}-->#}
 {% if visible %}
-<div class='plugin-manage'>
+<div class='plugin-manage' id='{{ name }}'>
 {% if hidable %}
   {% if hidden %}
-<p id='show-{{ uuid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ classname }}</span></a></p>
-<p id='hide-{{ uuid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ classname }}</span></a></p>
+<p id='show-{{ uuid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
+<p id='hide-{{ uuid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
   {% else %}
-<p id='show-{{ uuid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ classname }}</span></a></p>
-<p id='hide-{{ uuid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ classname }}</span></a></p>
+<p id='show-{{ uuid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
+<p id='hide-{{ uuid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
   {% endif %}
 {% endif %}
 {% endif %}
@@ -18,13 +19,14 @@
 {% if visible %}
 </div>
 {% endif %}
+{#<!--end {{ classname }}{{ name }}{{ uuid }}-->#}
 
 {# Plugin initialization (if the plugin has the right structure) - from plugin.php #}
 {# note: that's the spirit but using {% insert %}  is not reliable enough #}
 {# so for now this doesn't make it back to the browser #}
 {% insert prelude_js %}
 if (typeof jQuery('#{{ uuid }}').$title != 'undefined') {
-  jQuery('#{{ uuid }}').$title({ {{ settings_json }} plugin_uuid: '{{ uuid }}' });
-  //jQuery('#{{ uuid }}').$title('show');
+  jQuery('#plugin-{{ uuid }}').$title({ {{ settings_json }} plugin_uuid: '{{ uuid }}' });
+  //jQuery('#plugin-{{ uuid }}').$title('show');
   }; 
 {% endinsert %}

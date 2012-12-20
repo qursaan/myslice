@@ -8,10 +8,11 @@ from django.template.loader import render_to_string
 
 from engine.prelude import Prelude
 
-# set to
+#################### 
+# set DEBUG to
 # . False : silent
-# [ 'SliceList', 'TabbedView' ] : to debug these classes
-# True : to debug all slices
+# . [ 'SliceList', 'TabbedView' ] : to debug these classes
+# . True : to debug all plugin
 
 DEBUG= [ 'SliceList' ]
 
@@ -53,10 +54,12 @@ class Plugin:
         self.name=name
         self.add_to_settings ( ['title','name'] )
         self.uuid=Plugin.newuuid()
+        self.classname=self._classname()
+        self.add_to_settings ( [ 'uuid', 'classname' ] )
         self.visible=visible
         self.hidable=hidable
         self.hidden_by_default=hidden_by_default
-        self.add_to_settings( ['uuid','visible','hidable','hidden_by_default'] )
+        self.add_to_settings( ['visible','hidable','hidden_by_default'] )
         # we store as a dictionary the arguments passed to constructor
         # e.g. SimpleList (list=[1,2,3]) => _settings = { 'list':[1,2,3] }
         # our own settings are not made part of _settings but could be..
@@ -73,7 +76,7 @@ class Plugin:
             for setting_name in setting_name_s:
                 self._settings[setting_name]=getattr(self,setting_name)
 
-    def classname (self): 
+    def _classname (self): 
         try:    return self.__class__.__name__
         except: return 'Plugin'
 
@@ -90,13 +93,12 @@ class Plugin:
     def need_debug (self):
         if not DEBUG:           return False
         if DEBUG is True:       return True
-        else:                   return self.classname() in DEBUG
+        else:                   return self.classname in DEBUG
 
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
         uuid = self.uuid
-        classname = self.classname()
         # initialize prelude placeholder 
         self._init_request (request)
         
@@ -105,15 +107,11 @@ class Plugin:
         # expose _settings in json format to js
         settings_json = json.dumps (self._settings, separators=(',',':'))
 
-        result = render_to_string ('plugin.html',
-                                   {'uuid':uuid, 
-                                    'classname':classname,
-                                    'visible':self.is_visible(),
-                                    'hidable':self.is_hidable(),
-                                    'hidden':self.is_hidden_by_default(),
-                                    'plugin_content' : plugin_content,
-                                    'settings_json' : settings_json,
-                                    })
+        env= {'plugin_content' : plugin_content,
+              'settings_json' : settings_json,
+              }
+        env.update(self._settings)
+        result = render_to_string ('plugin.html',env)
 
         # handle requirements() if defined on this class
         try: 
@@ -136,17 +134,18 @@ class Plugin:
         template = self.template_file()
         env=self.template_env(request)
         if not isinstance (env,dict):
-            raise Exception, "%s.template_env returns wrong type"%self.classname()
+            raise Exception, "%s.template_env returns wrong type"%self.classname
         # expose this class's settings to the template
         # xxx we might need to check that this does not overwrite env..
         env.update(self._settings)
         result=render_to_string (template, env)
         if self.need_debug():
-            print "%s.render_content: BEG --------------------"%self.classname()
+            print "%s.render_content: BEG --------------------"%self.classname
             print "template=%s"%template
-            print "env=%s"%env.keys()
-            # print result
-            print "%s.render_content: END --------------------"%self.classname()
+            print "env.keys=%s"%env.keys()
+            print "env=%s"%env
+            print result
+            print "%s.render_content: END --------------------"%self.classname
         return result
 
     #################### requirements/prelude management
@@ -178,7 +177,7 @@ class Plugin:
     def handle_requirements (self, request, d):
         for (k,v) in d.iteritems():
             if self.need_debug():
-                print "%s: handling requirement %s"%(self.classname(),v)
+                print "%s: handling requirement %s"%(self.classname,v)
             method_name='add_'+k
             method=Plugin.__dict__[method_name]
             method(self,request,v)
@@ -187,15 +186,15 @@ class Plugin:
     # your plugin is expected to implement either 
     # (*) def render_content(self, request) -> html fragment
     # -- or --
-    # (*) def template_file(self) -> filename
+    # (*) def template_file (self) -> filename
     #   relative to STATIC 
     # (*) def template_env (self, request) -> dict
     #   this is the variable->value association used to render the template
     # in which case the html template will be used
 
     # if you see this string somewhere your template_file() code is not kicking in
-    def template_file (self):                return "undefined_template"
-    def template_env (self, request):     return {}
+    def template_file (self):           return "undefined_template"
+    def template_env (self, request):   return {}
 
 #    # tell the framework about requirements (for the document <header>)
 #    # the notion of 'Media' in django provides for medium-dependant

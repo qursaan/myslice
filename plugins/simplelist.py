@@ -22,7 +22,6 @@ class SimpleList (Plugin) :
         if self.with_datatables:
             reqs['js_files'].append ("datatables/js/dataTables.js")
             reqs['js_files'].append ("js/with-datatables.js")
-        print self.classname(),reqs
         return reqs
 # for tests
 #                 'js_chunks' : "/* a javascript chunk */",       

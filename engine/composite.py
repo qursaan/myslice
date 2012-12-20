@@ -12,11 +12,14 @@ class Composite (Plugin):
     def template_env (self, request):
         # this is designed so as to support a template like
         # {% for son in sons %} {{ son.rendered }} ...
+        ranks=range(len(self.sons))
         return { 'sons': 
                  [ { 'rendered': son.render(request),
                      'title': son.title,
-                     'uuid': son.uuid}
-                   for son in self.sons ]}
+                     'uuid': son.uuid,
+                     'classname': son.classname,
+                     'rank': rank}
+                   for (son,rank) in zip(self.sons,ranks) ]}
 
     # xxx need a way to select an active son, like e.g.
     # Composite (active='some string')
