@@ -29,7 +29,7 @@ def fake_slice_view (request, name=None):
 @login_required
 def tab_view (request):
     prelude=Prelude( js_files='bootstrap/js/bootstrap.js', css_files='bootstrap/css/bootstrap.css')
-    prelude_env = prelude.render_env()
+    prelude_env = prelude.template_env()
     tab_env = {'title':'Page for playing with Tabs',
                'topmenu_items': topmenu_items('tab',request),
                'username':the_user (request),

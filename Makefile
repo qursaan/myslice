@@ -23,6 +23,8 @@ list-js: force
 	@find . -type f -name '*.js' | grep -v '/all-static/'
 list-css: force
 	@find . -type f -name '*.css' | grep -v '/all-static/'
+list-img:
+	@find . -type f -name '*.png' | grep -v '/all-static/'
 
 #################### manage static contents (extract from all the modules into the single all-static location)
 static: force

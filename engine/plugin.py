@@ -96,13 +96,13 @@ class Plugin:
         
     # you may redefine this completely, but if you don't we'll just use methods 
     # . template() to find out which template to use, and 
-    # . render_env() to compute a dictionary to pass along to the templating system
+    # . template_env() to compute a dictionary to pass along to the templating system
     def render_content (self, request):
         """Should return an HTML fragment"""
         template = self.template()
-        env=self.render_env(request)
+        env=self.template_env(request)
         if not isinstance (env,dict):
-            raise Exception, "%s.render_env returns wrong type"%self.classname()
+            raise Exception, "%s.template_env returns wrong type"%self.classname()
         # expose this class's settings to the template
         # xxx we might need to check that this does not overwrite env..
         env.update(self._settings)
@@ -157,13 +157,13 @@ class Plugin:
     # -- or --
     # (*) def template(self) -> filename
     #   relative to STATIC 
-    # (*) def render_env (self, request) -> dict
+    # (*) def template_env (self, request) -> dict
     #   this is the variable->value association used to render the template
     # in which case the html template will be used
 
     # if you see this string somewhere your template() code is not kicking in
     def template (self):                return "undefined_template"
-    def render_env (self, request):     return {}
+    def template_env (self, request):     return {}
 
 #    # tell the framework about requirements (for the document <header>)
 #    # the notion of 'Media' in django provides for medium-dependant

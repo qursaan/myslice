@@ -45,7 +45,7 @@ class Prelude:
     # probably insert_above is not powerful enough to handle that
     # 
     # so a much simpler and safer approach is for use to compute the html header directly
-    def render_env (self): 
+    def template_env (self): 
         env={}
         env['js_files']=  self.js_files
         env['css_files']= self.css_files
