@@ -20,29 +20,58 @@ class Plugin:
     # using a simple incremental scheme to generate uuids for now
     uuid=0
 
+    # xxx should generate some random id
     @staticmethod
     def newuuid():
         Plugin.uuid += 1
         return Plugin.uuid
 
-    def __init__ (self, visible=True, hidable=True, hidden_by_default=False, **settings):
-        # xxx should generate some random id
+    ########## 
+    # Constructor
+    #### mandatory
+    # . title: is used visually for displaying the widget
+    # . name:  a simple id suitable for forging css names
+    #### optional
+    # . hidable: whether it can be turned on and off from the UI
+    #   like e.g. PleKitToggle
+    # . hidden_by_default: if hidable, what's the initial status
+    # . visible: if not set the plugin does not show up at all,
+    #   not quite sure what this was for
+    #### internal data
+    # . uuid: created internally
+    # . rank: this is for plugins sons of a composite plugin
+    #### custom
+    # any other setting can also be set when creating the object, like
+    # p=Plugin(foo='bar')
+    # which will result in 'foo' being accessible to the template engine
+    # 
+    def __init__ (self, title, name,
+                  visible=True, hidable=True, hidden_by_default=False, **settings):
+        # what is in this dictionary will get exposed to template and to javascript
+        self._settings=settings
+        self.title=title
+        self.name=name
+        self.add_to_settings ( ['title','name'] )
         self.uuid=Plugin.newuuid()
         self.visible=visible
         self.hidable=hidable
         self.hidden_by_default=hidden_by_default
+        self.add_to_settings( ['uuid','visible','hidable','hidden_by_default'] )
         # we store as a dictionary the arguments passed to constructor
         # e.g. SimpleList (list=[1,2,3]) => _settings = { 'list':[1,2,3] }
         # our own settings are not made part of _settings but could be..
-        self._settings=settings
         if self.need_debug():
             print "Plugin.__init__ Created plugin with settings %s"%self._settings.keys()
 
     # subclasses might handle some fields in their own way, 
     # in which case this call is needed to capture that setting
     # see e.g. SimpleList or SliceList for an example of that
-    def add_to_settings (self, setting_name):
-        self._settings[setting_name]=getattr(self,setting_name)
+    def add_to_settings (self, setting_name_s):
+        if not isinstance (setting_name_s, list):
+            self._settings[setting_name_s]=getattr(self,setting_name_s)
+        else:
+            for setting_name in setting_name_s:
+                self._settings[setting_name]=getattr(self,setting_name)
 
     def classname (self): 
         try:    return self.__class__.__name__
@@ -155,8 +184,6 @@ class Plugin:
             method(self,request,v)
 
     ######################################## abstract interface
-    def title (self): return "you should redefine title()"
-
     # your plugin is expected to implement either 
     # (*) def render_content(self, request) -> html fragment
     # -- or --

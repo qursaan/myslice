@@ -20,25 +20,32 @@ def test_plugin_view (request):
     template_env = {}
     
     main_plugin = \
-        VerticalLayout ( sons = [ SimpleList (list=hard_wired_list, 
+        VerticalLayout ( title='title for the vertical layout',name='vertical1',
+        sons = [ SimpleList (title='SimpleList and dataTables',
+                                              name='simplelist1',
+                                              list=hard_wired_list, 
                                               header='Hard wired', 
                                               foo='the value for foo',
                                               with_datatables=True),
-                                  Tabs (sons = [ Raw (html= 3*lorem_p),
-                                                 SliceList(list=hard_wired_slice_names),
-                                                 Raw (html=lorem) ]),
-                                  SimpleList (list=hard_wired_slice_names,
-                                              headers='Slices in main content') ] )
+                                  Tabs (title='Sample Tabs',name='tabs1',
+                                        sons = [ Raw (title='a raw plugin',name='raw1',
+                                                      html= 3*lorem_p),
+                                                 SliceList(title='a slice list',name='slicelist-main',
+                                                           list=hard_wired_slice_names),
+                                                 Raw (title='raw title',name='raw2',html=lorem) ]),
+                                  SimpleList (title='SimpleList with slice names', 
+                                              name='simplelist2',
+                                              list=hard_wired_slice_names,
+                                              ) ] )
     # define 'content_main' to the template engine
     template_env [ 'content_main' ] = main_plugin.render(request)
 
     ##########
     # lacks a/href to /slice/%s
-    related_plugin = SliceList (visible=True, 
-                                hidable=True,
+    related_plugin = SliceList (title='SliceList plugin',name='slicelist1',
                                 with_datatables='yes', 
                                 list=hard_wired_slice_names, 
-                                header='Slices' )
+                                header='Slices')
     # likewise but on the side view
     template_env [ 'content_related' ] = related_plugin.render (request)
 

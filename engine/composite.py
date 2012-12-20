@@ -14,7 +14,7 @@ class Composite (Plugin):
         # {% for son in sons %} {{ son.rendered }} ...
         return { 'sons': 
                  [ { 'rendered': son.render(request),
-                     'title': son.title(),
+                     'title': son.title,
                      'uuid': son.uuid}
                    for son in self.sons ]}
 

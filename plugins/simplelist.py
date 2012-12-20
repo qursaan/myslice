@@ -13,8 +13,6 @@ class SimpleList (Plugin) :
         self.add_to_settings ('with_datatables')
 
     # SimpleList is useless per se anyways
-    def title (self) : return "Title for Simple List"
-
     def template_file (self): return "simplelist.html"
 
     def requirements (self):

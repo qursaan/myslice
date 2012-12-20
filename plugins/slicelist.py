@@ -7,9 +7,6 @@ class SliceList (SimpleList):
         self.list = [ "<a href='/slice/%s/' class='slicelist'>%s</a>"%(x,x) for x in list ]
         self.add_to_settings ('list')
 
-    def title (self):
-        return "Slice list"
-
 #    def requirements (self):
 #        reqs=SimpleList.requirements(self)
 #        reqs['js_files'].append('slice.js')
