@@ -1,22 +1,22 @@
 {#<!--begin {{ classname }}{{ name }}{{ uuid }}-->#}
 {% if visible %}
-<div class='plugin-manage' id='{{ name }}'>
-{% if hidable %}
-  {% if hidden %}
+<div class='plugin-toggle' id='{{ name }}'>
+{% if togglable %}
+  {% if not toggled %}
 <p id='show-{{ uuid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
 <p id='hide-{{ uuid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
   {% else %}
 <p id='show-{{ uuid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
 <p id='hide-{{ uuid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
-  {% endif %}
-{% endif %}
-{% endif %}
+  {% endif %}{# toggled #}
+{% endif %}{# togglable #}
+{% endif %}{# visible #}
 
-<div class='plugin {{ classname }}' id='plugin-{{ uuid }}'>
+<div class='plugin {{ classname }}' id='plugin-{{ uuid }}' {% if not toggled %}style='display:none'{% endif %}>
 {{ plugin_content|safe }}
-</div><!--plugin {{ classname }}-->
+</div><!--plugin {{ classname }}{{ name }}{{ uuid }}-->
 
 {% if visible %}
 </div>
-{% endif %}
+{% endif %}{# visible #}
 {#<!--end {{ classname }}{{ name }}{{ uuid }}-->#}

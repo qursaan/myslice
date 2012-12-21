@@ -33,9 +33,9 @@ class Plugin:
     # . title: is used visually for displaying the widget
     # . name:  a simple id suitable for forging css names
     #### optional
-    # . hidable: whether it can be turned on and off from the UI
+    # . togglable: whether it can be turned on and off from the UI
     #   like e.g. PleKitToggle
-    # . hidden_by_default: if hidable, what's the initial status
+    # . toggled: if togglable, what's the initial status
     # . visible: if not set the plugin does not show up at all,
     #   not quite sure what this was for
     #### internal data
@@ -47,7 +47,7 @@ class Plugin:
     # which will result in 'foo' being accessible to the template engine
     # 
     def __init__ (self, title, name,
-                  visible=True, hidable=True, hidden_by_default=False, **settings):
+                  visible=True, togglable=True, toggled=True, **settings):
         # what is in this dictionary will get exposed to template and to javascript
         self._settings=settings
         self.title=title
@@ -57,9 +57,9 @@ class Plugin:
         self.classname=self._classname()
         self.add_to_settings ( [ 'uuid', 'classname' ] )
         self.visible=visible
-        self.hidable=hidable
-        self.hidden_by_default=hidden_by_default
-        self.add_to_settings( ['visible','hidable','hidden_by_default'] )
+        self.togglable=togglable
+        self.toggled=toggled
+        self.add_to_settings( ['visible','togglable','toggled'] )
         # we store as a dictionary the arguments passed to constructor
         # e.g. SimpleList (list=[1,2,3]) => _settings = { 'list':[1,2,3] }
         # our own settings are not made part of _settings but could be..
