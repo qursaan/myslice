@@ -23,26 +23,25 @@ def test_plugin_view (request):
     template_env = {}
     
     main_plugin = \
-        VerticalLayout ( title='title for the vertical layout',domid='vertical1',
+        VerticalLayout ( title='title for the vertical layout',
         sons = [ SimpleList (title='SimpleList and dataTables',
-                             domid='simplelist1',
                              list=hard_wired_list, 
                              header='Hard wired', 
                              foo='the value for foo',
                              with_datatables=True,
                              toggled=False),
-                 Tabs (title='Sample Tabs',domid='tabs1',
-                       active='raw1',
+                 Tabs (title='Sample Tabs',
+                       # *** we select this one to be the active tab ***
+                       active='raw2',
                        sons = [ Raw (title='a raw plugin',domid='raw1',
                                      togglable=False,
                                      html= 3*lorem_p),
-                                SliceList(title='a slice list',domid='slicelist-main',
+                                SliceList(title='a slice list',
                                           togglable=False,
                                           list=hard_wired_slice_names),
                                 Raw (title='raw title',domid='raw2',
                                      togglable=False,html=lorem) ]),
                  SimpleList (title='SimpleList with slice names', 
-                             domid='simplelist2',
                              list=hard_wired_slice_names,
                              ) ] )
     # define 'content_main' to the template engine
