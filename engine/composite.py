@@ -15,8 +15,8 @@ class Composite (Plugin):
         # this is designed so as to support a template like
         # {% for son in sons %} {{ son.rendered }} ...
         def is_active (son):
-#            print 'comparing >%s< and >%s<'%(son.name,self.active)
-            return son.name==self.active
+#            print 'comparing >%s< and >%s<'%(son.domid,self.active)
+            return son.domid==self.active
         ranks=range(len(self.sons))
         env = { 'sons':
                  [ { 'rendered': son.render(request),
@@ -24,8 +24,7 @@ class Composite (Plugin):
                      'active': is_active(son),
                      # this should probably come from son._settings..
                      'title': son.title,
-                     'name': son.name,
-                     'uuid': son.uuid,
+                     'domid': son.domid,
                      'classname': son.classname,
                      }
                    for (son,rank) in zip(self.sons,ranks) ]}

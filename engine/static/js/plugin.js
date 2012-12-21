@@ -4,13 +4,13 @@
 $(document).ready(function() {
     $('.plugin-hide').each(function() {
 	$(this).click(function () { 
-	    var plugin='#'+$(this).attr('id').replace('hide-','plugin-'); 
+	    var plugin='#'+$(this).attr('id').replace('hide-',''); 
 	    var show='#'+$(this).attr('id').replace('hide-','show-'); 
 	    jQuery(plugin).hide(); jQuery(show).show(); $(this).hide();});
 	})
     $('.plugin-show').each(function() {
 	$(this).click(function () { 
-	    var plugin='#'+$(this).attr('id').replace('show-','plugin-'); 
+	    var plugin='#'+$(this).attr('id').replace('show-',''); 
 	    var hide='#'+$(this).attr('id').replace('show-','hide-'); 
 	    jQuery(plugin).show(); jQuery(hide).show(); $(this).hide();});
 	})

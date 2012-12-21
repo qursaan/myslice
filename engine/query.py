@@ -1,6 +1,8 @@
 # needed imports
 # uniqid
 
+xxx this code is broken and not used 
+
 class Query:
 
     def __init__ (self):
@@ -11,6 +13,7 @@ class Query:
         self.params=[]
         self.fields=[]
         self.unique=False
+        # xxx 
         self.uuid=uniquid()
         self.sort=None
         self.limit=None

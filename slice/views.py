@@ -10,6 +10,7 @@ from myslice.viewutils import topmenu_items, the_user
 # tmp
 from myslice.viewutils import lorem, hard_wired_slice_names
 
+# we take name from the URL and propagate in the template
 @login_required
 def fake_slice_view (request, name=None):
     title='Fake Slice Page'

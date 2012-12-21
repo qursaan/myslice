@@ -1,22 +1,22 @@
-{#<!--begin {{ classname }}{{ name }}{{ uuid }}-->#}
+{#<!--begin {{ classname }}{{ domid }}-->#}
 {% if visible %}
-<div class='plugin-toggle' id='{{ name }}'>
+<div class='plugin-toggle' id='toggle-{{ domid }}'>
 {% if togglable %}
   {% if not toggled %}
-<p id='show-{{ uuid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
-<p id='hide-{{ uuid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
+<p id='show-{{ domid }}' class='plugin-show'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
+<p id='hide-{{ domid }}' class='plugin-hide' style='display:none;'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
   {% else %}
-<p id='show-{{ uuid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
-<p id='hide-{{ uuid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
+<p id='show-{{ domid }}' class='plugin-show' style='display:none;'><a href='#'><span>&raquo; Show {{ classname }} "{{ title }}"</span></a></p>
+<p id='hide-{{ domid }}' class='plugin-hide'><a href='#'><span>&laquo; Hide {{ classname }} "{{ title }}"</span></a></p>
   {% endif %}{# toggled #}
 {% endif %}{# togglable #}
 {% endif %}{# visible #}
 
-<div class='plugin {{ classname }}' id='plugin-{{ uuid }}' {% if not toggled %}style='display:none'{% endif %}>
+<div class='plugin {{ classname }}' id='{{ domid }}' {% if not toggled %}style='display:none;'{% endif %}>
 {{ plugin_content|safe }}
-</div><!--plugin {{ classname }}{{ name }}{{ uuid }}-->
+</div><!--plugin {{ classname }}{{ domid }}-->
 
 {% if visible %}
 </div>
 {% endif %}{# visible #}
-{#<!--end {{ classname }}{{ name }}{{ uuid }}-->#}
+{#<!--end {{ classname }}{{ domid }}-->#}

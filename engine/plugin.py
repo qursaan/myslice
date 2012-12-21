@@ -18,44 +18,42 @@ DEBUG= [ 'Tabs' ]
 
 class Plugin:
 
-    # using a simple incremental scheme to generate uuids for now
-    uuid=0
+    # using a simple incremental scheme to generate domids for now
+    # we just need this to be unique in a page
+    domid=0
 
-    # xxx should generate some random id
     @staticmethod
-    def newuuid():
-        Plugin.uuid += 1
-        return Plugin.uuid
+    def newdomid():
+        Plugin.domid += 1
+        return "plugin-%d"%Plugin.domid
 
     ########## 
     # Constructor
     #### mandatory
     # . title: is used visually for displaying the widget
-    # . name:  a simple id suitable for forging css names
     #### optional
-    # . togglable: whether it can be turned on and off from the UI
-    #   like e.g. PleKitToggle
+    # . togglable: whether it can be turned on and off (like PleKitToggle)
     # . toggled: if togglable, what's the initial status
-    # . visible: if not set the plugin does not show up at all,
-    #   not quite sure what this was for
+    # . visible: if not set the plugin does not show up at all
+    #            (not quite sure what this was for)
     #### internal data
-    # . uuid: created internally
+    # . domid: created internally, but can be set at creation time if needed
+    #          useful for hand-made css, or for selecting an active plugin in a composite
     # . rank: this is for plugins sons of a composite plugin
     #### custom
     # any other setting can also be set when creating the object, like
     # p=Plugin(foo='bar')
     # which will result in 'foo' being accessible to the template engine
     # 
-    def __init__ (self, title, name,
+    def __init__ (self, title, domid=None,
                   visible=True, togglable=True, toggled=True, **settings):
         # what is in this dictionary will get exposed to template and to javascript
         self._settings=settings
         self.title=title
-        self.name=name
-        self.add_to_settings ( ['title','name'] )
-        self.uuid=Plugin.newuuid()
+        if not domid: domid=Plugin.newdomid()
+        self.domid=domid
         self.classname=self._classname()
-        self.add_to_settings ( [ 'uuid', 'classname' ] )
+        self.add_to_settings ( ['title', 'domid', 'classname'] )
         self.visible=visible
         self.togglable=togglable
         self.toggled=toggled
@@ -94,7 +92,6 @@ class Plugin:
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
-        uuid = self.uuid
         # initialize prelude placeholder if needed
         self._init_prelude (request)
         # call render_content
@@ -105,8 +102,9 @@ class Plugin:
         env.update(self._settings)
         result = render_to_string ('plugin.html',env)
 
-        # expose _settings in json format to js, and add plugin_uuid: uuid in the mix
-        js_env = { 'plugin_uuid' : self.uuid }
+        # expose _settings in json format to js, and add plugin_uuid: domid in the mix
+        # NOTE this plugin_uuid thing might occur in js files, ** do not rename **
+        js_env = { 'plugin_uuid' : self.domid }
         js_env.update (self._settings)
         settings_json = json.dumps (js_env, separators=(',',':'))
         env ['settings_json' ] = settings_json

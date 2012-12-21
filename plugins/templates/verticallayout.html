@@ -1,7 +1,7 @@
-<div id='{{ uuid }}'>
+<div id='div-{{ domid }}'>
 {% for son in sons %}
 <h3>{{ son.title }}</h3>
-<div id='{{ name }}-{{ son.rank }}'>
+<div id='tab-{{ son.domid }}'>
 {{ son.rendered }}
 </div>
 {% endfor %}
