@@ -4,7 +4,7 @@ See the devel/ subdir for more devel-oriented doc.
 
 ==================== 1 minute howto
 
-* requirement is to have python + django installed django
+*  REQUIREMENTS  is to have python + django installed django
 ** should be straightforward
 ** see devel/django-install.txt in case of trouble
 
@@ -22,7 +22,7 @@ $ manage.py syncdb
 [ at this point point it *might* be needed to run
 $ make allst
  but as far as running a local server is concerned you should be good without that 
- feedbakc on this is appreciated]
+ feedback on this is appreciated]
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
