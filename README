@@ -85,11 +85,13 @@ not much effort has been put into coming up with a nice layout and all, feel fre
   a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
 
 * templates/
+   * some global templates (django templates, i.e. (essentially html) fragments that can be specializied)
+     more on this below
+
 * static/
-  some global stuff:
-   * templates (django templates, i.e. (essentially html) fragments that can be specializied)
-   * static files (css, js, images..)
-  see more about that below
+   * third party stuff (bootstrapfs, jquery, datatables)
+   * + some global static files (css, js, images..)
+     see more about that below too
 
 * devel:
   no code in there, only various notes and other scripts useful for developers
@@ -122,7 +124,38 @@ not much effort has been put into coming up with a nice layout and all, feel fre
       css/
       js/
 
-
 NOTE. in essence any of these files can be moved around (from e.g. one templates/ dir to another) 
 at any time without any change needed in the code
 
+* filenames / locations
+
+  you can run the following make targets to have a summary of where things are
+
+  $ make list-html list-js list-css list-img
+  -- or --
+  $ make list-all
+
+  as far as possible it's great to have things named the same after e.g. say a plugin name
+    like e.g.
+    plugins/quickfilter.py
+    plugins/templates/quickfilter.html
+    plugins/static/js/quickfilter.js
+    plugins/static/css/quickfilter.css
+
+  it's sometimes not working though, so here are a few additional conventions
+
+    the global layout (for now I needed only one) is named layout-myslice.html
+      it provides the global layout with one menu stuck on top and 2 divs 3/4 1/4
+
+    the views that I currently have are all named in templates/view-<>.html
+      they all extend a layout
+      they should/could admittedly move where they belong (in auth/slice/engine) 
+      so that they would go with their views.py code, but for now it's impler this way
+
+    and there are 3 'widgets' (login, logout, and topmenu) 
+      these could maybe be best implemented as a plugin now that I have the right model for that
+      however esp. for the login/logout I'm not quite sure this will remain over time
+      so for now it's good enough like this
+
+So in summary there's still room for a lot of improvement on this particular topic..
+At the very least topmenu should be made a plugin, and maybe also login/logout
