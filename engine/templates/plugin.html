@@ -20,13 +20,3 @@
 </div>
 {% endif %}
 {#<!--end {{ classname }}{{ name }}{{ uuid }}-->#}
-
-{# Plugin initialization (if the plugin has the right structure) - from plugin.php #}
-{# note: that's the spirit but using {% insert %}  is not reliable enough #}
-{# so for now this doesn't make it back to the browser #}
-{% insert prelude_js %}
-if (typeof jQuery('#{{ uuid }}').$title != 'undefined') {
-  jQuery('#plugin-{{ uuid }}').$title({ {{ settings_json }} plugin_uuid: '{{ uuid }}' });
-  //jQuery('#plugin-{{ uuid }}').$title('show');
-  }; 
-{% endinsert %}

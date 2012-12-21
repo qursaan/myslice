@@ -85,10 +85,6 @@ class Plugin:
         if setting not in self._settings: return default
         else:                             return self._settings[setting]
 
-    def is_visible (self): return self.visible
-    def is_hidable (self): return self.hidable
-    def is_hidden_by_default (self): return self.hidden_by_default
-
     ##########
     def need_debug (self):
         if not DEBUG:           return False
@@ -99,30 +95,28 @@ class Plugin:
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
         uuid = self.uuid
-        # initialize prelude placeholder 
-        self._init_request (request)
-        
+        # initialize prelude placeholder if needed
+        self._init_prelude (request)
         # call render_content
         plugin_content = self.render_content (request)
-        # expose _settings in json format to js
-        settings_json = json.dumps (self._settings, separators=(',',':'))
-
-        env= {'plugin_content' : plugin_content,
-              'settings_json' : settings_json,
-              }
+        # shove this into plugin.html
+        env = {}
+        env ['plugin_content']= plugin_content
         env.update(self._settings)
         result = render_to_string ('plugin.html',env)
 
-        # handle requirements() if defined on this class
-        try: 
-            self.handle_requirements (request, self.requirements())
-        except AttributeError: 
-            # most likely the object does not have that method defined, which is fine
-            pass
-        except:
-            import traceback
-            traceback.print_exc()
-            pass
+        # expose _settings in json format to js, and add plugin_uuid: uuid in the mix
+        js_env = { 'plugin_uuid' : self.uuid }
+        js_env.update (self._settings)
+        settings_json = json.dumps (js_env, separators=(',',':'))
+        env ['settings_json' ] = settings_json
+        # compute plugin-specific initialization
+        js_init = render_to_string ( 'init_plugin.js', env )
+        print 'js_init',js_init
+        self.add_js_chunks (request, js_init)
+        
+        # interpret the result of requirements ()
+        self.handle_requirements (request)
 
         return result
         
@@ -149,7 +143,7 @@ class Plugin:
         return result
 
     #################### requirements/prelude management
-    def _init_request (self, request):
+    def _init_prelude (self, request):
         if not hasattr (request, 'plugin_prelude'): 
             # include css/plugins.css
             request.plugin_prelude=Prelude(css_files='css/plugin.css')
@@ -161,26 +155,35 @@ class Plugin:
 
     # can be used directly in render_content()
     def add_js_files (self, request, files):
-        self._init_request (request)
+        self._init_prelude (request)
         request.plugin_prelude.add_js_files (files)
     def add_css_files (self, request, files):
-        self._init_request (request)
+        self._init_prelude (request)
         request.plugin_prelude.add_css_files (files)
     def add_js_chunks (self, request, chunks):
-        self._init_request (request)
+        self._init_prelude (request)
         request.plugin_prelude.add_js_chunks (chunks)
     def add_css_chunks (self, request, chunks):
-        self._init_request (request)
+        self._init_prelude (request)
         request.plugin_prelude.add_css_chunks (chunks)
 
     # or from the result of self.requirements()
-    def handle_requirements (self, request, d):
-        for (k,v) in d.iteritems():
-            if self.need_debug():
-                print "%s: handling requirement %s"%(self.classname,v)
-            method_name='add_'+k
-            method=Plugin.__dict__[method_name]
-            method(self,request,v)
+    def handle_requirements (self, request):
+        try:
+            d=self.requirements()
+            for (k,v) in d.iteritems():
+                if self.need_debug():
+                    print "%s: handling requirement %s"%(self.classname,v)
+                method_name='add_'+k
+                method=Plugin.__dict__[method_name]
+                method(self,request,v)
+        except AttributeError: 
+            # most likely the object does not have that method defined, which is fine
+            pass
+        except:
+            import traceback
+            traceback.print_exc()
+            pass
 
     ######################################## abstract interface
     # your plugin is expected to implement either 

@@ -15,7 +15,7 @@ class Composite (Plugin):
         # this is designed so as to support a template like
         # {% for son in sons %} {{ son.rendered }} ...
         def is_active (son):
-            print 'comparing >%s< and >%s<'%(son.name,self.active)
+#            print 'comparing >%s< and >%s<'%(son.name,self.active)
             return son.name==self.active
         ranks=range(len(self.sons))
         env = { 'sons':
