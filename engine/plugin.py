@@ -111,7 +111,7 @@ class Plugin:
         settings_json = json.dumps (js_env, separators=(',',':'))
         env ['settings_json' ] = settings_json
         # compute plugin-specific initialization
-        js_init = render_to_string ( 'init_plugin.js', env )
+        js_init = render_to_string ( 'plugin_setenv.js', env )
         print 'js_init',js_init
         self.add_js_chunks (request, js_init)
         
