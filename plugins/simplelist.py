@@ -9,7 +9,7 @@ class SimpleList (Plugin) :
         Plugin.__init__ (self, **settings)
         self.list=list
 # don't expose this as it's big and 
-#        self.add_to_settings ('list')
+        self.add_to_settings ('list')
         self.with_datatables = with_datatables
         self.add_to_settings ('with_datatables')
 
@@ -27,3 +27,6 @@ class SimpleList (Plugin) :
 # for tests
 #                 'js_chunks' : "/* a javascript chunk */",       
 #                 'css_chunks': "/* a css style */ ",
+
+    def exclude_from_json (self):
+        return ['list']
