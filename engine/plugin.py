@@ -106,6 +106,8 @@ class Plugin:
         # NOTE this plugin_uuid thing might occur in js files, ** do not rename **
         js_env = { 'plugin_uuid' : self.domid }
         js_env.update (self._settings)
+        for k in self.exclude_from_json():
+            if k in js_env: del js_env[k]
         settings_json = json.dumps (js_env, separators=(',',':'))
         env ['settings_json' ] = settings_json
         # compute plugin-specific initialization
@@ -211,3 +213,6 @@ class Plugin:
 #                 'css_chunk': [],       # likewise for css scripts
 #                 }
     
+    # for better performance
+    # you can specify a list of keys that won't be exposed as json attributes
+    def exclude_from_json (self): return []
