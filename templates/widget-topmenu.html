@@ -7,7 +7,7 @@
   <div class="navbar-inner">
     <div class="container-fluid">
       <a class="brand" href="/"><img src="{{ STATIC_URL }}img/myslice-logo.png" height="30" alt="MySlice logo" /></a>
-      <div class="nav-collapse">
+      <div class="nav-collapse topmenu">
 	<ul class="nav nav-pills" id='menu_ul'>
 	  {% for d in topmenu_items %}
 	  {% if d.active %}
@@ -23,7 +23,7 @@
 	  {% else %}
 	  Not logged in
 	  {% endif %}
-      </div><!--/.nav-collapse -->
+      </div><!--nav-collapse-->
     </div><!--container-fluid-->
   </div><!--navbar-inner-->
 </div><!--topmenu-->
