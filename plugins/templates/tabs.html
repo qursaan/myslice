@@ -6,7 +6,7 @@
 </ul><!--nav-tabs-->
 <div class="tab-content">
 {% for son in sons %}
-<div class="tab-pane fade in" id="{{ son.uuid }}">
+<div class="tab-pane fade in{% if son.active %} active{% endif %}" id="{{ son.uuid }}">
 {{ son.rendered }}
 </div><!--tab-pane-->
 {% endfor %}

@@ -14,7 +14,7 @@ from engine.prelude import Prelude
 # . [ 'SliceList', 'TabbedView' ] : to debug these classes
 # . True : to debug all plugin
 
-DEBUG= [ 'SliceList' ]
+DEBUG= [ 'Tabs' ]
 
 class Plugin:
 
@@ -143,8 +143,8 @@ class Plugin:
             print "%s.render_content: BEG --------------------"%self.classname
             print "template=%s"%template
             print "env.keys=%s"%env.keys()
-            print "env=%s"%env
-            print result
+            #print "env=%s"%env
+            #print result
             print "%s.render_content: END --------------------"%self.classname
         return result
 
