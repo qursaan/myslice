@@ -4,5 +4,9 @@ from engine.plugin import Plugin
 
 class Raw (Plugin):
 
+    def __init__ (self, html, **kwds):
+        Plugin.__init__ (self, **kwds)
+        self.html=html
+
     def render_content (self, request):
-        return self.get_setting('html')
+        return self.html
