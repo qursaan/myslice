@@ -4,15 +4,11 @@ class QuickFilter (Plugin) :
 
     def __init__ (self, list=[], with_datatables=False, **settings):
         Plugin.__init__ (self, **settings)
-        self.list=[{'key': 'Slice', 'values': ['slice1','slice2']}, \
-                          {'key': 'Type', 'values': ['type1','type2']}, \
-                          {'key': 'Network', 'values': ['net1','net2']}]
+        self.list=list
         self.add_to_settings ('list')
         self.with_datatables = with_datatables
         self.add_to_settings ('with_datatables')
-        self.criterias = [{'key': 'Slice', 'values': ['slice1','slice2']}, \
-                          {'key': 'Type', 'values': ['type1','type2']}, \
-                          {'key': 'Network', 'values': ['net1','net2']}]
+        
 
     def title (self) : return "Title for Quick "
 
@@ -28,3 +24,6 @@ class QuickFilter (Plugin) :
         print self.classname(),reqs
         return reqs
 
+    def exclude_from_json (self):
+        return ['list']
+  
