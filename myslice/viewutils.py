@@ -57,3 +57,6 @@ hard_wired_list.append("just like a standard plugin can be set as visible or not
 hard_wired_list.append("")    
 hard_wired_list.append("OTOH and IMHO, there should be two separate and explicit subclasses of SimpleList for slices or testbeds")
 
+quickfilter_criterias = [{'key': 'Slice', 'values': ['slice1','slice2']}, \
+                          {'key': 'Type', 'values': ['type1','type2']}, \
+                          {'key': 'Network', 'values': ['net1','net2']}]

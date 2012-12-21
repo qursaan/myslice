@@ -11,10 +11,11 @@ from plugins.verticallayout import VerticalLayout
 from plugins.tabs import Tabs
 from plugins.simplelist import SimpleList
 from plugins.slicelist import SliceList
+from plugins.quickfilter import QuickFilter
 from plugins.raw import Raw
 
 from myslice.viewutils import topmenu_items, the_user
-from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem
+from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 @login_required
 def test_plugin_view (request):
@@ -43,7 +44,9 @@ def test_plugin_view (request):
                                      togglable=False,html=lorem) ]),
                  SimpleList (title='SimpleList with slice names', 
                              list=hard_wired_slice_names,
-                             ) ] )
+                             ),
+                 QuickFilter (list=quickfilter_criterias,
+                              title='QuickFilter in main content') ] )
     # define 'content_main' to the template engine
     template_env [ 'content_main' ] = main_plugin.render(request)
 

@@ -1,0 +1,28 @@
+
+<div id ='quick_filters'>
+<table class='filters'>
+    <tr>
+    {% for criteria in list %}
+        <th class='top'>{{criteria.key}}</th>
+    {% endfor %}
+        <th class="top">Extra fields</th>
+    </tr>
+    <tr>
+    {% for criteria in list %}
+        <td class='top'>
+        <select id='{{uid}}-select_{{criteria.key}}' class='topselect QuickFilter_select'>
+            <option value=''>All</option>
+            {% for item in criteria.values%}
+                <option value=''>{{item}}</option>
+            {% endfor %}
+        </select>
+        </td>
+    {% endfor %}
+        <td class='top'>
+        <select id='{{uid}}-select_extra' class='topselect QuickFilter_select'>
+            <option value=''>All</option>
+        </select>
+        </td>
+    </tr>
+</table>
+</div>
