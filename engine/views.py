@@ -5,6 +5,8 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 
+from django.contrib.auth.decorators import login_required
+
 from plugins.verticallayout import VerticalLayout
 from plugins.tabs import Tabs
 from plugins.simplelist import SimpleList
@@ -14,6 +16,7 @@ from plugins.raw import Raw
 from myslice.viewutils import topmenu_items, the_user
 from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem
 
+@login_required
 def test_plugin_view (request):
     
     # variables that will get passed to this template

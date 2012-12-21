@@ -1,8 +1,17 @@
 # Django settings for myslice project.
 
+import os.path
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# change these if you use a different convention
+
+DEVELOPER_ROOT=os.path.expanduser("~/git/myslice-django")
+
+PRODUCTION_ROOT="/root/myslice"
+
+####################
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -16,10 +25,13 @@ import os, os.path
 ROOT=''
 def init_root ():
     global ROOT
-    if os.path.exists("/root/myslice"):
-        ROOT="/root/myslice"
+    if os.path.exists(PRODUCTION_ROOT):
+        ROOT=PRODUCTION_ROOT
+    elif os.path.exists (DEVELOPER_ROOT):
+        ROOT=DEVELOPER_ROOT
     else:
-        ROOT=os.path.expanduser("~/git/myslice-django")
+        raise Exception,"Cannot find ROOT for myslice (neither %s nor %s)"%(PRODUCTION_ROOT,DEVELOPER_ROOT)
+
 init_root()
 
 DATABASES = {

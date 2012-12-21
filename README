@@ -1,17 +1,67 @@
 This file documents the contents of this module
 
-See devel/ for more devel-oriented doc.
+See the devel/ subdir for more devel-oriented doc.
 
-==================== 1st level subdirs
+==================== 1 minute howto
+
+* requirement is to have python + django installed django
+** should be straightforward
+** see devel/django-install.txt in case of trouble
+
+* git clone git://git.onelab.eu/myslice-django.git
+-- or --
+* git clone ssh://yourlogin@git.onelab.eu/git/myslice-django.git
+
+* edit myslice/settings.py and
+** change DEVELOPER_ROOT if you didnt clone into ~/git/myslice-django
+** change the location of your backend API (not yet supported)
+
+* init django
+$ manage.py syncdb
+
+[ at this point point it *might* be needed to run
+$ make allst
+ but as far as running a local server is concerned you should be good without that 
+ feedbakc on this is appreciated]
+
+* run a local server:
+$ manage.py runserver 0.0.0.0:8000
+
+* use it from your browser 
+
+
+==================== Status
+
+For now there's not much in here; 
+
+* Logging in should be easy using one of the few hard coded accounts
+  this was the simplest possible way to demonstrate deferring authorization elsewhere
+* To logout, click on 'logged as *jean*', this shows a confirmation page..
+
+Right now the UI has 4 views: 
+
+* the most useful one being the 'Plugin' view which demonstrates all the available plugins
+  see test_plugin_view in engine/views.py
+
+* slice view : only demonstrates how to use URLs to pass arguments along
+* scroll view : forget about that one, but it does illustrate that some pages can be made public (no need to login)
+* tab view : a hand-made tab widget
+
+(last three from slice/views.py)
+
+==================== Contents: 1st level subdirs
+
+========== code from git
 * myslice: 
-  this is the sjango project', where to look for
-  . settings
-  . urls
-  . common static files 
+  this is the django 'project', where to look for
+  . settings.py
+  . urls.py
 
-* insert_above: 
-  a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
-  much like our past drupal_set_html_head() 
+* engine:
+  the code for building / rendering plugins
+
+* plugins:
+  the actual code for plugins
 
 * auth: 
   a django 'app' that deals with authentication; see especially
@@ -22,19 +72,20 @@ See devel/ for more devel-oriented doc.
 * slice:
   a django app for dealing with slice views
 
+* insert_above: 
+  a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
+
 * templates/
 * static/
-  initially I had started to keep:
-   * templates (html templates with embedded python-like django chunks) 
+  some global stuff:
+   * templates (django templates, i.e. (essentially html) fragments that can be specializied)
    * static files (css, js, images..)
-  locally in the app were they belong
-  but I ended up with having the need to move up and down the tree endlessly
-  so for the beginning at least, I have moved everything in a unique place
-  this convention is subject to change
+  see more about that below
 
----
 * devel:
   no code in there, only various notes and other scripts useful for developers
+
+========== automatically generated 
 
 * all-static: (generated, no need to source-control)
   this is where 'manage.py collectstatic' will gather all your static contents if you run a local server
@@ -42,12 +93,16 @@ See devel/ for more devel-oriented doc.
   $ make clean-static 
   $ make static 
 
-==================== initial conventions for templates and static
+* myslice.sqlite3
+  this is where django stores its own stuff, as per settings.py
+
+
+==================== conventions for templates and static
 
 * templates:
   we store this under templates/ within the corresponding app, e.g.
   auth/templates/login.html
-  for now this is only about html, but the engine can be used for rendering anything including json or whatever..
+  for now this is mostly about html, but the engine can be used for rendering anything including js(on) or whatever..
 
 * static files:
   we chose to have all static files (images, but also javascript and stylesheets) in the various
@@ -57,7 +112,8 @@ See devel/ for more devel-oriented doc.
       img/
       css/
       js/
-  the stuff I have so far is in myslice/ because it looks common to all apps..
 
 
+NOTE. in essence any of these files can be moved around (from e.g. one templates/ dir to another) 
+at any time without any change needed in the code
 

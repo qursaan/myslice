@@ -40,7 +40,6 @@ def tab_view (request):
     return render_to_response ('view-tab.html', tab_env,
                                context_instance=RequestContext(request))
 
-@login_required
 def scroll_view (request):
     return render_to_response ('view-scroll.html',
                                {'title':'Toy page for scrolling',
