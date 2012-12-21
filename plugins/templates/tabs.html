@@ -1,7 +1,7 @@
 {# could try to set class='active' on the one we want to highlight #}
-<ul class="nav nav-tabs" id=tab-'{{ domid }}'>
+<ul class="nav nav-tabs" id='tab-{{ domid }}'>
 {% for son in sons %}
-<li> <a href="#{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
+<li{% if son.active %} class='active'{% endif %}> <a href="#{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
 {% endfor %}
 </ul><!--nav-tabs-->
 <div class="tab-content">
