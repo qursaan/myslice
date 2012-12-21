@@ -18,10 +18,6 @@ class QuickFilter (Plugin) :
         reqs = { 'js_files' : [ "js/quickfilter.js" ],
                  'css_files': [ "css/quickfilter.css" ],
                  }
-        if self.with_datatables:
-            reqs['js_files'].append ("datatables/js/dataTables.js")
-            reqs['js_files'].append ("js/with-datatables.js")
-        print self.classname(),reqs
         return reqs
 
     def exclude_from_json (self):
