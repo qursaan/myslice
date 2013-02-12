@@ -5,13 +5,16 @@
 {% endblock content_related %}
 
 {% block content_main %}
-<code>
-This page is currently not connected to any useful authentication system, but instead, as a proof of concept, it uses a set of hardwired user accounts, see auth/backend.py for more details.
-</code>
-<p>Currently hard wired users:</p>
+<code> This page is currently connected to two authentication systems:</code>
+<ul>
+<li> A manifold server, located at <code>{{ manifold_url }}</code>, and</li>
+<li>
+as a proof of concept, a set of hardwired user accounts, see auth/backend.py for more details. 
+Currently hard wired users are:
 <ul>
   {% for k,v in hard_wired_users.iteritems %}
   <li class='well'> Name= <code>{{ k }}</code>, Password= <code>{{ v }}</code> </li>
   {% endfor %}
 </ul>
+</li></ul>
 {% endblock content_main %}

@@ -16,7 +16,7 @@ class ManifoldAPI:
     self.trace = []
     self.calls = {}
     self.multicall = False
-    self.url = "http://"+self.server+":"+self.port+"/"
+    self.url = config.manifold_url()
     self.proxy = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
   def __getattr__(self, methodName):
