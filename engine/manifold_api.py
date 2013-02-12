@@ -1,19 +1,16 @@
 # Manifold API Python interface
 import xmlrpclib
-#from util.config import Config
+from myslice.config import Config
 
 class ManifoldAPI:
 
   def __init__(self, auth=None, cainfo=None):
 
-    #config = Config()
+    config = Config()
     self.auth = auth
-    #self.server = config.server
-    #self.port = config.port
-    #self.path = config.path
-    self.server = 'demo.myslice.info'
-    self.port = '7080'
-    self.path = '/'
+    self.server = config.manifold_server
+    self.port = config.manifold_port
+    self.path = config.manifold_path
     self.cainfo = cainfo
     self.errors = []
     self.trace = []
