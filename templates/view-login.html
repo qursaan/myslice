@@ -7,9 +7,9 @@
 {% block content_main %}
 <code> This page is currently connected to two authentication systems:</code>
 <ul>
-<li> A manifold server, located at <code>{{ manifold_url }}</code>, and</li>
+<li> A manifold server, located at <code>{{ manifold_url }}</code>, (configured in <code>myslice/config.py</code>), and</li>
 <li>
-as a proof of concept, a set of hardwired user accounts, see auth/backend.py for more details. 
+as a proof of concept, a set of hardwired user accounts, see <code>auth/backend.py</code> for more details. 
 Currently hard wired users are:
 <ul>
   {% for k,v in hard_wired_users.iteritems %}
