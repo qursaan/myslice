@@ -14,7 +14,8 @@ from engine.prelude import Prelude
 # . [ 'SliceList', 'TabbedView' ] : to debug these classes
 # . True : to debug all plugin
 
-DEBUG= [ 'Tabs' ]
+#DEBUG= [ 'Tabs' ]
+DEBUG= False
 
 class Plugin:
 
@@ -112,7 +113,6 @@ class Plugin:
         env ['settings_json' ] = settings_json
         # compute plugin-specific initialization
         js_init = render_to_string ( 'plugin-setenv.js', env )
-        print 'js_init',js_init
         self.add_js_chunks (request, js_init)
         
         # interpret the result of requirements ()

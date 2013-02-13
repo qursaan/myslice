@@ -1,6 +1,6 @@
 # import the User object
 from django.contrib.auth.models import User
-from engine.manifold_api import ManifoldAPI
+from engine.manifoldapi import ManifoldAPI
 
 
 # import time - this is used to create Django's internal username
@@ -14,7 +14,6 @@ class ManifoldBackend:
     def authenticate(self, username=None, password=None):
         if not username or not password:
             return None
-        print username
 
         try:
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}

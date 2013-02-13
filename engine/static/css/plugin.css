@@ -3,3 +3,9 @@ div.plugin-toggle {
     border-style:	dotted;
     border-width:	1px;
 }
+p.plugin-show {
+    cursor: s-resize;
+}
+p.plugin-hide { 
+    cursor: n-resize;
+}

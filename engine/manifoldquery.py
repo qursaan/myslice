@@ -43,6 +43,3 @@ class ManifoldQuery:
         aq = self.analyzed_query.to_json() if self.analyzed_query else 'null'
         
         return "new Query('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, {{%(sq)s}})"%locals()
-
-    
-

@@ -2,6 +2,8 @@
 import xmlrpclib
 from myslice.config import Config
 
+debug=True
+
 class ManifoldAPI:
 
   def __init__(self, auth=None, cainfo=None):
@@ -21,7 +23,7 @@ class ManifoldAPI:
 
   def __getattr__(self, methodName):
       def func(*args, **kwds):
-           print methodName, self.auth, self.url
-           result=getattr(self.proxy, methodName)(self.auth, *args, **kwds)
-           return result
+        result=getattr(self.proxy, methodName)(self.auth, *args, **kwds)
+        if debug: print methodName, self.auth, self.url,'->',result
+        return result
       return func

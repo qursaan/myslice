@@ -1,7 +1,7 @@
 class Config:
 
-#    manifold_server = 'manifold.pl.sophia.inria.fr'
-    manifold_server = 'demo.myslice.info'
+    manifold_server = 'manifold.pl.sophia.inria.fr'
+#    manifold_server = 'demo.myslice.info'
     manifold_port = '7080'
     manifold_path = '/'
 
