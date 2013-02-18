@@ -20,8 +20,11 @@ def login_user(request):
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
+        
+        # pass request within the token, so manifold session key could be attached to the request session.
+        token = {'username': username, 'password': password, 'request': request}    
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(token=token)
         if user is not None:
             if user.is_active:
                 login(request, user)
