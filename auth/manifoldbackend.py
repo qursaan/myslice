@@ -27,7 +27,6 @@ class ManifoldBackend:
             if not session : 
                 return None
             
-            request.session['manifold_session'] = session
             #self.session = session
             # Change GetSession() at some point to return expires as well
             expires = time.time() + (24 * 60 * 60)
