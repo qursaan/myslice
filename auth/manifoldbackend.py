@@ -34,12 +34,13 @@ class ManifoldBackend:
 
             # Change to session authentication
             api.auth = {'AuthMethod': 'session', 'session': session}
-            #self.api = api
+            self.api = api
 
             # Get account details
             person = api.GetPersons(auth)[0]
-            request.session['manifold_person'] = person
-            #self.person = person[0]
+            self.person = person
+
+            request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': expires}
         except:
             return None
 
