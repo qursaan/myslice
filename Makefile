@@ -44,7 +44,7 @@ SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 ### rsync options
 # the config file should probably not be overridden ??
 # --exclude settings.py 
-LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude devel --exclude DataTables-1.9.4
+LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude devel --exclude DataTables-1.9.4 --exclude '*.sqlite3'
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
