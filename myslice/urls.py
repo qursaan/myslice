@@ -8,6 +8,11 @@ from django.conf.urls import patterns, include, url
 from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
+# main entry point (set to the / URL)
+default_view='engine.views.test_plugin_view'
+# where to be redirected after login
+after_login_view='myslice.dashboard.dashboard_view'
+
 urlpatterns = patterns(
     '',
     # Examples:
@@ -19,7 +24,8 @@ urlpatterns = patterns(
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    (r'^/?$', 'engine.views.test_plugin_view'),
+    (r'^/?$', default_view),
+    (r'^/login-ok?$', after_login_view),
     # seems to be what login_required uses to redirect ...
     (r'^accounts/login/$', 'auth.views.login_user'),
     (r'^login/?$', 'auth.views.login_user'),
@@ -30,4 +36,5 @@ urlpatterns = patterns(
     (r'^tab/?$', 'slice.views.tab_view'),
     (r'^scroll/?$', 'slice.views.scroll_view'),
     (r'^plugin/?$', 'engine.views.test_plugin_view'),
+    (r'^dashboard/?$', 'myslice.dashboard.dashboard_view'),
 )

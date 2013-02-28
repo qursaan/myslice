@@ -14,8 +14,8 @@ from engine.prelude import Prelude
 # . [ 'SliceList', 'TabbedView' ] : to debug these classes
 # . True : to debug all plugin
 
-#DEBUG= [ 'Tabs' ]
 DEBUG= False
+DEBUG= [ 'SimpleList' ]
 
 class Plugin:
 
@@ -48,47 +48,57 @@ class Plugin:
     # 
     def __init__ (self, title, domid=None,
                   visible=True, togglable=True, toggled=True, **settings):
-        # what is in this dictionary will get exposed to template and to javascript
-        self._settings=settings
         self.title=title
         if not domid: domid=Plugin.newdomid()
         self.domid=domid
         self.classname=self._classname()
-        self.add_to_settings ( ['title', 'domid', 'classname'] )
         self.visible=visible
         self.togglable=togglable
         self.toggled=toggled
-        self.add_to_settings( ['visible','togglable','toggled'] )
-        # we store as a dictionary the arguments passed to constructor
-        # e.g. SimpleList (list=[1,2,3]) => _settings = { 'list':[1,2,3] }
-        # our own settings are not made part of _settings but could be..
+        # what comes from subclasses
+        for (k,v) in settings.iteritems():
+            setattr(self,k,v)
+            if self.need_debug(): print "%s init - subclass setting %s"%(self.classname,k)
+        # minimal debugging
         if self.need_debug():
-            print "Plugin.__init__ Created plugin with settings %s"%self._settings.keys()
-
-    # subclasses might handle some fields in their own way, 
-    # in which case this call is needed to capture that setting
-    # see e.g. SimpleList or SliceList for an example of that
-    def add_to_settings (self, setting_name_s):
-        if not isinstance (setting_name_s, list):
-            self._settings[setting_name_s]=getattr(self,setting_name_s)
-        else:
-            for setting_name in setting_name_s:
-                self._settings[setting_name]=getattr(self,setting_name)
+            print "%s init dbg .... BEG"%self.classname
+            for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
+            print "%s init dbg .... END"%self.classname
 
     def _classname (self): 
         try:    return self.__class__.__name__
         except: return 'Plugin'
-
-    # shorthands to inspect _settings
-    def get_setting (self, setting, default=None):
-        if setting not in self._settings: return default
-        else:                             return self._settings[setting]
 
     ##########
     def need_debug (self):
         if not DEBUG:           return False
         if DEBUG is True:       return True
         else:                   return self.classname in DEBUG
+
+    def setting_json (self, setting):
+        # TMP: js world expects plugin_uuid
+        if setting=='plugin_uuid':
+            value=self.domid
+        elif setting=='query_uuid':
+            try: value=self.query.uuid
+            except: return '%s:"undefined"'%setting
+        else:
+            value=getattr(self,setting,None)
+            if not value: value = "unknown-setting-%s"%setting
+        # first try to use to_json method (json.dumps not working on class instances)
+        try:    value_json=value.to_json()
+        except: value_json=json.dumps(value,separators=(',',':'))
+        return "%s:%s"%(setting,value_json)
+
+    # expose in json format to js the list of fields as described in json_settings_list()
+    # and add plugin_uuid: domid in the mix
+    # NOTE this plugin_uuid thing might occur in js files from joomla/js, ** do not rename **
+    def settings_json (self):
+        result = "{"
+        result += "plugin_uuid:%s,"%self.domid
+        result += ",".join([ self.setting_json(setting) for setting in self.json_settings_list() ])
+        result += "}"
+        return result
 
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
@@ -100,17 +110,10 @@ class Plugin:
         # shove this into plugin.html
         env = {}
         env ['plugin_content']= plugin_content
-        env.update(self._settings)
+        env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 
-        # expose _settings in json format to js, and add plugin_uuid: domid in the mix
-        # NOTE this plugin_uuid thing might occur in js files, ** do not rename **
-        js_env = { 'plugin_uuid' : self.domid }
-        js_env.update (self._settings)
-        for k in self.exclude_from_json():
-            if k in js_env: del js_env[k]
-        settings_json = json.dumps (js_env, separators=(',',':'))
-        env ['settings_json' ] = settings_json
+        env ['settings_json' ] = self.settings_json()
         # compute plugin-specific initialization
         js_init = render_to_string ( 'plugin-setenv.js', env )
         self.add_js_chunks (request, js_init)
@@ -129,9 +132,6 @@ class Plugin:
         env=self.template_env(request)
         if not isinstance (env,dict):
             raise Exception, "%s.template_env returns wrong type"%self.classname
-        # expose this class's settings to the template
-        # xxx we might need to check that this does not overwrite env..
-        env.update(self._settings)
         result=render_to_string (template, env)
         if self.need_debug():
             print "%s.render_content: BEG --------------------"%self.classname
@@ -213,6 +213,13 @@ class Plugin:
 #                 'css_chunk': [],       # likewise for css scripts
 #                 }
     
-    # for better performance
-    # you can specify a list of keys that won't be exposed as json attributes
-    def exclude_from_json (self): return []
+#    # for better performance
+#    # you can specify a list of keys that won't be exposed as json attributes
+#    def exclude_from_json (self): return []
+
+    # mandatory : define the fields that need to be exposed to json as part of 
+    # plugin initialization
+    # mention 'domid' if you need plugin_uuid
+    # also 'query_uuid' gets replaced with query.uuid
+    def json_settings_list (self): return ['json_settings_list-must-be-redefined']
+

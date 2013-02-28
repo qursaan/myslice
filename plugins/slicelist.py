@@ -5,7 +5,6 @@ class SliceList (SimpleList):
     def __init__ (self, list=[], **settings):
         SimpleList.__init__(self, **settings)
         self.list = [ "<a href='/slice/%s/' class='slicelist'>%s</a>"%(x,x) for x in list ]
-        self.add_to_settings ('list')
 
 #    def requirements (self):
 #        reqs=SimpleList.requirements(self)

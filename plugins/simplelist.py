@@ -8,10 +8,7 @@ class SimpleList (Plugin) :
     def __init__ (self, list=[], with_datatables=False, **settings):
         Plugin.__init__ (self, **settings)
         self.list=list
-# don't expose this as it's big and 
-        self.add_to_settings ('list')
         self.with_datatables = with_datatables
-        self.add_to_settings ('with_datatables')
 
     # SimpleList is useless per se anyways
     def template_file (self): return "simplelist.html"
@@ -27,6 +24,6 @@ class SimpleList (Plugin) :
 # for tests
 #                 'js_chunks' : "/* a javascript chunk */",       
 #                 'css_chunks': "/* a css style */ ",
+    
+    def json_settings_list (self): return ['plugin_uuid', 'query','query_uuid','key','value']
 
-    def exclude_from_json (self):
-        return ['list']

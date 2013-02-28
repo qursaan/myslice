@@ -22,7 +22,6 @@ class Composite (Plugin):
                  [ { 'rendered': son.render(request),
                      'rank': rank,
                      'active': is_active(son),
-                     # this should probably come from son._settings..
                      'title': son.title,
                      'domid': son.domid,
                      'classname': son.classname,
