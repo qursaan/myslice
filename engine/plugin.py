@@ -112,10 +112,13 @@ class Plugin:
         env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 
-        env ['settings_json' ] = self.settings_json()
-        # compute plugin-specific initialization
-        js_init = render_to_string ( 'plugin-setenv.js', env )
-        self.add_js_chunks (request, js_init)
+        # as a first approximation we're only concerned with plugins that are associated with a query
+        # other simpler plugins that only deal with layout do not need this
+        if 'query' in self.__dict__:
+            env ['settings_json' ] = self.settings_json()
+            # compute plugin-specific initialization
+            js_init = render_to_string ( 'plugin-setenv.js', env )
+            self.add_js_chunks (request, js_init)
         
         # interpret the result of requirements ()
         self.handle_requirements (request)
