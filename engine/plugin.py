@@ -95,7 +95,6 @@ class Plugin:
     # NOTE this plugin_uuid thing might occur in js files from joomla/js, ** do not rename **
     def settings_json (self):
         result = "{"
-        result += "plugin_uuid:%s,"%self.domid
         result += ",".join([ self.setting_json(setting) for setting in self.json_settings_list() ])
         result += "}"
         return result
