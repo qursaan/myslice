@@ -25,7 +25,8 @@
             /* Plugin initialization */
 
             /* Subscribe to query updates */
-            jQuery.subscribe('/results/' + options.query_uuid + '/changed', {instance: $this}, update_list);
+	     var url='/results/' + options.query_uuid + '/changed';
+	    jQuery.subscribe(url, {instance: $this}, update_list);
 
             /* End of plugin initialization */
 
