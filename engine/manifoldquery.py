@@ -36,10 +36,13 @@ class ManifoldQuery:
         # xxx unique can be removed, but for now we pad the js structure
         unique=0
 
-        # subqueries is a dictionary method:query
-        sq=", ".join ( [ "'%s':%s" % (method, subquery.to_json())
-                      for (method, subquery) in self.subqueries.iteritems()])
-        
         aq = self.analyzed_query.to_json() if self.analyzed_query else 'null'
+        # subqueries is a dictionary method:query
+        if not self.subqueries: 
+            sq="{}"
+        else:
+            sq=", ".join ( [ "'%s':%s" % (method, subquery.to_json())
+                      for (method, subquery) in self.subqueries.iteritems()])
+            sq="{%s}"%sq
         
-        return "new Query('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, {{%(sq)s}})"%locals()
+        return """ new Query('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, %(sq)s)"""%locals()
