@@ -14,7 +14,7 @@ class SimpleList (Plugin) :
     def template_file (self): return "simplelist.html"
 
     def requirements (self):
-        reqs = { 'js_files' : [ "js/simplelist.js" ],
+        reqs = { 'js_files' : [ "js/plugin.js", "js/query.js", "js/simplelist.js" ],
                  'css_files': [ "css/simplelist.css" ],
                  }
         if self.with_datatables:
