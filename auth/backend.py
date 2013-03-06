@@ -18,7 +18,9 @@ class MyCustomBackend:
 
     # Create an authentication method
     # This is called by the standard Django login procedure
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, token=None):
+        username=token['username']
+        password=token['password']
         users=MyCustomBackend.hard_wired_users
         if username not in users: return None
         if password != users[username]: return None
