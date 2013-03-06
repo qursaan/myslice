@@ -9,7 +9,7 @@
 {{ header_prelude }}
 </head>{# let's add these ones no matter what #}
 {% insert_str prelude "jquery/js/jquery.js" %}
-{% insert prelude_js %} "var _$_=jQuery.noConflict();" {% endinsert %}
+{% insert prelude_js %} "jQuery.noConflict();" {% endinsert %}
 {% insert_str prelude "js/plugin_init.js" %}
 {% insert_str prelude "css/myslice.css" %}
 <body>
