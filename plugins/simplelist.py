@@ -15,7 +15,7 @@ class SimpleList (Plugin) :
 
     def requirements (self):
         reqs = { 'js_files' : [ "js/plugin.js", "js/query.js",
-                                "js/tophat-core.js", "js/simplelist.js" ],
+                                "js/manifold-pubsub.js", "js/simplelist.js" ],
                  'css_files': [ "css/simplelist.css" ],
                  }
         if self.with_datatables:
