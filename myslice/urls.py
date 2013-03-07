@@ -9,9 +9,9 @@ from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
 # main entry point (set to the / URL)
-default_view='engine.views.test_plugin_view'
+default_view='trash.pluginview.test_plugin_view'
 # where to be redirected after login
-after_login_view='myslice.dashboard.dashboard_view'
+after_login_view='trash.dashboard.dashboard_view'
 
 urlpatterns = patterns(
     '',
@@ -31,10 +31,10 @@ urlpatterns = patterns(
     (r'^login/?$', 'auth.views.login_user'),
     (r'^logout/?$', 'auth.views.logout_user'),
     (r'^logout/confirm/?$', 'auth.views.do_logout_user'),
-    (r'^slice/?$', 'slice.views.fake_slice_view'),
-    (r'^slice/(?P<name>[\w\.]+)/?$', 'slice.views.fake_slice_view'),
-    (r'^tab/?$', 'slice.views.tab_view'),
-    (r'^scroll/?$', 'slice.views.scroll_view'),
-    (r'^plugin/?$', 'engine.views.test_plugin_view'),
-    (r'^dashboard/?$', 'myslice.dashboard.dashboard_view'),
+    (r'^slice/?$', 'trash.sampleviews.slice_view'),
+    (r'^slice/(?P<name>[\w\.]+)/?$', 'trash.sampleviews.slice_view'),
+    (r'^tab/?$', 'trash.sampleviews.tab_view'),
+    (r'^scroll/?$', 'trash.sampleviews.scroll_view'),
+    (r'^plugin/?$', 'trash.pluginview.test_plugin_view'),
+    (r'^dashboard/?$', 'trash.dashboard.dashboard_view'),
 )

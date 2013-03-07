@@ -48,9 +48,7 @@ class PluginSet:
         self.reset_queue()
         # run only once the document is ready
         js = "jQuery(function(){%(js)s})"%locals()
-        self.prelude.inspect('before add_js_chunks in async')
         self.add_js_chunks (js)
-        self.prelude.inspect('after add_js_chunks in async')
 
     #################### requirements/prelude management
     # just forward to self.pluginset - see decorator above

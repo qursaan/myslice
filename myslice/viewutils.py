@@ -2,12 +2,13 @@
 
 from copy import deepcopy
 
-standard_topmenu_items = [ { 'label':'Plugin', 'href': '/plugin/'},
-                           { 'label':'Slice',  'href': '/slice/'},
-                           { 'label':'Scroll', 'href': '/scroll/'},
-                           { 'label':'Tab', 'href': '/tab/'},
-                           { 'label':'Dashboard', 'href': '/dashboard/'},
-                           ]
+standard_topmenu_items = [ 
+    { 'label':'Tab', 'href': '/tab/'},
+    { 'label':'Scroll', 'href': '/scroll/'},
+    { 'label':'Slice',  'href': '/slice/'},
+    { 'label':'Plugin', 'href': '/plugin/'},
+    { 'label':'Dashboard', 'href': '/dashboard/'},
+    ]
 
 #login_out_items = { False: { 'label':'Login', 'href':'/login/'},
 #                    True:  { 'label':'Logout', 'href':'/logout/'}}

@@ -66,10 +66,9 @@ def dashboard_view (request):
 
     pluginset.exec_queue_asynchroneously ()
 
-    # request.plugin_prelude holds a summary of the requirements() for all plugins
+    # the prelude object in pluginset contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
     prelude_env = pluginset.template_env()
     template_env.update(prelude_env)
     return render_to_response ('view-plugin.html',template_env,
                                context_instance=RequestContext(request))
-                               

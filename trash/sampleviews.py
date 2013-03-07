@@ -10,23 +10,6 @@ from myslice.viewutils import topmenu_items, the_user
 # tmp
 from myslice.viewutils import lorem, hard_wired_slice_names
 
-# we take name from the URL and propagate in the template
-@login_required
-def fake_slice_view (request, name=None):
-    title='Fake Slice Page'
-    if name: title += " for slice %s"%name
-    result=render_to_response ('view-slice.html',
-                               {'name':name,
-                                'title':title,
-                                'topmenu_items' : topmenu_items('slice',request),
-                                'username':the_user (request),
-                                'slices': hard_wired_slice_names,
-                                'content_main' : lorem,
-                                },
-                               context_instance=RequestContext(request))
-
-    return result
-
 @login_required
 def tab_view (request):
     prelude=Prelude( js_files='bootstrap/js/bootstrap.js', css_files='bootstrap/css/bootstrap.css')
@@ -49,3 +32,20 @@ def scroll_view (request):
                                 'lorem':lorem,
                                 },
                                context_instance=RequestContext(request))
+
+# we take name from the URL and propagate in the template
+@login_required
+def slice_view (request, name=None):
+    title='Fake Slice Page'
+    if name: title += " for slice %s"%name
+    result=render_to_response ('view-slice.html',
+                               {'name':name,
+                                'title':title,
+                                'topmenu_items' : topmenu_items('slice',request),
+                                'username':the_user (request),
+                                'slices': hard_wired_slice_names,
+                                'content_main' : lorem,
+                                },
+                               context_instance=RequestContext(request))
+
+    return result
