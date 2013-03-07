@@ -14,7 +14,7 @@ class SimpleList (Plugin) :
     def template_file (self): return "simplelist.html"
 
     def requirements (self):
-        reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js",
+        reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js", "js/onavail.js",
                                 "js/manifold-pubsub.js", "js/manifold-async.js", ] ,
                  'css_files': [ "css/simplelist.css" ],
                  }

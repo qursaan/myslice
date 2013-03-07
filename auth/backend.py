@@ -1,10 +1,6 @@
 # import the User object
 from django.contrib.auth.models import User
 
-# import the IMAP library
-#from imaplib import IMAP4
-
-# import time - this is used to create Django's internal username
 import time
 
 # Name my backend 'MyCustomBackend'

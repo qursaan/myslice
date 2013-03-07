@@ -7,7 +7,7 @@ force:
 #################### compute emacs tags
 # list files under git but exclude third-party stuff like bootstrap and jquery
 myfiles: force
-	@git ls-files | egrep -v 'insert(_|-)above|/bootstrap.*[0-9]|/jquery/|datatables/'
+	@git ls-files | egrep -v 'insert(_|-)above|static/bootstrap|/jquery/|datatables/'
 
 # in general it's right to rely on the contents as reported by git
 tags: force

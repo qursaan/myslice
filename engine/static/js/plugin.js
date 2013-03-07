@@ -1,7 +1,3 @@
-/*
- * This file is included in includes/js_libraries.php
- */
-
 function getMetadata(){
     return all_headers;
 }

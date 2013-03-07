@@ -6,6 +6,7 @@ import json
 
 from django.template.loader import render_to_string
 
+from engine.pluginset import PluginSet
 from engine.prelude import Prelude
 
 #################### 
@@ -15,7 +16,14 @@ from engine.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-DEBUG= [ 'SimpleList' ]
+#DEBUG= [ 'SimpleList' ]
+
+# decorator to deflect calls on Plugin to its PluginSet
+def to_prelude (method):
+    def actual (self, *args, **kwds):
+        prelude_method=Prelude.__dict__[method.__name__]
+        return prelude_method(self.pluginset.prelude,*args, **kwds)
+    return actual
 
 class Plugin:
 
@@ -31,6 +39,7 @@ class Plugin:
     ########## 
     # Constructor
     #### mandatory
+    # . pluginset: the context of the request being served
     # . title: is used visually for displaying the widget
     #### optional
     # . togglable: whether it can be turned on and off (like PleKitToggle)
@@ -46,8 +55,9 @@ class Plugin:
     # p=Plugin(foo='bar')
     # which will result in 'foo' being accessible to the template engine
     # 
-    def __init__ (self, title, domid=None,
+    def __init__ (self, pluginset, title, domid=None,
                   visible=True, togglable=True, toggled=True, **settings):
+        self.pluginset = pluginset
         self.title=title
         if not domid: domid=Plugin.newdomid()
         self.domid=domid
@@ -64,6 +74,8 @@ class Plugin:
             print "%s init dbg .... BEG"%self.classname
             for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
             print "%s init dbg .... END"%self.classname
+        # do this only once the structure is fine
+        self.pluginset.record_plugin(self)
 
     def _classname (self): 
         try:    return self.__class__.__name__
@@ -102,8 +114,6 @@ class Plugin:
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
-        # initialize prelude placeholder if needed
-        self._init_prelude (request)
         # call render_content
         plugin_content = self.render_content (request)
         # shove this into plugin.html
@@ -118,7 +128,7 @@ class Plugin:
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
             js_init = render_to_string ( 'plugin-setenv.js', env )
-            self.add_js_chunks (request, js_init)
+            self.add_js_chunks (js_init)
         
         # interpret the result of requirements ()
         self.handle_requirements (request)
@@ -144,26 +154,6 @@ class Plugin:
             print "%s.render_content: END --------------------"%self.classname
         return result
 
-    #################### requirements/prelude management
-    def _init_prelude (self, request):
-        if not hasattr (request, 'plugin_prelude'): 
-            # include css/plugins.css
-            request.plugin_prelude=Prelude(css_files='css/plugin.css')
-
-    # can be used directly in render_content()
-    def add_js_files (self, request, files):
-        self._init_prelude (request)
-        request.plugin_prelude.add_js_files (files)
-    def add_css_files (self, request, files):
-        self._init_prelude (request)
-        request.plugin_prelude.add_css_files (files)
-    def add_js_chunks (self, request, chunks):
-        self._init_prelude (request)
-        request.plugin_prelude.add_js_chunks (chunks)
-    def add_css_chunks (self, request, chunks):
-        self._init_prelude (request)
-        request.plugin_prelude.add_css_chunks (chunks)
-
     # or from the result of self.requirements()
     def handle_requirements (self, request):
         try:
@@ -172,8 +162,8 @@ class Plugin:
                 if self.need_debug():
                     print "%s: handling requirement %s"%(self.classname,v)
                 method_name='add_'+k
-                method=Plugin.__dict__[method_name]
-                method(self,request,v)
+                method=PluginSet.__dict__[method_name]
+                method(self.pluginset,v)
         except AttributeError: 
             # most likely the object does not have that method defined, which is fine
             pass
@@ -181,6 +171,17 @@ class Plugin:
             import traceback
             traceback.print_exc()
             pass
+
+    #################### requirements/prelude management
+    # just forward to self.pluginset - see decorator above
+    @to_prelude
+    def add_js_files (self):pass
+    @to_prelude
+    def add_css_files (self):pass
+    @to_prelude
+    def add_js_chunks (self):pass
+    @to_prelude
+    def add_css_chunks (self):pass
 
     ######################################## abstract interface
     # your plugin is expected to implement either 

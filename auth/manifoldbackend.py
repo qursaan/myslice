@@ -1,10 +1,8 @@
-# import the User object
-from django.contrib.auth.models import User
-from engine.manifoldapi import ManifoldAPI
-
-
-# import time - this is used to create Django's internal username
 import time
+
+from django.contrib.auth.models import User
+
+from engine.manifoldapi import ManifoldAPI
 
 # Name my backend 'ManifoldBackend'
 class ManifoldBackend:

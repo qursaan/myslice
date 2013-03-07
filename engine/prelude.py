@@ -2,12 +2,14 @@ from types import StringTypes, ListType
 
 from django.template.loader import render_to_string
 
+debug=True
+
 class Prelude:
 
     """A class for collecting dependencies on js/css files or fragments"""
 
     keys=[ 'js_files','css_files','js_chunks', 'css_chunks' ]
-    def __init__ (self, js_files=[], css_files=[], js_chunks=[], css_chunks=[]):
+    def __init__ (self, js_files=None, css_files=None, js_chunks=None, css_chunks=None):
         # it's tempting to use sets but sets are not ordered..
         self.js_files  = Prelude._normalize(js_files)
         self.css_files = Prelude._normalize(css_files)
@@ -16,7 +18,8 @@ class Prelude:
 
     @staticmethod
     def _normalize (input):
-        if   isinstance (input, ListType):      return input
+        if not input:                           return []
+        elif isinstance (input, ListType):      return input
         elif isinstance (input, StringTypes):   return [ input ]
         else:                                   return list (input)
 
@@ -27,9 +30,18 @@ class Prelude:
         for i in Prelude._normalize (x):
             if i not in self.css_files: self.css_files.append(i)
     def add_js_chunks (self, x):
+        print 'add_js_chunks BEFORE',len(self.js_chunks)
         self.js_chunks += Prelude._normalize (x)
+        print 'add_js_chunks AFTER',len(self.js_chunks)
     def add_css_chunks (self, x):
         self.css_chunks += Prelude._normalize (x)
+
+    def inspect_string (self,msg):
+        result =  'Prelude.inspect %s (%s) with '%(msg,self)
+        result += ",".join( [ "%s->%s"%(k,len(getattr(self,k))) for k in ['js_files','js_chunks','css_files','css_chunks'] ] )
+        return result
+    def inspect (self,msg):
+        print self.inspect_string(msg)
 
     # first attempt was to use a simple dict like this
     #    env={}
@@ -46,6 +58,8 @@ class Prelude:
     # 
     # so a much simpler and safer approach is for use to compute the html header directly
     def template_env (self): 
+        inspect = self.inspect ('template_env')
+        print inspect
         env={}
         env['js_files']=  self.js_files
         env['css_files']= self.css_files
