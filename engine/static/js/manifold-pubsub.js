@@ -1,7 +1,3 @@
-/*
- * This file is included in tophat_render.php
- */
-
 /* getting random error messages with this... -- jordan
    wait until query code is fixed
 jQuery(document).ready(function() {
