@@ -57,11 +57,11 @@ function clone_object(obj) {
 }
 
 /* https://gist.github.com/661855 */
-(function(jQuery) {
+(function($) {
 
-  var o = jQuery({});
+  var o = $({});
 
-  jQuery.subscribe = function( types, selector, data, fn) {
+  $.subscribe = function( types, selector, data, fn) {
     /* borrowed from jQuery */
     if ( data == null && fn == null ) {
         // ( types, fn )
@@ -97,11 +97,11 @@ function clone_object(obj) {
     }]);
   };
 
-  jQuery.unsubscribe = function() {
+  $.unsubscribe = function() {
     o.off.apply(o, arguments);
   };
 
-  jQuery.publish = function() {
+  $.publish = function() {
     o.trigger.apply(o, arguments);
   };
 
