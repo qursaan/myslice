@@ -15,8 +15,8 @@
 	    return this.each(function(){
 		var $this = $(this);
 		var data = $this.data('SimpleList');
-		console.log("data" + data);
-//		looks like $this.attr('title') in undefined..
+//		console.log("data" + data);
+//		looks like $this.attr('title') is undefined..
 //		console.log('iterating in simplelist.init with data='+data+' and title='+$this.attr('title'));
 		/* create an empty DOM object */		
 		var SimpleList = $('<div />', { text : $this.attr('title') });
