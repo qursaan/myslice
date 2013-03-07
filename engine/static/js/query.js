@@ -1,7 +1,3 @@
-/*
- * This file is included in tophat_render.php
- */
-
 function Query(action, method, ts, filter, params, fields, unique, uuid, aq, sq)
 {  
     // get, update, delete, create
