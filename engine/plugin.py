@@ -150,11 +150,6 @@ class Plugin:
             # include css/plugins.css
             request.plugin_prelude=Prelude(css_files='css/plugin.css')
 
-    def inspect_request (self, request, message):
-        has=hasattr(request,'plugin_prelude')
-        get=getattr(request,'plugin_prelude','none-defined')
-        print "INSPECT (%s), hasattr %s, getattr %s"%(message,has,get)
-
     # can be used directly in render_content()
     def add_js_files (self, request, files):
         self._init_prelude (request)
