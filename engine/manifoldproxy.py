@@ -7,7 +7,7 @@
 import json
 # this is for django objects only
 #from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 
 # xxx should probably cater for
 # format_in : how is the query encoded in POST
@@ -34,4 +34,4 @@ def api (request,format):
 failure_answer=[ "csrf_failure" ]
 def csrf_failure(request, reason=""):
     print "CSRF failure with reason '%s'"%reason
-    return HttpResponseForbidden (json.dump (failure_answer), mimetype="application/json")
+    return HttpResponseForbidden (json.dumps (failure_answer), mimetype="application/json")
