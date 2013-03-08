@@ -4,7 +4,9 @@
 # as well as 
 # static/js/manifold-async.js
 
-from django.core import serializers
+import json
+# this is for django objects only
+#from django.core import serializers
 from django.http import HttpResponse
 
 # xxx should probably cater for
@@ -21,6 +23,15 @@ def api (request,format):
         return
 
     # xxx actually ask the backend here
-    hard_wired_answer = {'a':'some string','b':123}
-    return HttpResponse (serializers.serialize("json",hard_wired_answer),
-                         mimetype="application/json")
+    hard_wired_answer = [ {'slice_hrn':'a.b.c'}, {'slice_hrn':'ple.inria.foo' } ]
+    answer=hard_wired_answer
+    return HttpResponse (json.dumps(answer), mimetype="application/json")
+
+#################### 
+# to enable : see CSRF_FAILURE_VIEW in settings.py
+# probably we want to elaborate this one a little in real life
+# at least we can display the reason in the django output (although this turns out disappointing)
+failure_answer=[ "csrf_failure" ]
+def csrf_failure(request, reason=""):
+    print "CSRF failure with reason '%s'"%reason
+    return HttpResponseForbidden (json.dump (failure_answer), mimetype="application/json")
