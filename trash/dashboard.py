@@ -29,6 +29,7 @@ def dashboard_view (request):
                                   # we don't have the user's hrn yet
                                   # in addition this currently returns all slices anyways
                                   sort='slice_hrn',)
+    pluginset.enqueue_query (slices_query)
 
     main_plugin = SimpleList ( # setting visible attributes first
         pluginset=pluginset,

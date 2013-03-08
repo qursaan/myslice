@@ -16,59 +16,22 @@ function manifold_array_size(obj) {
 //
 function manifold_async_exec(arr)
 {
-
+    console.log('manifold_async_exec length='+ arr.length);
     // start spinners
-    //onObjectAvailable('Spinners', function(){ Spinners.create('.loading').play(); }, this, true);
-    jQuery('.loading').spin();
+    // xxx todo - I don't have the spinner jquery plugin yet
+//    jQuery('.loading').spin();
 
     // We use js function closure to be able to pass the query (array) to the
     // callback function used when data is received
-    var manifold_async_success_wrapper = function(query, id) {
-        return function(data, textStatus) {
-            manifold_async_success(data, query, id);
-        };
+    var manifold_async_success_closure = function(query, id) {
+        return function(data, textStatus) {manifold_async_success(data, query, id);}
     };
 
     // Loop through query array and issue XML/RPC queries
     jQuery.each(arr, function(index, elt) {
-        // we do rendering by default
-        jQuery.post(api_url, {'query': elt.query.to_hash()}, manifold_async_success_wrapper(elt.query, elt.id));
+	console.log ('sending POST on ' + api_url + " iterating on " + elt);
+        jQuery.post(api_url, {'query': elt.query.to_hash()}, manifold_async_success_closure(elt.query, elt.id));
     })
-}
-
-function manifold_async_exec_render(arr)
-{
-
-    // start spinners
-    //onObjectAvailable('Spinners', function(){ Spinners.create('.loading').play(); }, this, true);
-    jQuery('.loading').spin();
-
-    // We use js function closure to be able to pass the query (array) to the
-    // callback function used when data is received
-    var manifold_async_success_wrapper = function(query, id) {
-        return function(data, textStatus) {
-            manifold_async_success(data, query, id);
-        };
-    };
-
-    // Loop through query array and issue XML/RPC queries
-    jQuery.each(arr, function(index, elt) {
-        // we do rendering by default
-        jQuery.post(api_render_url, {'query': elt.query.to_hash()}, manifold_async_success_wrapper(elt.query, elt.id));
-    })
-}
-
-function manifold_async_render(data, query)
-{
-    // We use js function closure to be able to pass the query (array) to the
-    // callback function used when data is received
-    var manifold_async_render_success_wrapper = function(query) {
-        return function(data, textStatus) {
-            manifold_async_render_success(data, query);
-        };
-    };
-
-    jQuery.post(api_render_url, {'data': data, 'query': query.to_hash()}, manifold_async_render_success_wrapper(data, query));
 }
 
 function manifold_async_error(str) {
@@ -78,6 +41,7 @@ function manifold_async_error(str) {
     jQuery('.loading').spin();
 }
 
+/* what the hell is this doing here ?
 function apply_format(key, value, type, method) {
     // type = type, key = 
     var link = {
@@ -120,6 +84,7 @@ function apply_format(key, value, type, method) {
         return key;
     }
 }
+*/
 
 function manifold_html_a(key, value, type) {
     if (type == 'network_hrn') {

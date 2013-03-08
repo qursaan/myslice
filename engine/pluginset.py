@@ -33,21 +33,21 @@ class PluginSet:
     # the js async methods (see manifold_async_success)
     # offer the option to deliver the result to a specific DOM elt
     # otherwise it goes through the pubsub using query's uuid
-    def query_enqueue (self, query, domid=None):
+    def enqueue_query (self, query, domid=None):
         self._queue.append ( (query,domid,) )
 
     # return the javascript that triggers all the queries
     def exec_queue_asynchroneously (self):
         js = ""
-        js += "var manifold_query_array = new Array();"
+        js += "var manifold_query_array = new Array();\n"
         for (query,domid) in self._queue:
             qjson=query.to_json()
-            id="'%s'"%domid if domid else undefined
-            js += "manifold_query_array.push({'query':'%(qjson)s', 'id':%(id)s});"%locals()
+            id="'%s'"%domid if domid else 'undefined'
+            js += "manifold_query_array.push({'query':%(qjson)s, 'id':%(id)s});\n"%locals()
         js += "onFunctionAvailable('manifold_async_exec', function() {manifold_async_exec(manifold_query_array);}, this, true);"
         self.reset_queue()
         # run only once the document is ready
-        js = "jQuery(function(){%(js)s})"%locals()
+        js = "$(document).ready(function(){%(js)s})"%locals()
         self.add_js_chunks (js)
 
     #################### requirements/prelude management
