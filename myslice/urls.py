@@ -18,19 +18,30 @@ urlpatterns = patterns(
     # Examples:
     # url(r'^$', 'myslice.views.home', name='home'),
     # url(r'^myslice/', include('myslice.foo.urls')),
-
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
+    #
+    # default / view
+    #
     (r'^/?$', default_view),
+    #
+    # login / logout
+    #
     (r'^login-ok/?$', after_login_view),
     # seems to be what login_required uses to redirect ...
     (r'^accounts/login/$', 'auth.views.login_user'),
     (r'^login/?$', 'auth.views.login_user'),
     (r'^logout/?$', 'auth.views.logout_user'),
     (r'^logout/confirm/?$', 'auth.views.do_logout_user'),
+    #
+    # the manifold proxy
+    #
+    (r'^manifold/api/(?P<format>\w+)/?$', 'engine.manifoldproxy.api'),
+    #
+    # various trash views
+    #
     (r'^slice/?$', 'trash.sampleviews.slice_view'),
     (r'^slice/(?P<name>[\w\.]+)/?$', 'trash.sampleviews.slice_view'),
     (r'^tab/?$', 'trash.sampleviews.tab_view'),
