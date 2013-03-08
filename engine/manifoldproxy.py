@@ -31,8 +31,6 @@ def api (request,format):
     manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
     # forward
     answer=manifold_api.send_manifold_query (manifold_query)
-    #hard_wired_answer = [ {'slice_hrn':'a.b.c'}, {'slice_hrn':'ple.inria.foo' } ]
-    #answer=hard_wired_answer
     return HttpResponse (json.dumps(answer), mimetype="application/json")
 
 #################### 
