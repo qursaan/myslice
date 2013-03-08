@@ -28,3 +28,16 @@ class ManifoldAPI:
         if debug: print methodName, self.auth, self.url,'->',result
         return result
       return func
+
+  # 4amine : xxx
+  def send_manifold_query (self, manifold_query):
+    (action,method)= (raw_query.action,raw_query.method)
+    if action=='get':
+      return self.Get(method,
+                      # need to fill in the other args here
+                      )
+    # xxx...
+    elif action=='others':
+      return None
+
+    

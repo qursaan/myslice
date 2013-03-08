@@ -9,6 +9,8 @@ import json
 #from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
 
+from engine.manifoldquery import ManifoldQuery
+
 # xxx should probably cater for
 # format_in : how is the query encoded in POST
 # format_out: how to serve the results
@@ -23,6 +25,13 @@ def api (request,format):
         return
 
     # xxx actually ask the backend here
+    # 4amine
+    # manifold_query = ManifoldQuery()
+    # manifold_query.fill_from_dict(request.POST)
+    # locate the api and/or the auth
+    # api=
+    # forward
+    # answer=api.send_manifold_query (manifold_query)
     hard_wired_answer = [ {'slice_hrn':'a.b.c'}, {'slice_hrn':'ple.inria.foo' } ]
     answer=hard_wired_answer
     return HttpResponse (json.dumps(answer), mimetype="application/json")

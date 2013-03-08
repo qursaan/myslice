@@ -33,7 +33,7 @@ def dashboard_view (request):
 
     main_plugin = SimpleList ( # setting visible attributes first
         pluginset=pluginset,
-        title='SimpleList and dataTables',
+        title='Asynchroneous SimpleList',
         header='slices list', 
         with_datatables=True,
         toggled=False,
@@ -59,7 +59,7 @@ def dashboard_view (request):
 #    template_env [ 'content_related' ] = related_plugin.render (request)
 
     # more general variables expected in the template
-    template_env [ 'title' ] = 'SimpleList Test View'
+    template_env [ 'title' ] = 'Test view for a full request cycle'
     # the menu items on the top 
     template_env [ 'topmenu_items' ] = topmenu_items('dashboard', request) 
     # so we can sho who is logged
