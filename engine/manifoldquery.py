@@ -54,6 +54,9 @@ class ManifoldQuery:
     # incoming POST <QueryDict: {u'query[method]': [u'slice'], u'query[fields][]': [u'slice_hrn'], u'query[ts]': [u'latest'], u'query[action]': [u'get']}>
     def fill_from_dict (self, d):
         # mandatory...
-        self.action=d['action']
-        self.method=d['method']
-        # 
+        self.action=d['query[action]']
+        self.method=d['query[method]']
+        self.fields=[d['query[fields][]']]
+        self.timestamp=d['query[ts]'] 
+        #self.filters=d['filters']
+        #self.params=d['params']
