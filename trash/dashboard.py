@@ -36,7 +36,7 @@ def dashboard_view (request):
         title='Asynchroneous SimpleList',
         header='slices list', 
         with_datatables=True,
-        toggled=False,
+        toggled=True,
         # this is required for the javascript code
         query=slices_query,
         key='slice_hrn',

@@ -1,4 +1,4 @@
-onavail_debug=true;
+onavail_debug=false;
 
 function onFunctionAvailable(sMethod, oCallback, oObject, bScope) {
     if (eval('typeof ' + sMethod) == 'function') {

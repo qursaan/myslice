@@ -9,6 +9,8 @@
  * License: GPLv3
  */
 
+simplelist_debug=false;
+
 (function($){
     var methods = {
 	init : function( options ) {
@@ -24,8 +26,8 @@
 		if ( ! data ) {
 		    /* Subscribe to query updates */
 		    var url='/results/' + options.query_uuid + '/changed';
-		    $.subscribe(url, {instance: this}, update_list);
-		    window.console.log('subscribing to ' + url);
+		    $.subscribe(url, {instance: $this}, update_list);
+		    if (simplelist_debug) window.console.log('subscribing to ' + url);
 		    $this.data('SimpleList', {options: options, target : this, SimpleList : SimpleList});
 		}
 	    });
@@ -53,7 +55,6 @@
     };
 
     /* Private methods */
-
     function update_list(e, rows) {
         if (rows.length == 0) {
             e.data.instance.html('No result !');
@@ -65,23 +66,11 @@
         }
         options = e.data.instance.data().SimpleList.options;
         is_cached = options.query.ts != 'now' ? true : false;
-        e.data.instance.html(myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>");
+	html_code=myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>";
+        e.data.instance.html(html_code);
         
     }
 
-    function myslice_html_li(type, value, is_cached) {
-        var cached = '';
-        //if (is_cached)
-        //    cached='<div class="cache"><span><b>Cached information from the database</b><br/>Timestamp: XX/XX/XX XX:XX:XX<br/><br/><i>Refresh in progress...</i></span></div>';
-        if (type == 'slice_hrn') {
-            return "<li class='icn icn-play'><a href='/view/slice/" + value + "'>" + value + cached + "</a></li>";
-        } else if (type == 'network_hrn') {
-            return "<li class='icn icn-play'>" + value + cached + "</li>";
-        } else {
-            return "<li>" + value + "</li>";
-        }
-    }
-    
     function myslice_html_ul(data, key, value, is_cached) {
         var out = "<ul>";
         for (var i = 0; i < data.length; i++) {
@@ -90,6 +79,19 @@
         }
         out += "</ul>";
         return out;
+    }
+    
+    function myslice_html_li(type, value, is_cached) {
+        var cached = '';
+        //if (is_cached)
+        //    cached='<div class="cache"><span><b>Cached information from the database</b><br/>Timestamp: XX/XX/XX XX:XX:XX<br/><br/><i>Refresh in progress...</i></span></div>';
+        if (type == 'slice_hrn') {
+            return "<li class='icn icn-play'><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
+        } else if (type == 'network_hrn') {
+            return "<li class='icn icn-play'>" + value + cached + "</li>";
+        } else {
+            return "<li>" + value + "</li>";
+        }
     }
     
 })( jQuery );

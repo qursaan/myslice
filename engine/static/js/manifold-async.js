@@ -1,22 +1,15 @@
+manifold_async_debug=false;
+
 // Helper functions for asynchronous requests
 
 var api_url = '/manifold/api/json/'
-var api_render_url = '/manifold/render/json'
-
-function manifold_array_size(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};
 
 // Executes all async. queries contained in manifold_async_query_array, which is
 // an array of hash (action, method, ts, filter, fields)
 //
 function manifold_async_exec(arr)
 {
-    console.log('manifold_async_exec length='+ arr.length);
+    if (manifold_async_debug) console.log('manifold_async_exec length='+ arr.length);
     // start spinners
     // xxx todo - I don't have the spinner jquery plugin yet
 //    jQuery('.loading').spin();
@@ -29,8 +22,9 @@ function manifold_async_exec(arr)
 
     // Loop through query array and issue XML/RPC queries
     jQuery.each(arr, function(index, elt) {
-	console.log ('sending POST on ' + api_url + " iterating on " + elt);
-        jQuery.post(api_url, {'query': elt.query.to_hash()}, manifold_async_success_closure(elt.query, elt.id));
+	hash=elt.query.to_hash();
+	if (manifold_async_debug) console.log ('sending POST on ' + api_url + " iterating on " + hash);
+        jQuery.post(api_url, {'query': hash}, manifold_async_success_closure(elt.query, elt.id));
     })
 }
 
@@ -121,33 +115,6 @@ function manifold_html_ul(data, key, value, type, method, is_cached) {
     return out;
 }
 
-function manifold_async_render_list(data, method, is_cached) {
-    // we suppose we only have one column, or we need more precisions
-    var col = [];
-    if (manifold_array_size(data[0]) == 1) {
-        for (var k in data[0]) {
-            key = k;
-            value = k;
-        }
-    } else {
-        for (var k in data[0]) {
-            if (k.substr(-4) == '_hrn') {
-                key = k;
-            } else {
-                value = k;
-            }
-        }
-    }
-    var out = manifold_html_ul(data, key, value, key, method, is_cached);
-    var element = '#manifold__list__' + key + '__' + value;
-    jQuery(element).html(out);
-    // FIXME spinners
-    //onObjectAvailable('Spinners', function(){ Spinners.get(element).remove(); }, this, true);
-    jQuery('.loading').spin();
-}
-
-
-
 function manifold_update_template(data) 
 {
     jQuery.each(data, function(key, value) {
@@ -178,26 +145,6 @@ function manifold_async_success(data, query, id) {
         //    var new_query = [query_json.replace("latest", "now")];
         //    manifold_async_exec(new_query);
         //}
-    }
-}
-
-function __old__manifold_async_render_success(data, query) {
-    if (data) {
-
-        // We loop through all the fields to update the corresponding
-        // locations in the page
-        if (typeof(data[0].error) != 'undefined') {
-            manifold_async_error(data[0].error);
-        }
-
-        /* Publish an update announce */
-        jQuery.publish("/rendering/changed", [data, query]);
-
-        // Is there a linked query ?
-        if ((query.done == 'now') && (query.ts == 'latest')) {
-            var new_query = [query_json.replace("latest", "now")];
-            manifold_async_exec(new_query);
-        }
     }
 }
 
