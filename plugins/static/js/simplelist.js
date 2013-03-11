@@ -64,6 +64,7 @@ simplelist_debug=false;
         }
         var options = e.data.data().SimpleList.options;
         var is_cached = options.query.timestamp != 'now' ? true : false;
+	// here is where we use 'key' and 'value' from the SimpleList (python) constructor
 	html_code=myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>";
         e.data.html(html_code);
 	var $elt = e.data;
