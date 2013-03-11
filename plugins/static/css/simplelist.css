@@ -4,3 +4,10 @@ select {
 div.dataTables_filter input[type=text] {
     width: 60;
 }
+li.slice-hrn, li.network-hrn {
+    padding: 0;
+    list-style: none;
+}
+li.slice-hrn>a {
+    padding-left: 8px;
+}

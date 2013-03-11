@@ -80,12 +80,12 @@ simplelist_debug=false;
         return out;
     }
     
-    function myslice_html_li(key, value) {
-        var cached = '';
+    function myslice_html_li(key, value,is_cached) {
+        var cached = is_cached ? "(cached)" : "";
         if (key == 'slice_hrn') {
-            return "<li class='icn icn-play'><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
+            return "<li class='slice-hrn'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
         } else if (key == 'network_hrn') {
-            return "<li class='icn icn-play'>" + value + cached + "</li>";
+            return "<li class='network-hrn'><i class='icon-play-circle'></i>" + value + cached + "</li>";
         } else {
             return "<li>" + value + "</li>";
         }
