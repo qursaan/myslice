@@ -61,6 +61,9 @@ class Prelude:
         env['css_files']= self.css_files
         env['js_chunks']= self.js_chunks
         env['css_chunks']=self.css_chunks
+        if debug:
+            print "prelude has %d js_files, %d css files, %d js chunks and %d css_chunks"%\
+                (len(self.js_files),len(self.css_files),len(self.js_chunks),len(self.css_chunks),)
         # not sure how this should be done more cleanly
         from myslice.settings import STATIC_URL
         env ['STATIC_URL'] = STATIC_URL

@@ -25,7 +25,7 @@ class ManifoldAPI:
   def __getattr__(self, methodName):
       def func(*args, **kwds):
         result=getattr(self.proxy, methodName)(self.auth, *args, **kwds)
-        if debug: print methodName, self.auth, self.url,'->',result
+        if debug: print '===> backend call',methodName, self.auth, self.url,'->',result
         return result
       return func
 
