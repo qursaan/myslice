@@ -54,41 +54,52 @@ simplelist_debug=false;
 
     /* Private methods */
     function update_list(e, rows) {
+	// e.data is what we passed in second argument to subscribe
+	var $this=e.data;
+	// locate the <tbody>, expected layout being
+	// <div class='plugin'> <table> <thead /> <tbody /tbody> </table> </div>
+	// -- or, if we don't have a header --
+	// <div class='plugin'> <table> <tbody /tbody> </table> </div>
+	var $tbody=$this.find("tbody.simplelist").first();
+	if (simplelist_debug) console.log("$tbody goes with "+$tbody.get(0));
+
         if (rows.length == 0) {
-            e.data.html('No result !');
+            $tbody.html("<tr><td class='simplelist-empty'>No result !</tr></td>");
             return;
         }
         if (typeof rows[0].error != 'undefined') {
-            e.data.html('ERROR: ' + rows[0].error);
+            e.data.html("<tr><td class='simplelist-error'>ERROR: " + rows[0].error + "</td></tr>");
             return;
         }
         var options = e.data.data().SimpleList.options;
         var is_cached = options.query.timestamp != 'now' ? true : false;
 	// here is where we use 'key' and 'value' from the SimpleList (python) constructor
-	html_code=myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>";
-        e.data.html(html_code);
+	html_code=myslice_html_tbody(rows, options.key, options.value, is_cached);
+	// locate the tbody from the template, set its text
+        $tbody.html(html_code);
+	// clear the spinning wheel
 	var $elt = e.data;
 	if (simplelist_debug) console.log("about to unspin with elt #" + $elt.attr('id') + " class " + $elt.attr('class'));
 	$elt.closest('.need-spin').spin(false);
     }
 
-    function myslice_html_ul(data, key, value, is_cached) {
-        var out = "<ul>";
+    function myslice_html_tbody(data, key, value, is_cached) {
+//	return $.map (...)
+        var out = "";
         for (var i = 0; i < data.length; i++) {
-            out += myslice_html_li(key, data[i][value], is_cached);
+            out += myslice_html_tr(key, data[i][value], is_cached);
         }
-        out += "</ul>";
         return out;
     }
     
-    function myslice_html_li(key, value,is_cached) {
+    function myslice_html_tr(key, value,is_cached) {
         var cached = is_cached ? "(cached)" : "";
         if (key == 'slice_hrn') {
-            return "<li class='slice-hrn'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
+            return "<tr><td class='simplelist'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></td></tr>";
         } else if (key == 'network_hrn') {
-            return "<li class='network-hrn'><i class='icon-play-circle'></i>" + value + cached + "</li>";
+            return "<tr><td class='simplelist'><i class='icon-play-circle'></i>" + value + cached + "</td></tr>";
         } else {
-            return "<li>" + value + "</li>";
+            return "<tr><td class='simplelist'>" + value + "</td></tr>";
         }
     }
     

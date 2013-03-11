@@ -4,10 +4,13 @@ select {
 div.dataTables_filter input[type=text] {
     width: 60;
 }
-li.slice-hrn, li.network-hrn {
+td.simplelist {
     padding: 0;
     list-style: none;
 }
-li.slice-hrn>a {
+td.simplelist>a {
     padding-left: 8px;
+}
+th.simplelist {
+    font-size: 150%;
 }

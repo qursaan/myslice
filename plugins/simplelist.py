@@ -10,7 +10,14 @@ class SimpleList (Plugin) :
         self.with_datatables = with_datatables
 
     # SimpleList is useless per se anyways
-    def template_file (self): return "simplelist.html"
+    def template_file (self): 
+        return "simplelist.html"
+    
+    def template_env (self, request):
+        env={}
+        header=getattr(self,'header',None)
+        if header: env['header']=header
+        return env
 
     def requirements (self):
         reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js", "js/onavail.js",

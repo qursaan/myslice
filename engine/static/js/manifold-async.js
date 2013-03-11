@@ -1,4 +1,4 @@
-manifold_async_debug=true;
+manifold_async_debug=false;
 
 // Helper functions for asynchronous requests
 

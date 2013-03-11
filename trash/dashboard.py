@@ -14,7 +14,6 @@ from plugins.slicelist import SliceList
 
 # 
 from myslice.viewutils import topmenu_items, the_user
-# from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 @login_required
 def dashboard_view (request):
