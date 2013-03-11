@@ -1,9 +1,4 @@
-select { 
-    width: auto;
-}
-div.dataTables_filter input[type=text] {
-    width: 60;
-}
+/* ---------- */
 td.simplelist {
     padding: 0;
     list-style: none;
@@ -13,4 +8,12 @@ td.simplelist>a {
 }
 th.simplelist {
     font-size: 150%;
+}
+/* ---------- */
+/* xxx this probably should be separated in something related to datatables */
+select { 
+    width: auto;
+}
+div.dataTables_filter input[type=text] {
+    width: 60;
 }
