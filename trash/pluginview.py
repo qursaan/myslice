@@ -22,7 +22,7 @@ from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, 
 @login_required
 def test_plugin_view (request):
 
-    pluginset = PluginSet()
+    pluginset = PluginSet(request)
     
     # variables that will get passed to this template
     template_env = {}

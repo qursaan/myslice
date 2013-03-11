@@ -19,7 +19,7 @@ from myslice.viewutils import topmenu_items, the_user
 @login_required
 def dashboard_view (request):
     
-    pluginset = PluginSet()
+    pluginset = PluginSet(request)
 
     slices_query = ManifoldQuery (action='get',
                                   method='slice',

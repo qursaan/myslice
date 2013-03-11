@@ -2,7 +2,9 @@
 # keeps a handle on all present plugins for managing their queries in a consistent way
 # it is expected to exist one such object for a given page
 
+import json
 from engine.prelude import Prelude
+from engine.manifoldapi import ManifoldAPI
 
 # decorator to deflect calls on this PluginSet to its prelude
 def to_prelude (method):
@@ -13,12 +15,16 @@ def to_prelude (method):
 
 class PluginSet:
 
-    def __init__ (self):
+    def __init__ (self, request):
         self._plugins = {}
         # queue of queries
         self._queue=[]
         self.prelude=Prelude(css_files='css/plugin.css')
         # no queries yet, needed ?
+        # load metadata
+        self._metadata={}
+        self._metadata_javascript='' 
+        self.load_metadata(request)
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):
@@ -49,6 +55,33 @@ class PluginSet:
         # run only once the document is ready
         js = "$(document).ready(function(){%(js)s})"%locals()
         self.add_js_chunks (js)
+
+
+    def load_metadata(self, request):
+        manifold_api_session_auth = request.session['manifold']['auth']
+        manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
+        
+        fields = ['table', 'column.column',
+                    'column.description','column.header', 'column.title',
+                    'column.unit', 'column.info_type',
+                    'column.resource_type', 'column.value_type',
+                    'column.allowed_values', 'column.platforms.platform',
+                    'column.platforms.platform_url']
+
+        results = manifold_api.Get('metadata:table', [], [], fields)
+
+        for res in results:
+            method = res['table']
+            self._metadata[method] = res
+
+        request.session['metadata'] = self._metadata
+        self._metadata_javascript = "all_headers=" + json.dumps(self._metadata) + ";"
+        self.add_js_chunks(self._metadata_javascript)
+
+
+    def metadata_get_fields(self, method):
+        return self._metadata[method]['column'].sort()
+        
 
     #################### requirements/prelude management
     # just forward to self.pluginset - see decorator above
