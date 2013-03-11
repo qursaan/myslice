@@ -1,18 +1,15 @@
-manifold_async_debug=false;
+manifold_async_debug=true;
 
 // Helper functions for asynchronous requests
 
 var api_url = '/manifold/api/json/'
 
-// Executes all async. queries contained in manifold_async_query_array, which is
-// an array of hash (action, method, ts, filter, fields)
-//
-function manifold_async_exec(arr)
-{
-    if (manifold_async_debug) console.log('manifold_async_exec length='+ arr.length);
+// Executes all async. queries
+// input queries are specified as a list of {'query': new Query(..), 'id': <possibly null>}
+function manifold_async_exec(queries) {
+    if (manifold_async_debug) console.log('manifold_async_exec length='+ queries.length);
     // start spinners
-    // xxx todo - I don't have the spinner jquery plugin yet
-//    jQuery('.loading').spin();
+    jQuery('.plugin-toggle').spin();
 
     // We use js function closure to be able to pass the query (array) to the
     // callback function used when data is received
@@ -20,20 +17,22 @@ function manifold_async_exec(arr)
         return function(data, textStatus) {manifold_async_success(data, query, id);}
     };
 
-    // Loop through query array and issue XML/RPC queries
-    jQuery.each(arr, function(index, elt) {
-	hash=elt.query.to_hash();
-	if (manifold_async_debug) console.log ('sending POST on ' + api_url + " iterating on " + hash);
-        jQuery.post(api_url, {'query': hash}, manifold_async_success_closure(elt.query, elt.id));
+    // Loop through query array and use ajax to send back queries (to frontend) with json
+    jQuery.each(queries, function(index, tuple) {
+	hash=tuple.query.to_hash();
+	if (manifold_async_debug) console.log ("sending POST on " + api_url + " iterating on " + tuple + " -> " + hash);
+        jQuery.post(api_url, {'query': hash}, manifold_async_success_closure(tuple.query, tuple.id));
     })
 }
 
+/*
 function manifold_async_error(str) {
     var out = '<div class="error"><h2>Error</h2><dl id="system-message"><dt class="error">Notice</dt><dd class="error message"><ul><li>' + jQuery('<div />').text(str).html() + '</li></ul></dd></dl></div>';
     jQuery('#manifold_message').html(out);
     //onObjectAvailable('Spinners', function(){ Spinners.get('.loading').remove(); }, this, true);
-    jQuery('.loading').spin();
+    jQuery('.plugin-toggle').spin(false);
 }
+*/
 
 /* what the hell is this doing here ?
 function apply_format(key, value, type, method) {

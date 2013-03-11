@@ -17,18 +17,16 @@ simplelist_debug=false;
 	    return this.each(function(){
 		var $this = $(this);
 		var data = $this.data('SimpleList');
-//		console.log("data" + data);
-//		looks like $this.attr('title') is undefined..
-//		console.log('iterating in simplelist.init with data='+data+' and title='+$this.attr('title'));
 		/* create an empty DOM object */		
 		var SimpleList = $('<div />', { text : $this.attr('title') });
 		// If the plugin hasn't been initialized yet
 		if ( ! data ) {
 		    /* Subscribe to query updates */
-		    var url='/results/' + options.query_uuid + '/changed';
-		    $.subscribe(url, {instance: $this}, update_list);
-		    if (simplelist_debug) window.console.log('subscribing to ' + url);
-		    $this.data('SimpleList', {options: options, target : this, SimpleList : SimpleList});
+		    var channel='/results/' + options.query_uuid + '/changed';
+		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
+		    $.subscribe(channel, $this, update_list);
+		    if (simplelist_debug) window.console.log('subscribing to ' + channel);
+		    $this.data('SimpleList', {options: options, SimpleList : SimpleList});
 		}
 	    });
 	},
@@ -57,37 +55,36 @@ simplelist_debug=false;
     /* Private methods */
     function update_list(e, rows) {
         if (rows.length == 0) {
-            e.data.instance.html('No result !');
+            e.data.html('No result !');
             return;
         }
         if (typeof rows[0].error != 'undefined') {
-            e.data.instance.html('ERROR: ' + rows[0].error);
+            e.data.html('ERROR: ' + rows[0].error);
             return;
         }
-        options = e.data.instance.data().SimpleList.options;
-        is_cached = options.query.ts != 'now' ? true : false;
+        var options = e.data.data().SimpleList.options;
+        var is_cached = options.query.timestamp != 'now' ? true : false;
 	html_code=myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>";
-        e.data.instance.html(html_code);
-        
+        e.data.html(html_code);
+	var $elt = e.data;
+	if (simplelist_debug) console.log("about to unspin with elt #" + $elt.attr('id') + " class " + $elt.attr('class'));
+	$elt.closest('.plugin-toggle').spin(false);
     }
 
     function myslice_html_ul(data, key, value, is_cached) {
         var out = "<ul>";
         for (var i = 0; i < data.length; i++) {
             out += myslice_html_li(key, data[i][value], is_cached);
-            //out += myslice_html_li(key, myslice_html_a(data[i][key], data[i][value], key), is_cached);
         }
         out += "</ul>";
         return out;
     }
     
-    function myslice_html_li(type, value, is_cached) {
+    function myslice_html_li(key, value) {
         var cached = '';
-        //if (is_cached)
-        //    cached='<div class="cache"><span><b>Cached information from the database</b><br/>Timestamp: XX/XX/XX XX:XX:XX<br/><br/><i>Refresh in progress...</i></span></div>';
-        if (type == 'slice_hrn') {
+        if (key == 'slice_hrn') {
             return "<li class='icn icn-play'><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
-        } else if (type == 'network_hrn') {
+        } else if (key == 'network_hrn') {
             return "<li class='icn icn-play'>" + value + cached + "</li>";
         } else {
             return "<li>" + value + "</li>";
