@@ -9,7 +9,7 @@ var api_url = '/manifold/api/json/'
 function manifold_async_exec(queries) {
     if (manifold_async_debug) console.log('manifold_async_exec length='+ queries.length);
     // start spinners
-    jQuery('.plugin-toggle').spin();
+    jQuery('.need-spin').spin();
 
     // We use js function closure to be able to pass the query (array) to the
     // callback function used when data is received
@@ -25,12 +25,12 @@ function manifold_async_exec(queries) {
     })
 }
 
-/*
+/* not used
 function manifold_async_error(str) {
     var out = '<div class="error"><h2>Error</h2><dl id="system-message"><dt class="error">Notice</dt><dd class="error message"><ul><li>' + jQuery('<div />').text(str).html() + '</li></ul></dd></dl></div>';
     jQuery('#manifold_message').html(out);
     //onObjectAvailable('Spinners', function(){ Spinners.get('.loading').remove(); }, this, true);
-    jQuery('.plugin-toggle').spin(false);
+    jQuery('.need-spin').spin(false);
 }
 */
 

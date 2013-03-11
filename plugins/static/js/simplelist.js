@@ -68,7 +68,7 @@ simplelist_debug=false;
         e.data.html(html_code);
 	var $elt = e.data;
 	if (simplelist_debug) console.log("about to unspin with elt #" + $elt.attr('id') + " class " + $elt.attr('class'));
-	$elt.closest('.plugin-toggle').spin(false);
+	$elt.closest('.need-spin').spin(false);
     }
 
     function myslice_html_ul(data, key, value, is_cached) {
