@@ -6,6 +6,10 @@ from django.http import HttpResponse, HttpResponseForbidden
 from engine.manifoldquery import ManifoldQuery
 from engine.manifoldapi import ManifoldAPI
 
+# add artificial delay in s
+debug_spin=0
+#debug_spin=1
+
 # this view is what the javascript talks to when it sends a query
 # see also
 # myslice/urls.py
@@ -34,6 +38,9 @@ with the query passed using POST"""
     # actually forward
     manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
     answer=manifold_api.send_manifold_query (manifold_query)
+    if debug_spin:
+        import time
+        time.sleep(debug_spin)
     # return json-encoded answer
     return HttpResponse (json.dumps(answer), mimetype="application/json")
 

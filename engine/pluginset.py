@@ -45,12 +45,12 @@ class PluginSet:
     # return the javascript that triggers all the queries
     def exec_queue_asynchroneously (self):
         js = ""
-        js += "var manifold_query_array = new Array();\n"
+        js += "var async_queries = new Array();\n"
         for (query,domid) in self._queue:
             qjson=query.to_json()
             id="'%s'"%domid if domid else 'undefined'
-            js += "manifold_query_array.push({'query':%(qjson)s, 'id':%(id)s});\n"%locals()
-        js += "onFunctionAvailable('manifold_async_exec', function() {manifold_async_exec(manifold_query_array);}, this, true);"
+            js += "async_queries.push({'query':%(qjson)s, 'id':%(id)s});\n"%locals()
+        js += "onFunctionAvailable('manifold_async_exec', function() {manifold_async_exec(async_queries);}, this, true);"
         self.reset_queue()
         # run only once the document is ready
         js = "$(document).ready(function(){%(js)s})"%locals()

@@ -25,7 +25,14 @@ class ManifoldAPI:
   def __getattr__(self, methodName):
       def func(*args, **kwds):
         result=getattr(self.proxy, methodName)(self.auth, *args, **kwds)
-        if debug: print '===> backend call',methodName, self.auth, self.url,'->',result
+        ### debug
+        if debug:
+          print '===> backend call',methodName, self.auth, self.url,'->',
+          if not result:                        print "no/empty result"
+          elif isinstance (result,str):         print "result is '%s'"%result
+          elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
+          else:                                 print "dont know how to display result"
+        ###
         return result
       return func
 
