@@ -31,11 +31,9 @@ class ManifoldAPI:
 
   # 4amine : xxx
   def send_manifold_query (self, manifold_query):
-    (action,method)= (raw_query.action,raw_query.method)
+    (action,method)= (manifold_query.action,manifold_query.method)
     if action=='get':
-      return self.Get(method,
-                      # need to fill in the other args here
-                      )
+      return self.proxy.Get(self.auth, method, manifold_query.filters, {}, manifold_query.fields)
     # xxx...
     elif action=='others':
       return None

@@ -1,4 +1,4 @@
-function Query(action, method, ts, filter, params, fields, unique, uuid, aq, sq)
+function Query(action, method, timestamp, filters, params, fields, unique, uuid, aq, sq)
 {  
     // get, update, delete, create
     var action;
@@ -7,10 +7,10 @@ function Query(action, method, ts, filter, params, fields, unique, uuid, aq, sq)
     var method; 
     
     // timestamp, now, latest(cache) : date of the results queried    
-    var ts;
+    var timestamp;
     
     // key(field),op(=<>),value
-    var filter;
+    var filters;
 
     // todo
     var params;
@@ -44,29 +44,29 @@ INSERT INTO method VALUES(field=value)
         return jQuery.extend(true, q, this);
     }
     this.add_filter = function(key, op, value) {
-        this.filter.push(new Array(key, op, value));
+        this.filters.push(new Array(key, op, value));
     }
     this.update_filter = function(key, op, value) {
         // Need to be improved...
         // remove all occurrences of key if operation is not defined
         if(!op){
-            this.filter = jQuery.grep(this.filter, function(val, i) {
+            this.filters = jQuery.grep(this.filters, function(val, i) {
                 return val[0] != key; 
             });
-        // Else remove the key+op filter
+        // Else remove the key+op filters
         }else{
-            this.filter = jQuery.grep(this.filter, function(val, i) {return (val[0] != key || val[1] != op);});
+            this.filters = jQuery.grep(this.filters, function(val, i) {return (val[0] != key || val[1] != op);});
         }
-        this.filter.push(new Array(key, op, value));
+        this.filters.push(new Array(key, op, value));
     }
     this.remove_filter = function (key,op,value){
         // if operator is null then remove all occurences of this key
         if(!op){
-            this.filter = jQuery.grep(this.filter, function(val, i) { 
+            this.filters = jQuery.grep(this.filters, function(val, i) { 
                 return val[0] != key; 
             });
         }else{
-            this.filter = jQuery.grep(this.filter, function(val, i) {return (val[0] != key || val[1] != op);});
+            this.filters = jQuery.grep(this.filters, function(val, i) {return (val[0] != key || val[1] != op);});
         }
     }
     // FIXME These functions computing diff's between queries are meant to be shared
@@ -85,8 +85,8 @@ INSERT INTO method VALUES(field=value)
     // FIXME Modify filter to filters
     this.diff_filter = function (otherQuery)
     {
-        var f1 = this.filter;
-        var f2 = otherQuery.filter;
+        var f1 = this.filters;
+        var f2 = otherQuery.filters;
         
         /* added elements are the ones in f2 not in f1 */
         var added   = jQuery.grep(f2, function (x) { return !arrayInArray(x, f1)}); 
@@ -96,7 +96,7 @@ INSERT INTO method VALUES(field=value)
         return {'added':added, 'removed':removed};
     } 
     this.to_hash = function() {
-        return {'action': this.action, 'method': this.method, 'ts': this.ts, 'filters': this.filter, 'params': this.params, 'fields': this.fields};
+        return {'action': this.action, 'method': this.method, 'timestamp': this.timestamp, 'filters': this.filters, 'params': this.params, 'fields': this.fields};
     }
 
     this.analyze_subqueries = function() {
@@ -105,7 +105,7 @@ INSERT INTO method VALUES(field=value)
         q.uuid = this.uuid;
         q.action = this.action;
         q.method = this.method;
-        q.ts = this.ts;
+        q.timestamp = this.timestamp;
 
         /* Filters */
         jQuery.each(this.filters, function(i, filter) {
@@ -120,7 +120,7 @@ INSERT INTO method VALUES(field=value)
                     q.subqueries[this.method] = new Query();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].ts = this.ts;
+                    q.subqueries[this.method].timestamp = this.timestamp;
                 }
                 q.subqueries[this.method].filters.push(Array(field, op, v));
             } else {
@@ -138,7 +138,7 @@ INSERT INTO method VALUES(field=value)
                     q.subqueries[this.method] = new Query();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].ts = this.ts;
+                    q.subqueries[this.method].timestamp = this.timestamp;
                 }
                 q.subqueries[this.method].params[field] = value;
             } else {
@@ -156,7 +156,7 @@ INSERT INTO method VALUES(field=value)
                     q.subqueries[this.method] = new Query();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].ts = this.ts;
+                    q.subqueries[this.method].timestamp = this.timestamp;
                 }
                 q.subqueries[this.method].fields.push(field);
             } else {
@@ -169,8 +169,8 @@ INSERT INTO method VALUES(field=value)
     /* constructor */
     this.action = action;
     this.method = method;
-    this.ts = ts;
-    this.filter = filter;
+    this.timestamp = timestamp;
+    this.filters = filters;
     this.params = params;
     this.fields = fields;
     this.unique = unique;

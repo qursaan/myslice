@@ -53,7 +53,13 @@ class ManifoldQuery:
     # to see an example just look at the server's output
     # incoming POST <QueryDict: {u'query[method]': [u'slice'], u'query[fields][]': [u'slice_hrn'], u'query[ts]': [u'latest'], u'query[action]': [u'get']}>
     def fill_from_dict (self, d):
-        # mandatory...
-        self.action=d['action']
-        self.method=d['method']
-        # 
+        for key in d.keys():
+           for arg in ['action', 'method', 'filters', 'fields', 'timestamp', 'params']:
+                if arg in key:
+                    # dirty hack around fields; fields must be a list
+                    if arg == 'fields': 
+                        setattr(self, arg, [d[key]])
+                    else: 
+                        setattr(self, arg, d[key])
+                    break
+        
