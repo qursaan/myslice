@@ -16,7 +16,7 @@ from engine.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-#DEBUG= [ 'SimpleList' ]
+#DEBUG= [ 'SliceList' ]
 
 # decorator to deflect calls on Plugin to its PluginSet
 def to_prelude (method):
@@ -116,6 +116,11 @@ class Plugin:
         result += "}"
         return result
 
+    # as a first approximation, only plugins that are associated with a query
+    # need to be prepared for js - others just get displayed and that's it
+    def is_asynchroneous (self):
+        return 'query' in self.__dict__
+    
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
@@ -127,9 +132,8 @@ class Plugin:
         env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 
-        # as a first approximation we're only concerned with plugins that are associated with a query
-        # other simpler plugins that only deal with layout do not need this
-        if 'query' in self.__dict__:
+        # export this only for relevant plugins
+        if self.is_asynchroneous():
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
             js_init = render_to_string ( 'plugin-setenv.js', env )
