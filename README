@@ -16,13 +16,14 @@ See the devel/ subdir for more devel-oriented doc.
 ** change DEVELOPER_ROOT if you didnt clone into ~/git/myslice-django
 ** change the location of your backend API (not yet supported)
 
+* edit myslice/config.py and enter the details of your manifold backend
+
 * init django
 $ manage.py syncdb
-
-[ at this point point it *might* be needed to run
+[[ at this point point it *might* be needed to run
 $ make allst
  but as far as running a local server is concerned you should be good without that 
- feedback on this is appreciated]
+ feedback on this is appreciated]]
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
@@ -32,31 +33,57 @@ $ manage.py runserver 0.0.0.0:8000
 
 ==================== Status
 
-For now there's not much in here; 
+*** Authentication ***
 
-* Logging in should be easy using one of the few hard coded accounts
-  this was the simplest possible way to demonstrate deferring authorization elsewhere
-* To logout, click on 'logged as *jean*', this shows a confirmation page..
+Although there still are a few hard-coded accounts in the system, you
+will only be able to see some static views and won't be able to send
+real queries if you use these, so you'd better use a real account (one
+that your manifold backend knows about).
+
+For logging out: click on 'logged as *jean*', this shows a
+confirmation page for logging out. this is intended to be temporary.
 
 
-Right now the UI has 4 views: 
+*** Features ***
 
-* the most useful one being the 'Plugin' view which demonstrates all the available plugins
-  see test_plugin_view in engine/views.py
+We have a basic model for asynchroneous queries (referring to manifold
+queries) and for plugins (in the most general sense a plugin is just a
+piece of the output that may be connected to a query)
+
+Right now the UI has a handful of demo views only; as of this writing
+only the list of slices actually comes from the manifold backend in an
+asynchroneous way.
+
+Also all the views are gathered in the trash/ locations for now, being
+that they're only for assessment purposes.
+
+* dahsboard : has one async. query and 2 plugins that share that
+  query; the intent was to demo a different layout in both cases,
+  although the datatables one won't work yet at this point.
+
+* the 'Plugin' view demonstrates most of the available plugins.
 
 * slice view : only demonstrates how to use URLs to pass arguments along
-* scroll view : forget about that one, but it does illustrate that some pages can be made public (no need to login)
-* tab view : a hand-made tab widget
-(last three from slice/views.py)
 
+* scroll view : mostly it only illustrates that some pages can be made
+  public (no need to login)
+
+* tab view : a hand-made tab widget
+
+Not much effort has yet been put into coming up with a nice layout,
+feel free to tweak that but it's probably still way too early for
+this.
+
+==================== 
 
 Third party tools shipped:
 
 * jquery
 * datatables
+* spin
 * bootstrap
 
-not much effort has been put into coming up with a nice layout and all, feel free to tweak that but it's probably way too early for that
+I've tried to keep track of the version I picked and to have an easy upgrade path.
 
 ==================== Contents: 1st level subdirs
 
@@ -67,7 +94,7 @@ not much effort has been put into coming up with a nice layout and all, feel fre
   . urls.py
 
 * engine:
-  the code for building / rendering plugins
+  the code for building / rendering plugins / queries
 
 * plugins:
   the actual code for plugins
@@ -77,9 +104,6 @@ not much effort has been put into coming up with a nice layout and all, feel fre
   auth.backend.MyCustomBackend 
   for how to use a separate authentication system, 
   as well as settings.py for how to enable it
-
-* slice:
-  a django app for dealing with slice views
 
 * insert_above: 
   a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
