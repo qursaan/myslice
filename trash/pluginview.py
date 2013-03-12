@@ -63,7 +63,6 @@ def test_plugin_view (request):
     template_env [ 'content_main' ] = main_plugin.render(request)
 
     ##########
-    # lacks a/href to /slice/%s
     related_plugin = StaticList (pluginset=pluginset,
                                  title='SliceList plugin',domid='slicelist1',
                                  with_datatables='yes', 
@@ -77,6 +76,7 @@ def test_plugin_view (request):
     template_env [ 'topmenu_items' ] = topmenu_items('plugin', request) 
     template_env [ 'username' ] = the_user (request) 
 
+    # we don't have anythong asynchroneous, but that doesn't hurt...
     pluginset.exec_queue_asynchroneously ()
 
     # the prelude object in pluginset contains a summary of the requirements() for all plugins
