@@ -148,7 +148,7 @@ INSTALLED_APPS = (
     'auth',
     'engine',
     'plugins',
-    'slice',
+    'trash',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
