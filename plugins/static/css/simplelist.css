@@ -1,3 +1,16 @@
+/* ---------- */
+td.simplelist {
+    padding: 0;
+    list-style: none;
+}
+td.simplelist>a {
+    padding-left: 8px;
+}
+th.simplelist {
+    font-size: 150%;
+}
+/* ---------- */
+/* xxx this probably should be separated in something related to datatables */
 select { 
     width: auto;
 }

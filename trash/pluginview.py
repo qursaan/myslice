@@ -11,8 +11,7 @@ from engine.pluginset import PluginSet
 
 from plugins.verticallayout import VerticalLayout
 from plugins.tabs import Tabs
-from plugins.simplelist import SimpleList
-from plugins.slicelist import SliceList
+from plugins.staticlist import StaticList
 from plugins.quickfilter import QuickFilter
 from plugins.raw import Raw
 
@@ -30,10 +29,10 @@ def test_plugin_view (request):
     main_plugin = \
         VerticalLayout ( pluginset=pluginset,
                          title='title for the vertical layout',
-                         sons = [ SimpleList (pluginset=pluginset,
-                                              title='SimpleList and dataTables',
+                         sons = [ StaticList (pluginset=pluginset,
+                                              title='StaticList - with datatables - starts toggled off',
                                               list=hard_wired_list, 
-                                              header='Hard wired', 
+                                              header='Hard wired header', 
                                               foo='the value for foo',
                                               with_datatables=True,
                                               toggled=False),
@@ -45,14 +44,15 @@ def test_plugin_view (request):
                                                       title='a raw plugin',domid='raw1',
                                                       togglable=False,
                                                       html= 3*lorem_p),
-                                                 SliceList(pluginset=pluginset,
-                                                           title='a slice list',
-                                                           togglable=False,
-                                                           list=hard_wired_slice_names),
+                                                 StaticList(pluginset=pluginset,
+                                                            title='a slice list',
+                                                            togglable=False,
+                                                            header="static list but not togglable",
+                                                            list=hard_wired_slice_names),
                                                  Raw (pluginset=pluginset,
                                                       title='raw title',domid='raw2',
                                                       togglable=False,html=lorem) ]),
-                                  SimpleList (pluginset=pluginset,
+                                  StaticList (pluginset=pluginset,
                                               title='SimpleList with slice names', 
                                               list=hard_wired_slice_names,
                                               ),
@@ -64,11 +64,11 @@ def test_plugin_view (request):
 
     ##########
     # lacks a/href to /slice/%s
-    related_plugin = SliceList (pluginset=pluginset,
-                                title='SliceList plugin',domid='slicelist1',
-                                with_datatables='yes', 
-                                list=hard_wired_slice_names, 
-                                header='Slices')
+    related_plugin = StaticList (pluginset=pluginset,
+                                 title='SliceList plugin',domid='slicelist1',
+                                 with_datatables='yes', 
+                                 list=hard_wired_slice_names, 
+                                 header='Slices')
     # likewise but on the side view
     template_env [ 'content_related' ] = related_plugin.render (request)
 

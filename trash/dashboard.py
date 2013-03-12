@@ -10,11 +10,10 @@ from django.contrib.auth.decorators import login_required
 from engine.pluginset import PluginSet
 from engine.manifoldquery import ManifoldQuery
 
-from plugins.simplelist import SimpleList
+from plugins.slicelist import SliceList
 
 # 
 from myslice.viewutils import topmenu_items, the_user
-# from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 @login_required
 def dashboard_view (request):
@@ -28,19 +27,20 @@ def dashboard_view (request):
                                   # xxx filter : should filter on the slices the logged user can see
                                   # we don't have the user's hrn yet
                                   # in addition this currently returns all slices anyways
+                                  # filter = ...
                                   sort='slice_hrn',)
     pluginset.enqueue_query (slices_query)
 
-    main_plugin = SimpleList ( # setting visible attributes first
+    main_plugin = SliceList ( # setting visible attributes first
         pluginset=pluginset,
-        title='Asynchroneous SimpleList',
+        title='Asynchroneous SliceList',
         header='slices list', 
         with_datatables=True,
         toggled=True,
         # this is required for the javascript code
         query=slices_query,
-        key='slice_hrn',
-        value='slice_hrn',
+#        key='slice_hrn',
+#        value='slice_hrn',
         )
 
     # variables that will get passed to the view-plugin.html template

@@ -1,17 +1,12 @@
 from plugins.simplelist import SimpleList
 
+# the SimpleList plugin requires 'key' and 'value' that are used 
+# on the results of the query for rendering
 class SliceList (SimpleList):
     
-    def __init__ (self, list=[], **settings):
-        SimpleList.__init__(self, **settings)
-        self.list = [ "<a href='/slice/%s/' class='slicelist'>%s</a>"%(x,x) for x in list ]
+    def __init__ (self, **settings):
+        SimpleList.__init__(self, key='slice_hrn', value='slice_hrn', **settings)
 
-#    def requirements (self):
-#        reqs=SimpleList.requirements(self)
-#        reqs['js_files'].append('slice.js')
-#        reqs['js_files'].append('slice2.js')
-#        reqs['css_files'].append('slice.css')
-#        reqs['css_files'].append('slice2.css')
-#        reqs['js_chunks']=['js chunk1','js chunk2']
-#        reqs['css_chunks']=['css chunk1','css chunk2']
-#        return reqs
+    # writing a js plugin for that would be overkill, just use SimpleList
+    def plugin_classname (self):
+        return 'SimpleList'

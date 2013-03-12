@@ -1,10 +1,7 @@
 <table class='simplelist{%if with_datatables %} with-datatables{% endif %}'>
 {% if header %}
-<thead><tr><th>{{ header }}</th></tr></thead>
+<thead><tr><th class='simplelist'>{{ header }}</th></tr></thead>
 {% endif %}
-<tbody>
-{% for item in list %}
-<tr><td>{{ item|safe }}</td></tr>
-{% endfor %}
+<tbody class='simplelist'>
 </tbody>
 </table>

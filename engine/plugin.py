@@ -16,7 +16,7 @@ from engine.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-#DEBUG= [ 'SimpleList' ]
+#DEBUG= [ 'SliceList' ]
 
 # decorator to deflect calls on Plugin to its PluginSet
 def to_prelude (method):
@@ -61,7 +61,8 @@ class Plugin:
         self.title=title
         if not domid: domid=Plugin.newdomid()
         self.domid=domid
-        self.classname=self._classname()
+        self.classname=self._py_classname()
+        self.plugin_classname=self._js_classname()
         self.visible=visible
         self.togglable=togglable
         self.toggled=toggled
@@ -77,9 +78,13 @@ class Plugin:
         # do this only once the structure is fine
         self.pluginset.record_plugin(self)
 
-    def _classname (self): 
+    def _py_classname (self): 
         try:    return self.__class__.__name__
         except: return 'Plugin'
+
+    def _js_classname (self): 
+        try:    return self.plugin_classname ()
+        except: return self._py_classname()
 
     ##########
     def need_debug (self):
@@ -111,6 +116,11 @@ class Plugin:
         result += "}"
         return result
 
+    # as a first approximation, only plugins that are associated with a query
+    # need to be prepared for js - others just get displayed and that's it
+    def is_asynchroneous (self):
+        return 'query' in self.__dict__
+    
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
@@ -122,9 +132,8 @@ class Plugin:
         env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 
-        # as a first approximation we're only concerned with plugins that are associated with a query
-        # other simpler plugins that only deal with layout do not need this
-        if 'query' in self.__dict__:
+        # export this only for relevant plugins
+        if self.is_asynchroneous():
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
             js_init = render_to_string ( 'plugin-setenv.js', env )
@@ -221,3 +230,5 @@ class Plugin:
     # also 'query_uuid' gets replaced with query.uuid
     def json_settings_list (self): return ['json_settings_list-must-be-redefined']
 
+    # might also define this one; see e.g. slicelist.py that piggybacks simplelist js code
+    # def plugin_classname (self):

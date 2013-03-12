@@ -1,34 +1,29 @@
 from engine.plugin import Plugin
 
-class SimpleList (Plugin) :
+class StaticList (Plugin) :
 
     # only deal with our own stuff here and let Plugin handle the rest
-    def __init__ (self, key, value, with_datatables=False, **settings):
+    def __init__ (self, list=[], with_datatables=False, **settings):
         Plugin.__init__ (self, **settings)
-        self.key=key
-        self.value=value
+        self.list=list
         self.with_datatables = with_datatables
 
     # SimpleList is useless per se anyways
     def template_file (self): 
-        return "simplelist.html"
+        return "staticlist.html"
     
     def template_env (self, request):
         env={}
         header=getattr(self,'header',None)
         if header: env['header']=header
+        env['list']=self.list
         return env
 
     def requirements (self):
-        reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js", "js/onavail.js",
-                                "js/manifold-pubsub.js", "js/manifold-async.js", "spin/spin.all.js", 
-] ,
-                 'css_files': [ "css/simplelist.css" ],
+        reqs = { 'js_files' : [ ] ,
+                 'css_files': [ "css/staticlist.css" ],
                  }
         if self.with_datatables:
             reqs['js_files'].append ("datatables/js/dataTables.js")
             reqs['js_files'].append ("js/with-datatables.js")
         return reqs
-    
-    def json_settings_list (self): return ['plugin_uuid', 'query','query_uuid','key','value']
-

@@ -17,18 +17,16 @@ simplelist_debug=false;
 	    return this.each(function(){
 		var $this = $(this);
 		var data = $this.data('SimpleList');
-//		console.log("data" + data);
-//		looks like $this.attr('title') is undefined..
-//		console.log('iterating in simplelist.init with data='+data+' and title='+$this.attr('title'));
 		/* create an empty DOM object */		
 		var SimpleList = $('<div />', { text : $this.attr('title') });
 		// If the plugin hasn't been initialized yet
 		if ( ! data ) {
 		    /* Subscribe to query updates */
-		    var url='/results/' + options.query_uuid + '/changed';
-		    $.subscribe(url, {instance: $this}, update_list);
-		    if (simplelist_debug) window.console.log('subscribing to ' + url);
-		    $this.data('SimpleList', {options: options, target : this, SimpleList : SimpleList});
+		    var channel='/results/' + options.query_uuid + '/changed';
+		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
+		    $.subscribe(channel, $this, update_list);
+		    if (simplelist_debug) window.console.log('subscribing to ' + channel);
+		    $this.data('SimpleList', {options: options, SimpleList : SimpleList});
 		}
 	    });
 	},
@@ -56,41 +54,52 @@ simplelist_debug=false;
 
     /* Private methods */
     function update_list(e, rows) {
+	// e.data is what we passed in second argument to subscribe
+	var $this=e.data;
+	// locate the <tbody>, expected layout being
+	// <div class='plugin'> <table> <thead /> <tbody /tbody> </table> </div>
+	// -- or, if we don't have a header --
+	// <div class='plugin'> <table> <tbody /tbody> </table> </div>
+	var $tbody=$this.find("tbody.simplelist").first();
+	if (simplelist_debug) console.log("$tbody goes with "+$tbody.get(0));
+
         if (rows.length == 0) {
-            e.data.instance.html('No result !');
+            $tbody.html("<tr><td class='simplelist-empty'>No result !</tr></td>");
             return;
         }
         if (typeof rows[0].error != 'undefined') {
-            e.data.instance.html('ERROR: ' + rows[0].error);
+            e.data.html("<tr><td class='simplelist-error'>ERROR: " + rows[0].error + "</td></tr>");
             return;
         }
-        options = e.data.instance.data().SimpleList.options;
-        is_cached = options.query.ts != 'now' ? true : false;
-	html_code=myslice_html_ul(rows, options.key, options.value, is_cached)+"<br/>";
-        e.data.instance.html(html_code);
-        
+        var options = e.data.data().SimpleList.options;
+        var is_cached = options.query.timestamp != 'now' ? true : false;
+	// here is where we use 'key' and 'value' from the SimpleList (python) constructor
+	html_code=myslice_html_tbody(rows, options.key, options.value, is_cached);
+	// locate the tbody from the template, set its text
+        $tbody.html(html_code);
+	// clear the spinning wheel
+	var $elt = e.data;
+	if (simplelist_debug) console.log("about to unspin with elt #" + $elt.attr('id') + " class " + $elt.attr('class'));
+	$elt.closest('.need-spin').spin(false);
     }
 
-    function myslice_html_ul(data, key, value, is_cached) {
-        var out = "<ul>";
+    function myslice_html_tbody(data, key, value, is_cached) {
+//	return $.map (...)
+        var out = "";
         for (var i = 0; i < data.length; i++) {
-            out += myslice_html_li(key, data[i][value], is_cached);
-            //out += myslice_html_li(key, myslice_html_a(data[i][key], data[i][value], key), is_cached);
+            out += myslice_html_tr(key, data[i][value], is_cached);
         }
-        out += "</ul>";
         return out;
     }
     
-    function myslice_html_li(type, value, is_cached) {
-        var cached = '';
-        //if (is_cached)
-        //    cached='<div class="cache"><span><b>Cached information from the database</b><br/>Timestamp: XX/XX/XX XX:XX:XX<br/><br/><i>Refresh in progress...</i></span></div>';
-        if (type == 'slice_hrn') {
-            return "<li class='icn icn-play'><a href='/slice/" + value + "'>" + value + cached + "</a></li>";
-        } else if (type == 'network_hrn') {
-            return "<li class='icn icn-play'>" + value + cached + "</li>";
+    function myslice_html_tr(key, value,is_cached) {
+        var cached = is_cached ? "(cached)" : "";
+        if (key == 'slice_hrn') {
+            return "<tr><td class='simplelist'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></td></tr>";
+        } else if (key == 'network_hrn') {
+            return "<tr><td class='simplelist'><i class='icon-play-circle'></i>" + value + cached + "</td></tr>";
         } else {
-            return "<li>" + value + "</li>";
+            return "<tr><td class='simplelist'>" + value + "</td></tr>";
         }
     }
     
