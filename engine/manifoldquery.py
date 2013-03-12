@@ -62,4 +62,86 @@ class ManifoldQuery:
                     else: 
                         setattr(self, arg, d[key])
                     break
-        
+
+
+
+    def analyze_subqueries(self):
+        analyzed_query = ManifoldQuery()
+        analyzed_query.uuid = self.uuid
+        analyzed_query.action = self.action
+        analyzed_query.method = self.method
+        analyzed_query.timestamp = self.timestamp
+
+        # analyse query filters
+        # filter syntax : ['key', 'oparation', 'value']
+        for filter in self.filters:
+            key = filter[0]
+            operation = filter[1]
+            value = filter[2]
+            if '.' in key:
+                method = key.split('.')[0]
+                field = key.split('.')[1]
+                if not analyzed_query.subqueries[method]:
+                    subquery = ManifoldQuery()
+                    subquery.action = self.action
+                    subquery.method = method
+                    subquery.timestamp = self.timestamp
+                    analyzed_query.subqueries[method] = subquery
+
+                analyzed_query.subqueries[method].filters.append([field, operation, value])
+            else:
+                analyzed_query.filters.append(filter)
+
+        # analyse query params
+        # params syntax : params = {'param1': value1, 'param2': value2, ...}
+        for param in self.params.keys():
+            if '.' in param:
+                method = param.split('.')[0]
+                field = param.split('.')[1]
+                if not analyzed_query.subqueries[method]:
+                    subquery = ManifoldQuery()
+                    subquery.action = self.action
+                    subquery.method = method
+                    subquery.timestamp = self.timestamp
+                    analyzed_query.subqueries[method] = subquery
+
+                analyzed_query.subqueries[method].params[field] = self.params[param]
+            else:
+                analyzed_query.params[param] = self.params[param]
+
+        # analyse query fields
+        # fields syntax: fields = [element1, element2, ....]
+        for element in self.fields:
+            if '.' in element:
+                method = element.split('.')[0]
+                field = element.split('.')[1]
+                if not analyzed_query.subqueries[method]:
+                    subquery = ManifoldQuery()
+                    subquery.action = self.action
+                    subquery.method = method
+                    subquery.timestamp = self.timestamp
+                    analyzed_query.subqueries[method] = subquery
+
+                analyzed_query.subqueries[method].fields.append(field)
+            else:
+                analyzed_query.fields.append(element)        
+
+
+        # default subqueries 
+        if analyzed_query.method == 'slice':
+            if not analyzed_query.subqueries['resource']:
+                subquery = ManifoldQuery()
+                subquery.action = self.action
+                subquery.method = method
+                subquery.timestamp = self.timestamp
+                analyzed_query.subqueries['resource'] = subquery
+
+            if not analyzed_query.subqueries['lease']:
+                subquery = ManifoldQuery()
+                subquery.action = self.action
+                subquery.method = method
+                subquery.timestamp = self.timestamp
+                analyzed_query.subqueries['lease'] = subquery
+
+
+        self.analyzed_query = analyzed_query
