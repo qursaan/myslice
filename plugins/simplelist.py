@@ -17,6 +17,7 @@ class SimpleList (Plugin) :
         env={}
         header=getattr(self,'header',None)
         if header: env['header']=header
+        env['with_datatables']= "yes" if self.with_datatables else ""
         return env
 
     def requirements (self):

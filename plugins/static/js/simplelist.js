@@ -9,7 +9,7 @@
  * License: GPLv3
  */
 
-simplelist_debug=false;
+simplelist_debug=true;
 
 (function($){
     var methods = {
@@ -24,7 +24,7 @@ simplelist_debug=false;
 		    /* Subscribe to query updates */
 		    var channel='/results/' + options.query_uuid + '/changed';
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
-		    $.subscribe(channel, $this, update_list);
+		    $.subscribe(channel, $this, update_table);
 		    if (simplelist_debug) window.console.log('subscribing to ' + channel);
 		    $this.data('SimpleList', {options: options, SimpleList : SimpleList});
 		}
@@ -53,8 +53,9 @@ simplelist_debug=false;
     };
 
     /* Private methods */
-    function update_list(e, rows) {
+    function update_table(e, rows) {
 	// e.data is what we passed in second argument to subscribe
+	// so here it is the jquery object attached to the plugin <div>
 	var $this=e.data;
 	// locate the <tbody>, expected layout being
 	// <div class='plugin'> <table> <thead /> <tbody /tbody> </table> </div>
@@ -77,10 +78,20 @@ simplelist_debug=false;
 	html_code=myslice_html_tbody(rows, options.key, options.value, is_cached);
 	// locate the tbody from the template, set its text
         $tbody.html(html_code);
-	// clear the spinning wheel
-	var $elt = e.data;
-	if (simplelist_debug) console.log("about to unspin with elt #" + $elt.attr('id') + " class " + $elt.attr('class'));
-	$elt.closest('.need-spin').spin(false);
+
+	// clear the spinning wheel: look up an ancestor that has the need-spin class
+	$this.closest('.need-spin').spin(false);
+
+	// in case we run in datatables mode
+	// xxx this is not working yet
+	// http://datatables.net/forums/discussion/14556/can039t-get-my-table-to-refresh-properly#Item_1
+	// http://live.datatables.net/ufihuc/2/edit#javascript,html
+	// most likely when using datatables we'll have to change the contents using some other way..
+	var datatables_table=$this.find("table.with-datatables");
+	if (simplelist_debug) console.log ("running fnDraw() on " + datatables_table.length + " items");
+	// only try this if needed as datatables might not be loaded at all
+	if (datatables_table.length >0) datatables_table.dataTable().fnDraw();
+
     }
 
     function myslice_html_tbody(data, key, value, is_cached) {
@@ -93,7 +104,9 @@ simplelist_debug=false;
     }
     
     function myslice_html_tr(key, value,is_cached) {
-        var cached = is_cached ? "(cached)" : "";
+// could not understand what sense this 'cache' stuff could actually make	
+//        var cached = is_cached ? "(cached)" : "";
+        var cached = "";
         if (key == 'slice_hrn') {
             return "<tr><td class='simplelist'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></td></tr>";
         } else if (key == 'network_hrn') {
