@@ -35,12 +35,10 @@ def dashboard_view (request):
         pluginset=pluginset,
         title='Asynchroneous SliceList',
         header='slices list', 
-        with_datatables=True,
+        with_datatables=False,
         toggled=True,
-        # this is required for the javascript code
+        # this is the query at the core of the slice list
         query=slices_query,
-#        key='slice_hrn',
-#        value='slice_hrn',
         )
 
     # variables that will get passed to the view-plugin.html template
@@ -65,7 +63,28 @@ def dashboard_view (request):
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 
+    ##########
+    # lacks a/href to /slice/%s
+    related_plugin = SliceList (
+        pluginset=pluginset,
+        title='Same request, other layout',
+        domid='sidelist',
+        with_datatables=True, 
+        header='paginated slices',
+        # share the query
+        query=slices_query,
+        )
+    # likewise but on the side view
+    template_env [ 'content_related' ] = related_plugin.render (request)
+    
+    # add our own css in the mix
+    pluginset.add_css_files ( 'css/dashboard.css')
+    
+    # don't forget to run the requests
     pluginset.exec_queue_asynchroneously ()
+
+    # xxx create another plugin with the same query and a different layout (with_datatables)
+    # show that it worls as expected, one single api call to backend and 2 refreshed views
 
     # the prelude object in pluginset contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
