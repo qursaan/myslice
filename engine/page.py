@@ -6,14 +6,14 @@ import json
 from engine.prelude import Prelude
 from engine.manifoldapi import ManifoldAPI
 
-# decorator to deflect calls on this PluginSet to its prelude
+# decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
     def actual (self, *args, **kwds):
         prelude_method=Prelude.__dict__[method.__name__]
         return prelude_method(self.prelude,*args, **kwds)
     return actual
 
-class PluginSet:
+class Page:
 
     def __init__ (self, request):
         self._plugins = {}
@@ -84,7 +84,7 @@ class PluginSet:
         
 
     #################### requirements/prelude management
-    # just forward to self.pluginset - see decorator above
+    # just forward to self.prelude - see decorator above
     @to_prelude
     def add_js_files (self):pass
     @to_prelude

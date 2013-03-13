@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 
 from django.contrib.auth.decorators import login_required
 
-from engine.pluginset import PluginSet
+from engine.page import Page
 from engine.manifoldquery import ManifoldQuery
 
 from plugins.slicelist import SliceList
@@ -18,7 +18,7 @@ from myslice.viewutils import topmenu_items, the_user
 @login_required
 def dashboard_view (request):
     
-    pluginset = PluginSet(request)
+    page = Page(request)
 
     slices_query = ManifoldQuery (action='get',
                                   method='slice',
@@ -29,10 +29,10 @@ def dashboard_view (request):
                                   # in addition this currently returns all slices anyways
                                   # filter = ...
                                   sort='slice_hrn',)
-    pluginset.enqueue_query (slices_query)
+    page.enqueue_query (slices_query)
 
     main_plugin = SliceList ( # setting visible attributes first
-        pluginset=pluginset,
+        page=page,
         title='Asynchroneous SliceList',
         header='slices list', 
         with_datatables=False,
@@ -66,7 +66,7 @@ def dashboard_view (request):
     ##########
     # lacks a/href to /slice/%s
     related_plugin = SliceList (
-        pluginset=pluginset,
+        page=page,
         title='Same request, other layout',
         domid='sidelist',
         with_datatables=True, 
@@ -78,17 +78,17 @@ def dashboard_view (request):
     template_env [ 'content_related' ] = related_plugin.render (request)
     
     # add our own css in the mix
-    pluginset.add_css_files ( 'css/dashboard.css')
+    page.add_css_files ( 'css/dashboard.css')
     
     # don't forget to run the requests
-    pluginset.exec_queue_asynchroneously ()
+    page.exec_queue_asynchroneously ()
 
     # xxx create another plugin with the same query and a different layout (with_datatables)
     # show that it worls as expected, one single api call to backend and 2 refreshed views
 
-    # the prelude object in pluginset contains a summary of the requirements() for all plugins
+    # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
-    prelude_env = pluginset.template_env()
+    prelude_env = page.template_env()
     template_env.update(prelude_env)
     return render_to_response ('view-plugin.html',template_env,
                                context_instance=RequestContext(request))

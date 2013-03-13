@@ -6,7 +6,7 @@ import json
 
 from django.template.loader import render_to_string
 
-from engine.pluginset import PluginSet
+from engine.page import Page
 from engine.prelude import Prelude
 
 #################### 
@@ -18,11 +18,11 @@ from engine.prelude import Prelude
 DEBUG= False
 #DEBUG= [ 'SliceList' ]
 
-# decorator to deflect calls on Plugin to its PluginSet
+# decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
     def actual (self, *args, **kwds):
         prelude_method=Prelude.__dict__[method.__name__]
-        return prelude_method(self.pluginset.prelude,*args, **kwds)
+        return prelude_method(self.page.prelude,*args, **kwds)
     return actual
 
 class Plugin:
@@ -39,7 +39,7 @@ class Plugin:
     ########## 
     # Constructor
     #### mandatory
-    # . pluginset: the context of the request being served
+    # . page: the context of the request being served
     # . title: is used visually for displaying the widget
     #### optional
     # . togglable: whether it can be turned on and off (like PleKitToggle)
@@ -55,10 +55,11 @@ class Plugin:
     # p=Plugin(foo='bar')
     # which will result in 'foo' being accessible to the template engine
     # 
-    def __init__ (self, pluginset, title, domid=None,
+    def __init__ (self, page, title, domid=None,
                   visible=True, togglable=True, toggled=True, **settings):
-        self.pluginset = pluginset
+        self.page = page
         self.title=title
+        # callers can provide their domid for css'ing 
         if not domid: domid=Plugin.newdomid()
         self.domid=domid
         self.classname=self._py_classname()
@@ -76,7 +77,7 @@ class Plugin:
             for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
             print "%s init dbg .... END"%self.classname
         # do this only once the structure is fine
-        self.pluginset.record_plugin(self)
+        self.page.record_plugin(self)
 
     def _py_classname (self): 
         try:    return self.__class__.__name__
@@ -171,8 +172,8 @@ class Plugin:
                 if self.need_debug():
                     print "%s: handling requirement %s"%(self.classname,v)
                 method_name='add_'+k
-                method=PluginSet.__dict__[method_name]
-                method(self.pluginset,v)
+                method=Page.__dict__[method_name]
+                method(self.page,v)
         except AttributeError: 
             # most likely the object does not have that method defined, which is fine
             pass
@@ -182,7 +183,7 @@ class Plugin:
             pass
 
     #################### requirements/prelude management
-    # just forward to self.pluginset - see decorator above
+    # just forward to our prelude instance - see decorator above
     @to_prelude
     def add_js_files (self):pass
     @to_prelude
