@@ -118,10 +118,14 @@ class Plugin:
         return result
 
     # as a first approximation, only plugins that are associated with a query
-    # need to be prepared for js - others just get displayed and that's it
-    def is_asynchroneous (self):
+    # need to be prepared for js - meaning their json settings get exposed to js
+    # others just get displayed and that's it
+    def export_json_settings (self):
         return 'query' in self.__dict__
     
+    def start_with_spin (self):
+        return self.export_json_settings()
+
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
@@ -130,12 +134,13 @@ class Plugin:
         # shove this into plugin.html
         env = {}
         env ['plugin_content']= plugin_content
-        self.need_spin=self.is_asynchroneous()
+        # need_spin is used in plugin.html
+        self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 
         # export this only for relevant plugins
-        if self.is_asynchroneous():
+        if self.export_json_settings():
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
             js_init = render_to_string ( 'plugin-setenv.js', env )
@@ -233,5 +238,13 @@ class Plugin:
     # also 'query_uuid' gets replaced with query.uuid
     def json_settings_list (self): return ['json_settings_list-must-be-redefined']
 
-    # might also define this one; see e.g. slicelist.py that piggybacks simplelist js code
-    # def plugin_classname (self):
+    # might also define these ones:
+    #
+    # see e.g. slicelist.py that piggybacks simplelist js code
+    # def plugin_classname (self)
+    #
+    # whether we export the json settings to js
+    # def export_json_settings (self)
+    #
+    # whether we show an initial spinner
+    # def start_with_spin (self)

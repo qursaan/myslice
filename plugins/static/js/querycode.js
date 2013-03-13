@@ -17,7 +17,6 @@ function debug_object (msg, o) {
 }
 
 // xxx TODO
-// . the spinner is still turning after the first refresh - find a means to shut it down completely
 // . turn back on syntax highlighting
 
 (function($) {
@@ -79,8 +78,6 @@ function debug_object (msg, o) {
     }
  
     function do_update ($plugindiv) {
-	// just in case
-	$plugindiv.closest('.need-spin').spin(false);
 
 	var lang=$plugindiv.find(".querycode-lang").val();
 	var dom=$plugindiv.find(".querycode-viz");
