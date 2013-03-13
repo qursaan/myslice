@@ -58,26 +58,31 @@ class Page:
 
 
     def load_metadata(self, request):
-        manifold_api_session_auth = request.session['manifold']['auth']
-        manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
+        if 'metadata' not in request.session.keys(): 
+            manifold_api_session_auth = request.session['manifold']['auth']
+            manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
         
-        fields = ['table', 'column.column',
+            fields = ['table', 'column.column',
                   'column.description','column.header', 'column.title',
                   'column.unit', 'column.info_type',
                   'column.resource_type', 'column.value_type',
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
 
-        results = manifold_api.Get('metadata:table', [], [], fields)
+            results = manifold_api.Get('metadata:table', [], [], fields)
 
-        for res in results:
-            method = res['table']
-            self._metadata[method] = res
+            for res in results:
+                 method = res['table']
+                 self._metadata[method] = res
 
-        request.session['metadata'] = self._metadata
+            request.session['metadata'] = self._metadata
+            self._metadata_javascript = "all_headers=" + json.dumps(self._metadata) + ";"
+            self.add_js_chunks(self._metadata_javascript)
+        else:
+            self._metadata = request.session['metadata']
+
         self._metadata_javascript = "all_headers=" + json.dumps(self._metadata) + ";"
         self.add_js_chunks(self._metadata_javascript)
-
 
     def metadata_get_fields(self, method):
         return self._metadata[method]['column'].sort()
