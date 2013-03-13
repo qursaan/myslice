@@ -10,7 +10,9 @@ from django.contrib.auth.decorators import login_required
 from engine.page import Page
 from engine.manifoldquery import ManifoldQuery
 
+from plugins.verticallayout import VerticalLayout
 from plugins.slicelist import SliceList
+from plugins.querycode import QueryCode
 
 # 
 from myslice.viewutils import topmenu_items, the_user
@@ -31,15 +33,25 @@ def dashboard_view (request):
                                   sort='slice_hrn',)
     page.enqueue_query (slices_query)
 
-    main_plugin = SliceList ( # setting visible attributes first
+    main_plugin = VerticalLayout (
         page=page,
-        title='Asynchroneous SliceList',
-        header='slices list', 
-        with_datatables=False,
-        toggled=True,
-        # this is the query at the core of the slice list
-        query=slices_query,
-        )
+        title="Putting stuff together",
+        sons=[ 
+            SliceList ( # setting visible attributes first
+                page=page,
+                title='Asynchroneous SliceList',
+                header='slices list', 
+                with_datatables=False,
+                toggled=False,
+                # this is the query at the core of the slice list
+                query=slices_query,
+                ),
+            QueryCode (
+                page=page,
+                title="Vizualize your query",
+                query=slices_query,
+                ),
+            ])
 
     # variables that will get passed to the view-plugin.html template
     template_env = {}

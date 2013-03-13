@@ -1,0 +1,185 @@
+body { font-family:Arial, Helvetica, Sans-Serif; font-size:0.8em;}
+
+#report {
+border-collapse:collapse;
+width: 100%;
+}
+#report h4 { margin:0px; padding:0px;}
+#report img { float:right;}
+#report ul { margin:10px 0 10px 40px; padding:0px;}
+#report th { background:#C7DDEE; color:#000; padding:7px 15px; text-align:left;}
+#report td { background:#fff; color:#000; padding:7px 15px; }
+#report tr.odd td { background:#D7DDE3; cursor:pointer; }
+#report div.arrow { background:transparent url(images/arrows.png) no-repeat scroll 0px -16px; width:16px; height:16px; display:block;}
+#report div.up { background-position:0px 0px;}
+
+div.info{
+    position:relative; /*this is the key*/
+    float: right;
+    z-index:24;
+    background: url(images/tooltip.png) no-repeat;
+    //background-color:#ccc;
+    width: 16px;
+    height: 16px;
+    color:#000;
+    text-decoration:none}
+
+div.info:hover{
+    z-index:25;
+    //background-color:#ff0
+}
+
+div.info span{display: none}
+
+div.info:hover span{ /*the span will display just on :hover state*/
+    display:block;
+    position:absolute;
+    //top:1em;
+    left:-22em;
+    width: 20em;
+    font-size: 8pt;
+    border:1px solid #ccdddd;
+    background-color:#ddeeee;
+    color:#000;
+    text-align: left;
+    padding: 0em 0em 0em 1em;
+}
+
+div.method {
+    padding: 10px;
+    background-color: #fafafa;
+    border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+}
+div.ts {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+}
+div.input {
+    padding: 10px;
+    background-color: #fafafa;
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+}
+div.output {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+    border-bottom: solid 1px black;
+}
+
+#viz {
+    padding: 10px;
+    background-color: #fafafa;
+    border: solid 1px black;
+    margin-bottom: 10px;
+}
+
+#colcfg {
+    padding: 10px;
+    background-color: #fafafa;
+    border: solid 1px black;
+    margin-bottom: 10px;
+}
+
+#results {
+    border-top: solid 1px black;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+td.center {
+    background: #ffffff;
+}
+
+#boxes {
+    font-family: Arial, sans-serif;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+#boxes li {
+    list-style-type: none;
+    cursor: move;
+    position: relative;
+    float: left;
+    margin: 2px 2px 0px 0px;
+    //width: 33px;
+    height: 33px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    padding: 5px;
+    background-color: #fafafa;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+table tr.even.row_selected td {
+    background-color: #B0BED9;
+}
+
+table tr.odd.row_selected td {
+    background-color: #9FAFD1;
+}
+
+#coltab tr {
+    margin: 0px;
+}
+
+#coltab td {
+    margin: 0px;
+    border-bottom: none; //1px solid #E9E9E9;
+    padding: 0px;
+}
+
+div.out{background-color:white; color:black}
+div.in{background-color:#CAE8EA; color:#4f6b72}
+div.selected{background-color:gray; color:black}
+div.invisible{display:none}
+
+div.clean{
+        border: 1px solid #850000;
+}
+
+.clean td, .clean th{
+        border: 2px solid #bbb;
+        background: #ddd;
+        padding: 5px 10px;
+        text-align: center;
+        border-radius: 2px;
+}
+
+.clean table{
+        margin: auto;
+        margin-top: 15px;
+        margin-bottom: 15px;
+}
+
+.clean caption{
+        font-weight: bold;
+
+}
+
+.gvChart,.clean{
+        border: 2px solid #850000;
+        border-radius: 5px;
+        -moz-border-radius: 10px;
+        width: 720px;
+
+        margin: auto;
+        margin-top: 20px;
+}
+
+pre{
+        background: #eee;
+        padding: 10px;
+        border-radius: 10px;
+        -moz-border-radius: 10px;
+        white-space: pre-wrap;
+}
+

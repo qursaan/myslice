@@ -130,6 +130,7 @@ class Plugin:
         # shove this into plugin.html
         env = {}
         env ['plugin_content']= plugin_content
+        self.need_spin=self.is_asynchroneous()
         env.update(self.__dict__)
         result = render_to_string ('plugin.html',env)
 

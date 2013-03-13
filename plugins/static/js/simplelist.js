@@ -1,24 +1,20 @@
 /**
  * MySlice SimpleList plugin
- * Version: 0.1.0
- * URL: http://www.myslice.info
+ * URL: http://trac.myslice.info
  * Description: display simple lists like slices or testbeds
- * Requires: 
  * Author: The MySlice Team
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
 
-simplelist_debug=true;
+simplelist_debug=false;
+//simplelist_debug=true;
 
 (function($){
     var methods = {
 	init : function( options ) {
 	    return this.each(function(){
-		var $this = $(this);
-		var data = $this.data('SimpleList');
-		/* create an empty DOM object */		
-		var SimpleList = $('<div />', { text : $this.attr('title') });
+		var $this = $(this), data = $this.data('SimpleList');
 		// If the plugin hasn't been initialized yet
 		if ( ! data ) {
 		    /* Subscribe to query updates */
@@ -26,20 +22,23 @@ simplelist_debug=true;
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
 		    $.subscribe(channel, $this, update_plugin);
 		    if (simplelist_debug) window.console.log('subscribing to ' + channel);
-		    $this.data('SimpleList', {options: options, SimpleList : SimpleList});
+		    $this.data('SimpleList', {options: options});
 		}
 	    });
 	},
 	destroy : function( ) {
+	    if (simplelist_debug) console.log("SimpleList.destroy...");
             return this.each(function(){
 		var $this = $(this), data = $this.data('SimpleList');
+		// xxx not too sure what this is about
 		$(window).unbind('SimpleList');
-		data.SimpleList.remove();
 		$this.removeData('SimpleList');
-            })
-    },
-	update : function( content ) { }
-    };
+            });
+	},
+	update : function( content ) { 
+	    if (simplelist_debug) console.log("SimpleList.update...");
+	},
+    }; // methods
 
     $.fn.SimpleList = function( method ) {
         /* Method calling logic */
@@ -53,21 +52,23 @@ simplelist_debug=true;
     };
 
     /* Private methods */
+    // complexity here is mostly because a datatables-enabled table cannot
+    // be updated in a "normal" way using .html()
     function update_plugin(e, rows) {
 	// e.data is what we passed in second argument to subscribe
 	// so here it is the jquery object attached to the plugin <div>
-	var $this=e.data;
+	var $plugindiv=e.data;
 	// locate the <table> element; with datatables in the way,
 	// this might not be a direct son of the div-plugin
-	var $table=$this.find("table.simplelist").first();
+	var $table=$plugindiv.find("table.simplelist").first();
 	// also we may or may not have a header
 	var $tbody=$table.find("tbody.simplelist").first();
 	var use_datatables = $table.hasClass("with-datatables");
-	if (simplelist_debug) console.log($this.attr('id') + " udt= " + use_datatables);
+	if (simplelist_debug) console.log($plugindiv.attr('id') + " udt= " + use_datatables);
 	
 	// clear the spinning wheel: look up an ancestor that has the need-spin class
 	// do this before we might return
-	$this.closest('.need-spin').spin(false);
+	$plugindiv.closest('.need-spin').spin(false);
 
         if (rows.length == 0) {
 	    if (use_datatables) datatables_set_message ("No result");
@@ -80,7 +81,7 @@ simplelist_debug=true;
 	    else		regular_set_message (error);
             return;
         }
-        var options = e.data.data().SimpleList.options;
+        var options = $plugindiv.data().SimpleList.options;
 	if (use_datatables)	datatables_update_table ($table,$tbody,rows,options.key);
 	else			regular_update_table ($table,$tbody,rows,options.key);
 
@@ -102,9 +103,8 @@ simplelist_debug=true;
     }
 
     function regular_update_table ($table, $tbody, rows, key) {
-	console.log('regular_update_table ' + rows.length + " rows");
+	if (simplelist_debug) console.log('regular_update_table ' + rows.length + " rows");
 	var html=$.map(rows, function (row) { return html_row ( cell (key, row[key])); }).join();
-	console.log("html="+html);
 	$tbody.html(html);
     }
     
@@ -115,7 +115,7 @@ simplelist_debug=true;
     }
 
     function datatables_update_table ($table, $tbody, rows, key) {
-	console.log('datatables_update_table ' + rows.length + " rows");
+	if (simplelist_debug) console.log('datatables_update_table ' + rows.length + " rows");
 	$table.dataTable().fnClearTable();
 	// the lambda here returns a [[]] because $.map is kind of broken; as per the doc:
 	// The function can return any value to add to the array. A returned array will be flattened into the resulting array.
