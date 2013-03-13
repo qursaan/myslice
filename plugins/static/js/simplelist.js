@@ -24,7 +24,7 @@ simplelist_debug=true;
 		    /* Subscribe to query updates */
 		    var channel='/results/' + options.query_uuid + '/changed';
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
-		    $.subscribe(channel, $this, update_table);
+		    $.subscribe(channel, $this, update_plugin);
 		    if (simplelist_debug) window.console.log('subscribing to ' + channel);
 		    $this.data('SimpleList', {options: options, SimpleList : SimpleList});
 		}
@@ -53,67 +53,77 @@ simplelist_debug=true;
     };
 
     /* Private methods */
-    function update_table(e, rows) {
+    function update_plugin(e, rows) {
 	// e.data is what we passed in second argument to subscribe
 	// so here it is the jquery object attached to the plugin <div>
 	var $this=e.data;
-	// locate the <tbody>, expected layout being
-	// <div class='plugin'> <table> <thead /> <tbody /tbody> </table> </div>
-	// -- or, if we don't have a header --
-	// <div class='plugin'> <table> <tbody /tbody> </table> </div>
-	var $tbody=$this.find("tbody.simplelist").first();
-	if (simplelist_debug) console.log("$tbody goes with "+$tbody.get(0));
+	// locate the <table> element; with datatables in the way,
+	// this might not be a direct son of the div-plugin
+	var $table=$this.find("table.simplelist").first();
+	// also we may or may not have a header
+	var $tbody=$table.find("tbody.simplelist").first();
+	var use_datatables = $table.hasClass("with-datatables");
+	if (simplelist_debug) console.log($this.attr('id') + " udt= " + use_datatables);
+	
+	// clear the spinning wheel: look up an ancestor that has the need-spin class
+	// do this before we might return
+	$this.closest('.need-spin').spin(false);
 
         if (rows.length == 0) {
-            $tbody.html("<tr><td class='simplelist-empty'>No result !</tr></td>");
+	    if (use_datatables) datatables_set_message ("No result");
+	    else		regular_set_message ("No result");
             return;
         }
         if (typeof rows[0].error != 'undefined') {
-            e.data.html("<tr><td class='simplelist-error'>ERROR: " + rows[0].error + "</td></tr>");
+	    var error="ERROR: " + rows[0].error;
+	    if (use_datatables) datatables_set_message (error);
+	    else		regular_set_message (error);
             return;
         }
         var options = e.data.data().SimpleList.options;
-        var is_cached = options.query.timestamp != 'now' ? true : false;
-	// here is where we use 'key' and 'value' from the SimpleList (python) constructor
-	html_code=myslice_html_tbody(rows, options.key, options.value, is_cached);
-	// locate the tbody from the template, set its text
-        $tbody.html(html_code);
-
-	// clear the spinning wheel: look up an ancestor that has the need-spin class
-	$this.closest('.need-spin').spin(false);
-
-	// in case we run in datatables mode
-	// xxx this is not working yet
-	// http://datatables.net/forums/discussion/14556/can039t-get-my-table-to-refresh-properly#Item_1
-	// http://live.datatables.net/ufihuc/2/edit#javascript,html
-	// most likely when using datatables we'll have to change the contents using some other way..
-	var datatables_table=$this.find("table.with-datatables");
-	if (simplelist_debug) console.log ("running fnDraw() on " + datatables_table.length + " items");
-	// only try this if needed as datatables might not be loaded at all
-	if (datatables_table.length >0) datatables_table.dataTable().fnDraw();
+	if (use_datatables)	datatables_update_table ($table,$tbody,rows,options.key);
+	else			regular_update_table ($table,$tbody,rows,options.key);
 
     }
 
-    function myslice_html_tbody(data, key, value, is_cached) {
-//	return $.map (...)
-        var out = "";
-        for (var i = 0; i < data.length; i++) {
-            out += myslice_html_tr(key, data[i][value], is_cached);
+    // hard-wire a separate presentation depending on the key being used....
+    function cell(key, value) {
+        if (key == 'slice_hrn') {
+            return "<i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + "</a>";
+        } else if (key == 'network_hrn') {
+            return "<i class='icon-play-circle'></i>" + value ;
+        } else {
+            return value;
         }
-        return out;
+    }
+
+    function regular_set_message ($table, $tbody, message) {
+	$tbody.html("<tr><td>"+message+"</td></tr>");
+    }
+
+    function regular_update_table ($table, $tbody, rows, key) {
+	console.log('regular_update_table ' + rows.length + " rows");
+	var html=$.map(rows, function (row) { return html_row ( cell (key, row[key])); }).join();
+	console.log("html="+html);
+	$tbody.html(html);
     }
     
-    function myslice_html_tr(key, value,is_cached) {
-// could not understand what sense this 'cache' stuff could actually make	
-//        var cached = is_cached ? "(cached)" : "";
-        var cached = "";
-        if (key == 'slice_hrn') {
-            return "<tr><td class='simplelist'><i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + cached + "</a></td></tr>";
-        } else if (key == 'network_hrn') {
-            return "<tr><td class='simplelist'><i class='icon-play-circle'></i>" + value + cached + "</td></tr>";
-        } else {
-            return "<tr><td class='simplelist'>" + value + "</td></tr>";
-        }
+    function datatables_set_message ($table, $tbody, message) {
+	$table.dataTable().fnClearTable();
+	$table.dataTable().fnAddData( [ message ] );
+	$table.dataTable().fnDraw();
     }
+
+    function datatables_update_table ($table, $tbody, rows, key) {
+	console.log('datatables_update_table ' + rows.length + " rows");
+	$table.dataTable().fnClearTable();
+	// the lambda here returns a [[]] because $.map is kind of broken; as per the doc:
+	// The function can return any value to add to the array. A returned array will be flattened into the resulting array.
+	// this is wrong indeed so let's work around that
+	$table.dataTable().fnAddData( $.map(rows, function (row) { return [[ cell (key,row[key]) ]] }) );
+	$table.dataTable().fnDraw();
+    }	
+    
+    function html_row (cell) { return "<tr><td class='simplelist'>"+cell+"</td></tr>"; }
     
 })( jQuery );

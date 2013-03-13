@@ -3,10 +3,9 @@ from engine.plugin import Plugin
 class SimpleList (Plugin) :
 
     # only deal with our own stuff here and let Plugin handle the rest
-    def __init__ (self, key, value, with_datatables=False, **settings):
+    def __init__ (self, key, with_datatables=False, **settings):
         Plugin.__init__ (self, **settings)
         self.key=key
-        self.value=value
         self.with_datatables = with_datatables
 
     # SimpleList is useless per se anyways
@@ -31,5 +30,5 @@ class SimpleList (Plugin) :
             reqs['js_files'].append ("js/with-datatables.js")
         return reqs
     
-    def json_settings_list (self): return ['plugin_uuid', 'query','query_uuid','key','value']
+    def json_settings_list (self): return ['plugin_uuid', 'query','query_uuid','key']
 
