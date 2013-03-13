@@ -1,8 +1,8 @@
 import json
+import uuid
 
-# xxx php has uniqid, need to find a module for that
-counter=1
-def uniqid (): global counter; counter += 1; return counter
+def uniqid (): 
+    return uuid.uuid4().hex
 
 class ManifoldQuery:
 
