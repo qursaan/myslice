@@ -16,10 +16,16 @@ function debug_object (msg, o) {
     console.log (msg + " Keys : " + keys);
 }
 
+// xxx TODO
+// . the spinner is still turning after the first refresh - find a means to shut it down completely
+// . turn back on syntax highlighting
+
 (function($) {
   
     var methods = {
 	init : function (options) {
+	    console.log("temporarily turned off SyntaxHighlighter ...");
+//          SyntaxHighlighter.all();
 	    return this.each(function() {
 		var $this=$(this);
 		var data=$this.data('QueryCode');
@@ -32,11 +38,11 @@ function debug_object (msg, o) {
 		    $this.data('QueryCode', {options: options});
 		    // react to changes to the language selector
 		    $this.find(".querycode-lang").change(change_language);
+		    // publish so we refresh ourselves
+		    $.publish(channel,"please_init_yourself");
 		}
 	    });
 
-	console.log("temporarily turned off SyntaxHighlighter ...");
-//      SyntaxHighlighter.all();
 
 	}, 
 
@@ -46,11 +52,6 @@ function debug_object (msg, o) {
 //	update : function( content ) { 
 //	    if (querycode_debug) console.log("QueryCode.update...");
 //	},
-	trigger : function () {
-	    var channel='/results/' + $(this).data.QueryCode.options.query_uuid + '/updated';
-	    publish(channel,"trigger");
-	}
-	    
 	
     } // methods
 			  
@@ -175,11 +176,5 @@ function debug_object (msg, o) {
 	return output;
     }
     
-
-
-    // get these plugins to update their contents upon loading
-    // manually publishing on the right channel
-//    $(function () { $(".QueryCode").each(function () { this.trigger(); })})
-
 })(jQuery); // end closure wrapper
 
