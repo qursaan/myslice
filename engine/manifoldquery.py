@@ -47,14 +47,12 @@ class ManifoldQuery:
         
         return """ new Query('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, %(sq)s)"""%locals()
     
-    # 4amine
-    # xxx
-    # this should build an object from a dict as received from javascript
-    # to see an example just look at the server's output
+    # this builds a ManifoldQuery object from a dict as received from javascript through its ajax request 
+    # e.g. here's what I captured from the server's output
     # incoming POST <QueryDict: {u'query[method]': [u'slice'], u'query[fields][]': [u'slice_hrn'], u'query[timestamp]': [u'latest'], u'query[action]': [u'get']}>
     def fill_from_dict (self, d):
         for key in d.keys():
-           for arg in ['action', 'method', 'filters', 'fields', 'timestamp', 'params']:
+            for arg in ['action', 'method', 'filters', 'fields', 'timestamp', 'params']:
                 if arg in key:
                     # dirty hack around fields; fields must be a list
                     if arg == 'fields': 

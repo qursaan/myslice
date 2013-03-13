@@ -96,9 +96,9 @@ INSERT INTO method VALUES(field=value)
         return {'added':added, 'removed':removed};
     } 
     this.to_hash = function() {
-        return {'action': this.action, 'method': this.method, 'timestamp': this.timestamp, 'filters': this.filters, 'params': this.params, 'fields': this.fields};
+        return {'action': this.action, 'method': this.method, 'timestamp': this.timestamp,
+		'filters': this.filters, 'params': this.params, 'fields': this.fields};
     }
-
     this.analyze_subqueries = function() {
         /* adapted from the PHP function in com_tophat/includes/query.php */
         var q = new Query();
