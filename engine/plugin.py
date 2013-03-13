@@ -171,6 +171,7 @@ class Plugin:
             for (k,v) in d.iteritems():
                 if self.need_debug():
                     print "%s: handling requirement %s"%(self.classname,v)
+                # e.g. js_files -> add_js_files
                 method_name='add_'+k
                 method=Page.__dict__[method_name]
                 method(self.page,v)
