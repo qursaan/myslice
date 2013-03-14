@@ -7,12 +7,6 @@
  * License: GPLv3
  */
 
-function debug_object (msg, o) {
-    var keys=[];
-    for (var k in o) keys.push(k);
-    console.log (msg + " Keys : " + keys);
-}
-
 // xxx TODO
 // . turn back on syntax highlighting
 
@@ -131,7 +125,7 @@ function debug_object (msg, o) {
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'pp srv.call("' + title_case(query.action) +'", auth, "' + query.method + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
+	output += 'pp srv.call("' + mixed_case(query.action) +'", auth, "' + query.method + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
 
 	var output = '<pre class="brush: ruby; toolbar: false;">' + output + "</pre>";
 	return output;
@@ -164,12 +158,12 @@ function debug_object (msg, o) {
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'srv.' + title_case(query.action) + '(auth, "' + query.method + '", ' + ifs + ', {}, ' + ofs + ')';
+	output += 'srv.' + mixed_case(query.action) + '(auth, "' + query.method + '", ' + ifs + ', {}, ' + ofs + ')';
 	var output = '<pre class="brush: python; toolbar: false;">' + output + "</pre>";
 	return output;
     }
 
-    function title_case (txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}
+    function mixed_case (txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}
     
 })(jQuery); // end closure wrapper
 

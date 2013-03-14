@@ -56,9 +56,10 @@ def test_plugin_view (request):
                                               title='SimpleList with slice names', 
                                               list=hard_wired_slice_names,
                                               ),
-                                  QuickFilter (list=quickfilter_criterias,
-                                               page=page,
-                                               title='QuickFilter in main content') ] )
+                                  QuickFilter (page=page,
+                                               title='QuickFilter in main content',
+                                               list=quickfilter_criterias,
+                                               ) ] )
     # define 'content_main' to the template engine
     template_env [ 'content_main' ] = main_plugin.render(request)
 
