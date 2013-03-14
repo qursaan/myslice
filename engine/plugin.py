@@ -16,7 +16,7 @@ from engine.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-#DEBUG= [ 'SliceList' ]
+DEBUG= [ 'QuickFilter' ]
 
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):

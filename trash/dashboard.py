@@ -15,7 +15,7 @@ from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
 
-from myslice.viewutils import, quickfilter_criterias
+from myslice.viewutils import quickfilter_criterias
 
 # 
 from myslice.viewutils import topmenu_items, the_user
@@ -49,7 +49,7 @@ def dashboard_view (request):
             QuickFilter (
                 page=page,
                 title='play with filters',
-                list=quickfilter_criterias,
+                criterias=quickfilter_criterias,
                 ),
             SliceList ( # setting visible attributes first
                 page=page,

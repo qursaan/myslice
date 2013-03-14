@@ -24,6 +24,6 @@ class StaticList (Plugin) :
                  'css_files': [ "css/staticlist.css" ],
                  }
         if self.with_datatables:
-            reqs['js_files'].append ("datatables/js/dataTables.js")
+            reqs['js_files'].append ("js/dataTables.js")
             reqs['js_files'].append ("js/with-datatables.js")
         return reqs

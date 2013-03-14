@@ -34,7 +34,7 @@
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
 		    $.subscribe(channel, $this, update_plugin);
 		    if (debug) window.console.log('subscribing to ' + channel);
-		    $this.data('SimpleList', {options: options});
+		    $this.data('SimpleList', options);
 		}
 	    });
 	},
@@ -82,7 +82,7 @@
 	    else		regular_set_message (error);
             return;
         }
-        var options = $plugindiv.data().SimpleList.options;
+        var options = $plugindiv.data().SimpleList;
 	if (use_datatables)	datatables_update_table ($table,$tbody,rows,options.key);
 	else			regular_update_table ($table,$tbody,rows,options.key);
 

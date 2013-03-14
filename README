@@ -162,13 +162,9 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
   we chose to have all static files (images, but also javascript and stylesheets) in the various
   proj or app where they belong, under a static/ subdir that has this structure:
   where-it-belongs/
-    static/
       img/
       css/
       js/
-
-NOTE. in essence any of these files can be moved around (from e.g. one templates/ dir to another) 
-at any time without any change needed in the code
 
 * filenames / locations
 
@@ -178,27 +174,13 @@ at any time without any change needed in the code
   -- or --
   $ make list-all
 
-  as far as possible it's great to have things named the same after e.g. say a plugin name
+
+* plugins
+  use a naming scheme as simple as possible
     like e.g.
-    plugins/quickfilter.py
-    plugins/templates/quickfilter.html
-    plugins/static/js/quickfilter.js
-    plugins/static/css/quickfilter.css
+    plugins/quickfilter/quickfilter.py
+    plugins/quickfilter/quickfilter.html
+    plugins/quickfilter/quickfilter.js
+    plugins/quickfilter/quickfilter.css
 
-  it's sometimes not working though, so here are a few additional conventions
 
-    the global layout (for now I needed only one) is named layout-myslice.html
-      it provides the global layout with one menu stuck on top and 2 divs 3/4 1/4
-
-    the views that I currently have are all named in templates/view-<>.html
-      they all extend a layout
-      they should/could admittedly move where they belong (in auth/slice/engine) 
-      so that they would go with their views.py code, but for now it's impler this way
-
-    and there are 3 'widgets' (login, logout, and topmenu) 
-      these could maybe be best implemented as a plugin now that I have the right model for that
-      however esp. for the login/logout I'm not quite sure this will remain over time
-      so for now it's good enough like this
-
-So in summary there's still room for a lot of improvement on this particular topic..
-At the very least topmenu should be made a plugin, and maybe also login/logout
