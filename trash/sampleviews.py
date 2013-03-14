@@ -12,7 +12,7 @@ from myslice.viewutils import lorem, hard_wired_slice_names
 
 @login_required
 def tab_view (request):
-    prelude=Prelude( js_files='bootstrap/js/bootstrap.js', css_files='bootstrap/css/bootstrap.css')
+    prelude=Prelude( js_files='js/bootstrap.js', css_files='css/bootstrap.css')
     prelude_env = prelude.template_env()
     tab_env = {'title':'Page for playing with Tabs',
                'topmenu_items': topmenu_items('tab',request),

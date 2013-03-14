@@ -1,4 +1,4 @@
-This file documents the contents of this module
+his file documents the contents of this module
 
 See the devel/ subdir for more devel-oriented doc.
 
@@ -20,15 +20,29 @@ See the devel/ subdir for more devel-oriented doc.
 
 * init django
 $ manage.py syncdb
-[[ at this point point it *might* be needed to run
-$ make allst
- but as far as running a local server is concerned you should be good without that 
- feedback on this is appreciated]]
+
+* gather static files
+$ make static
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
+-- or -- my advice:
+$ devel/server-loop.sh
+when you just need to hit ^C yourself when your static files need to be refreshed - see below
 
 * use it from your browser 
+
+.......... NOTES on using the development server
+. first off, running manage.py runserver is provided by django as a development convenience but SHOULD NOT be used in production
+. second, when you do use it for developement purposes, please be aware that:
+.. the recommended layout for the various files and pieces (py, html, js and css) qith django is really painful
+   we should use e.g. plugins/simplelist.py, plugins/templates/plugins.html, plugins/static/js/simplelist.js and plugins/static/css/simplelist.css
+.. as that does not make sense IMHO, I've rewritten the tool for gathering these pieces in such a layout but from a completely flat codebase
+   I mean I want to be able to store all the files building a plugin in a single (git) directory 
+   Of course it's a completely different matter once the service is packaged and installed, these files of course get properly separated.
+.. as a result it is a little bit less convenient to use the development server
+   when you change the layout of your static and template files, you might need to re-run 'make static', so it is recommended to use
+   devel/server-loop.sh instead
 
 
 ==================== Status
@@ -108,11 +122,14 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
 * insert_above: 
   a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
 
-* templates/
-   * some global templates (django templates, i.e. (essentially html) fragments that can be specializied)
-     more on this below
+* trash/
+  rough/preliminary views in here - as the name suggests this is temporary
 
-* static/
+* views/
+  will receive actual views over time 
+  currently has some global html templates as well
+
+* third-party/
    * third party stuff (bootstrapfs, jquery, datatables)
    * + some global static files (css, js, images..)
      see more about that below too
@@ -123,21 +140,23 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
 ========== automatically generated 
 
 * all-static: (generated, no need to source-control)
-  this is where 'manage.py collectstatic' will gather all your static contents if you run a local server
+  this is where 'make static' will gather all your static contents if you run a local server
   make has convenience targets to refresh this area
-  $ make clean-static 
   $ make static 
+  $ make clean-static 
 
 * myslice.sqlite3
   this is where django stores its own stuff, as per settings.py
 
-
-==================== conventions for templates and static
+==================== conventions for templates
 
 * templates:
   we store this under templates/ within the corresponding app, e.g.
   auth/templates/login.html
-  for now this is mostly about html, but the engine can be used for rendering anything including js(on) or whatever..
+  for now this is mostly about html, but the engine can be used for rendering anything 
+  including js(on) or whatever..
+
+==================== conventions for static files
 
 * static files:
   we chose to have all static files (images, but also javascript and stylesheets) in the various

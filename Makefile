@@ -7,7 +7,7 @@ force:
 #################### compute emacs tags
 # list files under git but exclude third-party stuff like bootstrap and jquery
 myfiles: force
-	@git ls-files | egrep -v 'insert(_|-)above|static/bootstrap|/jquery/|datatables/'
+	@git ls-files | egrep -v 'insert(_|-)above|/third-party/|/play/'
 
 # in general it's right to rely on the contents as reported by git
 tags: force
@@ -17,25 +17,70 @@ tags: force
 ftags: force
 	find . -type f | fgrep -v '/.git/' | xargs etags
 
-list-html: force
-	@find . -type f -name '*.html'
-list-js: force
-	@find . -type f -name '*.js' | grep -v '/all-static/'
-list-css: force
-	@find . -type f -name '*.css' | grep -v '/all-static/'
-list-img: force
-	@find . -type f -name '*.png' | grep -v '/all-static/'
+#################### third-party layout is kind of special 
+# because we have differents versions and all
+THIRD-PARTY-RESOURCES =
+# ignore variants, use the main symlink	third-party/bootstrap
+THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
+# just the single js as identified with a symlink
+THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
+# likewise
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
+# spin comes in plain or min, + the jquery plugin, and our own settings
+THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 
-list-all list-resources: list-html list-js list-css list-img
+thirdparty-js:
+	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
+thirdparty-css:
+	@find $(THIRD-PARTY-RESOURCES) -name '*.css'
+thirdparty-img:
+	@find $(THIRD-PARTY-RESOURCES) -name '*.png'
+
+# we might have any of these as templates - e.g. ./engine/templates/plugin-setenv.js
+# so if there's a /templates/ in the path ignore the file
+other-js: force
+	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'
+other-css: force
+	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
+other-img: force
+	@find . -type f -name '*.png' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
+
+list-js: thirdparty-js other-js
+list-css: thirdparty-css other-css
+list-img: thirdparty-img other-img
+
+# having templates in a templates/ subdir is fine most of the time except for plugins
+list-templates: force
+	@find plugins -type f -name '*.html' 
 
 #################### manage static contents (extract from all the modules into the single all-static location)
-static: force
-	./manage.py collectstatic --noinput 
+static run-static static-run: force
+	mkdir -p ./all-static/js all-static/css all-static/img
+	ln -sf $(foreach x,$(shell $(MAKE) list-js),../../$(x)) ./all-static/js
+	ln -sf $(foreach x,$(shell $(MAKE) list-css),../../$(x)) ./all-static/css
+	ln -sf $(foreach x,$(shell $(MAKE) list-img),../../$(x)) ./all-static/img
+#	rsync -av $(shell $(MAKE) list-js) ./all-static/js
+#	rsync -av $(shell $(MAKE) list-css) ./all-static/css
+#	rsync -av $(shell $(MAKE) list-img) ./all-static/img
 
-clean-static: force
-	rm -rf ./all-static/
+clean-static static-clean: force
+	rm -rf ./all-static
 
-allst: clean-static static
+all-static: clean-static run-static
+
+#################### manage templates for the plugin area
+templates run-templates templates-run: force
+	mkdir -p all-templates
+	ln -sf $(foreach x,$(shell $(MAKE) list-templates),.../$(x)) ./all-templates
+#	rsync -av $(shell $(MAKE) list-templates) ./all-templates
+
+clean-templates templates-clean: force
+	rm -rf ./all-templates
+
+all-templates: clean-templates run-templates
+
+####################
+list-all list-resources: list-templates list-js list-css list-img
 
 #################### sync : push current code on a (devel) box running myslice
 SSHURL:=root@$(MYSLICEBOX):/
@@ -44,7 +89,7 @@ SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 ### rsync options
 # the config file should probably not be overridden ??
 # --exclude settings.py 
-LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude devel --exclude DataTables-1.9.4 --exclude all-static --exclude '*.sqlite3' 
+LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude config.py --exclude all-static --exclude all-templates --exclude '*.sqlite3' 
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
@@ -53,6 +98,7 @@ RSYNC_COND_DRY_RUN	:= $(if $(findstring n,$(MAKEFLAGS)),--dry-run,)
 RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 
 # xxx until we come up with a packaging this is going to be a wild guess
+# on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
 #INSTALLED=/usr/share/myslice
 INSTALLED=/root/myslice
 
