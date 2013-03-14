@@ -9,7 +9,7 @@ bindir := /usr/bin
 
 PWD := $(shell pwd)
 
-build:
+build: static templates
 	python setup.py build
 
 install: 

@@ -15,5 +15,6 @@ packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/_
 setup(packages = packages,
       scripts = [],
       data_files = [ 
-#        ( dir [ list of paths from toplevel] ) ,
+        ( 'all-static', glob ('all-static/*')),
+        ( 'all-templates', glob ('all-templates/*')),
         ])

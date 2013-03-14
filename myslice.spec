@@ -42,5 +42,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %dir %{_datadir}/myslice
+%{_datadir}/myslice/*
 
 %changelog
