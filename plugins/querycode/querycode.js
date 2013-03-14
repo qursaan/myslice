@@ -7,9 +7,6 @@
  * License: GPLv3
  */
 
-querycode_debug=false;
-querycode_debug=true;
-
 function debug_object (msg, o) {
     var keys=[];
     for (var k in o) keys.push(k);
@@ -21,6 +18,9 @@ function debug_object (msg, o) {
 
 (function($) {
   
+    var debug=false;
+    //debug=true;
+
     $.fn.QueryCode = function( method ) {
         /* Method calling logic */
         if ( methods[method] ) {
@@ -44,7 +44,7 @@ function debug_object (msg, o) {
 		    var channel='/results/' + options.query_uuid + '/updated';
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
 		    $.subscribe(channel, $this, update_plugin);
-		    if (querycode_debug) window.console.log('subscribing to ' + channel);
+		    if (debug) console.log('subscribing to ' + channel);
 		    $this.data('QueryCode', {options: options});
 		    // react to changes to the language selector
 		    $this.find(".querycode-lang").change(change_language);
@@ -57,10 +57,10 @@ function debug_object (msg, o) {
 	}, 
 
 //	destroy : function( ) {
-//	    if (querycode_debug) console.log("QueryCode.destroy...");
+//	    if (debug) console.log("QueryCode.destroy...");
 //	},
 //	update : function( content ) { 
-//	    if (querycode_debug) console.log("QueryCode.update...");
+//	    if (debug) console.log("QueryCode.update...");
 //	},
 	
     } // methods
@@ -99,7 +99,6 @@ function debug_object (msg, o) {
 
     // private stuff
     function translate_query_as_ruby (query) {
-	debug_object("query_ruby entering -- query=" + query, query);
 	var output = '# Connection to XMLRPC server\n';
 	output += 'require "xmlrpc/client"\n';
 	output += 'require "pp"\n';
