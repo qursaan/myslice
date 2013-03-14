@@ -11,6 +11,18 @@ simplelist_debug=false;
 //simplelist_debug=true;
 
 (function($){
+
+    $.fn.SimpleList = function( method ) {
+        /* Method calling logic */
+        if ( methods[method] ) {
+            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        } else if ( typeof method === 'object' || ! method ) {
+            return methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.SimpleList' );
+        }    
+    };
+
     var methods = {
 	init : function( options ) {
 	    return this.each(function(){
@@ -39,17 +51,6 @@ simplelist_debug=false;
 	    if (simplelist_debug) console.log("SimpleList.update...");
 	},
     }; // methods
-
-    $.fn.SimpleList = function( method ) {
-        /* Method calling logic */
-        if ( methods[method] ) {
-            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-            return methods.init.apply( this, arguments );
-        } else {
-            $.error( 'Method ' +  method + ' does not exist on jQuery.SimpleList' );
-        }    
-    };
 
     /* Private methods */
     // complexity here is mostly because a datatables-enabled table cannot

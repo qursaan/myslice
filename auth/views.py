@@ -14,7 +14,7 @@ def login_user(request):
     state = "Please log in below..."
     username = password = ''
     env={'hard_wired_users':MyCustomBackend.hard_wired_users,
-         'manifold_url':Config.manifold_url(),
+         'manifold_url':Config.manifold_url,
          }
 
     if request.POST:

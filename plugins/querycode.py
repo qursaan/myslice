@@ -5,6 +5,8 @@ class QueryCode (Plugin):
     def __init__ (self, query, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
+        # our javascript requires the details of the manifold server
+        self.page.expose_js_manifold_config()
 
     def template_file (self):
         return "querycode.html"

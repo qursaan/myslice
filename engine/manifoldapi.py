@@ -11,15 +11,15 @@ class ManifoldAPI:
 
     config = Config()
     self.auth = auth
-    self.server = config.manifold_server
-    self.port = config.manifold_port
-    self.path = config.manifold_path
+#    self.server = config.manifold_server
+#    self.port = config.manifold_port
+#    self.path = config.manifold_path
     self.cainfo = cainfo
     self.errors = []
     self.trace = []
     self.calls = {}
     self.multicall = False
-    self.url = config.manifold_url()
+    self.url = config.manifold_url
     self.proxy = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
   def __getattr__(self, methodName):

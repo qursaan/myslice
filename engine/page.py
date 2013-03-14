@@ -3,8 +3,10 @@
 # it is expected to exist one such object for a given page
 
 import json
+
 from engine.prelude import Prelude
 from engine.manifoldapi import ManifoldAPI
+from myslice.config import Config
 
 # decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
@@ -16,15 +18,17 @@ def to_prelude (method):
 class Page:
 
     def __init__ (self, request):
+        self.request=request
+        # all plugins mentioned in this page
         self._plugins = {}
         # queue of queries
         self._queue=[]
+        # global prelude object
         self.prelude=Prelude(css_files='css/plugin.css')
-        # no queries yet, needed ?
         # load metadata
         self._metadata={}
         self._metadata_javascript='' 
-        self.load_metadata(request)
+        self.expose_js_metadata()
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):
@@ -38,7 +42,8 @@ class Page:
 
     # the js async methods (see manifold_async_success)
     # offer the option to deliver the result to a specific DOM elt
-    # otherwise it goes through the pubsub using query's uuid
+    # otherwise (i.e. if domid not provided) 
+    # it goes through the pubsub using query's uuid
     def enqueue_query (self, query, domid=None):
         self._queue.append ( (query,domid,) )
 
@@ -57,7 +62,8 @@ class Page:
         self.add_js_chunks (js)
 
 
-    def load_metadata(self, request):
+    def expose_js_metadata(self):
+        request=self.request
         if 'metadata' not in request.session.keys(): 
             manifold_api_session_auth = request.session['manifold']['auth']
             manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
@@ -87,6 +93,8 @@ class Page:
     def metadata_get_fields(self, method):
         return self._metadata[method]['column'].sort()
         
+    def expose_js_manifold_config (self):
+        self.add_js_chunks(Config.manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above

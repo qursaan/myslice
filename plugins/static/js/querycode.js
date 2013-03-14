@@ -21,6 +21,17 @@ function debug_object (msg, o) {
 
 (function($) {
   
+    $.fn.QueryCode = function( method ) {
+        /* Method calling logic */
+        if ( methods[method] ) {
+            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        } else if ( typeof method === 'object' || ! method ) {
+            return methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.QueryCode' );
+        }    
+    };
+
     var methods = {
 	init : function (options) {
 	    console.log("temporarily turned off SyntaxHighlighter ...");
@@ -54,19 +65,9 @@ function debug_object (msg, o) {
 	
     } // methods
 			  
-    $.fn.QueryCode = function( method ) {
-        /* Method calling logic */
-        if ( methods[method] ) {
-            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-            return methods.init.apply( this, arguments );
-        } else {
-            $.error( 'Method ' +  method + ' does not exist on jQuery.QueryCode' );
-        }    
-    };
-
     // we retrieve the plugindiv as e.data - cf the 2nd arg to subscribe
-    function update_plugin (e) {
+    // in fact we don't really read the published message
+    function update_plugin (e, _) {
 	var $plugindiv=e.data;
 	do_update ($plugindiv);
     }
@@ -107,8 +108,7 @@ function debug_object (msg, o) {
 	output += '  remove_const :ENABLE_NIL_PARSER\n';
 	output += '  const_set :ENABLE_NIL_PARSER, true\n';
 	output += 'end\n';
-	output += 'srv = XMLRPC::Client.new2("https://www.top-hat.info/API/")\n';
-	//output += 'tophat = xmlrpclib.ServerProxy("' . (TOPHAT_API_PORT == 443 ? 'http' : 'https') . '://' . TOPHAT_API_HOST . ':' . TOPHAT_API_PORT . TOPHAT_API_PATH . '", allow_none=True)\n\n';
+	output += 'srv = XMLRPC::Client.new2("' + MANIFOLD_URL + '")\n';
 	output += '\n';
 	output += '# Authentication token\n';
 	output += 'auth = {"AuthMethod" => "password", "Username" => "guest", "AuthString" => "guest"}\n';
@@ -132,7 +132,7 @@ function debug_object (msg, o) {
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'pp srv.call("' + query.action +'", auth, "' + query.method + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
+	output += 'pp srv.call("' + title_case(query.action) +'", auth, "' + query.method + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
 
 	var output = '<pre class="brush: ruby; toolbar: false;">' + output + "</pre>";
 	return output;
@@ -140,12 +140,9 @@ function debug_object (msg, o) {
     }
 
     function translate_query_as_python (query) {
-	// xxx tmp
-	var TOPHAT_API_HOST="hostname", TOPHAT_API_PORT=443, TOPHAT_API_PATH="/path";
-	var proto = (TOPHAT_API_PORT == 443 ? 'https' : 'http');
 	var output = '# Connection to XMLRPC server\n';
 	output += 'import xmlrpclib\n';
-	output += 'srv = xmlrpclib.ServerProxy("' + proto + '://' + TOPHAT_API_HOST + ':' + TOPHAT_API_PORT + TOPHAT_API_PATH + '", allow_none=True)\n\n';
+	output += 'srv = xmlrpclib.ServerProxy("' + MANIFOLD_URL + '", allow_none=True)\n\n';
 	output += '# Authentication token\n';
 	output += 'auth = {"AuthMethod": "password", "Username": "name.surname@domain.name", "AuthString": "mypassword"}\n\n';
 
@@ -168,10 +165,12 @@ function debug_object (msg, o) {
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'srv.' + query.action + '(auth, "' + query.method + '", ' + ifs + ', {}, ' + ofs + ')';
+	output += 'srv.' + title_case(query.action) + '(auth, "' + query.method + '", ' + ifs + ', {}, ' + ofs + ')';
 	var output = '<pre class="brush: python; toolbar: false;">' + output + "</pre>";
 	return output;
     }
+
+    function title_case (txt){ return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}
     
 })(jQuery); // end closure wrapper
 

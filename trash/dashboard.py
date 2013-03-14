@@ -37,18 +37,18 @@ def dashboard_view (request):
         page=page,
         title="Putting stuff together",
         sons=[ 
+            QueryCode (
+                page=page,
+                title="Vizualize your query (no syntax highlight for now)",
+                query=slices_query,
+                toggled=False,
+                ),
             SliceList ( # setting visible attributes first
                 page=page,
                 title='Asynchroneous SliceList',
                 header='slices list', 
                 with_datatables=False,
-                toggled=False,
                 # this is the query at the core of the slice list
-                query=slices_query,
-                ),
-            QueryCode (
-                page=page,
-                title="Vizualize your query",
                 query=slices_query,
                 ),
             ])
