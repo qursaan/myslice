@@ -1,3 +1,5 @@
+MAKE-SILENT = $(MAKE) --no-print-directory
+
 ### first purpose, build and install from the specfile
 all: build
 
@@ -26,7 +28,7 @@ myfiles: force
 
 # in general it's right to rely on the contents as reported by git
 tags: force
-	$(MAKE) myfiles | xargs etags
+	$(MAKE-SILENT) myfiles | xargs etags
 
 # however sometimes we have stuff not yet added, so in this case
 ftags: force
@@ -71,12 +73,12 @@ list-templates: force
 #################### manage static contents (extract from all the modules into the single all-static location)
 static run-static static-run: force
 	mkdir -p ./all-static/js all-static/css all-static/img
-	ln -sf $(foreach x,$(shell $(MAKE) list-js),../../$(x)) ./all-static/js
-	ln -sf $(foreach x,$(shell $(MAKE) list-css),../../$(x)) ./all-static/css
-	ln -sf $(foreach x,$(shell $(MAKE) list-img),../../$(x)) ./all-static/img
-#	rsync -av $(shell $(MAKE) list-js) ./all-static/js
-#	rsync -av $(shell $(MAKE) list-css) ./all-static/css
-#	rsync -av $(shell $(MAKE) list-img) ./all-static/img
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-js),../../$(x)) ./all-static/js
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-css),../../$(x)) ./all-static/css
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-img),../../$(x)) ./all-static/img
+#	rsync -av $(shell $(MAKE-SILENT) list-js) ./all-static/js
+#	rsync -av $(shell $(MAKE-SILENT) list-css) ./all-static/css
+#	rsync -av $(shell $(MAKE-SILENT) list-img) ./all-static/img
 
 clean-static static-clean: force
 	rm -rf ./all-static
@@ -86,8 +88,8 @@ all-static: clean-static run-static
 #################### manage templates for the plugin area
 templates run-templates templates-run: force
 	mkdir -p all-templates
-	ln -sf $(foreach x,$(shell $(MAKE) list-templates),../$(x)) ./all-templates
-#	rsync -av $(shell $(MAKE) list-templates) ./all-templates
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./all-templates
+#	rsync -av $(shell $(MAKE-SILENT) list-templates) ./all-templates
 
 clean-templates templates-clean: force
 	rm -rf ./all-templates
