@@ -1,8 +1,23 @@
-### 
-all: 
-	@echo no default target
+### first purpose, build and install from the specfile
+all: build
 
 force:
+
+DESTDIR := /
+datadir := /usr/share
+bindir := /usr/bin
+
+PWD := $(shell pwd)
+
+build:
+	python setup.py build
+
+install: 
+	python setup.py install \
+	    --install-purelib=$(DESTDIR)/$(datadir)/myslice \
+	    --install-scripts=$(DESTDIR)/$(datadir)/myslice \
+	    --install-data=$(DESTDIR)/$(datadir)/myslice
+
 
 #################### compute emacs tags
 # list files under git but exclude third-party stuff like bootstrap and jquery
