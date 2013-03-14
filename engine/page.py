@@ -27,8 +27,8 @@ class Page:
         self.prelude=Prelude(css_files='css/plugin.css')
         # load metadata
         self._metadata={}
-        self._metadata_javascript='' 
-        self.expose_js_metadata()
+        # do not call this uncondionnally as we might not even have logged in
+        # self.expose_js_metadata()
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):
@@ -64,7 +64,15 @@ class Page:
 
     def expose_js_metadata(self):
         request=self.request
-        if 'metadata' not in request.session.keys(): 
+        # xxx this code should probably not be called unconditionnally at page creation time
+        # because we're not sure a user is logged in so we might have no session...
+        if 'manifold' not in request.session:
+            print "Page.expose_js_metadata: no 'manifold' in session... - skipping"
+            return
+        # use cached version if present
+        if 'metadata' in request.session.keys(): 
+            self._metadata = request.session['metadata']
+        else:
             manifold_api_session_auth = request.session['manifold']['auth']
             manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
         
@@ -82,13 +90,9 @@ class Page:
                  self._metadata[method] = res
 
             request.session['metadata'] = self._metadata
-            self._metadata_javascript = "all_headers=" + json.dumps(self._metadata) + ";"
-            self.add_js_chunks(self._metadata_javascript)
-        else:
-            self._metadata = request.session['metadata']
 
-        self._metadata_javascript = "all_headers=" + json.dumps(self._metadata) + ";"
-        self.add_js_chunks(self._metadata_javascript)
+        javascript = "all_headers=" + json.dumps(self._metadata) + ";"
+        self.add_js_chunks(javascript)
 
     def metadata_get_fields(self, method):
         return self._metadata[method]['column'].sort()

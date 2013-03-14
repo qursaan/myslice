@@ -6,7 +6,7 @@ class QuickFilter (Plugin) :
         Plugin.__init__ (self, **settings)
         self.list=list
         self.with_datatables = with_datatables
-        
+        self.page.expose_js_metadata()
 
     def title (self) : return "Title for Quick "
 

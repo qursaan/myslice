@@ -1,10 +1,10 @@
 function getMetadata(){
-    return all_headers;
+    return MANIFOLD_METADATA;
 }
 // returns all fields of a given method
 function getMetadata_fields(method){
     var result=new Array();
-    jQuery.each(all_headers, function(m,obj){
+    jQuery.each(MANIFOLD_METADATA, function(m,obj){
         if(m==method){
             jQuery.each(obj['column'], function(i,f){
                 result.push(f);
@@ -18,9 +18,8 @@ function getMetadata_fields(method){
 }
 // returns all properties of a given field
 function getMetadata_field(method, field){
-    //console.log(all_headers);
     var result=new Array();
-    jQuery.each(all_headers, function(m,obj){
+    jQuery.each(MANIFOLD_METADATA, function(m,obj){
         if(m==method){
             jQuery.each(obj['column'], function(i,f){
                 if(f['column']==field){
@@ -35,9 +34,8 @@ function getMetadata_field(method, field){
 }
 // returns the value of a property from a field within a method (type of object : resource,node,lease,slice...)
 function getMetadata_property(method, field, property){
-    //console.log(all_headers);
     var result=null;
-    jQuery.each(all_headers, function(m,obj){
+    jQuery.each(MANIFOLD_METADATA, function(m,obj){
         if(m==method){
             jQuery.each(obj['column'], function(i,f){
                 if(f['column']==field){
@@ -49,6 +47,4 @@ function getMetadata_property(method, field, property){
         }
     });
     return result;
-    //all_headers[method]['column']
-    //[field][]
 }

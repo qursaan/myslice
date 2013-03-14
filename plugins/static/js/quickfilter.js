@@ -152,7 +152,7 @@
                     console.log(filter[0]);
                     allowedValues=getMetadata_property('resource', filter[0], 'allowed_values');
                     if (allowedValues!='' && allowedValues!="N/A") {
-                    //if(all_headers[filter[0]]['allowed_values']!=''){
+                    //if(MANIFOLD_METADATA[filter[0]]['allowed_values']!=''){
                         jQuery('#QuickFilter_select_field').val("#");
                         jQuery('#QuickFilter_select_value').children().remove().end();
                         jQuery('#QuickFilter_select_value_container').hide();

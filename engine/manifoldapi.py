@@ -11,9 +11,6 @@ class ManifoldAPI:
 
     config = Config()
     self.auth = auth
-#    self.server = config.manifold_server
-#    self.port = config.manifold_port
-#    self.path = config.manifold_path
     self.cainfo = cainfo
     self.errors = []
     self.trace = []
