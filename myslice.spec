@@ -19,6 +19,8 @@ URL: %{SCMURL}
 # We use set everywhere
 Requires: python >= 2.7
 Requires: Django
+Requires: httpd
+Requires: mod_wsgi
 BuildRequires: python-setuptools make
 
 %description 
