@@ -13,6 +13,9 @@ from engine.manifoldquery import ManifoldQuery
 from plugins.verticallayout.verticallayout import VerticalLayout
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
+from plugins.quickfilter.quickfilter import QuickFilter
+
+from myslice.viewutils import, quickfilter_criterias
 
 # 
 from myslice.viewutils import topmenu_items, the_user
@@ -42,6 +45,11 @@ def dashboard_view (request):
                 title="Vizualize your query (no syntax highlight for now)",
                 query=slices_query,
                 toggled=False,
+                ),
+            QuickFilter (
+                page=page,
+                title='play with filters',
+                list=quickfilter_criterias,
                 ),
             SliceList ( # setting visible attributes first
                 page=page,
