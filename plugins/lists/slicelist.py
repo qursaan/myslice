@@ -1,4 +1,4 @@
-from plugins.simplelist import SimpleList
+from plugins.lists.simplelist import SimpleList
 
 # the SimpleList plugin requires 'key' and 'value' that are used 
 # on the results of the query for rendering

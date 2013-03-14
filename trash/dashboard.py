@@ -10,9 +10,9 @@ from django.contrib.auth.decorators import login_required
 from engine.page import Page
 from engine.manifoldquery import ManifoldQuery
 
-from plugins.verticallayout import VerticalLayout
-from plugins.slicelist import SliceList
-from plugins.querycode import QueryCode
+from plugins.verticallayout.verticallayout import VerticalLayout
+from plugins.lists.slicelist import SliceList
+from plugins.querycode.querycode import QueryCode
 
 # 
 from myslice.viewutils import topmenu_items, the_user

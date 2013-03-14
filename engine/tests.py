@@ -7,7 +7,7 @@ Replace this with more appropriate tests for your application.
 
 from django.test import TestCase
 
-from plugins.simplelist import SimpleList
+from plugins.lists.simplelist import SimpleList
 
 class PluginTest(TestCase):
     def test_basic(self):

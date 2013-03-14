@@ -71,7 +71,7 @@ all-static: clean-static run-static
 #################### manage templates for the plugin area
 templates run-templates templates-run: force
 	mkdir -p all-templates
-	ln -sf $(foreach x,$(shell $(MAKE) list-templates),.../$(x)) ./all-templates
+	ln -sf $(foreach x,$(shell $(MAKE) list-templates),../$(x)) ./all-templates
 #	rsync -av $(shell $(MAKE) list-templates) ./all-templates
 
 clean-templates templates-clean: force

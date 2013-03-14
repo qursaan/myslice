@@ -9,11 +9,11 @@ from django.contrib.auth.decorators import login_required
 
 from engine.page import Page
 
-from plugins.verticallayout import VerticalLayout
-from plugins.tabs import Tabs
-from plugins.staticlist import StaticList
-from plugins.quickfilter import QuickFilter
-from plugins.raw import Raw
+from plugins.verticallayout.verticallayout import VerticalLayout
+from plugins.tabs.tabs import Tabs
+from plugins.lists.staticlist import StaticList
+from plugins.quickfilter.quickfilter import QuickFilter
+from plugins.raw.raw import Raw
 
 from myslice.viewutils import topmenu_items, the_user
 from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
