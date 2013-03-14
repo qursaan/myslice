@@ -21,8 +21,9 @@ class SimpleList (Plugin) :
 
     def requirements (self):
         reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js", "js/onavail.js",
-                                "js/manifold-pubsub.js", "js/manifold-async.js", "spin/spin.all.js", 
-] ,
+                                "js/manifold-pubsub.js", "js/manifold-async.js", 
+                                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                                ] ,
                  'css_files': [ "css/simplelist.css" ],
                  }
         if self.with_datatables:
