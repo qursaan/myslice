@@ -30,19 +30,23 @@ with the query passed using POST"""
     if format != 'json':
         print "manifoldproxy.api: unexpected format %s -- exiting"%format
         return
-    # translate incoming POST request into a query object
-    manifold_query = ManifoldQuery()
-    manifold_query.fill_from_dict(request.POST)
-    # retrieve session for request
-    manifold_api_session_auth = request.session['manifold']['auth']
-    # actually forward
-    manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
-    answer=manifold_api.send_manifold_query (manifold_query)
-    if debug_spin:
-        import time
-        time.sleep(debug_spin)
-    # return json-encoded answer
-    return HttpResponse (json.dumps(answer), mimetype="application/json")
+    try:
+        # translate incoming POST request into a query object
+        manifold_query = ManifoldQuery()
+        manifold_query.fill_from_dict(request.POST)
+        # retrieve session for request
+        manifold_api_session_auth = request.session['manifold']['auth']
+        # actually forward
+        manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
+        answer=manifold_api.send_manifold_query (manifold_query)
+        if debug_spin:
+            import time
+            time.sleep(debug_spin)
+        # return json-encoded answer
+        return HttpResponse (json.dumps(answer), mimetype="application/json")
+    except:
+        import traceback
+        traceback.print_exc()
 
 #################### 
 # see CSRF_FAILURE_VIEW in settings.py
