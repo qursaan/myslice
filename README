@@ -31,19 +31,7 @@ $ devel/server-loop.sh
 when you just need to hit ^C yourself when your static files need to be refreshed - see below
 
 * use it from your browser 
-
-.......... NOTES on using the development server
-. first off, running manage.py runserver is provided by django as a development convenience but SHOULD NOT be used in production
-. second, when you do use it for developement purposes, please be aware that:
-.. the recommended layout for the various files and pieces (py, html, js and css) qith django is really painful
-   we should use e.g. plugins/simplelist.py, plugins/templates/plugins.html, plugins/static/js/simplelist.js and plugins/static/css/simplelist.css
-.. as that does not make sense IMHO, I've rewritten the tool for gathering these pieces in such a layout but from a completely flat codebase
-   I mean I want to be able to store all the files building a plugin in a single (git) directory 
-   Of course it's a completely different matter once the service is packaged and installed, these files of course get properly separated.
-.. as a result it is a little bit less convenient to use the development server
-   when you change the layout of your static and template files, you might need to re-run 'make static', so it is recommended to use
-   devel/server-loop.sh instead
-
+(See more notes on using the development server below)
 
 ==================== Status
 
@@ -57,6 +45,14 @@ that your manifold backend knows about).
 For logging out: click on 'logged as *jean*', this shows a
 confirmation page for logging out. this is intended to be temporary.
 
+*** Packaging ***
+
+I've done a very rough attempt at packaging for rpm.
+The logic seems about right but needs more work, in particular in terms of installing myslice.conf
+in the httpd conf.d directory. 
+It seems like our app won't work on f14 as is because Django is only 1.3.1 on f14
+Plan is to target f18 but I lack a test machine.
+Also of course I'll try to tackle debian/ubunti at some point.
 
 *** Features ***
 
@@ -119,19 +115,19 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
   for how to use a separate authentication system, 
   as well as settings.py for how to enable it
 
-* insert_above: 
-  a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
-
 * trash/
   rough/preliminary views in here - as the name suggests this is temporary
 
 * views/
   will receive actual views over time 
   currently has some global html templates as well
+  + some global static files (css, js, images..)
+
+* insert_above: 
+  a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header
 
 * third-party/
-   * third party stuff (bootstrapfs, jquery, datatables)
-   * + some global static files (css, js, images..)
+   * third party javascript and css stuff (bootstrapfs, jquery, this kind of things)
      see more about that below too
 
 * devel:
@@ -148,39 +144,72 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
 * myslice.sqlite3
   this is where django stores its own stuff, as per settings.py
 
-==================== conventions for templates
+==================== conventions for templates & static files
+==================== and NOTES on using the development server
+
+. first off, running manage.py runserver is provided by django as a development convenience but
+  SHOULD NOT be used in production
+
+. second, when you do use it for developement purposes, please be aware that:
+
+.. the recommended layout for the various files and pieces (py, html, js and css) with django is
+   IMHO really painful; we *SHOULD* use e.g. 
+      plugins/simplelist.py, 
+      plugins/templates/plugins.html,
+      plugins/static/js/simplelist.js 
+      plugins/static/css/simplelist.css
+   which I have tried doing for a while but I found mmyself just hopping around in the file tree all
+   day long, wasting cycles all along
+
+.. as that does not make sense IMHO, I've rewritten the tool for gathering these pieces (this is in
+   the Makefile). Bottom line is we can essentially store this wherever we want.
+   The only restriction being that if you have a template that is *not* html, then it *has to* sit
+   in a templates/ directory, otherwise it gets shipped as a static file.  
+
+.. as a result, we can now store all the files building a plugin in a single (git) directory; like e.g.
+      plugins/quickfilter/quickfilter.py
+      plugins/quickfilter/quickfilter.html
+      plugins/quickfilter/quickfilter.js
+      plugins/quickfilter/quickfilter.css
+
+   Of course it's a completely different matter once the service is packaged and installed, these
+   files of course get properly separated.
+
+.. as a result it is a little bit less convenient to use the development server when you change the
+   layout of your static and template files, you might need to re-run 'make static', so it is
+   recommended to use devel/server-loop.sh instead
+
+
+All this being said, here are our current conventions for storing templates and static files
 
 * templates:
   we store this under templates/ within the corresponding app, e.g.
-  auth/templates/login.html
+     auth/templates/login.html
   for now this is mostly about html, but the engine can be used for rendering anything 
-  including js(on) or whatever..
-
-==================== conventions for static files
+  including js(on) or whatever (in which case, as stated above, this *must* have /templates/ in its path.
 
 * static files:
   we chose to have all static files (images, but also javascript and stylesheets) in the various
-  proj or app where they belong, under a static/ subdir that has this structure:
+  proj or app where they belong, with a layout like:
   where-it-belongs/
       img/
       css/
       js/
+  Honestly it's not yet very clear sometimes what 'where-it-belongs' should be sometimes, and it
+  does not matter too much anyway, given that the code doesn't need to change when we move things
+  around. So in particular it's fuzzy between myslice/ (where the logo could fit e.g.) views/ and
+  even trash/
 
-* filenames / locations
+Makefile has a few convenience targets to list all kinds of stuff; the 2 major targets are 
 
-  you can run the following make targets to have a summary of where things are
+$ make static templates
 
-  $ make list-html list-js list-css list-img
-  -- or --
-  $ make list-all
+that would reset all-static/ and all-templates/ for you from the other contents
 
+* third-party
+  please note that the set of files that actually get exposed in all-static from third-party is
+  hand-coded in Makefile because we tried to preserve the original codebase layout from mainstream,
+  and there's only so much in common between 2 differents js libraries at this point.
 
-* plugins
-  use a naming scheme as simple as possible
-    like e.g.
-    plugins/quickfilter/quickfilter.py
-    plugins/quickfilter/quickfilter.html
-    plugins/quickfilter/quickfilter.js
-    plugins/quickfilter/quickfilter.css
 
 
