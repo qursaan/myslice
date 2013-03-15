@@ -9,7 +9,7 @@
 <ul>
 <li> A manifold server, located at <code>{{ manifold_url }}</code>, (configured in <code>myslice/config.py</code>), and</li>
 <li>
-as a proof of concept, a set of hardwired user accounts, see <code>auth/backend.py</code> for more details. 
+as a proof of concept, a set of hardwired user accounts, see <code>auth/backend.py</code> for more details. However these won't of course have the ability to run real queries at the backend so it's more for testing login and all this.
 Currently hard wired users are:
 <ul>
   {% for k,v in hard_wired_users.iteritems %}
