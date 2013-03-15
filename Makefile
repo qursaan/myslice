@@ -21,21 +21,10 @@ install:
 	    --install-data=$(DESTDIR)/$(datadir)/myslice
 
 
-#################### compute emacs tags
-# list files under git but exclude third-party stuff like bootstrap and jquery
-myfiles: force
-	@git ls-files | egrep -v 'insert(_|-)above|/third-party/|/play/'
-
-# in general it's right to rely on the contents as reported by git
-tags: force
-	$(MAKE-SILENT) myfiles | xargs etags
-
-# however sometimes we have stuff not yet added, so in this case
-ftags: force
-	find . -type f | fgrep -v '/.git/' | xargs etags
-
 #################### third-party layout is kind of special 
-# because we have differents versions and all
+# because we have differents versions, and also we 
+# try to preserve the file structure from upstream
+# so let's handle this manually
 THIRD-PARTY-RESOURCES =
 # ignore variants, use the main symlink	third-party/bootstrap
 THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
@@ -55,20 +44,24 @@ thirdparty-img:
 
 # we might have any of these as templates - e.g. ./engine/templates/plugin-setenv.js
 # so if there's a /templates/ in the path ignore the file
-other-js: force
+local-js: force
 	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'
-other-css: force
+local-css: force
 	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
-other-img: force
+local-img: force
 	@find . -type f -name '*.png' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
 
-list-js: thirdparty-js other-js
-list-css: thirdparty-css other-css
-list-img: thirdparty-img other-img
+list-js: thirdparty-js local-js
+list-css: thirdparty-css local-css
+list-img: thirdparty-img local-img
 
 # having templates in a templates/ subdir is fine most of the time except for plugins
-list-templates: force
+plugins-templates: force
 	@find plugins -type f -name '*.html' 
+local-templates: force
+	@$(foreach tmpl,$(shell find . -name templates),ls -1 $(tmpl)/*;)
+
+list-templates: plugins-templates local-templates
 
 #################### manage static contents (extract from all the modules into the single all-static location)
 static run-static static-run: force
@@ -76,9 +69,6 @@ static run-static static-run: force
 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-js),../../$(x)) ./all-static/js
 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-css),../../$(x)) ./all-static/css
 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-img),../../$(x)) ./all-static/img
-#	rsync -av $(shell $(MAKE-SILENT) list-js) ./all-static/js
-#	rsync -av $(shell $(MAKE-SILENT) list-css) ./all-static/css
-#	rsync -av $(shell $(MAKE-SILENT) list-img) ./all-static/img
 
 clean-static static-clean: force
 	rm -rf ./all-static
@@ -89,7 +79,6 @@ all-static: clean-static run-static
 templates run-templates templates-run: force
 	mkdir -p all-templates
 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./all-templates
-#	rsync -av $(shell $(MAKE-SILENT) list-templates) ./all-templates
 
 clean-templates templates-clean: force
 	rm -rf ./all-templates
@@ -98,6 +87,19 @@ all-templates: clean-templates run-templates
 
 ####################
 list-all list-resources: list-templates list-js list-css list-img
+
+#################### compute emacs tags
+# list files under git but exclude third-party stuff like bootstrap and jquery
+myfiles: force
+	@git ls-files | egrep -v 'insert(_|-)above|/third-party/|/play/'
+
+# in general it's right to rely on the contents as reported by git
+tags: force
+	$(MAKE-SILENT) myfiles | xargs etags
+
+# however sometimes we have stuff not yet added, so in this case
+ftags: force
+	find . -type f | fgrep -v '/.git/' | xargs etags
 
 #################### sync : push current code on a (devel) box running myslice
 SSHURL:=root@$(MYSLICEBOX):/
