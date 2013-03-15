@@ -10,7 +10,7 @@
 (function($){
 
     var debug=false;
-    //debug=true
+    debug=true
 
     $.fn.SimpleList = function( method ) {
         /* Method calling logic */
@@ -72,14 +72,14 @@
 	$plugindiv.closest('.need-spin').spin(false);
 
         if (rows.length == 0) {
-	    if (use_datatables) datatables_set_message ("No result");
-	    else		regular_set_message ("No result");
+	    if (use_datatables) datatables_set_message ($table, $tbody, myslice_warning("No result"));
+	    else		regular_set_message ($table, $tbody, myslice_warning("No result"));
             return;
         }
         if (typeof rows[0].error != 'undefined') {
 	    var error="ERROR: " + rows[0].error;
-	    if (use_datatables) datatables_set_message (error);
-	    else		regular_set_message (error);
+	    if (use_datatables) datatables_set_message ($table, $tbody, myslice_error(error));
+	    else		regular_set_message ($table, $tbody, myslice_error(error));
             return;
         }
         var options = $plugindiv.data().SimpleList;

@@ -23,6 +23,7 @@ class SimpleList (Plugin) :
         reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/query.js", "js/onavail.js",
                                 "js/manifold-pubsub.js", "js/manifold-async.js", 
                                 "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                                "js/myslice.js",
                                 ] ,
                  'css_files': [ "css/simplelist.css" ],
                  }
