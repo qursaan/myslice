@@ -50,6 +50,7 @@ def dashboard_view (request):
                 page=page,
                 title='play with filters',
                 criterias=quickfilter_criterias,
+                toggled=False,
                 ),
             SliceList ( # setting visible attributes first
                 page=page,
