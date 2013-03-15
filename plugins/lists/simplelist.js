@@ -10,7 +10,7 @@
 (function($){
 
     var debug=false;
-    debug=true
+    // debug=true
 
     $.fn.SimpleList = function( method ) {
         /* Method calling logic */
