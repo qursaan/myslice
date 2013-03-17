@@ -1,4 +1,4 @@
-function Query(action, method, timestamp, filters, params, fields, unique, uuid, aq, sq)
+function ManifoldQuery(action, method, timestamp, filters, params, fields, unique, uuid, aq, sq)
 {  
     // get, update, delete, create
     var action;
@@ -40,7 +40,7 @@ INSERT INTO method VALUES(field=value)
 -------------------------------------------------------------*/
     
     this.clone = function() {
-        q = new Query();
+        q = new ManifoldQuery();
         return jQuery.extend(true, q, this);
     }
     this.add_filter = function(key, op, value) {
@@ -101,7 +101,7 @@ INSERT INTO method VALUES(field=value)
     }
     this.analyze_subqueries = function() {
         /* adapted from the PHP function in com_tophat/includes/query.php */
-        var q = new Query();
+        var q = new ManifoldQuery();
         q.uuid = this.uuid;
         q.action = this.action;
         q.method = this.method;
@@ -117,7 +117,7 @@ INSERT INTO method VALUES(field=value)
                 var method = k.substr(0, pos);
                 var field = k.substr(pos+1);
                 if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new Query();
+                    q.subqueries[this.method] = new ManifoldQuery();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
                     q.subqueries[this.method].timestamp = this.timestamp;
@@ -135,7 +135,7 @@ INSERT INTO method VALUES(field=value)
                 var method = param.substr(0, pos);
                 var field = param.substr(pos+1);
                 if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new Query();
+                    q.subqueries[this.method] = new ManifoldQuery();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
                     q.subqueries[this.method].timestamp = this.timestamp;
@@ -153,7 +153,7 @@ INSERT INTO method VALUES(field=value)
                 var method = v.substr(0, pos);
                 var field = v.substr(pos+1);
                 if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new Query();
+                    q.subqueries[this.method] = new ManifoldQuery();
                     q.subqueries[this.method].action = this.action;
                     q.subqueries[this.method].method = this.method;
                     q.subqueries[this.method].timestamp = this.timestamp;

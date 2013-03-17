@@ -45,7 +45,7 @@ class ManifoldQuery:
                       for (method, subquery) in self.subqueries.iteritems()])
             sq="{%s}"%sq
         
-        return """ new Query('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, %(sq)s)"""%locals()
+        return """ new ManifoldQuery('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, %(sq)s)"""%locals()
     
     # this builds a ManifoldQuery object from a dict as received from javascript through its ajax request 
     # e.g. here's what I captured from the server's output
