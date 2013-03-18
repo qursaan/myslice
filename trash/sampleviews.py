@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
-from engine.prelude import Prelude
+from unfold.prelude import Prelude
 
 from myslice.viewutils import topmenu_items, the_user
 # tmp

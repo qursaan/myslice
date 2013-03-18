@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 
 from django.contrib.auth.decorators import login_required
 
-from engine.page import Page
+from unfold.page import Page
 
 from plugins.verticallayout.verticallayout import VerticalLayout
 from plugins.tabs.tabs import Tabs

@@ -1,6 +1,6 @@
 from django.template.loader import render_to_string
 
-from engine.composite import Composite
+from unfold.composite import Composite
 
 class VerticalLayout (Composite) :
     

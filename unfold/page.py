@@ -4,8 +4,8 @@
 
 import json
 
-from engine.prelude import Prelude
-from engine.manifoldapi import ManifoldAPI
+from unfold.prelude import Prelude
+from manifold.manifoldapi import ManifoldAPI
 from myslice.config import Config
 
 # decorator to deflect calls on this Page to its prelude

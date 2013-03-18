@@ -142,12 +142,16 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # handling the {% insert %} and {% container %} tags
     # see details in devel/django-insert-above-1.0-4
     'insert_above',
+    # our django project
     'myslice',
-    'auth',
-    'engine',
+    # the core of the UI
+    'auth', 'manifold', 'unfold',
+    # plugins
     'plugins',
+    # views - more or less stable 
     'views',
     'trash',
     # Uncomment the next line to enable the admin:
@@ -190,7 +194,7 @@ AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', 'auth.manifoldbacken
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
 # if you need to see the error message then use this setting
-CSRF_FAILURE_VIEW = 'engine.manifoldproxy.csrf_failure'
+CSRF_FAILURE_VIEW = 'manifold.manifoldproxy.csrf_failure'
 
 #################### for insert_above
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"

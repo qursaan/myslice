@@ -7,8 +7,8 @@ from django.shortcuts import render_to_response
 
 from django.contrib.auth.decorators import login_required
 
-from engine.page import Page
-from engine.manifoldquery import ManifoldQuery
+from unfold.page import Page
+from manifold.manifoldquery import ManifoldQuery
 
 from plugins.verticallayout.verticallayout import VerticalLayout
 from plugins.lists.slicelist import SliceList

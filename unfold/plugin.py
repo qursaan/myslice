@@ -6,8 +6,8 @@ import json
 
 from django.template.loader import render_to_string
 
-from engine.page import Page
-from engine.prelude import Prelude
+from unfold.page import Page
+from unfold.prelude import Prelude
 
 #################### 
 # set DEBUG to

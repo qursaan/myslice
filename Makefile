@@ -42,7 +42,7 @@ thirdparty-css:
 thirdparty-img:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.png'
 
-# we might have any of these as templates - e.g. ./engine/templates/plugin-setenv.js
+# we might have any of these as templates - e.g. ./unfold/templates/plugin-setenv.js
 # so if there's a /templates/ in the path ignore the file
 local-js: force
 	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'

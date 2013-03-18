@@ -38,7 +38,7 @@ urlpatterns = patterns(
     #
     # the manifold proxy
     #
-    (r'^manifold/api/(?P<format>\w+)/?$', 'engine.manifoldproxy.api'),
+    (r'^manifold/api/(?P<format>\w+)/?$', 'manifold.manifoldproxy.api'),
     #
     # various trash views
     #

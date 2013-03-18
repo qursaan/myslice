@@ -103,8 +103,11 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
   . settings.py
   . urls.py
 
-* engine:
-  the code for building / rendering plugins / queries
+* manifold:
+  the code for dealing with queries, sending them to the backend, and offering the /manifold/api/ proxy URL
+
+* unfold:
+  the code for building / rendering plugins 
 
 * plugins:
   the actual code for plugins

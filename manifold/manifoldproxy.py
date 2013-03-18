@@ -3,8 +3,8 @@ import json
 #from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
 
-from engine.manifoldquery import ManifoldQuery
-from engine.manifoldapi import ManifoldAPI
+from manifold.manifoldquery import ManifoldQuery
+from manifold.manifoldapi import ManifoldAPI
 
 # add artificial delay in s
 debug_spin=0
