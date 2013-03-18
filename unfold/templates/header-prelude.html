@@ -1,12 +1,6 @@
-{% for js_file in js_files %}
-<script type='text/javascript' src='{{ STATIC_URL }}{{ js_file|safe }}'></script>
+{% for js_file in js_files %} <script type='text/javascript' src='{{ STATIC_URL }}{{ js_file|safe }}'></script> 
 {% endfor %}
-{% for css_file in css_files %}
-<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}{{ css_file|safe }}' />
+{% for css_file in css_files %} <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}{{ css_file|safe }}' /> 
 {% endfor %}
-<script type="text/javascript">
-{% for js_chunk in js_chunks %} {{ js_chunk|safe }} {% endfor %}
-</script>
-<style type="text/css">
-{% for css_chunk in css_chunks %} {{ css_chunk|safe }} {% endfor %}
-</style>
+<script type="text/javascript"> {% for js_chunk in js_chunks %} {{ js_chunk|safe }} {% endfor %} </script>
+<style type="text/css"> {% for css_chunk in css_chunks %} {{ css_chunk|safe }} {% endfor %} </style>
