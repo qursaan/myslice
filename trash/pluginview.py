@@ -82,7 +82,7 @@ def test_plugin_view (request):
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
-    prelude_env = page.template_env()
+    prelude_env = page.prelude_env()
     template_env.update(prelude_env)
     return render_to_response ('view-plugin.html',template_env,
                                context_instance=RequestContext(request))

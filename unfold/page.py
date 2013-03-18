@@ -111,4 +111,4 @@ class Page:
     @to_prelude
     def add_css_chunks (self):pass
     @to_prelude
-    def template_env (self):pass
+    def prelude_env (self):pass

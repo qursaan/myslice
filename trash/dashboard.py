@@ -68,15 +68,6 @@ def dashboard_view (request):
     # define 'content_main' to the template engine
     template_env [ 'content_main' ] = main_plugin.render(request)
 
-#    ########## add another plugin with the same request, on the RHS pane
-#    # lacks a/href to /slice/%s
-#    related_plugin = SliceList (title='SliceList plugin',domid='slicelist1',
-#                                with_datatables='yes', 
-#                                list=hard_wired_slice_names, 
-#                                header='Slices')
-#    # likewise but on the side view
-#    template_env [ 'content_related' ] = related_plugin.render (request)
-
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view for a full request cycle'
     # the menu items on the top 
@@ -84,8 +75,8 @@ def dashboard_view (request):
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 
-    ##########
-    # lacks a/href to /slice/%s
+#   ########## add another plugin with the same request, on the RHS pane
+#   will show up in the right-hand side area named 'related'
     related_plugin = SliceList (
         page=page,
         title='Same request, other layout',
@@ -109,7 +100,7 @@ def dashboard_view (request):
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
-    prelude_env = page.template_env()
+    prelude_env = page.prelude_env()
     template_env.update(prelude_env)
     return render_to_response ('view-plugin.html',template_env,
                                context_instance=RequestContext(request))
