@@ -1,3 +1,3 @@
-div#sidelist td.simplelist>a {
-    font-size: 50%;
+div#sidelist table.with-datatables {
+    font-size: 130%;
 }

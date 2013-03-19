@@ -68,5 +68,5 @@ class Prelude:
         from myslice.settings import STATIC_URL
         env ['STATIC_URL'] = STATIC_URL
         # render this with prelude.html and put the result in header_prelude
-        header_prelude = render_to_string ('header-prelude.html',env)
+        header_prelude = render_to_string ('prelude.html',env)
         return { 'header_prelude' : header_prelude }
