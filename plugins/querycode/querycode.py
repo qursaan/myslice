@@ -13,8 +13,8 @@ class QueryCode (Plugin):
 
     def requirements (self):
         return { 
-            'js_files' : [ "js/querycode.js", "js/plugin.js", "js/manifold-query.js", "js/onavail.js",
-                           "js/manifold-pubsub.js", "js/manifold-async.js", 
+            'js_files' : [ "js/querycode.js", "js/plugin.js", 
+                           "js/manifold.js", "js/manifold-query.js",
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            
 #        Plugins::add_js('/QueryCode/beautyofcode/scripts/shCore.js');

@@ -47,7 +47,7 @@ class Page:
         self._queries = set()
         self._queue = []
 
-    # the js async methods (see manifold_async_success)
+    # the js async methods (see manifold.asynchroneous_success)
     # offer the option to deliver the result to a specific DOM elt
     # otherwise (i.e. if domid not provided) 
     # it goes through the pubsub using query's uuid

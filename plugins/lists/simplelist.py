@@ -20,13 +20,14 @@ class SimpleList (Plugin) :
         return env
 
     def requirements (self):
-        reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/manifold-query.js", "js/onavail.js",
-                                "js/manifold-pubsub.js", "js/manifold-async.js", "js/manifold-queries.js",
-                                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
-                                "js/myslice.js",
-                                ] ,
-                 'css_files': [ "css/simplelist.css" ],
-                 }
+        reqs = {
+            'js_files' : [ "js/simplelist.js", "js/plugin.js",
+                           "js/manifold.js", "js/manifold-query.js", 
+                           "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                           "js/myslice.js",
+                           ] ,
+            'css_files': [ "css/simplelist.css" ],
+            }
         if self.with_datatables:
             reqs['js_files'].append ("js/dataTables.js")
             reqs['js_files'].append ("js/with-datatables.js")
