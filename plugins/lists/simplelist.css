@@ -1,14 +1,21 @@
-/* ---------- */
-td.simplelist {
-    padding: 0;
-    list-style: none;
+/* font size for regular (non datatable'd) simplelists */
+tbody.simplelist {
+    font-size: 80%;
 }
-td.simplelist>a {
-    padding-left: 8px;
+/* datatable'd tables behave differently */
+table.with-datatables>tbody.simplelist {
+    font-size: 100%;
 }
-th.simplelist {
+/* larger headers */
+thead.simplelist>tr>th {
     font-size: 150%;
+    padding: 10px 10px 20px 10px;
 }
+/* some space after the arrow */ 
+tbody.simplelist i {
+    padding-right: 8px;
+}
+
 /* ---------- */
 /* xxx this probably should be separated in something related to datatables */
 select { 
