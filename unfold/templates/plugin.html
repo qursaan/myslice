@@ -2,13 +2,10 @@
 {% if visible %}
 <div class='plugin-toggle{% if need_spin %} need-spin{% endif %}' id='toggle-{{ domid }}'>
 {% if togglable %}
-  {% if not toggled %}
-<p id='show-{{ domid }}' class='plugin-show'><i class="icon-hand-right"></i>{{ title }} ({{ classname }})</p>
-<p id='hide-{{ domid }}' class='plugin-hide' style='display:none;'><i class="icon-hand-down"></i>{{ title }} ({{ classname }})</p>
-  {% else %}
-<p id='show-{{ domid }}' class='plugin-show' style='display:none;'><i class="icon-hand-right"></i>{{ title }} ({{ classname }})</p>
-<p id='hide-{{ domid }}' class='plugin-hide'><i class="icon-hand-down"></i>{{ title }} ({{ classname }})</p>
-  {% endif %}{# toggled #}
+<p id='show-{{ domid }}' class='plugin-show'{% if toggled %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
+<a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Show plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></p>
+<p id='hide-{{ domid }}' class='plugin-hide'{% if not toggled %} style='display:none;'{% endif %}><i class="icon-hand-down"></i>
+<a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Hide plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></p>
 {% endif %}{# togglable #}
 {% endif %}{# visible #}
 

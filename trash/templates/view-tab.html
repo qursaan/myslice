@@ -3,6 +3,9 @@
 {% block content_main %}
 
 {% insert_str prelude "css/sample.css" %}
+{% insert prelude_js %}
+$(function(){console.log('hey!');$('#tooltipid').tooltip({'selector':'','placement':'bottom'});});
+{% endinsert %}
 
 <div id=sample-tabs>
 <ul class="nav nav-tabs" id='foo'>
@@ -22,7 +25,9 @@
 </div>
 
 
-<div class='well'> a sample of the 'well' class quis nostrud exerci tation </div>
+<div class='well'> a sample of the 'well' class quis nostrud exercitation </div>
+
+a first <a id='tooltipid' href="#" data-toggle="tooltip" data-original-title="what the tooltip displays"> attempt with tooltips </a>
 
 <div>
  {{ lorem }}   Lorem <span class='bold'>ipsum dolor</span> <code> counter += 1

@@ -7,11 +7,12 @@ $(document).ready(function() {
 	    var plugin='#'+$(this).attr('id').replace('hide-',''); 
 	    var show='#'+$(this).attr('id').replace('hide-','show-'); 
 	    $(plugin).slideUp(); $(show).show(); $(this).hide();});
-	})
+    });
     $('.plugin-show').each(function() {
 	$(this).click(function () { 
 	    var plugin='#'+$(this).attr('id').replace('show-',''); 
 	    var hide='#'+$(this).attr('id').replace('show-','hide-'); 
 	    $(plugin).slideDown(); $(hide).show(); $(this).hide();});
-	})
-    })
+    });
+    $('.plugin-tooltip').each(function(){ $(this).tooltip({'selector':'','placement':'right'}); });
+})
