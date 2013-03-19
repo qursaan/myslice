@@ -76,10 +76,11 @@
 
 	var lang=$plugindiv.find(".querycode-lang").val();
 	var dom=$plugindiv.find(".querycode-viz");
-	var query = $plugindiv.data().QueryCode.options.query;
+	var query_uuid = $plugindiv.data().QueryCode.options.query_uuid;
+	var query=manifold.find_query(query_uuid);
 	funname="translate_query_as_" + lang;
 	fun=eval(funname);
-	if ( ! fun) {
+	if (! fun) {
 	    console.log("Cannot find translator function for lang " + lang);
 	    return;
 	}

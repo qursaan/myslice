@@ -1,5 +1,5 @@
-function ManifoldQuery(action, method, timestamp, filters, params, fields, unique, uuid, aq, sq)
-{  
+function ManifoldQuery(action, method, timestamp, filters, params, fields, unique, query_uuid, aq, sq) {  
+
     // get, update, delete, create
     var action;
     
@@ -21,8 +21,8 @@ function ManifoldQuery(action, method, timestamp, filters, params, fields, uniqu
     // 0,1 : list of element of an object or single object  
     var unique;
     
-    // uuid : unique identifier of a query
-    var uuid;
+    // query_uuid : unique identifier of a query
+    var query_uuid;
     
     // Query : root query (no sub-Query)
     var analyzed_query;
@@ -102,7 +102,7 @@ INSERT INTO method VALUES(field=value)
     this.analyze_subqueries = function() {
         /* adapted from the PHP function in com_tophat/includes/query.php */
         var q = new ManifoldQuery();
-        q.uuid = this.uuid;
+        q.query_uuid = this.query_uuid;
         q.action = this.action;
         q.method = this.method;
         q.timestamp = this.timestamp;
@@ -174,7 +174,7 @@ INSERT INTO method VALUES(field=value)
     this.params = params;
     this.fields = fields;
     this.unique = unique;
-    this.uuid = uuid;
+    this.query_uuid = query_uuid;
     this.analyzed_query = aq;
     this.subqueries = sq;
 }  

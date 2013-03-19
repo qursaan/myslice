@@ -87,7 +87,7 @@
                                         query=d.current_query;
                                         query.update_filter(key,op,val);
                                         // Publish the query changed, the other plugins with subscribe will get the changes
-                                        $.publish('/query/' + query.uuid + '/changed', query);
+                                        $.publish('/query/' + query.query_uuid + '/changed', query);
                                         //add_ActiveFilter("#QuickFilter-string-"+key,ui.item.value,d);
                                     }
 				});
@@ -248,7 +248,7 @@
             var filter_field = $('#QuickFilter_select_field').val();
 
             query.update_filter(filter_field, '=', filter_value);
-            $.publish('/query/' + query.uuid + '/changed', query);
+            $.publish('/query/' + query.query_uuid + '/changed', query);
         });
         
         $('.QuickFilter_select').change( function() {
@@ -271,7 +271,7 @@
                     query.update_filter(key[1], '=', f_value);
                 }
             }
-            $.publish('/query/' + query.uuid + '/changed', query);
+            $.publish('/query/' + query.query_uuid + '/changed', query);
         });
 
     }

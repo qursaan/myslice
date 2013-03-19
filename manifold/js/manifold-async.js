@@ -1,11 +1,11 @@
-manifold_async_debug=false;
+manifold_async_debug=true;
 
 // Helper functions for asynchronous requests
 
 var api_url = '/manifold/api/json/'
 
 // Executes all async. queries
-// input queries are specified as a list of {'query': new Query(..), 'id': <possibly null>}
+// input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
 function manifold_async_exec(queries) {
     if (manifold_async_debug) console.log('manifold_async_exec length='+ queries.length);
     // start spinners
@@ -14,15 +14,34 @@ function manifold_async_exec(queries) {
     // We use js function closure to be able to pass the query (array) to the
     // callback function used when data is received
     var manifold_async_success_closure = function(query, id) {
-        return function(data, textStatus) {manifold_async_success(data, query, id);}
-    };
+	return function(data, textStatus) {manifold_async_success(data, query, id);}};
 
     // Loop through query array and use ajax to send back queries (to frontend) with json
     jQuery.each(queries, function(index, tuple) {
-	hash=tuple.query.to_hash();
-	if (manifold_async_debug) console.log ("sending POST on " + api_url + " iterating on " + tuple + " -> " + hash);
-        jQuery.post(api_url, {'query': hash}, manifold_async_success_closure(tuple.query, tuple.id));
+	var query=manifold.find_query(tuple.query_uuid);
+	var hash=query.to_hash();
+	if (manifold_async_debug) console.log ("sending POST on " + api_url + " iterating on " + tuple.query_uuid + " -> " + hash);
+        jQuery.post(api_url, {'query': hash}, manifold_async_success_closure(query, tuple.id));
     })
+}
+
+function manifold_async_success(data, query, id) {
+    if (data) {
+
+        if (!!id) {
+            /* Directly inform the requestor */
+            jQuery('#' + id).trigger('results', [data]);
+        } else {
+            /* Publish an update announce */
+            jQuery.publish("/results/" + query.query_uuid + "/changed", [data, query]);
+        }
+
+        // Is there a linked query ?
+        //if ((query.done == 'now') && (query.ts == 'latest')) {
+        //    var new_query = [query_json.replace("latest", "now")];
+        //    manifold_async_exec(new_query);
+        //}
+    }
 }
 
 /* not used
@@ -126,25 +145,6 @@ function manifold_update_template(data)
             manifold_update_table('#manifold__' + key, value);
         }
     });
-}
-
-function manifold_async_success(data, query, id) {
-    if (data) {
-
-        if (!!id) {
-            /* Directly inform the requestor */
-            jQuery('#' + id).trigger('results', [data]);
-        } else {
-            /* Publish an update announce */
-            jQuery.publish("/results/" + query.uuid + "/changed", [data, query]);
-        }
-
-        // Is there a linked query ?
-        //if ((query.done == 'now') && (query.ts == 'latest')) {
-        //    var new_query = [query_json.replace("latest", "now")];
-        //    manifold_async_exec(new_query);
-        //}
-    }
 }
 
 //http://stackoverflow.com/questions/5100539/django-csrf-check-failing-with-an-ajax-post-request

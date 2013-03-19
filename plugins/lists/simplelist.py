@@ -21,7 +21,7 @@ class SimpleList (Plugin) :
 
     def requirements (self):
         reqs = { 'js_files' : [ "js/simplelist.js", "js/plugin.js", "js/manifold-query.js", "js/onavail.js",
-                                "js/manifold-pubsub.js", "js/manifold-async.js", 
+                                "js/manifold-pubsub.js", "js/manifold-async.js", "js/manifold-queries.js",
                                 "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                                 "js/myslice.js",
                                 ] ,
@@ -32,5 +32,5 @@ class SimpleList (Plugin) :
             reqs['js_files'].append ("js/with-datatables.js")
         return reqs
     
-    def json_settings_list (self): return ['plugin_uuid', 'query','query_uuid','key']
+    def json_settings_list (self): return ['plugin_uuid','query_uuid','key']
 

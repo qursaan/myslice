@@ -10,7 +10,7 @@ class ManifoldQuery:
                   filters=[], params=[], fields=[],
                   sort=None, limit=None, offset=None,
                   ):
-        self.uuid=uniqid()
+        self.query_uuid=uniqid()
         # settable
         self.action=action
         self.method=method
@@ -26,7 +26,7 @@ class ManifoldQuery:
         self.subqueries = {}
 
     def to_json (self):
-        uuid=self.uuid
+        query_uuid=self.query_uuid
         a=self.action
         m=self.method
         t=self.timestamp
@@ -45,7 +45,7 @@ class ManifoldQuery:
                       for (method, subquery) in self.subqueries.iteritems()])
             sq="{%s}"%sq
         
-        return """ new ManifoldQuery('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(uuid)s', %(aq)s, %(sq)s)"""%locals()
+        return """ new ManifoldQuery('%(a)s', '%(m)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(query_uuid)s', %(aq)s, %(sq)s)"""%locals()
     
     # this builds a ManifoldQuery object from a dict as received from javascript through its ajax request 
     # e.g. here's what I captured from the server's output
@@ -65,7 +65,7 @@ class ManifoldQuery:
 
     def analyze_subqueries(self):
         analyzed_query = ManifoldQuery()
-        analyzed_query.uuid = self.uuid
+        analyzed_query.query_uuid = self.query_uuid
         analyzed_query.action = self.action
         analyzed_query.method = self.method
         analyzed_query.timestamp = self.timestamp

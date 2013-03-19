@@ -4,8 +4,12 @@
 
 import json
 
-from unfold.prelude import Prelude
+from django.template.loader import render_to_string
+
 from manifold.manifoldapi import ManifoldAPI
+
+from unfold.prelude import Prelude
+
 from myslice.config import Config
 
 # decorator to deflect calls on this Page to its prelude
@@ -21,7 +25,9 @@ class Page:
         self.request=request
         # all plugins mentioned in this page
         self._plugins = {}
-        # queue of queries
+        # the set of all queries 
+        self._queries=set()
+        # queue of queries with maybe a domid, see enqueue_query
         self._queue=[]
         # global prelude object
         self.prelude=Prelude(css_files='css/plugin.css')
@@ -38,6 +44,7 @@ class Page:
         return self._plugins.get(domid,None)
     
     def reset_queue (self):
+        self._queries = set()
         self._queue = []
 
     # the js async methods (see manifold_async_success)
@@ -45,21 +52,21 @@ class Page:
     # otherwise (i.e. if domid not provided) 
     # it goes through the pubsub using query's uuid
     def enqueue_query (self, query, domid=None):
-        self._queue.append ( (query,domid,) )
+        self._queries = self._queries.union(set( [ query, ] ))
+        self._queue.append ( (query.query_uuid,domid,) )
 
     # return the javascript that triggers all the queries
+    # xxx could fruitfully be renamed expose_queries_to_javascript or something
     def exec_queue_asynchroneously (self):
-        js = ""
-        js += "var async_queries = new Array();\n"
-        for (query,domid) in self._queue:
-            qjson=query.to_json()
-            id="'%s'"%domid if domid else 'undefined'
-            js += "async_queries.push({'query':%(qjson)s, 'id':%(id)s});\n"%locals()
-        js += "onFunctionAvailable('manifold_async_exec', function() {manifold_async_exec(async_queries);}, this, true);"
+        # compute variables to expose to the template
+        env = {}
+        # expose the json definition of all queries
+        env['queries_jsons'] = [ query.to_json() for query in self._queries ]
+        env['query_uuid_domids'] = [ {'query_uuid' : a, 'domid': '"%s"'%b if b else 'null'} for (a,b) in self._queue ]
+        javascript = render_to_string ("page-queries.js",env)
         self.reset_queue()
-        # run only once the document is ready
-        js = "$(document).ready(function(){%(js)s})"%locals()
-        self.add_js_chunks (js)
+        self.add_js_chunks (javascript)
+
 
 
     def expose_js_metadata(self):
@@ -91,14 +98,14 @@ class Page:
 
             request.session['metadata'] = self._metadata
 
-        javascript = "all_headers=" + json.dumps(self._metadata) + ";"
-        self.add_js_chunks(javascript)
+#        javascript = "all_headers=" + json.dumps(self._metadata) + ";"
+#        self.add_js_chunks(javascript)
 
     def metadata_get_fields(self, method):
         return self._metadata[method]['column'].sort()
         
     def expose_js_manifold_config (self):
-        self.add_js_chunks(Config.manifold_js_export())
+        self.add_js_chunks(Config.manifold_js_export()+"\n")
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above

@@ -16,7 +16,8 @@ from unfold.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-DEBUG= [ 'QuickFilter' ]
+#DEBUG= [ 'SliceList' ]
+DEBUG=True
 
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
@@ -98,7 +99,7 @@ class Plugin:
         if setting=='plugin_uuid':
             value=self.domid
         elif setting=='query_uuid':
-            try: value=self.query.uuid
+            try: value=self.query.query_uuid
             except: return '%s:"undefined"'%setting
         else:
             value=getattr(self,setting,None)
@@ -112,6 +113,9 @@ class Plugin:
     # and add plugin_uuid: domid in the mix
     # NOTE this plugin_uuid thing might occur in js files from joomla/js, ** do not rename **
     def settings_json (self):
+        exposed_settings=self.json_settings_list()
+        if 'query' in exposed_settings:
+            print "WARNING, cannot expose 'query' directly in json_settings_list, query_uuid is enough"
         result = "{"
         result += ",".join([ self.setting_json(setting) for setting in self.json_settings_list() ])
         result += "}"
@@ -121,8 +125,9 @@ class Plugin:
     # need to be prepared for js - meaning their json settings get exposed to js
     # others just get displayed and that's it
     def export_json_settings (self):
-        return 'query' in self.__dict__
+        return 'query_uuid' in self.json_settings_list()
     
+    # by default we create a timer if there's a query attached, redefine to change this behaviour
     def start_with_spin (self):
         return self.export_json_settings()
 
@@ -137,6 +142,8 @@ class Plugin:
         # need_spin is used in plugin.html
         self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
+        if self.need_debug(): 
+            print "rendering plugin.html with env keys %s"%env.keys()
         result = render_to_string ('plugin.html',env)
 
         # export this only for relevant plugins
@@ -235,7 +242,7 @@ class Plugin:
     # mandatory : define the fields that need to be exposed to json as part of 
     # plugin initialization
     # mention 'domid' if you need plugin_uuid
-    # also 'query_uuid' gets replaced with query.uuid
+    # also 'query_uuid' gets replaced with query.query_uuid
     def json_settings_list (self): return ['json_settings_list-must-be-redefined']
 
     # might also define these ones:
