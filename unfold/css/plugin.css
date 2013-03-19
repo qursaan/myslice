@@ -2,6 +2,7 @@ div.plugin-toggle {
     padding:		4px;
     border-style:	dotted;
     border-width:	1px;
+    border-radius:	8px;
 }
 p.plugin-show {
     cursor: s-resize;
@@ -9,6 +10,16 @@ p.plugin-show {
 p.plugin-hide { 
     cursor: n-resize;
 }
-p.plugin-show,i.icon-hand-right, p.plugin-hide,i.icon-hand-down {
+i.icon-hand-right,i.icon-hand-down {
     padding-right: 4px;
+}
+a.plugin-tooltip { 
+    font-size: 150%;
+    font-style: italic;
+    padding: 4px;
+    color: #808080;
+}
+a.plugin-tooltip:hover { 
+    color: #102050; 
+    text-decoration: none;
 }
