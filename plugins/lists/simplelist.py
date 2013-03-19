@@ -21,7 +21,7 @@ class SimpleList (Plugin) :
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/simplelist.js", "js/plugin.js",
+            'js_files' : [ "js/simplelist.js", 
                            "js/manifold.js", "js/manifold-query.js", 
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/myslice.js",

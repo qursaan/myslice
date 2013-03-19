@@ -98,14 +98,14 @@ class Page:
 
             request.session['metadata'] = self._metadata
 
-#        javascript = "all_headers=" + json.dumps(self._metadata) + ";"
-#        self.add_js_chunks(javascript)
+        javascript = "var MANIFOLD_METADATA =" + json.dumps(self._metadata) + ";"
+        self.add_js_chunks(javascript)
 
     def metadata_get_fields(self, method):
         return self._metadata[method]['column'].sort()
         
     def expose_js_manifold_config (self):
-        self.add_js_chunks(Config.manifold_js_export()+"\n")
+        self.add_js_chunks(Config.manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above

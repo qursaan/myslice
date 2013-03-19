@@ -10,9 +10,11 @@ class QuickFilter (Plugin) :
     def template_file (self): return "quickfilter.html"
 
     def requirements (self):
-        return { 'js_files' : "js/quickfilter.js",
-                 'css_files': "css/quickfilter.css",
-                 }
+        return { 
+            'js_files' : [ "js/quickfilter.js", "js/metadata.js",
+                           ],
+            'css_files': "css/quickfilter.css",
+            }
 
     def json_settings_list (self):
         return ['criterias','plugin_uuid']

@@ -6,7 +6,7 @@
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
-
+// global metadata from js/metadata.js
 ( function($){
 
     var debug=false;
@@ -141,7 +141,7 @@
                 var removed_filters = tmp.removed;
                 $.each(removed_filters, function(i,filter){
                     console.log(filter[0]);
-                    allowedValues=getMetadata_property('resource', filter[0], 'allowed_values');
+                    allowedValues=metadata.property('resource', filter[0], 'allowed_values');
                     if (allowedValues!='' && allowedValues!="N/A") {
 			//if(MANIFOLD_METADATA[filter[0]]['allowed_values']!=''){
                         $('#QuickFilter_select_field').val("#");
@@ -192,7 +192,7 @@
                     });            
                 }
             }else{
-                headers=getMetadata_fields('resource');
+                headers=metadata.fields('resource');
                 $.each (headers, function (key, value) {
                     $('#QuickFilter_select_field').append("<option>"+value['column']+"</option>");
                 });
@@ -209,10 +209,10 @@
             }else{
                 $('#QuickFilter_select_value_container').show();
                 $.publish('debug','field selected = '+field);
-                valType=getMetadata_property('resource', field, 'value_type');
+                valType=metadata.property('resource', field, 'value_type');
                 if (valType == 'string' || valType=="N/A") {
                     // If this key has predefined values, build a select with each allowed values as options
-                    allowedValues=getMetadata_property('resource', field, 'allowed_values');
+                    allowedValues=metadata.property('resource', field, 'allowed_values');
                     if (allowedValues!='' && allowedValues!="N/A") {
                         $('#QuickFilter_string_value_div').hide();
                         $('#QuickFilter_int_value_div').hide();

@@ -1,32 +1,22 @@
 function ManifoldQuery(action, method, timestamp, filters, params, fields, unique, query_uuid, aq, sq) {  
-
     // get, update, delete, create
     var action;
-    
-    // slice, user, network... : Metadata
+    // slice, user, network... 
     var method; 
-    
     // timestamp, now, latest(cache) : date of the results queried    
     var timestamp;
-    
     // key(field),op(=<>),value
     var filters;
-
     // todo
     var params;
-    
-    // hostname, ip,... : Metadata
+    // hostname, ip,... 
     var fields;
-    
     // 0,1 : list of element of an object or single object  
     var unique;
-    
     // query_uuid : unique identifier of a query
     var query_uuid;
-    
     // Query : root query (no sub-Query)
     var analyzed_query;
-    
     // {} : Assoc Table of sub-queries ["resources"->subQ1, "users"->subQ2]
     var subqueries;
 
