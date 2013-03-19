@@ -15,6 +15,8 @@ thead.simplelist>tr>th {
 tbody.simplelist i {
     padding-right: 8px;
 }
+/* make previous next buttons a bit nicer */
+div.paging_two_button>a { padding: 0px 4px 0px 4px; }
 
 /* ---------- */
 /* xxx this probably should be separated in something related to datatables */
