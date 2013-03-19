@@ -25,6 +25,11 @@ class ManifoldQuery:
         self.analyzed_query=None
         self.subqueries = {}
 
+    def __repr__ (self):
+        result="Q: id=%(query_uuid)s - %(action)s on %(method)s "%self.__dict__
+        result += " with %d filters, %d fields"%(len(self.filters),len(self.params))
+        return result
+
     def to_json (self):
         query_uuid=self.query_uuid
         a=self.action
@@ -61,8 +66,7 @@ class ManifoldQuery:
                         setattr(self, arg, d[key])
                     break
 
-
-
+    # not used yet ..
     def analyze_subqueries(self):
         analyzed_query = ManifoldQuery()
         analyzed_query.query_uuid = self.query_uuid
