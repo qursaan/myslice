@@ -1,5 +1,5 @@
 div.plugin-toggle {
-    padding:		10px;
+    padding:		4px;
     border-style:	dotted;
     border-width:	1px;
 }
@@ -8,4 +8,7 @@ p.plugin-show {
 }
 p.plugin-hide { 
     cursor: n-resize;
+}
+p.plugin-show,i.icon-hand-right, p.plugin-hide,i.icon-hand-down {
+    padding-right: 4px;
 }

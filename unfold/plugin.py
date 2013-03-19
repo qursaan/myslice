@@ -16,8 +16,8 @@ from unfold.prelude import Prelude
 # . True : to debug all plugin
 
 DEBUG= False
-#DEBUG= [ 'SliceList' ]
-#DEBUG=True
+DEBUG= [ 'SimpleList' ]
+DEBUG=True
 
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):

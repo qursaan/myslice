@@ -14,6 +14,7 @@ class SimpleList (Plugin) :
     
     def template_env (self, request):
         env={}
+        # would need some cleaner means to set a header here
         header=getattr(self,'header',None)
         if header: env['header']=header
         env['with_datatables']= "yes" if self.with_datatables else ""

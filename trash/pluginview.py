@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
 
-from plugins.verticallayout.verticallayout import VerticalLayout
+from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
 from plugins.lists.staticlist import StaticList
 from plugins.quickfilter.quickfilter import QuickFilter
@@ -27,39 +27,39 @@ def test_plugin_view (request):
     template_env = {}
     
     main_plugin = \
-        VerticalLayout ( page=page,
-                         title='title for the vertical layout',
-                         sons = [ StaticList (page=page,
-                                              title='StaticList - with datatables - starts toggled off',
-                                              list=hard_wired_list, 
-                                              header='Hard wired header', 
-                                              foo='the value for foo',
-                                              with_datatables=True,
-                                              toggled=False),
-                                  Tabs (page=page,
-                                        title='Sample Tabs',
-                                        # *** we select this one to be the active tab ***
-                                        active='raw2',
-                                        sons = [ Raw (page=page,
-                                                      title='a raw plugin',domid='raw1',
-                                                      togglable=False,
-                                                      html= 3*lorem_p),
-                                                 StaticList(page=page,
-                                                            title='a slice list',
-                                                            togglable=False,
-                                                            header="static list but not togglable",
-                                                            list=hard_wired_slice_names),
-                                                 Raw (page=page,
-                                                      title='raw title',domid='raw2',
-                                                      togglable=False,html=lorem) ]),
-                                  StaticList (page=page,
-                                              title='SimpleList with slice names', 
-                                              list=hard_wired_slice_names,
-                                              ),
-                                  QuickFilter (page=page,
-                                               title='QuickFilter in main content',
-                                               criterias=quickfilter_criterias,
-                                               ) ] )
+        Stack ( page=page,
+                title='title for the vertical layout',
+                sons = [ StaticList (page=page,
+                                     title='StaticList - with datatables - starts toggled off',
+                                     list=hard_wired_list, 
+                                     header='Hard wired header', 
+                                     foo='the value for foo',
+                                     with_datatables=True,
+                                     toggled=False),
+                         Tabs (page=page,
+                               title='Sample Tabs',
+                               # *** we select this one to be the active tab ***
+                               active='raw2',
+                               sons = [ Raw (page=page,
+                                             title='a raw plugin',domid='raw1',
+                                             togglable=False,
+                                             html= 3*lorem_p),
+                                        StaticList(page=page,
+                                                   title='a slice list',
+                                                   togglable=False,
+                                                   header="static list but not togglable",
+                                                   list=hard_wired_slice_names),
+                                        Raw (page=page,
+                                             title='raw title',domid='raw2',
+                                             togglable=False,html=lorem) ]),
+                         StaticList (page=page,
+                                     title='SimpleList with slice names', 
+                                     list=hard_wired_slice_names,
+                                     ),
+                         QuickFilter (page=page,
+                                      title='QuickFilter in main content',
+                                      criterias=quickfilter_criterias,
+                                      ) ] )
     # define 'content_main' to the template engine
     template_env [ 'content_main' ] = main_plugin.render(request)
 

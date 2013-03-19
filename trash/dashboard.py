@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from unfold.page import Page
 from manifold.manifoldquery import ManifoldQuery
 
-from plugins.verticallayout.verticallayout import VerticalLayout
+from plugins.stack.stack import Stack
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
@@ -36,7 +36,7 @@ def dashboard_view (request):
                                   sort='slice_hrn',)
     page.enqueue_query (slices_query)
 
-    main_plugin = VerticalLayout (
+    main_plugin = Stack (
         page=page,
         title="Putting stuff together",
         sons=[ 
