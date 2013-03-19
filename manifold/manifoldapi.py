@@ -17,11 +17,11 @@ class ManifoldAPI:
     self.calls = {}
     self.multicall = False
     self.url = config.manifold_url
-    self.proxy = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
+    self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
   def __getattr__(self, methodName):
       def func(*args, **kwds):
-        result=getattr(self.proxy, methodName)(self.auth, *args, **kwds)
+        result=getattr(self.server, methodName)(self.auth, *args, **kwds)
         ### debug
         if debug:
           print '===> backend call',methodName, self.auth, self.url,'->',
@@ -33,13 +33,11 @@ class ManifoldAPI:
         return result
       return func
 
-  # 4amine : xxx
   def send_manifold_query (self, manifold_query):
     (action,method)= (manifold_query.action,manifold_query.method)
     if action=='get':
-      return self.proxy.Get(self.auth, method, manifold_query.filters, {}, manifold_query.fields)
+      return self.server.Get(self.auth, method, manifold_query.filters, {}, manifold_query.fields)
     # xxx...
-    elif action=='others':
-      return None
-
+    else:
+      print "WARNING: ManifoldAPI.send_manifold_query: only 'get' implemented for now"
     

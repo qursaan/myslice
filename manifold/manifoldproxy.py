@@ -14,9 +14,9 @@ debug_spin=0
 # see also
 # myslice/urls.py
 # as well as 
-# static/js/manifold-async.js
-def api (request,format):
-    """the view associated with /manifold/api/ 
+# static/js/manifold.js
+def proxy (request,format):
+    """the view associated with /manifold/proxy/ 
 with the query passed using POST"""
     
     # expecting a POST
