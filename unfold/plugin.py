@@ -150,7 +150,7 @@ class Plugin:
         if self.export_json_settings():
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
-            js_init = render_to_string ( 'plugin-setenv.js', env )
+            js_init = render_to_string ( 'plugin-init.js', env )
             self.add_js_chunks (js_init)
         
         # interpret the result of requirements ()

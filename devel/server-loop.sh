@@ -6,8 +6,7 @@ cd $DIRNAME/..
 hostname | grep -q '^z' && port=8080 || port=80
 [[ -n "$@" ]] && port=$1
 
-make all-static all-templates
 while true; do 
+    make all-static all-templates
     ./manage.py runserver 0.0.0.0:$port
-    make static templates
 done
