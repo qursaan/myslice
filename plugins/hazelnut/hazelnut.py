@@ -13,8 +13,8 @@ class Hazelnut (Plugin):
         env={}
         env.update(self.__dict__)
         # xxx need to retrieve metadata
-# $method_keys = Plugins::get_default_fields($query->method, $is_unique);
-# $fields = Plugins::metadata_get_fields($query->method);
+# $subject_keys = Plugins::get_default_fields($query->subject, $is_unique);
+# $fields = Plugins::metadata_get_fields($query->subject);
         env['subject_fields']=[ 'the','available','default','fields']
         return env
 
