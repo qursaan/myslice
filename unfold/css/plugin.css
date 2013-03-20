@@ -3,6 +3,8 @@ div.plugin-toggle {
     padding:		5px;
     border-style:	dotted;
     border-width:	1px;
+}
+div.plugin, div.plugin-toggle {
     border-radius:	8px;
 }
 h4.plugin-show {
