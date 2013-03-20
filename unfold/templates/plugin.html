@@ -1,6 +1,6 @@
 {#<!--begin {{ classname }}{{ domid }}-->#}
 {% if visible %}
-<div class='plugin-toggle{% if need_spin %} need-spin{% endif %}' id='toggle-{{ domid }}'>
+<div class='plugin-toggle{% if need_spin %} need-spin{% endif %}' id='complete-{{ domid }}'>
 {% if togglable %}
 <h4 id='show-{{ domid }}' class='plugin-show'{% if toggled %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Show plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>

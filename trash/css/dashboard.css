@@ -1,3 +1,7 @@
 div#sidelist table.with-datatables {
     font-size: 130%;
 }
+# demo to show how to tweak a given section by setting its domid
+#complete-quickfilter {
+    background-color: #f080f0;
+}

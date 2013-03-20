@@ -47,6 +47,7 @@ def dashboard_view (request):
                 toggled=False,
                 ),
             QuickFilter (
+                domid='quickfilter',
                 page=page,
                 title='play with filters',
                 criterias=quickfilter_criterias,
