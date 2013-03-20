@@ -40,7 +40,7 @@ thirdparty-js:
 thirdparty-css:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.css'
 thirdparty-img:
-	@find $(THIRD-PARTY-RESOURCES) -name '*.png'
+	@find $(THIRD-PARTY-RESOURCES) -name '*.png' -o -name '*.ico'
 
 # we might have any of these as templates - e.g. ./unfold/templates/plugin-init.js
 # so if there's a /templates/ in the path ignore the file
@@ -49,7 +49,7 @@ local-js: force
 local-css: force
 	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
 local-img: force
-	@find . -type f -name '*.png' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
+	@find . -type f -name '*.png' -o -name '*.ico' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
 
 list-js: thirdparty-js local-js
 list-css: thirdparty-css local-css

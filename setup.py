@@ -19,6 +19,5 @@ setup(packages = packages,
         ( 'all-static/css', glob ('all-static/css/*')),
         ( 'all-static/img', glob ('all-static/img/*')),
         ( 'all-templates', glob ('all-templates/*')),
-        ( 'all-static', ['apache/favicon.ico', ] ),
         ( 'apache', [ 'apache/myslice.conf', 'apache/myslice.wsgi' ]),
         ])
