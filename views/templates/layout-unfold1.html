@@ -9,9 +9,8 @@
 {{ header_prelude }}
 </head>{# let's add these ones no matter what #}
 {% insert_str prelude "js/jquery.js" %}
-{# {% insert prelude_js %} jQuery.noConflict(); {% endinsert %} #}
 {% insert_str prelude "js/init-all-plugins.js" %}
-{% insert_str prelude "css/myslice.css" %}
+{% insert_str prelude "css/layout-unfold1.css" %}
 <body>
 {% block container %}
 <div id="container">
@@ -20,15 +19,15 @@
   {% endblock topmenu %}
 <div class="container-fluid">
   <div class="row-fluid">
-    <div id="content-main" class="span9 columns">
-      {% block content_main %}
-      "The main content area (define block 'content_main')"
-      {% endblock content_main %}
+    <div id="unfold1-main" class="span9 columns">
+      {% block unfold1_main %}
+      "The main content area (define block 'unfold1_main')"
+      {% endblock unfold1_main %}
     </div><!--span9-->
-    <div id='content-related' class='span3'>
-      {% block content_related %}
+    <div id='unfold1-margin' class='span3'>
+      {% block unfold1_margin %}
       "The related content area (define block 'related_main')"
-      {% endblock content_related %}
+      {% endblock unfold1_margin %}
     </div><!--span3-->
   </div><!--raw-fluid-->
 </div><!--container-fluid-->

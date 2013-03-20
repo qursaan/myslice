@@ -1,11 +1,11 @@
 {# -*-django-html-mumamo-mode-*- #}
-{% extends 'layout-myslice.html' %}
+{% extends 'layout-unfold1.html' %}
 
-{% block content_main %}
+{% block unfold1_main %}
 {% if name %}
 <p class='well'>We're getting the variable <code>name= {{ name }}</code> from the URL </p>
 {% else %}
 <p class='well'>This URL is not valid, you need to pass a slice name like in <a href="/slice/my.slice.name">/slice/my.slice.name</a></p>
 {% endif %}
-{% endblock content_main %}
+{% endblock unfold1_main %}
 

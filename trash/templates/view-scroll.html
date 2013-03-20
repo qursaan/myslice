@@ -1,6 +1,6 @@
-{% extends 'layout-myslice.html' %}
+{% extends 'layout-unfold1.html' %}
 
-{% block content_main %}
+{% block unfold1_main %}
 
 {% insert_str prelude "css/sample.css" %}
 
@@ -11,9 +11,9 @@
 <div id='scrollDiv3'> scroll3 area {{ lorem }}  </div>
 <div id='scrollDiv4'> scroll4 area {{ lorem }} {{ lorem }} {{ lorem }} </div>
 <!--</div>-->
-{% endblock content_main %}
+{% endblock unfold1_main %}
 
-{% block content_related %}
+{% block unfold1_margin %}
 <div class="foo">
 <ul class="nav nav-tabs nav-stacked">
   <li><a href="#scrollDiv1" data-toggle="tab"><!--<i class="icon-chevron-right"/>--> scroll1 </a></li>
@@ -22,4 +22,4 @@
   <li><a href="#scrollDiv4" data-toggle="tab"> scroll4 </a></li>
 </ul>
 </div>
-{% endblock content_related %}
+{% endblock unfold1_margin %}

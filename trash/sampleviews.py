@@ -44,7 +44,7 @@ def slice_view (request, name=None):
                                 'topmenu_items' : topmenu_items('slice',request),
                                 'username':the_user (request),
                                 'slices': hard_wired_slice_names,
-                                'content_main' : lorem,
+                                'unfold1_main' : lorem,
                                 },
                                context_instance=RequestContext(request))
 

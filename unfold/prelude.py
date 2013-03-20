@@ -48,7 +48,7 @@ class Prelude:
     #    env['js_chunks']= '\n'.join(self.js_chunks)
     #    env['css_chunks']='\n'.join(self.css_chunks)
     #    return env
-    # together with this in layout-myslice.html
+    # together with this in layout-unfold1.html
     # {% for js_file in js_files %} {% insert_str prelude js_file %} {% endfor %}
     # {% for css_file in css_files %} {% insert_str prelude css_file %} {% endfor %}
     # somehow however this would not work too well, 

@@ -1,6 +1,6 @@
-{% extends 'layout-myslice.html' %}
+{% extends 'layout-unfold1.html' %}
 
-{% block content_main %}
+{% block unfold1_main %}
 
 {% insert_str prelude "css/sample.css" %}
 {% insert prelude_js %}
@@ -24,6 +24,7 @@ $(function(){console.log('hey!');$('#tooltipid').tooltip({'selector':'','placeme
 </div>   
 </div>
 
+<p>Let's see what a <button class='unfold-warning btn btn-warning'>warning button</button> looks like.</p>
 
 <div class='well'> a sample of the 'well' class quis nostrud exercitation </div>
 
@@ -51,13 +52,13 @@ a first <a id='tooltipid' href="#" data-toggle="tooltip" data-original-title="wh
     decima et quinta decima. Eodem modo typi, qui nunc nobis videntur
     parum clari, fiant sollemnes in futurum.
   </div>
-{% endblock content_main %}
+{% endblock unfold1_main %}
 
-{% block content_related %}
+{% block unfold1_margin %}
 This text is shorter on purpose Lorem <span class='bold'>ipsum
    dolor</span> sit amet, consectetuer adipiscing elit, sed diam
    nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
    volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation
    ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo
    consequat.
-{% endblock content_related %}
+{% endblock unfold1_margin %}

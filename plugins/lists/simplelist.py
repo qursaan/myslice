@@ -25,7 +25,7 @@ class SimpleList (Plugin) :
             'js_files' : [ "js/simplelist.js", 
                            "js/manifold.js", "js/manifold-query.js", 
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
-                           "js/myslice.js",
+                           "js/unfold-helper.js",
                            ] ,
             'css_files': [ "css/simplelist.css" ],
             }

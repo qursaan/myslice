@@ -60,8 +60,8 @@ def test_plugin_view (request):
                                       title='QuickFilter in main content',
                                       criterias=quickfilter_criterias,
                                       ) ] )
-    # define 'content_main' to the template engine
-    template_env [ 'content_main' ] = main_plugin.render(request)
+    # define 'unfold1_main' to the template engine
+    template_env [ 'unfold1_main' ] = main_plugin.render(request)
 
     ##########
     related_plugin = StaticList (page=page,
@@ -70,7 +70,7 @@ def test_plugin_view (request):
                                  list=hard_wired_slice_names, 
                                  header='Slices')
     # likewise but on the side view
-    template_env [ 'content_related' ] = related_plugin.render (request)
+    template_env [ 'unfold1_margin' ] = related_plugin.render (request)
 
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test Plugin View' 
