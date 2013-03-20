@@ -4,6 +4,8 @@ body {
     padding-bottom: 20px;
 }
 
-div.topmenu {
-    padding-top: 10px;
+div.topmenu { padding-top: 10px; }
+button#logout { 
+    margin-left: 8px; 
+    margin-bottom: 8px; 
 }

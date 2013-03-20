@@ -47,13 +47,6 @@ def logout_user (request):
     # xxx check that we're indeed logged in
     if not request.user.is_authenticated():
         return HttpResponseRedirect ('/')
-    return render_to_response('view-logout.html',{'username':the_user(request)},
-                              context_instance=RequestContext(request))
-
-def do_logout_user (request):
-    # xxx check that we're indeed logged in
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect ('/')
     logout(request)
     return HttpResponseRedirect ('/')
         

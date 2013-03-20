@@ -30,6 +30,12 @@ $(function(){console.log('hey!');$('#tooltipid').tooltip({'selector':'','placeme
 
 a first <a id='tooltipid' href="#" data-toggle="tooltip" data-original-title="what the tooltip displays"> attempt with tooltips </a>
 
+Let us now try to attach <button id='mylougout' class='btn btn-danger' data='mydata'>a click function to a button</button>
+<script>
+function foo() {alert ('foo' + $(this).attr('data'));}
+$(function() {$('#mylougout').click(foo);})
+</script>
+
 <div>
  {{ lorem }}   Lorem <span class='bold'>ipsum dolor</span> <code> counter += 1
   </code> sit amet, consectetuer

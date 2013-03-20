@@ -34,7 +34,6 @@ urlpatterns = patterns(
     (r'^accounts/login/$', 'auth.views.login_user'),
     (r'^login/?$', 'auth.views.login_user'),
     (r'^logout/?$', 'auth.views.logout_user'),
-    (r'^logout/confirm/?$', 'auth.views.do_logout_user'),
     #
     # the manifold proxy
     #
