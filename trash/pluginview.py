@@ -77,8 +77,8 @@ def test_plugin_view (request):
     template_env [ 'topmenu_items' ] = topmenu_items('plugin', request) 
     template_env [ 'username' ] = the_user (request) 
 
-    # we don't have anythong asynchroneous, but that doesn't hurt...
-    page.exec_queue_asynchroneously ()
+    # we don't have anythong asynchroneous, and manifold.js is not loaded
+#    page.exec_queue_asynchroneously ()
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
