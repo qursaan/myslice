@@ -18,10 +18,12 @@ class ManifoldQuery:
         self.filters=filters
         self.params=params
         self.fields=fields
+        # xxx this is unused for now
         self.sort=sort
         self.limit=limit
         self.offset=offset
-        # internal data
+        # internal data - likewise, this is unused as of yet, although we have
+        # (untested) code below in analyze_subqueries to compute these..
         self.analyzed_query=None
         self.subqueries = {}
 
