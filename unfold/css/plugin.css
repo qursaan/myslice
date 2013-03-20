@@ -1,21 +1,26 @@
 div.plugin-toggle {
-    padding:		4px;
+    margin:		3px;
+    padding:		5px;
     border-style:	dotted;
     border-width:	1px;
     border-radius:	8px;
 }
-p.plugin-show {
+h4.plugin-show {
     cursor: s-resize;
 }
-p.plugin-hide { 
+h4.plugin-hide { 
     cursor: n-resize;
+}
+h4.plugin-show, h4.plugin-hide {
+    margin:8px;
 }
 i.icon-hand-right,i.icon-hand-down {
     padding-right: 4px;
 }
 a.plugin-tooltip { 
-    font-size: 150%;
+    font-size: 130%;
     font-style: italic;
+    font-weight: normal;
     padding: 4px;
     color: #808080;
 }
