@@ -8,6 +8,7 @@ standard_topmenu_items = [
     { 'label':'Slice',  'href': '/slice/'},
     { 'label':'Plugin', 'href': '/plugin/'},
     { 'label':'Dashboard', 'href': '/dashboard/'},
+    { 'label':'Hazelnut', 'href': '/hazelnut/'},
     ]
 
 #login_out_items = { False: { 'label':'Login', 'href':'/login/'},

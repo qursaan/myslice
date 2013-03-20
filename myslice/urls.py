@@ -47,4 +47,5 @@ urlpatterns = patterns(
     (r'^scroll/?$', 'trash.sampleviews.scroll_view'),
     (r'^plugin/?$', 'trash.pluginview.test_plugin_view'),
     (r'^dashboard/?$', 'trash.dashboard.dashboard_view'),
+    (r'^hazelnut/?$', 'trash.haze.hazelnut_view'),
 )
