@@ -126,7 +126,7 @@
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'pp srv.call("' + mixed_case(query.action) +'", auth, "' + query.method + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
+	output += 'pp srv.call("' + mixed_case(query.action) +'", auth, "' + query.subject + '", "' + query.timestamp + '", ' + ifs + ', ' + ofs + ')';
 
 	var output = '<pre class="brush: ruby; toolbar: false;">' + output + "</pre>";
 	return output;
@@ -159,7 +159,7 @@
 	});
 	ofs = '[' + ofs + ']';
 
-	output += 'srv.' + mixed_case(query.action) + '(auth, "' + query.method + '", ' + ifs + ', {}, ' + ofs + ')';
+	output += 'srv.' + mixed_case(query.action) + '(auth, "' + query.subject + '", ' + ifs + ', {}, ' + ofs + ')';
 	var output = '<pre class="brush: python; toolbar: false;">' + output + "</pre>";
 	return output;
     }

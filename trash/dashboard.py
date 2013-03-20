@@ -26,9 +26,10 @@ def dashboard_view (request):
     page = Page(request)
 
     slices_query = ManifoldQuery (action='get',
-                                  method='slice',
+                                  subject='slice',
                                   timestamp='latest',
                                   fields=['slice_hrn'],
+                                  filters=[],
                                   # xxx filter : should filter on the slices the logged user can see
                                   # we don't have the user's hrn yet
                                   # in addition this currently returns all slices anyways

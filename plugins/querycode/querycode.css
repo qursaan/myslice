@@ -45,7 +45,7 @@ div.info:hover span{ /*the span will display just on :hover state*/
     padding: 0em 0em 0em 1em;
 }
 
-div.method {
+div.subject {
     padding: 10px;
     background-color: #fafafa;
     border-top: solid 1px black;

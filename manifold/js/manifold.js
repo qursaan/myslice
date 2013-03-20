@@ -53,7 +53,7 @@ var manifold = {
 	    var query=manifold.find_query(tuple.query_uuid);
 	    var hash=query.to_hash();
 	    if (manifold.asynchroneous_debug) 
-		console.log ("sending POST on " + manifold.proxy_url + " iterating on " + tuple.query_uuid + " -> " + hash);
+		console.log ("sending POST on " + manifold.proxy_url + " with query= " + query.__repr(query));
             jQuery.post(manifold.proxy_url, {'query': hash}, success_closure(query, tuple.id));
 	})
 	    },

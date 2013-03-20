@@ -3,11 +3,11 @@ var metadata = {
     get : function () {
 	return MANIFOLD_METADATA;
     },
-    // returns all fields of a given method
-    fields : function (method) {
+    // returns all fields of a given subject
+    fields : function (subject) {
 	var result=new Array();
-	jQuery.each(MANIFOLD_METADATA, function(m,obj){
-            if(m==method){
+	jQuery.each(MANIFOLD_METADATA, function(s,obj){
+            if(s==subject){
 		jQuery.each(obj['column'], function(i,f){
                     result.push(f);
 		});
@@ -19,10 +19,10 @@ var metadata = {
 	return result;
     },
     // returns all properties of a given field
-    field : function (method, field) {
+    field : function (subject, field) {
 	var result=new Array();
-	jQuery.each(MANIFOLD_METADATA, function(m,obj){
-            if(m==method){
+	jQuery.each(MANIFOLD_METADATA, function(s,obj){
+            if(s==subject){
 		jQuery.each(obj['column'], function(i,f){
                     if(f['column']==field){
 			result.push(f);
@@ -34,11 +34,11 @@ var metadata = {
 	});
 	return result[0];
     },
-    // returns the value of a property from a field within a method (type of object : resource,node,lease,slice...)
-    property : function (method, field, property) {
+    // returns the value of a property from a field within a subject (type of object : resource,node,lease,slice...)
+    property : function (subject, field, property) {
 	var result=null;
-	jQuery.each(MANIFOLD_METADATA, function(m,obj){
-            if(m==method){
+	jQuery.each(MANIFOLD_METADATA, function(s,obj){
+            if(s==subject){
 		jQuery.each(obj['column'], function(i,f){
                     if(f['column']==field){
 			result=f[property];

@@ -1,8 +1,8 @@
-function ManifoldQuery(action, method, timestamp, filters, params, fields, unique, query_uuid, aq, sq) {  
+function ManifoldQuery(action, subject, timestamp, filters, params, fields, unique, query_uuid, aq, sq) {  
     // get, update, delete, create
     var action;
     // slice, user, network... 
-    var method; 
+    var subject; 
     // timestamp, now, latest(cache) : date of the results queried    
     var timestamp;
     // key(field),op(=<>),value
@@ -23,12 +23,24 @@ function ManifoldQuery(action, method, timestamp, filters, params, fields, uniqu
 /*-------------------------------------------------------------
               Query properties are SQL like : 
 ---------------------------------------------------------------
-SELECT fields FROM method WHERE filter;
-UPDATE method SET field=value WHERE filter; / returns SELECT 
-DELETE FROM method WHERE filter
-INSERT INTO method VALUES(field=value)
+SELECT fields FROM subject WHERE filter;
+UPDATE subject SET field=value WHERE filter; / returns SELECT 
+DELETE FROM subject WHERE filter
+INSERT INTO subject VALUES(field=value)
 -------------------------------------------------------------*/
     
+    this.__repr = function (q) {
+	res  = "ManyfoldQuery ";
+	res += " id=" + q.query_uuid;
+	res += " a=" + q.action;
+	res += " s=" + q.subject;
+	res += " ts=" + q.timestamp;
+	res += " flts=" + q.filters;
+	res += " flds=" + q.fields;
+	res += " prms=" + q.params;
+	return res;
+    }	
+
     this.clone = function() {
         q = new ManifoldQuery();
         return jQuery.extend(true, q, this);
@@ -86,7 +98,7 @@ INSERT INTO method VALUES(field=value)
         return {'added':added, 'removed':removed};
     } 
     this.to_hash = function() {
-        return {'action': this.action, 'method': this.method, 'timestamp': this.timestamp,
+        return {'action': this.action, 'subject': this.subject, 'timestamp': this.timestamp,
 		'filters': this.filters, 'params': this.params, 'fields': this.fields};
     }
     this.analyze_subqueries = function() {
@@ -94,7 +106,7 @@ INSERT INTO method VALUES(field=value)
         var q = new ManifoldQuery();
         q.query_uuid = this.query_uuid;
         q.action = this.action;
-        q.method = this.method;
+        q.subject = this.subject;
         q.timestamp = this.timestamp;
 
         /* Filters */
@@ -104,15 +116,15 @@ INSERT INTO method VALUES(field=value)
             var v = filter[2];
             var pos = k.indexOf('.');
             if (pos != -1) {
-                var method = k.substr(0, pos);
+                var subject = k.substr(0, pos);
                 var field = k.substr(pos+1);
-                if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new ManifoldQuery();
-                    q.subqueries[this.method].action = this.action;
-                    q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].timestamp = this.timestamp;
+                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
+                    q.subqueries[this.subject] = new ManifoldQuery();
+                    q.subqueries[this.subject].action = this.action;
+                    q.subqueries[this.subject].subject = this.subject;
+                    q.subqueries[this.subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.method].filters.push(Array(field, op, v));
+                q.subqueries[this.subject].filters.push(Array(field, op, v));
             } else {
                 q.filters.push(this.filter);
             }
@@ -122,15 +134,15 @@ INSERT INTO method VALUES(field=value)
         jQuery.each(this.params, function(param, value) {
             var pos = param.indexOf('.');
             if (pos != -1) {
-                var method = param.substr(0, pos);
+                var subject = param.substr(0, pos);
                 var field = param.substr(pos+1);
-                if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new ManifoldQuery();
-                    q.subqueries[this.method].action = this.action;
-                    q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].timestamp = this.timestamp;
+                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
+                    q.subqueries[this.subject] = new ManifoldQuery();
+                    q.subqueries[this.subject].action = this.action;
+                    q.subqueries[this.subject].subject = this.subject;
+                    q.subqueries[this.subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.method].params[field] = value;
+                q.subqueries[this.subject].params[field] = value;
             } else {
                 q.params[field] = value;
             }
@@ -140,15 +152,15 @@ INSERT INTO method VALUES(field=value)
         jQuery.each(this.fields, function(i, v) {
             var pos = v.indexOf('.');
             if (pos != -1) {
-                var method = v.substr(0, pos);
+                var subject = v.substr(0, pos);
                 var field = v.substr(pos+1);
-                if (jQuery.inArray(this.method, q.subqueries) == -1) {
-                    q.subqueries[this.method] = new ManifoldQuery();
-                    q.subqueries[this.method].action = this.action;
-                    q.subqueries[this.method].method = this.method;
-                    q.subqueries[this.method].timestamp = this.timestamp;
+                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
+                    q.subqueries[this.subject] = new ManifoldQuery();
+                    q.subqueries[this.subject].action = this.action;
+                    q.subqueries[this.subject].subject = this.subject;
+                    q.subqueries[this.subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.method].fields.push(field);
+                q.subqueries[this.subject].fields.push(field);
             } else {
                 q.fields.push(v);
             }
@@ -158,7 +170,7 @@ INSERT INTO method VALUES(field=value)
  
     /* constructor */
     this.action = action;
-    this.method = method;
+    this.subject = subject;
     this.timestamp = timestamp;
     this.filters = filters;
     this.params = params;

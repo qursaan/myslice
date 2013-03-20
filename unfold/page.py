@@ -93,16 +93,16 @@ class Page:
             results = manifold_api.Get('metadata:table', [], [], fields)
 
             for res in results:
-                 method = res['table']
-                 self._metadata[method] = res
+                 subject = res['table']
+                 self._metadata[subject] = res
 
             request.session['metadata'] = self._metadata
 
         javascript = "var MANIFOLD_METADATA =" + json.dumps(self._metadata) + ";"
         self.add_js_chunks(javascript)
 
-    def metadata_get_fields(self, method):
-        return self._metadata[method]['column'].sort()
+    def metadata_get_fields(self, subject):
+        return self._metadata[subject]['column'].sort()
         
     def expose_js_manifold_config (self):
         self.add_js_chunks(Config.manifold_js_export())

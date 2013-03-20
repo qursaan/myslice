@@ -34,9 +34,9 @@ class ManifoldAPI:
       return func
 
   def send_manifold_query (self, manifold_query):
-    (action,method)= (manifold_query.action,manifold_query.method)
+    (action,subject)= (manifold_query.action,manifold_query.subject)
     if action=='get':
-      return self.server.Get(self.auth, method, manifold_query.filters, {}, manifold_query.fields)
+      return self.server.Get(self.auth, subject, manifold_query.filters, {}, manifold_query.fields)
     # xxx...
     else:
       print "WARNING: ManifoldAPI.send_manifold_query: only 'get' implemented for now"

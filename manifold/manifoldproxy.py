@@ -6,6 +6,9 @@ from django.http import HttpResponse, HttpResponseForbidden
 from manifold.manifoldquery import ManifoldQuery
 from manifold.manifoldapi import ManifoldAPI
 
+debug=False
+debug=True
+
 # add artificial delay in s
 debug_spin=0
 #debug_spin=1
@@ -32,12 +35,14 @@ with the query passed using POST"""
         return
     try:
         # translate incoming POST request into a query object
+        if debug: print 'manifoldproxy.proxy: request.POST',request.POST
         manifold_query = ManifoldQuery()
         manifold_query.fill_from_dict(request.POST)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
+        if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
         answer=manifold_api.send_manifold_query (manifold_query)
         if debug_spin:
             import time

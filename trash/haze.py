@@ -24,7 +24,7 @@ def hazelnut_view (request):
     page = Page(request)
 
     main_query = ManifoldQuery (action='get',
-                                method='resource',
+                                subject='resource',
                                 timestamp='latest',
                                 fields=['hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', 'ple.inria.', ] ],
