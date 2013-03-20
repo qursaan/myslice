@@ -61,7 +61,7 @@ class Page:
         # compute variables to expose to the template
         env = {}
         # expose the json definition of all queries
-        env['queries_jsons'] = [ query.to_json() for query in self._queries ]
+        env['queries_json'] = [ query.to_json() for query in self._queries ]
         env['query_uuid_domids'] = [ {'query_uuid' : a, 'domid': '"%s"'%b if b else 'null'} for (a,b) in self._queue ]
         javascript = render_to_string ("page-queries.js",env)
         self.reset_queue()

@@ -37,7 +37,7 @@ with the query passed using POST"""
         # translate incoming POST request into a query object
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
         manifold_query = ManifoldQuery()
-        manifold_query.fill_from_dict(request.POST)
+        manifold_query.fill_from_POST(request.POST)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
         # actually forward

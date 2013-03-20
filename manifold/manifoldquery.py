@@ -63,7 +63,7 @@ class ManifoldQuery:
     # this builds a ManifoldQuery object from a dict as received from javascript through its ajax request 
     # e.g. here's what I captured from the server's output
     # incoming POST <QueryDict: {u'query[subject]': [u'slice'], u'query[fields][]': [u'slice_hrn'], u'query[timestamp]': [u'latest'], u'query[action]': [u'get']}>
-    def fill_from_dict (self, d):
+    def fill_from_POST (self, d):
         for key in d.keys():
             for arg in ['action', 'subject', 'filters', 'fields', 'timestamp', 'params']:
                 if arg in key:

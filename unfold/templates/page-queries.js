@@ -1,4 +1,4 @@
-{% for json in queries_jsons %} manifold.insert_query({{ json|safe }});
+{% for json in queries_json %} manifold.insert_query({{ json|safe }});
 {% endfor %}
 $(document).ready(function () {
   var query_uuid_domids = new Array();
