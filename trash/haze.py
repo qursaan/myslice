@@ -27,7 +27,7 @@ def hazelnut_view (request):
                                 method='resource',
                                 timestamp='latest',
                                 fields=['hrn','hostname'],
-                                filters= [ 
+                                filters= [ [ 'slice_hrn', '=', 'ple.inria.', ] ],
                                 # xxx filter : should filter on the slices the logged user can see
                                 # we don't have the user's hrn yet
                                 # in addition this currently returns all slices anyways
