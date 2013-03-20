@@ -27,7 +27,7 @@ def hazelnut_view (request):
                                 subject='resource',
                                 timestamp='latest',
                                 fields=['hrn','hostname'],
-                                filters= [ [ 'slice_hrn', '=', 'ple.inria.', ] ],
+                                filters= [ [ 'slice_hrn', '=', 'ple.inria.omftest', ] ],
                                 # xxx filter : should filter on the slices the logged user can see
                                 # we don't have the user's hrn yet
                                 # in addition this currently returns all slices anyways
@@ -61,22 +61,22 @@ def hazelnut_view (request):
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 
-#   ########## add another plugin with the same request, on the RHS pane
-#   will show up in the right-hand side area named 'related'
-    related_plugin = SliceList (
-        page=page,
-        title='Same request, other layout',
-        domid='sidelist',
-        with_datatables=True, 
-        header='paginated main',
-        # share the query
-        query=main_query,
-        )
-    # likewise but on the side view
-    template_env [ 'unfold1_margin' ] = related_plugin.render (request)
-    
-    # add our own css in the mix
-    page.add_css_files ( 'css/hazelnut.css')
+### #   ########## add another plugin with the same request, on the RHS pane
+### #   will show up in the right-hand side area named 'related'
+###     related_plugin = SliceList (
+###         page=page,
+###         title='Same request, other layout',
+###         domid='sidelist',
+###         with_datatables=True, 
+###         header='paginated main',
+###         # share the query
+###         query=main_query,
+###         )
+###     # likewise but on the side view
+###     template_env [ 'unfold1_margin' ] = related_plugin.render (request)
+###     
+###     # add our own css in the mix
+###     page.add_css_files ( 'css/hazelnut.css')
     
     # don't forget to run the requests
     page.exec_queue_asynchroneously ()
