@@ -149,8 +149,6 @@
         /* Spinner (could be done when the query is received = a query is in progress, also for update) */
         $('#' + options.plugin_uuid).spin()
 
-	if (debug) console.log ("bing 005");
-
         /* Add a filtering function to the current table 
          * Note: we use closure to get access to the 'options'
          */
@@ -160,9 +158,6 @@
                 return true;
             return hazelnut_filter.call(object, oSettings, aData, iDataIndex);
         });
-
-	if (debug) console.log ("bing 010");
-
 
         /* methods */
 
