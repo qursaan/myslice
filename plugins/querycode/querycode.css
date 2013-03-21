@@ -1,4 +1,4 @@
-body { font-family:Arial, Helvetica, Sans-Serif; font-size:0.8em;}
+/* body { font-family:Arial, Helvetica, Sans-Serif; font-size:0.8em;} */
 
 #report {
 border-collapse:collapse;
@@ -143,43 +143,45 @@ div.selected{background-color:gray; color:black}
 div.invisible{display:none}
 
 div.clean{
-        border: 1px solid #850000;
+    border: 1px solid #850000;
 }
 
 .clean td, .clean th{
-        border: 2px solid #bbb;
-        background: #ddd;
-        padding: 5px 10px;
-        text-align: center;
-        border-radius: 2px;
+    border: 2px solid #bbb;
+    background: #ddd;
+    padding: 5px 10px;
+    text-align: center;
+    border-radius: 2px;
 }
 
 .clean table{
-        margin: auto;
-        margin-top: 15px;
-        margin-bottom: 15px;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .clean caption{
-        font-weight: bold;
-
+    font-weight: bold;
 }
 
 .gvChart,.clean{
-        border: 2px solid #850000;
-        border-radius: 5px;
-        -moz-border-radius: 10px;
-        width: 720px;
-
-        margin: auto;
-        margin-top: 20px;
+    border: 2px solid #850000;
+    border-radius: 5px;
+    -moz-border-radius: 10px;
+    width: 720px;
+    
+    margin: auto;
+    margin-top: 20px;
 }
 
 pre{
-        background: #eee;
-        padding: 10px;
-        border-radius: 10px;
-        -moz-border-radius: 10px;
-        white-space: pre-wrap;
+    background: #eee;
+    padding: 10px;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    white-space: pre-wrap;
 }
 
+button.querycode {
+    margin-bottom: 10px;
+}
