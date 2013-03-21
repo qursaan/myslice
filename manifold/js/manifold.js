@@ -5,7 +5,7 @@ function debug_dict_keys (msg, o) {
     console.log ("debug_dict_keys: " + msg + " keys= " + keys);
 }
 function debug_dict (msg, o) {
-    for (var k in o) console.log ("debug_dict_keys: " + msg + " [" + k + "]=" + o[k]);
+    for (var k in o) console.log ("debug_dict: " + msg + " [" + k + "]=" + o[k]);
 }
 function debug_value (msg, value) {
     console.log ("debug_value: " + msg + " " + value);

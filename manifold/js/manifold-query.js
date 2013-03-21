@@ -29,15 +29,15 @@ DELETE FROM subject WHERE filter
 INSERT INTO subject VALUES(field=value)
 -------------------------------------------------------------*/
     
-    this.__repr = function (q) {
+    this.__repr = function () {
 	res  = "ManyfoldQuery ";
-	res += " id=" + q.query_uuid;
-	res += " a=" + q.action;
-	res += " s=" + q.subject;
-	res += " ts=" + q.timestamp;
-	res += " flts=" + q.filters;
-	res += " flds=" + q.fields;
-	res += " prms=" + q.params;
+	res += " id=" + this.query_uuid;
+	res += " a=" + this.action;
+	res += " s=" + this.subject;
+	res += " ts=" + this.timestamp;
+	res += " flts=" + this.filters;
+	res += " flds=" + this.fields;
+	res += " prms=" + this.params;
 	return res;
     }	
 
@@ -61,7 +61,8 @@ INSERT INTO subject VALUES(field=value)
         }
         this.filters.push(new Array(key, op, value));
     }
-    this.remove_filter = function (key,op,value){
+
+    this.remove_filter = function (key,op,value) {
         // if operator is null then remove all occurences of this key
         if(!op){
             this.filters = jQuery.grep(this.filters, function(val, i) { 
@@ -71,9 +72,9 @@ INSERT INTO subject VALUES(field=value)
             this.filters = jQuery.grep(this.filters, function(val, i) {return (val[0] != key || val[1] != op);});
         }
     }
+
     // FIXME These functions computing diff's between queries are meant to be shared
-    this.diff_fields = function (otherQuery)
-    {
+    this.diff_fields = function (otherQuery) {
         var f1 = this.fields;
         var f2 = otherQuery.fields;
 
@@ -83,10 +84,10 @@ INSERT INTO subject VALUES(field=value)
         var removed = jQuery.grep(f1, function (x) { return jQuery.inArray(x, f2) == -1 }); 
         
         return {'added':added, 'removed':removed};
-    }    
+    }
+
     // FIXME Modify filter to filters
-    this.diff_filter = function (otherQuery)
-    {
+    this.diff_filter = function (otherQuery) {
         var f1 = this.filters;
         var f2 = otherQuery.filters;
         
