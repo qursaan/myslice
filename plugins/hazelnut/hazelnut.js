@@ -147,7 +147,7 @@
         oSelectAll.click(selectAll);
 
         /* Spinner (could be done when the query is received = a query is in progress, also for update) */
-        $('#' + options.plugin_uuid).spin()
+//        $('#' + options.plugin_uuid).spin()
 
         /* Add a filtering function to the current table 
          * Note: we use closure to get access to the 'options'
