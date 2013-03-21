@@ -46,6 +46,11 @@ def hazelnut_view (request):
                 # this is the query at the core of the slice list
                 query=main_query,
                 ),
+            QueryCode (
+                page=page,
+                title='xmlrpc code',
+                query=main_query,
+                ),
             ])
 
     # variables that will get passed to the view-plugin.html template
