@@ -54,10 +54,13 @@ var manifold = {
 	// Loop through query array and use ajax to send back query_uuid_domids (to frontend) with json
 	jQuery.each(query_uuid_domids, function(index, tuple) {
 	    var query=manifold.find_query(tuple.query_uuid);
-	    var hash=query.to_hash();
-	    if (manifold.asynchroneous_debug) 
-		console.log ("sending POST on " + manifold.proxy_url + " with query= " + query.__repr(query));
-            jQuery.post(manifold.proxy_url, {'query': hash}, success_closure(query, tuple.id));
+	    var query_json=JSON.stringify (query);
+	    if (manifold.asynchroneous_debug) {
+		console.log ("sending POST on " + manifold.proxy_url + " with query= " + query.__repr());
+	    }
+	    // not quite sure what happens if we send a string directly, as POST data is named..
+	    // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
+            jQuery.post(manifold.proxy_url, {'json':query_json} , success_closure(query, tuple.id));
 	})
 	    },
 

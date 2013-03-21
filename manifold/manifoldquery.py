@@ -61,18 +61,20 @@ class ManifoldQuery:
         return result
     
     # this builds a ManifoldQuery object from a dict as received from javascript through its ajax request 
+    # we use a json-encoded string - see manifold.js for the sender part 
     # e.g. here's what I captured from the server's output
-    # incoming POST <QueryDict: {u'query[subject]': [u'slice'], u'query[fields][]': [u'slice_hrn'], u'query[timestamp]': [u'latest'], u'query[action]': [u'get']}>
-    def fill_from_POST (self, d):
-        for key in d.keys():
-            for arg in ['action', 'subject', 'filters', 'fields', 'timestamp', 'params']:
-                if arg in key:
-                    # dirty hack around fields; fields must be a list
-                    if arg == 'fields': 
-                        setattr(self, arg, [d[key]])
-                    else: 
-                        setattr(self, arg, d[key])
-                    break
+    # manifoldproxy.proxy: request.POST <QueryDict: {u'json': [u'{"action":"get","subject":"resource","timestamp":"latest","filters":[["slice_hrn","=","ple.inria.omftest"]],"params":[],"fields":["hrn","hostname"],"unique":0,"query_uuid":"436aae70a48141cc826f88e08fbd74b1","analyzed_query":null,"subqueries":{}}']}>
+    def fill_from_POST (self, POST_dict):
+        try:
+            json_string=POST_dict['json']
+            dict=json.loads(json_string)
+            for (k,v) in dict.iteritems(): 
+                setattr(self,k,v)
+        except:
+            print "Could not decode incoming ajax request as a Query, POST=",POST_dict
+            if (debug):
+                import traceback
+                traceback.print_exc()
 
     # not used yet ..
     def analyze_subqueries(self):

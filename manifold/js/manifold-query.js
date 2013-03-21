@@ -97,10 +97,11 @@ INSERT INTO subject VALUES(field=value)
         
         return {'added':added, 'removed':removed};
     } 
-    this.to_hash = function() {
-        return {'action': this.action, 'subject': this.subject, 'timestamp': this.timestamp,
-		'filters': this.filters, 'params': this.params, 'fields': this.fields};
-    }
+// we send queries as a json string now 
+//    this.as_POST = function() {
+//        return {'action': this.action, 'subject': this.subject, 'timestamp': this.timestamp,
+//		'filters': this.filters, 'params': this.params, 'fields': this.fields};
+//    }
     this.analyze_subqueries = function() {
         /* adapted from the PHP function in com_tophat/includes/query.php */
         var q = new ManifoldQuery();
