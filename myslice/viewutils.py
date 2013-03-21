@@ -5,10 +5,9 @@ from copy import deepcopy
 standard_topmenu_items = [ 
     { 'label':'Tab', 'href': '/tab/'},
     { 'label':'Scroll', 'href': '/scroll/'},
-    { 'label':'Slice',  'href': '/slice/'},
     { 'label':'Plugin', 'href': '/plugin/'},
     { 'label':'Dashboard', 'href': '/dashboard/'},
-    { 'label':'Hazelnut', 'href': '/hazelnut/'},
+    { 'label':'Slice', 'href': '/slice/'},
     ]
 
 #login_out_items = { False: { 'label':'Login', 'href':'/login/'},

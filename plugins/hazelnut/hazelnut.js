@@ -56,7 +56,7 @@
 
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });;
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
-                $.subscribe(results_channel, function(e, rows) { hazelnut.update_table(rows); });
+                $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
 
             }); // this.each
         }, // init
@@ -264,24 +264,19 @@
             }
         }
     
-        /**
-         * @brief
-         * @param plugin_uuid
-         * @param header
-         * @param field 
-         * @param selected_str
-         * @param disabled_str
-         */
-        this.checkbox = function(plugin_uuid, header, field, selected_str, disabled_str) {
-            /* Prefix id with plugin_uuid */
-            return "<input class='hazelnut-checkbox-" + plugin_uuid + "' id='hazelnut-checkbox-" + plugin_uuid + "-" + get_value(header) + "' name='" + get_value(field) + "' type='checkbox' " + selected_str + disabled_str + "autocomplete='off' value='" + get_value(header) + "'></input>";
-        }
+        this.update_plugin = function(e, rows) {
+	    if (debug) console.log("entering update_plugin");
+	    // e.data is what we passed in second argument to subscribe
+	    // so here it is the jquery object attached to the plugin <div>
+	    var $plugindiv=e.data;
+	    console.log("incoming plugindiv= " + $plugindiv);
+	    // clear the spinning wheel: look up an ancestor that has the need-spin class
+	    // do this before we might return
+	    $plugindiv.closest('.need-spin').spin(false);
+
+            var options = this.options;
+            var hazelnut = this;
     
-        this.update_table = function(rows) {
-            var o = this.options;
-            var object = this;
-    
-            $('#' + o.plugin_uuid).spin(false)
             if (rows.length==0) {
                 this.table.html(errorDisplay("No Result"));   
                 return;
@@ -300,10 +295,10 @@
     
                 // go through table headers to get column names we want
                 // in order (we have temporarily hack some adjustments in names)
-                var cols = object.table.fnSettings().aoColumns;
+                var cols = hazelnut.table.fnSettings().aoColumns;
                 var colnames = cols.map(function(x) {return x.sTitle})
                 var nb_col = colnames.length;
-                if (o.checkboxes)
+                if (options.checkboxes)
                     nb_col -= 1;
                 for (var j = 0; j < nb_col; j++) {
                     if (typeof colnames[j] == 'undefined') {
@@ -322,14 +317,14 @@
                     }
                 }
     
-                if (o.checkboxes) {
+                if (options.checkboxes) {
                     var checked = '';
                     if (typeof(obj['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
-                        object.current_resources.push(obj['urn']);
+                        hazelnut.current_resources.push(obj['urn']);
                     }
                     // Use a key instead of hostname (hard coded...)
-                    newline.push(object.checkbox(o.plugin_uuid, obj['urn'], obj['type'], checked, false));
+                    newline.push(hazelnut.checkbox(options.plugin_uuid, obj['urn'], obj['type'], checked, false));
                 }
     
                 newlines.push(newline);
@@ -337,10 +332,22 @@
     
             });
     
+//	    console.log ("end of each, newlines=" + newlines.length);
             this.table.fnAddData(newlines);
     
-        }
-    }
+//	    console.log (" exiting update_plugin = ");
+        };
+
+        this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {
+	    var result="";
+            /* Prefix id with plugin_uuid */
+	    result += "<input class='hazelnut-checkbox-" + plugin_uuid + "' id='hazelnut-checkbox-" + plugin_uuid + "-" + get_value(header) + "'";
+	    result += " name='" + get_value(field) + "' type='checkbox' " + selected_str + disabled_str + " autocomplete='off' value='" + get_value(header) + "'";
+	    result +="></input>";
+	    return result;
+        };
+    } // constructor
+
     /***************************************************************************
      * Private methods
      ***************************************************************************/
@@ -404,13 +411,13 @@
     }
 
     function hazelnut_draw_callback() {
-        var o = this.options;
+        var options = this.options;
         /* 
          * Handle clicks on checkboxes: reassociate checkbox click every time
          * the table is redrawn 
          */
-        $('.hazelnut-checkbox-' + o.plugin_uuid).unbind('click');
-        $('.hazelnut-checkbox-' + o.plugin_uuid).click({instance: this}, check_click);
+        $('.hazelnut-checkbox-' + options.plugin_uuid).unbind('click');
+        $('.hazelnut-checkbox-' + options.plugin_uuid).click({instance: this}, check_click);
 
         if (!this.table)
             return;

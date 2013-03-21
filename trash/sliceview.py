@@ -18,8 +18,10 @@ from myslice.viewutils import quickfilter_criterias
 
 from myslice.viewutils import topmenu_items, the_user
 
+tmp_default_slice='ple.inria.sfatest'
+
 @login_required
-def hazelnut_view (request):
+def slice_view (request, slicename=tmp_default_slice):
     
     page = Page(request)
 
@@ -27,7 +29,7 @@ def hazelnut_view (request):
                                 subject='resource',
                                 timestamp='latest',
                                 fields=['hrn','hostname'],
-                                filters= [ [ 'slice_hrn', '=', 'ple.inria.omftest', ] ],
+                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
                                 # xxx filter : should filter on the slices the logged user can see
                                 # we don't have the user's hrn yet
                                 # in addition this currently returns all slices anyways
@@ -50,6 +52,7 @@ def hazelnut_view (request):
                 page=page,
                 title='xmlrpc code',
                 query=main_query,
+                toggled=False,
                 ),
             ])
 

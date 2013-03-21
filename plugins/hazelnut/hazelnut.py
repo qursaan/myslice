@@ -15,7 +15,8 @@ class Hazelnut (Plugin):
         # xxx need to retrieve metadata
 # $subject_keys = Plugins::get_default_fields($query->subject, $is_unique);
 # $fields = Plugins::metadata_get_fields($query->subject);
-        env['subject_fields']=[ 'the','available','default','fields']
+# for now I am hard-coding the ones from haze.py
+        env['subject_fields']=[ 'hostname', 'hrn' ]
         return env
 
     def requirements (self):

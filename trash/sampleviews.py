@@ -33,19 +33,3 @@ def scroll_view (request):
                                 },
                                context_instance=RequestContext(request))
 
-# we take name from the URL and propagate in the template
-@login_required
-def slice_view (request, name=None):
-    title='Fake Slice Page'
-    if name: title += " for slice %s"%name
-    result=render_to_response ('view-slice.html',
-                               {'name':name,
-                                'title':title,
-                                'topmenu_items' : topmenu_items('slice',request),
-                                'username':the_user (request),
-                                'slices': hard_wired_slice_names,
-                                'unfold1_main' : lorem,
-                                },
-                               context_instance=RequestContext(request))
-
-    return result

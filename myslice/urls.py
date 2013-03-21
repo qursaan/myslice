@@ -41,11 +41,10 @@ urlpatterns = patterns(
     #
     # various trash views
     #
-    (r'^slice/?$', 'trash.sampleviews.slice_view'),
-    (r'^slice/(?P<name>[\w\.]+)/?$', 'trash.sampleviews.slice_view'),
     (r'^tab/?$', 'trash.sampleviews.tab_view'),
     (r'^scroll/?$', 'trash.sampleviews.scroll_view'),
     (r'^plugin/?$', 'trash.pluginview.test_plugin_view'),
     (r'^dashboard/?$', 'trash.dashboard.dashboard_view'),
-    (r'^hazelnut/?$', 'trash.haze.hazelnut_view'),
+    (r'^slice/?$', 'trash.sliceview.slice_view'),
+    (r'^slice/(?P<slicename>[\w\.]+)/?$', 'trash.sliceview.slice_view'),
 )
