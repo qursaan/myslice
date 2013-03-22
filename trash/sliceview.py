@@ -76,7 +76,7 @@ def slice_view (request, slicename=tmp_default_slice):
     # variables that will get passed to the view-plugin.html template
     template_env = {}
     
-    # define 'unfold1_main' to the template engine
+    # define 'unfold2_main' to the template engine
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
@@ -98,7 +98,7 @@ def slice_view (request, slicename=tmp_default_slice):
 ###         query=main_query,
 ###         )
 ###     # likewise but on the side view
-###     template_env [ 'unfold1_margin' ] = related_plugin.render (request)
+###     template_env [ 'unfold2_margin' ] = related_plugin.render (request)
 ###     
 ###     # add our own css in the mix
 ###     page.add_css_files ( 'css/hazelnut.css')
@@ -113,5 +113,7 @@ def slice_view (request, slicename=tmp_default_slice):
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()
     template_env.update(prelude_env)
-    return render_to_response ('view-plugin.html',template_env,
+    result=render_to_response ('view-slice.html',template_env,
                                context_instance=RequestContext(request))
+    print 'result=',result
+    return result

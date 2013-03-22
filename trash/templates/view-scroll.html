@@ -1,6 +1,6 @@
-{% extends 'layout-unfold1.html' %}
+{% extends 'layout-unfold2.html' %}
 
-{% block unfold1_main %}
+{% block unfold2_main %}
 
 {% insert_str prelude "css/sample.css" %}
 
@@ -11,9 +11,9 @@
 <div id='scrollDiv3'> scroll3 area {{ lorem }}  </div>
 <div id='scrollDiv4'> scroll4 area {{ lorem }} {{ lorem }} {{ lorem }} </div>
 <!--</div>-->
-{% endblock unfold1_main %}
+{% endblock unfold2_main %}
 
-{% block unfold1_margin %}
+{% block unfold2_margin %}
 <div class="foo">
 <ul class="nav nav-tabs nav-stacked">
   <li><a href="#scrollDiv1" data-toggle="tab"><!--<i class="icon-chevron-right"/>--> scroll1 </a></li>
@@ -22,4 +22,4 @@
   <li><a href="#scrollDiv4" data-toggle="tab"> scroll4 </a></li>
 </ul>
 </div>
-{% endblock unfold1_margin %}
+{% endblock unfold2_margin %}

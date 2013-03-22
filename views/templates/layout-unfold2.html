@@ -7,7 +7,7 @@
 <style type="text/css">{# In case we need to add raw css code #}{% container prelude_css %}</style>
 {{ header_prelude }}
 </head>{# let's add these ones no matter what #}
-{# not yet needed {% insert_str prelude "css/layout-unfold1.css" %} #}
+{% insert_str prelude "css/layout-unfold2.css" %}
 {% insert_str prelude "js/jquery.js" %}
 {% insert_str prelude "js/init-all-plugins.js" %}
 <body>
@@ -18,11 +18,16 @@
   {% endblock topmenu %}
 <div class="container-fluid">
   <div class="row-fluid">
-    <div id="unfold1-main" class="span12 columns">
-      {% block unfold1_main %}
-      "The main content area (define block 'unfold1_main')"
-      {% endblock unfold1_main %}
-    </div><!--span12-->
+    <div id="unfold2-main" class="span9 columns">
+      {% block unfold2_main %}
+      "The main content area (define block 'unfold2_main')"
+      {% endblock unfold2_main %}
+    </div><!--span9-->
+    <div id='unfold2-margin' class='span3'>
+      {% block unfold2_margin %}
+      "The related content area (define block 'related_main')"
+      {% endblock unfold2_margin %}
+    </div><!--span3-->
   </div><!--raw-fluid-->
 </div><!--container-fluid-->
 {% endblock container %}

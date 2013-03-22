@@ -1,10 +1,10 @@
-{% extends 'layout-unfold1.html' %}
+{% extends 'layout-unfold2.html' %}
 
-{% block unfold1_margin %}
+{% block unfold2_margin %}
 {% include 'widget-login.html' %}
-{% endblock unfold1_margin %}
+{% endblock unfold2_margin %}
 
-{% block unfold1_main %}
+{% block unfold2_main %}
 <code> This page is currently connected to two authentication systems:</code>
 <ul>
 <li> A manifold server, located at <code>{{ manifold_url }}</code>, (configured in <code>myslice/config.py</code>), and</li>
@@ -17,4 +17,4 @@ Currently hard wired users are:
   {% endfor %}
 </ul>
 </li></ul>
-{% endblock unfold1_main %}
+{% endblock unfold2_main %}
