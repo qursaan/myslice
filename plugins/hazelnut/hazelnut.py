@@ -27,7 +27,7 @@ class Hazelnut (Plugin):
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/unfold-helper.js",
                            ] ,
-            'css_files': [ "css/hazelnut.css" ],
+            'css_files': [ "css/hazelnut.css" , "css/demo_table.css", "css/demo_table_jui.css", ],
             }
         return reqs
 
