@@ -13,6 +13,11 @@ debug=True
 debug_spin=0
 #debug_spin=1
 
+# turn this on if you want the fastest possible (locally cached) feedback
+# beware that this is very rough though...
+work_offline=False
+#work_offline=True
+
 # this view is what the javascript talks to when it sends a query
 # see also
 # myslice/urls.py
@@ -38,17 +43,36 @@ with the query passed using POST"""
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
         manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
+        offline_filename="latest-%s-%s.json"%(manifold_query.action,manifold_query.subject)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
+        ### patch : return the latest one..
+        if work_offline:
+            # if that won't work then we'll try to update anyways
+            try:
+                with (file(offline_filename,"r")) as f:
+                    json_answer=f.read()
+                print "By-passing : using contents from %s"%offline_filename
+                return HttpResponse (json_answer, mimetype="application/json")
+            except:
+                import traceback
+                traceback.print_exc()
+                print "PROCEEDING"
+                pass
+                
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
         if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
         answer=manifold_api.send_manifold_query (manifold_query)
+        json_answer=json.dumps(answer)
+        if (debug):
+            with (file(offline_filename,"w")) as f:
+                f.write(json_answer)
         if debug_spin:
             import time
             time.sleep(debug_spin)
         # return json-encoded answer
-        return HttpResponse (json.dumps(answer), mimetype="application/json")
+        return HttpResponse (json_answer, mimetype="application/json")
     except:
         import traceback
         traceback.print_exc()
