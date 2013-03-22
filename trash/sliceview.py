@@ -42,29 +42,41 @@ def slice_view (request, slicename=tmp_default_slice):
     main_plugin = Stack (
         page=page,
         title="global container",
-        togglable=False,
+        domid='thestack',
+#        togglable=False,
         sons=[Tabs (
                 page=page,
-                title="different angles",
-                active_domid='with-checkboxes',
+                title="2 tabs : w/ and w/o checkboxes",
+                domid='thetabs',
+                toggled=False,
+                active_domid='checkboxes',
                 sons=[
                     Hazelnut ( 
                         page=page,
                         title='a sample and simple hazelnut',
-                        togglable=False,
+                        domid='simple',
+#                        togglable=False,
                         # this is the query at the core of the slice list
                         query=main_query,
                         ),
                     Hazelnut ( 
                         page=page,
                         title='with checkboxes',
-                        domid='with-checkboxes',
-                        togglable=False,
+                        domid='checkboxes',
+#                        togglable=False,
                         checkboxes=True,
                         # this is the query at the core of the slice list
                         query=main_query,
                         ),
                     ]),
+              Hazelnut ( 
+                page=page,
+                title='not in tabs',
+                domid='standalone',
+                toggled=False,
+                # this is the query at the core of the slice list
+                query=main_query,
+                ),
               QueryCode (
                 page=page,
                 title='xmlrpc code',
