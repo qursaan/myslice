@@ -65,7 +65,7 @@ def dashboard_view (request):
                 ),
             ])
 
-    # variables that will get passed to the view-plugin.html template
+    # variables that will get passed to the view-unfold2.html template
     template_env = {}
     
     # define 'unfold2_main' to the template engine
@@ -105,5 +105,5 @@ def dashboard_view (request):
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()
     template_env.update(prelude_env)
-    return render_to_response ('view-plugin.html',template_env,
+    return render_to_response ('view-unfold2.html',template_env,
                                context_instance=RequestContext(request))

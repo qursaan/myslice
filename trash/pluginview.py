@@ -91,6 +91,6 @@ def test_plugin_view (request):
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()
     template_env.update(prelude_env)
-    return render_to_response ('view-plugin.html',template_env,
+    return render_to_response ('view-unfold2.html',template_env,
                                context_instance=RequestContext(request))
                                

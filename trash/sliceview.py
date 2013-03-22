@@ -73,7 +73,7 @@ def slice_view (request, slicename=tmp_default_slice):
                 ),
               ])
 
-    # variables that will get passed to the view-plugin.html template
+    # variables that will get passed to the view-unfold2.html template
     template_env = {}
     
     # define 'unfold2_main' to the template engine
@@ -113,7 +113,7 @@ def slice_view (request, slicename=tmp_default_slice):
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()
     template_env.update(prelude_env)
-    result=render_to_response ('view-slice.html',template_env,
+    result=render_to_response ('view-unfold1.html',template_env,
                                context_instance=RequestContext(request))
     print 'result=',result
     return result
