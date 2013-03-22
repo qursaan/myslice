@@ -28,7 +28,7 @@
 
     var methods = {
 	init : function (options) {
-	    console.log("temporarily turned off SyntaxHighlighter ...");
+	    if (debug) console.log("temporarily turned off SyntaxHighlighter ...");
 //          SyntaxHighlighter.all();
 	    return this.each(function() {
 		var $this=$(this);
@@ -86,7 +86,7 @@
 	}
 	html_code=fun(query);
 	dom.html(html_code);
-	console.log("turned off SyntaxHighlighter.highlight");
+	if (debug) console.log("turned off SyntaxHighlighter.highlight");
 //	SyntaxHighlighter.highlight()
 
     }

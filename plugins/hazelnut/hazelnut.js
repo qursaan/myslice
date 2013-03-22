@@ -53,9 +53,10 @@
                 var update_channel  = '/update-set/' + options.query_uuid;
                 var results_channel = '/results/' + options.query_uuid + '/changed';
 
-                $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });;
+                $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
+		if (debug) console.log("hazelnut " + this.id + " subscribed to " + query_channel + " " + update_channel + " " + results_channel);
 
             }); // this.each
         }, // init
@@ -163,7 +164,7 @@
 
         this.set_query = function(query) {
 	    if (debug) console.log("entering set_query");
-            var o = this.options;
+            var options = this.options;
             /* Compare current and advertised query to get added and removed fields */
             previous_query = this.current_query;
             /* Save the query as the current query */
@@ -173,8 +174,8 @@
             // XXX ID naming has no plugin_uuid
             if (typeof(query.fields) != 'undefined') {        
                 $.each (query.fields, function(index, value) { 
-                    if (!$('#hazelnut-checkbox-' + o.plugin_uuid + "-" + value).attr('checked'))
-                        $('#hazelnut-checkbox-' + o.plugin_uuid + "-" + value).attr('checked', true);
+                    if (!$('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked'))
+                        $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked', true);
                 });
             }
             /*Process updates in filters / current_query must be updated before this call for filtering ! */
@@ -217,15 +218,15 @@
 
         this.set_resources = function(resources, instance) {
 	    if (debug) console.log("entering set_resources");
-            var o = this.options;
+            var options = this.options;
             var previous_resources = this.current_resources;
             this.current_resources = resources;
     
             /* We uncheck all checkboxes ... */
-            $('hazelnut-checkbox-' + o.plugin_uuid).attr('checked', false);
+            $('hazelnut-checkbox-' + options.plugin_uuid).attr('checked', false);
             /* ... and check the ones specified in the resource list */
             $.each(this.current_resources, function(index, urn) {
-                $('#hazelnut-checkbox-' + o.plugin_uuid + "-" + urn).attr('checked', true)
+                $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + urn).attr('checked', true)
             });
             
         }
