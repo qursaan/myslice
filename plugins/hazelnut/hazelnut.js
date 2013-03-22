@@ -47,7 +47,6 @@
 
                 /* An object that will hold private variables and methods */
 		var hazelnut = new Hazelnut (options);
-		if (debug) console.log("Hazelnut object created");
                 $(this).data('Hazelnut', hazelnut);
 
                 var query_channel   = '/query/' + options.query_uuid + '/changed';
@@ -107,6 +106,7 @@
 	// xxx thierry : init this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
 	this.current_query=manifold.find_query(this.options.query_uuid);
+	if (debug) console.log("Hazelnut constructor: have set current_query -> " + this.current_query);
 	this.query_update = null;
         this.current_resources = Array();
 
@@ -168,6 +168,7 @@
             previous_query = this.current_query;
             /* Save the query as the current query */
             this.current_query = query;
+	    if (debug) console.log("set_query, current_query is now -> " + this.current_query);
             /* We check all necessary fields : in column editor I presume XXX */
             // XXX ID naming has no plugin_uuid
             if (typeof(query.fields) != 'undefined') {        
@@ -269,7 +270,6 @@
 	    // e.data is what we passed in second argument to subscribe
 	    // so here it is the jquery object attached to the plugin <div>
 	    var $plugindiv=e.data;
-	    console.log("incoming plugindiv= " + $plugindiv);
 	    // clear the spinning wheel: look up an ancestor that has the need-spin class
 	    // do this before we might return
 	    $plugindiv.closest('.need-spin').spin(false);
@@ -367,7 +367,7 @@
          *
          * The current line should validate all filters
          */
-        $.each (cur_query.filter, function(index, filter) { 
+        $.each (cur_query.filters, function(index, filter) { 
             /* XXX How to manage checkbox ? */
             var key = filter[0]; 
             var op = filter[1];

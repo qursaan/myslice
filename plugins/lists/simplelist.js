@@ -27,15 +27,12 @@
 	init : function( options ) {
 	    return this.each(function(){
 		var $this = $(this), data = $this.data('SimpleList');
-		// If the plugin hasn't been initialized yet
-		if ( ! data ) {
-		    /* Subscribe to query updates */
-		    var channel='/results/' + options.query_uuid + '/changed';
-		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
-		    $.subscribe(channel, $this, update_plugin);
-		    if (debug) window.console.log('subscribing to ' + channel);
-		    $this.data('SimpleList', options);
-		}
+		/* Subscribe to query updates */
+		var channel='/results/' + options.query_uuid + '/changed';
+		/* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
+		$.subscribe(channel, $this, update_plugin);
+		if (debug) window.console.log('subscribing to ' + channel);
+		$this.data('SimpleList', options);
 	    });
 	},
 	destroy : function( ) {

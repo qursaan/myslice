@@ -22,7 +22,7 @@ class Hazelnut (Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [ "js/hazelnut.js", 
-                           "js/manifold.js", "js/manifold-query.js",
+                           "js/manifold.js", "js/manifold-query.js", "js/manifold-core.js",
                            "js/dataTables.js", "js/with-datatables.js",
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/unfold-helper.js",

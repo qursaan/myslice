@@ -13,7 +13,7 @@ function debug_value (msg, value) {
 function debug_query (msg, query) {
     if (query === undefined) console.log ("debug_query: " + msg + " -> undefined");
     else if (query == null) console.log ("debug_query: " + msg + " -> null");
-    else if ('query_uuid' in query) console.log ("debug_query: " + msg + " query_uuid= " + query.query_uuid);
+    else if ('query_uuid' in query) console.log ("debug_query: " + msg + query.__repr());
     else console.log ("debug_query: " + msg + " query= " + query);
 }
 
