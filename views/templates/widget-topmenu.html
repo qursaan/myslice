@@ -11,7 +11,7 @@
       <div class="nav-collapse topmenu">
 	<ul class="nav nav-pills" id='menu_ul'>
 	  {% for d in topmenu_items %}
-	  {% if d.active %}
+	  {% if d.is_active %}
 	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
 	  {% else %}
 	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>

@@ -4,7 +4,7 @@
 
 {% insert_str prelude "css/sample.css" %}
 {% insert prelude_js %}
-$(function(){console.log('hey!');$('#tooltipid').tooltip({'selector':'','placement':'bottom'});});
+$(function(){$('#tooltipid').tooltip({'selector':'','placement':'bottom'});});
 {% endinsert %}
 
 <div id=sample-tabs>
@@ -32,7 +32,7 @@ a first <a id='tooltipid' href="#" data-toggle="tooltip" data-original-title="wh
 
 Let us now try to attach <button id='mylougout' class='btn btn-danger' data='mydata'>a click function to a button</button>
 <script>
-function foo() {alert ('foo' + $(this).attr('data'));}
+function foo() {alert ('foo ' + $(this).attr('data'));}
 $(function() {$('#mylougout').click(foo);})
 </script>
 

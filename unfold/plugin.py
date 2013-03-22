@@ -80,6 +80,9 @@ class Plugin:
         # do this only once the structure is fine
         self.page.record_plugin(self)
 
+    def __repr__ (self):
+        return "[%s]:%s"%(self.classname,self.domid)
+
     def _py_classname (self): 
         try:    return self.__class__.__name__
         except: return 'Plugin'

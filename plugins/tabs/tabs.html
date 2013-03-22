@@ -1,12 +1,11 @@
-{# could try to set class='active' on the one we want to highlight #}
 <ul class="nav nav-tabs" id='tab-{{ domid }}'>
 {% for son in sons %}
-<li{% if son.active %} class='active'{% endif %}> <a href="#{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
+<li{% if son.is_active %} class='active'{% endif %}> <a href="#{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
 {% endfor %}
 </ul><!--nav-tabs-->
 <div class="tab-content">
 {% for son in sons %}
-<div class="tab-pane fade in{% if son.active %} active{% endif %}" id="{{ son.domid }}">
+<div class="tab-pane fade in{% if son.is_active %} active{% endif %}" id="{{ son.domid }}">
 {{ son.rendered }}
 </div><!--tab-pane-->
 {% endfor %}

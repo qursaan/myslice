@@ -9,6 +9,7 @@ from unfold.page import Page
 from manifold.manifoldquery import ManifoldQuery
 
 from plugins.stack.stack import Stack
+from plugins.tabs.tabs import Tabs
 from plugins.hazelnut.hazelnut import Hazelnut 
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
@@ -41,20 +42,36 @@ def slice_view (request, slicename=tmp_default_slice):
     main_plugin = Stack (
         page=page,
         title="global container",
-        sons=[ 
-            Hazelnut ( # setting visible attributes first
+        togglable=False,
+        sons=[Tabs (
                 page=page,
-                title='a sample and simple hazelnut',
-                # this is the query at the core of the slice list
-                query=main_query,
-                ),
-            QueryCode (
+                title="different angles",
+                active_domid='with-checkboxes',
+                sons=[
+                    Hazelnut ( 
+                        page=page,
+                        title='a sample and simple hazelnut',
+                        togglable=False,
+                        # this is the query at the core of the slice list
+                        query=main_query,
+                        ),
+                    Hazelnut ( 
+                        page=page,
+                        title='with checkboxes',
+                        domid='with-checkboxes',
+                        togglable=False,
+                        checkboxes=True,
+                        # this is the query at the core of the slice list
+                        query=main_query,
+                        ),
+                    ]),
+              QueryCode (
                 page=page,
                 title='xmlrpc code',
                 query=main_query,
                 toggled=False,
                 ),
-            ])
+              ])
 
     # variables that will get passed to the view-plugin.html template
     template_env = {}
@@ -65,7 +82,7 @@ def slice_view (request, slicename=tmp_default_slice):
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view for hazelnut'
     # the menu items on the top
-    template_env [ 'topmenu_items' ] = topmenu_items('hazelnut', request) 
+    template_env [ 'topmenu_items' ] = topmenu_items('slice', request) 
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 

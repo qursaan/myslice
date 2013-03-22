@@ -2,9 +2,10 @@ from unfold.plugin import Plugin
 
 class Hazelnut (Plugin):
 
-    def __init__ (self, query, **settings):
+    def __init__ (self, query, checkboxes=False, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
+        self.checkboxes=checkboxes
 
     def template_file (self):
         return "hazelnut.html"

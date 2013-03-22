@@ -10,3 +10,5 @@ class Tabs (Composite):
     def template_file (self):
         return "tabs.html"
 
+    # see Composite.py for the details of template_env, that exposes global
+    # 'sons' as a list of sons with each a set of a few attributes

@@ -14,13 +14,13 @@ from myslice.viewutils import lorem, hard_wired_slice_names
 def tab_view (request):
     prelude=Prelude( js_files='js/bootstrap.js', css_files='css/bootstrap.css')
     prelude_env = prelude.prelude_env()
+
     tab_env = {'title':'Page for playing with Tabs',
                'topmenu_items': topmenu_items('tab',request),
                'username':the_user (request),
                'lorem': lorem,                                
                }
     tab_env.update (prelude_env)
-
     return render_to_response ('view-tab.html', tab_env,
                                context_instance=RequestContext(request))
 

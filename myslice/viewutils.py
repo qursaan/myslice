@@ -16,7 +16,7 @@ standard_topmenu_items = [
 def topmenu_items (current,request=None):
     result=deepcopy(standard_topmenu_items)
     for d in result:
-        if d['label'].lower().find(current)>=0: d['active']=True
+        if d['label'].lower().find(current)>=0: d['is_active']=True
     if not request: return result
     has_user=request.user.is_authenticated()
 #    result.append (login_out_items [ has_user] )
