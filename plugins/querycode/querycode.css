@@ -1,3 +1,9 @@
+/* Thierry
+ This needs to be cleaned up 
+ in particular div.in below conflicts with bootstrap's fade in so another name would be helpful
+ ----
+ turning this off altogether for now -- see querycode.py
+ */
 /* body { font-family:Arial, Helvetica, Sans-Serif; font-size:0.8em;} */
 
 #report {

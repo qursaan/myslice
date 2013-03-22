@@ -22,11 +22,13 @@ class QueryCode (Plugin):
 #        Plugins::add_js('/QueryCode/beautyofcode/scripts/shBrushRuby.js');
 #        Plugins::add_js('/QueryCode/beautyofcode/scripts/shAutoloader.js');
                            ] ,
-            'css_files': [ "css/querycode.css" ,
+# thierry: see this file for details of why we turn this off for now            
+             'css_files': [
+###                "css/querycode.css" ,
 #        Plugins::add_css('/QueryCode/beautyofcode/styles/shCore.css');
 #        Plugins::add_css('/QueryCode/beautyofcode/styles/shCoreDefault.css');
 #        Plugins::add_css('/QueryCode/beautyofcode/styles/shThemeDefault.css');
-                           ],
+                ],
             }
 
     def json_settings_list (self): return ['plugin_uuid','query_uuid']
