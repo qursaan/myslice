@@ -56,7 +56,7 @@
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
-		if (debug) console.log("hazelnut " + this.id + " subscribed to " + query_channel + " " + update_channel + " " + results_channel);
+		if (debug) console.log("hazelnut '" + this.id + "' subscribed to " + query_channel + " " + update_channel + " " + results_channel);
 
             }); // this.each
         }, // init
