@@ -56,7 +56,7 @@
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
-		if (debug) console.log("hazelnut '" + this.id + "' subscribed to " + query_channel + " " + update_channel + " " + results_channel);
+		if (debug) console.log("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
 
             }); // this.each
         }, // init
@@ -147,9 +147,6 @@
         oSelectAll.unbind('click');
         oSelectAll.click(selectAll);
 
-        /* Spinner (could be done when the query is received = a query is in progress, also for update) */
-//        $('#' + options.plugin_uuid).spin()
-
         /* Add a filtering function to the current table 
          * Note: we use closure to get access to the 'options'
          */
@@ -163,13 +160,12 @@
         /* methods */
 
         this.set_query = function(query) {
-	    if (debug) console.log("entering set_query");
             var options = this.options;
             /* Compare current and advertised query to get added and removed fields */
             previous_query = this.current_query;
             /* Save the query as the current query */
             this.current_query = query;
-	    if (debug) console.log("set_query, current_query is now -> " + this.current_query);
+	    if (debug) console.log("hazelnut.set_query, current_query is now -> " + this.current_query);
             /* We check all necessary fields : in column editor I presume XXX */
             // XXX ID naming has no plugin_uuid
             if (typeof(query.fields) != 'undefined') {        
@@ -217,7 +213,7 @@
         }
 
         this.set_resources = function(resources, instance) {
-	    if (debug) console.log("entering set_resources");
+	    if (debug) console.log("entering hazelnut.set_resources");
             var options = this.options;
             var previous_resources = this.current_resources;
             this.current_resources = resources;
@@ -246,7 +242,7 @@
          * XXX will be removed/replaced
          */
         this.selected_changed = function(e, change) {
-	    if (debug) console.log("entering selected_changed");
+	    if (debug) console.log("entering hazelnut.selected_changed");
             var actions = change.split("/");
             if (actions.length > 1) {
                 var oNodes = this.table.fnGetNodes();
@@ -267,10 +263,10 @@
         }
     
         this.update_plugin = function(e, rows) {
-	    if (debug) console.log("entering update_plugin");
 	    // e.data is what we passed in second argument to subscribe
 	    // so here it is the jquery object attached to the plugin <div>
 	    var $plugindiv=e.data;
+	    if (debug) console.log("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
 	    // clear the spinning wheel: look up an ancestor that has the need-spin class
 	    // do this before we might return
 	    $plugindiv.closest('.need-spin').spin(false);
@@ -279,13 +275,13 @@
             var hazelnut = this;
     
             if (rows.length==0) {
+		if (debug) console.l ("empty result");
                 this.table.html(errorDisplay("No Result"));   
                 return;
-            } else {
-                if (typeof(rows[0].error) != 'undefined') {
-                    this.table.html(errorDisplay(rows[0].error));
-                    return;
-                }
+            } else if (typeof(rows[0].error) != 'undefined') {
+		if (debug) console.log ("undefined result");
+                this.table.html(errorDisplay(rows[0].error));
+                return;
             }
             newlines = new Array();
     
@@ -333,10 +329,9 @@
     
             });
     
-//	    console.log ("end of each, newlines=" + newlines.length);
+	    if (debug) console.log("hazelnut.update_plugin: total of " + newlines.length + " rows");
             this.table.fnAddData(newlines);
     
-//	    console.log (" exiting update_plugin = ");
         };
 
         this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {

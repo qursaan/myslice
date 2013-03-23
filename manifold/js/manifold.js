@@ -44,6 +44,8 @@ var manifold = {
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_uuid_domids) {
 	// start spinners
+
+	if (manifold.asynchroneous_exec) console.log("Turning spin on with " + jQuery(".need-spin").length + " matches for need-spin");
 	jQuery('.need-spin').spin();
 	
 	// We use js function closure to be able to pass the query (array) to the

@@ -31,10 +31,6 @@ def slice_view (request, slicename=tmp_default_slice):
                                 timestamp='latest',
                                 fields=['hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
-                                # xxx filter : should filter on the slices the logged user can see
-                                # we don't have the user's hrn yet
-                                # in addition this currently returns all slices anyways
-                                # filter = ...
                                 sort='slice_hrn',
                                 )
     page.enqueue_query (main_query)
@@ -48,7 +44,7 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title="2 tabs : w/ and w/o checkboxes",
                 domid='thetabs',
-                toggled=False,
+#                toggled=False,
                 active_domid='checkboxes',
                 sons=[
                     Hazelnut ( 
@@ -73,7 +69,7 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title='not in tabs',
                 domid='standalone',
-                toggled=False,
+#                toggled=False,
                 # this is the query at the core of the slice list
                 query=main_query,
                 ),
@@ -81,14 +77,14 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title='xmlrpc code',
                 query=main_query,
-                toggled=False,
+#                toggled=False,
                 ),
               ])
 
-    # variables that will get passed to the view-unfold2.html template
+    # variables that will get passed to the view-unfold1.html template
     template_env = {}
     
-    # define 'unfold2_main' to the template engine
+    # define 'unfold1_main' to the template engine - the main contents
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
@@ -98,23 +94,6 @@ def slice_view (request, slicename=tmp_default_slice):
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 
-### #   ########## add another plugin with the same request, on the RHS pane
-### #   will show up in the right-hand side area named 'related'
-###     related_plugin = SliceList (
-###         page=page,
-###         title='Same request, other layout',
-###         domid='sidelist',
-###         with_datatables=True, 
-###         header='paginated main',
-###         # share the query
-###         query=main_query,
-###         )
-###     # likewise but on the side view
-###     template_env [ 'unfold2_margin' ] = related_plugin.render (request)
-###     
-###     # add our own css in the mix
-###     page.add_css_files ( 'css/hazelnut.css')
-    
     # don't forget to run the requests
     page.exec_queue_asynchroneously ()
 
