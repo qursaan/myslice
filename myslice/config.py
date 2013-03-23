@@ -6,4 +6,4 @@ class Config:
     # exporting these details to js
     @staticmethod
     def manifold_js_export ():
-        return "var MANIFOLD_URL = '%s';"%Config.manifold_url;
+        return "var MANIFOLD_URL = '%s';\n"%Config.manifold_url;
