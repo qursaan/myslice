@@ -43,7 +43,7 @@ with the query passed using POST"""
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
         manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
-        offline_filename="latest-%s-%s.json"%(manifold_query.action,manifold_query.subject)
+        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.subject)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
         ### patch : return the latest one..
