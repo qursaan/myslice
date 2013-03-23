@@ -1,6 +1,6 @@
 <ul class="nav nav-tabs" id='tabs-{{ domid }}'>
 {% for son in sons %}
-<li{% if son.is_active %} class='active'{% endif %}> <a href="#{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
+<li{% if son.is_active %} class='active'{% endif %}> <a href="#tab-{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
 {% endfor %}
 </ul><!--nav-tabs-->
 <div class="tab-content">
