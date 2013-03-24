@@ -127,7 +127,8 @@
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
             bRetrieve: true,
-            sScrollX: '100%',       /* Horizontal scrolling */
+	    // xxx this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
+            // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
             fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                 $(nRow).attr('id', get_value(aData[3]));
@@ -329,6 +330,7 @@
     
             });
     
+	    this.table.fnClearTable();
 	    if (debug) console.log("hazelnut.update_plugin: total of " + newlines.length + " rows");
             this.table.fnAddData(newlines);
     
