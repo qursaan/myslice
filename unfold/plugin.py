@@ -167,7 +167,12 @@ class Plugin:
     def render_content (self, request):
         """Should return an HTML fragment"""
         template = self.template_file()
-        env=self.template_env(request)
+        # start with a fresh one
+        env={}
+        # add our own settings as defaults
+        env.update(self.__dict__)
+        # then the things explicitly defined in template_env()
+        env.update(self.template_env(request))
         if not isinstance (env,dict):
             raise Exception, "%s.template_env returns wrong type"%self.classname
         result=render_to_string (template, env)
