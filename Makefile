@@ -32,9 +32,14 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
 # likewise
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
+# used in hazelnut
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/css/jquery-ui.css)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
+# used in QueryCode
+THIRD-PARTY-RESOURCES += $(shell ls third-party/beautyofcode/scripts/sh{Core,Autoloader,BrushPython,BrushRuby}.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/beautyofcode/styles/sh{Core,CoreDefault,ThemeDefault}.css)
+
 
 thirdparty-js:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
