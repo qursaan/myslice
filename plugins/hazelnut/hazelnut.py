@@ -33,4 +33,4 @@ class Hazelnut (Plugin):
         return reqs
 
     # the list of things passed to the js plugin
-    def json_settings_list (self): return ['plugin_uuid','query_uuid']
+    def json_settings_list (self): return ['plugin_uuid','query_uuid','checkboxes']
