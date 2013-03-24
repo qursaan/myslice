@@ -7,9 +7,6 @@
  * License: GPLv3
  */
 
-// xxx TODO
-// . turn back on syntax highlighting
-
 (function($) {
   
     var debug=false;
@@ -28,8 +25,8 @@
 
     var methods = {
 	init : function (options) {
-	    if (debug) console.log("temporarily turned off SyntaxHighlighter ...");
-//          SyntaxHighlighter.all();
+	    if (debug) console.log("SyntaxHighlighter.all ...");
+            SyntaxHighlighter.all();
 	    return this.each(function() {
 		var $this=$(this);
 		var data=$this.data('QueryCode');
@@ -86,9 +83,8 @@
 	}
 	html_code=fun(query);
 	dom.html(html_code);
-	if (debug) console.log("turned off SyntaxHighlighter.highlight");
-//	SyntaxHighlighter.highlight()
-
+	if (debug) console.log("SyntaxHighlighter.highlight");
+	SyntaxHighlighter.highlight()
     }
 
 

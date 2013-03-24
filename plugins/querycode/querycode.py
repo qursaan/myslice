@@ -13,21 +13,16 @@ class QueryCode (Plugin):
 
     def requirements (self):
         return { 
-            'js_files' : [ "js/querycode.js", 
-                           "js/manifold.js", "js/manifold-query.js",
-                           "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
-                           
-#        Plugins::add_js('/QueryCode/beautyofcode/scripts/shCore.js');
-#        Plugins::add_js('/QueryCode/beautyofcode/scripts/shBrushPython.js');
-#        Plugins::add_js('/QueryCode/beautyofcode/scripts/shBrushRuby.js');
-#        Plugins::add_js('/QueryCode/beautyofcode/scripts/shAutoloader.js');
-                           ] ,
+            'js_files' : [ 
+                "js/querycode.js", 
+                "js/manifold.js", "js/manifold-query.js",
+                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                "js/shAutoloader.js","js/shCore.js","js/shBrushPython.js","js/shBrushRuby.js",
+                ] ,
 # thierry: see this file for details of why we turn this off for now            
-             'css_files': [
-###                "css/querycode.css" ,
-#        Plugins::add_css('/QueryCode/beautyofcode/styles/shCore.css');
-#        Plugins::add_css('/QueryCode/beautyofcode/styles/shCoreDefault.css');
-#        Plugins::add_css('/QueryCode/beautyofcode/styles/shThemeDefault.css');
+            'css_files': [
+                "css/querycode.css" ,
+                "css/shCore.css","css/shCoreDefault.css","css/shThemeDefault.css",
                 ],
             }
 
