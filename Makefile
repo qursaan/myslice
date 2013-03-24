@@ -33,7 +33,7 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
 # likewise
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
 # used in hazelnut
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/css/jquery-ui.css)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-ui/themes/base/jquery-ui.css)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 # used in QueryCode
