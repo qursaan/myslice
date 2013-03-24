@@ -3,23 +3,17 @@
 {% insert_str prelude "css/bootstrap.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
-
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
       <a class="brand" href="/"><img src="{{ STATIC_URL }}img/myslice-logo.png" height="30" alt="MySlice logo" /></a>
       <div class="nav-collapse topmenu">
-	<ul class="nav nav-pills" id='menu_ul'>
-	  {% for d in topmenu_items %}
-	  {% if d.is_active %}
-	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-	  {% else %}
-	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li>
-	  {% endif %}
-	  {% endfor %}
+	<ul class="nav nav-pills" id='menu_ul'> {% for d in topmenu_items %} {% if d.is_active %}
+	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% else %}
+	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% endif %} {% endfor %}
 	</ul> {# logout.js will attach a click function on that button, which then retrieves the 'username' attribute #}
-	<span class="navbar-text pull-right"> {% if username %} Logged in as {{ username }}<button id='logout' class='btn btn-danger' username='{{ username }}'>Logout</a>
-{% else %}Not logged in{% endif %}</span>
+	<span class="navbar-text pull-right"> {% if username %} Logged in as {{ username }}
+	<button id='logout' class='btn btn-danger' username='{{ username }}'>Logout</a> {% else %}Not logged in{% endif %}</span>
       </div><!--nav-collapse-->
     </div><!--container-fluid-->
   </div><!--navbar-inner-->
