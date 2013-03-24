@@ -64,6 +64,9 @@ with the query passed using POST"""
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
         if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
         answer=manifold_api.send_manifold_query (manifold_query)
+        if debug: 
+            try:        print "received answer from backend with %d rows"%len(answer)
+            except:     print "received answer from backend - can't say len"
         json_answer=json.dumps(answer)
         if (debug):
             with (file(offline_filename,"w")) as f:
