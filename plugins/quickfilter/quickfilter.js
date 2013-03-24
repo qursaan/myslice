@@ -59,7 +59,7 @@
 			var availableTags={};
 			$.each (rows, function(index, obj) {
 			    $.each(obj,function(key,value){                       
-				value = get_value(value);
+				value = unfold.get_value(value);
 				if(!availableTags.hasOwnProperty(key)){availableTags[key]=new Array();}
 				//availableTags[key].push(value);
 				var currentArray=availableTags[key];

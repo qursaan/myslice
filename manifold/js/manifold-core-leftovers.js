@@ -31,15 +31,6 @@ jQuery(document).ready(function() {
 });
 */
 
-function get_value(value) {
-    //if(typeof(jQuery(value).attr('value'))!="undefined"){
-    if (/<span value=['"].*['"]>.*<\/span>/i.test(value)) {
-        return jQuery(value).attr('value');
-    } else {
-        return value;
-    }
-}
-
 /*
 From: http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-a-javascript-object
     I want to note that the .clone() method in jQuery only clones DOM elements. In order to clone JavaScript objects, you would do:
@@ -55,58 +46,6 @@ From: http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-t
 function clone_object(obj) {
     return jQuery.extend(true, {}, obj);
 }
-
-/* https://gist.github.com/661855 */
-(function(jQuery) {
-
-  var o = jQuery({});
-
-  jQuery.subscribe = function( types, selector, data, fn) {
-    /* borrowed from jQuery */
-    if ( data == null && fn == null ) {
-        // ( types, fn )
-        fn = selector;
-        data = selector = undefined;
-    } else if ( fn == null ) {
-        if ( typeof selector === "string" ) {
-            // ( types, selector, fn )
-            fn = data;
-            data = undefined;
-        } else {
-            // ( types, data, fn )
-            fn = data;
-            data = selector;
-            selector = undefined;
-        }
-    }
-    /* </ugly> */
-
-    /* We use an indirection function that will clone the object passed in
-     * parameter to the subscribe callback 
-     * 
-     * FIXME currently we only clone query objects which are the only ones
-     * supported and editable, we might have the same issue with results but
-     * the page load time will be severely affected...
-     */
-    o.on.apply(o, [types, selector, data, function() { 
-        for(i = 1; i < arguments.length; i++) {
-            if ( arguments[i].constructor.name == 'Query' )
-                arguments[i] = arguments[i].clone();
-        }
-        fn.apply(o, arguments);
-    }]);
-  };
-
-  jQuery.unsubscribe = function() {
-    o.off.apply(o, arguments);
-  };
-
-  jQuery.publish = function() {
-    o.trigger.apply(o, arguments);
-  };
-
-}(jQuery));
-
 
 function executeFunctionByName(functionName, context /*, args */) {
   var args = Array.prototype.slice.call(arguments).splice(2);

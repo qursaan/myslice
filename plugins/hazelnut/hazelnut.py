@@ -17,13 +17,13 @@ class Hazelnut (Plugin):
 # $subject_keys = Plugins::get_default_fields($query->subject, $is_unique);
 # $fields = Plugins::metadata_get_fields($query->subject);
 # for now I am hard-coding the ones from haze.py
-        env['subject_fields']=[ 'hostname', 'hrn' ]
+        env['subject_fields']=[ 'network', 'type', 'hostname', 'hrn' ]
         return env
 
     def requirements (self):
         reqs = {
             'js_files' : [ "js/hazelnut.js", 
-                           "js/manifold.js", "js/manifold-query.js", "js/manifold-core.js",
+                           "js/manifold.js", "js/manifold-query.js", 
                            "js/dataTables.js", "js/with-datatables.js",
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/unfold-helper.js",

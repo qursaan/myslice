@@ -15,7 +15,7 @@
 (function($){
 
     var debug=false;
-    debug=true
+//    debug=true
 
     // routing calls
     $.fn.Hazelnut = function( method ) {
@@ -131,7 +131,7 @@
             // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
             fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-                $(nRow).attr('id', get_value(aData[3]));
+                $(nRow).attr('id', unfold.get_value(aData[3]));
                 return nRow;
             },
             fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
@@ -277,11 +277,11 @@
     
             if (rows.length==0) {
 		if (debug) console.l ("empty result");
-                this.table.html(errorDisplay("No Result"));   
+                this.table.html(unfold.errorDisplay("No Result"));   
                 return;
             } else if (typeof(rows[0].error) != 'undefined') {
 		if (debug) console.log ("undefined result");
-                this.table.html(errorDisplay(rows[0].error));
+                this.table.html(unfold.errorDisplay(rows[0].error));
                 return;
             }
             newlines = new Array();
@@ -339,8 +339,8 @@
         this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {
 	    var result="";
             /* Prefix id with plugin_uuid */
-	    result += "<input class='hazelnut-checkbox-" + plugin_uuid + "' id='hazelnut-checkbox-" + plugin_uuid + "-" + get_value(header) + "'";
-	    result += " name='" + get_value(field) + "' type='checkbox' " + selected_str + disabled_str + " autocomplete='off' value='" + get_value(header) + "'";
+	    result += "<input class='hazelnut-checkbox-" + plugin_uuid + "' id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
+	    result += " name='" + unfold.get_value(field) + "' type='checkbox' " + selected_str + disabled_str + " autocomplete='off' value='" + unfold.get_value(header) + "'";
 	    result +="></input>";
 	    return result;
         };
@@ -378,7 +378,7 @@
             if (typeof(col) == 'undefined')
                 return;
 
-            col_value=get_value(aData[col]);
+            col_value=unfold.get_value(aData[col]);
             /* Test whether current filter is compatible with the column */
             if (op == '=' || op == '==') {
                 if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
@@ -466,7 +466,7 @@
         if(filterData.length<=100){
             $.each(filterData, function(index, obj) {
                 var last=$(obj).last();
-                var key_value=get_value(last[0]);
+                var key_value=unfold.get_value(last[0]);
                 if(typeof($(last[0]).attr('checked'))=="undefined"){
                     $.publish('selected', 'add/'+key_value);
                 }

@@ -29,15 +29,15 @@ def slice_view (request, slicename=tmp_default_slice):
     main_query = ManifoldQuery (action='get',
                                 subject='resource',
                                 timestamp='latest',
-                                fields=['hrn','hostname'],
+                                fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
-                                sort='slice_hrn',
+#                                sort='slice_hrn',
                                 )
     page.enqueue_query (main_query)
 
     main_plugin = Stack (
         page=page,
-        title="global container",
+        title="Slice view for %s"%slicename,
         domid='thestack',
 #        togglable=False,
         sons=[Tabs (

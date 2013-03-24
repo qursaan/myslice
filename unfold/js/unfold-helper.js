@@ -25,7 +25,17 @@ var unfold = {
     return out;
     },
 
+    get_value: function (value) {
+    //if(typeof(jQuery(value).attr('value'))!="undefined"){
+    if (/<span value=['"].*['"]>.*<\/span>/i.test(value)) {
+        return jQuery(value).attr('value');
+    } else {
+        return value;
+    }
+}
+
 } // global unfold
 
 // xxx tmp - until all plugins are ported
-errorDisplay = unfold.errorDisplay;
+errorDisplay	= unfold.errorDisplay;
+get_value	= unfold.get_value;
