@@ -46,7 +46,7 @@ var manifold = {
 	// start spinners
 
 	if (manifold.asynchroneous_exec) console.log("Turning spin on with " + jQuery(".need-spin").length + " matches for need-spin");
-	jQuery('.need-spin').spin();
+	jQuery('.need-spin').spin(spin_presets);
 	
 	// We use js function closure to be able to pass the query (array) to the
 	// callback function used when data is received

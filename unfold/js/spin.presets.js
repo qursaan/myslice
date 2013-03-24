@@ -5,7 +5,7 @@ var spin_presets={
   radius: 10, // The radius of the inner circle
   corners: 1, // Corner roundness (0..1)
   rotate: 0, // The rotation offset
-  color: '#306', // #rgb or #rrggbb
+  color: '#f00', // #rgb or #rrggbb
   speed: 1, // Rounds per second
   trail: 60, // Afterglow percentage
   shadow: false, // Whether to render a shadow
