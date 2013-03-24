@@ -37,8 +37,8 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-ui/themes/base/jquery-ui.
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 # used in QueryCode
-THIRD-PARTY-RESOURCES += $(shell ls third-party/beautyofcode/scripts/sh{Core,Autoloader,BrushPython,BrushRuby}.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/beautyofcode/styles/sh{Core,CoreDefault,ThemeDefault}.css)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/sh{Core,Autoloader,BrushPython,BrushRuby}.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/sh{Core,CoreDefault,ThemeDefault}.css)
 
 
 thirdparty-js:
