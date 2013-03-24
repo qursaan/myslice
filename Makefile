@@ -32,6 +32,7 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
 # likewise
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/css/jquery-ui.css)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 
