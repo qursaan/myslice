@@ -50,7 +50,7 @@ def slice_view (request, slicename=tmp_default_slice):
                         page=page,
                         title='a sample and simple hazelnut',
                         domid='simple',
-#                        togglable=False,
+                        togglable=False,
                         # this is the query at the core of the slice list
                         query=main_query,
                         ),
@@ -58,7 +58,7 @@ def slice_view (request, slicename=tmp_default_slice):
                         page=page,
                         title='with checkboxes',
                         domid='checkboxes',
-#                        togglable=False,
+                        togglable=False,
                         checkboxes=True,
                         # this is the query at the core of the slice list
                         query=main_query,
