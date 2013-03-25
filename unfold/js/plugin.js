@@ -1,3 +1,6 @@
+// xxx NOTE : pending move towards a more elaborate mode for 'toggled'
+// for now it's just True or False and most of this code is not in action yet
+// init_all_plugins does kick in though
 var plugin = {
 
     debug:true,
@@ -17,22 +20,6 @@ var plugin = {
 	if (retrieved===null) return;
 	if (debug) console.log ("Applying retrieved status " + retrieved +  " to " + domid);
 	set_visible(domid,retrieved);
-    },
-    // triggered upon $(document).ready
-    init_all_plugins: function() {
-	$('.plugin-hide').each(function() {
-	    $(this).click(function () { 
-		var plugin='#'+this.id.replace('hide-',''); 
-		var show='#'+this.id.replace('hide-','show-'); 
-		$(plugin).slideUp(); $(show).show(); $(this).hide();});
-	});
-	$('.plugin-show').each(function() {
-	    $(this).click(function () { 
-		var plugin='#'+this.id.replace('show-',''); 
-		var hide='#'+this.id.replace('show-','hide-'); 
-		$(plugin).slideDown(); $(hide).show(); $(this).hide();});
-	});
-	$('.plugin-tooltip').each(function(){ $(this).tooltip({'selector':'','placement':'right'}); });
     },
     toggle : function (domid) {
 	var plugin=$('#'+domid);
@@ -55,6 +42,22 @@ var plugin = {
 	    if (debug) console.log('set_visible: toggling ' + domid);
 	    plugin.toggle (domid);
 	}
+    },
+    // triggered upon $(document).ready
+    init_all_plugins: function() {
+	$('.plugin-hide').each(function() {
+	    $(this).click(function () { 
+		var plugin='#'+this.id.replace('hide-',''); 
+		var show='#'+this.id.replace('hide-','show-'); 
+		$(plugin).slideUp(); $(show).show(); $(this).hide();});
+	});
+	$('.plugin-show').each(function() {
+	    $(this).click(function () { 
+		var plugin='#'+this.id.replace('show-',''); 
+		var hide='#'+this.id.replace('show-','hide-'); 
+		$(plugin).slideDown(); $(hide).show(); $(this).hide();});
+	});
+	$('.plugin-tooltip').each(function(){ $(this).tooltip({'selector':'','placement':'right'}); });
     },
 } // global unfold
 

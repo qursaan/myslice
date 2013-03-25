@@ -43,10 +43,19 @@ class Plugin:
     # . page: the context of the request being served
     # . title: is used visually for displaying the widget
     #### optional
-    # . togglable: whether it can be turned on and off (like PleKitToggle)
-    # . toggled: if togglable, what's the initial status
     # . visible: if not set the plugin does not show up at all
     #            (not quite sure what this was for)
+    # . togglable: whether it can be turned on and off by clicking on the title (like PleKitToggle)
+    # . toggled:   whether the plugin should startup open/shown or closed/hidden
+    #### xxx NOTE : pending move towards a more elaborate mode for 'toggled'
+    # . toggled: if togglable, what's the initial status; possible values are
+    #    .. True   : start up open/hidden
+    #    .. False  : start up closed/shown
+    #    .. 'last' : start up as it was the last time that browser showed it (based on 'domid')
+    #    .. None   : if not passed to __init__ at all, then the DefaultTaggled() method is called
+    #    ..        : anything else, defaults to True
+    #### xxx NOTE : pending move towards a more elaborate mode for 'toggled'
+    # 
     #### internal data
     # . domid: created internally, but can be set at creation time if needed
     #          useful for hand-made css, or for selecting an active plugin in a composite
