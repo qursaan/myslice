@@ -4,5 +4,6 @@ TAGS
 *~
 all-static/
 all-templates/
+offline-*
 play/
-sample-*
+*.leftovers
