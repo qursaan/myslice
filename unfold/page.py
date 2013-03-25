@@ -6,7 +6,7 @@ import json
 
 from django.template.loader import render_to_string
 
-from manifold.manifoldapi import ManifoldAPI
+from manifold.metadata import MetaData
 
 from unfold.prelude import Prelude
 
@@ -18,6 +18,9 @@ def to_prelude (method):
         prelude_method=Prelude.__dict__[method.__name__]
         return prelude_method(self.prelude,*args, **kwds)
     return actual
+
+debug=False
+debug=True
 
 class Page:
 
@@ -31,10 +34,6 @@ class Page:
         self._queue=[]
         # global prelude object
         self.prelude=Prelude(css_files='css/plugin.css')
-        # load metadata
-        self._metadata={}
-        # do not call this uncondionnally as we might not even have logged in
-        # self.expose_js_metadata()
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):
@@ -68,42 +67,32 @@ class Page:
         self.add_js_chunks (javascript)
 
 
-
-    def expose_js_metadata(self):
-        request=self.request
-        # xxx this code should probably not be called unconditionnally at page creation time
-        # because we're not sure a user is logged in so we might have no session...
-        if 'manifold' not in request.session:
-            print "Page.expose_js_metadata: no 'manifold' in session... - skipping"
+    # needs to be called explicitly and only when metadata is actually required
+    # in particular user needs to be logged
+    def get_metadata (self):
+        # look in session's cache - we don't want to retrieve this for every request
+        session=self.request.session
+        if 'manifold' not in session:
+            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
             return
-        # use cached version if present
-        if 'metadata' in request.session.keys(): 
-            self._metadata = request.session['metadata']
-        else:
-            manifold_api_session_auth = request.session['manifold']['auth']
-            manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
-        
-            fields = ['table', 'column.column',
-                  'column.description','column.header', 'column.title',
-                  'column.unit', 'column.info_type',
-                  'column.resource_type', 'column.value_type',
-                  'column.allowed_values', 'column.platforms.platform',
-                  'column.platforms.platform_url']
+        manifold=session['manifold']
+        # if cached, use it
+        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
+            if debug: print "Page.get_metadata: return cached value"
+            return manifold['metadata']
+        # otherwise retrieve it
+        manifold_api_session_auth = session['manifold']['auth']
+        metadata=MetaData (manifold_api_session_auth)
+        metadata.fetch()
+            # store it for next time
+        manifold['metadata']=metadata
+        if debug: print "Page.get_metadata: return new value"
+        return metadata
+            
+    def expose_js_metadata (self):
+        # export in this js global...
+        self.add_js_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
 
-            results = manifold_api.Get('metadata:table', [], [], fields)
-
-            for res in results:
-                 subject = res['table']
-                 self._metadata[subject] = res
-
-            request.session['metadata'] = self._metadata
-
-        javascript = "var MANIFOLD_METADATA =" + json.dumps(self._metadata) + ";"
-        self.add_js_chunks(javascript)
-
-    def metadata_get_fields(self, subject):
-        return self._metadata[subject]['column'].sort()
-        
     def expose_js_manifold_config (self):
         self.add_js_chunks(Config.manifold_js_export())
 

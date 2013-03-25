@@ -78,6 +78,11 @@ def slice_view (request, slicename=tmp_default_slice):
                 query=main_query,
 #                toggled=False,
                 ),
+              QuickFilter (
+                page=page,
+                title="QuickFilter is currently the only one that requires metadata",
+                criterias=quickfilter_criterias
+                ),
               ])
 
     # variables that will get passed to the view-unfold1.html template
