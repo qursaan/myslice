@@ -31,7 +31,6 @@ def slice_view (request, slicename=tmp_default_slice):
                                 timestamp='latest',
                                 fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
-#                                sort='slice_hrn',
                                 )
     page.enqueue_query (main_query)
 
