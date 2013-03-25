@@ -1,6 +1,6 @@
 %define name myslice
 %define version 0.1
-%define taglevel 1
+%define taglevel 2
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
@@ -47,3 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/myslice/*
 
 %changelog
+* Mon Mar 25 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-django-0.1-2
+- new pluing 'hazelnut' which is a tmpname for the former datatables one
+- querycode is syntaxhighlighter-enabled
+
