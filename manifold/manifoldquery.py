@@ -41,7 +41,6 @@ class ManifoldQuery:
         s=self.subject
         t=self.timestamp
         f=json.dumps (self.filters)
-        print 'filters f=',f
         p=json.dumps (self.params)
         c=json.dumps (self.fields)
         # xxx unique can be removed, but for now we pad the js structure

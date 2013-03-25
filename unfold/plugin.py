@@ -115,7 +115,7 @@ class Plugin:
             except: return '%s:"undefined"'%setting
         else:
             value=getattr(self,setting,None)
-            if not value: value = "unknown-setting-%s"%setting
+            if value is None: value = "unknown-setting-%s"%setting
         # first try to use to_json method (json.dumps not working on class instances)
         try:    value_json=value.to_json()
         except: value_json=json.dumps(value,separators=(',',':'))

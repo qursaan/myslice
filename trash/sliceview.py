@@ -110,5 +110,4 @@ def slice_view (request, slicename=tmp_default_slice):
     template_env.update(prelude_env)
     result=render_to_response ('view-unfold1.html',template_env,
                                context_instance=RequestContext(request))
-    print 'result=',result
     return result
