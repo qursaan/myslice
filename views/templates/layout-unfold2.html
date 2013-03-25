@@ -8,8 +8,9 @@
 {{ header_prelude }}
 </head>{# let's add these ones no matter what #}
 {% insert_str prelude "css/layout-unfold2.css" %}
-{% insert_str prelude "js/jquery.js" %}
-{% insert_str prelude "js/init-all-plugins.js" %}
+{% insert_str prelude "js/jquery.min.js" %}
+{% insert_str prelude "js/jquery.html5storage.min.js" %}
+{% insert_str prelude "js/plugin.js" %}
 <body>
 {% block container %}
 <div id="container">
