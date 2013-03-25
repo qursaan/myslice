@@ -22,14 +22,14 @@ var plugin = {
     init_all_plugins: function() {
 	$('.plugin-hide').each(function() {
 	    $(this).click(function () { 
-		var plugin='#'+$(this).attr('id').replace('hide-',''); 
-		var show='#'+$(this).attr('id').replace('hide-','show-'); 
+		var plugin='#'+this.id.replace('hide-',''); 
+		var show='#'+this.id.replace('hide-','show-'); 
 		$(plugin).slideUp(); $(show).show(); $(this).hide();});
 	});
 	$('.plugin-show').each(function() {
 	    $(this).click(function () { 
-		var plugin='#'+$(this).attr('id').replace('show-',''); 
-		var hide='#'+$(this).attr('id').replace('show-','hide-'); 
+		var plugin='#'+this.id.replace('show-',''); 
+		var hide='#'+this.id.replace('show-','hide-'); 
 		$(plugin).slideDown(); $(hide).show(); $(this).hide();});
 	});
 	$('.plugin-tooltip').each(function(){ $(this).tooltip({'selector':'','placement':'right'}); });
