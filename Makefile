@@ -1,3 +1,5 @@
+SHELL = /bin/bash
+
 MAKE-SILENT = $(MAKE) --no-print-directory
 
 ### first purpose, build and install from the specfile
@@ -33,14 +35,21 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.bootstrap.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootstrap.css)
 # likewise
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery{,.min}.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.min.js)
 # for storing the visible status of plugins
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage{,.min}.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.min.js)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 # used in QueryCode
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/sh{Core,Autoloader,BrushPython,BrushRuby}.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/sh{Core,CoreDefault,ThemeDefault}.css)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shCore.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shAutoloader.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushPython.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushRuby.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCore.css)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCoreDefault.css)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shThemeDefault.css)
 
 
 thirdparty-js:
