@@ -4,7 +4,7 @@ import json
 from django.http import HttpResponse, HttpResponseForbidden
 
 from manifold.manifoldquery import ManifoldQuery
-from manifold.manifoldapi import ManifoldAPI
+from manifold.manifoldapi import ManifoldAPI, SessionExpired
 
 debug=False
 debug=True
@@ -63,10 +63,14 @@ with the query passed using POST"""
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
         if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
-        answer=manifold_api.send_manifold_query (manifold_query)
-        if debug: 
-            try:        print "received answer from backend with %d rows"%len(answer)
-            except:     print "received answer from backend - can't say len"
+        # xxx we should embed the values inside a geni-like wrapper
+        try:
+            answer=manifold_api.send_manifold_query (manifold_query)
+            if debug: 
+                try:        print "received answer from backend with %d rows"%len(answer)
+                except:     print "received answer from backend - can't say len"
+        except SessionExpired,error:
+            answer=[ error.message ] 
         json_answer=json.dumps(answer)
         if (debug):
             with (file(offline_filename,"w")) as f:
@@ -74,8 +78,8 @@ with the query passed using POST"""
         if debug_spin:
             import time
             time.sleep(debug_spin)
-        # return json-encoded answer
         return HttpResponse (json_answer, mimetype="application/json")
+
     except:
         import traceback
         traceback.print_exc()
