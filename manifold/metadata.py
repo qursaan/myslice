@@ -13,7 +13,7 @@ class MetaData:
         self.hash_by_subject={}
 
     def fetch (self):
-        offline_filename="offline_metadata.json"
+        offline_filename="offline-metadata.json"
         if work_offline:
             try:
                 with file(offline_metadata) as f:
