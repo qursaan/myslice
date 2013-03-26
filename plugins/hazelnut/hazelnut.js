@@ -123,7 +123,7 @@
             //"sDom": 'lf<"#datatableSelectAll-'+ options.plugin_uuid+'">rtip',
             sDom: '<"H"Tfr>t<"F"ip>',
             bJQueryUI: true,
-            sPaginationType: 'full_numbers',
+            sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
