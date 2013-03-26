@@ -27,13 +27,12 @@ class Hazelnut (Plugin):
         reqs = {
             'js_files' : [ "js/hazelnut.js", 
                            "js/manifold.js", "js/manifold-query.js", 
-                           "js/dataTables.js", "js/DT_bootstrap.js", "js/with-datatables.js",
+                           "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/unfold-helper.js",
                            ] ,
             'css_files': [ "css/hazelnut.css" , 
-                           "css/demo_table.css", "css/demo_table_jui.css", 
-#                           "css/jquery-ui.css",
+                           "css/dataTables.bootstrap.css",
                            ],
             }
         return reqs

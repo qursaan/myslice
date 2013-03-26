@@ -1,27 +1,4 @@
-.tophat-datatables {
-    margin-top: 1em;
-    background: #F5F5F5;
+div.spacer {
+    height:20px;
+    clear: both;
 }
-/*
-.dataTables_wrapper {
-    border: 1px solid #999999;
-    padding-top: 1em;
-    / padding-bottom: 3.5em; /
-    margin-bottom: 3.5em;
-}
-.dataTables_scroll {
-    border-top: 1px solid #999999;
-    border-bottom: 1px solid #999999;
-}
-*/
-
-.dataTables_length {
-    padding-left: 1em;
-    padding-bottom: 1em;
-}
-
-.dataTables_filter {
-    padding-right: 1em;
-    padding-bottom: 1em;
-}
-

@@ -30,7 +30,8 @@ THIRD-PARTY-RESOURCES =
 THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
 # just the single js as identified with a symlink
 THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/DT_bootstrap.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.bootstrap.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootstrap.css)
 # likewise
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery{,.min}.js)
 # for storing the visible status of plugins

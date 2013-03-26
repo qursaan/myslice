@@ -121,20 +121,20 @@
             // http://datatables.net/release-datatables/examples/advanced_init/dom_toolbar.html
             // http://www.datatables.net/forums/discussion/3914/adding-buttons-to-header-or-footer/p1
             //"sDom": 'lf<"#datatableSelectAll-'+ options.plugin_uuid+'">rtip',
-            sDom: '<"H"Tfr>t<"F"ip>',
-            bJQueryUI: true,
+	    sDom: "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
-            bRetrieve: true,
+//            bRetrieve: true,
 	    // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
             // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
-            fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-                $(nRow).attr('id', unfold.get_value(aData[3]));
-                return nRow;
-            },
+// this looks like just another ugly hack
+//            fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+//                $(nRow).attr('id', unfold.get_value(aData[3]));
+//                return nRow;
+//            },
             fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
         });
 
