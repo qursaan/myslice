@@ -1,0 +1,2 @@
+manually replaced images/ with all-static/img/ in this css after downloading
+sed -i  -e s,images/,all-static/img/, dataTables.bootstrap.css
