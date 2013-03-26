@@ -36,9 +36,6 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootst
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery{,.min}.js)
 # for storing the visible status of plugins
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage{,.min}.js)
-# xxx we have jquery-ui in our codebase but we've now moved to using bootstrap instead 
-# so jquery-ui can probably be git removed altogether
-#THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-ui/themes/base/jquery-ui.css)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 # used in QueryCode
