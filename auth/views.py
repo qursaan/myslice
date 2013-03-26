@@ -44,7 +44,7 @@ def login_user(request):
 
 # hard question : where should we redirect requests to logout if user is not logged in ?
 def logout_user (request):
-    # xxx check that we're indeed logged in
+    # check that we're indeed logged in
     if not request.user.is_authenticated():
         return HttpResponseRedirect ('/')
     logout(request)

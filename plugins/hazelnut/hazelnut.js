@@ -78,6 +78,7 @@
         show : function( ) {
 	    var $this=$(this);
 	    // xxx wtf. why [1] ? would expect 0...
+	    if (debug) console.log("Hitting suspicious line in hazelnut.show");
             var oTable = $($('.dataTable', $this)[1]).dataTable();
             oTable.fnAdjustColumnSizing()
     
@@ -104,7 +105,7 @@
         this.options = options;
         /* constructor */
         this.table = null;
-	// xxx thierry : init this here - it was not, I expect this relied on set_query somehow..
+	// xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
 	this.current_query=manifold.find_query(this.options.query_uuid);
 	if (debug) console.log("Hazelnut constructor: have set current_query -> " + this.current_query);
@@ -127,7 +128,7 @@
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
             bRetrieve: true,
-	    // xxx this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
+	    // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
             // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
             fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {

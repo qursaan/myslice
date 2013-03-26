@@ -71,6 +71,7 @@ def slice_view (request, slicename=tmp_default_slice):
 #                toggled=False,
                 # this is the query at the core of the slice list
                 query=main_query,
+                columns=['hrn','hostname'],
                 ),
               QueryCode (
                 page=page,

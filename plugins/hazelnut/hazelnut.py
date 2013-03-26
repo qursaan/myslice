@@ -2,10 +2,17 @@ from unfold.plugin import Plugin
 
 class Hazelnut (Plugin):
 
-    def __init__ (self, query, checkboxes=False, **settings):
+    # set checkboxes if a final column with checkboxes is desired
+    # pass columns as the initial set of columns
+    #   if None then this is taken from the query's fields
+    def __init__ (self, query, checkboxes=False, columns=None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
         self.checkboxes=checkboxes
+        if columns is not None:
+            self.columns=columns
+        else:
+            self.columns=self.query.fields
 
     def template_file (self):
         return "hazelnut.html"
@@ -13,11 +20,7 @@ class Hazelnut (Plugin):
     def template_env (self, request):
         env={}
         env.update(self.__dict__)
-        # xxx need to retrieve metadata
-# $subject_keys = Plugins::get_default_fields($query->subject, $is_unique);
-# $fields = Plugins::metadata_get_fields($query->subject);
-# for now I am hard-coding the ones from haze.py
-        env['subject_fields']=[ 'network', 'type', 'hostname', 'hrn' ]
+        env['columns']=self.columns
         return env
 
     def requirements (self):

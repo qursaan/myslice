@@ -21,7 +21,7 @@ class ManifoldQuery:
         self.filters=filters
         self.params=params
         self.fields=fields
-        # xxx this is unused for now
+        # xxx these are unused for now....
         self.sort=sort
         self.limit=limit
         self.offset=offset
