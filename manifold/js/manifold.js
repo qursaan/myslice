@@ -77,6 +77,7 @@ var manifold = {
 	    alert("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
 	    return;
 	}
+	// once everything is checked we can use the 'value' part of the manifoldresult
 	data=data.value;
 	if (data) {
             if (!!id) {
