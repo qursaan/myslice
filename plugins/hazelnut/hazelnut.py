@@ -5,7 +5,7 @@ class Hazelnut (Plugin):
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
-    def __init__ (self, query, checkboxes=False, columns=None, **settings):
+    def __init__ (self, query, checkboxes=False, columns=None, datatables_options={}, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
         self.checkboxes=checkboxes
@@ -13,6 +13,7 @@ class Hazelnut (Plugin):
             self.columns=columns
         else:
             self.columns=self.query.fields
+        self.datatables_options=datatables_options
 
     def template_file (self):
         return "hazelnut.html"
@@ -38,4 +39,4 @@ class Hazelnut (Plugin):
         return reqs
 
     # the list of things passed to the js plugin
-    def json_settings_list (self): return ['plugin_uuid','query_uuid','checkboxes']
+    def json_settings_list (self): return ['plugin_uuid','query_uuid','checkboxes','datatables_options']

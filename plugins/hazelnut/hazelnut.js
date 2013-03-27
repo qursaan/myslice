@@ -115,28 +115,23 @@
         var object = this;
 
         /* Transforms the table into DataTable, and keep a pointer to it */
-        this.table = $('#hazelnut-' + options.plugin_uuid).dataTable({
+	actual_options = {
             // Customize the position of Datatables elements (length,filter,button,...)
-            // inspired from : 
             // http://datatables.net/release-datatables/examples/advanced_init/dom_toolbar.html
             // http://www.datatables.net/forums/discussion/3914/adding-buttons-to-header-or-footer/p1
-            //"sDom": 'lf<"#datatableSelectAll-'+ options.plugin_uuid+'">rtip',
 	    sDom: "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
-//            bRetrieve: true,
 	    // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
             // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
-// this looks like just another ugly hack
-//            fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-//                $(nRow).attr('id', unfold.get_value(aData[3]));
-//                return nRow;
-//            },
             fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
-        });
+        };
+	// the intention here is that options.datatables_options as coming from the python object take precedence
+	$.extend(actual_options, options.datatables_options );
+        this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
 
         /* Setup the SelectAll button in the dataTable header */
         var oSelectAll = $('#datatableSelectAll-'+ options.plugin_uuid);

@@ -62,6 +62,9 @@ def slice_view (request, slicename=tmp_default_slice):
                         checkboxes=True,
                         # this is the query at the core of the slice list
                         query=main_query,
+                        # this of course should be automatic in hazelnut
+                        # for now we turn off sorting on the checkboxes columns this way
+                        datatables_options = { 'aoColumns' : [ None, None, None, None, {'bSortable': False} ] },
                         ),
                     ]),
               Hazelnut ( 

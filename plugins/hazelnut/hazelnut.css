@@ -14,7 +14,7 @@ div.Hazelnut table.dataTable th {
     text-align: left;
     padding: 8px 12px 4px 20px;
     vertical-align:middle;
-    background: #CAE8EA url(../img/tablesort-header.jpg) no-repeat;
+/*    background: #CAE8EA url(../img/tablesort-header.jpg) no-repeat; */
 }
 
 div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Hazelnut table.dataTable input [type="text"] {
@@ -35,9 +35,16 @@ div.Hazelnut div.dataTables_info {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/* one could think or using repeat-x here but that's not working because of the arrows
+ * we might need to make these wider some day */
 div.Hazelnut table.dataTable thead .sorting { background: url('../img/tablesort-header-sortable.png') no-repeat; }
 div.Hazelnut table.dataTable thead .sorting_asc { background: url('../img/tablesort-header-up.png') no-repeat; }
 div.Hazelnut table.dataTable thead .sorting_desc { background: url('../img/tablesort-header-down.png') no-repeat; }
-/* former set did not have that exact equivalent - using an approximation for now */
-div.Hazelnut table.dataTable thead .sorting_asc_disabled { background: url('../img/tablesort-header-sortable.png') no-repeat; }
-div.Hazelnut table.dataTable thead .sorting_desc_disabled { background: url('../img/tablesort-header-sortable.png') no-repeat; }
+/* this icons set does not have that exact equivalent - using an approximation for now */
+div.Hazelnut table.dataTable thead .sorting_asc_disabled { background: url('../img/tablesort-header.png') no-repeat; }
+div.Hazelnut table.dataTable thead .sorting_desc_disabled { background: url('../img/tablesort-header.png') no-repeat; }
+
+/* the footers are not active */
+div.Hazelnut table.dataTable tfoot { background: url('../img/tablesort-header.png') no-repeat; }
+/* and when sorting is turned off it's useful to set this on header too */
+div.Hazelnut table.dataTable thead { background: url('../img/tablesort-header.png') no-repeat; }
