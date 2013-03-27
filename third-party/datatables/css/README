@@ -1,2 +1,2 @@
-manually replaced images/ with ../img/ in this css after downloading
-remember url() gives a location relative to where the css file lies
+we use different background images than the ones provided byt this package
+this gets customized in hazelnut.css
