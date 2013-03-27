@@ -1,2 +1,2 @@
-manually replaced images/ with all-static/img/ in this css after downloading
-sed -i  -e s,images/,all-static/img/, dataTables.bootstrap.css
+manually replaced images/ with ../img/ in this css after downloading
+remember url() gives a location relative to where the css file lies
