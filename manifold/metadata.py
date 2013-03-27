@@ -1,6 +1,10 @@
 import json 
 
+from manifold.manifoldresult import ManifoldResult
 from manifold.manifoldapi import ManifoldAPI
+
+debug=False
+debug=True
 
 # turn this on if you want to work offline
 work_offline=False
@@ -28,11 +32,15 @@ class MetaData:
                   'column.resource_type', 'column.value_type',
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
-        results = manifold_api.Get('metadata:table', [], [], fields)
-        self.hash_by_subject = dict ( [ (result['table'], result) for result in results ] )
+        rows_result = manifold_api.Get('metadata:table', [], [], fields)
+        rows = rows_result.ok_value()
+        if not rows:
+            print "Failed to retrieve metadata",rows_result.error()
+        self.hash_by_subject = dict ( [ (row['table'], row) for row in rows ] )
         # save for next time we use offline mode
-        with file(offline_filename,'w') as f:
-            f.write(json.dumps(self.hash_by_subject))
+        if debug:
+            with file(offline_filename,'w') as f:
+                f.write(json.dumps(self.hash_by_subject))
 
     def to_json(self):
         return json.dumps(self.hash_by_subject)

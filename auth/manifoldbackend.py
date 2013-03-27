@@ -2,7 +2,7 @@ import time
 
 from django.contrib.auth.models import User
 
-from manifold.manifoldapi import ManifoldAPI
+from manifold.manifoldapi import ManifoldAPI, ManifoldResult
 
 # Name my backend 'ManifoldBackend'
 class ManifoldBackend:
@@ -21,10 +21,13 @@ class ManifoldBackend:
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
             api = ManifoldAPI(auth)
             # Authenticate user and get session key
-            session = api.GetSession()
-            if not session : 
-                return None
+            session_result = api.GetSession()
+            session = session_result.ok_value()
+            if not session:
+                print "GetSession failed",session_result.error()
+                return
             
+            print 'DEALING with session',session
             #self.session = session
             # Change GetSession() at some point to return expires as well
             expires = time.time() + (24 * 60 * 60)
@@ -34,8 +37,12 @@ class ManifoldBackend:
             self.api = api
 
             # Get account details
-            person = api.GetPersons(auth)[0]
-            self.person = person
+            persons_result = api.GetPersons(auth)
+            persons = persons_result.ok_value()
+            if not persons:
+                print "GetPersons failed",persons_result.error()
+                return
+            person = persons[0]
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': expires}
         except:

@@ -67,6 +67,17 @@ var manifold = {
 	    },
 
     asynchroneous_success : function (data, query, id) {
+	if (manifold.asynchroneous_debug) console.log ("received manifold result with code " + data.code);
+	// xxx should have a nicer declaration of that enum in sync with the python code somehow
+	if (data.code == 1) {
+	    alert("Your session has expired, please log in again");
+	    window.location="/logout/";
+	    return;
+	} elif (data.code != 0) {
+	    alert("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
+	    return;
+	}
+	data=data.value;
 	if (data) {
             if (!!id) {
 		/* Directly inform the requestor */
