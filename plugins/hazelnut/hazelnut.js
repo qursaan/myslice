@@ -118,7 +118,7 @@
 	actual_options = {
             // Customize the position of Datatables elements (length,filter,button,...)
 	    // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-	    sDom: "<'row-fluid'<'span1'r><'span4'l><'span7'f>>t<'row-fluid'<'span4'i><'span8'p>>",
+	    sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span4'i><'span8'p>>",
             sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
