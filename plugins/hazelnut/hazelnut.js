@@ -119,7 +119,7 @@
             // Customize the position of Datatables elements (length,filter,button,...)
             // http://datatables.net/release-datatables/examples/advanced_init/dom_toolbar.html
             // http://www.datatables.net/forums/discussion/3914/adding-buttons-to-header-or-footer/p1
-	    sDom: "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+	    sDom: "<'row-fluid'<'span4'l><'span7'f><'span1'r>>t<'row-fluid'<'span4'i><'span8'p>>",
             sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
