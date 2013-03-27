@@ -73,7 +73,7 @@ var manifold = {
 	    alert("Your session has expired, please log in again");
 	    window.location="/logout/";
 	    return;
-	} elif (data.code != 0) {
+	} else if (data.code != 0) {
 	    alert("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
 	    return;
 	}
