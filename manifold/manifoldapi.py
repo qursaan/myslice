@@ -24,6 +24,12 @@ class ManifoldAPI:
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
 
+    # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
+    # as of march 2013 we work with an API that essentially either returns the value, or raises 
+    # an xmlrpclib.Fault exception with always the same 8002 code
+    # since most of the time we're getting this kind of issues for expired sessions
+    # (looks like sessions are rather short-lived), for now the choice is to map these errors on 
+    # a SESSION_EXPIRED code
     def __getattr__(self, methodName):
         def func(*args, **kwds):
             if (debug): 
