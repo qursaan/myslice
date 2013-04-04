@@ -38,12 +38,11 @@ def slice_view (request, slicename=tmp_default_slice):
         page=page,
         title="Slice view for %s"%slicename,
         domid='thestack',
-#        togglable=False,
+        togglable=False,
         sons=[Tabs (
                 page=page,
                 title="2 tabs : w/ and w/o checkboxes",
                 domid='thetabs',
-#                toggled=False,
                 active_domid='checkboxes',
                 sons=[
                     Hazelnut ( 
@@ -62,30 +61,38 @@ def slice_view (request, slicename=tmp_default_slice):
                         checkboxes=True,
                         # this is the query at the core of the slice list
                         query=main_query,
-                        # this of course should be automatic in hazelnut
-                        # for now we turn off sorting on the checkboxes columns this way
-                        datatables_options = { 'aoColumns' : [ None, None, None, None, {'bSortable': False} ] },
+                        datatables_options = { 
+                            # for now we turn off sorting on the checkboxes columns this way
+                            # this of course should be automatic in hazelnut
+                            'aoColumns' : [ None, None, None, None, {'bSortable': False} ],
+                            'iDisplayLength' : 25,
+                            'bLengthChange' : True,
+                            },
                         ),
                     ]),
               Hazelnut ( 
                 page=page,
                 title='not in tabs',
                 domid='standalone',
-#                toggled=False,
                 # this is the query at the core of the slice list
                 query=main_query,
                 columns=['hrn','hostname'],
                 ),
+              # you don't *have to* set a domid, but if you plan on using toggled=persistent then it's required
+              # because domid is the key for storing toggle status in the browser
               QueryCode (
                 page=page,
-                title='xmlrpc code',
+                title='xmlrpc code (toggled=False)',
                 query=main_query,
-#                toggled=False,
+#                domid='xmlrpc',
+                toggled=False,
                 ),
               QuickFilter (
                 page=page,
-                title="QuickFilter is currently the only one that requires metadata",
-                criterias=quickfilter_criterias
+                title="QuickFilter - requires metadata (toggled=False)",
+                criterias=quickfilter_criterias,
+                domid='filters',
+                toggled=False,
                 ),
               ])
 

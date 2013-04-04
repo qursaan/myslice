@@ -1,65 +1,63 @@
-// xxx NOTE : pending move towards a more elaborate mode for 'toggled'
-// for now it's just True or False and most of this code is not in action yet
-// init_all_plugins does kick in though
+//
+// storing toggle's status in localStorage
+// NOTE that localStorage only stores strings, so true becomes "true"
 var plugin = {
 
-    debug:true,
+    debug:false,
 
     ////////// use local storage to remember open/closed toggles
-    store_status : function (domid) {
-	var plugin=$('#'+domid);
-	key='toggle.'+domid;
-	if (debug) console.log('storing toggle status for '+domid);
-	$.localStorage.setItem(key,plugin.visible());
+    store_status : function (domid,status) {
+	var key='toggle.'+domid;
+	if (plugin.debug) console.log("storing toggle status " + status + " for " + domid + " key=" + key);
+	$.localStorage.setItem(key,status);
     },
     // restore last status
-    restore_last_status : function (domid) {
-	key='toggle.'+domid;
+    retrieve_last_status : function (domid) {
+	var key='toggle.'+domid;
 	// don't do anything if nothing stored
-	var retrieved=$.localStorage.getItem(key,undefined);
-	if (retrieved===null) return;
-	if (debug) console.log ("Applying retrieved status " + retrieved +  " to " + domid);
-	set_visible(domid,retrieved);
+	var retrieved=$.localStorage.getItem(key);
+	// set default to true
+	if (retrieved==null) retrieved="true";
+	if (plugin.debug) console.log ("retrieved toggle status for " + domid + " (key=" + key + ") -> " + retrieved);
+	return retrieved;
     },
-    toggle : function (domid) {
-	var plugin=$('#'+domid);
-	plugin.toggle();
+    set_toggle_status : function (domid,status) {
+	var plugindiv=$('#'+domid);
 	var showbtn=$('#show-'+domid);
 	var hidebtn=$('#hide-'+domid);
-	if (plugin.visible()) {
-	    hidebtn.show();
-	    showbtn.hide();
-	} else {
-	    hidebtn.hide();
-	    showbtn.show();
-	}
-	plugin.store_status(domid);
+	if (status=="true")	{ plugindiv.slideDown(); hidebtn.show(); showbtn.hide(); }
+	else			{ plugindiv.slideUp();   hidebtn.hide(); showbtn.show(); }
+	plugin.store_status(domid,status);
     },
-    // 'target' is retrieved from storage so essentially a string 'true' or 'false'
-    set_visible : function (domid, target) {
-	var plugin=$('#'+domid);
-	if (plugin.visible()!=target) {
-	    if (debug) console.log('set_visible: toggling ' + domid);
-	    plugin.toggle (domid);
-	}
+    set_from_saved_status : function (domid) {
+	var previous_status=plugin.retrieve_last_status (domid);
+	if (plugin.debug) console.log("restoring initial status for domid " + domid + " -> " + previous_status);
+	plugin.set_toggle_status (domid,previous_status);
     },
     // triggered upon $(document).ready
-    init_all_plugins: function() {
+    init_all_plugins : function() {
+	// plugins marked as persistent start with all 3 parts turned off
+	// let us first make sure the right parts are turned on 
+	$('.persistent-toggle').each(function() {
+	    var domid=this.id.replace('complete-','');
+	    plugin.set_from_saved_status(domid);
+	});
+	// program the hide buttons so they do the right thing
 	$('.plugin-hide').each(function() {
 	    $(this).click(function () { 
-		var plugin='#'+this.id.replace('hide-',''); 
-		var show='#'+this.id.replace('hide-','show-'); 
-		$(plugin).slideUp(); $(show).show(); $(this).hide();});
-	});
+		var domid=this.id.replace('hide-','');
+		plugin.set_toggle_status(domid,"false");
+	    })});
+	// same for show buttons
 	$('.plugin-show').each(function() {
 	    $(this).click(function () { 
-		var plugin='#'+this.id.replace('show-',''); 
-		var hide='#'+this.id.replace('show-','hide-'); 
-		$(plugin).slideDown(); $(hide).show(); $(this).hide();});
-	});
+		var domid=this.id.replace('show-','');
+		plugin.set_toggle_status(domid,"true");
+	    })});
+	// arm tooltips
 	$('.plugin-tooltip').each(function(){ $(this).tooltip({'selector':'','placement':'right'}); });
     },
-} // global unfold
+} // global var plugin
 
 /* upon document completion, we locate all the hide and show areas, 
  * and configure their behaviour 

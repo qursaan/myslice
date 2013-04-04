@@ -1,14 +1,14 @@
 {% if visible %}
-<div class='plugin-toggle{% if need_spin %} need-spin{% endif %}' id='complete-{{ domid }}'>
+<div id='complete-{{ domid }}' class='plugin-toggle{% if need_spin %} need-spin{% endif %}{% if persistent_toggle %} persistent-toggle{% endif %}'>
 {% if togglable %}
-<h4 id='show-{{ domid }}' class='plugin-show'{% if toggled %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
+<h4 id='show-{{ domid }}' class='plugin-show'{% if not display_show_button %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Show plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>
-<h4 id='hide-{{ domid }}' class='plugin-hide'{% if not toggled %} style='display:none;'{% endif %}><i class="icon-hand-down"></i>
+<h4 id='hide-{{ domid }}' class='plugin-hide'{% if not display_hide_button %} style='display:none;'{% endif %}><i class="icon-hand-down"></i>
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Hide plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>
 {% endif %}{# togglable #}
 {% endif %}{# visible #}
 
-<div class='plugin {{ classname }}' id='{{ domid }}'{% if not toggled %} style='display:none;'{% endif %}>
+<div class='plugin {{ classname }}' id='{{ domid }}'{% if not display_body %} style='display:none;'{% endif %}>
 {{ plugin_content|safe }}
 </div>{# plugin #}
 

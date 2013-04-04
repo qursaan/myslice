@@ -17,7 +17,7 @@ from unfold.prelude import Prelude
 
 DEBUG= False
 #DEBUG= [ 'SimpleList' ]
-#DEBUG=True
+DEBUG=True
 
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
@@ -47,15 +47,15 @@ class Plugin:
     #            (not quite sure what this was for)
     # . togglable: whether it can be turned on and off by clicking on the title (like PleKitToggle)
     # . toggled:   whether the plugin should startup open/shown or closed/hidden
-    #### xxx NOTE : pending move towards a more elaborate mode for 'toggled'
-    # . toggled: if togglable, what's the initial status; possible values are
-    #    .. True   : start up open/hidden
-    #    .. False  : start up closed/shown
-    #    .. 'last' : start up as it was the last time that browser showed it (based on 'domid')
-    #    .. None   : if not passed to __init__ at all, then the DefaultTaggled() method is called
-    #    ..        : anything else, defaults to True
-    #### xxx NOTE : pending move towards a more elaborate mode for 'toggled'
-    # 
+    #              possible values are
+    #   .. True         : start up open/hidden
+    #   .. False        : start up closed/shown
+    #   .. 'persistent' : start up as it was the last time that browser showed it (based on 'domid')
+    #                NOTE that it is required for you to set a domid if you want to use persistent mode
+    #                     since domid is the key for storing that data in the browser storage space
+    #   .. None         : if not passed to __init__ at all, then the default_toggled() method is called
+    #   ..              : anything else, defaults to True
+    #
     #### internal data
     # . domid: created internally, but can be set at creation time if needed
     #          useful for hand-made css, or for selecting an active plugin in a composite
@@ -66,7 +66,7 @@ class Plugin:
     # which will result in 'foo' being accessible to the template engine
     # 
     def __init__ (self, page, title, domid=None,
-                  visible=True, togglable=True, toggled=True, **settings):
+                  visible=True, togglable=True, toggled=None, **settings):
         self.page = page
         self.title=title
         # callers can provide their domid for css'ing 
@@ -76,7 +76,8 @@ class Plugin:
         self.plugin_classname=self._js_classname()
         self.visible=visible
         self.togglable=togglable
-        self.toggled=toggled
+        if toggled is not None: self.toggled=toggled
+        else:                   self.toggled=self.default_toggled()
         # what comes from subclasses
         for (k,v) in settings.iteritems():
             setattr(self,k,v)
@@ -154,8 +155,20 @@ class Plugin:
         # need_spin is used in plugin.html
         self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
+        # translate high-level 'toggled' into 4 different booleans
+        print "domid",self.domid,"toggled",self.toggled
+        if self.toggled=='persistent':
+            # start with everything turned off and let the js callback do its job
+            env.update({'persistent_toggle':True,'display_hide_button':False,'display_show_button':False,'display_body':False})
+        elif self.toggled==False:
+            env.update({'persistent_toggle':False,'display_hide_button':False,'display_show_button':True,'display_body':False})
+        else:
+            env.update({'persistent_toggle':False,'display_hide_button':True,'display_show_button':False,'display_body':True})
         if self.need_debug(): 
             print "rendering plugin.html with env keys %s"%env.keys()
+            print "rendering plugin.html with env"
+            for (k,v) in env.items(): 
+                if "display" in k or "persistent" in k: print k,'->',v
         result = render_to_string ('plugin.html',env)
 
         # export this only for relevant plugins
@@ -237,6 +250,8 @@ class Plugin:
     # if you see this string somewhere your template_file() code is not kicking in
     def template_file (self):           return "undefined_template"
     def template_env (self, request):   return {}
+
+    def default_toggled (self):         return 'persistent'
 
 #    # tell the framework about requirements (for the document <header>)
 #    # the notion of 'Media' in django provides for medium-dependant
