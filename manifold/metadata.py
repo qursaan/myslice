@@ -36,6 +36,7 @@ class MetaData:
         rows = rows_result.ok_value()
         if not rows:
             print "Failed to retrieve metadata",rows_result.error()
+            rows=[]
         self.hash_by_subject = dict ( [ (row['table'], row) for row in rows ] )
         # save for next time we use offline mode
         if debug:
