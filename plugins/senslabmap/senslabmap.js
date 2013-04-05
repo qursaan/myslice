@@ -1,8 +1,5 @@
 /**
- * MySlice GoogleMap plugin
- * URL: http://trac.myslice.info
  * Description: SensLab display of 3D-geolocated data
- * Author: The MySlice Team
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */

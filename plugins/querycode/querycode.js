@@ -1,8 +1,5 @@
 /**
- * MySlice QueryCode plugin
- * URL: http://trac.myslice.info
  * Description: display code for a target query in python or ruby
- * Author: The MySlice Team
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */

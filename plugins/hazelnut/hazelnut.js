@@ -1,8 +1,5 @@
 /**
- * MySlice Hazelnut plugin
- * URL: http://trac.myslice.info
  * Description: display a query result in a datatables-powered <table>
- * Author: The MySlice Team
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */

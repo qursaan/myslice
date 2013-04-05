@@ -1,8 +1,5 @@
 /**
- * MySlice SimpleList plugin
- * URL: http://trac.myslice.info
  * Description: display simple lists like slices or testbeds
- * Author: The MySlice Team
  * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
