@@ -11,6 +11,7 @@ from manifold.manifoldquery import ManifoldQuery
 from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
 from plugins.hazelnut.hazelnut import Hazelnut 
+from plugins.googlemap.googlemap import GoogleMap 
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
@@ -43,12 +44,14 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title="2 tabs : w/ and w/o checkboxes",
                 domid='thetabs',
-                active_domid='checkboxes',
+                # active_domid='checkboxes',
+                active_domid='gmap',
                 sons=[
                     Hazelnut ( 
                         page=page,
                         title='a sample and simple hazelnut',
                         domid='simple',
+                        # tab's sons preferably turn this off
                         togglable=False,
                         # this is the query at the core of the slice list
                         query=main_query,
@@ -57,10 +60,11 @@ def slice_view (request, slicename=tmp_default_slice):
                         page=page,
                         title='with checkboxes',
                         domid='checkboxes',
+                        # tab's sons preferably turn this off
                         togglable=False,
-                        checkboxes=True,
                         # this is the query at the core of the slice list
                         query=main_query,
+                        checkboxes=True,
                         datatables_options = { 
                             # for now we turn off sorting on the checkboxes columns this way
                             # this of course should be automatic in hazelnut
@@ -68,6 +72,14 @@ def slice_view (request, slicename=tmp_default_slice):
                             'iDisplayLength' : 25,
                             'bLengthChange' : True,
                             },
+                        ),
+                    GoogleMap (
+                        page=page,
+                        title='geographic view',
+                        domid='gmap',
+                        # tab's sons preferably turn this off
+                        togglable=False,
+                        query=main_query,
                         ),
                     ]),
               Hazelnut ( 

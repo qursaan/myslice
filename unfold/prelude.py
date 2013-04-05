@@ -48,25 +48,32 @@ class Prelude:
     #    env['js_chunks']= '\n'.join(self.js_chunks)
     #    env['css_chunks']='\n'.join(self.css_chunks)
     #    return env
-    # together with this in layout-unfold2.html
+    # together with this in prelude.html
     # {% for js_file in js_files %} {% insert_str prelude js_file %} {% endfor %}
     # {% for css_file in css_files %} {% insert_str prelude css_file %} {% endfor %}
     # somehow however this would not work too well, 
     # probably insert_above is not powerful enough to handle that
     # 
-    # so a much simpler and safer approach is for use to compute the html header directly
+    # so a much simpler and safer approach is for us to compute the html header directly
+    # this requires  to filter on full urls
+    #
+    @staticmethod
+    def full_url (input):
+        if input.startswith("http://") or input.startswith("https://"):
+            return input
+        else:
+            from myslice.settings import STATIC_URL
+            return "%s%s"%(STATIC_URL,input)
+        
     def prelude_env (self): 
         env={}
-        env['js_files']=  self.js_files
-        env['css_files']= self.css_files
+        env['js_urls'] = [ Prelude.full_url (js_file) for js_file in self.js_files ]
+        env['css_urls'] = [ Prelude.full_url (css_file) for css_file in self.css_files ]
         env['js_chunks']= self.js_chunks
         env['css_chunks']=self.css_chunks
         if debug:
             print "prelude has %d js_files, %d css files, %d js chunks and %d css_chunks"%\
                 (len(self.js_files),len(self.css_files),len(self.js_chunks),len(self.css_chunks),)
-        # not sure how this should be done more cleanly
-        from myslice.settings import STATIC_URL
-        env ['STATIC_URL'] = STATIC_URL
         # render this with prelude.html and put the result in header_prelude
         header_prelude = render_to_string ('prelude.html',env)
         return { 'header_prelude' : header_prelude }

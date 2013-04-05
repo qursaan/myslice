@@ -43,7 +43,7 @@ def dashboard_view (request):
         sons=[ 
             QueryCode (
                 page=page,
-                title="Vizualize your query (no syntax highlight for now)",
+                title="Vizualize your query",
                 query=slices_query,
                 toggled=False,
                 ),
