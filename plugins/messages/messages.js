@@ -73,8 +73,8 @@
 	var domid=e.data.plugindiv.data('Messages').plugin_uuid;
 	var html="";
 	html += "<li class='" + level + "'>";
-	html += "[" + level + "]";
-	html += " " + new Date() + " ";
+	html += "<span class='messages-date'>" + new Date() + "</span>";
+	html += "<span class='messages-level'>[" + level + "]</span>";
 //	html += "[" + domid + "]";
 	html += " " + message + "</li>";
 	$("ul#"+domid+".messages").append(html);
@@ -84,13 +84,22 @@
 
 // temporary
 
-var tests=true;
-if (tests) // arm this with a timeout rather
-    window.setInterval(
-	function () { 
-	    $.publish("messages:fatal","a fatal message");
-	    $.publish("messages:error","an error message");
-	    $.publish("messages:warning","a warning message");
-	    $.publish("messages:info","an info message");
-	    $.publish("messages:debug","a debug message");
-	}, 5000);
+var messages_test = {
+    // set this to 0 to disable
+    counter : 3,
+    period : 3000,
+    sample : function () { 
+	$.publish("messages:fatal","a fatal message (" + messages_test.counter + " runs to go)");
+	$.publish("messages:error","an error message");
+	$.publish("messages:warning","a warning message");
+	$.publish("messages:info","an info message");
+	$.publish("messages:debug","a debug message");
+	messages_test.counter -= 1;
+	if (messages_test.counter == 0)
+	    window.clearInterval (messages_test.interval_id);
+    },
+    run: function () {
+	messages_test.interval_id=window.setInterval(messages_test.sample , 5000);
+    }
+}
+messages_test.run()

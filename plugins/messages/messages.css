@@ -1,9 +1,22 @@
-.messages {
-    background-color: #f4f8f4;
+/* http://www.w3schools.com/html/html_colornames.asp */
+/* someone please feel free to pick a better set of colors */
+ul.messages {
+    background-color: #d0f0d0;
+    list-style-type: none;
 }
-// http://www.w3schools.com/html/html_colornames.asp
-li.fatal { background-color: Chocolate;}
+li.fatal { background-color: CornflowerBlue;}
 li.error { background-color: Coral; }
-li.warning { background-color: BurlyWood; }
+li.warning { background-color: Gold; }
 li.info { background-color: LightGreen; }
 li.debug { background-color: Azure; } 
+
+span.messages-date { 
+    font-size: 75%;
+    padding: 0px 1em 0px 2em;
+}
+
+span.messages-level {
+    float: left;
+    width: 40px;
+    font-size: 90%;
+}

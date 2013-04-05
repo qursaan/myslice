@@ -42,7 +42,14 @@ def slice_view (request, slicename=tmp_default_slice):
         title="Slice view for %s"%slicename,
         domid='thestack',
         togglable=False,
-        sons=[Tabs (
+        sons=[
+            Messages (
+                page=page,
+                title="Runtime messages",
+                domid="msgs-pre",
+                toggled=False,
+                ),
+            Tabs (
                 page=page,
                 title="2 tabs : w/ and w/o checkboxes",
                 domid='thetabs',
@@ -92,7 +99,7 @@ def slice_view (request, slicename=tmp_default_slice):
                         query=main_query,
                         ),
                     ]),
-              Hazelnut ( 
+            Hazelnut ( 
                 page=page,
                 title='not in tabs',
                 domid='standalone',
@@ -102,24 +109,24 @@ def slice_view (request, slicename=tmp_default_slice):
                 ),
               # you don't *have to* set a domid, but if you plan on using toggled=persistent then it's required
               # because domid is the key for storing toggle status in the browser
-              QueryCode (
+            QueryCode (
                 page=page,
                 title='xmlrpc code (toggled=False)',
                 query=main_query,
 #                domid='xmlrpc',
                 toggled=False,
                 ),
-              QuickFilter (
+            QuickFilter (
                 page=page,
                 title="QuickFilter - requires metadata (toggled=False)",
                 criterias=quickfilter_criterias,
                 domid='filters',
                 toggled=False,
                 ),
-              Messages (
+            Messages (
                 page=page,
-                title="Runtime messages",
-                domid="msgs",
+                title="Runtime messages (again)",
+                domid="msgs-post",
                 )
               ])
 
