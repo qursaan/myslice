@@ -1,0 +1,9 @@
+.messages {
+    background-color: #f4f8f4;
+}
+// http://www.w3schools.com/html/html_colornames.asp
+li.fatal { background-color: Chocolate;}
+li.error { background-color: Coral; }
+li.warning { background-color: BurlyWood; }
+li.info { background-color: LightGreen; }
+li.debug { background-color: Azure; } 

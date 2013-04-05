@@ -10,12 +10,13 @@ from manifold.manifoldquery import ManifoldQuery
 
 from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
+from plugins.lists.slicelist import SliceList
 from plugins.hazelnut.hazelnut import Hazelnut 
 from plugins.googlemap.googlemap import GoogleMap 
 from plugins.senslabmap.senslabmap import SensLabMap
-from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
+from plugins.messages.messages import Messages
 
 from myslice.viewutils import quickfilter_criterias
 
@@ -115,6 +116,11 @@ def slice_view (request, slicename=tmp_default_slice):
                 domid='filters',
                 toggled=False,
                 ),
+              Messages (
+                page=page,
+                title="Runtime messages",
+                domid="msgs",
+                )
               ])
 
     # variables that will get passed to the view-unfold1.html template
