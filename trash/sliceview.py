@@ -12,6 +12,7 @@ from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
 from plugins.hazelnut.hazelnut import Hazelnut 
 from plugins.googlemap.googlemap import GoogleMap 
+from plugins.senslabmap.senslabmap import SensLabMap
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
@@ -77,6 +78,14 @@ def slice_view (request, slicename=tmp_default_slice):
                         page=page,
                         title='geographic view',
                         domid='gmap',
+                        # tab's sons preferably turn this off
+                        togglable=False,
+                        query=main_query,
+                        ),
+                    SensLabMap (
+                        page=page,
+                        title='3D view',
+                        domid='smap',
                         # tab's sons preferably turn this off
                         togglable=False,
                         query=main_query,

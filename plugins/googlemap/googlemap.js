@@ -7,6 +7,8 @@
  * License: GPLv3
  */
 
+// xxx TODO -- this one could use a bit of cleaning like what was done for the first plugins
+// especially wrt using 'instance' and 'data' in such a confusing way
 
 (function( jQuery ){
 
