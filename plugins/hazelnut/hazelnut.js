@@ -100,8 +100,6 @@
     function Hazelnut(options) {
         /* member variables */
         this.options = options;
-        /* constructor */
-        this.table = null;
 	// xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
 	this.current_query=manifold.find_query(this.options.query_uuid);
@@ -130,6 +128,7 @@
         this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
 
         /* Setup the SelectAll button in the dataTable header */
+	/* xxx not sure this is still working */
         var oSelectAll = $('#datatableSelectAll-'+ options.plugin_uuid);
         oSelectAll.html("<span class='ui-icon ui-icon-check' style='float:right;display:inline-block;'></span>Select All");
         oSelectAll.button();
