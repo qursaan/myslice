@@ -1,6 +1,6 @@
 %define name myslice
 %define version 0.1
-%define taglevel 2
+%define taglevel 3
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
@@ -47,6 +47,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/myslice/*
 
 %changelog
+* Mon Apr 08 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-django-0.1-3
+- a small number of representative plugins are available
+- next step is to correlate a Get query with its corresponding Update like in slice.php
+
 * Mon Mar 25 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-django-0.1-2
 - new pluing 'hazelnut' which is a tmpname for the former datatables one
 - querycode is syntaxhighlighter-enabled
