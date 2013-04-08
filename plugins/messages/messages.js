@@ -1,11 +1,6 @@
 /**
- * MySlice Messages plugin
- * Version: 0.1.0
- * URL: http://www.myslice.info
- * Description: Display debug messages in a DIV
- * Requires: 
- * Author: The MySlice Team
- * Copyright: Copyright 2012 UPMC Sorbonne Universités
+ * Description: display messages in a dedicated area, with buttons for filtering on level
+ * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
 
@@ -22,39 +17,29 @@
 	}    
     };
 
+    var levels = {'fatal': true, 'error': true, 'warning' : true, 'info' : true, 'debug' : false};
+
     var methods = {
         init : function( options ) {
 
-            return this.each(function(){
-                var $this = $(this),
-                  data = $this.data('Messages'), 
-                  Messages = $('<div />', { text : $this.attr('title') });
-
-                // If the plugin hasn't been initialized yet
-                if ( ! data ) {
-                    $(this).data('Messages', {
-                        plugin_uuid: options.plugin_uuid,
-                        target : $this,
-                        Messages : Messages,
-		    });
-         
-                    /* Plugin initialization */
-                    $.subscribe("messages:fatal", {'plugindiv': $this,'level':'fatal'}, display_message);
-                    $.subscribe("messages:error", {'plugindiv': $this,'level':'error'}, display_message);
-                    $.subscribe("messages:warning", {'plugindiv': $this,'level':'warning'}, display_message);
-                    $.subscribe("messages:info", {'plugindiv': $this,'level':'info'}, display_message);
-                    $.subscribe("messages:debug", {'plugindiv': $this,'level':'debug'}, display_message);
-                    $.publish  ("messages:info", 'Subscribed to all 5 message channels');
-                    /* End of plugin initialization */
-                }
+            return this.each (function() {
+                var $this = $(this);
+		instance=new Messages (options,$this);
+		$this.data('Messages',instance);
+		for (level in levels) {
+		    (function (instance,level) {
+			$.subscribe("messages:"+level, function (e, msg){ instance.display_message (msg,level)});
+		    }) (instance,level);
+		}
+                $.publish  ("messages:info", 'Subscribed to all 5 message channels');
             });
         },
         destroy : function( ) {
 
             return this.each(function(){
-                var $this = $(this), data = $this.data('Messages');
+                var $this = $(this), instance = $this.data('Messages');
                 $(window).unbind('Messages');
-                data.Messages.remove();
+                instance.remove();
                 $this.removeData('Messages');
             });
         },
@@ -66,19 +51,44 @@
         update : function( content ) { },
     };
 
-    /* Private methods */
+    function Messages (options,plugindiv) {
+	this.options=options;
+	this.plugindiv=plugindiv;
+	/* cannot use 'this' directly of course */
+	(function (instance) { $( function () {instance.init_buttons();}) }) (this);
 
-    function display_message(e, message) {
-	var level=e.data.level;
-	var domid=e.data.plugindiv.data('Messages').plugin_uuid;
-	var html="";
-	html += "<li class='" + level + "'>";
-	html += "<span class='messages-date'>" + new Date() + "</span>";
-	html += "<span class='messages-level'>[" + level + "]</span>";
-//	html += "[" + domid + "]";
-	html += " " + message + "</li>";
-	$("ul#"+domid+".messages").append(html);
-    }
+	this.is_active = function (level) { 
+	    return this.plugindiv.find("div.messages-buttons>input[name="+level+"]").get(0).checked;
+	}
+	this.display_message = function (incoming, level) {
+	    var domid=this.plugindiv.attr('id');
+	    var html="";
+	    html += "<li class='" + level +"'"; 
+	    if ( ! this.is_active(level) ) html += " style='display:none'";
+	    html += ">";
+	    html += "<span class='messages-date'>" + new Date() + "</span>";
+	    html += "<span class='messages-level'>[" + level + "]</span>";
+	    //	html += "[" + domid + "]";
+	    html += " " + incoming + "</li>";
+	    $("ul#"+domid+".messages").append(html);
+	},
+
+
+	this.init_buttons = function () {
+	    this.plugindiv.find("div.messages-buttons>input").each(this.init_button);
+	},
+	this.init_button = function (_,input) {
+	    var level=input.name;
+	    input.checked=levels[level];
+	    console.log ("init_button did set initial status of " + level + " to " + input.checked);
+	    $(input).on('click',this.toggle_level);
+	},
+
+	this.toggle_level = function () {
+	    console.log("clicked, this= " + this + " this.name=" + this.name + " this.checked=" + this.checked);
+	}
+
+    };
     
 })(jQuery);
 
@@ -86,8 +96,8 @@
 
 var messages_test = {
     // set this to 0 to disable
-    counter : 3,
-    period : 3000,
+    counter : 2,
+    period : 1000,
     sample : function () { 
 	$.publish("messages:fatal","a fatal message (" + messages_test.counter + " runs to go)");
 	$.publish("messages:error","an error message");
@@ -99,7 +109,8 @@ var messages_test = {
 	    window.clearInterval (messages_test.interval_id);
     },
     run: function () {
-	messages_test.interval_id=window.setInterval(messages_test.sample , 5000);
+	messages_test.interval_id=window.setInterval(messages_test.sample , messages_test.period);
     }
 }
 messages_test.run()
+

@@ -1,9 +1,13 @@
-/* http://www.w3schools.com/html/html_colornames.asp */
-/* someone please feel free to pick a better set of colors */
+div.messages-buttons { padding: 0px 20px 8px 50px; }
+div.messages-buttons>input {
+    padding: 10px;
+}
+
 ul.messages {
-    background-color: #d0f0d0;
+/*    background-color: #d0f0d0; */
     list-style-type: none;
 }
+/* someone please feel free to pick a better set of colors */
 li.fatal { background-color: CornflowerBlue;}
 li.error { background-color: Coral; }
 li.warning { background-color: Gold; }
@@ -20,3 +24,4 @@ span.messages-level {
     width: 40px;
     font-size: 90%;
 }
+
