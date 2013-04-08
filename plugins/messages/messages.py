@@ -10,7 +10,7 @@ class Messages (Plugin):
 
     def requirements (self):
         return {
-            'js_files' :  "js/messages.js", 
+            'js_files' :  [ "js/messages.js", "js/manifold.js", ],
             'css_files' : "css/messages.css",
             }
 

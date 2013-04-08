@@ -1,10 +1,8 @@
 div.messages-buttons { padding: 0px 20px 8px 50px; }
-div.messages-buttons>input {
-    padding: 10px;
-}
+div.messages-buttons>input { margin: 10px; }
+div.messages-buttons>span { font-weight: bold; }
 
 ul.messages {
-/*    background-color: #d0f0d0; */
     list-style-type: none;
 }
 /* someone please feel free to pick a better set of colors */

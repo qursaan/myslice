@@ -78,14 +78,27 @@
 	    this.plugindiv.find("div.messages-buttons>input").each(this.init_button);
 	},
 	this.init_button = function (_,input) {
+	    /* set 'checked' state for that input from global 'levels' above */
 	    var level=input.name;
 	    input.checked=levels[level];
-	    console.log ("init_button did set initial status of " + level + " to " + input.checked);
-	    $(input).on('click',this.toggle_level);
-	},
-
-	this.toggle_level = function () {
-	    console.log("clicked, this= " + this + " this.name=" + this.name + " this.checked=" + this.checked);
+	    var toggle_level = function (input,level) {
+		console.log("input=" + input + " name=" + input.name);
+		var was_visible=input.checked;
+		var visible=!was_visible;
+		console.log('clic - was_visible=' + was_visible + " visible=" + visible);
+		var css_display=(visible ? "display:list-item" : "display:none");
+		console.log("Before setting input.checked=" + input.checked);
+		input.checked=visible;
+		console.log("After setting input.checked=" + input.checked);
+		var plugindiv=$(input).closest("div.Messages");
+		console.log("setting css display: " + css_display + " for level=" + level);
+		plugindiv.find("li."+level).css(css_display);
+		console.log("leaving input with checked=" + input.checked);
+	    };
+	    $(input).click(function (event) { 
+		event.preventDefault(); 
+		toggle_level(this,level); 
+	    });
 	}
 
     };
