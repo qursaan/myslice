@@ -3,9 +3,9 @@
 from copy import deepcopy
 
 standard_topmenu_items = [ 
-    { 'label':'Tab', 'href': '/tab/'},
-    { 'label':'Scroll', 'href': '/scroll/'},
-    { 'label':'Plugin', 'href': '/plugin/'},
+#    { 'label':'Tab', 'href': '/tab/'},
+#    { 'label':'Scroll', 'href': '/scroll/'},
+    { 'label':'One Plugin', 'href': '/plugin/'},
     { 'label':'Dashboard', 'href': '/dashboard/'},
     { 'label':'Slice', 'href': '/slice/'},
     ]
