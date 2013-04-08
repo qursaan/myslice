@@ -47,7 +47,6 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title="Runtime messages",
                 domid="msgs-pre",
-                toggled=False,
                 ),
             Tabs (
                 page=page,
@@ -137,7 +136,7 @@ def slice_view (request, slicename=tmp_default_slice):
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
-    template_env [ 'title' ] = 'Test view for hazelnut'
+    template_env [ 'title' ] = 'Test view that combines various plugins'
     # the menu items on the top
     template_env [ 'topmenu_items' ] = topmenu_items('slice', request) 
     # so we can sho who is logged
