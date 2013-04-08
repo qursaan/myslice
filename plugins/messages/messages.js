@@ -31,6 +31,8 @@
 			$.subscribe("messages:"+level, function (e, msg){ instance.display_message (msg,level)});
 		    }) (instance,level);
 		}
+		// this happens very early - even before the document is loaded
+		// so it won't show right away; no big deal though
                 $.publish  ("messages:info", 'Subscribed to all 5 message channels');
             });
         },
@@ -92,11 +94,11 @@
 	/* as an event handler toggle_handler will see the DOM <input> as 'this' */
 	this.toggle_handler = function (e) {
 	    var $this=$(this);
-	    var before=$this.attr('checked');
+	    // toggle the state of the checkbox
 	    if ($this.attr('checked')) $this.removeAttr('checked');
 	    else $this.attr('checked',true);
+	    // turn messages on or off
 	    var level=this.name;
-	    var after=$this.attr('checked');
 	    var display = $this.attr('checked') ? "list-item" : "none";
 	    var plugindiv=$this.closest("div.Messages");
 	    plugindiv.find("li."+level).css("display",display);
@@ -106,8 +108,7 @@
     
 })(jQuery);
 
-// temporary
-
+/* turn this on for an auto-test on startup
 var messages_test = {
     // set this to 0 to disable
     counter : 2,
@@ -127,4 +128,4 @@ var messages_test = {
     }
 }
 messages_test.run()
-
+*/

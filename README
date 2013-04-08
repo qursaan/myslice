@@ -92,6 +92,7 @@ Third party tools shipped:
 * datatables
 * spin
 * bootstrap
+* and others are added as we build the system when they become needed
 
 I've tried to keep track of the version I picked and to have an easy upgrade path.
 
