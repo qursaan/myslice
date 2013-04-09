@@ -13,7 +13,7 @@ class Updater (Plugin):
 
     def requirements (self):
         return {
-            'js_files' :  [ "js/updater.js" ],
+            'js_files' :  [ "js/updater.js" , "js/manifold.js", "js/manifold-query.js", ],
             'css_files' : "css/updater.css",
             }
 

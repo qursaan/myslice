@@ -6,7 +6,7 @@
 
 ( function ( $ ) {
     
-    $.fn.Updater = function( method ) {
+    $.fn.Updater = function ( method ) {
         /* Method calling logic */
         if ( methods[method] ) {
             return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -14,12 +14,10 @@
             return methods.init.apply( this, arguments );
         } else {
             $.error( 'Method ' +  method + ' does not exist on $.Updater' );
-        }    
-	
+        }
     };
     
     var methods = {
-	
 	init : function( options ) {
 	    return this.each(function(){
 		var $this = $(this);
@@ -28,100 +26,107 @@
 		/* Subscribe to query updates */
                 var results_channel = '/results/' + options.query_uuid + '/changed';
 		$.subscribe(results_channel, function (e,rows) { updater.update_slice (e,rows); } );
-
-
-	// xxx - here -- here -- xxx
-
-            $('#updater-' + options.plugin_uuid).click({instance: $this}, function (e) {
-                var data = e.data.instance.data().Slices;
-                tophat_async_exec([{'query': data.update_query, 'id': null}]);
-                //$('#updateslice-' + options.plugin_uuid).prop('disabled', true);
+		updater.arm_button();
+	    });
+	},
+	destroy : function( ) {
+            return this.each(function(){
+		var $this = $(this);
+		$(window).unbind('Updater');
+		data.Updater.remove();
+		$this.removeData('Updater');
             });
+	},
 
-            /* End of plugin initialization */
+	show : function( content ) { }
+    };
+    
+    function Updater (options) {
+	this.options=options;
+	// xxx should try to locate update_query first, in case we have several Updaters
+	// on the same query
+	// however the mental model behind the global manifold object for now is 
+	// to unambiguously find a query based on its query_uuid, which in the joomla
+	// implementation wouldn't fly
+	// we keep this for a later improvement
+	var query=manifold.find_query (options.query_uuid);
+	// very rough way of filling this for now
+	this.update_query = 
+	    new ManifoldQuery ("update", query.subject, null, query.filters, 
+			       {}, // params
+			       query.fields, 
+			       undefined, /* unique */ 
+			       query.query_uuid, /* tmp */
+			       undefined, undefined /* maybe some day I'll get that one */);
 
-            $(this).data('Slices', {
-                options: options,
-                target : $this,
-                update_query : null,
-                child_subscribe: false, /* Are we listening for children updates */
-                Slices : Slices
-            });
-
-         }
-       });
-     },
-    destroy : function( ) {
-
-        return this.each(function(){
-            var $this = $(this), data = $this.data('Slices');
-            $(window).unbind('Slices');
-            data.Slices.remove();
-            $this.removeData('Slices');
-        })
-
-    },
-
-    show : function( content ) { }
-  };
+	this.arm_button = function () {
+	    $('#updater-' + this.options.plugin_uuid).click(this, this.submit_update_request);
+	},
+	this.submit_update_request = function (e) {
+	    var update_query = e.data.update_query;
+	    $.publish("messages:debug","Updater.submit_update_request " + update_query.__repr());
+	    // xxx here - we need a valid query_uuid so the results will make it
+	    manifold.asynchroneous_exec ( [ {'query_uuid': xxx, 'id': null}]);
+	    // looks like a previous attempt to disable the button while the query is flying
+            //$('#updateslice-' + options.plugin_uuid).prop('disabled', true);
+        }
+    };
 
     /* Private methods */
 
-    function update_resources(e, resources, change)
-    {
+    function update_resources(e, resources, change) {
         data = e.data.instance.data().Slices;
 
         data.update_query.params['resource'] = resources
         $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
     }
 
-    function update_leases(e, leases, change)
-    {
-        data = e.data.instance.data().Slices;
-
-        data.update_query.params['lease'] = leases
-        $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
-    }
-
-    function update_slice(e, rows, query) {
-        /* This function is called twice : get and update */
-
-        var data = e.data.instance.data().Slices;
-
-        /* Update placeholders and trigger subqueries updates */
-        if (rows.length == 0) {
-            alert("no result");
-            return;
-        }
-        var slice = rows[0];
-
-        /* for get */
-        if (data.update_query == null) {
-            data.update_query = new Query('update','slice', 'now', query.filter, {"resource": null, "lease": null}, query.fields, 0, data.options.query_uuid);
-        }
-        /* In case of update the list of resources and leases should be updated accordingly */
-
-        /* only for get ? */
-        $.each(slice, function(key, value) {
-            if (typeof value == 'string') {
-                $('#myslice__' + key).html(value);
-            }
-        });
-
-        /* TODO avoid repetitions + made this code generic and plugin-independent */
-
-        if (query.method == 'update') {
-            // XXX NON, les uuid doivent etre les memes que dans la query Get, cet appel devrait etre fait avant.
-            query.analyzed_subqueries();
-        }
-
-        /* NOTE: Dans le cadre d'un update, on n'a pas besoin de refaire tout
-         * le query plan et obtenir toutes les infos, par contre on ne peut pas
-         * savoir d'avance quels parametres ont été accordés, changés, etc.
-         * Dans le cas général, ca pourrait affecter le query plan...
-         * Par contre on n'a pas d'information sur toutes les resources, mais
-         * uniquement celles dans la liste. Comment gérer ?
-         */
+  function update_leases(e, leases, change) {
+      data = e.data.instance.data().Slices;
+      
+      data.update_query.params['lease'] = leases
+      $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
+  }
+  
+  function update_slice(e, rows, query) {
+      /* This function is called twice : get and update */
+      
+      var data = e.data.instance.data().Slices;
+      
+      /* Update placeholders and trigger subqueries updates */
+      if (rows.length == 0) {
+          alert("no result");
+          return;
+      }
+      var slice = rows[0];
+      
+      /* for get */
+      if (data.update_query == null) {
+          data.update_query = new Query('update','slice', 'now', query.filter, {"resource": null, "lease": null}, query.fields, 0, data.options.query_uuid);
+      }
+      /* In case of update the list of resources and leases should be updated accordingly */
+      
+      /* only for get ? */
+      $.each(slice, function(key, value) {
+          if (typeof value == 'string') {
+              $('#myslice__' + key).html(value);
+          }
+      });
+      
+      /* TODO avoid repetitions + made this code generic and plugin-independent */
+      
+      if (query.method == 'update') {
+          // XXX NON, les uuid doivent etre les memes que dans la query Get, cet appel devrait etre fait avant.
+          query.analyzed_subqueries();
+      }
+      
+      /* NOTE: Dans le cadre d'un update, on n'a pas besoin de refaire tout
+       * le query plan et obtenir toutes les infos, par contre on ne peut pas
+       * savoir d'avance quels parametres ont été accordés, changés, etc.
+       * Dans le cas général, ca pourrait affecter le query plan...
+       * Par contre on n'a pas d'information sur toutes les resources, mais
+       * uniquement celles dans la liste. Comment gérer ?
+       */
 
         /* Inform child plugins about their respective parts of the results */
         /* Only for get */
