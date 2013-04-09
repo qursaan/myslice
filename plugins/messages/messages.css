@@ -1,10 +1,29 @@
+/* the buttons area */
 div.messages-buttons { padding: 0px 20px 8px 50px; }
-div.messages-buttons>input { margin: 10px; }
+div.messages-buttons>input { margin: 3px 10px 3px 20px ; }
 div.messages-buttons>span { font-weight: bold; }
 
+/* layout of messages per se */
 ul.messages {
     list-style-type: none;
+    /* a trick so that long lines wrap nicely */
+    padding-left: 280px;
+    text-indent: -280px;
+
 }
+span.messages-date { 
+    font-size: 75%;
+    width: 200px ;
+    float: center;
+    padding: 0px 10px 0px 10px;
+}
+
+span.messages-level {
+    font-size: 90%;
+    float: left;
+    width: 40px;
+}
+
 /* someone please feel free to pick a better set of colors */
 li.fatal { background-color: CornflowerBlue;}
 li.error { background-color: Coral; }
@@ -12,14 +31,4 @@ li.warning { background-color: Gold; }
 li.info { background-color: LightGreen; }
 li.debug { background-color: Azure; } 
 
-span.messages-date { 
-    font-size: 75%;
-    padding: 0px 1em 0px 2em;
-}
-
-span.messages-level {
-    float: left;
-    width: 40px;
-    font-size: 90%;
-}
 
