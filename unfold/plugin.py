@@ -66,7 +66,7 @@ class Plugin:
     # which will result in 'foo' being accessible to the template engine
     # 
     def __init__ (self, page, title, domid=None,
-                  visible=True, togglable=True, toggled=None, **settings):
+                  visible=True, togglable=None, toggled=None, **settings):
         self.page = page
         self.title=title
         # callers can provide their domid for css'ing 
@@ -75,9 +75,10 @@ class Plugin:
         self.classname=self._py_classname()
         self.plugin_classname=self._js_classname()
         self.visible=visible
-        self.togglable=togglable
-        if toggled is not None: self.toggled=toggled
-        else:                   self.toggled=self.default_toggled()
+        if togglable is None:   self.togglable=self.default_togglable()
+        else:                   self.togglable=togglable
+        if toggled is None:     self.toggled=self.default_toggled()
+        else:                   self.toggled=toggled
         # what comes from subclasses
         for (k,v) in settings.iteritems():
             setattr(self,k,v)
@@ -250,6 +251,7 @@ class Plugin:
     def template_file (self):           return "undefined_template"
     def template_env (self, request):   return {}
 
+    def default_togglable (self):       return True
     def default_toggled (self):         return 'persistent'
 
 #    # tell the framework about requirements (for the document <header>)
