@@ -4,6 +4,8 @@
  * License: GPLv3
  */
 
+// xxx this is ongoing work, very rough, and not working at all yet 
+
 ( function ( $ ) {
     
     $.fn.Updater = function ( method ) {
