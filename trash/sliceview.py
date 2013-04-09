@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from unfold.page import Page
 from manifold.manifoldquery import ManifoldQuery
 
+from plugins.raw.raw import Raw
 from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
 from plugins.lists.slicelist import SliceList
@@ -89,13 +90,21 @@ def slice_view (request, slicename=tmp_default_slice):
                         togglable=False,
                         query=main_query,
                         ),
-                    SensLabMap (
+                    Raw (
+#                    SensLabMap (
                         page=page,
-                        title='3D view',
+                        title='3D view (disabled)',
                         domid='smap',
-                        # tab's sons preferably turn this off
+#                        # tab's sons preferably turn this off
                         togglable=False,
-                        query=main_query,
+#                        query=main_query,
+                        html="""<p class='well'>
+Thierry: I am commeting off the use of <button class="btn btn-danger">SensLabMap</button> which,
+ although rudimentarily ported to the django framework, 
+causes a weird behaviour especially wrt scrolling. 
+On my Mac <button class="btn btn-warning"> I cannot use the mouse to scroll</button> any longer
+if I keep this active, so for now it's disabled
+</p>""",
                         ),
                     ]),
             Hazelnut ( 
