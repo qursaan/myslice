@@ -25,27 +25,28 @@ var manifold = {
 
     insert_query : function (query) { 
 	manifold.all_queries[query.query_uuid]=query; 
-   },
+    },
     find_query : function (query_uuid) { 
 	return manifold.all_queries[query_uuid];
     },
     debug_all_queries : function (msg) {
 	for (var query_uuid in manifold.all_queries) {
-	    console.log("manifold.debug " + msg + " " + query_uuid + " -> " + manifold.all_queries[query_uuid]);
+	    $.publish("messages:debug","manifold.debug " + msg + " " + query_uuid + " -> " + manifold.all_queries[query_uuid]);
 	}
     },
 
     // trigger a query asynchroneously
     proxy_url : '/manifold/proxy/json/',
 
-    asynchroneous_debug : false,
+    asynchroneous_debug : true,
 
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_uuid_domids) {
 	// start spinners
 
-	if (manifold.asynchroneous_debug) console.log("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
+	if (manifold.asynchroneous_debug) 
+	    $.publish("messages.debug","Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
 	jQuery('.need-spin').spin(spin_presets);
 	
 	// We use js function closure to be able to pass the query (array) to the
@@ -58,7 +59,7 @@ var manifold = {
 	    var query=manifold.find_query(tuple.query_uuid);
 	    var query_json=JSON.stringify (query);
 	    if (manifold.asynchroneous_debug) {
-		console.log ("sending POST on " + manifold.proxy_url + " with query= " + query.__repr());
+		$.publish("messages:debug","sending POST on " + manifold.proxy_url + " with query= " + query.__repr());
 	    }
 	    // not quite sure what happens if we send a string directly, as POST data is named..
 	    // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
@@ -67,7 +68,8 @@ var manifold = {
 	    },
 
     asynchroneous_success : function (data, query, id) {
-	if (manifold.asynchroneous_debug) console.log ("received manifold result with code " + data.code);
+	if (manifold.asynchroneous_debug) 
+	    $.publish("messages:debug","received manifold result with code " + data.code);
 	// xxx should have a nicer declaration of that enum in sync with the python code somehow
 	if (data.code == 1) {
 	    alert("Your session has expired, please log in again");

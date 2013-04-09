@@ -8,6 +8,7 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
+from manifold.manifoldquery import ManifoldQuery
 
 from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
@@ -15,6 +16,7 @@ from plugins.lists.staticlist import StaticList
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.raw.raw import Raw
 from plugins.messages.messages import Messages
+from plugins.updater.updater import Updater
 
 from myslice.viewutils import topmenu_items, the_user
 from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
@@ -27,12 +29,32 @@ def test_plugin_view (request):
     # variables that will get passed to this template
     template_env = {}
     
+    slicename='ple.inria.omftest'
+    main_query = ManifoldQuery (action='get',
+                                subject='resource',
+                                timestamp='latest',
+                                fields=['network','type','hrn','hostname'],
+                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
+                                )
+
     main_plugin = \
+        Stack (
+        page=page,
+        title='thestack',
+        togglable=False,
+        sons=[ \
             Messages (
                 page=page,
                 title="Runtime messages",
                 domid="msgs-pre",
-                )
+                ),
+            Updater (
+                    page=page,
+                    title="Update me",
+                    query=main_query,
+                    label="Update me",
+                    ),
+            ])
 
     # define 'unfold1_main' to the template engine
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
