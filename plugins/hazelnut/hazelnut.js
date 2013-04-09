@@ -40,11 +40,11 @@
             return this.each(function() {
                 var $this = $(this);
                 /* Events */
-                $(this).on('show.Datatables', methods.show);
+                $this.on('show.Datatables', methods.show);
 
                 /* An object that will hold private variables and methods */
 		var hazelnut = new Hazelnut (options);
-                $(this).data('Hazelnut', hazelnut);
+                $this.data('Hazelnut', hazelnut);
 
                 var query_channel   = '/query/' + options.query_uuid + '/changed';
                 var update_channel  = '/update-set/' + options.query_uuid;
