@@ -60,6 +60,7 @@
 			       undefined, /* unique */ 
 			       Math.uuid(32,16), 
 			       undefined, undefined /* maybe some day I'll get that one */);
+	manifold.insert_query (this.update_query);
 	// arm button once document is loaded
 	(function(updater) {$(document).ready(function(){updater.arm_button()})})(this);
 
@@ -71,8 +72,8 @@
 	    var query_uuid = e.data.options.query_uuid;
 	    var update_query = e.data.update_query;
 	    $.publish("/messages/debug","Updater.submit_update_request " + update_query.__repr());
-	    // publish results as if coming from the original query
-	    manifold.asynchroneous_exec ( [ {'query_uuid': query_uuid, 'publish_uuid' : update_query.query_uuid} ]);
+	    // actually send the Update query, but publish results as if coming from the original query
+	    manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ]);
 	    // looks like a previous attempt to disable the button while the query is flying
             //$('#updateslice-' + options.plugin_uuid).prop('disabled', true);
         },
