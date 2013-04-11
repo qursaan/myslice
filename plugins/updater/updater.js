@@ -51,24 +51,23 @@
 	// implementation wouldn't fly
 	// we keep this for a later improvement
 	var query=manifold.find_query (options.query_uuid);
-	console.log("retrieved query " + query.__repr());
+	messages.info("retrieved query " + query.__repr());
 	// very rough way of filling this for now
 	this.update_query = 
 	    new ManifoldQuery ("update", query.subject, null, query.filters, 
 			       {}, // params
 			       query.fields, 
 			       undefined, /* unique */ 
-			       query.query_uuid, /* tmp */
+			       Math.uuid(32,16), 
 			       undefined, undefined /* maybe some day I'll get that one */);
 	// arm button once document is loaded
 	(function(updater) {$(document).ready(function(){updater.arm_button()})})(this);
 
 	this.arm_button = function () {
-	    console.log("arm_button");
 	    $('#updater-' + this.options.plugin_uuid).click(this, this.submit_update_request);
 	},
 	this.submit_update_request = function (e) {
-	    console.log("submit_update_request");
+	    messages.debug("submit_update_request");
 	    var query_uuid = e.data.options.query_uuid;
 	    var update_query = e.data.update_query;
 	    $.publish("/messages/debug","Updater.submit_update_request " + update_query.__repr());
@@ -93,7 +92,9 @@
 	},
   
 	update_slice = function (e, rows, query) {
+
 	    /* This function is called twice : get and update */
+
       
 	    var data = e.data.instance.data().Slices;
       

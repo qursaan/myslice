@@ -40,6 +40,8 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.min.js)
 # for storing the visible status of plugins
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.min.js)
+# creating queries uuids on the fly
+THIRD-PARTY-RESOURCES += $(shell ls third-party/uuid/Math.uuid.js)
 # spin comes in plain or min, + the jquery plugin, and our own settings
 THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
 # used in QueryCode
