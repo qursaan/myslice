@@ -8,6 +8,9 @@
 
 ( function ( $ ) {
     
+    var debug=false;
+//    debug=true
+
     $.fn.Updater = function ( method ) {
         /* Method calling logic */
         if ( methods[method] ) {
@@ -25,9 +28,12 @@
 		var $this = $(this);
 		var updater = new Updater (options);
 		$this.data('Updater',updater);
-		/* Subscribe to query updates */
+		// xxx not tested yet
                 var results_channel = '/results/' + options.query_uuid + '/changed';
-		$.subscribe(results_channel, function (e,rows) { updater.update_slice (e,rows); } );
+		$.subscribe(results_channel, function (e,rows) { updater.query_completed (e,rows); } );
+		// under test..
+		var failed_channel = '/results/' + options.query_uuid + '/failed';
+		$.subscribe(failed_channel, $this, function (e,code,output) { updater.query_failed (e, code, output); } );
 	    });
 	},
 	destroy : function( ) {
@@ -51,7 +57,6 @@
 	// implementation wouldn't fly
 	// we keep this for a later improvement
 	var query=manifold.find_query (options.query_uuid);
-	messages.info("retrieved query " + query.__repr());
 	// very rough way of filling this for now
 	this.update_query = 
 	    new ManifoldQuery ("update", query.subject, null, query.filters, 
@@ -68,16 +73,23 @@
 	    $('#updater-' + this.options.plugin_uuid).click(this, this.submit_update_request);
 	},
 	this.submit_update_request = function (e) {
-	    messages.debug("submit_update_request");
 	    var query_uuid = e.data.options.query_uuid;
 	    var update_query = e.data.update_query;
-	    messages.debug("Updater.submit_update_request " + update_query.__repr());
+	    if (debug) messages.debug("Updater.submit_update_request " + update_query.__repr());
 	    // actually send the Update query, but publish results as if coming from the original query
-	    manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ]);
-	    // looks like a previous attempt to disable the button while the query is flying
-            //$('#updateslice-' + options.plugin_uuid).prop('disabled', true);
+	    manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ], false);
+	    // disable button while the query is flying
+            $('#updater-' + e.data.options.plugin_uuid).attr('disabled', 'disabled');
         },
 
+	this.query_failed = function (e, code, output) {
+	    var plugindiv=e.data;
+	    var updater=plugindiv.data('Updater');
+            $('#updater-' + updater.options.plugin_uuid).removeAttr('disabled');
+	    // just as a means to deom how to retrieve the stuff passed on the channel
+	    if (debug) messages.debug("retrieved error code " + code + " and output " + output);
+	}
+	    
 	update_resources = function (e, resources, change) {
             data = e.data.instance.data().Slices;
 
@@ -92,10 +104,12 @@
 	    $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
 	},
   
-	update_slice = function (e, rows, query) {
+	    
+
+	query_completed = function (e, rows, query) {
 
 	    /* This function is called twice : get and update */
-
+	    messages.info("updater.query_completed - not implemented yet");
       
 	    var data = e.data.instance.data().Slices;
       

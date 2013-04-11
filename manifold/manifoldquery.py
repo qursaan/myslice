@@ -31,8 +31,9 @@ class ManifoldQuery:
         self.subqueries = {}
 
     def __repr__ (self):
-        result="Q: id=%(query_uuid)s - %(action)s on %(subject)s "%self.__dict__
+        result="[[Q: id=%(query_uuid)s - %(action)s on %(subject)s "%self.__dict__
         result += " with %d filters, %d fields"%(len(self.filters),len(self.params))
+        result += "]]"
         return result
 
     def to_json (self):

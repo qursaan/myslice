@@ -29,11 +29,6 @@ var manifold = {
     find_query : function (query_uuid) { 
 	return manifold.all_queries[query_uuid];
     },
-    debug_all_queries : function (msg) {
-	for (var query_uuid in manifold.all_queries) {
-	    messages.debug("manifold.debug " + msg + " " + query_uuid + " -> " + manifold.all_queries[query_uuid]);
-	}
-    },
 
     // trigger a query asynchroneously
     proxy_url : '/manifold/proxy/json/',
@@ -79,27 +74,30 @@ var manifold = {
     // however in some cases we wish to publish the results under a different uuid
     // e.g. an updater wants to publish its results as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, domid) {
-	if (manifold.asynchroneous_debug) messages.debug("received manifold result with code " + data.code);
+	if (manifold.asynchroneous_debug) 
+	    messages.debug("received manifold result with code " + data.code + " for publish on " + publish_uuid);
 	// xxx should have a nicer declaration of that enum in sync with the python code somehow
 	if (data.code == 1) {
 	    alert("Your session has expired, please log in again");
 	    window.location="/logout/";
 	    return;
 	} else if (data.code != 0) {
-	    alert("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
+	    messages.error("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
+	    // publish error code and text message on a separate channel for whoever is interested
+	    jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.output] );
 	    return;
 	}
 	// once everything is checked we can use the 'value' part of the manifoldresult
-	data=data.value;
-	if (data) {
+	var value=data.value;
+	if (value) {
             if (!!domid) {
 		/* Directly inform the requestor */
 		if (manifold.asynchroneous_debug) messages.debug("directing results to " + domid);
-		jQuery('#' + domid).trigger('results', [data]);
+		jQuery('#' + domid).trigger('results', [value]);
             } else {
 		/* Publish an update announce */
 		if (manifold.asynchroneous_debug) messages.debug("publishing results on " + publish_uuid);
-		jQuery.publish("/results/" + publish_uuid + "/changed", [data, query]);
+		jQuery.publish("/results/" + publish_uuid + "/changed", [value, query]);
             }
 
 	}

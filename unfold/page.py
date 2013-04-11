@@ -74,8 +74,10 @@ class Page:
             return result
         env['query_publish_dom_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
         javascript = render_to_string ("page-queries.js",env)
-#        self.reset_queue()
         self.add_js_chunks (javascript)
+#        self.reset_queue()
+        # unconditionnally expose MANIFOLD_URL, this is small and manifold.js uses that for various messages
+        self.expose_js_manifold_config()
 
 
     # needs to be called explicitly and only when metadata is actually required

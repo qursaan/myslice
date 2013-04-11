@@ -14,6 +14,7 @@ from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
 from plugins.lists.staticlist import StaticList
 from plugins.quickfilter.quickfilter import QuickFilter
+from plugins.querycode.querycode import QueryCode
 from plugins.raw.raw import Raw
 from plugins.messages.messages import Messages
 from plugins.hazelnut.hazelnut import Hazelnut
@@ -32,7 +33,7 @@ def test_plugin_view (request):
     
     slicename='ple.inria.omftest'
     main_query = ManifoldQuery (action='get',
-                                subject='resource',
+                                subject='slice',
                                 timestamp='latest',
                                 fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],

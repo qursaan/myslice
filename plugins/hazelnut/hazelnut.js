@@ -50,8 +50,11 @@
                 var update_channel  = '/update-set/' + options.query_uuid;
                 var results_channel = '/results/' + options.query_uuid + '/changed';
 
+		// xxx not tested yet
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
+		// xxx not tested yet
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
+		// expected to work
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
 		if (debug) messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
 
