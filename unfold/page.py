@@ -41,29 +41,40 @@ class Page:
 
     def get_plugin (self, domid):
         return self._plugins.get(domid,None)
-    
-    def reset_queue (self):
-        self._queries = set()
-        self._queue = []
 
-    # the js async methods (see manifold.asynchroneous_success)
-    # offer the option to deliver the result to a specific DOM elt
-    # otherwise (i.e. if domid not provided) 
-    # it goes through the pubsub using query's uuid
-    def enqueue_query (self, query, domid=None):
+    # not sure this is useful at all
+#    def reset_queue (self):
+#        self._queries = set()
+#        self._queue = []
+
+    # this method adds a query to the page
+    # the query will be exposed to js when calling expose_queries
+    # additionally if exec is set to True, this query will be asynchroneously triggered on page load
+    # in this case (exec=True) the js async callback (see manifold.asynchroneous_success)
+    # offers the option to deliver the result to a specific DOM elt (in this case, set domid)
+    # otherwise (i.e. if domid not provided), it goes through the pubsub system (so all plugins can receive it)
+    def enqueue_query (self, query, run_it=True, domid=None):
+        # _queries is the set of all known queries
         self._queries = self._queries.union(set( [ query, ] ))
-        self._queue.append ( (query.query_uuid,domid,) )
+        # _queue is the list of queries that need to be triggered, with an optional domid
+        # we only do this if run_it is set
+        if run_it: self._queue.append ( (query.query_uuid,domid) )
 
-    # return the javascript that triggers all the queries
-    # xxx could fruitfully be renamed expose_queries_to_javascript or something
-    def exec_queue_asynchroneously (self):
+    # return the javascript code for exposing queries
+    # all queries are inserted in the global manifold object
+    # in addition, the ones enqueued with 'run_it=True' are triggered 
+    def expose_queries (self):
         # compute variables to expose to the template
         env = {}
         # expose the json definition of all queries
         env['queries_json'] = [ query.to_json() for query in self._queries ]
-        env['query_uuid_domids'] = [ {'query_uuid' : a, 'domid': '"%s"'%b if b else 'null'} for (a,b) in self._queue ]
+        def query_publish_dom_tuple (a,b):
+            result={'query_uuid':a}
+            if b: result['domid']=b
+            return result
+        env['query_publish_dom_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
         javascript = render_to_string ("page-queries.js",env)
-        self.reset_queue()
+#        self.reset_queue()
         self.add_js_chunks (javascript)
 
 

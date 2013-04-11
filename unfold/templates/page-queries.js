@@ -1,8 +1,9 @@
-{% for json in queries_json %} manifold.insert_query({{ json|safe }});
+{% for json in queries_json %}manifold.insert_query({{ json|safe }});
 {% endfor %}
 $(document).ready(function () {
-  var query_uuid_domids = new Array();
-{% for d in query_uuid_domids %}  query_uuid_domids.push({'query_uuid':"{{ d.query_uuid }}", 'id':{{ d.domid }}});
+var query_publish_dom_tuples = new Array();
+{% for d in query_publish_dom_tuples %}try {query_publish_dom_tuples.push({'query_uuid':"{{ d.query_uuid }}"{%if d.domid %},'domid':"{{ d.domid }}"{% endif %}}) } 
+catch(err){console.log ("Could not expose query {{ d.query_uuid }}")}
 {% endfor %}
-  manifold.asynchroneous_exec(query_uuid_domids);
+manifold.asynchroneous_exec(query_publish_dom_tuples);
 })

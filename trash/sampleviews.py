@@ -100,7 +100,7 @@ def test_plugin_view (request):
     template_env [ 'username' ] = the_user (request) 
 
     # we don't have anythong asynchroneous, and manifold.js is not loaded
-#    page.exec_queue_asynchroneously ()
+#    page.expose_queries ()
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}

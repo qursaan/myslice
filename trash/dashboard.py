@@ -96,7 +96,7 @@ def dashboard_view (request):
     page.add_css_files ( 'css/dashboard.css')
     
     # don't forget to run the requests
-    page.exec_queue_asynchroneously ()
+    page.expose_queries ()
 
     # xxx create another plugin with the same query and a different layout (with_datatables)
     # show that it worls as expected, one single api call to backend and 2 refreshed views

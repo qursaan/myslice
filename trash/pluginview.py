@@ -16,6 +16,7 @@ from plugins.lists.staticlist import StaticList
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.raw.raw import Raw
 from plugins.messages.messages import Messages
+from plugins.hazelnut.hazelnut import Hazelnut
 from plugins.updater.updater import Updater
 
 from myslice.viewutils import topmenu_items, the_user
@@ -36,6 +37,7 @@ def test_plugin_view (request):
                                 fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
                                 )
+    page.enqueue_query (main_query, run_it=False)
 
     main_plugin = \
         Stack (
@@ -43,10 +45,14 @@ def test_plugin_view (request):
         title='thestack',
         togglable=False,
         sons=[ \
+#            Hazelnut (page=page, 
+#                      query=main_query,
+#                      ),
             Messages (
                 page=page,
                 title="Runtime messages",
                 domid="msgs-pre",
+                levels='ALL',
                 ),
             Updater (
                     page=page,
@@ -64,8 +70,8 @@ def test_plugin_view (request):
     template_env [ 'topmenu_items' ] = topmenu_items('plugin', request) 
     template_env [ 'username' ] = the_user (request) 
 
-    # we don't have anythong asynchroneous, and manifold.js is not loaded
-#    page.exec_queue_asynchroneously ()
+    # run queries when we have any
+    page.expose_queries ()
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
