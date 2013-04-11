@@ -62,9 +62,11 @@ class ManifoldAPI:
 
     def send_manifold_query (self, query):
         (action,subject)= (query.action,query.subject)
+        # use e.g. self.Get rather than self.server.Get so we catch exceptions as per __getattr__
         if action=='get':
-            # use self.Get rather than self.server.Get so we catch exceptions as per __getattr__
-            return self.Get(subject, query.filters, query.timestamp, query.fields)
+# this makes the backend to squeak and one can't login anymore...
+#            return self.Get(subject, query.filters, query.timestamp, query.fields)
+            return self.Get(subject, query.filters, {}, query.fields)
         if action=='update':
             return self.Update(subject, query.filters, query.params, query.fields)
         else:
