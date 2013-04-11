@@ -60,11 +60,14 @@ class ManifoldAPI:
                 return ManifoldResult (code=ManifoldResult.UNKNOWN_ERROR, output="%s"%error)
         return func
 
-    def send_manifold_query (self, manifold_query):
-        (action,subject)= (manifold_query.action,manifold_query.subject)
+    def send_manifold_query (self, query):
+        (action,subject)= (query.action,query.subject)
         if action=='get':
             # use self.Get rather than self.server.Get so we catch exceptions as per __getattr__
-            return self.Get(subject, manifold_query.filters, {}, manifold_query.fields)
-        # xxx...
+            return self.Get(subject, query.filters, query.timestamp, query.fields)
+        if action=='update':
+            return self.Update(subject, query.filters, query.params, query.fields)
         else:
-            print "WARNING: ManifoldAPI.send_manifold_query: only 'get' implemented for now"
+            warning="WARNING: ManifoldAPI.send_manifold_query: %s not implemented for now"%action
+            print warning
+            return ManifoldResult(code=ManifoldCode.NOT_IMPLEMENTED, output=warning)

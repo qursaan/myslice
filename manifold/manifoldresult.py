@@ -5,7 +5,8 @@ def enum(*sequential, **named):
 ManifoldCode = enum (
     SUCCESS=0,
     SESSION_EXPIRED=1,
-    OTHERS=2,
+    NOT_IMPLEMENTED=2,
+    OTHERS=3,
 )
 
 # being a dict this can be used with json.dumps
