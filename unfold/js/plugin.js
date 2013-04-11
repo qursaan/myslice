@@ -8,7 +8,7 @@ var plugin = {
     ////////// use local storage to remember open/closed toggles
     store_status : function (domid,status) {
 	var key='toggle.'+domid;
-	if (plugin.debug) console.log("storing toggle status " + status + " for " + domid + " key=" + key);
+	if (plugin.debug) messages.debug("storing toggle status " + status + " for " + domid + " key=" + key);
 	$.localStorage.setItem(key,status);
     },
     // restore last status
@@ -18,7 +18,7 @@ var plugin = {
 	var retrieved=$.localStorage.getItem(key);
 	// set default to true
 	if (retrieved==null) retrieved="true";
-	if (plugin.debug) console.log ("retrieved toggle status for " + domid + " (key=" + key + ") -> " + retrieved);
+	if (plugin.debug) messages.debug ("retrieved toggle status for " + domid + " (key=" + key + ") -> " + retrieved);
 	return retrieved;
     },
     set_toggle_status : function (domid,status) {
@@ -31,7 +31,7 @@ var plugin = {
     },
     set_from_saved_status : function (domid) {
 	var previous_status=plugin.retrieve_last_status (domid);
-	if (plugin.debug) console.log("restoring initial status for domid " + domid + " -> " + previous_status);
+	if (plugin.debug) messages.debug("restoring initial status for domid " + domid + " -> " + previous_status);
 	plugin.set_toggle_status (domid,previous_status);
     },
     // triggered upon $(document).ready

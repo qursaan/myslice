@@ -53,7 +53,7 @@
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
-		if (debug) console.log("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
+		if (debug) messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
 
             }); // this.each
         }, // init
@@ -75,7 +75,7 @@
         show : function( ) {
 	    var $this=$(this);
 	    // xxx wtf. why [1] ? would expect 0...
-	    if (debug) console.log("Hitting suspicious line in hazelnut.show");
+	    if (debug) messages.debug("Hitting suspicious line in hazelnut.show");
             var oTable = $($('.dataTable', $this)[1]).dataTable();
             oTable.fnAdjustColumnSizing()
     
@@ -103,7 +103,7 @@
 	// xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
 	this.current_query=manifold.find_query(this.options.query_uuid);
-	if (debug) console.log("Hazelnut constructor: have set current_query -> " + this.current_query);
+	if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query);
 	this.query_update = null;
         this.current_resources = Array();
 
@@ -157,7 +157,7 @@
             previous_query = this.current_query;
             /* Save the query as the current query */
             this.current_query = query;
-	    if (debug) console.log("hazelnut.set_query, current_query is now -> " + this.current_query);
+	    if (debug) messages.debug("hazelnut.set_query, current_query is now -> " + this.current_query);
             /* We check all necessary fields : in column editor I presume XXX */
             // XXX ID naming has no plugin_uuid
             if (typeof(query.fields) != 'undefined') {        
@@ -205,7 +205,7 @@
         }
 
         this.set_resources = function(resources, instance) {
-	    if (debug) console.log("entering hazelnut.set_resources");
+	    if (debug) messages.debug("entering hazelnut.set_resources");
             var options = this.options;
             var previous_resources = this.current_resources;
             this.current_resources = resources;
@@ -234,7 +234,7 @@
          * XXX will be removed/replaced
          */
         this.selected_changed = function(e, change) {
-	    if (debug) console.log("entering hazelnut.selected_changed");
+	    if (debug) messages.debug("entering hazelnut.selected_changed");
             var actions = change.split("/");
             if (actions.length > 1) {
                 var oNodes = this.table.fnGetNodes();
@@ -258,7 +258,7 @@
 	    // e.data is what we passed in second argument to subscribe
 	    // so here it is the jquery object attached to the plugin <div>
 	    var $plugindiv=e.data;
-	    if (debug) console.log("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
+	    if (debug) messages.debug("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
 	    // clear the spinning wheel: look up an ancestor that has the need-spin class
 	    // do this before we might return
 	    $plugindiv.closest('.need-spin').spin(false);
@@ -271,7 +271,7 @@
                 this.table.html(unfold.errorDisplay("No Result"));   
                 return;
             } else if (typeof(rows[0].error) != 'undefined') {
-		if (debug) console.log ("undefined result");
+		if (debug) messages.debug ("undefined result");
                 this.table.html(unfold.errorDisplay(rows[0].error));
                 return;
             }
@@ -322,7 +322,7 @@
             });
     
 	    this.table.fnClearTable();
-	    if (debug) console.log("hazelnut.update_plugin: total of " + newlines.length + " rows");
+	    if (debug) messages.debug("hazelnut.update_plugin: total of " + newlines.length + " rows");
             this.table.fnAddData(newlines);
     
         };

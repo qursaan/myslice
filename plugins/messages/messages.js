@@ -29,9 +29,12 @@
 			$.subscribe("/messages/"+level, function (e, msg){ instance.display_message (msg,level)});
 		    }) (instance,level);
 		}
+		// kind of patchy, notify the convenience functions that somebody is listening...
+		try {messages.ready=true;}
+		catch (err) { console.log("Could not set messages.ready");}
 		// this happens very early - even before the document is loaded
 		// so it won't show right away; no big deal though
-                $.publish  ("/messages/info", 'Subscribed to all 5 message channels');
+                $.publish ("/messages/info", 'Subscribed to all 5 message channels');
             });
         },
         destroy : function( ) {

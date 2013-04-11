@@ -71,7 +71,7 @@
 	    messages.debug("submit_update_request");
 	    var query_uuid = e.data.options.query_uuid;
 	    var update_query = e.data.update_query;
-	    $.publish("/messages/debug","Updater.submit_update_request " + update_query.__repr());
+	    messages.debug("Updater.submit_update_request " + update_query.__repr());
 	    // actually send the Update query, but publish results as if coming from the original query
 	    manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ]);
 	    // looks like a previous attempt to disable the button while the query is flying

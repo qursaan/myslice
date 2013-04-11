@@ -37,6 +37,7 @@ def test_plugin_view (request):
                                 fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
                                 )
+    # don't run this one as nothing listens to this
     page.enqueue_query (main_query, run_it=False)
 
     main_plugin = \
@@ -45,21 +46,19 @@ def test_plugin_view (request):
         title='thestack',
         togglable=False,
         sons=[ \
-#            Hazelnut (page=page, 
-#                      query=main_query,
-#                      ),
+            Updater (
+                    page=page,
+                    title="Update me",
+                    query=main_query,
+                    label="Update me",
+                    domid="the-updater",
+                    ),
             Messages (
                 page=page,
                 title="Runtime messages",
                 domid="msgs-pre",
                 levels='ALL',
                 ),
-            Updater (
-                    page=page,
-                    title="Update me",
-                    query=main_query,
-                    label="Update me",
-                    ),
             ])
 
     # define 'unfold1_main' to the template engine

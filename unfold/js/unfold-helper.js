@@ -4,11 +4,11 @@ var unfold = {
 	if (maxdepth===undefined) maxdepth=5;
 	var up=null, counter=0;
 	while (true) {
-	    console.log(counter+" "+msg+" id='"+dom.id+"' ["+dom.classList+"]");
+	    messages.debug(counter+" "+msg+" id='"+dom.id+"' ["+dom.classList+"]");
 	    up=dom.parentNode;
 	    counter += 1;
 	    if ( (up == null) || (up === dom)) break;
-	    if (counter >= maxdepth) { console.log(counter+" "+msg+" -> ..."); break; }
+	    if (counter >= maxdepth) { messages.debug(counter+" "+msg+" -> ..."); break; }
 	    dom=up;
 	}
     },

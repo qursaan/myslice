@@ -66,9 +66,11 @@ with the query passed using POST"""
         answer=manifold_api.send_manifold_query (manifold_query)
         if debug: print 'manifoldproxy.proxy: received from backend with code', answer['code']
         json_answer=json.dumps(answer)
+        # if in debug mode we save this so we can use offline mode later
         if (debug):
             with (file(offline_filename,"w")) as f:
                 f.write(json_answer)
+        # this is an artificial delay added for debugging purposes only
         if debug_spin:
             import time
             time.sleep(debug_spin)

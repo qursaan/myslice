@@ -2,19 +2,19 @@
 function debug_dict_keys (msg, o) {
     var keys=[];
     for (var k in o) keys.push(k);
-    console.log ("debug_dict_keys: " + msg + " keys= " + keys);
+    messages.debug ("debug_dict_keys: " + msg + " keys= " + keys);
 }
 function debug_dict (msg, o) {
-    for (var k in o) console.log ("debug_dict: " + msg + " [" + k + "]=" + o[k]);
+    for (var k in o) messages.debug ("debug_dict: " + msg + " [" + k + "]=" + o[k]);
 }
 function debug_value (msg, value) {
-    console.log ("debug_value: " + msg + " " + value);
+    messages.debug ("debug_value: " + msg + " " + value);
 }
 function debug_query (msg, query) {
-    if (query === undefined) console.log ("debug_query: " + msg + " -> undefined");
-    else if (query == null) console.log ("debug_query: " + msg + " -> null");
-    else if ('query_uuid' in query) console.log ("debug_query: " + msg + query.__repr());
-    else console.log ("debug_query: " + msg + " query= " + query);
+    if (query === undefined) messages.debug ("debug_query: " + msg + " -> undefined");
+    else if (query == null) messages.debug ("debug_query: " + msg + " -> null");
+    else if ('query_uuid' in query) messages.debug ("debug_query: " + msg + query.__repr());
+    else messages.debug ("debug_query: " + msg + " query= " + query);
 }
 
 /* ------------------------------------------------------------ */
@@ -31,7 +31,7 @@ var manifold = {
     },
     debug_all_queries : function (msg) {
 	for (var query_uuid in manifold.all_queries) {
-	    $.publish("/messages/debug","manifold.debug " + msg + " " + query_uuid + " -> " + manifold.all_queries[query_uuid]);
+	    messages.debug("manifold.debug " + msg + " " + query_uuid + " -> " + manifold.all_queries[query_uuid]);
 	}
     },
 
@@ -48,9 +48,9 @@ var manifold = {
 	// in case the spin stuff was not loaded, let's make sure we proceed to the exit 
 	try {
 	    if (manifold.asynchroneous_debug) 
-		$.publish("/messages/debug","Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
+		messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
 	    jQuery('.need-spin').spin(spin_presets);
-	} catch (err) { console.log("Cannot turn on spins " + err); }
+	} catch (err) { messages.debug("Cannot turn on spins " + err); }
 	
 	// We use js function closure to be able to pass the query (array) to the
 	// callback function used when data is received
@@ -65,8 +65,8 @@ var manifold = {
 	    // by default we publish using the same uuid of course
 	    if (publish_uuid==undefined) publish_uuid=query.query_uuid;
 	    if (manifold.asynchroneous_debug) {
-		$.publish("/messages/debug","sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
-		$.publish("/messages/debug","... ctd... with actual query= " + query.__repr());
+		messages.debug("sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
+		messages.debug("... ctd... with actual query= " + query.__repr());
 	    }
 	    // not quite sure what happens if we send a string directly, as POST data is named..
 	    // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
@@ -80,7 +80,7 @@ var manifold = {
     // e.g. an updater wants to publish its results as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, domid) {
 	if (manifold.asynchroneous_debug) 
-	    $.publish("/messages/debug","received manifold result with code " + data.code);
+	    messages.debug("received manifold result with code " + data.code);
 	// xxx should have a nicer declaration of that enum in sync with the python code somehow
 	if (data.code == 1) {
 	    alert("Your session has expired, please log in again");
@@ -95,11 +95,11 @@ var manifold = {
 	if (data) {
             if (!!domid) {
 		/* Directly inform the requestor */
-		if (manifold.asynchroneous_debug) $.publish("/messages/debug","directing results to " + domid);
+		if (manifold.asynchroneous_debug) messages.debug("directing results to " + domid);
 		jQuery('#' + domid).trigger('results', [data]);
             } else {
 		/* Publish an update announce */
-		if (manifold.asynchroneous_debug) $.publish("/messages/debug","publishing results on " + publish_uuid);
+		if (manifold.asynchroneous_debug) messages.debug("publishing results on " + publish_uuid);
 		jQuery.publish("/results/" + publish_uuid + "/changed", [data, query]);
             }
 

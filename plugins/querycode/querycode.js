@@ -22,7 +22,7 @@
 
     var methods = {
 	init : function (options) {
-	    if (debug) console.log("SyntaxHighlighter.all ...");
+	    if (debug) messages.debug("SyntaxHighlighter.all ...");
             SyntaxHighlighter.all();
 	    return this.each(function() {
 		var $this=$(this);
@@ -32,7 +32,7 @@
 		    var channel='/results/' + options.query_uuid + '/updated';
 		    /* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
 		    $.subscribe(channel, $this, update_plugin);
-		    if (debug) console.log('subscribing to ' + channel);
+		    if (debug) messages.debug('subscribing to ' + channel);
 		    $this.data('QueryCode', {options: options});
 		    // react to changes to the language selector
 		    $this.find(".querycode-lang").change(change_language);
@@ -45,10 +45,10 @@
 	}, 
 
 //	destroy : function( ) {
-//	    if (debug) console.log("QueryCode.destroy...");
+//	    if (debug) messages.debug("QueryCode.destroy...");
 //	},
 //	update : function( content ) { 
-//	    if (debug) console.log("QueryCode.update...");
+//	    if (debug) messages.debug("QueryCode.update...");
 //	},
 	
     } // methods
@@ -75,12 +75,12 @@
 	funname="translate_query_as_" + lang;
 	fun=eval(funname);
 	if (! fun) {
-	    console.log("Cannot find translator function for lang " + lang);
+	    messages.debug("Cannot find translator function for lang " + lang);
 	    return;
 	}
 	html_code=fun(query);
 	dom.html(html_code);
-	if (debug) console.log("SyntaxHighlighter.highlight");
+	if (debug) messages.debug("SyntaxHighlighter.highlight");
 	SyntaxHighlighter.highlight()
     }
 

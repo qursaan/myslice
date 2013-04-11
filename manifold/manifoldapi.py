@@ -48,7 +48,7 @@ class ManifoldAPI:
             except xmlrpclib.Fault, error:
                 ### xxx this is very rough for now
                 # until we have some agreement about how the API calls should return error conditions
-                # in some less unpolite way than this anoanymous exception, we assume it's a problem with the session
+                # in some less unpolite way than this anonymous exception, we assume it's a problem with the session
                 # that needs to be refreshed
                 if debug: print "Session Expired"
                 if error.faultCode == 8002:

@@ -48,6 +48,7 @@ def slice_view (request, slicename=tmp_default_slice):
                 page=page,
                 title="Runtime messages",
                 domid="msgs-pre",
+                levels="ALL",
                 ),
             Tabs (
                 page=page,

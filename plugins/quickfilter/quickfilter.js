@@ -137,7 +137,7 @@
                 // Remove first to clean up select boxes
                 var removed_filters = tmp.removed;
                 $.each(removed_filters, function(i,filter){
-                    console.log(filter[0]);
+                    messages.debug(filter[0]);
                     allowedValues=metadata.property('resource', filter[0], 'allowed_values');
                     if (allowedValues!='' && allowedValues!="N/A") {
 			//if(MANIFOLD_METADATA[filter[0]]['allowed_values']!=''){
@@ -198,7 +198,7 @@
 
         $('#QuickFilter_select_field').change( function () {
             var field = $(this).val();
-            console.log(field);
+            messages.debug(field);
             $('input[id^="QuickFilter-string-"]').hide();
             $('#QuickFilter_int_value_div').hide();
             if(field=="#"){
@@ -249,7 +249,7 @@
         });
         
         $('.QuickFilter_select').change( function() {
-            console.log(this.id);
+            messages.debug(this.id);
             var query = data.current_query;
 	    var f_value = $(this).val();
             
@@ -261,7 +261,7 @@
 			  f_value = "";
 	    */
             if(typeof(key[1])!="undefined"){
-                console.log(key[1]+'='+f_value);
+                messages.debug(key[1]+'='+f_value);
                 if(f_value==""){
                     query.remove_filter(key[1],"","");
                 }else{

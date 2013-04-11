@@ -28,12 +28,12 @@
 		var channel='/results/' + options.query_uuid + '/changed';
 		/* passing $this as 2nd arg: callbacks will retrieve $this as e.data */
 		$.subscribe(channel, $this, update_plugin);
-		if (debug) window.console.log('subscribing to ' + channel);
+		if (debug) window.messages.debug('subscribing to ' + channel);
 		$this.data('SimpleList', options);
 	    });
 	},
 	destroy : function( ) {
-	    if (debug) console.log("SimpleList.destroy...");
+	    if (debug) messages.debug("SimpleList.destroy...");
             return this.each(function(){
 		var $this = $(this), data = $this.data('SimpleList');
 		// xxx not too sure what this is about
@@ -42,7 +42,7 @@
             });
 	},
 	update : function( content ) { 
-	    if (debug) console.log("SimpleList.update...");
+	    if (debug) messages.debug("SimpleList.update...");
 	},
     }; // methods
 
@@ -59,7 +59,7 @@
 	// also we may or may not have a header
 	var $tbody=$table.find("tbody.simplelist").first();
 	var use_datatables = $table.hasClass("with-datatables");
-	if (debug) console.log($plugindiv.attr('id') + " udt= " + use_datatables);
+	if (debug) messages.debug($plugindiv.attr('id') + " udt= " + use_datatables);
 	
 	// clear the spinning wheel: look up an ancestor that has the need-spin class
 	// do this before we might return
@@ -98,7 +98,7 @@
     }
 
     function regular_update_table ($table, $tbody, rows, key) {
-	if (debug) console.log('regular_update_table ' + rows.length + " rows");
+	if (debug) messages.debug('regular_update_table ' + rows.length + " rows");
 	var html=$.map(rows, function (row) { return html_row ( cell (key, row[key])); }).join();
 	$tbody.html(html);
     }
@@ -110,7 +110,7 @@
     }
 
     function datatables_update_table ($table, $tbody, rows, key) {
-	if (debug) console.log('datatables_update_table ' + rows.length + " rows");
+	if (debug) messages.debug('datatables_update_table ' + rows.length + " rows");
 	$table.dataTable().fnClearTable();
 	// the lambda here returns a [[]] because $.map is kind of broken; as per the doc:
 	// The function can return any value to add to the array. A returned array will be flattened into the resulting array.
