@@ -79,8 +79,7 @@ var manifold = {
     // however in some cases we wish to publish the results under a different uuid
     // e.g. an updater wants to publish its results as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, domid) {
-	if (manifold.asynchroneous_debug) 
-	    messages.debug("received manifold result with code " + data.code);
+	if (manifold.asynchroneous_debug) messages.debug("received manifold result with code " + data.code);
 	// xxx should have a nicer declaration of that enum in sync with the python code somehow
 	if (data.code == 1) {
 	    alert("Your session has expired, please log in again");
