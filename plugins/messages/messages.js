@@ -17,8 +17,6 @@
 	}    
     };
 
-    var levels = {'fatal': true, 'error': true, 'warning' : true, 'info' : true, 'debug' : false};
-
     var methods = {
         init : function( options ) {
 
@@ -26,14 +24,14 @@
                 var $this = $(this);
 		instance=new Messages (options,$this);
 		$this.data('Messages',instance);
-		for (level in levels) {
+		for (level in options.levels) {
 		    (function (instance,level) {
-			$.subscribe("messages:"+level, function (e, msg){ instance.display_message (msg,level)});
+			$.subscribe("/messages/"+level, function (e, msg){ instance.display_message (msg,level)});
 		    }) (instance,level);
 		}
 		// this happens very early - even before the document is loaded
 		// so it won't show right away; no big deal though
-                $.publish  ("messages:info", 'Subscribed to all 5 message channels');
+                $.publish  ("/messages/info", 'Subscribed to all 5 message channels');
             });
         },
         destroy : function( ) {
@@ -76,14 +74,16 @@
 	},
 
 	this.initialize = function () {
-	    this.plugindiv.find("div.messages-buttons>input").each(this.init_button);
+	    var init_button=this.init_button;
+	    var levels=this.options.levels;
+	    this.plugindiv.find("div.messages-buttons>input").each(
+		function (i,input) {init_button (input, levels)});
 	    var arm_button=this.arm_button;
 	    var toggle_handler=this.toggle_handler;
 	    this.plugindiv.find("div.messages-buttons>input").each(
-		function (i,input) {arm_button (input,toggle_handler); }
-	    );
+		function (i,input) {arm_button (input,toggle_handler); });
 	},
-	this.init_button = function (_,input) {
+	this.init_button = function (input,levels) {
 	    /* set initial 'checked' state for that input from global 'levels' above */
 	    var level=input.name;
 	    if (levels[level]) $(input).attr('checked','checked');
@@ -114,11 +114,11 @@ var messages_test = {
     counter : 2,
     period : 1000,
     sample : function () { 
-	$.publish("messages:fatal","a fatal message (" + messages_test.counter + " runs to go)");
-	$.publish("messages:error","an error message");
-	$.publish("messages:warning","a warning message");
-	$.publish("messages:info","an info message");
-	$.publish("messages:debug","a debug message");
+	$.publish("/messages/fatal","a fatal message (" + messages_test.counter + " runs to go)");
+	$.publish("/messages/error","an error message");
+	$.publish("/messages/warning","a warning message");
+	$.publish("/messages/info","an info message");
+	$.publish("/messages/debug","a debug message");
 	messages_test.counter -= 1;
 	if (messages_test.counter == 0)
 	    window.clearInterval (messages_test.interval_id);
