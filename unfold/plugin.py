@@ -65,13 +65,14 @@ class Plugin:
     # p=Plugin(foo='bar')
     # which will result in 'foo' being accessible to the template engine
     # 
-    def __init__ (self, page, title, domid=None,
+    def __init__ (self, page, title=None, domid=None,
                   visible=True, togglable=None, toggled=None, **settings):
         self.page = page
         self.title=title
         # callers can provide their domid for css'ing 
         if not domid: domid=Plugin.newdomid()
         self.domid=domid
+        if not title: title="Plugin title for %s"%domid
         self.classname=self._py_classname()
         self.plugin_classname=self._js_classname()
         self.visible=visible
