@@ -29,9 +29,10 @@
             $this.data('markerCluster', null);
             $this.data('markers', []);
 
-            var myLatlng = new google.maps.LatLng(34.397, 150.644);
+	     console.log ("lat=" + options.latitude + " long=" + options.longitude + " and zoom=" + options.zoom);
+            var myLatlng = new google.maps.LatLng(options.latitude, options.longitude);
             var myOptions = {
-              zoom: 2,
+              zoom: options.zoom,
               center: myLatlng,
               mapTypeId: google.maps.MapTypeId.ROADMAP
             }

@@ -90,6 +90,10 @@ def slice_view (request, slicename=tmp_default_slice):
                         # tab's sons preferably turn this off
                         togglable=False,
                         query=main_query,
+                        # center on Paris
+                        latitude=49.,
+                        longitude=2.2,
+                        zoom=3,
                         ),
                     Raw (
 #                    SensLabMap (
@@ -110,7 +114,7 @@ if I keep this active, so for now it's disabled
                     ]),
             Hazelnut ( 
                 page=page,
-                title='not in tabs',
+                title='a hazelnut not in tabs',
                 domid='standalone',
                 # this is the query at the core of the slice list
                 query=main_query,
