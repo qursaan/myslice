@@ -135,8 +135,8 @@
 	    instance_.closest('.need-spin').spin(false);
 
 
-            if (!rows) {
-                alert('error');
+            if (rows === undefined || !rows || rows.length==0) {
+		messages.warning ("Empty result in googlemap.update_map - nothing to show");
                 return;
             }
 

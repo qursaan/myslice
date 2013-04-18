@@ -106,7 +106,7 @@
 	// xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
 	this.current_query=manifold.find_query(this.options.query_uuid);
-	if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query);
+//	if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query.__repr());
 	this.query_update = null;
         this.current_resources = Array();
 
@@ -270,12 +270,13 @@
             var hazelnut = this;
     
             if (rows.length==0) {
-		if (debug) console.l ("empty result");
-                this.table.html(unfold.errorDisplay("No Result"));   
+		if (debug) messages.debug("Empty result on hazelnut " + domid);
+                this.table.html(unfold.warning("Empty result"));   
                 return;
             } else if (typeof(rows[0].error) != 'undefined') {
-		if (debug) messages.debug ("undefined result");
-                this.table.html(unfold.errorDisplay(rows[0].error));
+		// we now should have another means to report errors that this inline/embedded hack
+		if (debug) messages.error ("undefined result on " + domid + " - should not happen anymore");
+                this.table.html(unfold.error(rows[0].error));
                 return;
             }
             newlines = new Array();
