@@ -38,13 +38,18 @@ class ManifoldAPI:
                 print "kwds",kwds
             try:
                 result=getattr(self.server, methodName)(self.auth, *args, **kwds)
-                if debug:
-                    print '===> backend call',methodName, self.auth, self.url,'->',
-                    if not result:                        print "[no/empty result]"
-                    elif isinstance (result,str):         print "result is '%s'"%result
-                    elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
-                    else:                                 print "[dont know how to display result]"
-                return ManifoldResult (code=ManifoldCode.SUCCESS, value=result)
+                ### attempt to cope with old APIs and new APIs
+                if isinstance (result, dict) and 'code' in result:
+                    # this sounds like a result from a new API, leave it untouched
+                    pass
+                else:
+                    if debug:
+                        print '===> backend call',methodName, self.auth, self.url,'->',
+                        if not result:                        print "[no/empty result]"
+                        elif isinstance (result,str):         print "result is '%s'"%result
+                        elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
+                        else:                                 print "[dont know how to display result]"
+                    return ManifoldResult (code=ManifoldCode.SUCCESS, value=result)
             except xmlrpclib.Fault, error:
                 ### xxx this is very rough for now
                 # until we have some agreement about how the API calls should return error conditions

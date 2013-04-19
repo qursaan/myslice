@@ -21,6 +21,7 @@ class ManifoldBackend:
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
             api = ManifoldAPI(auth)
             # Authenticate user and get session key
+            # the new API would expect Get('local:session') instead
             session_result = api.GetSession()
             session = session_result.ok_value()
             if not session:
@@ -37,6 +38,7 @@ class ManifoldBackend:
             self.api = api
 
             # Get account details
+            # the new API would expect Get('local:user') instead
             persons_result = api.GetPersons(auth)
             persons = persons_result.ok_value()
             if not persons:
