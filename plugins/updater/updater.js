@@ -90,26 +90,25 @@
 	    if (debug) messages.debug("retrieved error code " + code + " and output " + output);
 	}
 	    
-	update_resources = function (e, resources, change) {
+	this.update_resources = function (e, resources, change) {
             data = e.data.instance.data().Slices;
 
             data.update_query.params['resource'] = resources
             $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
 	},
 
-	update_leases = function (e, leases, change) {
+	this.update_leases = function (e, leases, change) {
 	    data = e.data.instance.data().Slices;
 	    
 	    data.update_query.params['lease'] = leases
 	    $.publish('/update/' + data.options.query_uuid, [data.update_query, true]);
 	},
-  
-	    
-
-	query_completed = function (e, rows, query) {
+	
+	this.query_completed = function (e, rows, query) {
 
 	    /* This function is called twice : get and update */
 	    messages.info("updater.query_completed - not implemented yet");
+	    return;
       
 	    var data = e.data.instance.data().Slices;
       
