@@ -13,6 +13,11 @@ debug=True
 debug_spin=0
 #debug_spin=1
 
+# pretend the server only returns - empty lists to 'get' requests - this is to mimick 
+# misconfigurations or expired credentials or similar cormer case situations
+debug_empty=False
+#debug_empty=True
+
 # turn this on if you want the fastest possible (locally cached) feedback
 # beware that this is very rough though...
 work_offline=False
@@ -36,7 +41,7 @@ with the query passed using POST"""
     # format_in : how is the query encoded in POST
     # format_out: how to serve the results
     if format != 'json':
-        print "manifoldproxy.api: unexpected format %s -- exiting"%format
+        print "manifoldproxy.proxy: unexpected format %s -- exiting"%format
         return
     try:
         # translate incoming POST request into a query object
@@ -46,6 +51,10 @@ with the query passed using POST"""
         offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.subject)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
+        if debug_empty and manifold_query.action.lower()=='get':
+            json_answer=json.dumps({'code':0,'value':[]})
+            print "By-passing : debug_empty & 'get' request : returning a fake empty list"
+            return HttpResponse (json_answer, mimetype="application/json")
         ### patch : return the latest one..
         if work_offline:
             # if that won't work then we'll try to update anyways
@@ -57,7 +66,7 @@ with the query passed using POST"""
             except:
                 import traceback
                 traceback.print_exc()
-                print "PROCEEDING"
+                print "Could not run in offline mode, PROCEEDING"
                 pass
                 
         # actually forward
@@ -71,7 +80,8 @@ with the query passed using POST"""
             with (file(offline_filename,"w")) as f:
                 f.write(json_answer)
         # this is an artificial delay added for debugging purposes only
-        if debug_spin:
+        if debug_spin>0:
+            print "Adding additional artificial delay",debug_spin
             import time
             time.sleep(debug_spin)
         return HttpResponse (json_answer, mimetype="application/json")
