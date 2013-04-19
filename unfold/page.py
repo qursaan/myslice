@@ -49,7 +49,7 @@ class Page:
 
     # this method adds a query to the page
     # the query will be exposed to js when calling expose_queries
-    # additionally if exec is set to True, this query will be asynchroneously triggered on page load
+    # additionally if run_it is set to True, this query will be asynchroneously triggered on page load
     # in this case (exec=True) the js async callback (see manifold.asynchroneous_success)
     # offers the option to deliver the result to a specific DOM elt (in this case, set domid)
     # otherwise (i.e. if domid not provided), it goes through the pubsub system (so all plugins can receive it)
