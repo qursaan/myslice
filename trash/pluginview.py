@@ -31,21 +31,23 @@ def test_plugin_view (request):
     # variables that will get passed to this template
     template_env = {}
     
-    slicename='ple.inria.omftest'
+    slicename='ple.inria.heartbeat'
     main_query = ManifoldQuery (action='get',
-                                subject='slice',
+                                subject='resource',
                                 timestamp='latest',
                                 fields=['network','type','hrn','hostname'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
                                 )
-    # don't run this one as nothing listens to this
-    page.enqueue_query (main_query, run_it=False)
+    # without an hazelnut, this would use use : run_it=False as nothing would listen to the results
+    page.enqueue_query (main_query, # run_it=False
+                        )
 
     main_plugin = \
         Stack (
         page=page,
         title='thestack',
         togglable=False,
+        domid='stack',
         sons=[ \
             Updater (
                     page=page,
@@ -53,6 +55,13 @@ def test_plugin_view (request):
                     query=main_query,
                     label="Update me",
                     domid="the-updater",
+                    ),
+            # make sure the 2 things work together
+            Hazelnut (
+                    page=page,
+                    title="Checkboxes should impact updater",
+                    query=main_query,
+                    domid="hazelnut",
                     ),
             Messages (
                 page=page,
