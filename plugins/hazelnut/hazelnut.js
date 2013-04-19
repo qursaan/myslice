@@ -271,7 +271,10 @@
     
             if (rows.length==0) {
 		if (debug) messages.debug("Empty result on hazelnut " + domid);
-                this.table.html(unfold.warning("Empty result"));   
+		var placeholder=$(this.table).find("td.dataTables_empty");
+		console.log("placeholder "+placeholder);
+		if (placeholder.length==1) placeholder.html(unfold.warning("Empty result"));
+		else			   this.table.html(unfold.warning("Empty result"));
                 return;
             } else if (typeof(rows[0].error) != 'undefined') {
 		// we now should have another means to report errors that this inline/embedded hack
