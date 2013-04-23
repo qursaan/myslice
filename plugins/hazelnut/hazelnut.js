@@ -155,6 +155,7 @@
         /* methods */
 
         this.set_query = function(query) {
+	    messages.info('hazelnut.set_query');
             var options = this.options;
             /* Compare current and advertised query to get added and removed fields */
             previous_query = this.current_query;
@@ -269,6 +270,7 @@
             var options = this.options;
             var hazelnut = this;
     
+	    /* if we get no result, or an error, try to make that clear, and exit */
             if (rows.length==0) {
 		if (debug) messages.debug("Empty result on hazelnut " + domid);
 		var placeholder=$(this.table).find("td.dataTables_empty");
@@ -282,64 +284,79 @@
                 this.table.html(unfold.error(rows[0].error));
                 return;
             }
-            newlines = new Array();
+
+	    /* 
+	     * fill the dataTables object
+	     * we cannot set html content directly here, need to use fnAddData
+	     */
+            var lines = new Array();
     
             this.current_resources = Array();
     
-            $.each(rows, function(index, obj) {
-                newline = new Array();
-    
+            $.each(rows, function(index, row) {
+		// this models a line in dataTables, each element in the line describes a cell
+                line = new Array();
+     
                 // go through table headers to get column names we want
                 // in order (we have temporarily hack some adjustments in names)
                 var cols = hazelnut.table.fnSettings().aoColumns;
                 var colnames = cols.map(function(x) {return x.sTitle})
-                var nb_col = colnames.length;
-                if (options.checkboxes)
-                    nb_col -= 1;
+                var nb_col = cols.length;
+		/* if we've requested checkboxes, then forget about the checkbox column for now */
+                if (options.checkboxes) nb_col -= 1;
+
+		/* fill in stuff depending on the column name */
                 for (var j = 0; j < nb_col; j++) {
                     if (typeof colnames[j] == 'undefined') {
-                        newline.push('...');
+                        line.push('...');
                     } else if (colnames[j] == 'hostname') {
-                        if (obj['type'] == 'resource,link')
+                        if (row['type'] == 'resource,link')
                             //TODO: we need to add source/destination for links
-                            newline.push('');
+                            line.push('');
                         else
-                            newline.push(obj['hostname']);
+                            line.push(row['hostname']);
                     } else {
-                        if (obj[colnames[j]])
-                            newline.push(obj[colnames[j]]);
+                        if (row[colnames[j]])
+                            line.push(row[colnames[j]]);
                         else
-                            newline.push('');
+                            line.push('');
                     }
                 }
     
+		/* catch up with the last column if checkboxes were requested */
                 if (options.checkboxes) {
                     var checked = '';
-                    if (typeof(obj['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
+                    if (typeof(row['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
-                        hazelnut.current_resources.push(obj['urn']);
+                        hazelnut.current_resources.push(row['urn']);
                     }
                     // Use a key instead of hostname (hard coded...)
-                    newline.push(hazelnut.checkbox(options.plugin_uuid, obj['urn'], obj['type'], checked, false));
+                    line.push(hazelnut.checkbox(options.plugin_uuid, row['urn'], row['type'], checked, false));
                 }
     
-                newlines.push(newline);
-    
+                lines.push(line);
     
             });
     
 	    this.table.fnClearTable();
-	    if (debug) messages.debug("hazelnut.update_plugin: total of " + newlines.length + " rows");
-            this.table.fnAddData(newlines);
+	    if (debug) messages.debug("hazelnut.update_plugin: total of " + lines.length + " rows");
+            this.table.fnAddData(lines);
     
         };
 
         this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {
 	    var result="";
-            /* Prefix id with plugin_uuid */
-	    result += "<input class='hazelnut-checkbox-" + plugin_uuid + "' id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
-	    result += " name='" + unfold.get_value(field) + "' type='checkbox' " + selected_str + disabled_str + " autocomplete='off' value='" + unfold.get_value(header) + "'";
-	    result +="></input>";
+            // Preafix id with plugin_uuid
+	    result += "<input";
+	    result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
+	    result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
+	    result += " name='" + unfold.get_value(field) + "'";
+	    result += " type='checkbox'";
+	    result += selected_str;
+	    result += disabled_str;
+	    result += " autocomplete='off'";
+	    result += " value='" + unfold.get_value(header) + "'";
+	    result += "></input>";
 	    return result;
         };
     } // constructor
