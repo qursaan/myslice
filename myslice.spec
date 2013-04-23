@@ -16,7 +16,6 @@ Vendor: OpenLab
 Packager: OpenLab <thierry.parmentelat@inria.fr>
 URL: %{SCMURL}
 
-# We use set everywhere
 Requires: python >= 2.7
 Requires: Django
 Requires: httpd
