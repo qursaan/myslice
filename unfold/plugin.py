@@ -32,10 +32,14 @@ class Plugin:
     # we just need this to be unique in a page
     domid=0
 
-    @staticmethod
-    def newdomid():
+    # when a domid is not set by the caller, we name plugins after their respective class as well, 
+    # so as to limit name clashes between different views
+    # this has to see with the UI storing the last-seen status of plugins based on their id
+    # put it more bluntly it is recommended that a domid should be set 
+    # and maybe xxx we should just enforce that...
+    def newdomid(self):
         Plugin.domid += 1
-        return "plugin-%d"%Plugin.domid
+        return "plugin-%s-%d"%(self.__class__.__name__.lower(),Plugin.domid)
 
     ########## 
     # Constructor
@@ -69,7 +73,7 @@ class Plugin:
                   visible=True, togglable=None, toggled=None, **settings):
         self.page = page
         # callers can provide their domid for css'ing 
-        if not domid: domid=Plugin.newdomid()
+        if not domid: domid=self.newdomid()
         self.domid=domid
         # title is shown when togglable
         if not title: title="Plugin title for %s"%domid
