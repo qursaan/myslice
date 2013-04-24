@@ -35,7 +35,7 @@ def test_plugin_view (request):
     main_query = ManifoldQuery (action='get',
                                 subject='resource',
                                 timestamp='latest',
-                                fields=['network','type','hrn','hostname'],
+                                fields=['network','type','hrn','hostname','sliver'],
                                 filters= [ [ 'slice_hrn', '=', slicename, ] ],
                                 )
     # without an hazelnut, this would use use : run_it=False as nothing would listen to the results
@@ -51,7 +51,7 @@ def test_plugin_view (request):
         sons=[ \
             Updater (
                     page=page,
-                    title="Update me",
+                    title="wont show up as non togglable by default",
                     query=main_query,
                     label="Update me",
                     domid="the-updater",
@@ -59,16 +59,17 @@ def test_plugin_view (request):
             # make sure the 2 things work together
             Hazelnut (
                     page=page,
-                    title="Checkboxes should impact updater",
+                    title="Slice %s - checkboxes interacting w/ updater"%slicename,
                     query=main_query,
                     domid="hazelnut",
+                    checkboxes=True,
                     ),
             Messages (
-                page=page,
-                title="Runtime messages",
-                domid="msgs-pre",
-                levels='ALL',
-                ),
+                    page=page,
+                    title="Runtime messages",
+                    domid="msgs-pre",
+                    levels='ALL',
+                    ),
             ])
 
     # define 'unfold1_main' to the template engine

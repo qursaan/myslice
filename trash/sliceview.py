@@ -23,7 +23,7 @@ from myslice.viewutils import quickfilter_criterias
 
 from myslice.viewutils import topmenu_items, the_user
 
-tmp_default_slice='ple.inria.sfatest'
+tmp_default_slice='ple.inria.heartbeat'
 
 @login_required
 def slice_view (request, slicename=tmp_default_slice):
@@ -44,9 +44,10 @@ def slice_view (request, slicename=tmp_default_slice):
         domid='thestack',
         togglable=False,
         sons=[
+            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename),
             Messages (
                 page=page,
-                title="Runtime messages",
+                title="Runtime messages for slice %s"%slicename,
                 domid="msgs-pre",
                 levels="ALL",
                 ),
