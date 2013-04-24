@@ -111,19 +111,19 @@ var manifold = {
 
   var o = $({});
 
-  $.subscribe = function( types, selector, data, fn) {
+  $.subscribe = function( channel, selector, data, fn) {
     /* borrowed from jQuery */
     if ( data == null && fn == null ) {
-        // ( types, fn )
+        // ( channel, fn )
         fn = selector;
         data = selector = undefined;
     } else if ( fn == null ) {
         if ( typeof selector === "string" ) {
-            // ( types, selector, fn )
+            // ( channel, selector, fn )
             fn = data;
             data = undefined;
         } else {
-            // ( types, data, fn )
+            // ( channel, data, fn )
             fn = data;
             data = selector;
             selector = undefined;
@@ -138,7 +138,7 @@ var manifold = {
      * supported and editable, we might have the same issue with results but
      * the page load time will be severely affected...
      */
-    o.on.apply(o, [types, selector, data, function() { 
+    o.on.apply(o, [channel, selector, data, function() { 
         for(i = 1; i < arguments.length; i++) {
             if ( arguments[i].constructor.name == 'ManifoldQuery' )
                 arguments[i] = arguments[i].clone();

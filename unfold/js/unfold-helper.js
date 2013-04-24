@@ -22,7 +22,6 @@ var unfold = {
 
     errorDisplay : function (error) {
 	return '<div class="error"><dl id="system-message"><dt class="error">Notice</dt><dd class="error message"><ul><li>' + error + '</li></ul></dd></dl></div>';
-    return out;
     },
 
     get_value: function (value) {

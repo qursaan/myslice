@@ -14,7 +14,7 @@ debug_spin=0
 #debug_spin=1
 
 # pretend the server only returns - empty lists to 'get' requests - this is to mimick 
-# misconfigurations or expired credentials or similar cormer case situations
+# misconfigurations or expired credentials or similar corner case situations
 debug_empty=False
 #debug_empty=True
 
@@ -73,7 +73,14 @@ with the query passed using POST"""
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
         if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
         answer=manifold_api.send_manifold_query (manifold_query)
-        if debug: print 'manifoldproxy.proxy: received from backend with code', answer['code']
+        if debug: 
+            print '<=== manifoldproxy.proxy: received from backend with code', answer['code']
+            if answer['code']==0:
+                print ".... ctd ",
+                value=answer['value']
+                if isinstance (value, list): print "result is a list with %d entries"%len(value)
+                elif isinstance (value, dict): print "result is a dict with keys %s"%value.keys()
+                else: print "result is other (type=%s) : %s"%(type(value),value)
         json_answer=json.dumps(answer)
         # if in debug mode we save this so we can use offline mode later
         if (debug):

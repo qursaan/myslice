@@ -29,7 +29,6 @@
             $this.data('markerCluster', null);
             $this.data('markers', []);
 
-	     console.log ("lat=" + options.latitude + " long=" + options.longitude + " and zoom=" + options.zoom);
             var myLatlng = new google.maps.LatLng(options.latitude, options.longitude);
             var myOptions = {
               zoom: options.zoom,

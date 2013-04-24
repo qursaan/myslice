@@ -44,7 +44,7 @@ class ManifoldAPI:
                     pass
                 else:
                     if debug:
-                        print '===> backend call', methodName, args, kwds
+                        print '<=== backend call', methodName, args, kwds
                         print '.... ctd', 'Authmethod=',self.auth['AuthMethod'], self.url,'->',
                         if not result:                        print "[no/empty result]"
                         elif isinstance (result,str):         print "result is '%s'"%result
