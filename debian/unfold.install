@@ -1,2 +1,9 @@
-usr/lib*/python*/site-packages/unfold/unfold
-usr/lib*/python*/site-packages/unfold/engine
+usr/share/unfold/all-static
+usr/share/unfold/all-templates
+usr/share/unfold/apache
+usr/share/unfold/auth
+usr/share/unfold/insert_above
+usr/share/unfold/manifold
+usr/share/unfold/plugins
+usr/share/unfold/unfold
+usr/share/unfold/views

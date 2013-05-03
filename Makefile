@@ -18,9 +18,9 @@ build: static templates
 
 install: 
 	python setup.py install \
-	    --install-purelib=$(DESTDIR)/$(datadir)/myslice \
-	    --install-scripts=$(DESTDIR)/$(datadir)/myslice \
-	    --install-data=$(DESTDIR)/$(datadir)/myslice
+	    --install-purelib=$(DESTDIR)/$(datadir)/unfold \
+	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
+	    --install-data=$(DESTDIR)/$(datadir)/unfold
 
 ####################
 # general stuff
@@ -164,6 +164,7 @@ RSYNC_COND_DRY_RUN	:= $(if $(findstring n,$(MAKEFLAGS)),--dry-run,)
 # putting it together
 RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 
+##### convenience for development only, push code on a specific test box
 # xxx until we come up with a packaging this is going to be a wild guess
 # on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
 #INSTALLED=/usr/share/myslice

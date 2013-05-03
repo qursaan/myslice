@@ -9,7 +9,7 @@ import os.path
 from glob import glob
 from distutils.core import setup
 
-# we don't have a final list os let's keep it simple for now
+# we don't have a final list so let's keep it simple for now
 packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/__init__.py")) ]
 
 setup(packages = packages,
