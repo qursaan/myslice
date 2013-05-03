@@ -23,6 +23,18 @@ install:
 	    --install-data=$(DESTDIR)/$(datadir)/myslice
 
 ####################
+# general stuff
+DATE=$(shell date -u +"%a, %d %b %Y %T")
+
+# This is called from the build with the following variables set 
+# (see build/Makefile and target_debian)
+# (.) RPMTARBALL
+# (.) RPMVERSION
+# (.) RPMRELEASE
+# (.) RPMNAME
+DEBVERSION=$(RPMVERSION).$(RPMRELEASE)
+DEBTARBALL=../$(RPMNAME)_$(DEBVERSION).orig.tar.bz2
+
 debian: static templates debian/changelog debian.source debian.package
 
 debian/changelog: debian/changelog.in
