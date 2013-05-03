@@ -1,0 +1,17 @@
+Source: myslice
+Maintainer: Thierry Parmentelat <Thierry.Parmentelat@inria.fr>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: devscripts, debhelper (>=7.0.50~), debconf, dpatch, python-setuptools, make
+
+Package: myslice
+Architecture: any
+Depends: unfold
+Description: Myslice plugins, based on django and unfold frontend
+
+# Thierry: the recipe I'm using somehow only works with several packages
+Package: unfold
+Architecture: any
+Depends: python, python-django
+Description: Generic django-based frontend for manifold backends
