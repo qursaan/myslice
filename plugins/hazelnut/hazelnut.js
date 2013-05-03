@@ -12,7 +12,7 @@
 (function($){
 
     var debug=false;
-//    debug=true
+    debug=true
 
     // routing calls
     $.fn.Hazelnut = function( method ) {
@@ -326,6 +326,7 @@
 		/* catch up with the last column if checkboxes were requested */
                 if (options.checkboxes) {
                     var checked = '';
+		    // xxx problem is, we don't get this 'sliver' thing set apparently
                     if (typeof(row['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
                         hazelnut.current_resources.push(row['urn']);
