@@ -22,6 +22,23 @@ install:
 	    --install-scripts=$(DESTDIR)/$(datadir)/myslice \
 	    --install-data=$(DESTDIR)/$(datadir)/myslice
 
+####################
+debian: static templates debian/changelog debian.source debian.package
+
+debian/changelog: debian/changelog.in
+	sed -e "s|@VERSION@|$(DEBVERSION)|" -e "s|@DATE@|$(DATE)|" debian/changelog.in > debian/changelog
+
+debian.source: force 
+	rsync -a $(RPMTARBALL) $(DEBTARBALL)
+
+debian.package:
+	debuild -uc -us -b 
+
+debian.clean:
+	$(MAKE) -f debian/rules clean
+	rm -rf build/ MANIFEST ../*.tar.gz ../*.dsc ../*.build
+	find . -name '*.pyc' -delete
+
 
 #################### third-party layout is kind of special 
 # because we have differents versions, and also we 
