@@ -32,7 +32,8 @@ class MetaData:
                   'column.resource_type', 'column.value_type',
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
-        rows_result = manifold_api.Get('metadata:table', [], [], fields)
+        rows_result = manifold_api.Get(fact_table='metadata:table', fields=fields)
+#old#        rows_result = manifold_api.Get('metadata:table', [], [], fields)
         rows = rows_result.ok_value()
         if not rows:
             print "Failed to retrieve metadata",rows_result.error()

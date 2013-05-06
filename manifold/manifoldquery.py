@@ -160,3 +160,13 @@ class ManifoldQuery:
 
 
         self.analyzed_query = analyzed_query
+
+    def to_dict(self):
+        return {
+            'action': self.action,
+            'fact_table': self.subject,
+            'ts': self.timestamp,
+            'filters': self.filters,
+            'params': self.params,
+            'fields': self.fields
+        }

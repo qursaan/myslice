@@ -41,7 +41,7 @@ class ManifoldAPI:
                 ### attempt to cope with old APIs and new APIs
                 if isinstance (result, dict) and 'code' in result:
                     # this sounds like a result from a new API, leave it untouched
-                    pass
+                    return result # jordan
                 else:
                     if debug:
                         print '<=== backend call', methodName, args, kwds
@@ -69,18 +69,27 @@ class ManifoldAPI:
         return func
 
     def send_manifold_query (self, query):
-        (action,subject)= (query.action,query.subject)
-        # use e.g. self.Get rather than self.server.Get so we use the __getattr__ code
-        if action=='get':
-# this makes the backend to squeak and one can't login anymore...
-#            return self.Get(subject, query.filters, query.timestamp, query.fields)
-            return self.Get(subject, query.filters, {}, query.fields)
-        elif action=='update':
-            answer=self.Update(subject, query.filters, query.params, query.fields)
-            if not isinstance (answer, ManifoldResult): print "UNEXECPECTED answer", answer
-            return answer
-        else:
-            warning="WARNING: ManifoldAPI.send_manifold_query: %s not implemented for now"%action
-            print warning
-            print 3
-            return ManifoldResult(code=ManifoldCode.NOT_IMPLEMENTED, output=warning)
+        # We use a dictionary representation of the query for forwarding it to the API
+        ret = self.forward(query.to_dict())
+        print "="*80
+        print "Result:"
+        print ret
+        print "="*80
+        print ret
+        return ret
+
+#old#        (action,subject)= (query.action,query.subject)
+#old#        # use e.g. self.Get rather than self.server.Get so we use the __getattr__ code
+#old#        if action=='get':
+#old## this makes the backend to squeak and one can't login anymore...
+#old##            return self.Get(subject, query.filters, query.timestamp, query.fields)
+#old#            return self.Get(subject, query.filters, {}, query.fields)
+#old#        elif action=='update':
+#old#            answer=self.Update(subject, query.filters, query.params, query.fields)
+#old#            if not isinstance (answer, ManifoldResult): print "UNEXECPECTED answer", answer
+#old#            return answer
+#old#        else:
+#old#            warning="WARNING: ManifoldAPI.send_manifold_query: %s not implemented for now"%action
+#old#            print warning
+#old#            print 3
+#old#            return ManifoldResult(code=ManifoldCode.NOT_IMPLEMENTED, output=warning)

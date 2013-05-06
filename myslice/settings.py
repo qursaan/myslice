@@ -7,9 +7,9 @@ TEMPLATE_DEBUG = DEBUG
 
 # change these if you use a different convention
 
-DEVELOPER_ROOT=os.path.expanduser("~/git/myslice-django")
+DEVELOPER_ROOT=os.path.expanduser("~/repos/myslice-django")
 
-PRODUCTION_ROOT="/usr/share/myslice"
+PRODUCTION_ROOT="/usr/share/myslice/USE_DEVELOPMENT"
 
 ####################
 ADMINS = (
