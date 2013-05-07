@@ -4,7 +4,7 @@ from unfold.plugin import Plugin
 # sons is expected to be a list of the contained plugins, and 
 # active_domid is the domid for the one son that should be displayed as active
 # some subclasses of Composite, like e.g. Tabs, will not behave as expected 
-# if a valid active_domid is not be provided
+# if a valid active_domid is not provided
 
 class Composite (Plugin):
 

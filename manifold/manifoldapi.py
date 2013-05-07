@@ -41,7 +41,12 @@ class ManifoldAPI:
                 ### attempt to cope with old APIs and new APIs
                 if isinstance (result, dict) and 'code' in result:
                     # this sounds like a result from a new API, leave it untouched
-                    return result # jordan
+                    # XXX jordan : we need to wrap it into a ResultValue structure
+                    # XXX this is not good until we merge both repos
+                    if result['code'] != 2:
+                        return ManifoldResult(code=result['code'], value=result['result'])
+                    else:
+                        return ManifoldResult(code=result['code'], output=result['description'])
                 else:
                     if debug:
                         print '<=== backend call', methodName, args, kwds

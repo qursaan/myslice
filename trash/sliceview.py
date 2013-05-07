@@ -6,7 +6,8 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
-from manifold.manifoldquery import ManifoldQuery
+#from manifold.manifoldquery import ManifoldQuery
+from manifold.core.query import Query, AnalyzedQuery
 
 from plugins.raw.raw import Raw
 from plugins.stack.stack import Stack
@@ -23,126 +24,221 @@ from myslice.viewutils import quickfilter_criterias
 
 from myslice.viewutils import topmenu_items, the_user
 
+# XXX JORDAN
+from manifold.metadata import MetaData as Metadata
+
 tmp_default_slice='ple.inria.heartbeat'
+debug = True
 
 @login_required
 def slice_view (request, slicename=tmp_default_slice):
     
     page = Page(request)
 
-    main_query = ManifoldQuery (action='get',
-                                subject='resource',
-                                timestamp='latest',
-                                fields=['network','type','hrn','hostname'],
-                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
-                                )
-    page.enqueue_query (main_query)
+    # TODO The query to run is embedded in the URL
+    main_query = Query({'action': 'get', 'object': 'slice'}).filter_by('slice_hrn', '=', slicename)
 
+    # Get default fields from metadata unless specified
+    if not main_query.fields:
+        md_fields = page.get_metadata()
+        md_fields = md_fields.details_by_subject('slice')
+        if debug:
+            print "METADATA", md_fields
+        # TODO Get default fields
+        main_query.fields = ['slice_hrn', 'resource.hrn', 'resource.hostname', 'resource.type', 'resource.authority']
+
+#old#    main_query = ManifoldQuery (action='get',
+#old#                                subject='resource',
+#old#                                timestamp='latest',
+#old#                                fields=['network','type','hrn','hostname'],
+#old#                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
+#old#                                )
+    page.enqueue_query(main_query)
+
+    # Prepare the display according to all metadata
+    # (some parts will be pending, others can be triggered by users).
+    # 
+    # For example slice measurements will not be requested by default...
+
+    # Create the base layout (Stack)...
     main_plugin = Stack (
         page=page,
         title="Slice view for %s"%slicename,
         domid='thestack',
         togglable=False,
         sons=[
-            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename),
             Messages (
                 page=page,
                 title="Runtime messages for slice %s"%slicename,
                 domid="msgs-pre",
                 levels="ALL",
                 ),
-            Tabs (
-                page=page,
-                title="2 tabs : w/ and w/o checkboxes",
-                domid='thetabs',
-                # active_domid='checkboxes',
-                active_domid='gmap',
-                sons=[
-                    Hazelnut ( 
-                        page=page,
-                        title='a sample and simple hazelnut',
-                        domid='simple',
-                        # tab's sons preferably turn this off
-                        togglable=False,
-                        # this is the query at the core of the slice list
-                        query=main_query,
-                        ),
-                    Hazelnut ( 
-                        page=page,
-                        title='with checkboxes',
-                        domid='checkboxes',
-                        # tab's sons preferably turn this off
-                        togglable=False,
-                        # this is the query at the core of the slice list
-                        query=main_query,
-                        checkboxes=True,
-                        datatables_options = { 
-                            # for now we turn off sorting on the checkboxes columns this way
-                            # this of course should be automatic in hazelnut
-                            'aoColumns' : [ None, None, None, None, {'bSortable': False} ],
-                            'iDisplayLength' : 25,
-                            'bLengthChange' : True,
-                            },
-                        ),
-                    GoogleMap (
-                        page=page,
-                        title='geographic view',
-                        domid='gmap',
-                        # tab's sons preferably turn this off
-                        togglable=False,
-                        query=main_query,
-                        # center on Paris
-                        latitude=49.,
-                        longitude=2.2,
-                        zoom=3,
-                        ),
-                    Raw (
-#                    SensLabMap (
-                        page=page,
-                        title='3D view (disabled)',
-                        domid='smap',
-#                        # tab's sons preferably turn this off
-                        togglable=False,
-#                        query=main_query,
-                        html="""<p class='well'>
-Thierry: I am commeting off the use of <button class="btn btn-danger">SensLabMap</button> which,
- although rudimentarily ported to the django framework, 
-causes a weird behaviour especially wrt scrolling. 
-On my Mac <button class="btn btn-warning"> I cannot use the mouse to scroll</button> any longer
-if I keep this active, so for now it's disabled
-</p>""",
-                        ),
-                    ]),
-            Hazelnut ( 
-                page=page,
-                title='a hazelnut not in tabs',
-                domid='standalone',
-                # this is the query at the core of the slice list
-                query=main_query,
-                columns=['hrn','hostname'],
-                ),
-              # you don't *have to* set a domid, but if you plan on using toggled=persistent then it's required
-              # because domid is the key for storing toggle status in the browser
-            QueryCode (
-                page=page,
-                title='xmlrpc code (toggled=False)',
-                query=main_query,
-#                domid='xmlrpc',
-                toggled=False,
-                ),
-            QuickFilter (
-                page=page,
-                title="QuickFilter - requires metadata (toggled=False)",
-                criterias=quickfilter_criterias,
-                domid='filters',
-                toggled=False,
-                ),
-            Messages (
-                page=page,
-                title="Runtime messages (again)",
-                domid="msgs-post",
-                )
-              ])
+            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename),
+        ]
+    )
+
+    # ... responsible for the slice properties...
+
+    main_plugin.insert(
+        Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
+    )
+
+
+    # ... and for the relations
+    # XXX Let's hardcode resources for now
+    aq = AnalyzedQuery(main_query)
+    sq = aq.subquery('resource')
+    
+    tab_resources = Tabs (
+        page         = page,
+        title        = 'Resources',
+        domid        = 'thetabs',
+        # activeid   = 'checkboxes',
+        active_domid = 'gmap',
+    )
+    main_plugin.insert(tab_resources)
+
+    tab_resources.insert(
+        Hazelnut ( 
+            page        = page,
+            title       = 'List',
+            domid       = 'checkboxes',
+            # tab's sons preferably turn this off
+            togglable   = False,
+            # this is the query at the core of the slice list
+            query       = sq,
+            checkboxes  = True,
+            datatables_options = { 
+                # for now we turn off sorting on the checkboxes columns this way
+                # this of course should be automatic in hazelnut
+                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+                'iDisplayLength' : 25,
+                'bLengthChange'  : True,
+            },
+        )
+    )
+    tab_resources.insert(
+        GoogleMap (
+            page        = page,
+            title       = 'Geographic view',
+            domid       = 'gmap',
+            # tab's sons preferably turn this off
+            togglable   = False,
+            query       = sq,
+            # center on Paris
+            latitude    = 49.,
+            longitude   = 2.2,
+            zoom        = 3,
+        )
+    )
+
+    # END OF JORDAN's CODE
+
+#old#    main_plugin = Stack (
+#old#        page=page,
+#old#        title="Slice view for %s"%slicename,
+#old#        domid='thestack',
+#old#        togglable=False,
+#old#        sons=[
+#old#            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename),
+#old#            Messages (
+#old#                page=page,
+#old#                title="Runtime messages for slice %s"%slicename,
+#old#                domid="msgs-pre",
+#old#                levels="ALL",
+#old#                ),
+#old#            Tabs (
+#old#                page=page,
+#old#                title="2 tabs : w/ and w/o checkboxes",
+#old#                domid='thetabs',
+#old#                # active_domid='checkboxes',
+#old#                active_domid='gmap',
+#old#                sons=[
+#old#                    Hazelnut ( 
+#old#                        page=page,
+#old#                        title='a sample and simple hazelnut',
+#old#                        domid='simple',
+#old#                        # tab's sons preferably turn this off
+#old#                        togglable=False,
+#old#                        # this is the query at the core of the slice list
+#old#                        query=main_query,
+#old#                        ),
+#old#                    Hazelnut ( 
+#old#                        page=page,
+#old#                        title='with checkboxes',
+#old#                        domid='checkboxes',
+#old#                        # tab's sons preferably turn this off
+#old#                        togglable=False,
+#old#                        # this is the query at the core of the slice list
+#old#                        query=main_query,
+#old#                        checkboxes=True,
+#old#                        datatables_options = { 
+#old#                            # for now we turn off sorting on the checkboxes columns this way
+#old#                            # this of course should be automatic in hazelnut
+#old#                            'aoColumns' : [ None, None, None, None, {'bSortable': False} ],
+#old#                            'iDisplayLength' : 25,
+#old#                            'bLengthChange' : True,
+#old#                            },
+#old#                        ),
+#old#                    GoogleMap (
+#old#                        page=page,
+#old#                        title='geographic view',
+#old#                        domid='gmap',
+#old#                        # tab's sons preferably turn this off
+#old#                        togglable=False,
+#old#                        query=main_query,
+#old#                        # center on Paris
+#old#                        latitude=49.,
+#old#                        longitude=2.2,
+#old#                        zoom=3,
+#old#                        ),
+#old#                    Raw (
+#old##                    SensLabMap (
+#old#                        page=page,
+#old#                        title='3D view (disabled)',
+#old#                        domid='smap',
+#old##                        # tab's sons preferably turn this off
+#old#                        togglable=False,
+#old##                        query=main_query,
+#old#                        html="""<p class='well'>
+#old#Thierry: I am commeting off the use of <button class="btn btn-danger">SensLabMap</button> which,
+#old# although rudimentarily ported to the django framework, 
+#old#causes a weird behaviour especially wrt scrolling. 
+#old#On my Mac <button class="btn btn-warning"> I cannot use the mouse to scroll</button> any longer
+#old#if I keep this active, so for now it's disabled
+#old#</p>""",
+#old#                        ),
+#old#                    ]),
+#old#            Hazelnut ( 
+#old#                page=page,
+#old#                title='a hazelnut not in tabs',
+#old#                domid='standalone',
+#old#                # this is the query at the core of the slice list
+#old#                query=main_query,
+#old#                columns=['hrn','hostname'],
+#old#                ),
+#old#              # you don't *have to* set a domid, but if you plan on using toggled=persistent then it's required
+#old#              # because domid is the key for storing toggle status in the browser
+#old#            QueryCode (
+#old#                page=page,
+#old#                title='xmlrpc code (toggled=False)',
+#old#                query=main_query,
+#old##                domid='xmlrpc',
+#old#                toggled=False,
+#old#                ),
+#old#            QuickFilter (
+#old#                page=page,
+#old#                title="QuickFilter - requires metadata (toggled=False)",
+#old#                criterias=quickfilter_criterias,
+#old#                domid='filters',
+#old#                toggled=False,
+#old#                ),
+#old#            Messages (
+#old#                page=page,
+#old#                title="Runtime messages (again)",
+#old#                domid="msgs-post",
+#old#                )
+#old#              ])
 
     # variables that will get passed to the view-unfold1.html template
     template_env = {}

@@ -16,6 +16,9 @@ class MetaData:
         self.auth=auth
         self.hash_by_subject={}
 
+        # XXX Retrieve all metadata the first time we instanciate the class
+        self.fetch()
+
     def fetch (self):
         offline_filename="offline-metadata.json"
         if work_offline:
@@ -32,7 +35,10 @@ class MetaData:
                   'column.resource_type', 'column.value_type',
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
-        rows_result = manifold_api.Get(fact_table='metadata:table', fields=fields)
+        rows_result = manifold_api.Get({
+            'fact_table': 'local:objects', # proposed to replace metadata:table
+            'fields':     fields 
+        })
 #old#        rows_result = manifold_api.Get('metadata:table', [], [], fields)
         rows = rows_result.ok_value()
         if not rows:
@@ -52,4 +58,3 @@ class MetaData:
 
     def sorted_fields_by_subject (self, subject):
         return self.hash_by_subject[subject]['columns'].sort()
-
