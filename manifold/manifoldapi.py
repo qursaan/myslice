@@ -76,11 +76,11 @@ class ManifoldAPI:
     def send_manifold_query (self, query):
         # We use a dictionary representation of the query for forwarding it to the API
         ret = self.forward(query.to_dict())
-        print "="*80
-        print "Result:"
-        print ret
-        print "="*80
-        print ret
+        if debug:
+            print "="*80
+            print "Result:"
+            print ret
+            print "="*80
         return ret
 
 #old#        (action,subject)= (query.action,query.subject)

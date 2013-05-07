@@ -5,11 +5,22 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-# change these if you use a different convention
+# compute ROOT from where this file is installed
+# should fit every need including developers
+# but you can redefine ROOT if that's not working for you
+try:
+    # get the directory where this file is
+    ROOT=os.path.dirname(__file__) or '.'
+    # move one step up
+    ROOT=os.path.realpath(ROOT+'/..')
+except:
+    ROOT=None
+    if DEBUG:
+        import traceback
+        traceback.print_exc()
 
-DEVELOPER_ROOT=os.path.expanduser("~/repos/myslice-django")
-
-PRODUCTION_ROOT="/usr/share/myslice/USE_DEVELOPMENT"
+if not ROOT:
+    raise Exception,"Cannot find ROOT for myslice"
 
 ####################
 ADMINS = (
@@ -17,22 +28,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-####################
-# guess if we run on the 'prod' site (:) that for now uses /root/myslice and run manage.py
-# or on a working laptop, in which case we use ~/git/myslice-django
-import os, os.path
-ROOT=''
-def init_root ():
-    global ROOT
-    if os.path.exists(PRODUCTION_ROOT):
-        ROOT=PRODUCTION_ROOT
-    elif os.path.exists (DEVELOPER_ROOT):
-        ROOT=DEVELOPER_ROOT
-    else:
-        raise Exception,"Cannot find ROOT for myslice (neither %s nor %s)"%(PRODUCTION_ROOT,DEVELOPER_ROOT)
-
-init_root()
 
 DATABASES = {
     'default': {
