@@ -44,7 +44,7 @@ class ManifoldAPI:
                     # XXX jordan : we need to wrap it into a ResultValue structure
                     # XXX this is not good until we merge both repos
                     if result['code'] != 2:
-                        return ManifoldResult(code=result['code'], value=result['result'])
+                        return ManifoldResult(code=result['code'], value=result['value'])
                     else:
                         return ManifoldResult(code=result['code'], output=result['description'])
                 else:

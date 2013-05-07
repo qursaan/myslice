@@ -120,13 +120,13 @@ INSERT INTO subject VALUES(field=value)
             if (pos != -1) {
                 var subject = k.substr(0, pos);
                 var field = k.substr(pos+1);
-                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
-                    q.subqueries[this.subject] = new ManifoldQuery();
-                    q.subqueries[this.subject].action = this.action;
-                    q.subqueries[this.subject].subject = this.subject;
-                    q.subqueries[this.subject].timestamp = this.timestamp;
+                if (!q.subqueries[subject]) {
+                    q.subqueries[subject] = new ManifoldQuery();
+                    q.subqueries[subject].action = this.action;
+                    q.subqueries[subject].subject = this.subject;
+                    q.subqueries[subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.subject].filters.push(Array(field, op, v));
+                q.subqueries[subject].filters.push(Array(field, op, v));
             } else {
                 q.filters.push(this.filter);
             }
@@ -138,13 +138,13 @@ INSERT INTO subject VALUES(field=value)
             if (pos != -1) {
                 var subject = param.substr(0, pos);
                 var field = param.substr(pos+1);
-                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
-                    q.subqueries[this.subject] = new ManifoldQuery();
-                    q.subqueries[this.subject].action = this.action;
-                    q.subqueries[this.subject].subject = this.subject;
-                    q.subqueries[this.subject].timestamp = this.timestamp;
+                if (!q.subqueries[subject]) {
+                    q.subqueries[subject] = new ManifoldQuery();
+                    q.subqueries[subject].action = this.action;
+                    q.subqueries[subject].subject = this.subject;
+                    q.subqueries[subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.subject].params[field] = value;
+                q.subqueries[subject].params[field] = value;
             } else {
                 q.params[field] = value;
             }
@@ -156,13 +156,13 @@ INSERT INTO subject VALUES(field=value)
             if (pos != -1) {
                 var subject = v.substr(0, pos);
                 var field = v.substr(pos+1);
-                if (jQuery.inArray(this.subject, q.subqueries) == -1) {
-                    q.subqueries[this.subject] = new ManifoldQuery();
-                    q.subqueries[this.subject].action = this.action;
-                    q.subqueries[this.subject].subject = this.subject;
-                    q.subqueries[this.subject].timestamp = this.timestamp;
+                if (!q.subqueries[subject]) {
+                    q.subqueries[subject] = new ManifoldQuery();
+                    q.subqueries[subject].action = this.action;
+                    q.subqueries[subject].subject = this.subject;
+                    q.subqueries[subject].timestamp = this.timestamp;
                 }
-                q.subqueries[this.subject].fields.push(field);
+                q.subqueries[subject].fields.push(field);
             } else {
                 q.fields.push(v);
             }
@@ -171,14 +171,49 @@ INSERT INTO subject VALUES(field=value)
     }
  
     /* constructor */
-    this.action = action;
-    this.subject = subject;
-    this.timestamp = timestamp;
-    this.filters = filters;
-    this.params = params;
-    this.fields = fields;
-    this.unique = unique;
+    if (typeof action == "undefined")
+        this.action = "get";
+    else
+        this.action = action;
+    
+    if (typeof subject == "undefined")
+        this.subject = null;
+    else
+        this.subject = subject;
+
+    if (typeof timestamp == "undefined")
+        this.timestamp = "now";
+    else
+        this.timestamp = timestamp;
+
+    if (typeof filters == "undefined")
+        this.filters = [];
+    else
+        this.filters = filters;
+
+    if (typeof params == "undefined")
+        this.params = {};
+    else
+        this.params = params;
+
+    if (typeof fields == "undefined")
+        this.fields = [];
+    else
+        this.fields = fields;
+
+    if (typeof unique == "undefined")
+        this.unique = false;
+    else
+        this.unique = unique;
+
     this.query_uuid = query_uuid;
-    this.analyzed_query = aq;
-    this.subqueries = sq;
+    if (typeof analyzed_query == "undefined")
+        this.analyzed_query = null;
+    else
+        this.analyzed_query = aq;
+
+    if (typeof subqueries == "undefined")
+        this.subqueries = {};
+    else
+        this.subqueries = sq;
 }  

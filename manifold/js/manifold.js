@@ -18,16 +18,41 @@ function debug_query (msg, query) {
 }
 
 /* ------------------------------------------------------------ */
-// this namespace holds functions for globally managing query objects
+
+/*!
+ * This namespace holds functions for globally managing query objects
+ * \Class Manifold
+ */
 var manifold = {
 
+    /*!
+     * Associative array storing the set of queries active on the page
+     * \memberof Manifold
+     */
     all_queries: {},
 
+    /*!
+     * Insert a query in the global hash table associating uuids to queries.
+     * If the query has no been analyzed yet, let's do it.
+     * \fn insert_query(query)
+     * \memberof Manifold
+     * \param ManifoldQuery query Query to be added
+     */
     insert_query : function (query) { 
-	manifold.all_queries[query.query_uuid]=query; 
+        if (query.analyzed_query == null) {
+            query.analyze_subqueries();
+        }
+        manifold.all_queries[query.query_uuid]=query; 
     },
+
+    /*!
+     * Returns the query associated to a UUID
+     * \fn find_query(query_uuid)
+     * \memberof Manifold
+     * \param string query_uuid The UUID of the query to be returned
+     */
     find_query : function (query_uuid) { 
-	return manifold.all_queries[query_uuid];
+        return manifold.all_queries[query_uuid];
     },
 
     // trigger a query asynchroneously
@@ -38,68 +63,68 @@ var manifold = {
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_publish_dom_tuples) {
-	// start spinners
+        // start spinners
 
-	// in case the spin stuff was not loaded, let's make sure we proceed to the exit 
-	try {
-	    if (manifold.asynchroneous_debug) 
-		messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
-	    jQuery('.need-spin').spin(spin_presets);
-	} catch (err) { messages.debug("Cannot turn on spins " + err); }
+        // in case the spin stuff was not loaded, let's make sure we proceed to the exit 
+        try {
+            if (manifold.asynchroneous_debug) 
+            messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
+            jQuery('.need-spin').spin(spin_presets);
+        } catch (err) { messages.debug("Cannot turn on spins " + err); }
 	
-	// We use js function closure to be able to pass the query (array) to the
-	// callback function used when data is received
-	var success_closure = function(query, publish_uuid, domid) {
-	    return function(data, textStatus) {manifold.asynchroneous_success(data, query, publish_uuid, domid);}};
-	
-	// Loop through input array, and use publish_uuid to publish back results
-	jQuery.each(query_publish_dom_tuples, function(index, tuple) {
-	    var query=manifold.find_query(tuple.query_uuid);
-	    var query_json=JSON.stringify (query);
-	    var publish_uuid=tuple.publish_uuid;
-	    // by default we publish using the same uuid of course
-	    if (publish_uuid==undefined) publish_uuid=query.query_uuid;
-	    if (manifold.asynchroneous_debug) {
-		messages.debug("sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
-		messages.debug("... ctd... with actual query= " + query.__repr());
-	    }
-	    // not quite sure what happens if we send a string directly, as POST data is named..
-	    // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-            jQuery.post(manifold.proxy_url, {'json':query_json} , success_closure(query, publish_uuid, tuple.domid));
-	})
-	    },
+        // We use js function closure to be able to pass the query (array) to the
+        // callback function used when data is received
+        var success_closure = function(query, publish_uuid, domid) {
+            return function(data, textStatus) {manifold.asynchroneous_success(data, query, publish_uuid, domid);}};
+        
+        // Loop through input array, and use publish_uuid to publish back results
+        jQuery.each(query_publish_dom_tuples, function(index, tuple) {
+            var query=manifold.find_query(tuple.query_uuid);
+            var query_json=JSON.stringify (query);
+            var publish_uuid=tuple.publish_uuid;
+            // by default we publish using the same uuid of course
+            if (publish_uuid==undefined) publish_uuid=query.query_uuid;
+            if (manifold.asynchroneous_debug) {
+                messages.debug("sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
+                messages.debug("... ctd... with actual query= " + query.__repr());
+            }
+            // not quite sure what happens if we send a string directly, as POST data is named..
+            // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
+                jQuery.post(manifold.proxy_url, {'json':query_json} , success_closure(query, publish_uuid, tuple.domid));
+        })
+    },
 
     // if set domid allows the result to be directed to just one plugin
     // most of the time publish_uuid will be query.query_uuid
     // however in some cases we wish to publish the results under a different uuid
     // e.g. an updater wants to publish its results as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, domid) {
-	// xxx should have a nicer declaration of that enum in sync with the python code somehow
-	if (data.code == 1) {
-	    alert("Your session has expired, please log in again");
-	    window.location="/logout/";
-	    return;
-	} else if (data.code != 0) {
-	    messages.error("Error received from manifold backend at " + MANIFOLD_URL + " [" + data.output + "]");
-	    // publish error code and text message on a separate channel for whoever is interested
-	    jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.output] );
-	    return;
-	}
-	// once everything is checked we can use the 'value' part of the manifoldresult
-	var value=data.value;
-	if (value) {
+        // xxx should have a nicer declaration of that enum in sync with the python code somehow
+        if (data.code == 2) { // ERROR
+            alert("Your session has expired, please log in again");
+            window.location="/logout/";
+            return;
+        }
+        if (data.code == 1) { // WARNING
+            messages.error("Some errors have been received from the manifold backend at " + MANIFOLD_URL + " [" + data.description + "]");
+            // publish error code and text message on a separate channel for whoever is interested
+            jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
+        }
+        // once everything is checked we can use the 'value' part of the manifoldresult
+        var value=data.value;
+        if (value) {
             if (!!domid) {
-		/* Directly inform the requestor */
-		if (manifold.asynchroneous_debug) messages.debug("directing results to " + domid);
-		jQuery('#' + domid).trigger('results', [value]);
+                /* Directly inform the requestor */
+                if (manifold.asynchroneous_debug) messages.debug("directing results to " + domid);
+                jQuery('#' + domid).trigger('results', [value]);
             } else {
-		/* Publish an update announce */
-		var channel="/results/" + publish_uuid + "/changed";
-		if (manifold.asynchroneous_debug) messages.debug("publishing results on " + channel);
-		jQuery.publish(channel, [value, query]);
+                /* Publish an update announce */
+                var channel="/results/" + publish_uuid + "/changed";
+                if (manifold.asynchroneous_debug) messages.debug("publishing results on " + channel);
+                jQuery.publish(channel, [value, query]);
             }
 
-	}
+        }
     },
 
 }; // manifold object
