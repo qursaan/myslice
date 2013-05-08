@@ -127,7 +127,7 @@
             fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
         };
 	// the intention here is that options.datatables_options as coming from the python object take precedence
-	$.extend(actual_options, options.datatables_options );
+//	XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
         this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
 
         /* Setup the SelectAll button in the dataTable header */
@@ -372,6 +372,7 @@
      */
     function hazelnut_filter (oSettings, aData, iDataIndex) {
         var cur_query = this.current_query;
+        if (!cur_query) return true;
         var ret = true;
 
         /* We have an array of filters : a filter is an array (key op val) 

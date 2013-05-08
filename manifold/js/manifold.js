@@ -42,7 +42,7 @@ var manifold = {
         if (query.analyzed_query == null) {
             query.analyze_subqueries();
         }
-        manifold.all_queries[query.query_uuid]=query; 
+        manifold.all_queries[query.query_uuid]=query;
     },
 
     /*!
@@ -94,10 +94,61 @@ var manifold = {
         })
     },
 
+
+    /*!
+     * Returns whether a query expects a unique results.
+     * This is the case when the filters contain a key of the object
+     * \fn query_expects_unique_result(query)
+     * \memberof Manifold
+     * \param ManifoldQuery query Query for which we are testing whether it expects a unique result
+     */
+    query_expects_unique_result: function(query) {
+        /* XXX we need functions to query metadata */
+        //var keys = MANIFOLD_METADATA[query.object]['keys']; /* array of array of field names */
+        /* TODO requires keys in metadata */
+        return true;
+    },
+
+    /*!
+     * Publish result
+     * \fn publish_result(query, results)
+     * \memberof Manifold
+     * \param ManifoldQuery query Query which has received results
+     * \param array results results corresponding to query
+     */
+    publish_result: function(query, result) {
+        /* Publish an update announce */
+        var channel="/results/" + query.query_uuid + "/changed";
+        if (manifold.asynchroneous_debug) messages.debug("publishing result on " + channel);
+        jQuery.publish(channel, [result, query]);
+    },
+
+    /*!
+     * Recursively publish result
+     * \fn publish_result_rec(query, result)
+     * \memberof Manifold
+     * \param ManifoldQuery query Query which has received result
+     * \param array result result corresponding to query
+     */
+    publish_result_rec: function(query, result) {
+        /* If the result is not unique, only publish the top query;
+         * otherwise, publish the main object as well as subqueries
+         * XXX how much recursive are we ?
+         */
+        if (manifold.query_expects_unique_result(query)) {
+            /* Also publish subqueries */
+            jQuery.each(query.subqueries, function(object, subquery) {
+                manifold.publish_result_rec(subquery, result[0][object]);
+                /* TODO remove object from result */
+            });
+        }
+        manifold.publish_result(query, result);
+    },
+
     // if set domid allows the result to be directed to just one plugin
     // most of the time publish_uuid will be query.query_uuid
-    // however in some cases we wish to publish the results under a different uuid
-    // e.g. an updater wants to publish its results as if from the original (get) query
+    // however in some cases we wish to publish the result under a different uuid
+    // e.g. an updater wants to publish its result as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, domid) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
         if (data.code == 2) { // ERROR
@@ -111,17 +162,19 @@ var manifold = {
             jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
         }
         // once everything is checked we can use the 'value' part of the manifoldresult
-        var value=data.value;
-        if (value) {
+        var result=data.value;
+        if (result) {
             if (!!domid) {
                 /* Directly inform the requestor */
-                if (manifold.asynchroneous_debug) messages.debug("directing results to " + domid);
-                jQuery('#' + domid).trigger('results', [value]);
+                if (manifold.asynchroneous_debug) messages.debug("directing result to " + domid);
+                jQuery('#' + domid).trigger('results', [result]);
             } else {
-                /* Publish an update announce */
-                var channel="/results/" + publish_uuid + "/changed";
-                if (manifold.asynchroneous_debug) messages.debug("publishing results on " + channel);
-                jQuery.publish(channel, [value, query]);
+                /* XXX Jordan XXX I don't need publish_uuid here... What is it used for ? */
+                /* query is the query we sent to the backend; we need to find the
+                 * corresponding analyezd_query in manifold.all_queries
+                 */
+                tmp_query = manifold.find_query(query.query_uuid);
+                manifold.publish_result_rec(tmp_query.analyzed_query, result);
             }
 
         }

@@ -34,6 +34,8 @@ debug = True
 def slice_view (request, slicename=tmp_default_slice):
     
     page = Page(request)
+    page.expose_js_metadata()
+
 
     # TODO The query to run is embedded in the URL
     main_query = Query({'action': 'get', 'object': 'slice'}).filter_by('slice_hrn', '=', slicename)
@@ -53,7 +55,9 @@ def slice_view (request, slicename=tmp_default_slice):
 #old#                                fields=['network','type','hrn','hostname'],
 #old#                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
 #old#                                )
-    page.enqueue_query(main_query)
+
+    aq = AnalyzedQuery(main_query)
+    page.enqueue_query(main_query, analyzed_query=aq)
 
     # Prepare the display according to all metadata
     # (some parts will be pending, others can be triggered by users).
@@ -86,7 +90,6 @@ def slice_view (request, slicename=tmp_default_slice):
 
     # ... and for the relations
     # XXX Let's hardcode resources for now
-    aq = AnalyzedQuery(main_query)
     sq = aq.subquery('resource')
     
     tab_resources = Tabs (
@@ -98,6 +101,10 @@ def slice_view (request, slicename=tmp_default_slice):
     )
     main_plugin.insert(tab_resources)
 
+    jj = aq.to_json()
+    print "="*80
+    print "AQ=", jj
+    print "="*80
     tab_resources.insert(
         Hazelnut ( 
             page        = page,

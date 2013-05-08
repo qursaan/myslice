@@ -53,9 +53,17 @@ class Page:
     # in this case (exec=True) the js async callback (see manifold.asynchroneous_success)
     # offers the option to deliver the result to a specific DOM elt (in this case, set domid)
     # otherwise (i.e. if domid not provided), it goes through the pubsub system (so all plugins can receive it)
-    def enqueue_query (self, query, run_it=True, domid=None):
+    # 
+    # NOTE:
+    # analyzed_query is required because it contains query_uuid that the
+    # plugins initialized in the python part will listen to. When a result is
+    # received in javascript, subresults should be publish to the appropriate
+    # query_uuid.
+    # 
+    def enqueue_query (self, query, run_it=True, domid=None, analyzed_query=None):
         # _queries is the set of all known queries
-        self._queries = self._queries.union(set( [ query, ] ))
+        # XXX complex XXX self._queries = self._queries.union(set( [ query, ] ))
+        self._queries.add((query, analyzed_query))
         # _queue is the list of queries that need to be triggered, with an optional domid
         # we only do this if run_it is set
         if run_it: self._queue.append ( (query.query_uuid,domid) )
@@ -67,7 +75,7 @@ class Page:
         # compute variables to expose to the template
         env = {}
         # expose the json definition of all queries
-        env['queries_json'] = [ query.to_json() for query in self._queries ]
+        env['queries_json'] = [ query.to_json(analyzed_query=aq) for (query, aq) in self._queries ]
         def query_publish_dom_tuple (a,b):
             result={'query_uuid':a}
             if b: result['domid']=b

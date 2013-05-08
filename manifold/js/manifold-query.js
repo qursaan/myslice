@@ -122,13 +122,13 @@ INSERT INTO subject VALUES(field=value)
                 var field = k.substr(pos+1);
                 if (!q.subqueries[subject]) {
                     q.subqueries[subject] = new ManifoldQuery();
-                    q.subqueries[subject].action = this.action;
-                    q.subqueries[subject].subject = this.subject;
-                    q.subqueries[subject].timestamp = this.timestamp;
+                    q.subqueries[subject].action = q.action;
+                    q.subqueries[subject].subject = subject;
+                    q.subqueries[subject].timestamp = q.timestamp;
                 }
                 q.subqueries[subject].filters.push(Array(field, op, v));
             } else {
-                q.filters.push(this.filter);
+                q.filters.push(filter);
             }
         });
 
@@ -140,9 +140,9 @@ INSERT INTO subject VALUES(field=value)
                 var field = param.substr(pos+1);
                 if (!q.subqueries[subject]) {
                     q.subqueries[subject] = new ManifoldQuery();
-                    q.subqueries[subject].action = this.action;
-                    q.subqueries[subject].subject = this.subject;
-                    q.subqueries[subject].timestamp = this.timestamp;
+                    q.subqueries[subject].action = q.action;
+                    q.subqueries[subject].subject = subject;
+                    q.subqueries[subject].timestamp = q.timestamp;
                 }
                 q.subqueries[subject].params[field] = value;
             } else {
@@ -158,9 +158,9 @@ INSERT INTO subject VALUES(field=value)
                 var field = v.substr(pos+1);
                 if (!q.subqueries[subject]) {
                     q.subqueries[subject] = new ManifoldQuery();
-                    q.subqueries[subject].action = this.action;
-                    q.subqueries[subject].subject = this.subject;
-                    q.subqueries[subject].timestamp = this.timestamp;
+                    q.subqueries[subject].action = q.action;
+                    q.subqueries[subject].subject = subject;
+                    q.subqueries[subject].timestamp = q.timestamp;
                 }
                 q.subqueries[subject].fields.push(field);
             } else {
@@ -207,12 +207,13 @@ INSERT INTO subject VALUES(field=value)
         this.unique = unique;
 
     this.query_uuid = query_uuid;
-    if (typeof analyzed_query == "undefined")
+
+    if (typeof aq == "undefined")
         this.analyzed_query = null;
     else
         this.analyzed_query = aq;
 
-    if (typeof subqueries == "undefined")
+    if (typeof sq == "undefined")
         this.subqueries = {};
     else
         this.subqueries = sq;
