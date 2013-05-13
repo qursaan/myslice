@@ -38,23 +38,16 @@ def slice_view (request, slicename=tmp_default_slice):
 
 
     # TODO The query to run is embedded in the URL
-    main_query = Query({'action': 'get', 'object': 'slice'}).filter_by('slice_hrn', '=', slicename)
+    main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
 
     # Get default fields from metadata unless specified
     if not main_query.fields:
         md_fields = page.get_metadata()
-        md_fields = md_fields.details_by_subject('slice')
+        md_fields = md_fields.details_by_object('slice')
         if debug:
             print "METADATA", md_fields
         # TODO Get default fields
         main_query.fields = ['slice_hrn', 'resource.hrn', 'resource.hostname', 'resource.type', 'resource.authority']
-
-#old#    main_query = ManifoldQuery (action='get',
-#old#                                subject='resource',
-#old#                                timestamp='latest',
-#old#                                fields=['network','type','hrn','hostname'],
-#old#                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
-#old#                                )
 
     aq = AnalyzedQuery(main_query)
     page.enqueue_query(main_query, analyzed_query=aq)

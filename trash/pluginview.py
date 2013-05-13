@@ -8,7 +8,8 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
-from manifold.manifoldquery import ManifoldQuery
+#from manifold.manifoldquery import ManifoldQuery
+from manifold.core.query import Query
 
 from plugins.stack.stack import Stack
 from plugins.tabs.tabs import Tabs
@@ -32,12 +33,7 @@ def test_plugin_view (request):
     template_env = {}
     
     slicename='ple.inria.heartbeat'
-    main_query = ManifoldQuery (action='get',
-                                subject='resource',
-                                timestamp='latest',
-                                fields=['network','type','hrn','hostname','sliver'],
-                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
-                                )
+    main_query = Query.get('resource').filter_by('slice_hrn', '=', slicename).select(['network','type','hrn','hostname','sliver'])
     # without an hazelnut, this would use use : run_it=False as nothing would listen to the results
     page.enqueue_query (main_query, # run_it=False
                         )

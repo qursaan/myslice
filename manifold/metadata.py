@@ -14,7 +14,7 @@ class MetaData:
 
     def __init__ (self, auth):
         self.auth=auth
-        self.hash_by_subject={}
+        self.hash_by_object={}
 
         # XXX Retrieve all metadata the first time we instanciate the class
         self.fetch()
@@ -24,7 +24,7 @@ class MetaData:
         if work_offline:
             try:
                 with file(offline_metadata) as f:
-                    self.hash_by_subject=json.loads(f.read())
+                    self.hash_by_object=json.loads(f.read())
                 return
             except:
                 print "metadata.work_offline: failed to decode %s"%offline_filename
@@ -36,7 +36,7 @@ class MetaData:
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
         rows_result = manifold_api.Get({
-            'fact_table': 'local:objects', # proposed to replace metadata:table
+            'object': 'local:objects', # proposed to replace metadata:table
             'fields':     fields 
         })
 #old#        rows_result = manifold_api.Get('metadata:table', [], [], fields)
@@ -44,17 +44,17 @@ class MetaData:
         if not rows:
             print "Failed to retrieve metadata",rows_result.error()
             rows=[]
-        self.hash_by_subject = dict ( [ (row['table'], row) for row in rows ] )
+        self.hash_by_object = dict ( [ (row['table'], row) for row in rows ] )
         # save for next time we use offline mode
         if debug:
             with file(offline_filename,'w') as f:
-                f.write(json.dumps(self.hash_by_subject))
+                f.write(json.dumps(self.hash_by_object))
 
     def to_json(self):
-        return json.dumps(self.hash_by_subject)
+        return json.dumps(self.hash_by_object)
 
-    def details_by_subject (self, subject):
-        return self.hash_by_subject[subject]
+    def details_by_object (self, object):
+        return self.hash_by_object[object]
 
-    def sorted_fields_by_subject (self, subject):
-        return self.hash_by_subject[subject]['columns'].sort()
+    def sorted_fields_by_object (self, object):
+        return self.hash_by_object[object]['columns'].sort()

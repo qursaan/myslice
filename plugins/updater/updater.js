@@ -59,7 +59,7 @@
 	var query=manifold.find_query (options.query_uuid);
 	// very rough way of filling this for now
 	this.update_query = 
-	    new ManifoldQuery ("update", query.subject, null, query.filters, 
+	    new ManifoldQuery ("update", query.object, null, query.filters, 
 			       {}, // params
 			       query.fields, 
 			       undefined, /* unique */ 

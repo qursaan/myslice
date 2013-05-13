@@ -187,7 +187,7 @@ class Query(object):
     def to_json (self, analyzed_query=None):
         query_uuid=self.query_uuid
         a=self.action
-        s=self.object
+        o=self.object
         t=self.timestamp
         f=json.dumps (self.filters.to_list())
         p=json.dumps (self.params)
@@ -201,7 +201,7 @@ class Query(object):
             aq = analyzed_query.to_json()
         sq="{}"
         
-        result= """ new ManifoldQuery('%(a)s', '%(s)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(query_uuid)s', %(aq)s, %(sq)s)"""%locals()
+        result= """ new ManifoldQuery('%(a)s', '%(o)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(query_uuid)s', %(aq)s, %(sq)s)"""%locals()
         if debug: print 'ManifoldQuery.to_json:',result
         return result
     
@@ -266,7 +266,7 @@ class Query(object):
     @classmethod
     def action(self, action, object):
         query = Query()
-        query.action = 'get'
+        query.action = action
         query.object = object
         return query
 
@@ -398,7 +398,7 @@ class AnalyzedQuery(Query):
     def to_json (self):
         query_uuid=self.query_uuid
         a=self.action
-        s=self.object
+        o=self.object
         t=self.timestamp
         f=json.dumps (self.filters.to_list())
         p=json.dumps (self.params)
@@ -407,10 +407,10 @@ class AnalyzedQuery(Query):
         unique=0
 
         aq = 'null'
-        sq=", ".join ( [ "'%s':%s" % (subject, subquery.to_json())
-                  for (subject, subquery) in self._subqueries.iteritems()])
+        sq=", ".join ( [ "'%s':%s" % (object, subquery.to_json())
+                  for (object, subquery) in self._subqueries.iteritems()])
         sq="{%s}"%sq
         
-        result= """ new ManifoldQuery('%(a)s', '%(s)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(query_uuid)s', %(aq)s, %(sq)s)"""%locals()
+        result= """ new ManifoldQuery('%(a)s', '%(o)s', '%(t)s', %(f)s, %(p)s, %(c)s, %(unique)s, '%(query_uuid)s', %(aq)s, %(sq)s)"""%locals()
         if debug: print 'ManifoldQuery.to_json:',result
         return result

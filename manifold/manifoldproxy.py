@@ -3,7 +3,8 @@ import json
 #from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
 
-from manifold.manifoldquery import ManifoldQuery
+#from manifold.manifoldquery import ManifoldQuery
+from manifold.core.query import Query
 from manifold.manifoldapi import ManifoldAPI
 
 debug=False
@@ -46,9 +47,10 @@ with the query passed using POST"""
     try:
         # translate incoming POST request into a query object
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
-        manifold_query = ManifoldQuery()
+        manifold_query = Query()
+        #manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
-        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.subject)
+        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.object)
         # retrieve session for request
         manifold_api_session_auth = request.session['manifold']['auth']
         if debug_empty and manifold_query.action.lower()=='get':

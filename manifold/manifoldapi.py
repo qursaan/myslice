@@ -82,19 +82,3 @@ class ManifoldAPI:
             print ret
             print "="*80
         return ret
-
-#old#        (action,subject)= (query.action,query.subject)
-#old#        # use e.g. self.Get rather than self.server.Get so we use the __getattr__ code
-#old#        if action=='get':
-#old## this makes the backend to squeak and one can't login anymore...
-#old##            return self.Get(subject, query.filters, query.timestamp, query.fields)
-#old#            return self.Get(subject, query.filters, {}, query.fields)
-#old#        elif action=='update':
-#old#            answer=self.Update(subject, query.filters, query.params, query.fields)
-#old#            if not isinstance (answer, ManifoldResult): print "UNEXECPECTED answer", answer
-#old#            return answer
-#old#        else:
-#old#            warning="WARNING: ManifoldAPI.send_manifold_query: %s not implemented for now"%action
-#old#            print warning
-#old#            print 3
-#old#            return ManifoldResult(code=ManifoldCode.NOT_IMPLEMENTED, output=warning)
