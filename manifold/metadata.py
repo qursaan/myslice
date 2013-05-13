@@ -36,7 +36,7 @@ class MetaData:
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
         rows_result = manifold_api.Get({
-            'object': 'local:objects', # proposed to replace metadata:table
+            'object': 'local:object', # proposed to replace metadata:table
             'fields':     fields 
         })
 #old#        rows_result = manifold_api.Get('metadata:table', [], [], fields)
