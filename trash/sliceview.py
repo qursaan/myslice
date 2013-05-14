@@ -47,7 +47,12 @@ def slice_view (request, slicename=tmp_default_slice):
         if debug:
             print "METADATA", md_fields
         # TODO Get default fields
-        main_query.fields = ['slice_hrn', 'resource.hrn', 'resource.hostname', 'resource.type', 'resource.authority']
+        main_query.fields = [
+                'slice_hrn',
+                'resource.hrn', 'resource.hostname', 'resource.type', 'resource.authority',
+                'user.user_hrn',
+#                'application.measurement_point.counter'
+        ]
 
     aq = AnalyzedQuery(main_query)
     page.enqueue_query(main_query, analyzed_query=aq)
@@ -94,10 +99,6 @@ def slice_view (request, slicename=tmp_default_slice):
     )
     main_plugin.insert(tab_resources)
 
-    jj = aq.to_json()
-    print "="*80
-    print "AQ=", jj
-    print "="*80
     tab_resources.insert(
         Hazelnut ( 
             page        = page,
@@ -129,6 +130,70 @@ def slice_view (request, slicename=tmp_default_slice):
             latitude    = 49.,
             longitude   = 2.2,
             zoom        = 3,
+        )
+    )
+
+    # XXX Let's hardcode users also for now
+    sq = aq.subquery('user')
+    
+    tab_users = Tabs (
+        page         = page,
+        title        = 'Users',
+        domid        = 'thetabs2',
+        # activeid   = 'checkboxes',
+        active_domid = 'checkboxes2',
+    )
+    main_plugin.insert(tab_users)
+
+    tab_users.insert(
+        Hazelnut ( 
+            page        = page,
+            title       = 'List',
+            domid       = 'checkboxes2',
+            # tab's sons preferably turn this off
+            togglable   = False,
+            # this is the query at the core of the slice list
+            query       = sq,
+            checkboxes  = True,
+            datatables_options = { 
+                # for now we turn off sorting on the checkboxes columns this way
+                # this of course should be automatic in hazelnut
+                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+                'iDisplayLength' : 25,
+                'bLengthChange'  : True,
+            },
+        )
+    )
+
+    # XXX Let's hardcode measurements also for now
+    sq = aq.subquery('measurement')
+    
+    tab_users = Tabs (
+        page         = page,
+        title        = 'Measurements',
+        domid        = 'thetabs3',
+        # activeid   = 'checkboxes',
+        active_domid = 'checkboxes3',
+    )
+    main_plugin.insert(tab_users)
+
+    tab_users.insert(
+        Hazelnut ( 
+            page        = page,
+            title       = 'List',
+            domid       = 'checkboxes3',
+            # tab's sons preferably turn this off
+            togglable   = False,
+            # this is the query at the core of the slice list
+            query       = sq,
+            checkboxes  = True,
+            datatables_options = { 
+                # for now we turn off sorting on the checkboxes columns this way
+                # this of course should be automatic in hazelnut
+                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+                'iDisplayLength' : 25,
+                'bLengthChange'  : True,
+            },
         )
     )
 

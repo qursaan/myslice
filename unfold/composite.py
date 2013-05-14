@@ -8,9 +8,9 @@ from unfold.plugin import Plugin
 
 class Composite (Plugin):
 
-    def __init__ (self, sons=[], active_domid=None, *args, **kwds):
+    def __init__ (self, sons=None, active_domid=None, *args, **kwds):
         Plugin.__init__ (self, *args, **kwds)
-        self.sons=sons
+        self.sons= sons if sons else []
         self.active_domid=active_domid
         # make sure this is valid, unset otherwise, so we always have exactly one active
         self.check_active_domid()

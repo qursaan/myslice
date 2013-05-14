@@ -3,6 +3,7 @@ import time
 from django.contrib.auth.models import User
 
 from manifold.manifoldapi import ManifoldAPI, ManifoldResult
+from manifold.core.query        import Query
 
 # Name my backend 'ManifoldBackend'
 class ManifoldBackend:
@@ -20,34 +21,45 @@ class ManifoldBackend:
 
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
             api = ManifoldAPI(auth)
-            # Authenticate user and get session key
-            # the new API would expect Get('local:session') instead
-            session_result = api.GetSession()
-            session = session_result.ok_value()
-            if not session:
-                print "GetSession failed",session_result.error()
-                return
-            
-            print 'DEALING with session',session
-            #self.session = session
-            # Change GetSession() at some point to return expires as well
-            expires = time.time() + (24 * 60 * 60)
+#old            # Authenticate user and get session key
+#old            # the new API would expect Get('local:session') instead
+#old            session_result = api.GetSession()
+#old            session = session_result.ok_value()
+#old            if not session:
+#old                print "GetSession failed",session_result.error()
+#old                return
+#old            print 'DEALING with session',session
+#old            #self.session = session
+#old            # Change GetSession() at some point to return expires as well
+#old            expires = time.time() + (24 * 60 * 60)
+
+            sessions_result = api.forward(Query.create('local:session').to_dict())
+            print "result"
+            sessions = sessions_result.ok_value()
+            print "ok"
+            if not sessions:
+                print "GetSession failed", sessions_result.error()
+            print "first"
+            session = sessions[0]
+            print "SESSION=", session
 
             # Change to session authentication
-            api.auth = {'AuthMethod': 'session', 'session': session}
+            api.auth = {'AuthMethod': 'session', 'session': session['session']}
             self.api = api
 
             # Get account details
             # the new API would expect Get('local:user') instead
-            persons_result = api.GetPersons(auth)
+            persons_result = api.forward(Query.get('local:user').to_dict())
             persons = persons_result.ok_value()
             if not persons:
                 print "GetPersons failed",persons_result.error()
                 return
             person = persons[0]
+            print "PERSON=", person
 
-            request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': expires}
-        except:
+            request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
+        except Exception, e:
+            print "E: manifoldbackend", e
             return None
 
         try:
