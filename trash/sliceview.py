@@ -4,6 +4,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 
 from unfold.page import Page
 #from manifold.manifoldquery import ManifoldQuery
@@ -20,8 +21,9 @@ from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages import Messages
 
-from myslice.viewutils import quickfilter_criterias
+from manifold.manifoldresult import ManifoldException
 
+from myslice.viewutils import quickfilter_criterias
 from myslice.viewutils import topmenu_items, the_user
 
 # XXX JORDAN
@@ -32,18 +34,34 @@ debug = True
 
 @login_required
 def slice_view (request, slicename=tmp_default_slice):
-    
+    # xxx Thierry - ugly hack
+    # fetching metadata here might fail - e.g. with an expired session..
+    # let's catch this early on and log out our user if needed
+    # it should of course be handled in a more generic way
+    try:
+        return _slice_view(request,slicename)
+    except ManifoldException, manifold_result:
+        # xxx needs a means to display this message to user...
+        from django.contrib.auth import logout
+        logout(request)
+        return HttpResponseRedirect ('/')
+    except Exception, e:
+        # xxx we need to sugarcoat this error message in some error template...
+        print "Unexpected exception",e
+        # return ...
+
+def _slice_view (request, slicename):
+
     page = Page(request)
     page.expose_js_metadata()
-
 
     # TODO The query to run is embedded in the URL
     main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
 
     # Get default fields from metadata unless specified
     if not main_query.fields:
-        md_fields = page.get_metadata()
-        md_fields = md_fields.details_by_object('slice')
+        metadata = page.get_metadata()
+        md_fields = metadata.details_by_object('slice')
         if debug:
             print "METADATA", md_fields
         # TODO Get default fields

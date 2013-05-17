@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 #from manifold.manifoldquery import ManifoldQuery
 from manifold.core.query import Query
 from manifold.manifoldapi import ManifoldAPI
+from manifold.manifoldresult import ManifoldException
 
 debug=False
 debug=True
@@ -73,8 +74,13 @@ with the query passed using POST"""
                 
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
-        if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
-        answer=manifold_api.send_manifold_query (manifold_query)
+        if debug: print '===> manifoldproxy.proxy: sending to backend', manifold_query
+        # for the benefit of the python code, manifoldAPI raises an exception if something is wrong
+        # however in this case we want to propagate the complete manifold result to the js world
+        try:
+            answer=manifold_api.send_manifold_query (manifold_query)
+        except ManifoldException, manifold_result:
+            answer=manifold_result
         print "="*80
         print "ANSWER IN PROXY", answer
         print answer.ok_value()
@@ -89,7 +95,7 @@ with the query passed using POST"""
                 else: print "result is other (type=%s) : %s"%(type(value),value)
         json_answer=json.dumps(answer)
         # if in debug mode we save this so we can use offline mode later
-        if (debug):
+        if debug:
             with (file(offline_filename,"w")) as f:
                 f.write(json_answer)
         # this is an artificial delay added for debugging purposes only
