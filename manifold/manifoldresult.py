@@ -21,11 +21,16 @@ class ManifoldResult (dict):
         for k in ['code','value','output']:
             self[k]=d[k]
 
+    # raw accessors
+    def code (self): return self['code']
+    def output (self): return self['output']
+
     # this returns None if there's a problem, the value otherwise
     def ok_value (self):
         if self['code']==ManifoldCode.SUCCESS:
             return self['value']
 
+    # both data in a single string
     def error (self):
         return "code=%s -- %s"%(self['code'],self['output'])
     
@@ -40,3 +45,11 @@ class ManifoldResult (dict):
             result += " [output=%s]"%self['output']
         result += "]]"
         return result
+
+# probably simpler to use a single class and transport the whole result there
+# instead of a clumsy set of derived classes 
+class ManifoldException (Exception):
+    def __init__ (self, manifold_result):
+        self.manifold_result=manifold_result
+    def __repr__ (self):
+        return "Manifold Exception %s"%(self.manifold_result.error())

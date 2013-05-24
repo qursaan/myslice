@@ -16,9 +16,6 @@ class MetaData:
         self.auth=auth
         self.hash_by_object={}
 
-        # XXX Retrieve all metadata the first time we instanciate the class
-        self.fetch()
-
     def fetch (self):
         offline_filename="offline-metadata.json"
         if work_offline:
@@ -39,14 +36,14 @@ class MetaData:
             'object': 'local:object', # proposed to replace metadata:table
             'fields':     fields 
         })
-#old#        rows_result = manifold_api.Get('metadata:table', [], [], fields)
         rows = rows_result.ok_value()
-        if not rows:
-            print "Failed to retrieve metadata",rows_result.error()
-            rows=[]
+# API errors will be handled by the outer logic
+#        if not rows:
+#            print "Failed to retrieve metadata",rows_result.error()
+#            rows=[]
         self.hash_by_object = dict ( [ (row['table'], row) for row in rows ] )
         # save for next time we use offline mode
-        if debug:
+        if debug and rows:
             with file(offline_filename,'w') as f:
                 f.write(json.dumps(self.hash_by_object))
 

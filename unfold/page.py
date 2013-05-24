@@ -105,7 +105,7 @@ class Page:
         manifold_api_session_auth = session['manifold']['auth']
         metadata=MetaData (manifold_api_session_auth)
         metadata.fetch()
-            # store it for next time
+        # store it for next time
         manifold['metadata']=metadata
         if debug: print "Page.get_metadata: return new value"
         return metadata
