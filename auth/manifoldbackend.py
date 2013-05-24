@@ -68,8 +68,8 @@ class ManifoldBackend:
         except User.DoesNotExist:
             # Create a user in Django's local database
             user = User.objects.create_user(username, username, 'passworddoesntmatter')
-            user.first_name = person['first_name']
-            user.last_name = person['last_name']
+            user.first_name = "DUMMY_FIRST_NAME" #person['first_name']
+            user.last_name = "DUMMY LAST NAME" # person['last_name']
             user.email = person['email']
         return user
 
