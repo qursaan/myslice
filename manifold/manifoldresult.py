@@ -40,7 +40,8 @@ class ManifoldResult (dict):
         if self['code']==0:
             value=self['value']
             if isinstance(value,list): result += " [value=list with %d elts]"%len(value)
-            else: result += " [value=other %s]"%value
+            elif isinstance(value,dict): result += " [value=dict with keys %s]"%value.keys()
+            else: result += " [value=%s: %s]"%(type(value).__name__,value)
         else:
             result += " [output=%s]"%self['output']
         result += "]]"
