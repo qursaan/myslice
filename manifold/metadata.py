@@ -54,4 +54,4 @@ class MetaData:
         return self.hash_by_object[object]
 
     def sorted_fields_by_object (self, object):
-        return self.hash_by_object[object]['columns'].sort()
+        return self.hash_by_object[object]['column'].sort()

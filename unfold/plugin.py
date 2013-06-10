@@ -163,6 +163,7 @@ class Plugin:
         self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
         # translate high-level 'toggled' into 4 different booleans
+        self.need_toggle = False
         if self.toggled=='persistent':
             # start with everything turned off and let the js callback do its job
             env.update({'persistent_toggle':True,'display_hide_button':False,'display_show_button':False,'display_body':False})

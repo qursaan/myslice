@@ -81,6 +81,10 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrus
 THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCore.css)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCoreDefault.css)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shThemeDefault.css)
+# wizard plugin
+THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.js)
+#THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.min.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart_wizard.css)
 
 
 thirdparty-js:

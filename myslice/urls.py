@@ -47,4 +47,6 @@ urlpatterns = patterns(
     (r'^dashboard/?$', 'trash.dashboard.dashboard_view'),
     (r'^slice/?$', 'trash.sliceview.slice_view'),
     (r'^slice/(?P<slicename>[\w\.]+)/?$', 'trash.sliceview.slice_view'),
+    # Portal
+    url(r'^portal/', include('portal.urls')),
 )
