@@ -86,18 +86,14 @@ def _slice_view (request, slicename):
         title="Slice view for %s"%slicename,
         domid='thestack',
         togglable=False,
-        sons=[
-            Messages (
-                page=page,
-                title="Runtime messages for slice %s"%slicename,
-                domid="msgs-pre",
-                levels="ALL",
-                ),
-            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename),
-        ]
+        sons=[],
     )
 
     # ... responsible for the slice properties...
+
+
+    main_plugin.insert (
+        Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename))
 
     main_plugin.insert(
         Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
@@ -214,6 +210,15 @@ def _slice_view (request, slicename):
             },
         )
     )
+
+    main_plugin.insert (
+        Messages (
+            page=page,
+            title="Runtime messages for slice %s"%slicename,
+            domid="msgs-pre",
+            levels="ALL",
+            ))
+    
 
     # END OF JORDAN's CODE
 

@@ -2,13 +2,13 @@ class Config:
 
     # production should use https of course
 
-# an old-fashioned API - that's what is currently only supported   
-    manifold_url = "http://localhost:7080/"
-# this one runs a new API, but currently (april 2013) there are missing
-# features; GetSession and GetPersons are still there (they should go away) and 
-# the code for retrieving metadata does not work as-is, and I have no clue 
-# what it should become anyways, so...
-#    manifold_url = "http://dev.myslice.info:7080/"
+# this version of unfold expects a backend that runs a new API
+# xxx
+# -- although currently (april 2013) there are missing features
+# e.g. GetSession and GetPersons are still there -- they should go away
+# also the code for retrieving metadata does not work as-is
+#    manifold_url = "http://localhost:7080/"
+    manifold_url = "http://dev.myslice.info:7080/"
 
     # exporting these details to js
     @staticmethod
