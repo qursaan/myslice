@@ -66,10 +66,6 @@
 
         /* methods */
 
-        this.on_result = function(data) {
-
-        }
-        
         /**
          * \brief Validate the form
          * \param validate_callback (function) a callback to be triggered when validation is done
@@ -83,32 +79,40 @@
             // Loop on the fields and test regexp if present
             var err = false;
             var params = {}
-            $.each(options.columns, function(i, column) {
-                var value = frm.elements[column['field']].value;
-                var rx    = column['validate_rx'];
+            $.each(options.fields, function(i, field) {
+                var value = frm.elements[field['field']].value;
+                var rx    = field['validate_rx'];
                 var str   = '';
                 if (rx && !value.match(rx)) {
-                    str = column['validate_err'];
+                    str = field['validate_err'];
                     err = true;
                 }
-                params[column['field']] = value;
-                $('#err-' + options.plugin_uuid + '-' + column['field']).html(str);
+                params[field['field']] = value;
+                $('#err-' + options.plugin_uuid + '-' + field['field']).html(str);
             });
 
             /* If the form correctly validates, we issue a create query */
             if (!err) {
                 var query = {
                     'action': 'create',
-                    'object': 'local:user',
+                    'object': options.object,
                     'params': params,
                 };
 
                 /* Inform user about ongoing query: spinner */
-                this.disable();
+                this.enable(false);
                 manifold.spin($obj);
 
                 /* Issue json query and wait for callback */
-                manifold.forward(query, this.onresult);
+                manifold.forward(query, function(data) {
+                    manifold.spin($obj, false);
+                    if (data.code != 0) { // ERROR OR WARNING, which we don't expect
+                        alert("ERROR IN CALLING THE API");
+                        validate_callback(false);
+                        return;
+                    }
+                    validate_callback(true);
+                });
             }
 
             /* Note, if the create has already been done (or fails, or ... ?)
@@ -122,7 +126,7 @@
         /**
          * \brief Disable the form entirely, during a create query for example
          */
-        this.disable = function() {
+        this.enable = function(is_enabled) {
 
         }
 

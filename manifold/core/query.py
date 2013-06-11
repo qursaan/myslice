@@ -148,20 +148,25 @@ class Query(object):
         self.filters = Filter([])
         self.params  = {}
         self.fields  = set([])
-        self.timestamp      = "now" 
+        self.timestamp  = "now" 
         self.timestamp  = 'now' # ignored for now
 
     @returns(StringTypes)
     def __str__(self):
+        return "SELECT %(select)s%(from)s%(where)s%(at)s" % {
+            "select": ", ".join(self.get_select())          if self.get_select()    else "*",
+            "from"  : "\n  FROM  %s" % self.get_from(),
+            "where" : "\n  WHERE %s" % self.get_where()     if self.get_where()     else "",
+            "at"    : "\n  AT    %s" % self.get_timestamp() if self.get_timestamp() else ""
+        }
+
+    @returns(StringTypes)
+    def __repr__(self):
         return "SELECT %s FROM %s WHERE %s" % (
             ", ".join(self.get_select()) if self.get_select() else '*',
             self.get_from(),
             self.get_where()
         )
-
-    @returns(StringTypes)
-    def __repr__(self):
-        return self.__str__()
 
     def __key(self):
         return (self.action, self.object, self.filters, frozendict(self.params), frozenset(self.fields))
@@ -284,6 +289,10 @@ class Query(object):
     @classmethod
     def execute(self, object): return self.action('execute', object)
 
+    def at(self, timestamp):
+        self.timestamp = timestamp
+        return self
+
     def filter_by(self, *args):
         if len(args) == 1:
             filters = args[0]
@@ -298,7 +307,11 @@ class Query(object):
             raise Exception, 'Invalid expression for filter'
         return self
             
-    def select(self, fields):
+    def select(self, fields=None):
+        if not fields:
+            # Delete all fields
+            self.fields = set()
+            return self
         if not isinstance(fields, (set, list, tuple)):
             fields = [fields]
         for field in fields:
@@ -313,8 +326,9 @@ class AnalyzedQuery(Query):
 
     # XXX we might need to propagate special parameters sur as DEBUG, etc.
 
-    def __init__(self, query=None):
+    def __init__(self, query=None, metadata=None):
         self.clear()
+        self.metadata = metadata
         if query:
             self.query_uuid = query.query_uuid
             self.analyze(query)
@@ -324,8 +338,10 @@ class AnalyzedQuery(Query):
     @returns(StringTypes)
     def __str__(self):
         out = []
+        fields = self.get_select()
+        fields = ", ".join(fields) if fields else '*'
         out.append("SELECT %s FROM %s WHERE %s" % (
-            ", ".join(self.get_select()),
+            fields,
             self.get_from(),
             self.get_where()
         ))
@@ -343,11 +359,24 @@ class AnalyzedQuery(Query):
     def subquery(self, method):
         # Allows for the construction of a subquery
         if not method in self._subqueries:
-            analyzed_query = AnalyzedQuery()
+            analyzed_query = AnalyzedQuery(metadata=self.metadata)
             analyzed_query.action = self.action
-            analyzed_query.object = method
+            try:
+                type = self.metadata.get_field_type(self.object, method)
+            except ValueError ,e: # backwards 1..N
+                type = method
+            analyzed_query.object = type
             self._subqueries[method] = analyzed_query
         return self._subqueries[method]
+
+    def get_subquery(self, method):
+        return self._subqueries.get(method, None)
+
+    def remove_subquery(self, method):
+        del self._subqueries[method]
+
+    def get_subquery_names(self):
+        return set(self._subqueries.keys())
 
     def subqueries(self):
         for method, subquery in self._subqueries.iteritems():
@@ -360,6 +389,8 @@ class AnalyzedQuery(Query):
         for predicate in filters:
             if '.' in predicate.key:
                 method, subkey = pred.key.split('.', 1)
+                # Method contains the name of the subquery, we need the type
+                # XXX type = self.metadata.get_field_type(self.object, method)
                 sub_pred = Predicate(subkey, pred.op, pred.value)
                 self.subquery(method).filter_by(sub_pred)
             else:
@@ -372,6 +403,8 @@ class AnalyzedQuery(Query):
         for field in fields:
             if '.' in field:
                 method, subfield = field.split('.', 1)
+                # Method contains the name of the subquery, we need the type
+                # XXX type = self.metadata.get_field_type(self.object, method)
                 self.subquery(method).select(subfield)
             else:
                 super(AnalyzedQuery, self).select(field)
@@ -381,6 +414,8 @@ class AnalyzedQuery(Query):
         for param, value in self.params.items():
             if '.' in param:
                 method, subparam = param.split('.', 1)
+                # Method contains the name of the subquery, we need the type
+                # XXX type = self.metadata.get_field_type(self.object, method)
                 self.subquery(method).set({subparam: value})
             else:
                 super(AnalyzedQuery, self).set({param: value})

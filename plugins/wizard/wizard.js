@@ -358,7 +358,7 @@
             }
             
             /* Otherwise, proceed to next step */
-            this.GoToNextStep();
+            $this.GoToNextStep();
         }
     
         this.doForwardProgress = function()

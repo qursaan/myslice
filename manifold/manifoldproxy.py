@@ -53,7 +53,14 @@ with the query passed using POST"""
         manifold_query.fill_from_POST(request.POST)
         offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.object)
         # retrieve session for request
-        manifold_api_session_auth = request.session['manifold']['auth']
+
+        # We allow some requests to use the ADMIN user account
+        if manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create':
+            print "W: Used hardcoded demo account for admin queries"
+            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+        else:
+            manifold_api_session_auth = request.session['manifold']['auth']
+
         if debug_empty and manifold_query.action.lower()=='get':
             json_answer=json.dumps({'code':0,'value':[]})
             print "By-passing : debug_empty & 'get' request : returning a fake empty list"

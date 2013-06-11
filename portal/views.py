@@ -44,9 +44,10 @@ def index(request):
         sons.append(Raw(page=p, title=STEP1_TITLE, togglable=False, html=STEP0))
         start_step += 1
     else:
-        # XXX This should become local:user
         # We could pass a list of fields also, instead of retrieving them from metadata
         # Otherwise we need some heuristics to display nice forms
+        # XXX Could we log the user in after the form is validated ?
+        # XXX Explain the password is for XXX
         field_list = [{
             'name'        : 'First name',
             'field'       : 'firstname',
@@ -77,7 +78,7 @@ def index(request):
             'type'        : 'password',
             'description' : 'Enter your password again',
         }]
-        sons.append(CreateForm(page = p, title = STEP1_TITLE, togglable = False, fields = field_list))
+        sons.append(CreateForm(page = p, title = STEP1_TITLE, togglable = False, object = 'local:user', fields = field_list))
 
     # STEP 2
     # If the user already exists (is logged), let's display a summary of its institution

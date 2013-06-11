@@ -77,10 +77,10 @@ var manifold = {
      * \brief We use js function closure to be able to pass the query (array)
      * to the callback function used when data is received
      */
-    success_closure: function(query, publish_uuid, domid)
+    success_closure: function(query, publish_uuid, callback /*domid*/)
     {
         return function(data, textStatus) {
-            manifold.asynchroneous_success(data, query, publish_uuid, domid);
+            manifold.asynchroneous_success(data, query, publish_uuid, callback /*domid*/);
         }
     },
 
@@ -109,18 +109,20 @@ var manifold = {
             }
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-                jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.domid));
+                jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
         })
     },
 
     /**
      * \brief Forward a query to the manifold backend
      * \param query (dict) the query to be executed asynchronously
+     * \param callback (function) the function to be called when the query terminates
+     * Deprecated:
      * \param domid (string) the domid to be notified about the results (null for using the pub/sub system
      */
-    forward: function(query, domid) {
+    forward: function(query, callback /*domid*/) {
         var query_json = JSON.stringify(query);
-        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, query.query_uuid, domid));
+        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, query.query_uuid, callback/*domid*/));
     },
 
     /*!
@@ -177,8 +179,12 @@ var manifold = {
     // most of the time publish_uuid will be query.query_uuid
     // however in some cases we wish to publish the result under a different uuid
     // e.g. an updater wants to publish its result as if from the original (get) query
-    asynchroneous_success : function (data, query, publish_uuid, domid) {
+    asynchroneous_success : function (data, query, publish_uuid, callback /*domid*/) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
+
+        /* If a callback has been specified, we redirect results to it */
+        if (!!callback) { callback(data); return; }
+
         if (data.code == 2) { // ERROR
             alert("Your session has expired, please log in again");
             window.location="/logout/";
@@ -192,18 +198,20 @@ var manifold = {
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
         if (result) {
-            if (!!domid) {
-                /* Directly inform the requestor */
-                if (manifold.asynchroneous_debug) messages.debug("directing result to " + domid);
-                jQuery('#' + domid).trigger('results', [result]);
-            } else {
+            //if (!!callback /* domid */) {
+            //    /* Directly inform the requestor */
+            //    if (manifold.asynchroneous_debug) messages.debug("directing result to callback");
+            //    callback(result);
+            //    //if (manifold.asynchroneous_debug) messages.debug("directing result to " + domid);
+            //    //jQuery('#' + domid).trigger('results', [result]);
+            //} else {
                 /* XXX Jordan XXX I don't need publish_uuid here... What is it used for ? */
                 /* query is the query we sent to the backend; we need to find the
                  * corresponding analyezd_query in manifold.all_queries
                  */
                 tmp_query = manifold.find_query(query.query_uuid);
                 manifold.publish_result_rec(tmp_query.analyzed_query, result);
-            }
+            //}
 
         }
     },
