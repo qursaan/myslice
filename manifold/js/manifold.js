@@ -25,6 +25,19 @@ function debug_query (msg, query) {
  */
 var manifold = {
 
+    spin_presets: {},
+
+    spin: function(locator, active /*= true */) {
+        active = typeof active !== 'undefined' ? active : true;
+        try {
+            if (active) {
+                $(locator).spin(manifold.spin_presets);
+            } else {
+                $locator.spin(false);
+            }
+        } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
+    },
+
     /*!
      * Associative array storing the set of queries active on the page
      * \memberof Manifold
@@ -60,6 +73,17 @@ var manifold = {
 
     asynchroneous_debug : true,
 
+    /**
+     * \brief We use js function closure to be able to pass the query (array)
+     * to the callback function used when data is received
+     */
+    success_closure: function(query, publish_uuid, domid)
+    {
+        return function(data, textStatus) {
+            manifold.asynchroneous_success(data, query, publish_uuid, domid);
+        }
+    },
+
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_publish_dom_tuples) {
@@ -69,13 +93,8 @@ var manifold = {
         try {
             if (manifold.asynchroneous_debug) 
             messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
-            jQuery('.need-spin').spin(spin_presets);
+            jQuery('.need-spin').spin(manifold.spin_presets);
         } catch (err) { messages.debug("Cannot turn on spins " + err); }
-	
-        // We use js function closure to be able to pass the query (array) to the
-        // callback function used when data is received
-        var success_closure = function(query, publish_uuid, domid) {
-            return function(data, textStatus) {manifold.asynchroneous_success(data, query, publish_uuid, domid);}};
         
         // Loop through input array, and use publish_uuid to publish back results
         jQuery.each(query_publish_dom_tuples, function(index, tuple) {
@@ -90,10 +109,19 @@ var manifold = {
             }
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-                jQuery.post(manifold.proxy_url, {'json':query_json} , success_closure(query, publish_uuid, tuple.domid));
+                jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.domid));
         })
     },
 
+    /**
+     * \brief Forward a query to the manifold backend
+     * \param query (dict) the query to be executed asynchronously
+     * \param domid (string) the domid to be notified about the results (null for using the pub/sub system
+     */
+    forward: function(query, domid) {
+        var query_json = JSON.stringify(query);
+        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, query.query_uuid, domid));
+    },
 
     /*!
      * Returns whether a query expects a unique results.

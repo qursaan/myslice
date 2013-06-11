@@ -46,9 +46,6 @@
                 var form = new CreateForm(options);
                 $this.data('plugin', form);
 
-                $(this).on('validate.Form', form.validate);
-                $(this).on('validate', form.validate);
-
             }); // this.each
         }, // init
 
@@ -61,7 +58,8 @@
     function CreateForm(options) {
 
         /* save a reference to this */
-        var obj = this;
+        var $this = this;
+        var $obj  = $('#' + options.plugin_uuid);
 
         /* member variables */
         this.options = options;
@@ -99,10 +97,18 @@
 
             /* If the form correctly validates, we issue a create query */
             if (!err) {
+                var query = {
+                    'action': 'create',
+                    'object': 'local:user',
+                    'params': params,
+                };
+
                 /* Inform user about ongoing query: spinner */
+                this.disable();
+                manifold.spin($obj);
 
                 /* Issue json query and wait for callback */
-                // this.on_result()
+                manifold.forward(query, this.onresult);
             }
 
             /* Note, if the create has already been done (or fails, or ... ?)
@@ -111,6 +117,13 @@
             /* We always return false. Only the query callback is in charge of
              * advancing to next step */
             return false;
+        }
+
+        /**
+         * \brief Disable the form entirely, during a create query for example
+         */
+        this.disable = function() {
+
         }
 
     }

@@ -106,26 +106,9 @@
            \param stepIdx (integer) : step identifier (0-based)
            \returns jQuery selector
          */
-        this.get_step = function(stepIdx) 
-        {
-            return $('.plugin', $(stepIdx.attr('href')));
-        }
+        this.get_step = function(stepIdx) { return $('.plugin', $(stepIdx.attr('href'))); }
 
-        this.get_plugin = function(step) 
-        {
-            return step.data().plugin;
-        }
-
-        this.onLeaveStep = function(stepIdx) 
-        {
-            /* does the plugin has a validate entry ? */
-            var step = this.get_step(stepIdx);
-            var plugin = this.get_plugin(step);
-            if (plugin.validate) {
-                plugin.validate();
-            }
-        }
-    
+        this.get_plugin = function(step) { return step.data().plugin; }
 
         this.init1 = function() {
             $this.curStepIdx = options.selected;
@@ -152,9 +135,6 @@
 
         this.init = function() {
             this.init1();
-
-            /* additonal init */
-            this.options.onLeaveStep = this.onLeaveStep;
 
             var allDivs =obj.children('div'); //$("div", obj);                
             obj.children('ul').addClass("anchor");
@@ -370,15 +350,45 @@
                }
             } 
         }                
-                    
+
+        this.validate_callback = function(validated) {
+            /* In case of failure, inform the user of what went wrong */
+            if (!validated) {
+                return;
+            }
+            
+            /* Otherwise, proceed to next step */
+            this.GoToNextStep();
+        }
+    
         this.doForwardProgress = function()
         {
+            var curStep = this.steps.eq($this.curStepIdx);
+            var step = this.get_step(curStep);
+            var plugin = this.get_plugin(step);
+
+            /* If the plugin has a validate method, trigger it and wait for
+             * callback */
+            if (plugin.validate) {
+                /* Trigger validation code and wait for callback */
+                // XXX We should inform the user about progress and disable buttons 
+                plugin.validate(this.validate_callback);
+                return;
+            }
+
+            /* Otherwise, proceed to next step */
+            this.GoToNextStep();
+        }
+        
+        this.GoToNextStep = function()
+        {
             var nextStepIdx = $this.curStepIdx + 1;
+
             if(this.steps.length <= nextStepIdx){
-              if(!options.cycleSteps){
-                return false;
-              }                  
-              nextStepIdx = 0;
+                if (!options.cycleSteps) {
+                    return false;
+                }                  
+                nextStepIdx = 0;
             }
             this.LoadContent(nextStepIdx);
         }
