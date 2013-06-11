@@ -33,6 +33,8 @@ def index(request):
     p << "<h3>User registration</h3>"
 
     sons = []
+    start_step = 1
+
     # STEP 1
     # If the user already exists (is logged), let's display a summary of his account details
     # Otherwise propose a form to fill in
@@ -40,9 +42,42 @@ def index(request):
         # Fill a disabled form with user info
         # Please logout to register another user
         sons.append(Raw(page=p, title=STEP1_TITLE, togglable=False, html=STEP0))
+        start_step += 1
     else:
         # XXX This should become local:user
-        sons.append(CreateForm(page = p, title = STEP1_TITLE, togglable = False, object = 'user'))
+        # We could pass a list of fields also, instead of retrieving them from metadata
+        # Otherwise we need some heuristics to display nice forms
+        field_list = [{
+            'name'        : 'First name',
+            'field'       : 'firstname',
+            'type'        : 'text',
+            'validate_rx' : '^[a-zA-Z -]+$',
+            'validate_err': 'Your first name must be comprised of letters only',
+            'description' : 'Enter your first name',
+        }, {
+            'name'        : 'Last name',
+            'field'       : 'lastname',
+            'type'        : 'text',
+            'validate_rx' : '^[a-zA-Z -]+$',
+            'validate_err': 'Your last name must be comprised of letters only',
+            'description' : 'Enter your last name',
+        }, { 
+            'name'        : 'Email',
+            'field'       : 'email',
+            'type'        : 'text',
+            'description' : 'Enter your email address',
+        }, {
+            'name'        : 'Password',
+            'field'       : 'password',
+            'type'        : 'password',
+            'description' : 'Enter your password',
+        }, {
+            'name'        : 'Confirm password',
+            'field'       : 'password2',
+            'type'        : 'password',
+            'description' : 'Enter your password again',
+        }]
+        sons.append(CreateForm(page = p, title = STEP1_TITLE, togglable = False, fields = field_list))
 
     # STEP 2
     # If the user already exists (is logged), let's display a summary of its institution
@@ -51,8 +86,9 @@ def index(request):
         # Fill a disabled form with institution
         # Please logout to register another user
         sons.append(Raw(page=p, title=STEP2_TITLE, togglable=False, html="User created"))
+        start_step += 1
     else:
-        sons.append(CreateForm(page = p, title = STEP2_TITLE, togglable = False, object = 'institution'))
+        sons.append(CreateForm(page = p, title = STEP2_TITLE, togglable = False, object = 'slice')) #institution'))
 
     # STEP3
     # Please should your prefered authentication method
@@ -78,7 +114,7 @@ def index(request):
         title      = WIZARD_TITLE,
         togglable  = False,
         sons       = sons,
-        start_step = 2,
+        start_step = start_step,
     )
 
     p << wizard.render(request) # in portal page if possible

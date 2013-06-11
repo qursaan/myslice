@@ -1,13 +1,13 @@
-<div id="form-{{domid}}">
-  <form class="cmxform" id="commentForm" method="post" action="#" enctype="multipart/form-data" >
+<div id="form_plugin_{{domid}}">
+  <form class="cmxform" id="form_{{domid}}" method="post" action="#" enctype="multipart/form-data" onsubmit="return validate_form_{{domid}}(this)">
     <fieldset>
 
       {% for c in columns %}
       <div class="field">
         <label for="lname">{{c.name}}</label>
-        <input type="text" id="affiliation" name="affiliation" size="25" class="required" minlength="2" value="<?php echo $_POST['affiliation'] ?>"/>
-        <p class="hint">Enter {{c.description}}</p>
-        {{err}}
+        <input type="{{c.type}}" id="{{domid}}-{{c.field}}" name="{{c.field}}" size="25" class="required" minlength="2" value="{{c.old_value}}"/>
+        <p class="hint">{{c.description}}</p>
+        <span id='err-{{domid}}-{{c.field}}'><font color='red'>{{c.validation_err}}</font></span>
       </div>
       {% endfor %}
 

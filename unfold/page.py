@@ -88,21 +88,50 @@ class Page:
         self.expose_js_manifold_config()
 
 
+# DEPRECATED #    # needs to be called explicitly and only when metadata is actually required
+# DEPRECATED #    # in particular user needs to be logged
+# DEPRECATED #    def get_metadata (self):
+# DEPRECATED #        # look in session's cache - we don't want to retrieve this for every request
+# DEPRECATED #        session=self.request.session
+# DEPRECATED #        if 'manifold' not in session:
+# DEPRECATED #            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
+# DEPRECATED #            return
+# DEPRECATED #        manifold=session['manifold']
+# DEPRECATED #        # if cached, use it
+# DEPRECATED #        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
+# DEPRECATED #            if debug: print "Page.get_metadata: return cached value"
+# DEPRECATED #            return manifold['metadata']
+# DEPRECATED #        # otherwise retrieve it
+# DEPRECATED #        manifold_api_session_auth = session['manifold']['auth']
+# DEPRECATED #        print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
+# DEPRECATED #        metadata=MetaData (manifold_api_session_auth)
+# DEPRECATED #        metadata.fetch()
+# DEPRECATED #        # store it for next time
+# DEPRECATED #        manifold['metadata']=metadata
+# DEPRECATED #        if debug: print "Page.get_metadata: return new value"
+# DEPRECATED #        return metadata
+
     # needs to be called explicitly and only when metadata is actually required
     # in particular user needs to be logged
     def get_metadata (self):
         # look in session's cache - we don't want to retrieve this for every request
         session=self.request.session
+
         if 'manifold' not in session:
-            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
-            return
-        manifold=session['manifold']
+            session['manifold'] = {}
+        manifold = session['manifold']
+
         # if cached, use it
         if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
             if debug: print "Page.get_metadata: return cached value"
             return manifold['metadata']
-        # otherwise retrieve it
-        manifold_api_session_auth = session['manifold']['auth']
+
+        #if 'auth' in session:
+        #manifold_api_session_auth = session['manifold']['auth']
+        #print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
+        #else:
+        manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString':'demo'}
+
         metadata=MetaData (manifold_api_session_auth)
         metadata.fetch()
         # store it for next time
