@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 from portal.portalpage  import PortalPage
 from plugins.wizard     import Wizard
 from plugins.form       import CreateForm
@@ -7,6 +9,89 @@ from myslice.viewutils  import the_user
 
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.views import generic
+from django.shortcuts import render
+
+from portal.forms  import RegisterUserForm
+
+from django.contrib.formtools.wizard.views import NamedUrlSessionWizardView
+#from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import default_storage
+
+#class MerlinWizard(NamedUrlSessionWizardView):
+#
+#    ...
+#    ...
+#
+#    @classonlymethod
+#    def as_view(cls, *args, **kwargs):
+#        kwargs.update({
+#            'form_list': [
+#                NameForm,
+#                QuestForm,
+#                ColorForm,
+#            ],
+#            'url_name': 'merlin_wizard'
+#        })
+#        return super(MerlinWizard, cls).as_view(*args, **kwargs)
+
+class RegisterUserWizardView(NamedUrlSessionWizardView):
+#class RegisterUserWizardView(LoginRequiredMixin, NamedUrlSessionWizardView):
+    # Notice that I specify a file storage instance. If you don't specify this,
+    # and you need to support FileField or ImageField in your forms, you'll get
+    # errors from Django. This is something else I think could be handled by
+    # the views better. Seems to me that it should just use whatever the
+    # default/specified storage is for the rest of your project/application.
+    file_storage = default_storage # FileSystemStorage()
+    template_name = "register_user_wizard.html"
+
+    def done(self, form_list, **kwargs):
+        step1_form = form_list[0]
+        step2_form = form_list[1]
+
+        productext = self.create_product(product_form)
+        shippings = self.create_shippings(productext, shipping_forms)
+        images = self.create_images(productext, image_forms)
+
+        if all([productext, shippings, images]):
+            del self.request.session["wizard_product_wizard_view"]
+
+            messages.success(self.request,
+                _("Your product has been created."))
+            return HttpResponseRedirect(self.get_success_url(productext))
+
+        messages.error(self.request, _("Something went wrong creating your "
+            "product. Please try again or contact support."))
+        return HttpResponseRedirect(reverse("register_wizard"))
+
+    #def get_form_kwargs(self, step):
+    #    if step == "product":
+    #        return {"user": self.request.user}
+    #    return {}
+
+# The portal should hook the slice and user creation pages
+
+def register_user(request):
+    
+    if request.method == 'POST':
+        form = RegisterUserForm(request.POST) # Nous reprenons les données
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name  = form.cleaned_data['last_name']
+            email      = form.cleaned_data['email']
+            password   = form.cleaned_data['password']
+            password2  = form.cleaned_data['password2']
+            keypair    = form.cleaned_data['keypair']
+            ## Ici nous pouvons traiter les données du formulaire
+            #sujet = form.cleaned_data['sujet']
+            #message = form.cleaned_data['message']
+            #envoyeur = form.cleaned_data['envoyeur']
+            #renvoi = form.cleaned_data['renvoi']
+            ## Nous pourrions ici envoyer l'e-mail grâce aux données que nous venons de récupérer
+            #envoi = True
+    else:
+        form = RegisterUserForm()
+    return render(request, 'register_user.html', locals())
 
 def index(request):
 
