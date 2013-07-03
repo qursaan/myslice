@@ -21,6 +21,8 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from django.db import models
+from .validators import validate_email
+
 
 # Create your models here.
 
@@ -33,7 +35,7 @@ class PendingUser(models.Model):
     # simplify form creation in forms.py
     first_name  = models.TextField()
     last_name   = models.TextField()
-    email       = models.TextField()
+    email       = models.EmailField(validators=[validate_email])
     password    = models.TextField()
     keypair     = models.TextField()
     # institution
