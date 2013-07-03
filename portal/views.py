@@ -21,11 +21,11 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from django.shortcuts import render
-from portal.forms     import RegisterUserForm
+from portal.forms     import UserRegisterForm, SliceRequestForm
 
 def user_register(request):
     if request.method == 'POST':
-        form = RegisterUserForm(request.POST) # Nous reprenons les données
+        form = UserRegisterForm(request.POST)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name  = form.cleaned_data['last_name']
@@ -41,15 +41,20 @@ def user_register(request):
             ## Nous pourrions ici envoyer l'e-mail grâce aux données que nous venons de récupérer
             #envoi = True
     else:
-        form = RegisterUserForm()
-    return render(request, 'register_user.html', locals())
-    pass
+        form = UserRegisterForm()
+    return render(request, 'user_register.html', locals())
 
 def user_validate(request):
     pass
 
 def slice_request(request):
-    pass
+    if request.method == 'POST':
+        form = SliceRequestForm(request.POST)
+        if form.is_valid():
+            slice_name = form.cleaned_data['slice_name']
+    else:
+        form = SliceRequestForm()
+    return render(request, 'slice_request.html', locals())
 
 def slice_validate(request):
     pass
@@ -86,8 +91,8 @@ def slice_validate(request):
 # DEPRECATED ##        })
 # DEPRECATED ##        return super(MerlinWizard, cls).as_view(*args, **kwargs)
 # DEPRECATED #
-# DEPRECATED #class RegisterUserWizardView(NamedUrlSessionWizardView):
-# DEPRECATED ##class RegisterUserWizardView(LoginRequiredMixin, NamedUrlSessionWizardView):
+# DEPRECATED #class UserRegisterWizardView(NamedUrlSessionWizardView):
+# DEPRECATED ##class UserRegisterWizardView(LoginRequiredMixin, NamedUrlSessionWizardView):
 # DEPRECATED #    # Notice that I specify a file storage instance. If you don't specify this,
 # DEPRECATED #    # and you need to support FileField or ImageField in your forms, you'll get
 # DEPRECATED #    # errors from Django. This is something else I think could be handled by
@@ -125,7 +130,7 @@ def slice_validate(request):
 # DEPRECATED #def register_user(request):
 # DEPRECATED #    
 # DEPRECATED #    if request.method == 'POST':
-# DEPRECATED #        form = RegisterUserForm(request.POST) # Nous reprenons les données
+# DEPRECATED #        form = UserRegisterForm(request.POST) # Nous reprenons les données
 # DEPRECATED #        if form.is_valid():
 # DEPRECATED #            first_name = form.cleaned_data['first_name']
 # DEPRECATED #            last_name  = form.cleaned_data['last_name']
@@ -141,7 +146,7 @@ def slice_validate(request):
 # DEPRECATED #            ## Nous pourrions ici envoyer l'e-mail grâce aux données que nous venons de récupérer
 # DEPRECATED #            #envoi = True
 # DEPRECATED #    else:
-# DEPRECATED #        form = RegisterUserForm()
+# DEPRECATED #        form = UserRegisterForm()
 # DEPRECATED #    return render(request, 'register_user.html', locals())
 # DEPRECATED #
 # DEPRECATED #def index(request):

@@ -21,11 +21,11 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from django import forms
-from portal.models import PendingUser
+from portal.models import PendingUser, PendingSlice
 #from crispy_forms.helper import FormHelper
 #from crispy_forms.layout import Submit
 
-class RegisterUserForm(forms.ModelForm):
+class UserRegisterForm(forms.ModelForm):
 # DEPRECATED #    def __init__(self, *args, **kwargs):
 # DEPRECATED #        self.helper = FormHelper()
 # DEPRECATED #        self.helper.form_tag = False
@@ -45,6 +45,11 @@ class RegisterUserForm(forms.ModelForm):
     class Meta:
         model = PendingUser
 
-class RegisterUserStep2Form(forms.ModelForm):
+class SliceRequestForm(forms.ModelForm):
+    slice_name = forms.CharField( widget=forms.TextInput )
     class Meta:
-        model = PendingUser
+        model = PendingSlice
+
+# DEPRECATED #class RegisterUserStep2Form(forms.ModelForm):
+# DEPRECATED #    class Meta:
+# DEPRECATED #        model = PendingUser
