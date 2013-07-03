@@ -154,9 +154,16 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
-    'django.contrib.formtools',
-#    'crispy_forms',
+# DEPRECATED #    'django.contrib.formtools',
+# DEPRECATED ##    'crispy_forms',
+# DEPRECATED #
+# DEPRECATED #    # User registration
+# DEPRECATED #    'django.contrib.auth',
+# DEPRECATED #    'django.contrib.sites',
+# DEPRECATED #    'registration',
 )
+
+ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -20,12 +20,13 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, include, url
 
 # DEPRECATED #from django.forms.formsets import formset_factory
 # DEPRECATED #from portal.forms import RegisterUserForm, RegisterUserStep2Form
 # DEPRECATED #from portal.views import RegisterUserWizardView
 from portal import views
+from portal.views import UserRegisterView, UserValidateView
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -37,14 +38,16 @@ from portal import views
 
 urlpatterns = patterns('',
     # User registration
-    url(r'^user/register/?$',  views.user_register,  name='user_register'),
+    url(r'^user/register/?$', UserRegisterView.as_view(), name='user_register'),
+    # User validation
+    url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
     # Slice request
-    url(r'^user/validate/?$',  views.user_validate,  name='user_validate'),
-    # User confirmation
-    url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
+    #url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
     # Slice confirmation
-    url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),
+    #url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),
 )
+# (r'^accounts/', include('registration.backends.default.urls')),
+
 
 # DEPRECATED #    url(r'^$', views.index, name='index'),
 # DEPRECATED #    url(r"^registerwizard/(?P<step>[-\w]+)/$", register_wizard,

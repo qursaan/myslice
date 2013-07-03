@@ -49,4 +49,5 @@ urlpatterns = patterns(
     (r'^slice/(?P<slicename>[\w\.]+)/?$', 'trash.sliceview.slice_view'),
     # Portal
     url(r'^portal/', include('portal.urls')),
+
 )
