@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# portal/urls.py: URL mappings for the portal application
+# portal/views.py: views for the portal application
 # This file is part of the Manifold project.
 #
 # Authors:
