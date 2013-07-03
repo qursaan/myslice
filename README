@@ -33,6 +33,9 @@ when you just need to hit ^C yourself when your static files need to be refreshe
 * use it from your browser 
 (See more notes on using the development server below)
 
+* install dependencies
+$ pip install -r path/to/requirements/file.txt
+
 ==================== Status
 
 *** Authentication ***
