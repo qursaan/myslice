@@ -30,8 +30,8 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # Mail configuration
-EMAIL_HOST         = 'tibre.lip6.fr'
-EMAIL_PORT         = 465
+#EMAIL_HOST         = 'tibre.lip6.fr'
+#EMAIL_PORT         = 465
 DEFAULT_FROM_EMAIL = "support@myslice.info"
 
 DATABASES = {
