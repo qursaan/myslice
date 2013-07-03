@@ -40,7 +40,7 @@ class ManifoldAPI:
     def __getattr__(self, methodName):
         def func(*args, **kwds):
             try:
-                if debug: print "====> ManifoldAPI.%s"%methodName,"args",args,"kwds",kwds
+                if debug: print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
                 result=getattr(self.server, methodName)(self.auth, *args, **kwds)
                 if debug:
                     print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
@@ -53,7 +53,7 @@ class ManifoldAPI:
                     # minimal treatment is required, but we do want to turn this into a 
                     # class instance
                     if result['code'] != 2: # in the manifold world, this can be either
-                                            # 0 (ok) 1 (partial result) or 2 which means error
+                                            # 0 (ok) 1 (partial result) or 2 (which means error)
                         if debug: print "OK (new API)"
                         return ManifoldResult(code=result['code'], value=result['value'])
                     else:
@@ -73,6 +73,8 @@ class ManifoldAPI:
                     if debug: print "KO (old API - 8002) - raising ManifoldException"
                     reason="most likely your session has expired"
                     reason += " (the manifold API has no unambiguous error reporting mechanism yet)"
+                    import traceback
+                    traceback.print_exc()
                     raise ManifoldException ( ManifoldResult (code=ManifoldCode.SESSION_EXPIRED, output=reason))
                 else:
                     if debug: print "KO (old API - other) - raising ManifoldException"

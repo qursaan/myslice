@@ -48,6 +48,8 @@ def slice_view (request, slicename=tmp_default_slice):
     except Exception, e:
         # xxx we need to sugarcoat this error message in some error template...
         print "Unexpected exception",e
+        import traceback
+        traceback.print_exc()
         # return ...
 
 def _slice_view (request, slicename):
