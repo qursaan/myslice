@@ -1,22 +1,52 @@
+# -*- coding: utf-8 -*-
+#
+# portal/urls.py: URL mappings for the portal application
+# This file is part of the Manifold project.
+#
+# Authors:
+#   Jordan Augé <jordan.auge@lip6.fr>
+# Copyright 2013, UPMC Sorbonne Universités / LIP6
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 3, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; see the file COPYING.  If not, write to the Free Software
+# Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
 from django.conf.urls import patterns, url
 
-#from django.forms.formsets import formset_factory
-from portal.forms import RegisterUserForm, RegisterUserStep2Form
-from portal.views import RegisterUserWizardView
+# DEPRECATED #from django.forms.formsets import formset_factory
+# DEPRECATED #from portal.forms import RegisterUserForm, RegisterUserStep2Form
+# DEPRECATED #from portal.views import RegisterUserWizardView
 from portal import views
 
-named_register_forms = (
-    ("step1", RegisterUserForm),
-    ("step2", RegisterUserStep2Form)
-)
-
-register_wizard = RegisterUserWizardView.as_view(named_register_forms,
-    url_name="register_wizard_step")
+# DEPRECATED #named_register_forms = (
+# DEPRECATED #    ("step1", RegisterUserForm),
+# DEPRECATED #    ("step2", RegisterUserStep2Form)
+# DEPRECATED #)
+# DEPRECATED #
+# DEPRECATED #register_wizard = RegisterUserWizardView.as_view(named_register_forms,
+# DEPRECATED #    url_name="register_wizard_step")
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name='index'),
-    url(r'^register/?$', views.register_user, name='register'),
-    url(r"^registerwizard/(?P<step>[-\w]+)/$", register_wizard,
-        name="register_wizard_step"),
-    url(r"^registerwizard/$", register_wizard, name="register_wizard")
+    # User registration
+    url(r'^user/register/?$',  views.user_register,  name='user_register'),
+    # Slice request
+    url(r'^user/validate/?$',  views.user_validate,  name='user_validate'),
+    # User confirmation
+    url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
+    # Slice confirmation
+    url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),
 )
+
+# DEPRECATED #    url(r'^$', views.index, name='index'),
+# DEPRECATED #    url(r"^registerwizard/(?P<step>[-\w]+)/$", register_wizard,
+# DEPRECATED #        name="register_wizard_step"),
+# DEPRECATED #    url(r"^registerwizard/$", register_wizard, name="register_wizard")

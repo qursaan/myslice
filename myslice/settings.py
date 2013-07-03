@@ -155,7 +155,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'portal',
     'django.contrib.formtools',
-    'crispy_forms',
+#    'crispy_forms',
 )
 
 # A sample logging configuration. The only tangible logging
