@@ -21,12 +21,9 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from django.conf.urls import patterns, include, url
-
-# DEPRECATED #from django.forms.formsets import formset_factory
-# DEPRECATED #from portal.forms import RegisterUserForm, RegisterUserStep2Form
-# DEPRECATED #from portal.views import RegisterUserWizardView
-from portal import views
-from portal.views import UserRegisterView, UserValidateView
+from portal           import views
+from portal.views     import UserRegisterView, UserValidateView
+from portal.util      import TemplateView
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -39,6 +36,9 @@ from portal.views import UserRegisterView, UserValidateView
 urlpatterns = patterns('',
     # User registration
     url(r'^user/register/?$', UserRegisterView.as_view(), name='user_register'),
+    url(r'^user/register/complete/$',
+        TemplateView.as_view(template_name='user_register_complete.html'),
+        name='user_register_complete'),
     # User validation
     url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
     # Slice request

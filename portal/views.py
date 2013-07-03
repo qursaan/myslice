@@ -135,7 +135,7 @@ class UserRegisterView(RegistrationView):
         user registration.
         
         """
-        return ('registration_complete', (), {})
+        return ('user_register_complete', (), {})
 
 
 class UserValidateView(ActivationView):

@@ -29,6 +29,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# Mail configuration
+EMAIL_HOST         = 'tibre.lip6.fr'
+EMAIL_PORT         = 465
+DEFAULT_FROM_EMAIL = "support@myslice.info"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
