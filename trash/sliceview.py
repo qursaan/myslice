@@ -22,6 +22,7 @@ from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
+from plugins.updater.updater         import Updater
 
 tmp_default_slice='ple.inria.heartbeat'
 debug = True
@@ -236,13 +237,18 @@ def _slice_view (request, slicename):
 
     main_plugin.insert(sq_plugin)
 
-    main_plugin.insert (
-        Messages (
-            page=page,
-            title="Runtime messages for slice %s"%slicename,
-            domid="msgs-pre",
-            levels="ALL",
-            ))
+    main_plugin.insert(Messages(
+        page   = page,
+        title  = "Runtime messages for slice %s"%slicename,
+        domid  = "msgs-pre",
+        levels = "ALL",
+    ))
+    main_plugin.insert(Updater(
+        page   = page,
+        title  = "wont show up as non togglable by default",
+        query  = main_query,
+        label  = "Update slice",
+    ))
     
 
     # END OF JORDAN's CODE
