@@ -50,41 +50,50 @@
     // complexity here is mostly because a datatables-enabled table cannot
     // be updated in a "normal" way using .html()
     function update_plugin(e, rows) {
-	// e.data is what we passed in second argument to subscribe
-	// so here it is the jquery object attached to the plugin <div>
-	var $plugindiv=e.data;
-	// locate the <table> element; with datatables in the way,
-	// this might not be a direct son of the div-plugin
-	var $table=$plugindiv.find("table.simplelist").first();
-	// also we may or may not have a header
-	var $tbody=$table.find("tbody.simplelist").first();
-	var use_datatables = $table.hasClass("with-datatables");
-	if (debug) messages.debug($plugindiv.attr('id') + " udt= " + use_datatables);
+        // e.data is what we passed in second argument to subscribe
+        // so here it is the jquery object attached to the plugin <div>
+        var $plugindiv = e.data;
+        // locate the <table> element; with datatables in the way,
+        // this might not be a direct son of the div-plugin
+        var $table = $plugindiv.find("table.simplelist").first();
+        // also we may or may not have a header
+        var $tbody = $table.find("tbody.simplelist").first();
+        var use_datatables = $table.hasClass("with-datatables");
+        if (debug) 
+            messages.debug($plugindiv.attr('id') + " udt= " + use_datatables);
 	
 	// clear the spinning wheel: look up an ancestor that has the need-spin class
 	// do this before we might return
-	$plugindiv.closest('.need-spin').spin(false);
+	    $plugindiv.closest('.need-spin').spin(false);
 
         if (rows.length == 0) {
-	    if (use_datatables) datatables_set_message ($table, $tbody, unfold.warning("No result"));
-	    else		regular_set_message ($table, $tbody, unfold.warning("No result"));
+	        if (use_datatables)
+                 datatables_set_message ($table, $tbody, unfold.warning("No result"));
+	        else
+        		regular_set_message ($table, $tbody, unfold.warning("No result"));
             return;
         }
-        if (typeof rows[0].error != 'undefined') {
-	    var error="ERROR: " + rows[0].error;
-	    if (use_datatables) datatables_set_message ($table, $tbody, unfold.error(error));
-	    else		regular_set_message ($table, $tbody, unfold.error(error));
-            return;
-        }
-        var options = $plugindiv.data().SimpleList;
-	if (use_datatables)	datatables_update_table ($table,$tbody,rows,options.key);
-	else			regular_update_table ($table,$tbody,rows,options.key);
 
-    }
+        if (typeof rows[0].error != 'undefined') {
+	        var error="ERROR: " + rows[0].error;
+	        if (use_datatables) 
+                datatables_set_message ($table, $tbody, unfold.error(error));
+	        else
+        		regular_set_message ($table, $tbody, unfold.error(error));
+            return;
+        }
+
+        var options = $plugindiv.data().SimpleList;
+	    if (use_datatables)	
+            datatables_update_table($table, $tbody, rows, options.key);
+	    else
+  			regular_update_table($table, $tbody, rows, options.key);
+
+        }
 
     // hard-wire a separate presentation depending on the key being used....
     function cell(key, value) {
-        if (key == 'slice_hrn') {
+        if (key == 'slice.slice_hrn') {
             return "<i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + "</a>";
         } else if (key == 'network_hrn') {
             return "<i class='icon-play-circle'></i>" + value ;
@@ -98,15 +107,31 @@
     }
 
     function regular_update_table ($table, $tbody, rows, key) {
-	if (debug) messages.debug('regular_update_table ' + rows.length + " rows");
-	var html=$.map(rows, function (row) { return html_row ( cell (key, row[key])); }).join();
-	$tbody.html(html);
+        if (debug)
+            messages.debug('regular_update_table ' + rows.length + " rows");
+	    var html=$.map(rows, function (row) {
+            value = row;
+            $.each(key.split('.'), function(i, k) {
+                if ($.isArray(value)) {
+                    value = $.map(value, function(val, i) { return val[k]});
+                } else {
+                    value = value[k];
+                }
+            });
+            if ($.isArray(value)) {
+                x = $.map(value, function(val, i) { return html_row ( cell (key, val)); });
+                return x;
+            } else {
+                return html_row ( cell (key, value));
+            }
+        }).join();
+    	$tbody.html(html);
     }
     
     function datatables_set_message ($table, $tbody, message) {
-	$table.dataTable().fnClearTable();
-	$table.dataTable().fnAddData( [ message ] );
-	$table.dataTable().fnDraw();
+        $table.dataTable().fnClearTable();
+        $table.dataTable().fnAddData( [ message ] );
+        $table.dataTable().fnDraw();
     }
 
     function datatables_update_table ($table, $tbody, rows, key) {
@@ -119,6 +144,8 @@
 	$table.dataTable().fnDraw();
     }	
     
-    function html_row (cell) { return "<tr><td class='simplelist'>"+cell+"</td></tr>"; }
+    function html_row (cell) { 
+        return "<tr><td class='simplelist'>"+cell+"</td></tr>"; 
+    }
     
 })( jQuery );

@@ -22,6 +22,8 @@ DEBUG= False
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
     def actual (self, *args, **kwds):
+        if not self.page: # jordan
+            return None
         prelude_method=Prelude.__dict__[method.__name__]
         return prelude_method(self.page.prelude,*args, **kwds)
     return actual
@@ -76,7 +78,7 @@ class Plugin:
         if not domid: domid=self.newdomid()
         self.domid=domid
         # title is shown when togglable
-        if not title: title="Plugin title for %s"%domid
+        #if not title: title="Plugin title for %s"%domid
         self.title=title
         self.classname=self._py_classname()
         self.plugin_classname=self._js_classname()
@@ -95,7 +97,8 @@ class Plugin:
             for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
             print "%s init dbg .... END"%self.classname
         # do this only once the structure is fine
-        self.page.record_plugin(self)
+        if self.page: # I assume we can have a None page (Jordan)
+            self.page.record_plugin(self)
 
     def __repr__ (self):
         return "[%s]:%s"%(self.classname,self.domid)
@@ -258,7 +261,7 @@ class Plugin:
     def template_file (self):           return "undefined_template"
     def template_env (self, request):   return {}
 
-    def default_togglable (self):       return True
+    def default_togglable (self):       return False
     def default_toggled (self):         return 'persistent'
 
 #    # tell the framework about requirements (for the document <header>)

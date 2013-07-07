@@ -4,7 +4,9 @@
 <h4 id='show-{{ domid }}' class='plugin-show'{% if not display_show_button %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Show plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>
 <h4 id='hide-{{ domid }}' class='plugin-hide'{% if not display_hide_button %} style='display:none;'{% endif %}><i class="icon-hand-down"></i>
+{% if title %}
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Hide plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>
+{% endif %}
 {% endif %}{# togglable #}
 {% endif %}{# visible #}
 

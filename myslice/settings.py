@@ -24,15 +24,22 @@ if not ROOT:
 
 ####################
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    # ('your_name', 'your_email@test.com'),
 )
 
 MANAGERS = ADMINS
 
 # Mail configuration
-#EMAIL_HOST         = 'tibre.lip6.fr'
-#EMAIL_PORT         = 465
-DEFAULT_FROM_EMAIL = "support@myslice.info"
+#DEFAULT_FROM_EMAIL = "root@theseus.ipv6.lip6.fr"
+#EMAIL_HOST_PASSWORD = "mypassword"
+
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+
+
+
+
 
 DATABASES = {
     'default': {

@@ -22,7 +22,7 @@
 
 from django.conf.urls import patterns, include, url
 from portal           import views
-from portal.views     import UserRegisterView, UserValidateView
+from portal.views     import UserRegisterView, UserValidateView, DashboardView
 from portal.util      import TemplateView
 
 # DEPRECATED #named_register_forms = (
@@ -41,6 +41,7 @@ urlpatterns = patterns('',
         name='user_register_complete'),
     # User validation
     url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
+    url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
     # Slice request
     #url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
     # Slice confirmation

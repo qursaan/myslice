@@ -20,15 +20,58 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf                import settings
-from django.contrib.sites.models import RequestSite
-from django.contrib.sites.models import Site
+from django.conf                 import settings
+from django.contrib.sites.models import Site, RequestSite
+from django.views.generic        import View
+from django.views.generic.base   import TemplateView
+from django.shortcuts            import render
+from plugins.lists.simplelist    import SimpleList
+from portal                      import signals
+from portal.forms                import UserRegisterForm, SliceRequestForm
+from portal.util                 import RegistrationView, ActivationView
+from portal.models               import PendingUser, PendingSlice
+from manifold.core.query         import Query
+from unfold.page                 import Page
 
-from django.shortcuts           import render
-from portal.forms               import UserRegisterForm, SliceRequestForm
-from portal.util                import RegistrationView, ActivationView
-from portal.models              import PendingUser, PendingSlice
-from portal                     import signals
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        user_hrn = 'ple.upmc.jordan_auge'
+
+        page = Page(self.request)
+
+        # Slow...
+        #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
+        slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('slice.slice_hrn')
+        auth_query  = Query().get('network').select('network_hrn')
+        page.enqueue_query(slice_query)
+        page.enqueue_query(auth_query)
+
+        page.expose_queries()
+
+        slicelist = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'slice.slice_hrn',
+            query = slice_query,
+        )
+         
+        authlist = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'network_hrn',
+            query = auth_query,
+        )
+
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['networks'] = authlist.render(self.request) 
+        context['slices']   = slicelist.render(self.request)
+
+        context.update(page.prelude_env())
+
+        return context
 
 class UserRegisterView(RegistrationView):
     """
