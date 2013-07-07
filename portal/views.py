@@ -32,6 +32,7 @@ from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
 from unfold.page                 import Page
+from myslice.viewutils           import topmenu_items, the_user
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -68,6 +69,14 @@ class DashboardView(TemplateView):
         context['person']   = self.request.user
         context['networks'] = authlist.render(self.request) 
         context['slices']   = slicelist.render(self.request)
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Test view that combines various plugins'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('dashboard', self.request) 
+        # so we can sho who is logged
+        context['username'] = the_user(self.request) 
 
         context.update(page.prelude_env())
 

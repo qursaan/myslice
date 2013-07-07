@@ -1,33 +1,27 @@
 # Create your views here.
 
-from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.template                 import RequestContext
+from django.shortcuts                import render_to_response
+from django.contrib.auth.decorators  import login_required
+from django.http                     import HttpResponseRedirect
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from unfold.page                     import Page
+from manifold.core.query             import Query, AnalyzedQuery
+from manifold.manifoldresult         import ManifoldException
+from manifold.metadata               import MetaData as Metadata
+from myslice.viewutils               import quickfilter_criterias, topmenu_items, the_user
 
-from unfold.page import Page
-#from manifold.manifoldquery import ManifoldQuery
-from manifold.core.query import Query, AnalyzedQuery
-
-from plugins.raw.raw import Raw
-from plugins.stack.stack import Stack
-from plugins.tabs.tabs import Tabs
-from plugins.lists.slicelist import SliceList
-from plugins.hazelnut.hazelnut import Hazelnut 
-from plugins.googlemap.googlemap import GoogleMap 
-from plugins.senslabmap.senslabmap import SensLabMap
-from plugins.querycode.querycode import QueryCode
+from plugins.raw.raw                 import Raw
+from plugins.stack.stack             import Stack
+from plugins.tabs.tabs               import Tabs
+from plugins.lists.slicelist         import SliceList
+from plugins.hazelnut.hazelnut       import Hazelnut 
+from plugins.resources_selected      import ResourcesSelected
+from plugins.googlemap.googlemap     import GoogleMap 
+from plugins.senslabmap.senslabmap   import SensLabMap
+from plugins.querycode.querycode     import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
-from plugins.messages.messages import Messages
-
-from manifold.manifoldresult import ManifoldException
-
-from myslice.viewutils import quickfilter_criterias
-from myslice.viewutils import topmenu_items, the_user
-
-# XXX JORDAN
-from manifold.metadata import MetaData as Metadata
+from plugins.messages.messages       import Messages
 
 tmp_default_slice='ple.inria.heartbeat'
 debug = True
@@ -69,7 +63,8 @@ def _slice_view (request, slicename):
         # TODO Get default fields
         main_query.fields = [
                 'slice_hrn',
-                'resource.hrn', 'resource.hostname', 'resource.type', 'resource.authority',
+                'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.authority',
+                'lease.urn',
                 'user.user_hrn',
 #                'application.measurement_point.counter'
         ]
@@ -85,9 +80,7 @@ def _slice_view (request, slicename):
     # Create the base layout (Stack)...
     main_plugin = Stack (
         page=page,
-        title="Slice view for %s"%slicename,
-        domid='thestack',
-        togglable=False,
+        title="Slice !!view for %s"%slicename,
         sons=[],
     )
 
@@ -95,123 +88,153 @@ def _slice_view (request, slicename):
 
 
     main_plugin.insert (
-        Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename))
+        Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename)
+    )
 
     main_plugin.insert(
         Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
     )
 
+    sq_plugin = Tabs (
+        page=page,
+        title="Slice view for %s"%slicename,
+        togglable=False,
+        sons=[],
+    )
+
 
     # ... and for the relations
     # XXX Let's hardcode resources for now
-    sq = aq.subquery('resource')
+    sq_resource = aq.subquery('resource')
+    sq_user     = aq.subquery('user')
+    sq_lease    = aq.subquery('lease')
+    sq_measurement = aq.subquery('measurement')
     
-    tab_resources = Tabs (
-        page         = page,
+
+    ############################################################################
+    # RESOURCES
+    # 
+    # A stack inserted in the subquery tab that will hold all operations
+    # related to resources
+    # 
+    
+    stack_resources = Stack(
+        page = page,
         title        = 'Resources',
-        domid        = 'thetabs',
-        # activeid   = 'checkboxes',
-        active_domid = 'gmap',
-    )
-    main_plugin.insert(tab_resources)
-
-    tab_resources.insert(
-        Hazelnut ( 
-            page        = page,
-            title       = 'List',
-            domid       = 'checkboxes',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            # this is the query at the core of the slice list
-            query       = sq,
-            checkboxes  = True,
-            datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
-            },
-        )
-    )
-    tab_resources.insert(
-        GoogleMap (
-            page        = page,
-            title       = 'Geographic view',
-            domid       = 'gmap',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            query       = sq,
-            # center on Paris
-            latitude    = 49.,
-            longitude   = 2.2,
-            zoom        = 3,
-        )
+        sons=[],
     )
 
-    # XXX Let's hardcode users also for now
-    sq = aq.subquery('user')
-    
-    tab_users = Tabs (
+    # --------------------------------------------------------------------------
+    # Different displays = DataTables + GoogleMaps
+    #
+    tab_resource_plugins = Tabs(
+        page    = page,
+        sons = []
+    )
+
+    tab_resource_plugins.insert(Hazelnut( 
+        page        = page,
+        title       = 'List',
+        domid       = 'checkboxes',
+        # this is the query at the core of the slice list
+        query       = sq_resource,
+        checkboxes  = True,
+        datatables_options = { 
+            # for now we turn off sorting on the checkboxes columns this way
+            # this of course should be automatic in hazelnut
+            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+            'iDisplayLength' : 25,
+            'bLengthChange'  : True,
+        },
+    ))
+
+    tab_resource_plugins.insert(GoogleMap(
+        page        = page,
+        title       = 'Geographic view',
+        domid       = 'gmap',
+        # tab's sons preferably turn this off
+        togglable   = False,
+        query       = sq_resource,
+        # center on Paris
+        latitude    = 49.,
+        longitude   = 2.2,
+        zoom        = 3,
+    ))
+
+    stack_resources.insert(tab_resource_plugins)
+
+    # --------------------------------------------------------------------------
+    # ResourcesSelected
+    #
+    stack_resources.insert(ResourcesSelected(
+        page                = page,
+        title               = 'Pending operations',
+        resource_query_uuid = sq_resource,
+        lease_query_uuid    = sq_lease,
+        togglable           = True,
+    ))
+
+    sq_plugin.insert(stack_resources)
+
+    ############################################################################
+    # USERS
+    # 
+
+    tab_users = Tabs(
         page         = page,
         title        = 'Users',
         domid        = 'thetabs2',
         # activeid   = 'checkboxes',
         active_domid = 'checkboxes2',
     )
-    main_plugin.insert(tab_users)
+    sq_plugin.insert(tab_users)
 
-    tab_users.insert(
-        Hazelnut ( 
-            page        = page,
-            title       = 'List',
-            domid       = 'checkboxes2',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            # this is the query at the core of the slice list
-            query       = sq,
-            checkboxes  = True,
-            datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
-            },
-        )
-    )
+    tab_users.insert(Hazelnut( 
+        page        = page,
+        title       = 'List',
+        domid       = 'checkboxes2',
+        # tab's sons preferably turn this off
+        togglable   = False,
+        # this is the query at the core of the slice list
+        query       = sq_user,
+        checkboxes  = True,
+        datatables_options = { 
+            # for now we turn off sorting on the checkboxes columns this way
+            # this of course should be automatic in hazelnut
+            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+            'iDisplayLength' : 25,
+            'bLengthChange'  : True,
+        },
+    ))
 
-    # XXX Let's hardcode measurements also for now
-    sq = aq.subquery('measurement')
-    
-    tab_users = Tabs (
+    tab_measurements = Tabs (
         page         = page,
         title        = 'Measurements',
         domid        = 'thetabs3',
         # activeid   = 'checkboxes',
         active_domid = 'checkboxes3',
     )
-    main_plugin.insert(tab_users)
+    sq_plugin.insert(tab_measurements)
 
-    tab_users.insert(
-        Hazelnut ( 
-            page        = page,
-            title       = 'List',
-            domid       = 'checkboxes3',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            # this is the query at the core of the slice list
-            query       = sq,
-            checkboxes  = True,
-            datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
-            },
-        )
-    )
+    tab_measurements.insert(Hazelnut( 
+        page        = page,
+        title       = 'List',
+        domid       = 'checkboxes3',
+        # tab's sons preferably turn this off
+        togglable   = False,
+        # this is the query at the core of the slice list
+        query       = sq_measurement,
+        checkboxes  = True,
+        datatables_options = { 
+            # for now we turn off sorting on the checkboxes columns this way
+            # this of course should be automatic in hazelnut
+            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+            'iDisplayLength' : 25,
+            'bLengthChange'  : True,
+        },
+    ))
+
+    main_plugin.insert(sq_plugin)
 
     main_plugin.insert (
         Messages (

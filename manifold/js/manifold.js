@@ -149,7 +149,10 @@ var manifold = {
     publish_result: function(query, result) {
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
-        if (manifold.asynchroneous_debug) messages.debug("publishing result on " + channel);
+        if (manifold.asynchroneous_debug)
+            messages.debug("publishing result on " + channel);
+        if (typeof result === 'undefined')
+            result = [];
         jQuery.publish(channel, [result, query]);
     },
 

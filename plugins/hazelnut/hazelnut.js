@@ -31,37 +31,52 @@
 
     var methods = {
 
+        /**
+         * @brief Plugin initialization
+         * @param options : an associative array of setting values
+         * @return : a jQuery collection of objects on which the plugin is
+         *     applied, which allows to maintain chainability of calls
+         */
         init : function ( options ) {
+
             /* Default settings */
             var options = $.extend( {
                 'checkboxes': false
             }, options);
 
             return this.each(function() {
+
                 var $this = $(this);
+
                 /* Events */
                 $this.on('show.Datatables', methods.show);
 
                 /* An object that will hold private variables and methods */
-		var hazelnut = new Hazelnut (options);
+                var hazelnut = new Hazelnut (options);
                 $this.data('Hazelnut', hazelnut);
-
                 var query_channel   = '/query/' + options.query_uuid + '/changed';
                 var update_channel  = '/update-set/' + options.query_uuid;
                 var results_channel = '/results/' + options.query_uuid + '/changed';
 
-		// xxx not tested yet
+                // xxx not tested yet
                 $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
-		// xxx not tested yet
+                // xxx not tested yet
                 $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
-		// expected to work
+                // expected to work
                 $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
-		if (debug) messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
+                if (debug)
+                    messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
 
             }); // this.each
         }, // init
 
+        /**
+         * @brief Plugin destruction
+         * @return : a jQuery collection of objects on which the plugin is
+         *     applied, which allows to maintain chainability of calls
+         */
         destroy : function( ) {
+
             return this.each(function() {
                 var $this = $(this);
                 var hazelnut = $this.data('Hazelnut');
@@ -76,12 +91,13 @@
         }, // destroy
 
         show : function( ) {
-	    var $this=$(this);
-	    // xxx wtf. why [1] ? would expect 0...
-	    if (debug) messages.debug("Hitting suspicious line in hazelnut.show");
+            var $this=$(this);
+            // xxx wtf. why [1] ? would expect 0...
+            if (debug)
+                messages.debug("Hitting suspicious line in hazelnut.show");
             var oTable = $($('.dataTable', $this)[1]).dataTable();
             oTable.fnAdjustColumnSizing()
-    
+        
             /* Refresh dataTabeles if click on the menu to display it : fix dataTables 1.9.x Bug */        
             $(this).each(function(i,elt) {
                 if (jQuery(elt).hasClass('dataTables')) {
@@ -96,42 +112,44 @@
 
     }; // var methods;
 
-
     /***************************************************************************
      * Hazelnut object
      ***************************************************************************/
-    function Hazelnut(options) {
+
+    function Hazelnut(options) 
+    {
         /* member variables */
         this.options = options;
-	// xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
+
+        // xxx thierry : initialize this here - it was not, I expect this relied on set_query somehow..
         //this.current_query = null;
-	this.current_query=manifold.find_query(this.options.query_uuid);
-//	if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query.__repr());
-	this.query_update = null;
+        this.current_query=manifold.find_query(this.options.query_uuid);
+        //  if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query.__repr());
+        this.query_update = null;
         this.current_resources = Array();
 
         var object = this;
 
         /* Transforms the table into DataTable, and keep a pointer to it */
-	actual_options = {
+        actual_options = {
             // Customize the position of Datatables elements (length,filter,button,...)
-	    // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-	    sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span5'i><'span7'p>>",
+            // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
+            sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span5'i><'span7'p>>",
             sPaginationType: 'bootstrap',
             // Handle the null values & the error : Datatables warning Requested unknown parameter
             // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
             aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
-	    // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
+            // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
             // sScrollX: '100%',       /* Horizontal scrolling */
             bProcessing: true,      /* Loading */
             fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
         };
-	// the intention here is that options.datatables_options as coming from the python object take precedence
-//	XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
+        // the intention here is that options.datatables_options as coming from the python object take precedence
+        //  XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
         this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
 
         /* Setup the SelectAll button in the dataTable header */
-	/* xxx not sure this is still working */
+        /* xxx not sure this is still working */
         var oSelectAll = $('#datatableSelectAll-'+ options.plugin_uuid);
         oSelectAll.html("<span class='ui-icon ui-icon-check' style='float:right;display:inline-block;'></span>Select All");
         oSelectAll.button();
@@ -155,13 +173,15 @@
         /* methods */
 
         this.set_query = function(query) {
-	    messages.info('hazelnut.set_query');
+            messages.info('hazelnut.set_query');
             var options = this.options;
             /* Compare current and advertised query to get added and removed fields */
             previous_query = this.current_query;
             /* Save the query as the current query */
             this.current_query = query;
-	    if (debug) messages.debug("hazelnut.set_query, current_query is now -> " + this.current_query);
+            if (debug)
+                messages.debug("hazelnut.set_query, current_query is now -> " + this.current_query);
+
             /* We check all necessary fields : in column editor I presume XXX */
             // XXX ID naming has no plugin_uuid
             if (typeof(query.fields) != 'undefined') {        
@@ -170,7 +190,8 @@
                         $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked', true);
                 });
             }
-            /*Process updates in filters / current_query must be updated before this call for filtering ! */
+
+            /* Process updates in filters / current_query must be updated before this call for filtering ! */
             this.table.fnDraw();
 
             /*
@@ -209,7 +230,8 @@
         }
 
         this.set_resources = function(resources, instance) {
-	    if (debug) messages.debug("entering hazelnut.set_resources");
+            if (debug)
+                messages.debug("entering hazelnut.set_resources");
             var options = this.options;
             var previous_resources = this.current_resources;
             this.current_resources = resources;
@@ -238,7 +260,7 @@
          * XXX will be removed/replaced
          */
         this.selected_changed = function(e, change) {
-	    if (debug) messages.debug("entering hazelnut.selected_changed");
+        if (debug) messages.debug("entering hazelnut.selected_changed");
             var actions = change.split("/");
             if (actions.length > 1) {
                 var oNodes = this.table.fnGetNodes();
@@ -259,42 +281,42 @@
         }
     
         this.update_plugin = function(e, rows) {
-	    // e.data is what we passed in second argument to subscribe
-	    // so here it is the jquery object attached to the plugin <div>
-	    var $plugindiv=e.data;
-	    if (debug) messages.debug("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
-	    // clear the spinning wheel: look up an ancestor that has the need-spin class
-	    // do this before we might return
-	    $plugindiv.closest('.need-spin').spin(false);
+        // e.data is what we passed in second argument to subscribe
+        // so here it is the jquery object attached to the plugin <div>
+        var $plugindiv=e.data;
+        if (debug) messages.debug("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
+        // clear the spinning wheel: look up an ancestor that has the need-spin class
+        // do this before we might return
+        $plugindiv.closest('.need-spin').spin(false);
 
             var options = this.options;
             var hazelnut = this;
     
-	    /* if we get no result, or an error, try to make that clear, and exit */
+        /* if we get no result, or an error, try to make that clear, and exit */
             if (rows.length==0) {
-		if (debug) messages.debug("Empty result on hazelnut " + domid);
-		var placeholder=$(this.table).find("td.dataTables_empty");
-		console.log("placeholder "+placeholder);
-		if (placeholder.length==1) placeholder.html(unfold.warning("Empty result"));
-		else			   this.table.html(unfold.warning("Empty result"));
+        if (debug) messages.debug("Empty result on hazelnut " + this.options.domid);
+        var placeholder=$(this.table).find("td.dataTables_empty");
+        console.log("placeholder "+placeholder);
+        if (placeholder.length==1) placeholder.html(unfold.warning("Empty result"));
+        else               this.table.html(unfold.warning("Empty result"));
                 return;
             } else if (typeof(rows[0].error) != 'undefined') {
-		// we now should have another means to report errors that this inline/embedded hack
-		if (debug) messages.error ("undefined result on " + domid + " - should not happen anymore");
+        // we now should have another means to report errors that this inline/embedded hack
+        if (debug) messages.error ("undefined result on " + this.options.domid + " - should not happen anymore");
                 this.table.html(unfold.error(rows[0].error));
                 return;
             }
 
-	    /* 
-	     * fill the dataTables object
-	     * we cannot set html content directly here, need to use fnAddData
-	     */
+        /* 
+         * fill the dataTables object
+         * we cannot set html content directly here, need to use fnAddData
+         */
             var lines = new Array();
     
             this.current_resources = Array();
     
             $.each(rows, function(index, row) {
-		// this models a line in dataTables, each element in the line describes a cell
+        // this models a line in dataTables, each element in the line describes a cell
                 line = new Array();
      
                 // go through table headers to get column names we want
@@ -302,10 +324,10 @@
                 var cols = hazelnut.table.fnSettings().aoColumns;
                 var colnames = cols.map(function(x) {return x.sTitle})
                 var nb_col = cols.length;
-		/* if we've requested checkboxes, then forget about the checkbox column for now */
+        /* if we've requested checkboxes, then forget about the checkbox column for now */
                 if (options.checkboxes) nb_col -= 1;
 
-		/* fill in stuff depending on the column name */
+        /* fill in stuff depending on the column name */
                 for (var j = 0; j < nb_col; j++) {
                     if (typeof colnames[j] == 'undefined') {
                         line.push('...');
@@ -323,10 +345,10 @@
                     }
                 }
     
-		/* catch up with the last column if checkboxes were requested */
+        /* catch up with the last column if checkboxes were requested */
                 if (options.checkboxes) {
                     var checked = '';
-		    // xxx problem is, we don't get this 'sliver' thing set apparently
+            // xxx problem is, we don't get this 'sliver' thing set apparently
                     if (typeof(row['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
                         hazelnut.current_resources.push(row['urn']);
@@ -339,26 +361,26 @@
     
             });
     
-	    this.table.fnClearTable();
-	    if (debug) messages.debug("hazelnut.update_plugin: total of " + lines.length + " rows");
+        this.table.fnClearTable();
+        if (debug) messages.debug("hazelnut.update_plugin: total of " + lines.length + " rows");
             this.table.fnAddData(lines);
     
         };
 
         this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {
-	    var result="";
+        var result="";
             // Preafix id with plugin_uuid
-	    result += "<input";
-	    result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
-	    result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
-	    result += " name='" + unfold.get_value(field) + "'";
-	    result += " type='checkbox'";
-	    result += selected_str;
-	    result += disabled_str;
-	    result += " autocomplete='off'";
-	    result += " value='" + unfold.get_value(header) + "'";
-	    result += "></input>";
-	    return result;
+        result += "<input";
+        result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
+        result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
+        result += " name='" + unfold.get_value(field) + "'";
+        result += " type='checkbox'";
+        result += selected_str;
+        result += disabled_str;
+        result += " autocomplete='off'";
+        result += " value='" + unfold.get_value(header) + "'";
+        result += "></input>";
+        return result;
         };
     } // constructor
 
