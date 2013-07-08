@@ -74,7 +74,7 @@ INSERT INTO object VALUES(field=value)
     }
 
     // FIXME These functions computing diff's between queries are meant to be shared
-    this.diff_fields = function (otherQuery) {
+    this.diff_fields = function(otherQuery) {
         var f1 = this.fields;
         var f2 = otherQuery.fields;
 
@@ -87,7 +87,7 @@ INSERT INTO object VALUES(field=value)
     }
 
     // FIXME Modify filter to filters
-    this.diff_filter = function (otherQuery) {
+    this.diff_filter = function(otherQuery) {
         var f1 = this.filters;
         var f2 = otherQuery.filters;
         
@@ -98,6 +98,22 @@ INSERT INTO object VALUES(field=value)
         
         return {'added':added, 'removed':removed};
     } 
+
+    this.iter_subqueries = function(callback, data)
+    {
+        rec = function(query, callback, data) {
+            jQuery.each(query.subqueries, function(object, subquery) {
+                rec(subquery, callback);
+            });
+            callback(query, data);
+        };
+        if (this.analyzed_query !== undefined)
+            query = this.analyzed_query;
+        else
+            query = this
+        rec(query, callback, data);
+    }
+
 // we send queries as a json string now 
 //    this.as_POST = function() {
 //        return {'action': this.action, 'object': this.object, 'timestamp': this.timestamp,

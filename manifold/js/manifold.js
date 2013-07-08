@@ -19,6 +19,19 @@ function debug_query (msg, query) {
 
 /* ------------------------------------------------------------ */
 
+// Constants that should be somehow moved to a plugin.js file
+var FILTER_ADDED   = 1;
+var FILTER_REMOVED = 2;
+var CLEAR_FILTERS  = 3;
+var FIELD_ADDED    = 4;
+var FIELD_REMOVED  = 5;
+var CLEAR_FIELDS   = 6;
+var NEW_RECORD     = 7;
+var CLEAR_RECORDS  = 8;
+
+var IN_PROGRESS     = 101;
+var DONE           = 102;
+
 /*!
  * This namespace holds functions for globally managing query objects
  * \Class Manifold
@@ -33,7 +46,7 @@ var manifold = {
             if (active) {
                 $(locator).spin(manifold.spin_presets);
             } else {
-                $locator.spin(false);
+                $(locator).spin(false);
             }
         } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
     },
@@ -90,11 +103,11 @@ var manifold = {
         // start spinners
 
         // in case the spin stuff was not loaded, let's make sure we proceed to the exit 
-        try {
-            if (manifold.asynchroneous_debug) 
-            messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
-            jQuery('.need-spin').spin(manifold.spin_presets);
-        } catch (err) { messages.debug("Cannot turn on spins " + err); }
+        //try {
+        //    if (manifold.asynchroneous_debug) 
+        //   messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
+        //    jQuery('.need-spin').spin(manifold.spin_presets);
+        //} catch (err) { messages.debug("Cannot turn on spins " + err); }
         
         // Loop through input array, and use publish_uuid to publish back results
         jQuery.each(query_publish_dom_tuples, function(index, tuple) {
@@ -107,6 +120,11 @@ var manifold = {
                 messages.debug("sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
                 messages.debug("... ctd... with actual query= " + query.__repr());
             }
+
+            query.iter_subqueries(function (sq) {
+                $('.plugin').trigger(manifold.get_record_channel(sq.query_uuid), [IN_PROGRESS]);
+            });
+
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
                 jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
@@ -147,12 +165,22 @@ var manifold = {
      * \param array results results corresponding to query
      */
     publish_result: function(query, result) {
+        if (typeof result === 'undefined')
+            result = [];
+
+        // NEW PLUGIN API
+        var channel = manifold.get_record_channel(query.query_uuid);
+        $('.plugin').trigger(channel, [CLEAR_RECORDS]);
+        $.each(result, function(i, record) {
+            $('.plugin').trigger(channel, [NEW_RECORD, record]);
+        });
+        $('.plugin').trigger(channel, [DONE]);
+
+        // OLD PLUGIN API BELOW
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
         if (manifold.asynchroneous_debug)
             messages.debug("publishing result on " + channel);
-        if (typeof result === 'undefined')
-            result = [];
         jQuery.publish(channel, [result, query]);
     },
 
@@ -219,59 +247,83 @@ var manifold = {
         }
     },
 
+    /* Publish/subscribe channels for internal use */
+    get_query_channel:  function(uuid) { return '/query/'  + uuid },
+    get_record_channel: function(uuid) { return '/record/' + uuid },
+
 }; // manifold object
 /* ------------------------------------------------------------ */
 
-// extend jQuery/$ with pubsub capabilities
-/* https://gist.github.com/661855 */
 (function($) {
 
-  var o = $({});
-
-  $.subscribe = function( channel, selector, data, fn) {
-    /* borrowed from jQuery */
-    if ( data == null && fn == null ) {
-        // ( channel, fn )
-        fn = selector;
-        data = selector = undefined;
-    } else if ( fn == null ) {
-        if ( typeof selector === "string" ) {
-            // ( channel, selector, fn )
-            fn = data;
-            data = undefined;
-        } else {
-            // ( channel, data, fn )
-            fn = data;
-            data = selector;
-            selector = undefined;
-        }
-    }
-    /* </ugly> */
-
-    /* We use an indirection function that will clone the object passed in
-     * parameter to the subscribe callback 
+    /* NEW PLUGIN API
      * 
-     * FIXME currently we only clone query objects which are the only ones
-     * supported and editable, we might have the same issue with results but
-     * the page load time will be severely affected...
+     * NOTE: Since we don't have a plugin class, we are extending all jQuery
+     * plugins...
      */
-    o.on.apply(o, [channel, selector, data, function() { 
-        for(i = 1; i < arguments.length; i++) {
-            if ( arguments[i].constructor.name == 'ManifoldQuery' )
-                arguments[i] = arguments[i].clone();
-        }
-        fn.apply(o, arguments);
-    }]);
-  };
 
-  $.unsubscribe = function() {
-    o.off.apply(o, arguments);
-  };
+    /*!
+     * \brief Associates a query handler to the current plugin
+     * \param uuid (string) query uuid
+     * \param handler (function) handler callback
+     */
+    $.fn.set_query_handler = function(uuid, handler)
+    {
+        this.on(manifold.get_query_channel(uuid), handler);
+    }
 
-  $.publish = function() {
-    o.trigger.apply(o, arguments);
-  };
+    $.fn.set_record_handler = function(uuid, handler)
+    {
+        this.on(manifold.get_record_channel(uuid), handler);
+    }
 
+    // OLD PLUGIN API: extend jQuery/$ with pubsub capabilities
+    // https://gist.github.com/661855
+    var o = $({});
+    $.subscribe = function( channel, selector, data, fn) {
+      /* borrowed from jQuery */
+      if ( data == null && fn == null ) {
+          // ( channel, fn )
+          fn = selector;
+          data = selector = undefined;
+      } else if ( fn == null ) {
+          if ( typeof selector === "string" ) {
+              // ( channel, selector, fn )
+              fn = data;
+              data = undefined;
+          } else {
+              // ( channel, data, fn )
+              fn = data;
+              data = selector;
+              selector = undefined;
+          }
+      }
+      /* </ugly> */
+  
+      /* We use an indirection function that will clone the object passed in
+       * parameter to the subscribe callback 
+       * 
+       * FIXME currently we only clone query objects which are the only ones
+       * supported and editable, we might have the same issue with results but
+       * the page load time will be severely affected...
+       */
+      o.on.apply(o, [channel, selector, data, function() { 
+          for(i = 1; i < arguments.length; i++) {
+              if ( arguments[i].constructor.name == 'ManifoldQuery' )
+                  arguments[i] = arguments[i].clone();
+          }
+          fn.apply(o, arguments);
+      }]);
+    };
+  
+    $.unsubscribe = function() {
+      o.off.apply(o, arguments);
+    };
+  
+    $.publish = function() {
+      o.trigger.apply(o, arguments);
+    };
+  
 }(jQuery));
 
 /* ------------------------------------------------------------ */

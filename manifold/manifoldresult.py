@@ -15,6 +15,7 @@ class ManifoldResult (dict):
         self['code']=code
         self['value']=value
         self['output']=output
+        self['description'] = '' # Jordan: needed by javascript code
 
     def from_json (self, json_string):
         d=json.dumps(json_string)

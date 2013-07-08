@@ -48,24 +48,30 @@
 
                 var $this = $(this);
 
-                /* Events */
-                $this.on('show.Datatables', methods.show);
-
                 /* An object that will hold private variables and methods */
                 var hazelnut = new Hazelnut (options);
                 $this.data('Hazelnut', hazelnut);
-                var query_channel   = '/query/' + options.query_uuid + '/changed';
-                var update_channel  = '/update-set/' + options.query_uuid;
-                var results_channel = '/results/' + options.query_uuid + '/changed';
 
-                // xxx not tested yet
-                $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
-                // xxx not tested yet
-                $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
-                // expected to work
-                $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
-                if (debug)
-                    messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
+                /* Events */
+                $this.on('show.Datatables', methods.show);
+
+                // This is the new plugin API meant to replace the weird publish_subscribe mechanism
+                $this.set_query_handler(options.query_uuid, hazelnut.query_handler);
+                $this.set_record_handler(options.query_uuid, hazelnut.record_handler); 
+
+//                /* Subscriptions */
+//                var query_channel   = '/query/' + options.query_uuid + '/changed';
+//                var update_channel  = '/update-set/' + options.query_uuid;
+//                var results_channel = '/results/' + options.query_uuid + '/changed';
+//
+//                // xxx not tested yet
+//                $.subscribe(query_channel,  function(e, query) { hazelnut.set_query(query); });
+//                // xxx not tested yet
+//                $.subscribe(update_channel, function(e, resources, instance) { hazelnut.set_resources(resources, instance); });
+//                // expected to work
+//                $.subscribe(results_channel, $this, function(e, rows) { hazelnut.update_plugin(e,rows); });
+//                if (debug)
+//                    messages.debug("hazelnut '" + this.id + "' subscribed to e.g." + results_channel);
 
             }); // this.each
         }, // init
@@ -281,53 +287,58 @@
         }
     
         this.update_plugin = function(e, rows) {
-        // e.data is what we passed in second argument to subscribe
-        // so here it is the jquery object attached to the plugin <div>
-        var $plugindiv=e.data;
-        if (debug) messages.debug("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
-        // clear the spinning wheel: look up an ancestor that has the need-spin class
-        // do this before we might return
-        $plugindiv.closest('.need-spin').spin(false);
+            // e.data is what we passed in second argument to subscribe
+            // so here it is the jquery object attached to the plugin <div>
+            var $plugindiv=e.data;
+            if (debug)
+                messages.debug("entering hazelnut.update_plugin on id '" + $plugindiv.attr('id') + "'");
+            // clear the spinning wheel: look up an ancestor that has the need-spin class
+            // do this before we might return
+            $plugindiv.closest('.need-spin').spin(false);
 
             var options = this.options;
             var hazelnut = this;
     
-        /* if we get no result, or an error, try to make that clear, and exit */
+            /* if we get no result, or an error, try to make that clear, and exit */
             if (rows.length==0) {
-        if (debug) messages.debug("Empty result on hazelnut " + this.options.domid);
-        var placeholder=$(this.table).find("td.dataTables_empty");
-        console.log("placeholder "+placeholder);
-        if (placeholder.length==1) placeholder.html(unfold.warning("Empty result"));
-        else               this.table.html(unfold.warning("Empty result"));
-                return;
+                if (debug) 
+                    messages.debug("Empty result on hazelnut " + this.options.domid);
+                var placeholder=$(this.table).find("td.dataTables_empty");
+                console.log("placeholder "+placeholder);
+                if (placeholder.length==1) 
+                    placeholder.html(unfold.warning("Empty result"));
+                else
+                    this.table.html(unfold.warning("Empty result"));
+                    return;
             } else if (typeof(rows[0].error) != 'undefined') {
-        // we now should have another means to report errors that this inline/embedded hack
-        if (debug) messages.error ("undefined result on " + this.options.domid + " - should not happen anymore");
+                // we now should have another means to report errors that this inline/embedded hack
+                if (debug) 
+                    messages.error ("undefined result on " + this.options.domid + " - should not happen anymore");
                 this.table.html(unfold.error(rows[0].error));
                 return;
             }
 
-        /* 
-         * fill the dataTables object
-         * we cannot set html content directly here, need to use fnAddData
-         */
+            /* 
+             * fill the dataTables object
+             * we cannot set html content directly here, need to use fnAddData
+             */
             var lines = new Array();
     
             this.current_resources = Array();
     
             $.each(rows, function(index, row) {
-        // this models a line in dataTables, each element in the line describes a cell
+                // this models a line in dataTables, each element in the line describes a cell
                 line = new Array();
      
                 // go through table headers to get column names we want
                 // in order (we have temporarily hack some adjustments in names)
-                var cols = hazelnut.table.fnSettings().aoColumns;
+                var cols = object.table.fnSettings().aoColumns;
                 var colnames = cols.map(function(x) {return x.sTitle})
                 var nb_col = cols.length;
-        /* if we've requested checkboxes, then forget about the checkbox column for now */
+                /* if we've requested checkboxes, then forget about the checkbox column for now */
                 if (options.checkboxes) nb_col -= 1;
 
-        /* fill in stuff depending on the column name */
+                /* fill in stuff depending on the column name */
                 for (var j = 0; j < nb_col; j++) {
                     if (typeof colnames[j] == 'undefined') {
                         line.push('...');
@@ -345,10 +356,10 @@
                     }
                 }
     
-        /* catch up with the last column if checkboxes were requested */
+                /* catch up with the last column if checkboxes were requested */
                 if (options.checkboxes) {
                     var checked = '';
-            // xxx problem is, we don't get this 'sliver' thing set apparently
+                    // xxx problem is, we don't get this 'sliver' thing set apparently
                     if (typeof(row['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
                         hazelnut.current_resources.push(row['urn']);
@@ -361,27 +372,140 @@
     
             });
     
-        this.table.fnClearTable();
-        if (debug) messages.debug("hazelnut.update_plugin: total of " + lines.length + " rows");
+            this.table.fnClearTable();
+            if (debug)
+                messages.debug("hazelnut.update_plugin: total of " + lines.length + " rows");
             this.table.fnAddData(lines);
-    
+        
         };
 
-        this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str) {
-        var result="";
-            // Preafix id with plugin_uuid
-        result += "<input";
-        result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
-        result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
-        result += " name='" + unfold.get_value(field) + "'";
-        result += " type='checkbox'";
-        result += selected_str;
-        result += disabled_str;
-        result += " autocomplete='off'";
-        result += " value='" + unfold.get_value(header) + "'";
-        result += "></input>";
-        return result;
+        this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str)
+        {
+            var result="";
+            // Prefix id with plugin_uuid
+            result += "<input";
+            result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
+            result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
+            result += " name='" + unfold.get_value(field) + "'";
+            result += " type='checkbox'";
+            result += selected_str;
+            result += disabled_str;
+            result += " autocomplete='off'";
+            result += " value='" + unfold.get_value(header) + "'";
+            result += "></input>";
+            return result;
         };
+
+        ////////////////////////////////////////////////////////////////////////
+        // New plugin API (in tests)
+
+        // TODO : signal empty/non empty table
+
+        this.new_record = function(record)
+        {
+            // this models a line in dataTables, each element in the line describes a cell
+            line = new Array();
+     
+            // go through table headers to get column names we want
+            // in order (we have temporarily hack some adjustments in names)
+            var cols = object.table.fnSettings().aoColumns;
+            var colnames = cols.map(function(x) {return x.sTitle})
+            var nb_col = cols.length;
+            /* if we've requested checkboxes, then forget about the checkbox column for now */
+            if (options.checkboxes) nb_col -= 1;
+
+            /* fill in stuff depending on the column name */
+            for (var j = 0; j < nb_col; j++) {
+                if (typeof colnames[j] == 'undefined') {
+                    line.push('...');
+                } else if (colnames[j] == 'hostname') {
+                    if (record['type'] == 'resource,link')
+                        //TODO: we need to add source/destination for links
+                        line.push('');
+                    else
+                        line.push(record['hostname']);
+                } else {
+                    if (record[colnames[j]])
+                        line.push(record[colnames[j]]);
+                    else
+                        line.push('');
+                }
+            }
+    
+            /* catch up with the last column if checkboxes were requested */
+            if (options.checkboxes) {
+                var checked = '';
+                // xxx problem is, we don't get this 'sliver' thing set apparently
+                if (typeof(record['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
+                    checked = 'checked ';
+                    hazelnut.current_resources.push(record['urn']);
+                }
+                // Use a key instead of hostname (hard coded...)
+                line.push(object.checkbox(options.plugin_uuid, record['urn'], record['type'], checked, false));
+            }
+    
+            // XXX Is adding an array of lines more efficient ?
+            this.table.fnAddData(line);
+
+        };
+
+        this.record_handler = function(e, event_type, record)
+        {
+            switch(event_type) {
+                case NEW_RECORD:
+                    object.new_record(record);
+                    break;
+                case CLEAR_RECORDS:
+                    object.table.fnClearTable();
+                    break;
+                case IN_PROGRESS:
+                    manifold.spin($(this));
+                    break;
+                case DONE:
+                    manifold.spin($(this), false);
+                    break;
+            }
+        };
+
+        this.query_handler = function(e, event_type, query)
+        {
+            // This replaces the complex set_query function
+            // The plugin does not need to remember the query anymore
+            switch(event_type) {
+                // Filters
+                case FILTER_ADDED:
+                case FILTER_REMOVED:
+                case CLEAR_FILTERS:
+                    // XXX Here we might need to maintain the list of filters !
+                    /* Process updates in filters / current_query must be updated before this call for filtering ! */
+                    object.table.fnDraw();
+                    break;
+
+                // Fields
+                /* Hide/unhide columns to match added/removed fields */
+                case FIELD_ADDED:
+                    var object = this;
+                    $.each(added_fields, function (index, field) {            
+                        var index = object.getColIndex(field,cols);
+                        if(index != -1)
+                            object.table.fnSetColumnVis(index, true);
+                    });
+                    break;
+                case FIELD_REMOVED:
+                    var object = this;
+                    $.each(removed_fields, function (index, field) {
+                        var index = object.getColIndex(field,cols);
+                        if(index != -1)
+                            object.table.fnSetColumnVis(index, false);
+                    });            
+                    break;
+                case CLEAR_FIELDS:
+                    alert('Hazelnut::clear_fields() not implemented');
+                    break;
+            } // switch
+
+
+        }
     } // constructor
 
     /***************************************************************************
