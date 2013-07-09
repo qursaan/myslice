@@ -87,6 +87,7 @@ with the query passed using POST"""
         try:
             answer=manifold_api.send_manifold_query (manifold_query)
         except ManifoldException, manifold_result:
+            print "MANIFOLD EXCEPTION"
             answer=manifold_result
         print "="*80
         print "ANSWER IN PROXY", answer

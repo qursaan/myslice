@@ -3,6 +3,7 @@
 <title> MySlice - {{ title }} </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {# This is where insert_str will end up #}{% media_container prelude %}
+{% include 'messages-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
 <style type="text/css">{# In case we need to add raw css code #}{% container prelude_css %}</style>
 {{ header_prelude }}
@@ -19,6 +20,7 @@
   {% block topmenu %}
   {% include 'widget-topmenu.html' %}
   {% endblock topmenu %}
+{% include 'messages.html' %}
 <div class="container-fluid">
   <div class="row-fluid">
     <div id="unfold1-main" class="span12 columns">

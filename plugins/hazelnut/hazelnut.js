@@ -178,78 +178,78 @@
 
         /* methods */
 
-        this.set_query = function(query) {
-            messages.info('hazelnut.set_query');
-            var options = this.options;
-            /* Compare current and advertised query to get added and removed fields */
-            previous_query = this.current_query;
-            /* Save the query as the current query */
-            this.current_query = query;
-            if (debug)
-                messages.debug("hazelnut.set_query, current_query is now -> " + this.current_query);
+// DEPRECATED //        this.set_query = function(query) {
+// DEPRECATED //            messages.info('hazelnut.set_query');
+// DEPRECATED //            var options = this.options;
+// DEPRECATED //            /* Compare current and advertised query to get added and removed fields */
+// DEPRECATED //            previous_query = this.current_query;
+// DEPRECATED //            /* Save the query as the current query */
+// DEPRECATED //            this.current_query = query;
+// DEPRECATED //            if (debug)
+// DEPRECATED //                messages.debug("hazelnut.set_query, current_query is now -> " + this.current_query);
+// DEPRECATED //
+// DEPRECATED //            /* We check all necessary fields : in column editor I presume XXX */
+// DEPRECATED //            // XXX ID naming has no plugin_uuid
+// DEPRECATED //            if (typeof(query.fields) != 'undefined') {        
+// DEPRECATED //                $.each (query.fields, function(index, value) { 
+// DEPRECATED //                    if (!$('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked'))
+// DEPRECATED //                        $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked', true);
+// DEPRECATED //                });
+// DEPRECATED //            }
+// DEPRECATED //
+// DEPRECATED //            /* Process updates in filters / current_query must be updated before this call for filtering ! */
+// DEPRECATED //            this.table.fnDraw();
+// DEPRECATED //
+// DEPRECATED //            /*
+// DEPRECATED //             * Process updates in fields
+// DEPRECATED //             */
+// DEPRECATED //            if (typeof(query.fields) != 'undefined') {     
+// DEPRECATED //                /* DataTable Settings */
+// DEPRECATED //                var oSettings = this.table.dataTable().fnSettings();
+// DEPRECATED //                var cols = oSettings.aoColumns;
+// DEPRECATED //                var colnames = cols.map(function(x) {return x.sTitle});
+// DEPRECATED //                colnames = $.grep(colnames, function(value) {return value != "+/-";});
+// DEPRECATED //
+// DEPRECATED //                if (previous_query == null) {
+// DEPRECATED //                    var added_fields = query.fields;
+// DEPRECATED //                    var removed_fields = colnames;            
+// DEPRECATED //                    removed_fields = $.grep(colnames, function(x) { return $.inArray(x, added_fields) == -1});
+// DEPRECATED //                } else {
+// DEPRECATED //                    var tmp = previous_query.diff_fields(query);
+// DEPRECATED //                    var added_fields = tmp.added;
+// DEPRECATED //                    var removed_fields = tmp.removed;
+// DEPRECATED //                }
+// DEPRECATED //
+// DEPRECATED //                /* Hide/unhide columns to match added/removed fields */
+// DEPRECATED //                var object = this;
+// DEPRECATED //                $.each(added_fields, function (index, field) {            
+// DEPRECATED //                    var index = object.getColIndex(field,cols);
+// DEPRECATED //                    if(index != -1)
+// DEPRECATED //                        object.table.fnSetColumnVis(index, true);
+// DEPRECATED //                });
+// DEPRECATED //                $.each(removed_fields, function (index, field) {
+// DEPRECATED //                    var index = object.getColIndex(field,cols);
+// DEPRECATED //                    if(index != -1)
+// DEPRECATED //                        object.table.fnSetColumnVis(index, false);
+// DEPRECATED //                });            
+// DEPRECATED //            }
+// DEPRECATED //        }
 
-            /* We check all necessary fields : in column editor I presume XXX */
-            // XXX ID naming has no plugin_uuid
-            if (typeof(query.fields) != 'undefined') {        
-                $.each (query.fields, function(index, value) { 
-                    if (!$('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked'))
-                        $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + value).attr('checked', true);
-                });
-            }
-
-            /* Process updates in filters / current_query must be updated before this call for filtering ! */
-            this.table.fnDraw();
-
-            /*
-             * Process updates in fields
-             */
-            if (typeof(query.fields) != 'undefined') {     
-                /* DataTable Settings */
-                var oSettings = this.table.dataTable().fnSettings();
-                var cols = oSettings.aoColumns;
-                var colnames = cols.map(function(x) {return x.sTitle});
-                colnames = $.grep(colnames, function(value) {return value != "+/-";});
-
-                if (previous_query == null) {
-                    var added_fields = query.fields;
-                    var removed_fields = colnames;            
-                    removed_fields = $.grep(colnames, function(x) { return $.inArray(x, added_fields) == -1});
-                } else {
-                    var tmp = previous_query.diff_fields(query);
-                    var added_fields = tmp.added;
-                    var removed_fields = tmp.removed;
-                }
-
-                /* Hide/unhide columns to match added/removed fields */
-                var object = this;
-                $.each(added_fields, function (index, field) {            
-                    var index = object.getColIndex(field,cols);
-                    if(index != -1)
-                        object.table.fnSetColumnVis(index, true);
-                });
-                $.each(removed_fields, function (index, field) {
-                    var index = object.getColIndex(field,cols);
-                    if(index != -1)
-                        object.table.fnSetColumnVis(index, false);
-                });            
-            }
-        }
-
-        this.set_resources = function(resources, instance) {
-            if (debug)
-                messages.debug("entering hazelnut.set_resources");
-            var options = this.options;
-            var previous_resources = this.current_resources;
-            this.current_resources = resources;
-    
-            /* We uncheck all checkboxes ... */
-            $('hazelnut-checkbox-' + options.plugin_uuid).attr('checked', false);
-            /* ... and check the ones specified in the resource list */
-            $.each(this.current_resources, function(index, urn) {
-                $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + urn).attr('checked', true)
-            });
-            
-        }
+// DEPRECATED //        this.set_resources = function(resources, instance) {
+// DEPRECATED //            if (debug)
+// DEPRECATED //                messages.debug("entering hazelnut.set_resources");
+// DEPRECATED //            var options = this.options;
+// DEPRECATED //            var previous_resources = this.current_resources;
+// DEPRECATED //            this.current_resources = resources;
+// DEPRECATED //    
+// DEPRECATED //            /* We uncheck all checkboxes ... */
+// DEPRECATED //            $('hazelnut-checkbox-' + options.plugin_uuid).attr('checked', false);
+// DEPRECATED //            /* ... and check the ones specified in the resource list */
+// DEPRECATED //            $.each(this.current_resources, function(index, urn) {
+// DEPRECATED //                $('#hazelnut-checkbox-' + options.plugin_uuid + "-" + urn).attr('checked', true)
+// DEPRECATED //            });
+// DEPRECATED //            
+// DEPRECATED //        }
 
         /**
          * @brief Determine index of key in the table columns 
@@ -261,30 +261,30 @@
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }
     
-        /**
-         * @brief
-         * XXX will be removed/replaced
-         */
-        this.selected_changed = function(e, change) {
-        if (debug) messages.debug("entering hazelnut.selected_changed");
-            var actions = change.split("/");
-            if (actions.length > 1) {
-                var oNodes = this.table.fnGetNodes();
-                var myNode = $.grep(oNodes, function(value) {
-                    if (value.id == actions[1]) { return value; }
-                });                
-                if( myNode.length>0 ) {
-                    if ((actions[2]=="add" && actions[0]=="cancel") || actions[0]=="del")
-                        checked='';
-                    else
-                        checked="checked='checked' ";
-                    var newValue = this.checkbox(actions[1], 'node', checked, false);
-                    var columnPos = this.table.fnSettings().aoColumns.length - 1;
-                    this.table.fnUpdate(newValue, myNode[0], columnPos);
-                    this.table.fnDraw();
-                }
-            }
-        }
+// DEPRECATED //        /**
+// DEPRECATED //         * @brief
+// DEPRECATED //         * XXX will be removed/replaced
+// DEPRECATED //         */
+// DEPRECATED //        this.selected_changed = function(e, change) {
+// DEPRECATED //        if (debug) messages.debug("entering hazelnut.selected_changed");
+// DEPRECATED //            var actions = change.split("/");
+// DEPRECATED //            if (actions.length > 1) {
+// DEPRECATED //                var oNodes = this.table.fnGetNodes();
+// DEPRECATED //                var myNode = $.grep(oNodes, function(value) {
+// DEPRECATED //                    if (value.id == actions[1]) { return value; }
+// DEPRECATED //                });                
+// DEPRECATED //                if( myNode.length>0 ) {
+// DEPRECATED //                    if ((actions[2]=="add" && actions[0]=="cancel") || actions[0]=="del")
+// DEPRECATED //                        checked='';
+// DEPRECATED //                    else
+// DEPRECATED //                        checked="checked='checked' ";
+// DEPRECATED //                    var newValue = this.checkbox(actions[1], 'node', checked, false);
+// DEPRECATED //                    var columnPos = this.table.fnSettings().aoColumns.length - 1;
+// DEPRECATED //                    this.table.fnUpdate(newValue, myNode[0], columnPos);
+// DEPRECATED //                    this.table.fnDraw();
+// DEPRECATED //                }
+// DEPRECATED //            }
+// DEPRECATED //        }
     
         this.update_plugin = function(e, rows) {
             // e.data is what we passed in second argument to subscribe
@@ -604,8 +604,17 @@
     }
 
     function check_click (e) {
+
         var object = e.data.instance;
-        var value = this.value;
+
+        /* The key of the object to be added */
+        // XXX What about multiple keys ?
+        var value = this.value; 
+
+        // NEW PLUGIN API
+        manifold.raise_event(object.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, value);
+        
+        // OLD PLUGIN API BELOW
 
         if (this.checked) {
             object.current_resources.push(value);

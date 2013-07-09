@@ -85,6 +85,10 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shTheme
 THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.js)
 #THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.min.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart_wizard.css)
+# jquery.notify
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.min.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
 
 
 thirdparty-js:

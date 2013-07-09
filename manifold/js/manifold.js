@@ -29,8 +29,11 @@ var CLEAR_FIELDS   = 6;
 var NEW_RECORD     = 7;
 var CLEAR_RECORDS  = 8;
 
-var IN_PROGRESS     = 101;
+var IN_PROGRESS    = 101;
 var DONE           = 102;
+
+var SET_ADD        = 201;
+var SET_REMOVED    = 202;
 
 /*!
  * This namespace holds functions for globally managing query objects
@@ -122,7 +125,7 @@ var manifold = {
             }
 
             query.iter_subqueries(function (sq) {
-                $('.plugin').trigger(manifold.get_record_channel(sq.query_uuid), [IN_PROGRESS]);
+                manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
             });
 
             // not quite sure what happens if we send a string directly, as POST data is named..
@@ -157,6 +160,34 @@ var manifold = {
         return true;
     },
 
+    raise_event_handler: function(type, query_uuid, event_type, value)
+    {
+        if (type == 'query') {
+            var channels = [ manifold.get_query_channel(query_uuid), manifold.get_query_channel('*') ];
+        } else if (type == 'record') {
+            var channels = [ manifold.get_record_channel(query_uuid), manifold.get_record_channel('*') ];
+
+        } else {
+            throw 'Incorrect type for manifold.raise_event()';
+        }
+        $.each(channels, function(i, channel) {
+            if (value === undefined)
+                $('.plugin').trigger(channel, [event_type]);
+            else
+                $('.plugin').trigger(channel, [event_type, value]);
+        });
+    },
+
+    raise_query_event: function(query_uuid, event_type, value)
+    {
+        manifold.raise_event_handler('query', query_uuid, event_type, value);
+    },
+
+    raise_record_event: function(query_uuid, event_type, value)
+    {
+        manifold.raise_event_handler('record', query_uuid, event_type, value);
+    },
+
     /*!
      * Publish result
      * \fn publish_result(query, results)
@@ -169,12 +200,11 @@ var manifold = {
             result = [];
 
         // NEW PLUGIN API
-        var channel = manifold.get_record_channel(query.query_uuid);
-        $('.plugin').trigger(channel, [CLEAR_RECORDS]);
+        manifold.raise_record_event(query.query_uuid, CLEAR_RECORDS);
         $.each(result, function(i, record) {
-            $('.plugin').trigger(channel, [NEW_RECORD, record]);
+            manifold.raise_record_event(query.query_uuid, NEW_RECORD, record);
         });
-        $('.plugin').trigger(channel, [DONE]);
+        manifold.raise_record_event(query.query_uuid, DONE);
 
         // OLD PLUGIN API BELOW
         /* Publish an update announce */
@@ -244,6 +274,18 @@ var manifold = {
                 manifold.publish_result_rec(tmp_query.analyzed_query, result);
             //}
 
+        }
+    },
+
+    raise_event: function(uuid, event_type, value)
+    {
+        switch(event_type) {
+            case SET_ADD:
+                // Query uuid has been updated with the key of a new element
+                break;
+            case SET_REMOVED:
+                // Query uuid has been updated with the key of a removed element
+                break;
         }
     },
 

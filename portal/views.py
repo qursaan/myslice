@@ -22,6 +22,7 @@
 
 from django.conf                 import settings
 from django.contrib.sites.models import Site, RequestSite
+from django.contrib import messages
 from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
@@ -39,6 +40,9 @@ class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         user_hrn = 'ple.upmc.jordan_auge'
+
+        messages.info(self.request, 'You have logged in')
+
 
         page = Page(self.request)
 

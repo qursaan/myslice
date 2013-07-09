@@ -58,6 +58,7 @@ class ManifoldAPI:
                         return ManifoldResult(code=result['code'], value=result['value'])
                     else:
                         if debug: print "KO (new API) - raising ManifoldException"
+                        print "RESULT=", result
                         raise ManifoldException(ManifoldResult(code=result['code'], output=result['description']))
                 else:
                     if debug: print "taken as old API"
