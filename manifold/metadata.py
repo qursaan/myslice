@@ -62,3 +62,7 @@ class MetaData:
 
     def sorted_fields_by_object (self, object):
         return self.hash_by_object[object]['column'].sort()
+
+    def get_field_type(self, object, field):
+        print "Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon"
+        return field

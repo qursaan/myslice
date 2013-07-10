@@ -9,6 +9,10 @@
  * Expression) that maps it to the dollar sign so it can't be overwritten by
  * another library in the scope of its execution.
  */
+
+// TEMP
+var ELEMENT_KEY = 'resource_hrn';
+
 (function($){
 
     var debug=false;
@@ -58,6 +62,7 @@
                 // This is the new plugin API meant to replace the weird publish_subscribe mechanism
                 $this.set_query_handler(options.query_uuid, hazelnut.query_handler);
                 $this.set_record_handler(options.query_uuid, hazelnut.record_handler); 
+                $this.set_record_handler(options.query_all_uuid, hazelnut.record_handler_all); 
 
 //                /* Subscriptions */
 //                var query_channel   = '/query/' + options.query_uuid + '/changed';
@@ -133,6 +138,11 @@
         //  if (debug) messages.debug("Hazelnut constructor: have set current_query -> " + this.current_query.__repr());
         this.query_update = null;
         this.current_resources = Array();
+
+        // query status
+        this.received_all = false;
+        this.received_set = false;
+        this.in_set_buffer = Array();
 
         var object = this;
 
@@ -362,10 +372,10 @@
                     // xxx problem is, we don't get this 'sliver' thing set apparently
                     if (typeof(row['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                         checked = 'checked ';
-                        hazelnut.current_resources.push(row['urn']);
+                        hazelnut.current_resources.push(row[ELEMENT_KEY]);
                     }
                     // Use a key instead of hostname (hard coded...)
-                    line.push(hazelnut.checkbox(options.plugin_uuid, row['urn'], row['type'], checked, false));
+                    line.push(hazelnut.checkbox(options.plugin_uuid, row[ELEMENT_KEY], row['type'], checked, false));
                 }
     
                 lines.push(line);
@@ -382,10 +392,12 @@
         this.checkbox = function (plugin_uuid, header, field, selected_str, disabled_str)
         {
             var result="";
+            if (header === null)
+                header = '';
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
-            result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header) + "'";
+            result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header).replace(/\\/g, '')  + "'";
             result += " name='" + unfold.get_value(field) + "'";
             result += " type='checkbox'";
             result += selected_str;
@@ -438,10 +450,10 @@
                 // xxx problem is, we don't get this 'sliver' thing set apparently
                 if (typeof(record['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
                     checked = 'checked ';
-                    hazelnut.current_resources.push(record['urn']);
+                    hazelnut.current_resources.push(record[ELEMENT_KEY]);
                 }
                 // Use a key instead of hostname (hard coded...)
-                line.push(object.checkbox(options.plugin_uuid, record['urn'], record['type'], checked, false));
+                line.push(object.checkbox(options.plugin_uuid, record[ELEMENT_KEY], record['type'], checked, false));
             }
     
             // XXX Is adding an array of lines more efficient ?
@@ -449,10 +461,47 @@
 
         };
 
+        this.set_checkbox = function(record)
+        {
+            // XXX urn should be replaced by the key
+            // XXX we should enforce that both queries have the same key !!
+            checkbox_id = "#hazelnut-checkbox-" + object.options.plugin_uuid + "-" + unfold.escape_id(record[ELEMENT_KEY].replace(/\\/g, ''))
+            $(checkbox_id, object.table.fnGetNodes()).attr('checked', true);
+        }
+
         this.record_handler = function(e, event_type, record)
         {
+            // elements in set
             switch(event_type) {
                 case NEW_RECORD:
+                    /* NOTE in fact we are doing a join here */
+                    if (object.received_all)
+                        // update checkbox for record
+                        object.set_checkbox(record);
+                    else
+                        // store for later update of checkboxes
+                        object.in_set_buffer.push(record);
+                    break;
+                case CLEAR_RECORDS:
+                    // nothing to do here
+                    break;
+                case IN_PROGRESS:
+                    manifold.spin($(this));
+                    break;
+                case DONE:
+                    if (object.received_all)
+                        manifold.spin($(this), false);
+                    object.received_set = true;
+                    break;
+            }
+        };
+
+        this.record_handler_all = function(e, event_type, record)
+        {
+            // all elements
+            switch(event_type) {
+                case NEW_RECORD:
+                    // Add the record to the table
                     object.new_record(record);
                     break;
                 case CLEAR_RECORDS:
@@ -462,7 +511,18 @@
                     manifold.spin($(this));
                     break;
                 case DONE:
-                    manifold.spin($(this), false);
+                    if (object.received_set) {
+                        /* XXX needed ? XXX We uncheck all checkboxes ... */
+                        $("[id^='datatables-checkbox-" + object.options.plugin_uuid +"']").attr('checked', false);
+
+                        /* ... and check the ones specified in the resource list */
+                        $.each(object.in_set_buffer, function(i, record) {
+                            object.set_checkbox(record);
+                        });
+
+                        manifold.spin($(this), false);
+                    }
+                    object.received_all = true;
                     break;
             }
         };

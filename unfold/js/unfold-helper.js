@@ -25,13 +25,17 @@ var unfold = {
     },
 
     get_value: function (value) {
-    //if(typeof(jQuery(value).attr('value'))!="undefined"){
-    if (/<span value=['"].*['"]>.*<\/span>/i.test(value)) {
-        return jQuery(value).attr('value');
-    } else {
-        return value;
+        //if(typeof(jQuery(value).attr('value'))!="undefined"){
+        if (/<span value=['"].*['"]>.*<\/span>/i.test(value)) {
+            return jQuery(value).attr('value');
+        } else {
+            return value;
+        }
+    },
+
+    escape_id: function(id) {
+        return id.replace( /(:|\.|\[|\])/g, "\\$1" );
     }
-}
 
 } // global unfold
 

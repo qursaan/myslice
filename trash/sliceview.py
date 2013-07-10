@@ -54,6 +54,7 @@ def _slice_view (request, slicename):
 
     # TODO The query to run is embedded in the URL
     main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
+    query_resource_all = Query.get('resource').select('resource_hrn', 'hostname', 'type', 'authority')
 
     # Get default fields from metadata unless specified
     if not main_query.fields:
@@ -62,16 +63,17 @@ def _slice_view (request, slicename):
         if debug:
             print "METADATA", md_fields
         # TODO Get default fields
-        main_query.fields = [
+        main_query.select(
                 'slice_hrn',
                 'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.authority',
                 'lease.urn',
                 'user.user_hrn',
 #                'application.measurement_point.counter'
-        ]
+        )
 
-    aq = AnalyzedQuery(main_query)
+    aq = AnalyzedQuery(main_query, metadata=metadata)
     page.enqueue_query(main_query, analyzed_query=aq)
+    page.enqueue_query(query_resource_all)
 
     # Prepare the display according to all metadata
     # (some parts will be pending, others can be triggered by users).
@@ -134,12 +136,13 @@ def _slice_view (request, slicename):
     )
 
     tab_resource_plugins.insert(Hazelnut( 
-        page        = page,
-        title       = 'List',
-        domid       = 'checkboxes',
+        page           = page,
+        title          = 'List',
+        domid          = 'checkboxes',
         # this is the query at the core of the slice list
-        query       = sq_resource,
-        checkboxes  = True,
+        query          = sq_resource,
+        query_all_uuid = query_resource_all.query_uuid,
+        checkboxes     = True,
         datatables_options = { 
             # for now we turn off sorting on the checkboxes columns this way
             # this of course should be automatic in hazelnut
