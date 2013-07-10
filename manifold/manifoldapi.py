@@ -3,7 +3,9 @@ import xmlrpclib
 
 from myslice.config import Config
 
+from django.contrib import messages
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException
+from manifold.core.result_value import ResultValue
 
 debug=False
 debug=True
@@ -46,52 +48,12 @@ class ManifoldAPI:
                     print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
                     print '.ctd. Authmethod=',self.auth['AuthMethod'], self.url,'->',
                     self._print_result(result)
-                ### attempt to cope with old APIs and new APIs
-                if isinstance (result, dict) and 'code' in result:
-                    if debug: print "taken as new API"
-                    # this sounds like a result from a new API
-                    # minimal treatment is required, but we do want to turn this into a 
-                    # class instance
-                    if result['code'] != 2: # in the manifold world, this can be either
-                                            # 0 (ok) 1 (partial result) or 2 (which means error)
-                        if debug: print "OK (new API)"
-                        return ManifoldResult(code=result['code'], value=result['value'])
-                    else:
-                        if debug: print "KO (new API) - raising ManifoldException"
-                        print "RESULT=", result
-                        raise ManifoldException(ManifoldResult(code=result['code'], output=result['description']))
-                else:
-                    if debug: print "taken as old API"
-                    # we're talking to an old API
-                    # so if we make it here it should mean success
-                    return ManifoldResult (code=ManifoldCode.SUCCESS, value=result)
-            except xmlrpclib.Fault, error:
-                ### xxx this is very rough for now
-                # until we have some agreement about how the API calls should return error conditions
-                # in some less unpolite way than this anonymous exception, we assume it's a problem with the session
-                # that needs to be refreshed
-                if error.faultCode == 8002:
-                    if debug: print "KO (old API - 8002) - raising ManifoldException"
-                    reason="most likely your session has expired"
-                    reason += " (the manifold API has no unambiguous error reporting mechanism yet)"
-                    import traceback
-                    traceback.print_exc()
-                    raise ManifoldException ( ManifoldResult (code=ManifoldCode.SESSION_EXPIRED, output=reason))
-                else:
-                    if debug: print "KO (old API - other) - raising ManifoldException"
-                    reason="xmlrpclib.Fault with faultCode = %s (not taken as session expired)"%error.faultCode
-                    raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output=reason))
+
+                return ResultValue(**result)
+
             except Exception,error:
                 if debug: print "KO (unexpected exception)",error
                 raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error) )
+
         return func
 
-    def send_manifold_query (self, query):
-        # We use a dictionary representation of the query for forwarding it to the API
-        ret = self.forward(query.to_dict())
-        if debug:
-            print "="*80
-            print "Result:"
-            print ret
-            print "="*80
-        return ret

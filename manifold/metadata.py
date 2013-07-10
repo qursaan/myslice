@@ -36,6 +36,13 @@ class MetaData:
             'object': 'local:object', # proposed to replace metadata:table
             'fields':     fields 
         })
+
+        if row_results['code'] == 1: # warning
+            messages.warning(request, result['description'])
+        elif row_results['code'] == 2:
+            messages.error(request, result['description'])
+            # XXX FAIL HERE XXX
+
         rows = rows_result.ok_value()
 # API errors will be handled by the outer logic
 #        if not rows:

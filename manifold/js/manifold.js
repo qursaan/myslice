@@ -247,6 +247,7 @@ var manifold = {
         if (!!callback) { callback(data); return; }
 
         if (data.code == 2) { // ERROR
+            // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
             window.location="/logout/";
             return;
@@ -255,6 +256,15 @@ var manifold = {
             messages.error("Some errors have been received from the manifold backend at " + MANIFOLD_URL + " [" + data.description + "]");
             // publish error code and text message on a separate channel for whoever is interested
             jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
+
+            $("#notifications").notify("create", "sticky", {
+              title: 'Warning',
+              text: data.description
+            },{
+              expires: false,
+              speed: 1000
+            });
+            
         }
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;

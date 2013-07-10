@@ -22,7 +22,7 @@
 
 from django.conf                 import settings
 from django.contrib.sites.models import Site, RequestSite
-from django.contrib import messages
+from django.contrib              import messages
 from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render

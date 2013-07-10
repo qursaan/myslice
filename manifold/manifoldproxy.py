@@ -84,33 +84,29 @@ with the query passed using POST"""
         if debug: print '===> manifoldproxy.proxy: sending to backend', manifold_query
         # for the benefit of the python code, manifoldAPI raises an exception if something is wrong
         # however in this case we want to propagate the complete manifold result to the js world
-        try:
-            answer=manifold_api.send_manifold_query (manifold_query)
-        except ManifoldException, manifold_result:
-            print "MANIFOLD EXCEPTION"
-            answer=manifold_result
-        print "="*80
-        print "ANSWER IN PROXY", answer
-        print answer.ok_value()
-        print "="*80
-        if debug: 
-            print '<=== manifoldproxy.proxy: received from backend with code', answer['code']
-            if answer['code']==0:
-                print ".... ctd ",
-                value=answer.ok_value()
-                if isinstance (value, list): print "result is a list with %d entries"%len(value)
-                elif isinstance (value, dict): print "result is a dict with keys %s"%value.keys()
-                else: print "result is other (type=%s) : %s"%(type(value),value)
-        json_answer=json.dumps(answer)
+
+
+        result = manifold_api.forward(manifold_query.to_dict())
+
+        # XXX TEMP HACK
+        import pprint
+        htmlLines = []
+        for textLine in pprint.pformat(result['description']).splitlines():
+            htmlLines.append('<br/>%s' % textLine) # or something even nicer
+        result['description'] = ('\n'.join(htmlLines)).replace(' ', '&nbsp;')
+
+        json_answer=json.dumps(result)
         # if in debug mode we save this so we can use offline mode later
         if debug:
             with (file(offline_filename,"w")) as f:
                 f.write(json_answer)
+
         # this is an artificial delay added for debugging purposes only
         if debug_spin>0:
             print "Adding additional artificial delay",debug_spin
             import time
             time.sleep(debug_spin)
+
         return HttpResponse (json_answer, mimetype="application/json")
 
     except:
