@@ -99,19 +99,22 @@ INSERT INTO object VALUES(field=value)
         return {'added':added, 'removed':removed};
     } 
 
+    // Callaback received 3 parameters: query, data, parent_query
     this.iter_subqueries = function(callback, data)
     {
-        rec = function(query, callback, data) {
+        rec = function(query, callback, data, parent_query) {
             jQuery.each(query.subqueries, function(object, subquery) {
-                rec(subquery, callback);
+                rec(subquery, callback, data, query);
             });
-            callback(query, data);
+            callback(query, data, parent_query);
         };
+
         if (this.analyzed_query !== undefined)
             query = this.analyzed_query;
         else
-            query = this
-        rec(query, callback, data);
+            query = this;
+
+        rec(query, callback, data, null);
     }
 
 // we send queries as a json string now 

@@ -35,11 +35,77 @@ var DONE           = 102;
 var SET_ADD        = 201;
 var SET_REMOVED    = 202;
 
+// A structure for storing queries
+
+function QueryExt(query, parent_query, main_query) {
+
+    /* Constructor */
+    if (typeof query == "undefined")
+        throw "Must pass a query in QueryExt constructor";
+    this.query        = query
+    this.parent_query = (typeof parent_query == "undefined") ? false : parent_query
+    this.main_query   = (typeof main_query   == "undefined") ? false : main_query
+
+    // How to link to an update query ? they both have the same UUID !!
+
+}
+
+function QueryStore() {
+
+    var main_queries     = {};
+    var analyzed_queries = {};
+
+    /* Insertion */
+
+    this.insert = function(query)
+    {
+        if (query.analyzed_query == null) {
+            query.analyze_subqueries();
+        }
+
+        query_ext = QueryExt(query, null, null)
+        manifold.query_store.main_queries[query.query_uuid] = query_ext;
+
+        // We also need to insert all queries and subqueries from the analyzed_query
+        query.iter_subqueries(function(sq, data, parent_query) {
+            parent_query_ext = this.find_analyzed_query_ext(parent_query.query_uuid);
+            sq_ext = QueryExt(sq, parent_query_ext, query_ext)
+            this.analyzed_queries[sq.query_uuid] = sq_ext;
+        });
+    }
+
+    /* Searching */
+
+    this.find_query_ext = function(query_uuid)
+    {
+        return this.main_queries[query_uuid];
+    }
+
+    this.find_query = function(query_uuid)
+    {
+        return this.find_query_ext(query_uuid).query;
+    }
+
+    this.find_analyzed_query_ext = function(query_uuid)
+    {
+        return this.analyzed_queries[query_uuid];
+    }
+
+    this.find_analyzed_query = function(query_uuid)
+    {
+        return this.find_analyzed_query_ext(query_uuid).query;
+    }
+}
+
 /*!
  * This namespace holds functions for globally managing query objects
  * \Class Manifold
  */
 var manifold = {
+
+    /************************************************************************** 
+     * Helper functions
+     **************************************************************************/ 
 
     spin_presets: {},
 
@@ -53,6 +119,14 @@ var manifold = {
             }
         } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
     },
+
+    /************************************************************************** 
+     * Query management
+     **************************************************************************/ 
+
+    query_store: QueryStore(),
+
+    // XXX Remaining functions are deprecated since they are replaced by the query store
 
     /*!
      * Associative array storing the set of queries active on the page
@@ -83,6 +157,10 @@ var manifold = {
     find_query : function (query_uuid) { 
         return manifold.all_queries[query_uuid];
     },
+
+    /************************************************************************** 
+     * Query execution
+     **************************************************************************/ 
 
     // trigger a query asynchroneously
     proxy_url : '/manifold/proxy/json/',
@@ -158,34 +236,6 @@ var manifold = {
         //var keys = MANIFOLD_METADATA[query.object]['keys']; /* array of array of field names */
         /* TODO requires keys in metadata */
         return true;
-    },
-
-    raise_event_handler: function(type, query_uuid, event_type, value)
-    {
-        if (type == 'query') {
-            var channels = [ manifold.get_query_channel(query_uuid), manifold.get_query_channel('*') ];
-        } else if (type == 'record') {
-            var channels = [ manifold.get_record_channel(query_uuid), manifold.get_record_channel('*') ];
-
-        } else {
-            throw 'Incorrect type for manifold.raise_event()';
-        }
-        $.each(channels, function(i, channel) {
-            if (value === undefined)
-                $('.plugin').trigger(channel, [event_type]);
-            else
-                $('.plugin').trigger(channel, [event_type, value]);
-        });
-    },
-
-    raise_query_event: function(query_uuid, event_type, value)
-    {
-        manifold.raise_event_handler('query', query_uuid, event_type, value);
-    },
-
-    raise_record_event: function(query_uuid, event_type, value)
-    {
-        manifold.raise_event_handler('record', query_uuid, event_type, value);
     },
 
     /*!
@@ -287,11 +337,48 @@ var manifold = {
         }
     },
 
-    raise_event: function(uuid, event_type, value)
+    /************************************************************************** 
+     * Plugin API helpers
+     **************************************************************************/ 
+
+    raise_event_handler: function(type, query_uuid, event_type, value)
+    {
+        if (type == 'query') {
+            var channels = [ manifold.get_query_channel(query_uuid), manifold.get_query_channel('*') ];
+        } else if (type == 'record') {
+            var channels = [ manifold.get_record_channel(query_uuid), manifold.get_record_channel('*') ];
+
+        } else {
+            throw 'Incorrect type for manifold.raise_event()';
+        }
+        $.each(channels, function(i, channel) {
+            if (value === undefined)
+                $('.plugin').trigger(channel, [event_type]);
+            else
+                $('.plugin').trigger(channel, [event_type, value]);
+        });
+    },
+
+    raise_query_event: function(query_uuid, event_type, value)
+    {
+        manifold.raise_event_handler('query', query_uuid, event_type, value);
+    },
+
+    raise_record_event: function(query_uuid, event_type, value)
+    {
+        manifold.raise_event_handler('record', query_uuid, event_type, value);
+    },
+
+
+    raise_event: function(query_uuid, event_type, value)
     {
         switch(event_type) {
             case SET_ADD:
                 // Query uuid has been updated with the key of a new element
+                query = manifold.find_query(query_uuid);
+
+                // XXX We need to find the parent to update the property
+                // XXX We need to find the non-analyzed query so that it can be updated also
                 break;
             case SET_REMOVED:
                 // Query uuid has been updated with the key of a removed element

@@ -32,18 +32,18 @@ class MetaData:
                   'column.resource_type', 'column.value_type',
                   'column.allowed_values', 'column.platforms.platform',
                   'column.platforms.platform_url']
-        rows_result = manifold_api.Get({
+        result = manifold_api.Get({
             'object': 'local:object', # proposed to replace metadata:table
             'fields':     fields 
         })
 
-        if row_results['code'] == 1: # warning
+        if result['code'] == 1: # warning
             messages.warning(request, result['description'])
-        elif row_results['code'] == 2:
+        elif result['code'] == 2:
             messages.error(request, result['description'])
             # XXX FAIL HERE XXX
 
-        rows = rows_result.ok_value()
+        rows = result.ok_value()
 # API errors will be handled by the outer logic
 #        if not rows:
 #            print "Failed to retrieve metadata",rows_result.error()
