@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 
 #from manifold.manifoldquery import ManifoldQuery
 from manifold.core.query import Query
+from manifold.core.result_value import ResultValue
 from manifold.manifoldapi import ManifoldAPI
 from manifold.manifoldresult import ManifoldException
 
@@ -89,11 +90,7 @@ with the query passed using POST"""
         result = manifold_api.forward(manifold_query.to_dict())
 
         # XXX TEMP HACK
-        import pprint
-        htmlLines = []
-        for textLine in pprint.pformat(result['description']).splitlines():
-            htmlLines.append('<br/>%s' % textLine) # or something even nicer
-        result['description'] = ('\n'.join(htmlLines)).replace(' ', '&nbsp;')
+        result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)
         # if in debug mode we save this so we can use offline mode later
