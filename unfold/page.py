@@ -126,13 +126,9 @@ class Page:
             if debug: print "Page.get_metadata: return cached value"
             return manifold['metadata']
 
-        #if 'auth' in session:
-        #manifold_api_session_auth = session['manifold']['auth']
-        #print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
-        #else:
-        manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString':'demo'}
+        metadata_auth = {'AuthMethod':'anonymous'}
 
-        metadata=MetaData (manifold_api_session_auth)
+        metadata=MetaData (metadata_auth)
         metadata.fetch()
         # store it for next time
         manifold['metadata']=metadata
