@@ -6,7 +6,8 @@
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <a class="brand" href="/"><img src="{{ STATIC_URL }}img/myslice-logo.png" height="30" alt="MySlice logo" /></a>
+      <a class="brand" href="/"><img src="{{ STATIC_URL }}img/onelab-logo.png" height="30" alt="OneLab logo" /></a>
+      <!--<a class="brand" href="/"><img src="{{ STATIC_URL }}img/myslice-logo.png" height="30" alt="MySlice logo" /></a>-->
       <div class="nav-collapse topmenu">
 	<ul class="nav nav-pills" id='menu_ul'> {% for d in topmenu_items %} {% if d.is_active %}
 	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% else %}

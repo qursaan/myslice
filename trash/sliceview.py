@@ -24,7 +24,7 @@ from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
 from plugins.updater.updater         import Updater
 
-tmp_default_slice='ple.inria.heartbeat'
+tmp_default_slice='ple.inria.myslicedemo'
 debug = True
 
 @login_required

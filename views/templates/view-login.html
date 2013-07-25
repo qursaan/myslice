@@ -5,6 +5,7 @@
 {% endblock unfold2_margin %}
 
 {% block unfold2_main %}
+<!--
 <code> This page is currently connected to two authentication systems:</code>
 <ul>
 <li> A manifold server, located at <code>{{ manifold_url }}</code>, (configured in <code>myslice/config.py</code>), and</li>
@@ -17,4 +18,25 @@ Currently hard wired users are:
   {% endfor %}
 </ul>
 </li></ul>
+-->
+
+<div style='padding: 20px;'>
+  <div style=' padding-top: 12px; background-color: orange; border: 1px solid #61210B; text-align: center;'>
+    <h2 style="font-weight: bold;">Welcome to the OneLab portal !</h2>
+    <h3>New to OneLab? Please <a href="/register">register</a> or learn more about <a href="http://www.fed4fire.eu/" target="_blank">the project</a>.</h3>
+  </div>
+<p/>
+  <p>
+Experimentally-driven research is key to success in exploring the possible
+futures of the Internet. The OneLab initiative provides an open,
+general-purpose, shared experimental facility, both large-scale and
+sustainable, which allows European industry and academia to innovate and assess
+the performance of their solutions. Based on the results of several different
+European and national projects, OneLab offers access to a range of  tools and
+testbeds including PlanetLab Europe, the NITOS wireless testbed, and other
+federated testbeds.
+  </p>
+  <div class="item-separator"></div>
+</div>
+
 {% endblock unfold2_main %}
