@@ -43,9 +43,7 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         user_hrn = 'ple.upmc.jordan_auge'
 
-        messages.info(self.request, 'You have logged in')
-
-
+        #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 
         # Slow...

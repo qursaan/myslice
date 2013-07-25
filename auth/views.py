@@ -29,7 +29,8 @@ def login_user(request):
             if user.is_active:
                 login(request, user)
                 #state = "You're successfully logged in!"
-                return HttpResponseRedirect ('/login-ok')
+                return HttpResponseRedirect ('/portal/dashboard')
+                #return HttpResponseRedirect ('/login-ok')
             else:
                 env['state'] = "Your account is not active, please contact the site admin."
                 return render_to_response('view-login.html',env, context_instance=RequestContext(request))
@@ -37,7 +38,7 @@ def login_user(request):
             env['state'] = "Your username and/or password were incorrect."
             return render_to_response('view-login.html',env, context_instance=RequestContext(request))
     else:
-        state='Welcome to MySlice'
+        state='' #Welcome to MySlice'
         env['state']=state
         env['username']=the_user(request)
         return render_to_response('view-login.html',env, context_instance=RequestContext(request))

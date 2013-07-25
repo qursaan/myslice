@@ -32,10 +32,24 @@ var CLEAR_RECORDS  = 8;
 var IN_PROGRESS    = 101;
 var DONE           = 102;
 
+/* Update requests from plugins */
 var SET_ADD        = 201;
 var SET_REMOVED    = 202;
 
+/* Query status */
+var STATUS_NONE               = 500; // Query has not been started yet
+var STATUS_GET_IN_PROGRESS    = 501; // Query has been sent, no result has been received
+var STATUS_GET_RECEIVED       = 502; // Success
+var STATUS_GET_ERROR          = 503; // Error
+var STATUS_UPDATE_PENDING     = 504;
+var STATUS_UPDATE_IN_PROGRESS = 505;
+var STATUS_UPDATE_RECEIVED    = 506;
+var STATUS_UPDATE_ERROR       = 507;
+// outdated ?
+
 // A structure for storing queries
+
+
 
 function QueryExt(query, parent_query, main_query) {
 
@@ -45,15 +59,16 @@ function QueryExt(query, parent_query, main_query) {
     this.query        = query
     this.parent_query = (typeof parent_query == "undefined") ? false : parent_query
     this.main_query   = (typeof main_query   == "undefined") ? false : main_query
-
-    // How to link to an update query ? they both have the same UUID !!
-
+    
+    this.status       = null;
+    this.results      = null;
+    this.update_query = null; // null unless we are a main_query (aka parent_query == null); only main_query_fields can be updated...
 }
 
 function QueryStore() {
 
-    var main_queries     = {};
-    var analyzed_queries = {};
+    this.main_queries     = {};
+    this.analyzed_queries = {};
 
     /* Insertion */
 
@@ -63,14 +78,17 @@ function QueryStore() {
             query.analyze_subqueries();
         }
 
-        query_ext = QueryExt(query, null, null)
+        query_ext = new QueryExt(query, null, null)
         manifold.query_store.main_queries[query.query_uuid] = query_ext;
 
         // We also need to insert all queries and subqueries from the analyzed_query
         query.iter_subqueries(function(sq, data, parent_query) {
-            parent_query_ext = this.find_analyzed_query_ext(parent_query.query_uuid);
+            if (parent_query)
+                parent_query_ext = manifold.query_store.find_analyzed_query_ext(parent_query.query_uuid);
+            else
+                parent_query_ext = null;
             sq_ext = QueryExt(sq, parent_query_ext, query_ext)
-            this.analyzed_queries[sq.query_uuid] = sq_ext;
+            manifold.query_store.analyzed_queries[sq.query_uuid] = sq_ext;
         });
     }
 
@@ -124,7 +142,7 @@ var manifold = {
      * Query management
      **************************************************************************/ 
 
-    query_store: QueryStore(),
+    query_store: new QueryStore(),
 
     // XXX Remaining functions are deprecated since they are replaced by the query store
 
@@ -142,6 +160,10 @@ var manifold = {
      * \param ManifoldQuery query Query to be added
      */
     insert_query : function (query) { 
+        // NEW API
+        manifold.query_store.insert(query);
+
+        // FORMER API
         if (query.analyzed_query == null) {
             query.analyze_subqueries();
         }
@@ -375,10 +397,24 @@ var manifold = {
         switch(event_type) {
             case SET_ADD:
                 // Query uuid has been updated with the key of a new element
-                query = manifold.find_query(query_uuid);
+                query_ext    = manifold.find_analyzed_query(query_uuid);
 
-                // XXX We need to find the parent to update the property
-                // XXX We need to find the non-analyzed query so that it can be updated also
+                // update is only possible is the query is not pending, etc
+                // CHECK status !
+
+                // XXX we can only update subqueries of the main query. Check !
+                // assert query_ext.parent_query == query_ext.main_query
+                update_query = query_ext.parent_query.update_query;
+
+                // NOTE: update might modify the fields in Get
+                // NOTE : we have to modify all child queries
+                // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
+
+                // if everything is done right, update_query should not be null. It is updated when we received results from the get query
+                // object = the same as get
+                // filter = key : update a single object for now
+                // fields = the same as get
+
                 break;
             case SET_REMOVED:
                 // Query uuid has been updated with the key of a removed element
