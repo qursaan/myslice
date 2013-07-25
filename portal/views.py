@@ -435,20 +435,47 @@ def contact(request):
             affiliation = form.cleaned_data['affiliation']
             subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
-            email = form.cleaned_data['email']
+            email = form.cleaned_data['email'] # email of the sender
             cc_myself = form.cleaned_data['cc_myself']
 
             recipients = ['yasin.upmc@gmail.com']
             if cc_myself:
-                recipients.append(sender)
+                recipients.append(email)
 
             from django.core.mail import send_mail
-            send_mail(subject, message, email, recipients)
+            send_mail("Onelab user submitted a query ", [first_name,last_name,affiliation,subject,message], email, recipients)
             return render(request,'contact_sent.html') # Redirect after POST
     else:
         form = ContactForm() # An unbound form
 
     return render(request, 'contact.html', {
+        'form': form,
+    })
+
+
+def slice_request(request):
+    if request.method == 'POST': # If the form has been submitted...
+        form = SliceRequestForm(request.POST) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            # Process the data in form.cleaned_data
+            slice_name = form.cleaned_data['slice_name']
+            number_of_nodes = form.cleaned_data['number_of_nodes']
+            type_of_nodes = form.cleaned_data['type_of_nodes']
+            purpose = form.cleaned_data['purpose']
+            email = form.cleaned_data['email'] # email of the sender
+            cc_myself = form.cleaned_data['cc_myself']
+
+            recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
+            if cc_myself:
+                recipients.append(email)
+
+            from django.core.mail import send_mail
+            send_mail("Onelab New Slice request form submitted", [slice_name,number_of_nodes,type_of_nodes,purpose], email, recipients)
+            return render(request,'slicereq_recvd.html') # Redirect after POST
+    else:
+        form = SliceRequestForm() # An unbound form
+
+    return render(request, 'slice_request.html', {
         'form': form,
     })
 

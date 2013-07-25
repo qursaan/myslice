@@ -121,3 +121,12 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea)
     email = forms.EmailField()
     cc_myself = forms.BooleanField(required=False)
+
+class SliceRequestForm(forms.Form):
+    slice_name = forms.CharField()
+    number_of_nodes  = forms.DecimalField()
+    type_of_nodes = forms.CharField()
+    purpose = forms.CharField(widget=forms.Textarea)
+    email = forms.EmailField()
+    cc_myself = forms.BooleanField(required=False)
+
