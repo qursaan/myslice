@@ -42,7 +42,9 @@ urlpatterns = patterns('',
     # User validation
     url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
+    url(r'^contact/?$', views.contact),
     # Slice request
+    url(r'^slice_request/?$', views.slice_request),
     #url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
     # Slice confirmation
     #url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),

@@ -5,6 +5,7 @@
 #
 # Authors:
 #   Jordan Augé <jordan.auge@lip6.fr>
+#   Mohammed-Yasin Rahman <mohammed-yasin.rahman@lip6.fr>
 # Copyright 2013, UPMC Sorbonne Universités / LIP6
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -49,6 +50,11 @@ class UserRegisterForm(forms.Form): # Not ModelForm
                                  max_length=30,
                                  label=_("Last name"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    affiliation = forms.RegexField(regex=r'^[\w.@+-]+$',
+                             max_length=30,
+                             label=_("Affiliation"),
+                             error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+
     email = forms.EmailField(label=_("E-mail"))
     password1 = forms.CharField(widget=forms.PasswordInput,
                                 label=_("Password"))
@@ -106,3 +112,21 @@ class SliceRequestForm(forms.ModelForm):
 # DEPRECATED #class RegisterUserStep2Form(forms.ModelForm):
 # DEPRECATED #    class Meta:
 # DEPRECATED #        model = PendingUser
+
+class ContactForm(forms.Form):
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    affiliation = forms.CharField()
+    subject = forms.CharField(max_length=100)
+    message = forms.CharField(widget=forms.Textarea)
+    email = forms.EmailField()
+    cc_myself = forms.BooleanField(required=False)
+
+class SliceRequestForm(forms.Form):
+    slice_name = forms.CharField()
+    number_of_nodes  = forms.DecimalField()
+    type_of_nodes = forms.CharField()
+    purpose = forms.CharField(widget=forms.Textarea)
+    email = forms.EmailField()
+    cc_myself = forms.BooleanField(required=False)
+

@@ -5,6 +5,7 @@
 #
 # Authors:
 #   Jordan Augé <jordan.auge@lip6.fr>
+#   Mohammed Yasin Rahman <mohammed-yasin.rahman@lip6.fr>
 # Copyright 2013, UPMC Sorbonne Universités / LIP6
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -28,12 +29,13 @@ from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from plugins.lists.simplelist    import SimpleList
 from portal                      import signals
-from portal.forms                import UserRegisterForm, SliceRequestForm
+from portal.forms                import UserRegisterForm, SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
+from django.http                 import HttpResponseRedirect
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -151,8 +153,10 @@ class UserRegisterView(RegistrationView):
         """
         first_name = cleaned_data['first_name']
         last_name  = cleaned_data['last_name']
+        affiliation= cleaned_data['affiliation']
         email      = cleaned_data['email']
         password   = cleaned_data['password1']
+        
         #password2  = cleaned_data['password2']
         keypair    = cleaned_data['keypair']
 
@@ -418,3 +422,60 @@ class UserValidateView(ActivationView):
 # DEPRECATED #    p << wizard.render(request) # in portal page if possible
 # DEPRECATED #
 # DEPRECATED #    return p.render()
+
+
+# view for contact form
+def contact(request):
+    if request.method == 'POST': # If the form has been submitted...
+        form = ContactForm(request.POST) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            # Process the data in form.cleaned_data
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            affiliation = form.cleaned_data['affiliation']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            email = form.cleaned_data['email'] # email of the sender
+            cc_myself = form.cleaned_data['cc_myself']
+
+            recipients = ['yasin.upmc@gmail.com']
+            if cc_myself:
+                recipients.append(email)
+
+            from django.core.mail import send_mail
+            send_mail("Onelab user submitted a query ", [first_name,last_name,affiliation,subject,message], email, recipients)
+            return render(request,'contact_sent.html') # Redirect after POST
+    else:
+        form = ContactForm() # An unbound form
+
+    return render(request, 'contact.html', {
+        'form': form,
+    })
+
+
+def slice_request(request):
+    if request.method == 'POST': # If the form has been submitted...
+        form = SliceRequestForm(request.POST) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            # Process the data in form.cleaned_data
+            slice_name = form.cleaned_data['slice_name']
+            number_of_nodes = form.cleaned_data['number_of_nodes']
+            type_of_nodes = form.cleaned_data['type_of_nodes']
+            purpose = form.cleaned_data['purpose']
+            email = form.cleaned_data['email'] # email of the sender
+            cc_myself = form.cleaned_data['cc_myself']
+
+            recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
+            if cc_myself:
+                recipients.append(email)
+
+            from django.core.mail import send_mail
+            send_mail("Onelab New Slice request form submitted", [slice_name,number_of_nodes,type_of_nodes,purpose], email, recipients)
+            return render(request,'slicereq_recvd.html') # Redirect after POST
+    else:
+        form = SliceRequestForm() # An unbound form
+
+    return render(request, 'slice_request.html', {
+        'form': form,
+    })
+

@@ -210,6 +210,7 @@ class PendingUser(models.Model):
     # simplify form creation in forms.py
     first_name  = models.TextField()
     last_name   = models.TextField()
+    affiliation = models.TextField()
     email       = models.EmailField() #validators=[validate_email])
     password    = models.TextField()
     keypair     = models.TextField()
