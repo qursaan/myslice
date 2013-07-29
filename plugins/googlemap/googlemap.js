@@ -49,6 +49,10 @@
                 GoogleMap : GoogleMap
             });
 
+            /* Events */
+            $this.on('show.GoogleMaps', methods.show);
+
+
             /* Subscribe to query updates */
             jQuery.subscribe('/results/' + options.query_uuid + '/changed', {instance: $this}, update_map);
             jQuery.subscribe('/update-set/' + options.query_uuid, {instance: $this}, on_resource_changed);

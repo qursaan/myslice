@@ -46,7 +46,7 @@ class DashboardView(TemplateView):
 
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
-        slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('slice.slice_hrn')
+        slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('user_hrn', 'slice.slice_hrn')
         auth_query  = Query().get('network').select('network_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(auth_query)
@@ -76,7 +76,7 @@ class DashboardView(TemplateView):
         # more general variables expected in the template
         context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('dashboard', self.request) 
+        context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 

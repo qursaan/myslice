@@ -66,7 +66,7 @@ def _slice_view (request, slicename):
         main_query.select(
                 'slice_hrn',
                 'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.authority',
-                'lease.urn',
+                #'lease.urn',
                 'user.user_hrn',
 #                'application.measurement_point.counter'
         )
@@ -371,7 +371,7 @@ def _slice_view (request, slicename):
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view that combines various plugins'
     # the menu items on the top
-    template_env [ 'topmenu_items' ] = topmenu_items('slice', request) 
+    template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 

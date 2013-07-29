@@ -39,7 +39,8 @@ class ManifoldBackend:
             print "ok"
             if not sessions:
                 print "GetSession failed", sessions_result.error()
-            print "first"
+                return
+            print "first", sessions
             session = sessions[0]
             print "SESSION=", session
 
@@ -60,6 +61,8 @@ class ManifoldBackend:
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
         except Exception, e:
             print "E: manifoldbackend", e
+            import traceback
+            traceback.print_exc()
             return None
 
         try:

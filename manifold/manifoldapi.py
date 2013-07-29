@@ -52,6 +52,10 @@ class ManifoldAPI:
                 return ResultValue(**result)
 
             except Exception,error:
+                # XXX Connection refused for example
+                print "** API ERROR **"
+                import traceback
+                traceback.print_exc()
                 if debug: print "KO (unexpected exception)",error
                 raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error) )
 

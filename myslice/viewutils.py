@@ -15,10 +15,14 @@ standard_topmenu_items = [
 
 def topmenu_items (current,request=None):
     result=deepcopy(standard_topmenu_items)
-    for d in result:
-        if d['label'].lower().find(current)>=0: d['is_active']=True
-    if not request: return result
     has_user=request.user.is_authenticated()
+    if has_user:
+        result.append({ 'label':'Request a slice', 'href': '/portal/slice/request/'})
+    for d in result:
+        #if d['label'].lower()find(current)>=0: d['is_active']=True
+        if d['label'] == current: d['is_active']=True
+        print "CURRENT=", current
+    if not request: return result
 #    result.append (login_out_items [ has_user] )
     return result
 

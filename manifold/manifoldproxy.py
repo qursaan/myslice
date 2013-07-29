@@ -90,7 +90,8 @@ with the query passed using POST"""
         result = manifold_api.forward(manifold_query.to_dict())
 
         # XXX TEMP HACK
-        result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
+        if 'description' in result and result['description'] and isinstance(result['description'], (tuple, list, set, frozenset)):
+            result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)
         # if in debug mode we save this so we can use offline mode later
@@ -107,6 +108,7 @@ with the query passed using POST"""
         return HttpResponse (json_answer, mimetype="application/json")
 
     except:
+        print "** PROXY ERROR **"
         import traceback
         traceback.print_exc()
 
