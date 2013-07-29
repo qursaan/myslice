@@ -54,7 +54,7 @@ def _slice_view (request, slicename):
 
     # TODO The query to run is embedded in the URL
     main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
-    query_resource_all = Query.get('resource').select('resource_hrn', 'hostname', 'type', 'authority')
+    query_resource_all = Query.get('resource').select('resource_hrn', 'hostname', 'type', 'network_hrn', 'latitude', 'longitude')
 
     # Get default fields from metadata unless specified
     if not main_query.fields:
@@ -65,8 +65,8 @@ def _slice_view (request, slicename):
         # TODO Get default fields
         main_query.select(
                 'slice_hrn',
-                'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.authority',
-                'lease.urn',
+                'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.network_hrn',
+                #'lease.urn',
                 'user.user_hrn',
 #                'application.measurement_point.counter'
         )
@@ -159,6 +159,8 @@ def _slice_view (request, slicename):
         # tab's sons preferably turn this off
         togglable   = False,
         query       = sq_resource,
+        query_all_uuid = query_resource_all.query_uuid,
+        checkboxes     = True,
         # center on Paris
         latitude    = 49.,
         longitude   = 2.2,
@@ -371,7 +373,7 @@ def _slice_view (request, slicename):
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view that combines various plugins'
     # the menu items on the top
-    template_env [ 'topmenu_items' ] = topmenu_items('slice', request) 
+    template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 

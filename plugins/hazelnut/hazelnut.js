@@ -124,7 +124,7 @@ var ELEMENT_KEY = 'resource_hrn';
     }; // var methods;
 
     /***************************************************************************
-     * Hazelnut object
+     * Plugin object
      ***************************************************************************/
 
     function Hazelnut(options) 
@@ -269,7 +269,7 @@ var ELEMENT_KEY = 'resource_hrn';
         this.getColIndex = function(key, cols) {
             var tabIndex = $.map(cols, function(x, i) { if (x.sTitle == key) return i; });
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
-        }
+        };
     
 // DEPRECATED //        /**
 // DEPRECATED //         * @brief

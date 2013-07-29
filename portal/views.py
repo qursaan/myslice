@@ -48,7 +48,7 @@ class DashboardView(TemplateView):
 
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
-        slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('slice.slice_hrn')
+        slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('user_hrn', 'slice.slice_hrn')
         auth_query  = Query().get('network').select('network_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(auth_query)
@@ -78,7 +78,7 @@ class DashboardView(TemplateView):
         # more general variables expected in the template
         context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('dashboard', self.request) 
+        context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 
@@ -171,6 +171,12 @@ class UserRegisterView(RegistrationView):
                                      user=new_user,
                                      request=request)
         return new_user
+
+    def get_context_data(self, **kwargs):
+        context = super(UserRegisterView, self).get_context_data(**kwargs)
+        context['topmenu_items'] = topmenu_items('Register', self.request)
+        context['username'] = the_user (self.request)
+        return context
 
     def registration_allowed(self, request):
         """
@@ -529,7 +535,20 @@ def slice_request(request):
     else:
         form = SliceRequestForm() # An unbound form
 
+#    template_env = {}
+#    template_env['form'] = form
+#    template_env['topmenu_items'] = topmenu_items('Request a slice', request) 
+#    template_env['unfold1_main'] = render(request, 'slice_request_.html', {
+#        'form': form,
+#    })
+#    from django.shortcuts                import render_to_response
+#    from django.template                 import RequestContext
+#    return render_to_response ('view-unfold1.html',template_env,
+#                               context_instance=RequestContext(request))
+
     return render(request, 'slice_request.html', {
         'form': form,
+        'topmenu_items': topmenu_items('Request a slice', request),
+        'username': the_user (request) 
     })
 
