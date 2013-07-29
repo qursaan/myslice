@@ -423,6 +423,60 @@ class UserValidateView(ActivationView):
 # DEPRECATED #
 # DEPRECATED #    return p.render()
 
+class MyAccountView(TemplateView):
+    template_name = "my_account.html"
+
+    def get_context_data(self, **kwargs):
+        #user_hrn = 'ple.upmc.jordan_auge'
+
+        #messages.info(self.request, 'You have logged in')
+        page = Page(self.request)
+
+        # Slow...
+        #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
+        #slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('slice.slice_hrn')
+        #auth_query  = Query().get('network').select('network_hrn')
+        #page.enqueue_query(slice_query)
+        #page.enqueue_query(auth_query)
+
+        #page.expose_queries()
+
+        #slicelist = SimpleList(
+        #    title = None,
+        #    page  = page,
+        #    key   = 'slice.slice_hrn',
+        #    query = slice_query,
+        #)
+
+        #authlist = SimpleList(
+        #    title = None,
+        #    page  = page,
+        #    key   = 'network_hrn',
+        #    query = auth_query,
+        #)
+
+        context = super(MyAccountView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        #context['networks'] = authlist.render(self.request)
+        #context['slices']   = slicelist.render(self.request)
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'User Profile Page'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('my_account', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+
+        return context
+
+
+
+
+
+
 
 # view for contact form
 def contact(request):
