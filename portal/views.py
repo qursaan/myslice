@@ -35,7 +35,7 @@ from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
-from django.http                 import HttpResponseRedirect
+from django.http                 import HttpResponseRedirect, HttpResponse
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -117,7 +117,7 @@ class UserRegisterView(RegistrationView):
     setting ``REGISTRATION_OPEN`` and setting it to
     ``False``. Omitting this setting, or setting it to ``True``, will
     be interpreted as meaning that registration is currently open and
-    permitted.
+    permitt ed.
 
     Internally, this is accomplished via storing an activation key in
     an instance of ``registration.models.RegistrationProfile``. See
@@ -429,58 +429,81 @@ class UserValidateView(ActivationView):
 # DEPRECATED #
 # DEPRECATED #    return p.render()
 
-class MyAccountView(TemplateView):
-    template_name = "my_account.html"
 
-    def get_context_data(self, **kwargs):
-        #user_hrn = 'ple.upmc.jordan_auge'
-
-        #messages.info(self.request, 'You have logged in')
-        page = Page(self.request)
-
-        # Slow...
-        #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
-        #slice_query = Query().get('user').filter_by('user_hrn', '==', user_hrn).select('slice.slice_hrn')
-        #auth_query  = Query().get('network').select('network_hrn')
-        #page.enqueue_query(slice_query)
-        #page.enqueue_query(auth_query)
-
-        #page.expose_queries()
-
-        #slicelist = SimpleList(
-        #    title = None,
-        #    page  = page,
-        #    key   = 'slice.slice_hrn',
-        #    query = slice_query,
-        #)
-
-        #authlist = SimpleList(
-        #    title = None,
-        #    page  = page,
-        #    key   = 'network_hrn',
-        #    query = auth_query,
-        #)
-
-        context = super(MyAccountView, self).get_context_data(**kwargs)
-        context['person']   = self.request.user
-        #context['networks'] = authlist.render(self.request)
-        #context['slices']   = slicelist.render(self.request)
-
-        # XXX This is repeated in all pages
-        # more general variables expected in the template
-        context['title'] = 'User Profile Page'
-        # the menu items on the top
-        context['topmenu_items'] = topmenu_items('my_account', self.request)
-        # so we can sho who is logged
-        context['username'] = the_user(self.request)
-
-        context.update(page.prelude_env())
-
-        return context
+# DEPRECATED ## view for my_account
+# DEPRECATED # class MyAccountView(TemplateView):
+# DEPRECATED #    template_name = "my_account.html"
+# DEPRECATED #    
+# DEPRECATED #    def from_process(self, request, **cleaned_data): 
+# DEPRECATED #        #if request.method == 'POST':
+# DEPRECATED #         #       if request.POST['submit_name']:
+# DEPRECATED #        if 'fname' in request.POST:            
+# DEPRECATED #                messsag= "Got Name"
+# DEPRECATED #                #return render(request, 'portal/my_account.html')
+# DEPRECATED #                #response = HttpResponse("Here's the text of the Web page.")    
+# DEPRECATED #                return HttpResponse(message)
+# DEPRECATED #            
+# DEPRECATED #    def get_context_data(self, **kwargs):
+# DEPRECATED #        page = Page(self.request)
+# DEPRECATED #        context = super(MyAccountView, self).get_context_data(**kwargs)
+# DEPRECATED #        context['person']   = self.request.user
+# DEPRECATED #        # XXX This is repeated in all pages
+# DEPRECATED #        # more general variables expected in the template
+# DEPRECATED #        context['title'] = 'User Profile Page'
+# DEPRECATED #        # the menu items on the top
+# DEPRECATED #        context['topmenu_items'] = topmenu_items('my_account', self.request)
+# DEPRECATED #        # so we can sho who is logged
+# DEPRECATED #        context['username'] = the_user(self.request)
+# DEPRECATED #        context.update(page.prelude_env())
+# DEPRECATED #        return context
 
 
 
+# View for my_account form
+def my_account(request):
+    return render(request, 'my_account.html')
 
+#my_acc form value processing
+def acc_process(request):
+    if 'submit_name' in request.POST:
+        edited_first_name =  request.POST['fname']
+        edited_last_name =  request.POST['lname']
+        #email = 'test_email@gmail.com'
+        #password = 'test_pp'
+        #message = 'F_Name: %s L_name: %s dummy_pp: %s' % (first_name, last_name, password)
+        #site = None
+        
+        # insert into DB [needed for registration page]
+        #approach borrowed from register view     
+        #new_user = PendingUser.objects.create_inactive_user(edited_first_name, edited_last_name, email,  password, site) 
+        #conventional approach
+        #b = PendingUser(first_name=edited_first_name, edited_last_name=last_name)
+        #b.save()
+        
+        # select and update [will be used throughout this view]
+        # select the logged in user [for the moment hard coded]
+        get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+        # update first and last name
+        get_user.first_name = edited_first_name
+        get_user.last_name = edited_last_name
+        get_user.save() 
+
+        return HttpResponse('Success: Name Updated!!')       
+    elif 'submit_pass' in request.POST:
+        edited_password = request.POST['password']
+        # select the logged in user [for the moment hard coded]
+        get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+        # update password
+        get_user.password = edited_password
+        get_user.save()
+        return HttpResponse('Success: Password Changed!!')
+    elif 'generate' in request.POST:
+        a =2
+        message = 'Here will generate ssh-rsa keys :D %d' %a
+        return HttpResponse(message)
+    else:
+        message = 'You submitted an empty form.'
+        return HttpResponse(message)
 
 
 

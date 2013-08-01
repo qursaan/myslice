@@ -19,7 +19,8 @@
     <div class='ms-dashboard-content' id='tophat__list__user_hrn'>
             <div id="main">
                     <div id="middle">
-                       <form id="editForm"  method="POST" action="#" enctype="multipart/form-data">
+                       <form id="editForm"  method="POST" action="acc_process" enctype="multipart/form-data">
+						{% csrf_token %}
                        <table class="profile">          
                                     <tr class="odd">
                                             <td colspan="2">

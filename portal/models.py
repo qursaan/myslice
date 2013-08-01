@@ -223,7 +223,7 @@ class PendingUser(models.Model):
         verbose_name_plural = _('registration profiles')
     
     def __unicode__(self):
-        return u"Registration information for %s" % self.user
+        return u"Registration information for %s" % self.email
 
     def activation_key_expired(self):
         """
