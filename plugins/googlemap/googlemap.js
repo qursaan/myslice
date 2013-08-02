@@ -12,6 +12,8 @@
 
 (function($){
 
+    var PLUGIN_NAME = 'GoogleMap';
+
     // routing calls
     jQuery.fn.GoogleMap = function( method ) {
 		if ( methods[method] ) {
@@ -19,7 +21,7 @@
 		} else if ( typeof method === 'object' || ! method ) {
 			return methods.init.apply( this, arguments );
 		} else {
-			jQuery.error( 'Method ' +  method + ' does not exist on jQuery.GoogleMap' );
+			jQuery.error( 'Method ' +  method + ' does not exist on jQuery.' + PLUGIN_NAME );
 		}    
     };
 
@@ -48,7 +50,7 @@
                 plugin.initialize();
 
                 /* Events */
-                $this.on('show.GoogleMaps', methods.show);
+                $this.on('show.' + PLUGIN_NAME, methods.show);
 
                 $this.set_query_handler(options.query_uuid, plugin.query_handler);
                 $this.set_record_handler(options.query_uuid, plugin.record_handler); 
@@ -69,7 +71,7 @@
                 var hazelnut = $this.data('Manifold');
 
                 // Unbind all events using namespacing
-                $(window).unbind('Manifold');
+                $(window).unbind(PLUGIN_NAME);
 
                 // Remove associated data
                 hazelnut.remove();

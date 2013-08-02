@@ -427,7 +427,7 @@
 
         this.initialize();
         // END CONSTRUCTOR
-    } // function DebugPlatform
+    } // function CodeEditor
 
 })( jQuery );
 
