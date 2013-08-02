@@ -42,6 +42,9 @@ urlpatterns = patterns('',
     # User validation
     url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
+    #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
+    url(r'^account/?$', views.my_account),
+    url(r'^acc_process/?$', views.acc_process),
     url(r'^contact/?$', views.contact),
     # Slice request
     url(r'^slice_request/?$', views.slice_request),
