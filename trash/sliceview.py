@@ -20,6 +20,7 @@ from plugins.resources_selected      import ResourcesSelected
 from plugins.googlemap.googlemap     import GoogleMap 
 from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
+from plugins.query_editor            import QueryEditor
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
 from plugins.updater.updater         import Updater
@@ -126,6 +127,12 @@ def _slice_view (request, slicename):
         title        = 'Resources',
         sons=[],
     )
+
+    resource_query_editor = QueryEditor(
+        page  = page,
+        query = sq_resource,
+    )
+    stack_resources.insert(resource_query_editor)
 
     # --------------------------------------------------------------------------
     # Different displays = DataTables + GoogleMaps
