@@ -87,7 +87,7 @@ function QueryStore() {
                 parent_query_ext = manifold.query_store.find_analyzed_query_ext(parent_query.query_uuid);
             else
                 parent_query_ext = null;
-            sq_ext = QueryExt(sq, parent_query_ext, query_ext)
+            sq_ext = new QueryExt(sq, parent_query_ext, query_ext)
             manifold.query_store.analyzed_queries[sq.query_uuid] = sq_ext;
         });
     }
@@ -397,7 +397,7 @@ var manifold = {
         switch(event_type) {
             case SET_ADD:
                 // Query uuid has been updated with the key of a new element
-                query_ext    = manifold.find_analyzed_query(query_uuid);
+                query_ext    = manifold.query_store.find_analyzed_query(query_uuid);
 
                 // update is only possible is the query is not pending, etc
                 // CHECK status !

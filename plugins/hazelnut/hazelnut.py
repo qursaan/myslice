@@ -5,15 +5,17 @@ class Hazelnut (Plugin):
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
-    def __init__ (self, query, query_all_uuid=None, checkboxes=False, columns=None, datatables_options={}, **settings):
+    def __init__ (self, query=None, query_all_uuid=None, checkboxes=False, columns=None, datatables_options={}, **settings):
         Plugin.__init__ (self, **settings)
         self.query          = query
         self.query_all_uuid = query_all_uuid
         self.checkboxes=checkboxes
         if columns is not None:
             self.columns=columns
-        else:
+        elif self.query:
             self.columns=self.query.fields
+        else:
+            self.columns = []
         self.datatables_options=datatables_options
 
     def template_file (self):

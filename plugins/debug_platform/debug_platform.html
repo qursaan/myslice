@@ -1,0 +1,49 @@
+<div id='sidebar'>
+	<label>Platform:</label>
+	<select name='platform_name' id='platform_name'>
+		<optgroup label='SFA'>
+			<option value='ple'>PLE</option>
+			<option value='omf'>NITOS</option>
+			<option value='senslab'>SENSLAB</option>
+		</optgroup>
+	</select>
+
+	<label>Authentication:</label>
+	<input type="radio" name="auth" value="myslice" checked>Use MANIFOLD default<br/>
+	<input type="radio" name="auth" value="myslice" disabled>Enter manually<br/>
+
+	<input id="" type="button" name="execute" value="Execute MANIFOLD query"/>
+	<input id="" type="button" name="execute" value="Execute platform query"/>
+</div>
+
+<div id='content'>
+	<fieldset class='column left'>
+		<div class='window top' id="panel_html" data-panel_type="html">
+			<!-- <textarea id="id_code_html" rows="10" cols="40" name="code_html"></textarea>-->
+			{{ topleft }}
+			<span class='window_label'>HTML</span>
+		</div>
+		<div class='handler handler_horizontal'></div>
+		<div class='window bottom' id="panel_js" data-panel_type="js">
+			<!--<textarea id="id_code_js" rows="10" cols="40" name="code_js"></textarea>-->
+			{{ bottomleft }}
+			<span class='window_label'>JavaScript</span>
+		</div>
+		<div class="shim"></div>
+	</fieldset>
+
+	<div class='handler' id='handler_vertical'></div>
+
+	<fieldset class='column right'>
+		<div class='window top' id="panel_css" data-panel_type="css">
+			<textarea id="id_code_css" rows="10" cols="40" name="code_css"></textarea>
+			<span class='window_label'>CSS</span>
+		</div>
+		<div class='handler handler_horizontal'></div>
+		<div id='result' class='window bottom'>
+		  <iframe name='result' frameBorder='0'></iframe>
+			<span class='window_label'>Result</span>
+		</div>
+		<div class="shim"></div>
+	</fieldset>
+</div>
