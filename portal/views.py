@@ -36,6 +36,7 @@ from manifold.core.query         import Query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
 from django.http                 import HttpResponseRedirect, HttpResponse
+import os.path, re
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -465,6 +466,8 @@ def my_account(request):
 
 #my_acc form value processing
 def acc_process(request):
+    # getting the user_id from the session [now hardcoded]
+    get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
@@ -482,7 +485,7 @@ def acc_process(request):
         
         # select and update [will be used throughout this view]
         # select the logged in user [for the moment hard coded]
-        get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+        #get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
         # update first and last name
         get_user.first_name = edited_first_name
         get_user.last_name = edited_last_name
@@ -492,7 +495,7 @@ def acc_process(request):
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
         # select the logged in user [for the moment hard coded]
-        get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+        #get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
         # update password
         get_user.password = edited_password
         get_user.save()
@@ -501,6 +504,22 @@ def acc_process(request):
         a =2
         message = 'Here will generate ssh-rsa keys :D %d' %a
         return HttpResponse(message)
+    elif 'upload_key' in request.POST:
+        up_file = request.FILES['pubkey']
+        file_content =  up_file.read()
+        file_name = up_file.name
+        file_extension = os.path.splitext(file_name)[1] 
+        allowed_extension =  ['.pub','.txt']
+        if file_extension in allowed_extension:
+            file_content = '{user_public_key:'+ file_content +'}'
+            file_content = re.sub("\r", "", file_content)
+            file_content = re.sub("\n", "\\n",file_content)
+            get_user.keypair = file_content
+            get_user.save()
+            return HttpResponse('Success: Publickey uploaded! Old records overwritten')
+        else:
+            return HttpResponse('Please upload a valid public key.')    
+        
     else:
         message = 'You submitted an empty form.'
         return HttpResponse(message)
