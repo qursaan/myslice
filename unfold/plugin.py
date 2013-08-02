@@ -176,7 +176,6 @@ class Plugin:
             env.update({'persistent_toggle':False,'display_hide_button':True,'display_show_button':False,'display_body':True})
         if self.need_debug(): 
             print "rendering plugin.html with env keys %s"%env.keys()
-            print "rendering plugin.html with env"
             for (k,v) in env.items(): 
                 if "display" in k or "persistent" in k: print k,'->',v
         result = render_to_string ('plugin.html',env)

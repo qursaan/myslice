@@ -89,7 +89,10 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.min.js)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
-
+# CodeMirror
+THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.js) 
+THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.css) 
+THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
 
 thirdparty-js:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
