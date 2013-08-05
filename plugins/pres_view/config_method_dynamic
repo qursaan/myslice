@@ -1,0 +1,1 @@
+getSite;1001;descriptif blabla;postmsg;xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/","authType":"anonymous"};marker;{"alpha":"1","beta":"2"};GetSites;{">date_created":0};'site_id','name','date_created';>date_created;
