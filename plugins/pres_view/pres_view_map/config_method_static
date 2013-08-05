@@ -1,1 +1,0 @@
-Sites last created;3;descriptif infobulle;[{"ens":[{"type":"date","variable":"date_created","op":"]"}]}];xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};GetSites;'site_id','name','date_created';line;{"color":"green"};
