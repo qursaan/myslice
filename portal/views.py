@@ -30,7 +30,7 @@ from django.shortcuts            import render
 
 from plugins.lists.simplelist    import SimpleList
 
-#from plugins.pres_view           import PresView
+from plugins.pres_view           import PresView
 from portal.event import Event
 import json
 
