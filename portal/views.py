@@ -30,7 +30,7 @@ from django.shortcuts            import render
 
 from plugins.lists.simplelist    import SimpleList
 
-from plugins.pres_view           import PresView
+#from plugins.pres_view           import PresView
 from portal.event import Event
 import json
 
@@ -508,9 +508,38 @@ def acc_process(request):
         get_user.save()
         return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
-        a =2
-        message = 'Here will generate ssh-rsa keys :D %d' %a
-        return HttpResponse(message)
+        import os
+        from M2Crypto import Rand, RSA, BIO
+
+        KEY_LENGTH = 2048
+
+        def blank_callback():
+            "Replace the default dashes"
+            return
+
+        # Random seed
+        Rand.rand_seed (os.urandom (KEY_LENGTH))
+        # Generate key pair
+        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+        # Create memory buffers
+        pri_mem = BIO.MemoryBuffer()
+        pub_mem = BIO.MemoryBuffer()
+        # Save keys to buffers
+        key.save_key_bio(pri_mem, None)
+        key.save_pub_key_bio(pub_mem)
+
+        # Get keys 
+        public_key = pub_mem.getvalue()
+        private_key = pri_mem.getvalue()
+        # Saving to DB
+        keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
+        #keypair = re.sub("\r", "", keypair)
+        #keypair = re.sub("\n", "\\n", keypair)
+        keypair = keypair.rstrip('\r\n')
+        get_user.keypair = keypair
+        get_user.save()
+        return HttpResponse('Success: New Keypair Generated! %s' % keypair)
+
     elif 'upload_key' in request.POST:
         up_file = request.FILES['pubkey']
         file_content =  up_file.read()
@@ -518,7 +547,7 @@ def acc_process(request):
         file_extension = os.path.splitext(file_name)[1] 
         allowed_extension =  ['.pub','.txt']
         if file_extension in allowed_extension:
-            file_content = '{user_public_key:'+ file_content +'}'
+            file_content = '{"user_public_key":"'+ file_content +'"}'
             file_content = re.sub("\r", "", file_content)
             file_content = re.sub("\n", "\\n",file_content)
             get_user.keypair = file_content
