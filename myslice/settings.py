@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
 # Django settings for myslice project.
+
+import os
+gettext = lambda s: s
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 import os.path
 
@@ -128,7 +133,25 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # CMS
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
 )
+
+# CMS
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.request',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'cms.context_processors.media',
+    'sekizai.context_processors.sekizai',
+)
+
 
 ROOT_URLCONF = 'myslice.urls'
 
@@ -140,7 +163,19 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(ROOT,"all-templates"),
+
+    # CMS
+    os.path.join(PROJECT_PATH, "templates"),
 )
+
+# CMS
+CMS_TEMPLATES = (
+    ('template_1.html', 'Template One'),
+    ('template_2.html', 'Template Two'),
+)
+LANGUAGES = [
+    ('en', 'English'),
+]
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -162,7 +197,7 @@ INSTALLED_APPS = (
     'views',
     'trash',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
@@ -173,6 +208,35 @@ INSTALLED_APPS = (
 # DEPRECATED #    'django.contrib.auth',
 # DEPRECATED #    'django.contrib.sites',
 # DEPRECATED #    'registration',
+
+    # CMS : Django CMS
+    'cms',     # django CMS itself
+    'mptt',    # utilities for implementing a modified pre-order traversal tree
+    'menus',   # helper for model independent hierarchical website navigation
+    'south',   # intelligent schema and data migrations
+    'sekizai', # for javascript and css management
+    # + plugins:
+    'cms.plugins.flash',
+    'cms.plugins.googlemap'
+    'cms.plugins.link',
+    'cms.plugins.snippet',
+    'cms.plugins.text',
+    'cms.plugins.twitter',
+    # either
+    'cms.plugins.file',
+    'cms.plugins.picture',
+    'cms.plugins.teaser',
+    'cms.plugins.video',
+    # or
+    #'filer',
+    #'cmsplugin_filer_file',
+    #'cmsplugin_filer_folder',
+    #'cmsplugin_filer_image',
+    #'cmsplugin_filer_teaser',
+    #'cmsplugin_filer_video',
+
+    # Versioning of content 
+    'reversion',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
