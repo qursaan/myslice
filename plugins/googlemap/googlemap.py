@@ -6,10 +6,11 @@ class GoogleMap (Plugin):
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
     # latitude,longitude, zoom : the starting point
-    def __init__ (self, query, query_all_uuid = None, latitude=43., longitude=7., zoom=4, **settings):
+    def __init__ (self, query, query_all = None, latitude=43., longitude=7., zoom=4, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
-        self.query_all_uuid = query_all_uuid
+        self.query_all = query_all
+        self.query_all_uuid = query_all.query_uuid if query_all else None
         self.latitude=latitude
         self.longitude=longitude
         self.zoom=zoom

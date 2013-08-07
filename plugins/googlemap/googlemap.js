@@ -298,20 +298,8 @@
                 // Fields
                 /* Hide/unhide columns to match added/removed fields */
                 case FIELD_ADDED:
-                    var object = this;
-                    $.each(added_fields, function (index, field) {            
-                        var index = object.getColIndex(field,cols);
-                        if(index != -1)
-                            object.table.fnSetColumnVis(index, true);
-                    });
                     break;
                 case FIELD_REMOVED:
-                    var object = this;
-                    $.each(removed_fields, function (index, field) {
-                        var index = object.getColIndex(field,cols);
-                        if(index != -1)
-                            object.table.fnSetColumnVis(index, false);
-                    });            
                     break;
                 case CLEAR_FIELDS:
                     alert('GoogleMaps::clear_fields() not implemented');

@@ -29,7 +29,7 @@ EOF; -->
         <td class='center'> {{ field.type }}</td>
         <td class='center'> {{ field.filter_input }}</td>
         <td class='center'>
-          <input class='queryeditor-check' id='check_{{ field.name }}' name='{{ field.header }}' type='checkbox' autocomplete='off' value='{{ field.header}}'></input>
+          <input class='queryeditor-check' id='check_{{ field.name }}' name='{{ field.header }}' type='checkbox' autocomplete='off' value='{{ field.name }}' {% if field.checked %} checked {% endif %}></input>
         </td>
       </tr>
 		

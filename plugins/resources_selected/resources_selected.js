@@ -16,6 +16,8 @@
  */
 (function( $ ){
 
+    var PLUGIN_NAME = 'ResourcesSelected';
+
     // Routing calls
     jQuery.fn.ResourcesSelected = function( method ) {
         if ( methods[method] ) {
@@ -23,7 +25,7 @@
         } else if ( typeof method === 'object' || ! method ) {
             return methods.init.apply( this, arguments );
         } else {
-            jQuery.error( 'Method ' +  method + ' does not exist on jQuery.ResourcesSelected' );
+            jQuery.error( 'Method ' +  method + ' does not exist on jQuery.' + PLUGIN_NAME );
         }    
 
     };
@@ -47,13 +49,16 @@
                 var $this = $(this);
 
                 /* An object that will hold private variables and methods */
-                var s = new ResourcesSelected(options);
-                $(this).data('ResourcesSelected', s);
-                var RESULTS_RESOURCES = '/results/' + options.resource_query_uuid + '/changed';
-                var UPDATE_RESOURCES  = '/update-set/' + options.resource_query_uuid;
-                                 
-                $.subscribe(RESULTS_RESOURCES, function(e, resources) { s.set_resources(resources);    });
-                $.subscribe(UPDATE_RESOURCES,  function(e, resources, change) { s.update_resources(resources, change); });
+                var plugin = new ResourcesSelected(options);
+                $(this).data('Manifold', plugin);
+
+                //$this.set_query_handler(options.query_uuid, hazelnut.query_handler);
+                //$this.set_record_handler(options.query_uuid, hazelnut.record_handler); 
+
+                //var RESULTS_RESOURCES = '/results/' + options.resource_query_uuid + '/changed';
+                //var UPDATE_RESOURCES  = '/update-set/' + options.resource_query_uuid;
+                //$.subscribe(RESULTS_RESOURCES, function(e, resources) { s.set_resources(resources);    });
+                //$.subscribe(UPDATE_RESOURCES,  function(e, resources, change) { s.update_resources(resources, change); });
                 
             }); // this.each
         }, // init
@@ -65,19 +70,20 @@
          */
         destroy : function( ) {
 
-            return this.each(function(){
-                var $this = jQuery(this), data = $this.data('ResourcesSelected');
-                jQuery(window).unbind('ResourcesSelected');
-                data.ResourcesSelected.remove();
-                $this.removeData('ResourcesSelected');
-            })
+            return this.each(function() {
+                var $this = $(this);
+                var plugin = $this.data('Manifold');
 
+                // Remove associated data
+                plugin.remove();
+                $this.removeData('Manifold');
+            });
         }, // destroy
 
     }; // var methods
 
     /***************************************************************************
-     * ResourcesSelected object
+     * Plugin object
      ***************************************************************************/
 
     function ResourcesSelected(options)
@@ -85,6 +91,8 @@
         /* member variables */
 
         this.options = options;
+
+        var object = this;
 
         /* The resources that are in the slice */
         this.current_resources = null;
@@ -110,7 +118,7 @@
                 jQuery('.ResourceSelectedClose').unbind('click');
                 /* Handle clicks on close span */
                 /* Reassociate close click every time the table is redrawn */
-                $('.ResourceSelectedClose').bind('click',{instance: rs}, close_click);
+                $('.ResourceSelectedClose').bind('click',{instance: rs}, object.close_click);
             }
          });
 
@@ -257,6 +265,102 @@
              //jQuery('#updateslice-' + data.ResourceSelected.plugin_uuid).prop('disabled', false);
 
         } // update_resources
+
+        this.record_handler = function(e, event_type, record)
+        {
+            // elements in set
+            switch(event_type) {
+                case NEW_RECORD:
+                    /* NOTE in fact we are doing a join here */
+                    if (object.received_all)
+                        // update checkbox for record
+                        object.set_checkbox(record);
+                    else
+                        // store for later update of checkboxes
+                        object.in_set_buffer.push(record);
+                    break;
+                case CLEAR_RECORDS:
+                    // nothing to do here
+                    break;
+                case IN_PROGRESS:
+                    manifold.spin($(this));
+                    break;
+                case DONE:
+                    if (object.received_all)
+                        manifold.spin($(this), false);
+                    object.received_set = true;
+                    break;
+            }
+        };
+
+        this.record_handler_all = function(e, event_type, record)
+        {
+            // all elements
+            switch(event_type) {
+                case NEW_RECORD:
+                    // Add the record to the table
+                    object.new_record(record);
+                    break;
+                case CLEAR_RECORDS:
+                    object.table.fnClearTable();
+                    break;
+                case IN_PROGRESS:
+                    manifold.spin($(this));
+                    break;
+                case DONE:
+                    if (object.received_set) {
+                        /* XXX needed ? XXX We uncheck all checkboxes ... */
+                        $("[id^='datatables-checkbox-" + object.options.plugin_uuid +"']").attr('checked', false);
+
+                        /* ... and check the ones specified in the resource list */
+                        $.each(object.in_set_buffer, function(i, record) {
+                            object.set_checkbox(record);
+                        });
+
+                        manifold.spin($(this), false);
+                    }
+                    object.received_all = true;
+                    break;
+            }
+        };
+
+        this.query_handler = function(e, event_type, data)
+        {
+            // This replaces the complex set_query function
+            // The plugin does not need to remember the query anymore
+            switch(event_type) {
+                // Filters
+                case FILTER_ADDED:
+                case FILTER_REMOVED:
+                case CLEAR_FILTERS:
+                    // XXX Here we might need to maintain the list of filters !
+                    /* Process updates in filters / current_query must be updated before this call for filtering ! */
+                    object.table.fnDraw();
+                    break;
+
+                // Fields
+                /* Hide/unhide columns to match added/removed fields */
+                case FIELD_ADDED:
+                    var field = data;
+                    var oSettings = object.table.fnSettings();
+                    var cols = oSettings.aoColumns;
+                    var index = object.getColIndex(field,cols);
+                    if(index != -1)
+                        object.table.fnSetColumnVis(index, true);
+                    break;
+                case FIELD_REMOVED:
+                    var field = data;
+                    var oSettings = object.table.fnSettings();
+                    var cols = oSettings.aoColumns;
+                    var index = object.getColIndex(field,cols);
+                    if(index != -1)
+                        object.table.fnSetColumnVis(index, false);
+                    break;
+                case CLEAR_FIELDS:
+                    alert('Hazelnut::clear_fields() not implemented');
+                    break;
+            } // switch
+        }
 
     } // ResourcesSelected
 

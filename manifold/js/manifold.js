@@ -56,9 +56,9 @@ function QueryExt(query, parent_query, main_query) {
     /* Constructor */
     if (typeof query == "undefined")
         throw "Must pass a query in QueryExt constructor";
-    this.query        = query
-    this.parent_query = (typeof parent_query == "undefined") ? false : parent_query
-    this.main_query   = (typeof main_query   == "undefined") ? false : main_query
+    this.query            = query
+    this.parent_query_ext = (typeof parent_query == "undefined") ? false : parent_query
+    this.main_query_ext   = (typeof main_query   == "undefined") ? false : main_query
     
     this.status       = null;
     this.results      = null;
@@ -82,11 +82,14 @@ function QueryStore() {
         manifold.query_store.main_queries[query.query_uuid] = query_ext;
 
         // We also need to insert all queries and subqueries from the analyzed_query
+        // XXX We need the root of all subqueries
         query.iter_subqueries(function(sq, data, parent_query) {
             if (parent_query)
                 parent_query_ext = manifold.query_store.find_analyzed_query_ext(parent_query.query_uuid);
             else
                 parent_query_ext = null;
+            // XXX parent_query_ext == false
+            // XXX main.subqueries = {} # Normal, we need analyzed_query
             sq_ext = new QueryExt(sq, parent_query_ext, query_ext)
             manifold.query_store.analyzed_queries[sq.query_uuid] = sq_ext;
         });
@@ -394,17 +397,18 @@ var manifold = {
 
     raise_event: function(query_uuid, event_type, value)
     {
+        // Query uuid has been updated with the key of a new element
+        query_ext    = manifold.query_store.find_analyzed_query_ext(query_uuid);
+        query = query_ext.query;
+
         switch(event_type) {
             case SET_ADD:
-                // Query uuid has been updated with the key of a new element
-                query_ext    = manifold.query_store.find_analyzed_query(query_uuid);
-
                 // update is only possible is the query is not pending, etc
                 // CHECK status !
 
                 // XXX we can only update subqueries of the main query. Check !
                 // assert query_ext.parent_query == query_ext.main_query
-                update_query = query_ext.parent_query.update_query;
+                update_query = query_ext.parent_query_ext.update_query;
 
                 // NOTE: update might modify the fields in Get
                 // NOTE : we have to modify all child queries
@@ -419,7 +423,45 @@ var manifold = {
             case SET_REMOVED:
                 // Query uuid has been updated with the key of a removed element
                 break;
+            case FILTER_ADDED:
+                break;
+            case FILTER_REMOVED:
+                break;
+            case FIELD_ADDED:
+                main_query = query_ext.main_query_ext.query;
+                main_update_query = query_ext.main_query_ext.update_query;
+                query.select(value);
+
+                // Here we need the full path through all subqueries
+                path = ""
+                // XXX We might need the query name in the QueryExt structure
+                main_query.select(value);
+
+                // XXX When is an update query associated ?
+                // XXX main_update_query.select(value);
+
+                // We need to inform about changes in these queries to the respective plugins
+                // Note: query, main_query & update_query have the same UUID
+                manifold.raise_query_event(query_uuid, event_type, value);
+                // We are targeting the same object with get and update
+                // The notion of query is bad, we should have a notion of destination, and issue queries on the destination
+                // NOTE: Editing a subquery == editing a local view on the destination
+                break;
+
+            case FIELD_REMOVED:
+                query = query_ext.query;
+                main_query = query_ext.main_query_ext.query;
+                main_update_query = query_ext.main_query_ext.update_query;
+                query.unselect(value);
+                main_query.unselect(value);
+
+                // We need to inform about changes in these queries to the respective plugins
+                // Note: query & main_query have the same UUID
+                manifold.raise_query_event(query_uuid, event_type, value);
+                break;
         }
+        // XXX We might need to run the new query again and manage the plugins in the meantime with spinners...
+        // For the time being, we will collect all columns during the first query
     },
 
     /* Publish/subscribe channels for internal use */

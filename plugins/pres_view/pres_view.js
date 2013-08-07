@@ -62,13 +62,13 @@
 
             return this.each(function() {
                 var $this = $(this);
-                var hazelnut = $this.data('Manifold');
+                var plugin = $this.data('Manifold');
 
                 // Unbind all events using namespacing
                 $(window).unbind(PLUGIN_NAME);
 
                 // Remove associated data
-                hazelnut.remove();
+                plugin.remove();
                 $this.removeData('Manifold');
             });
         }, // destroy

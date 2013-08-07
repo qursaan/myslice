@@ -143,13 +143,13 @@ def _slice_view (request, slicename):
     )
 
     tab_resource_plugins.insert(Hazelnut( 
-        page           = page,
-        title          = 'List',
-        domid          = 'checkboxes',
+        page       = page,
+        title      = 'List',
+        domid      = 'checkboxes',
         # this is the query at the core of the slice list
-        query          = sq_resource,
-        query_all_uuid = query_resource_all.query_uuid,
-        checkboxes     = True,
+        query      = sq_resource,
+        query_all  = query_resource_all,
+        checkboxes = True,
         datatables_options = { 
             # for now we turn off sorting on the checkboxes columns this way
             # this of course should be automatic in hazelnut
@@ -160,18 +160,18 @@ def _slice_view (request, slicename):
     ))
 
     tab_resource_plugins.insert(GoogleMap(
-        page        = page,
-        title       = 'Geographic view',
-        domid       = 'gmap',
+        page       = page,
+        title      = 'Geographic view',
+        domid      = 'gmap',
         # tab's sons preferably turn this off
-        togglable   = False,
-        query       = sq_resource,
-        query_all_uuid = query_resource_all.query_uuid,
-        checkboxes     = True,
+        togglable  = False,
+        query      = sq_resource,
+        query_all  = query_resource_all,
+        checkboxes = True,
         # center on Paris
-        latitude    = 49.,
-        longitude   = 2.2,
-        zoom        = 3,
+        latitude   = 49.,
+        longitude  = 2.2,
+        zoom       = 3,
     ))
 
     stack_resources.insert(tab_resource_plugins)

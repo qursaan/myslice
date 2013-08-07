@@ -53,16 +53,16 @@ var ELEMENT_KEY = 'resource_hrn';
                 var $this = $(this);
 
                 /* An object that will hold private variables and methods */
-                var hazelnut = new Hazelnut (options);
-                $this.data('Hazelnut', hazelnut);
+                var plugin = new Hazelnut (options);
+                $this.data('Hazelnut', plugin);
 
                 /* Events */
                 $this.on('show.Datatables', methods.show);
 
                 // This is the new plugin API meant to replace the weird publish_subscribe mechanism
-                $this.set_query_handler(options.query_uuid, hazelnut.query_handler);
-                $this.set_record_handler(options.query_uuid, hazelnut.record_handler); 
-                $this.set_record_handler(options.query_all_uuid, hazelnut.record_handler_all); 
+                $this.set_query_handler(options.query_uuid, plugin.query_handler);
+                $this.set_record_handler(options.query_uuid, plugin.record_handler); 
+                $this.set_record_handler(options.query_all_uuid, plugin.record_handler_all); 
 
 //                /* Subscriptions */
 //                var query_channel   = '/query/' + options.query_uuid + '/changed';
@@ -146,45 +146,52 @@ var ELEMENT_KEY = 'resource_hrn';
 
         var object = this;
 
-        /* Transforms the table into DataTable, and keep a pointer to it */
-        actual_options = {
-            // Customize the position of Datatables elements (length,filter,button,...)
-            // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-            sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span5'i><'span7'p>>",
-            sPaginationType: 'bootstrap',
-            // Handle the null values & the error : Datatables warning Requested unknown parameter
-            // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
-            aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
-            // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
-            // sScrollX: '100%',       /* Horizontal scrolling */
-            bProcessing: true,      /* Loading */
-            fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
-        };
-        // the intention here is that options.datatables_options as coming from the python object take precedence
-        //  XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
-        this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
+        this.initialize = function() {
+            /* Transforms the table into DataTable, and keep a pointer to it */
+            actual_options = {
+                // Customize the position of Datatables elements (length,filter,button,...)
+                // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
+                sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span5'i><'span7'p>>",
+                sPaginationType: 'bootstrap',
+                // Handle the null values & the error : Datatables warning Requested unknown parameter
+                // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
+                aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
+                // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
+                // sScrollX: '100%',       /* Horizontal scrolling */
+                bProcessing: true,      /* Loading */
+                fnDrawCallback: function() { hazelnut_draw_callback.call(object, options); }
+            };
+            // the intention here is that options.datatables_options as coming from the python object take precedence
+            //  XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
+            this.table = $('#hazelnut-' + options.plugin_uuid).dataTable(actual_options);
 
-        /* Setup the SelectAll button in the dataTable header */
-        /* xxx not sure this is still working */
-        var oSelectAll = $('#datatableSelectAll-'+ options.plugin_uuid);
-        oSelectAll.html("<span class='ui-icon ui-icon-check' style='float:right;display:inline-block;'></span>Select All");
-        oSelectAll.button();
-        oSelectAll.css('font-size','11px');
-        oSelectAll.css('float','right');
-        oSelectAll.css('margin-right','15px');
-        oSelectAll.css('margin-bottom','5px');
-        oSelectAll.unbind('click');
-        oSelectAll.click(selectAll);
+            /* Setup the SelectAll button in the dataTable header */
+            /* xxx not sure this is still working */
+            var oSelectAll = $('#datatableSelectAll-'+ options.plugin_uuid);
+            oSelectAll.html("<span class='ui-icon ui-icon-check' style='float:right;display:inline-block;'></span>Select All");
+            oSelectAll.button();
+            oSelectAll.css('font-size','11px');
+            oSelectAll.css('float','right');
+            oSelectAll.css('margin-right','15px');
+            oSelectAll.css('margin-bottom','5px');
+            oSelectAll.unbind('click');
+            oSelectAll.click(selectAll);
 
-        /* Add a filtering function to the current table 
-         * Note: we use closure to get access to the 'options'
-         */
-        $.fn.dataTableExt.afnFiltering.push(function( oSettings, aData, iDataIndex ) { 
-            /* No filtering if the table does not match */
-            if (oSettings.nTable.id != "hazelnut-" + options.plugin_uuid)
-                return true;
-            return hazelnut_filter.call(object, oSettings, aData, iDataIndex);
-        });
+            /* Add a filtering function to the current table 
+             * Note: we use closure to get access to the 'options'
+             */
+            $.fn.dataTableExt.afnFiltering.push(function( oSettings, aData, iDataIndex ) { 
+                /* No filtering if the table does not match */
+                if (oSettings.nTable.id != "hazelnut-" + options.plugin_uuid)
+                    return true;
+                return hazelnut_filter.call(object, oSettings, aData, iDataIndex);
+            });
+
+            /* Processing hidden_columns */
+            $.each(options.hidden_columns, function(i, field) {
+                object.hide_column(field);
+            });
+        }
 
         /* methods */
 
@@ -527,7 +534,25 @@ var ELEMENT_KEY = 'resource_hrn';
             }
         };
 
-        this.query_handler = function(e, event_type, query)
+        this.show_column = function(field)
+        {
+            var oSettings = object.table.fnSettings();
+            var cols = oSettings.aoColumns;
+            var index = object.getColIndex(field,cols);
+            if (index != -1)
+                object.table.fnSetColumnVis(index, true);
+        }
+
+        this.hide_column = function(field)
+        {
+            var oSettings = object.table.fnSettings();
+            var cols = oSettings.aoColumns;
+            var index = object.getColIndex(field,cols);
+            if (index != -1)
+                object.table.fnSetColumnVis(index, false);
+        }
+
+        this.query_handler = function(e, event_type, data)
         {
             // This replaces the complex set_query function
             // The plugin does not need to remember the query anymore
@@ -544,20 +569,10 @@ var ELEMENT_KEY = 'resource_hrn';
                 // Fields
                 /* Hide/unhide columns to match added/removed fields */
                 case FIELD_ADDED:
-                    var object = this;
-                    $.each(added_fields, function (index, field) {            
-                        var index = object.getColIndex(field,cols);
-                        if(index != -1)
-                            object.table.fnSetColumnVis(index, true);
-                    });
+                    object.show_column(data);
                     break;
                 case FIELD_REMOVED:
-                    var object = this;
-                    $.each(removed_fields, function (index, field) {
-                        var index = object.getColIndex(field,cols);
-                        if(index != -1)
-                            object.table.fnSetColumnVis(index, false);
-                    });            
+                    object.hide_column(data);
                     break;
                 case CLEAR_FIELDS:
                     alert('Hazelnut::clear_fields() not implemented');
@@ -566,6 +581,10 @@ var ELEMENT_KEY = 'resource_hrn';
 
 
         }
+
+        // Constructor
+        object.initialize();
+
     } // constructor
 
     /***************************************************************************

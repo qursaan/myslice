@@ -47,6 +47,9 @@
                 var plugin = new QueryEditor(options);
                 $this.data('Manifold', plugin);
 
+                $this.set_query_handler(options.query_uuid, plugin.query_handler);
+                $this.set_record_handler(options.query_uuid, plugin.record_handler); 
+
             }); // this.each
         }, // init
 
@@ -149,7 +152,7 @@
             });
 
             jQuery('.queryeditor-check').click(function() { 
-                manifold.raise_event(object.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
+                manifold.raise_event(object.options.query_uuid, this.checked?FIELD_ADDED:FIELD_REMOVED, this.value);
                 /*
                     var column = this.id.substring(6);
                     query = data.current_query;
@@ -341,24 +344,12 @@
             // elements in set
             switch(event_type) {
                 case NEW_RECORD:
-                    /* NOTE in fact we are doing a join here */
-                    if (object.received_all)
-                        // update checkbox for record
-                        object.set_checkbox(record);
-                    else
-                        // store for later update of checkboxes
-                        object.in_set_buffer.push(record);
                     break;
                 case CLEAR_RECORDS:
-                    // nothing to do here
                     break;
                 case IN_PROGRESS:
-                    manifold.spin($(this));
                     break;
                 case DONE:
-                    if (object.received_all)
-                        manifold.spin($(this), false);
-                    object.received_set = true;
                     break;
             }
         };
@@ -401,11 +392,12 @@
 
                 // Fields
                 /* Hide/unhide columns to match added/removed fields */
+                // XXX WRONG IDENTIFIERS
                 case FIELD_ADDED:
-                    $('#check_' + data).attr('checked', true);
+                    object.check(data);
                     break;
                 case FIELD_REMOVED:
-                    $('#check_' + data).attr('checked', false);
+                    object.uncheck(data);
                     break;
                 case CLEAR_FIELDS:
                     alert(PLUGIN_NAME + '::clear_fields() not implemented');
@@ -413,6 +405,14 @@
             } // switch
 
 
+        }
+        this.check = function(field)
+        {
+            $('#check_' + field).attr('checked', true);
+        }
+        this.uncheck = function(field)
+        {
+            $('#check_' + field).attr('checked', false);
         }
         this.fnFormatDetails  = function( metaTable, nTr, div_id ) {
             var aData = metaTable.fnGetData( nTr );

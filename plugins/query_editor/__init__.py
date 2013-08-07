@@ -30,7 +30,6 @@ class QueryEditor(Plugin):
         fields = []
         metadata = self.page.get_metadata()
         md_fields = metadata.details_by_object('resource')
-        print "METADATA FIELDS", md_fields
 
         # XXX use django templating system here
         for md_field in md_fields['column']:
@@ -64,5 +63,6 @@ class QueryEditor(Plugin):
                 'resource_type': 'N/A',
                 'filter_input':  filter_input,
                 'header':        None,
+                'checked':       md_field['name'] in self.query.get_select()
             })
         return { 'fields': fields }

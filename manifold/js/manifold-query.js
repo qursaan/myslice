@@ -117,6 +117,16 @@ INSERT INTO object VALUES(field=value)
         rec(query, callback, data, null);
     }
 
+    this.select = function(field)
+    {
+        this.fields.push(field);
+    }
+
+    this.unselect = function(field)
+    {   
+        this.fields = $.grep(this.fields, function(x) { return x != field; });
+    }
+
 // we send queries as a json string now 
 //    this.as_POST = function() {
 //        return {'action': this.action, 'object': this.object, 'timestamp': this.timestamp,
