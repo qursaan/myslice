@@ -53,24 +53,21 @@ def _slice_view (request, slicename):
     page = Page(request)
     page.expose_js_metadata()
 
+    metadata = page.get_metadata()
+    resource_md = metadata.details_by_object('resource')
+    resource_fields = [column['name'] for column in resource_md['column']]
+
     # TODO The query to run is embedded in the URL
     main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
-    query_resource_all = Query.get('resource').select('resource_hrn', 'hostname', 'type', 'network_hrn', 'latitude', 'longitude')
+    main_query.select(
+            'slice_hrn',
+            'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.network_hrn',
+            #'lease.urn',
+            'user.user_hrn',
+            #'application.measurement_point.counter'
+    )
 
-    # Get default fields from metadata unless specified
-    if not main_query.fields:
-        metadata = page.get_metadata()
-        md_fields = metadata.details_by_object('slice')
-        if debug:
-            print "METADATA", md_fields
-        # TODO Get default fields
-        main_query.select(
-                'slice_hrn',
-                'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.network_hrn',
-                #'lease.urn',
-                'user.user_hrn',
-#                'application.measurement_point.counter'
-        )
+    query_resource_all = Query.get('resource').select(resource_fields)
 
     aq = AnalyzedQuery(main_query, metadata=metadata)
     page.enqueue_query(main_query, analyzed_query=aq)
