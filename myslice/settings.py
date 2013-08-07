@@ -29,7 +29,7 @@ if not ROOT:
 
 ####################
 ADMINS = (
-    # ('your_name', 'your_email@test.com'),
+    ('admin', 'your_email@test.com'),
 )
 
 MANAGERS = ADMINS
@@ -41,10 +41,6 @@ MANAGERS = ADMINS
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
-
-
-
-
 
 DATABASES = {
     'default': {
@@ -134,11 +130,14 @@ MIDDLEWARE_CLASSES = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.doc.XViewMiddleware',
+
     # CMS
-    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
 )
 
 # CMS
@@ -173,6 +172,7 @@ CMS_TEMPLATES = (
     ('template_1.html', 'Template One'),
     ('template_2.html', 'Template Two'),
 )
+
 LANGUAGES = [
     ('en', 'English'),
 ]
@@ -217,7 +217,7 @@ INSTALLED_APPS = (
     'sekizai', # for javascript and css management
     # + plugins:
     'cms.plugins.flash',
-    'cms.plugins.googlemap'
+    'cms.plugins.googlemap',
     'cms.plugins.link',
     'cms.plugins.snippet',
     'cms.plugins.text',
@@ -236,7 +236,7 @@ INSTALLED_APPS = (
     #'cmsplugin_filer_video',
 
     # Versioning of content 
-    'reversion',
+    #'reversion',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
@@ -270,7 +270,12 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', 'auth.manifoldbackend.ManifoldBackend', )
+AUTHENTICATION_BACKENDS = (
+    'auth.backend.MyCustomBackend',
+    'auth.manifoldbackend.ManifoldBackend', 
+    # This is required to login as an admin
+    'django.contrib.auth.backends.ModelBackend' 
+)
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine

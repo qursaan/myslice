@@ -34,15 +34,11 @@ class ManifoldBackend:
 #old            expires = time.time() + (24 * 60 * 60)
 
             sessions_result = api.forward(Query.create('local:session').to_dict())
-            print "result"
             sessions = sessions_result.ok_value()
-            print "ok"
             if not sessions:
                 print "GetSession failed", sessions_result.error()
                 return
-            print "first", sessions
             session = sessions[0]
-            print "SESSION=", session
 
             # Change to session authentication
             api.auth = {'AuthMethod': 'session', 'session': session['session']}
@@ -56,7 +52,6 @@ class ManifoldBackend:
                 print "GetPersons failed",persons_result.error()
                 return
             person = persons[0]
-            print "PERSON=", person
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
         except Exception, e:
