@@ -17,6 +17,7 @@ class QueryEditor(Plugin):
             ] ,
             'css_files': [
                 'css/query_editor.css',
+                'css/jquery-ui.css',
                 'css/demo_page.css',
                 'css/demo_table.css',
             ]

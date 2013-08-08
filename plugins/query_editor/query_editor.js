@@ -56,13 +56,11 @@
             nCloneTh.innerHTML = '<b>Info</b>';
             nCloneTd.className = "center";
             nCloneTh.className = "center";
-            // XXX
-            jQuery('#'+this.options.plugin_uuid+'_fields thead tr').each( function () {
-                this.insertBefore( nCloneTh, this.childNodes[0] );
+            this.el('table thead tr').each(function() {
+                this.insertBefore(nCloneTh, this.childNodes[0]);
             });
-            // XXX
-            jQuery('#'+this.options.plugin_uuid+'_fields tbody tr').each( function () {
-                this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
+            this.el('table tbody tr').each(function() {
+                this.insertBefore(nCloneTd.cloneNode( true ), this.childNodes[0]);
             });
          
             // We are currently using a DataTable display, but another browsing component could be better
@@ -171,7 +169,7 @@
             this.uncheck_field(field);
         },
 
-        /* Former code */
+        /* Former code not used at the moment */
 
         print_field_description: function(field_header, div_id) 
         { 
