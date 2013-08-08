@@ -8,9 +8,10 @@ EOF;
 EOF; -->
 
 <div>
-  <table id='{{domid}}__table' class='display'>
+  <table id='{{domid}}__table' class='display' width='95%'>
     <thead>
       <tr>
+        <th class='center'>Info</th>
         <th class='center'>Field</th>
         <th class='center'>Resource</th>
         <th class='center'>Type</th>
@@ -24,10 +25,11 @@ EOF; -->
     {% for field in fields %}
 
       <tr>
-        <td class='center'><b> {{ field.name }}</b></td>
-        <td class='center'> {{ field.resource_type }}</td>
-        <td class='center'> {{ field.type }}</td>
-        <td class='center'> {{ field.filter_input }}</td>
+        <td class='center'><span class='ui-icon ui-icon-triangle-1-e' style='cursor:pointer'></span></td>
+        <td class='center'>{{ field.name }}</td>
+        <td class='center'>{{ field.resource_type }}</td>
+        <td class='center'>{{ field.type }}</td>
+        <td class='center'>{{ field.filter_input }}</td>
         <td class='center'>
           <input class='queryeditor-check' id='{{domid}}__check__{{ field.name }}' name='{{ field.header }}' type='checkbox' autocomplete='off' value='{{ field.name }}' {% if field.checked %} checked {% endif %}></input>
         </td>
@@ -38,4 +40,3 @@ EOF; -->
     </tbody>
   </table>
 </div>
-

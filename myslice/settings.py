@@ -37,10 +37,6 @@ EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 
-
-
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -92,22 +88,41 @@ STATIC_ROOT = os.path.join(ROOT,'django-static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/all-static/'
+# thierry STATIC_URL = '/all-static/'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT,'all-static'),
+    # thierry os.path.join(ROOT,'all-static'),
+    ('js', os.path.join(ROOT,'manifold/js')),
+    ('js', os.path.join(ROOT,'unfold/js')),
+    ('js', os.path.join(ROOT,'auth/js')),
+    ('css', os.path.join(ROOT,'manifold/css')),
+    ('css', os.path.join(ROOT,'unfold/css')),
+    ('css', os.path.join(ROOT,'views/css')),
+    ('img', os.path.join(ROOT,'views/img')),
 )
+
+# Needed by PluginFinder
+PLUGIN_DIR = os.path.join(ROOT,'plugins')
+# ThirdPartyFinder
+THIRDPARTY_DIR = os.path.join(ROOT, 'third-party')
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'unfold.static.PluginFinder',
+    'unfold.static.ThirdPartyFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.static',
 )
 
 # Make this unique, and don't share it with anybody.

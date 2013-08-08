@@ -47,7 +47,7 @@
                 manifold.raise_event(self.options.query_uuid, this.checked?FIELD_ADDED:FIELD_REMOVED, this.value);
             });
 
-            /* The following code adds an expandable column for the table */
+            /* The following code adds an expandable column for the table
             // XXX Why isn't it done statically ?
             var nCloneTh = document.createElement( 'th' );
             var nCloneTd = document.createElement( 'td' );
@@ -62,6 +62,7 @@
             this.el('table tbody tr').each(function() {
                 this.insertBefore(nCloneTd.cloneNode( true ), this.childNodes[0]);
             });
+            */
          
             // We are currently using a DataTable display, but another browsing component could be better
             //jQuery('#'+this.options.plugin_uuid+'-table').dataTable...
@@ -71,7 +72,7 @@
                 bInfo       : false,
                 sScrollX    : '100%',         // Horizontal scrolling
                 sScrollY    : '200px',
-                bJQueryUI   : true,           // Use jQuery UI
+                //bJQueryUI   : true,           // Use jQuery UI
                 bProcessing : true,           // Loading
                 aaSorting   : [[ 1, "asc" ]], // sort by column fields on load
                 aoColumnDefs: [
