@@ -1,10 +1,11 @@
+{% load staticfiles %}
 <div id='{{domid}}__myActiveFilters' style='clear:both;'>
 
 	<!-- TEMPLATE -->
 	<div id='{{domid}}__template' class='template'>
 		 <div id='{% templatetag openvariable %} id {% templatetag closevariable %}' class='filterButton' style='float:left;margin-bottom:10px;'>
 			<span>{% templatetag openvariable %} span {% templatetag closevariable %}</span>
-            <img src='/all-static/img/details_close.png' class='closeButton' style='padding-left:3px;'/>
+            <img src='{% static "img/details_close.png" %}' class='closeButton' style='padding-left:3px;'/>
 		</div>
 	</div>
 
