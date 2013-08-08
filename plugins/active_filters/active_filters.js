@@ -4,6 +4,8 @@
  * License: GPLv3
  */
 
+// NOTE: We are not making use of element, but this.el() instead...
+
 (function($){
 
     var ActiveFilters = Plugin.extend({
@@ -60,7 +62,7 @@
             // Count the number of filter _inside_ the current plugin
             var count = this.els('filterButton').length;
             if (count == 1) { // Including the template
-                jQuery("#clearFilters").hide();
+                this.el('clearFilters').hide();
             }
         }
 

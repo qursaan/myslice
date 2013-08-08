@@ -4,97 +4,12 @@
  * License: GPLv3
  */
 
-/*
- * It's a best practice to pass jQuery to an IIFE (Immediately Invoked Function
- * Expression) that maps it to the dollar sign so it can't be overwritten by
- * another library in the scope of its execution.
- */
-
 (function($){
 
-    var PLUGIN_NAME = 'QueryEditor';
+    var QueryEditor = Plugin.extend({
 
-    // routing calls
-    jQuery.fn.QueryEditor = function( method ) {
-		if ( methods[method] ) {
-			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-		} else if ( typeof method === 'object' || ! method ) {
-			return methods.init.apply( this, arguments );
-		} else {
-			jQuery.error( 'Method ' +  method + ' does not exist on jQuery.' + PLUGIN_NAME );
-		}    
-    };
-
-    /***************************************************************************
-     * Public methods
-     ***************************************************************************/
-
-    var methods = {
-
-        /**
-         * @brief Plugin initialization
-         * @param options : an associative array of setting values
-         * @return : a jQuery collection of objects on which the plugin is
-         *     applied, which allows to maintain chainability of calls
-         */
-        init : function ( options ) {
-
-            return this.each(function() {
-
-                var $this = $(this);
-
-                /* An object that will hold private variables and methods */
-                var plugin = new QueryEditor(options);
-                $this.data('Manifold', plugin);
-
-                $this.set_query_handler(options.query_uuid, plugin.query_handler);
-                // This is used for autocomplete
-                $this.set_record_handler(options.query_uuid, plugin.record_handler); 
-
-            }); // this.each
-        }, // init
-
-        /**
-         * @brief Plugin destruction
-         * @return : a jQuery collection of objects on which the plugin is
-         *     applied, which allows to maintain chainability of calls
-         */
-        destroy : function( ) {
-
-            return this.each(function() {
-                var $this = $(this);
-                var plugin = $this.data('Manifold');
-
-                // Unbind all events using namespacing
-                $(window).unbind(PLUGIN_NAME);
-
-                // Remove associated data
-                plugin.remove();
-                $this.removeData('Manifold');
-
-            });
-        }, // destroy
-
-    }; // var methods;
-
-    /***************************************************************************
-     * Plugin object
-     ***************************************************************************/
-
-    function QueryEditor(options)
-    {
-
-        /* member variables */
-        this.options = options;
-
-        var object = this;
-
-        this.initialize_table = function(data) 
-        {
-
-            var d = data;
-
-            jQuery('.queryeditor-auto-filter').change(function(event) { 
+        init: function(options, element) {
+            $('.queryeditor-auto-filter').change(function(event) { 
                 var key   = event.target.id.split('-')[4]; // Should be consistent with the naming of fields
                 var op    = '=';
                 var value = event.target.value;
@@ -223,11 +138,64 @@
                 jQuery('#'+this.options.plugin_uuid+'_fields_wrapper').css({'padding-top':'0em','padding-bottom':'0em'});
 
             //}); // onfunctionAvailable
+        }, // init
 
-        } // initialize_table
+        /* UI management */
 
-        this.print_field_description = function(field_header, div_id) { 
-            
+        check_field: function(field)
+        {
+            this.el('check', field).attr('checked', true);
+        },
+
+        uncheck_field: function(field)
+        {
+            this.el('check', field).attr('checked', false);
+        },
+
+        /* Events */
+
+        on_filter_added: function(filter)
+        {
+//                    filter = data;
+//                    // Set the value of the filter = to query filter value
+//                    // Necessary if the filter has been modified by another plugin (QuickFilter)
+//                    if(filter[1]=="="){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(filter[2]);
+//                    }else if(filter[1]=="<"){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(filter[2]);
+//                    }else if(filter[1]==">"){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(filter[2]);
+//                    }
+        },
+
+        on_filter_removed: function(filter)
+        {
+//                    filter = data;
+//                    if(filter[1]=="="){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(null);
+//                    }else if(filter[1]=="<"){
+//                        //502124d5a5848-filter-asn-max
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(null);
+//                    }else if(filter[1]==">"){
+//                        //502124d5a5848-filter-asn-min
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(null);
+//                    }
+        },
+
+        on_field_added: function(field)
+        {
+            this.check_field(field);
+        },
+
+        on_field_removed: function(field)
+        {
+            this.uncheck_field(field);
+        },
+
+        /* Former code */
+
+        print_field_description: function(field_header, div_id) 
+        { 
             //var selected = all_headers[field_header];
             var selected = getMetadata_field('resource',field_header);
 
@@ -288,9 +256,9 @@
             output += "</div>";
 
             return output;
-        }
+        },
 
-        this.update_autocomplete = function(e, rows, current_query)
+        update_autocomplete: function(e, rows, current_query)
         {
             var d = data;
             d.current_query = current_query;
@@ -325,87 +293,10 @@
                             }
                 });
             });                
-        } // update_autocomplete     
+        }, // update_autocomplete     
 
-        /**
-         * This function is used to update autocomplete
-         */
-        this.record_handler = function(e, event_type, record)
+        fnFormatDetails: function( metaTable, nTr, div_id ) 
         {
-            // elements in set
-            switch(event_type) {
-                case NEW_RECORD:
-                    break;
-                case CLEAR_RECORDS:
-                    break;
-                case IN_PROGRESS:
-                    break;
-                case DONE:
-                    break;
-            }
-        };
-
-        this.query_handler = function(e, event_type, data)
-        {
-            // This replaces the complex set_query function
-            // The plugin does not need to remember the query anymore
-//            switch(event_type) {
-//                // Filters
-//                // When Query changed, Then we need to update the filters of
-//                // QueryEditor plugin if the filter is active, set the value
-//                // (the update can come from another plugin) else set the
-//                // filter value to null PB if the filter is composed of MIN/MAX
-//                // values
-//                case FILTER_ADDED:
-//                    filter = data;
-//                    // Set the value of the filter = to query filter value
-//                    // Necessary if the filter has been modified by another plugin (QuickFilter)
-//                    if(filter[1]=="="){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(filter[2]);
-//                    }else if(filter[1]=="<"){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(filter[2]);
-//                    }else if(filter[1]==">"){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(filter[2]);
-//                    }
-//                case FILTER_REMOVED:
-//                    filter = data;
-//                    if(filter[1]=="="){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(null);
-//                    }else if(filter[1]=="<"){
-//                        //502124d5a5848-filter-asn-max
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(null);
-//                    }else if(filter[1]==">"){
-//                        //502124d5a5848-filter-asn-min
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(null);
-//                    }
-//                case CLEAR_FILTERS:
-//                    break;
-//
-//                // Fields
-//                /* Hide/unhide columns to match added/removed fields */
-//                // XXX WRONG IDENTIFIERS
-//                case FIELD_ADDED:
-//                    object.check(data);
-//                    break;
-//                case FIELD_REMOVED:
-//                    object.uncheck(data);
-//                    break;
-//                case CLEAR_FIELDS:
-//                    alert(PLUGIN_NAME + '::clear_fields() not implemented');
-//                    break;
-//            } // switch
-
-
-        }
-        this.check = function(field)
-        {
-            $('#check_' + field).attr('checked', true);
-        }
-        this.uncheck = function(field)
-        {
-            $('#check_' + field).attr('checked', false);
-        }
-        this.fnFormatDetails  = function( metaTable, nTr, div_id ) {
             var aData = metaTable.fnGetData( nTr );
             var sOut = '<blockquote>';
             //sOut += prepare_tab_description(aData[1].substr(21, aData[1].length-21-7), div_id);
@@ -415,18 +306,4 @@
             return sOut;
         }
        
-            
-        /**
-         *
-         */
-        this.initialize = function() {
-            //XXX
-            this.initialize_table(jQuery(this).data());
-        }
-        /* Constructor */
-
-        this.initialize();
-
-    } // function PresView
-
 })( jQuery );
