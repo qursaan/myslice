@@ -7,6 +7,6 @@ hostname | grep -q '^z' && port=8080 || port=80
 [[ -n "$@" ]] && port=$1
 
 while true; do 
-    make all-static all-templates
+    ./manage.py collectstatic --noinput
     ./manage.py runserver 0.0.0.0:$port
 done
