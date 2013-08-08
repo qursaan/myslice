@@ -4,140 +4,109 @@
  * License: GPLv3
  */
 
+// XXX TODO This plugin will be interested in changes in metadata
+// What if we remove a filter, is it removed in the right min/max field ???
+//  -> no on_filter_removed is not yet implemented
+// XXX if a plugin has not declared a handler, it might become inconsistent,
+// and the interface should either reset or disable it
 (function($){
 
     var QueryEditor = Plugin.extend({
 
+        event_filter_added: function(op, suffix) {
+            suffix = (typeof suffix === 'undefined') ? '' : manifold.separator + suffix;
+            var self = this;
+            return function(e) {
+                var array = self.array_from_id(e.target.id);
+                var key   = self.field_from_id(array); // No need to remove suffix...
+                var value = e.target.value;
+
+                if (value) {
+                    // XXX This should be handled by manifold
+                    //manifold.raise_event(object.options.query_uuid, FILTER_UPDATED, [key, op, value]);
+                    manifold.raise_event(self.options.query_uuid, FILTER_ADDED, [key, op, value]);
+                } else {
+                    // XXX This should be handled by manifold
+                    manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, [key, op]);
+                }
+            }
+        },
+
         init: function(options, element) {
-            $('.queryeditor-auto-filter').change(function(event) { 
-                var key   = event.target.id.split('-')[4]; // Should be consistent with the naming of fields
-                var op    = '=';
-                var value = event.target.value;
+            this._super(options, element);
 
-                manifold.raise_event(object.options.query_uuid, FILTER_ADDED, [key, op, value]);
-            });
-            
-            jQuery('.queryeditor-filter').change(function(event) { 
-                var key   = event.target.id.split('-')[4];
-                var op    = '=';
-                var value = event.target.value;
+            this.listen_query(options.query_uuid);
 
-                manifold.raise_event(object.options.query_uuid, FILTER_ADDED, [key, op, value]);
+            this.els('queryeditor-auto-filter').change(this.event_filter_added('='));
+            this.els('queryeditor-filter').change(this.event_filter_added('='));
+            this.els('queryeditor-filter-min').change(this.event_filter_added('>'));
+            this.els('queryeditor-filter-max').change(this.event_filter_added('<'));
+
+            var self = this;
+            this.els('queryeditor-check').click(function() { 
+                manifold.raise_event(self.options.query_uuid, this.checked?FIELD_ADDED:FIELD_REMOVED, this.value);
             });
-            jQuery('.queryeditor-filter-min').change(function(event) {
-                query = data.current_query;
-                var key=getKeySplitId(event.target.id,"-");
-                var op='>';
-                var value=event.target.value;
+
+            /* The following code adds an expandable column for the table */
+            // XXX Why isn't it done statically ?
+            var nCloneTh = document.createElement( 'th' );
+            var nCloneTd = document.createElement( 'td' );
+            nCloneTd.innerHTML = "<span class='ui-icon ui-icon-triangle-1-e' style='cursor:pointer'></span>";
+            //nCloneTd.innerHTML = '<img src="/components/com_tophat/images/details_open.png">';
+            nCloneTh.innerHTML = '<b>Info</b>';
+            nCloneTd.className = "center";
+            nCloneTh.className = "center";
+            // XXX
+            jQuery('#'+this.options.plugin_uuid+'_fields thead tr').each( function () {
+                this.insertBefore( nCloneTh, this.childNodes[0] );
+            });
+            // XXX
+            jQuery('#'+this.options.plugin_uuid+'_fields tbody tr').each( function () {
+                this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
+            });
+         
+            // We are currently using a DataTable display, but another browsing component could be better
+            //jQuery('#'+this.options.plugin_uuid+'-table').dataTable...
+            var  metaTable = this.el('table').dataTable({
+                bFilter     : false,
+                bPaginate   : false,
+                bInfo       : false,
+                sScrollX    : '100%',         // Horizontal scrolling
+                sScrollY    : '200px',
+                bJQueryUI   : true,           // Use jQuery UI
+                bProcessing : true,           // Loading
+                aaSorting   : [[ 1, "asc" ]], // sort by column fields on load
+                aoColumnDefs: [
+                    { 'bSortable': false, 'aTargets': [ 0 ]},
+                    { 'sWidth': '8px', 'aTargets': [ 0 ] },
+                    { 'sWidth': '8px', 'aTargets': [ 4 ] } // XXX NB OF COLS
+                ]
+            });
+
+            var self = this;
+            // Actions on the newly added fields
+            this.el('table tbody td span').on('click', function() {
+                var nTr = this.parentNode.parentNode;
+                // use jQuery UI instead of images to keep a common UI
+                // class="ui-icon treeclick ui-icon-triangle-1-s tree-minus"
+                // East oriented Triangle class="ui-icon-triangle-1-e"
+                // South oriented Triangle class="ui-icon-triangle-1-s"
                 
-                if(value){
-                    query.update_filter(key, op, value);
-                    //add_ActiveFilter(event.target.id,'>',event.target.value,data);
-                }else{
-                    query.remove_filter(key,op,"");
-                    //remove_ActiveFilter(event, data, event.target.id,'>');
+                if (this.className=="ui-icon ui-icon-triangle-1-e") {
+                    this.removeClass("ui-icon-triangle-1-e").addClass("ui-icon-triangle-1-s");
+                    // XXX ??????
+                    metaTable.fnOpen(nTr, this.fnFormatDetails(metaTable, nTr, self.options.plugin_uuid+'_div'), 'details' );
+                } else {
+                    this.removeClass("ui-icon-triangle-1-s").addClass("ui-icon-triangle-1-e");
+                    metaTable.fnClose(nTr);
                 }
-                // Publish the query changed, the other plugins with subscribe will get the changes
-                jQuery.publish('/query/' + query.uuid + '/changed', query);
-            });
-            jQuery('.queryeditor-filter-max').change(function(event) {
-                query = data.current_query;
-                var key=getKeySplitId(event.target.id,"-");
-                var op='<';
-                var value=event.target.value;
-                
-                if(value){
-                    query.update_filter(key, op, value);
-                    //add_ActiveFilter(event.target.id,'<',event.target.value,data);
-                }else{
-                    query.remove_filter(key,op,"");
-                    //remove_ActiveFilter(event, data, event.target.id,'<');
-                }
-                // Publish the query changed, the other plugins with subscribe will get the changes
-                jQuery.publish('/query/' + query.uuid + '/changed', query);
             });
 
-            jQuery('.queryeditor-check').click(function() { 
-                manifold.raise_event(object.options.query_uuid, this.checked?FIELD_ADDED:FIELD_REMOVED, this.value);
-                /*
-                    var column = this.id.substring(6);
-                    query = data.current_query;
-                    if (this.checked) {
-                        if (jQuery.inArray(column, query.fields) == -1) {
-                            query.fields.push(column);
-                            jQuery.publish('/query/' + query.uuid + '/changed', query);
-                        }
-                    } else {
-                        query.fields = jQuery.grep(query.fields, function(value) {return value != column;});
-                        jQuery.publish('/query/' + query.uuid + '/changed', query);
-                    }
-                */
-                });
+            this.el('table_wrapper').css({
+                'padding-top'   : '0em',
+                'padding-bottom': '0em'
+            });
 
-            //onFunctionAvailable('jQuery.fn.dataTable', function() {
-
-                var nCloneTh = document.createElement( 'th' );
-                var nCloneTd = document.createElement( 'td' );
-                nCloneTd.innerHTML = "<span class='ui-icon ui-icon-triangle-1-e' style='cursor:pointer'></span>";
-                //nCloneTd.innerHTML = '<img src="/components/com_tophat/images/details_open.png">';
-                nCloneTh.innerHTML = '<b>Info</b>';
-                nCloneTd.className = "center";
-                nCloneTh.className = "center";
-         
-                jQuery('#'+this.options.plugin_uuid+'_fields thead tr').each( function () {
-                    this.insertBefore( nCloneTh, this.childNodes[0] );
-                });
-         
-                jQuery('#'+this.options.plugin_uuid+'_fields tbody tr').each( function () {
-                    this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
-                });
-         
-                var  metaTable = jQuery('#'+this.options.plugin_uuid+'-table').dataTable( {
-                    bFilter: false,
-                    bPaginate: false,
-                    bInfo: false,
-                    sScrollX: '100%',       /* Horizontal scrolling */
-                    sScrollY: "200px",
-                    bJQueryUI: true, // Use jQuery UI
-                    bProcessing: true, // Loading
-                    aaSorting: [[ 1, "asc" ]], // sort by column fields on load
-                    aoColumnDefs: [ {"bSortable": false, "aTargets": [ 0 ]},
-                                      { "sWidth": "8px", "aTargets": [ 0 ] },
-                                      { "sWidth": "8px", "aTargets": [ 4 ] }
-                    ]
-                });
-
-                jQuery('#'+this.options.plugin_uuid+'_fields tbody td span').live('click', function () {
-                    var nTr = this.parentNode.parentNode;
-                    // use jQuery UI instead of images to keep a common UI
-                    // class="ui-icon treeclick ui-icon-triangle-1-s tree-minus"
-                    //East oriented Triangle class="ui-icon-triangle-1-e"
-                    //South oriented Triangle class="ui-icon-triangle-1-s"
-                    
-                    if(this.className=="ui-icon ui-icon-triangle-1-e"){
-                        this.removeClass("ui-icon-triangle-1-e");
-                        this.addClass("ui-icon-triangle-1-s");
-                        metaTable.fnOpen( nTr, this.fnFormatDetails(metaTable, nTr, this.options.plugin_uuid+'_div'), 'details' );
-                    }else{
-                        this.removeClass("ui-icon-triangle-1-s");
-                        this.addClass("ui-icon-triangle-1-e");
-                        metaTable.fnClose( nTr );
-                    }
-                    /*
-                    if ( this.src.match('details_close') ) {
-                        this.src = "/components/com_tophat/images/details_open.png";
-                        metaTable.fnClose( nTr );
-                    }
-                    else {
-                        this.src = "/components/com_tophat/images/details_close.png";
-                        metaTable.fnOpen( nTr, this.fnFormatDetails(metaTable, nTr, this.options.plugin_uuid+'_div'), 'details' );
-                    }
-                    */
-                });
-
-                jQuery('#'+this.options.plugin_uuid+'_fields_wrapper').css({'padding-top':'0em','padding-bottom':'0em'});
-
-            //}); // onfunctionAvailable
         }, // init
 
         /* UI management */
@@ -152,34 +121,44 @@
             this.el('check', field).attr('checked', false);
         },
 
+        update_filter_value: function(filter, removed)
+        {
+            removed = !(typeof removed === 'undefined'); // default = False
+
+            var key   = filter[0];
+            var op    = filter[1];
+            var value = filter[2];
+
+            var id = this.id_from_field(key);
+
+            if (op == '=') {
+                var element = this.el(id);
+            } else {
+                var suffix;
+                if (op == '<') {
+                    this.el(id, 'max').val(value);
+                } else if (op == '>') {
+                    this.el(id, 'min').val(value);
+                } else {
+                    return;
+                }
+                var element = this.el(id, suffix);
+            }
+
+            element.val(removed?null:value);
+
+        },
+
         /* Events */
 
         on_filter_added: function(filter)
         {
-//                    filter = data;
-//                    // Set the value of the filter = to query filter value
-//                    // Necessary if the filter has been modified by another plugin (QuickFilter)
-//                    if(filter[1]=="="){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(filter[2]);
-//                    }else if(filter[1]=="<"){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(filter[2]);
-//                    }else if(filter[1]==">"){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(filter[2]);
-//                    }
+            this.update_filter_value(filter);
         },
 
         on_filter_removed: function(filter)
         {
-//                    filter = data;
-//                    if(filter[1]=="="){
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(null);
-//                    }else if(filter[1]=="<"){
-//                        //502124d5a5848-filter-asn-max
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(null);
-//                    }else if(filter[1]==">"){
-//                        //502124d5a5848-filter-asn-min
-//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(null);
-//                    }
+            this.update_filter_value(filter, true);
         },
 
         on_field_added: function(field)
@@ -305,5 +284,8 @@
          
             return sOut;
         }
-       
-})( jQuery );
+    });
+
+    $.plugin('QueryEditor', QueryEditor);
+
+})(jQuery);

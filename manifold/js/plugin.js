@@ -77,11 +77,13 @@ var Plugin = Class.extend({
     },
 
     listen_query: function(query_uuid, prefix) {
-        this.query_handler_prefix = (typeof prefix === 'undefined') ? '' : (prefix + '_');
+        this.query_handler_prefix = (typeof prefix === 'undefined') ? '' : (prefix + manifold.separator);
         this.$element.on(manifold.get_query_channel(query_uuid), $.proxy(this._query_handler, this));
     },
 
     default_options: {},
+
+    /* Helper functions for naming HTML elements (ID, classes), with support for filters and fields */
 
     id: function()
     {
@@ -127,6 +129,30 @@ var Plugin = Class.extend({
     str_from_filter: function(filter)
     {
         return filter[0] + ' ' + filter[1] + ' ' + filter[2];
+    },
+
+    array_from_id: function(id)
+    {
+        var ret = id.split(manifold.separator);
+        ret.shift(); // remove plugin_uuid at the beginning
+        return ret;
+    },
+
+    id_from_field: function(field)
+    {
+        return 'field' + manifold.separator + field;
+    },
+
+    field_from_id: function(id)
+    {
+        var array;
+        if (typeof id === 'string') {
+            array = id.split(manifold.separator);
+        } else { // We suppose we have an array ('object')
+            array = id;
+        }
+        // array = ['field', FIELD_NAME]
+        return array[1];
     },
 
 });

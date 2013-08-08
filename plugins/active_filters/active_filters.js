@@ -50,12 +50,12 @@
         show_clear_button: function()
         {
             this.el('clearFilters').show();
-        }
+        },
 
         hide_clear_button: function()
         {
             this.el('clearFilters').hide();
-        }
+        },
 
         check_and_hide_clear_button: function()
         {
@@ -64,7 +64,7 @@
             if (count == 1) { // Including the template
                 this.el('clearFilters').hide();
             }
-        }
+        },
 
         clear_filters: function() 
         {
@@ -92,7 +92,7 @@
             this.show_clear_button();
         },
         
-        remove_filter = function(filter)
+        remove_filter: function(filter)
         {
             this.el(this.id_from_filter(filter, false)).remove();
             this.check_and_hide_clear_button();

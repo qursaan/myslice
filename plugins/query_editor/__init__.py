@@ -2,6 +2,8 @@ from unfold.plugin import Plugin
 
 from django.template.loader import render_to_string
 
+# XXX We need naming helpers in the python Plugin class also, used in template
+
 class QueryEditor(Plugin):
 
     def template_file(self):
@@ -10,6 +12,7 @@ class QueryEditor(Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [
+                # XXX datatables
                 'js/query_editor.js',
             ] ,
             'css_files': [
@@ -43,18 +46,32 @@ class QueryEditor(Plugin):
                         v_desc = v.split('-')
                         options.append(v_desc[0])
 
-                    env = {'options': options}
+                    env = {
+                        'domid': self.domid,
+                        'options': options
+                    }
                     filter_input = render_to_string('filter_input_string_values.html', env)
                 else:
-                    env = {'filter_id': "%s-filter-%s" % (self.domid, md_field['name'])}
+                    env = {
+                        'domid': self.domid,
+                        'field': md_field['name']
+                    }
                     filter_input = render_to_string('filter_input_string.html', env)
                     
             elif md_field['type'] == 'int':
                 allowed_values = md_field.get('allowed_values', '0,0').split(',')
-                env = {'min': allowed_values[0], 'max': allowed_values[1]}
+                env = {
+                    'domid': self.domid,
+                    'field': md_field['name'],
+                    'min'  : allowed_values[0],
+                    'max'  : allowed_values[1]
+                }
                 filter_input = render_to_string('filter_input_integer.html', env)
             else:
-                env = {'filter_id': "%s-filter-%s" % (self.domid, md_field['name'])}
+                env = {
+                    'domid': self.domid,
+                    'field': md_field['name']
+                }
                 filter_input = render_to_string('filter_input_others.html', env)
 
             fields.append({
