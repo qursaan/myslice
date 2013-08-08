@@ -83,13 +83,50 @@ var Plugin = Class.extend({
 
     default_options: {},
 
-    speak: function(msg){
-        // You have direct access to the associated and cached jQuery element
-        this.$element.append('<p>'+msg+'</p>');
+    id: function()
+    {
+        var ret = this.options.plugin_uuid;
+        for (var i = 0; i < arguments.length; i++) {
+            ret = ret + manifold.separator + arguments[i];
+        }
+        return ret;
     },
 
-    register: function() {
-        // Registers the plugin to jQuery
+    el: function()
+    {
+        if (arguments.length == 0) {
+            return $('#' + this.id());
+        } else {
+            // We make sure to search _inside_ the dom tag of the plugin
+            return $('#' + this.id.apply(this, arguments), this.el());
+        }
+    },
+
+    els: function(cls)
+    {
+        return $('.' + cls, this.el());
+    },
+
+    id_from_filter: function(filter, use_value)
+    {
+        use_value = typeof use_value !== 'undefined' ? use_value : true;
+
+        var key    = filter[0];
+        var op     = filter[1];
+        var value  = filter[2];
+        var op_str = this.getOperatorLabel(op);
+        var s      = manifold.separator;
+
+        if (use_value) {
+            return 'filter' + s + key + s + op_str + s + value;
+        } else {
+            return 'filter' + s + key + s + op_str;
+        }
+    },
+
+    str_from_filter: function(filter)
+    {
+        return filter[0] + ' ' + filter[1] + ' ' + filter[2];
     },
 
 });

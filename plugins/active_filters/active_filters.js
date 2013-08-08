@@ -11,11 +11,17 @@
         init: function(options, element) {
             this._super(options, element);
 
-            this.listen_query(options.query_uuid);
+            this.els('closeButton').click(function() {
+                manifold.raise_event(options.query_uuid, FILTER_REMOVED, filter);
+            });
 
-            $("#clearFilters").click(function () {
+            this.el('clearFilters').click(function () {
                 manifold.raise_event(options.query_uuid, CLEAR_FILTERS);
             });
+            this.check_and_hide_clear_button();
+
+            this.listen_query(options.query_uuid);
+
         },
 
         // This should be provided in the API
@@ -39,51 +45,69 @@
             }
         },
 
-        // Visual actions on the component
+        show_clear_button: function()
+        {
+            this.el('clearFilters').show();
+        }
 
-        clear_filters: function() {
-            $("#clearFilters").hide();
+        hide_clear_button: function()
+        {
+            this.el('clearFilters').hide();
+        }
+
+        check_and_hide_clear_button: function()
+        {
+            // Count the number of filter _inside_ the current plugin
+            var count = this.els('filterButton').length;
+            if (count == 1) { // Including the template
+                jQuery("#clearFilters").hide();
+            }
+        }
+
+        clear_filters: function() 
+        {
+            // XXX We need to remove all filter but template
+            this.hide_clear_button();
         },
 
-        on_filter_added: function(filter) {
-            var key    = filter[0];
-            var op     = filter[1];
-            var value  = filter[2];
-            var op_str = this.getOperatorLabel(op);
-            var id     = 'filter_' + key + "_" + op_str;
+        add_filter: function(filter)
+        {
+            var template = this.el('template').html();
+            var ctx = {
+                id:   this.id(this.id_from_filter(filter, false)),
+                span: this.str_from_filter(filter)
+            };
+            var output = Mustache.render(template, ctx);
 
-            // Add a button for a filter            
-            $('#myActiveFilters').append("<div id='" + id + "' class='filterButton' style='float:left;margin-bottom:10px;'/>");
-            $('#' + id).append(key + op + value);
+            this.el('myActiveFilters').append(output);
 
-            // Add a close button to remove the filter
-            $('#' + id).append("<img id='close-" + id + "' src='/all-static/img/details_close.png' class='closeButton' style='padding-left:3px;'/>");
             // Add an event on click on the close button, call function removeFilter
-            $('#close-' + id).click(function(event) {
-                manifold.raise_event(options.query_uuid, FILTER_REMOVED, filter);
+            var self = this;
+            this.els('closeButton').last().click(function() {
+                manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, filter);
             });
-            // If there are active filters, then show the clear filters button
-            $("#clearFilters").show();
+
+            this.show_clear_button();
+        },
+        
+        remove_filter = function(filter)
+        {
+            this.el(this.id_from_filter(filter, false)).remove();
+            this.check_and_hide_clear_button();
+        },
+
+        /* Events */
+
+        on_filter_added: function(filter) {
+            this.add_filter(filter);
         },
 
         on_filter_removed: function(filter) {
-            var key    = filter[0];
-            var op     = filter[1];
-            var value  = filter[2];
-            var op_str = this.getOperatorLabel(op);
-            var id     = 'filter_' + key + "_" + op_str;
-
-            $('#' + id).remove()
-            // Count the number of filter _inside_ the current plugin
-            count = $('.filterButton', $('#myActiveFilters')).length;
-            if (count == 0) {
-                jQuery("#clearFilters").hide();
-            }
+            this.remove_filter(filter);
         },
 
         on_filter_clear: function(filter) {
-            $("#clearFilters").hide();
-
+            this.clear_filters();
         },
     });
 

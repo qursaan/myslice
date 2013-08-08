@@ -93,6 +93,9 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
 THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.js) 
 THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.css) 
 THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
+# Mustache.js
+THIRD-PARTY-RESOURCES += $(shell ls third-party/mustache/mustache.js)
+
 
 thirdparty-js:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'

@@ -128,6 +128,8 @@ var manifold = {
      * Helper functions
      **************************************************************************/ 
 
+    separator: '__',
+
     spin_presets: {},
 
     spin: function(locator, active /*= true */) {

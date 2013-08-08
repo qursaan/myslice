@@ -290,9 +290,6 @@
                 case FILTER_ADDED:
                 case FILTER_REMOVED:
                 case CLEAR_FILTERS:
-                    // XXX Here we might need to maintain the list of filters !
-                    /* Process updates in filters / current_query must be updated before this call for filtering ! */
-                    object.table.fnDraw();
                     break;
 
                 // Fields
