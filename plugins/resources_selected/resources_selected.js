@@ -89,9 +89,7 @@
     function ResourcesSelected(options)
     {
         /* member variables */
-
         this.options = options;
-
         var object = this;
 
         /* The resources that are in the slice */

@@ -48,6 +48,7 @@
                 $this.data('Manifold', plugin);
 
                 $this.set_query_handler(options.query_uuid, plugin.query_handler);
+                // This is used for autocomplete
                 $this.set_record_handler(options.query_uuid, plugin.record_handler); 
 
             }); // this.each
@@ -62,23 +63,14 @@
 
             return this.each(function() {
                 var $this = $(this);
-                var hazelnut = $this.data('Manifold');
+                var plugin = $this.data('Manifold');
 
                 // Unbind all events using namespacing
                 $(window).unbind(PLUGIN_NAME);
 
                 // Remove associated data
-                hazelnut.remove();
+                plugin.remove();
                 $this.removeData('Manifold');
-
-                $this.set_query_handler(options.query_uuid, hazelnut.query_handler);
-                $this.set_record_handler(options.query_uuid, hazelnut.record_handler); 
-
-                /* XXX Subscribe to query updates to maintain current state of query (multiple editors) */
-                jQuery.subscribe('/query/' + options.query_uuid + '/changed', {instance: $this}, query_changed);
-                jQuery.subscribe('/query/' + options.query_uuid + '/diff', {instance: $this}, query_changed_diff);
-                /* Subscribe to results in order to redraw the table when updates arrive */
-                jQuery.subscribe('/results/' + options.query_uuid + '/changed', {instance: $this}, update_autocomplete);
 
             });
         }, // destroy
@@ -101,22 +93,21 @@
         {
 
             var d = data;
+
+            jQuery('.queryeditor-auto-filter').change(function(event) { 
+                var key   = event.target.id.split('-')[4]; // Should be consistent with the naming of fields
+                var op    = '=';
+                var value = event.target.value;
+
+                manifold.raise_event(object.options.query_uuid, FILTER_ADDED, [key, op, value]);
+            });
             
             jQuery('.queryeditor-filter').change(function(event) { 
-                query = data.current_query;
-                var key=getKeySplitId(event.target.id,"-");
-                var op='=';
-                var value=event.target.value;
-                            
-                if(value){                
-                    query.update_filter(key, op, value);
-                    //add_ActiveFilter(event.target.id, '=',event.target.value,data);
-                }else{
-                    query.remove_filter(key,op,"");
-                    //remove_ActiveFilter(event, data, event.target.id,'=');
-                }
-                // Publish the query changed, the other plugins with subscribe will get the changes
-                jQuery.publish('/query/' + query.uuid + '/changed', query);
+                var key   = event.target.id.split('-')[4];
+                var op    = '=';
+                var value = event.target.value;
+
+                manifold.raise_event(object.options.query_uuid, FILTER_ADDED, [key, op, value]);
             });
             jQuery('.queryeditor-filter-min').change(function(event) {
                 query = data.current_query;
@@ -358,51 +349,51 @@
         {
             // This replaces the complex set_query function
             // The plugin does not need to remember the query anymore
-            switch(event_type) {
-                // Filters
-                // When Query changed, Then we need to update the filters of
-                // QueryEditor plugin if the filter is active, set the value
-                // (the update can come from another plugin) else set the
-                // filter value to null PB if the filter is composed of MIN/MAX
-                // values
-                case FILTER_ADDED:
-                    filter = data;
-                    // Set the value of the filter = to query filter value
-                    // Necessary if the filter has been modified by another plugin (QuickFilter)
-                    if(filter[1]=="="){
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(filter[2]);
-                    }else if(filter[1]=="<"){
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(filter[2]);
-                    }else if(filter[1]==">"){
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(filter[2]);
-                    }
-                case FILTER_REMOVED:
-                    filter = data;
-                    if(filter[1]=="="){
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(null);
-                    }else if(filter[1]=="<"){
-                        //502124d5a5848-filter-asn-max
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(null);
-                    }else if(filter[1]==">"){
-                        //502124d5a5848-filter-asn-min
-                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(null);
-                    }
-                case CLEAR_FILTERS:
-                    break;
-
-                // Fields
-                /* Hide/unhide columns to match added/removed fields */
-                // XXX WRONG IDENTIFIERS
-                case FIELD_ADDED:
-                    object.check(data);
-                    break;
-                case FIELD_REMOVED:
-                    object.uncheck(data);
-                    break;
-                case CLEAR_FIELDS:
-                    alert(PLUGIN_NAME + '::clear_fields() not implemented');
-                    break;
-            } // switch
+//            switch(event_type) {
+//                // Filters
+//                // When Query changed, Then we need to update the filters of
+//                // QueryEditor plugin if the filter is active, set the value
+//                // (the update can come from another plugin) else set the
+//                // filter value to null PB if the filter is composed of MIN/MAX
+//                // values
+//                case FILTER_ADDED:
+//                    filter = data;
+//                    // Set the value of the filter = to query filter value
+//                    // Necessary if the filter has been modified by another plugin (QuickFilter)
+//                    if(filter[1]=="="){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(filter[2]);
+//                    }else if(filter[1]=="<"){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(filter[2]);
+//                    }else if(filter[1]==">"){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(filter[2]);
+//                    }
+//                case FILTER_REMOVED:
+//                    filter = data;
+//                    if(filter[1]=="="){
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]).val(null);
+//                    }else if(filter[1]=="<"){
+//                        //502124d5a5848-filter-asn-max
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-max').val(null);
+//                    }else if(filter[1]==">"){
+//                        //502124d5a5848-filter-asn-min
+//                        jQuery('#'+this.options.plugin_uuid+'-filter-'+filter[0]+'-min').val(null);
+//                    }
+//                case CLEAR_FILTERS:
+//                    break;
+//
+//                // Fields
+//                /* Hide/unhide columns to match added/removed fields */
+//                // XXX WRONG IDENTIFIERS
+//                case FIELD_ADDED:
+//                    object.check(data);
+//                    break;
+//                case FIELD_REMOVED:
+//                    object.uncheck(data);
+//                    break;
+//                case CLEAR_FIELDS:
+//                    alert(PLUGIN_NAME + '::clear_fields() not implemented');
+//                    break;
+//            } // switch
 
 
         }

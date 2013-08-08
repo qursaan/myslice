@@ -1,0 +1,15 @@
+<div id='myActiveFilters' style='clear:both;'>
+	<div id='{{domid}}-template' class='filterButton' style='float:left;margin-bottom:10px;visibility: hidden;'>
+		<span id='{{domid}}-template-filter'>KEY OP VALUE</span>
+	</div>
+	{% for filter in filters %}
+	<div id='{{domid}}-filter-{{filter.key}}{{filter.op_str}}{{filter.value}}' class='filterButton' style='float:left;margin-bottom:10px;visibility: hidden;'>
+		<span id='{{domid}}-template-filter'>{{filter.key}}{{filter.op}}{{filter.value}}</span>
+	</div>
+	{% endfor %}
+</div>
+
+<div id='clearFilters' class='paging_full_numbers' style='clear:both;'>
+    <span class='paginate_button'>Clear</span>
+</div>
+<div style='clear:both;'></div>

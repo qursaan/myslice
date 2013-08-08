@@ -440,12 +440,6 @@ var manifold = {
                 // XXX When is an update query associated ?
                 // XXX main_update_query.select(value);
 
-                // We need to inform about changes in these queries to the respective plugins
-                // Note: query, main_query & update_query have the same UUID
-                manifold.raise_query_event(query_uuid, event_type, value);
-                // We are targeting the same object with get and update
-                // The notion of query is bad, we should have a notion of destination, and issue queries on the destination
-                // NOTE: Editing a subquery == editing a local view on the destination
                 break;
 
             case FIELD_REMOVED:
@@ -460,6 +454,13 @@ var manifold = {
                 manifold.raise_query_event(query_uuid, event_type, value);
                 break;
         }
+        // We need to inform about changes in these queries to the respective plugins
+        // Note: query, main_query & update_query have the same UUID
+        manifold.raise_query_event(query_uuid, event_type, value);
+        // We are targeting the same object with get and update
+        // The notion of query is bad, we should have a notion of destination, and issue queries on the destination
+        // NOTE: Editing a subquery == editing a local view on the destination
+
         // XXX We might need to run the new query again and manage the plugins in the meantime with spinners...
         // For the time being, we will collect all columns during the first query
     },
