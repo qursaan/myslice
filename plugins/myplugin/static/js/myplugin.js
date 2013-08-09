@@ -1,92 +1,82 @@
 /**
- * MySlice MyPlugin demonstration plugin
- * Version: 0.1.0
- * URL: http://www.myslice.info
- * Description: Template for writing new plugins and illustrating the different possibilities of the plugin API
- * Requires: 
- * Author: The MySlice Team
- * Copyright: Copyright 2012-2013 UPMC Sorbonne Universités
- * License: GPLv3
+ * MyPlugin:    demonstration plugin
+ * Version:     0.1
+ * Description: Template for writing new plugins and illustrating the different
+ *              possibilities of the plugin API.
+ *              This file is part of the Manifold project 
+ * Requires:    js/plugin.js
+ * URL:         http://www.myslice.info
+ * Author:      Jordan Augé <jordan.auge@lip6.fr>
+ * Copyright:   Copyright 2012-2013 UPMC Sorbonne Universités
+ * License:     GPLv3
  */
 
-/*
- * It's a best practice to pass jQuery to an IIFE (Immediately Invoked Function
- * Expression) that maps it to the dollar sign so it can't be overwritten by
- * another library in the scope of its execution.
- */
-(function( $ ){
+(function($){
 
-    var PLUGIN_NAME = 'MyPlugin';
+    var MyPlugin = Plugin.extend({
 
-    // Routing calls
-    jQuery.fn.ResourcesSelected = function( method ) {
-        if ( methods[method] ) {
-            return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-            return methods.init.apply( this, arguments );
-        } else {
-            jQuery.error( 'Method ' +  method + ' does not exist on jQuery' + PLUGIN_NAME );
-        }    
+        // Constructor
+        init: function(options, element) {
+            // Call the parent constructor, see FAQ when forgotten
+            this._super(options, element);
 
-    };
+            // Explain this will allow query events to be handled
+            // What happens when we don't define some events ?
+            // Some can be less efficient
+            this.listen_query(options.query_uuid);
+            this.listen_query(options.query_uuid, 'all');
 
-    /***************************************************************************
-     * Public methods
-     ***************************************************************************/
+            // GUI Event binding
+            // call function
 
-    var methods = {
+        },
 
-        /**
-         * @brief Plugin initialization
-         * @param options : an associative array of setting values
-         * @return : a jQuery collection of objects on which the plugin is
-         *     applied, which allows to maintain chainability of calls
-         */
-        init : function( options ) {
+        /* GUI EVENTS */
 
-            return this.each(function(){
+        // a function to bind events here
+        // how to raise manifold events
 
-                var $this = $(this);
+        /* GUI MANIPULATION */
 
-                /* An object that will hold private variables and methods */
-                var s = new ResourcesSelected(options);
-                $(this).data('Manifold', s);
-                
-            }); // this.each
-        }, // init
+        // We advise you to write function to change behaviour of the GUI
+        // Will use naming helpers to access content _inside_ the plugin
+        // always refer to these functions in the remaining of the code
 
-        /**
-         * @brief Plugin destruction
-         * @return : a jQuery collection of objects on which the plugin is
-         *     applied, which allows to maintain chainability of calls
-         */
-        destroy : function( ) {
+        show_hide_button: function() 
+        {
+            // this.id, this.el, this.cl, this.els
+            // same output as a jquery selector with some guarantees
+        },
 
-            return this.each(function(){
-                var $this = jQuery(this), data = $this.data('Manifold');
-                jQuery(window).unbind('Manifold');
-                data.Manifold.remove();
-                $this.removeData('Manifold');
-            })
+        /* TEMPLATES */
 
-        }, // destroy
+        // see in the html template
+        // How to load a template, use of mustache
 
-    }; // var methods
+        /* QUERY HANDLERS */
 
-    /***************************************************************************
-     * ResourcesSelected object
-     ***************************************************************************/
+        // How to make sure the plugin is not desynchronized
+        // He should manifest its interest in filters, fields or records
+        // functions triggered only if the proper listen is done
 
-    function MyPlugin(options)
-    {
-        /* member variables */
+        // no prefix
 
-        this.options = options;
+        on_filter_added: function(filter)
+        {
 
-        /* methods */
+        },
 
-        /* constructor */
+        // ... be sure to list all events here
 
-    } // function MyPlugin
+        /* RECORD HANDLERS */
+        
+        on_record_received: function(record)
+        {
+            //
+        },
+
+    });
+
+    // TODO Here use cases for instanciating plugins in different ways like in the pastie.
 
 })(jQuery);
