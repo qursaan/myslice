@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class GoogleMap (Plugin):
+class GoogleMaps (Plugin):
 
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
@@ -16,7 +16,7 @@ class GoogleMap (Plugin):
         self.zoom=zoom
 
     def template_file (self):
-        return "googlemap.html"
+        return "googlemaps.html"
 
     def template_env (self, request):
         env={}
@@ -25,13 +25,13 @@ class GoogleMap (Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [ "https://maps.googleapis.com/maps/api/js?sensor=false", 
-                           "/js/googlemap.js",
+                           "/js/googlemaps.js",
                            "/js/markerclusterer.js",
                             "js/manifold.js", "js/manifold-query.js", 
                             "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                             "js/unfold-helper.js",
                            ],
-            'css_files' : [ "css/googlemap.css",
+            'css_files' : [ "css/googlemaps.css",
                             ],
             }
         return reqs

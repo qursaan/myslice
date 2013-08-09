@@ -370,14 +370,11 @@ var manifold = {
 
     raise_event_handler: function(type, query_uuid, event_type, value)
     {
-        if (type == 'query') {
-            var channels = [ manifold.get_query_channel(query_uuid), manifold.get_query_channel('*') ];
-        } else if (type == 'record') {
-            var channels = [ manifold.get_record_channel(query_uuid), manifold.get_record_channel('*') ];
-
-        } else {
+        if ((type != 'query') && (type != 'record'))
             throw 'Incorrect type for manifold.raise_event()';
-        }
+
+        var channels = [ manifold.get_channel(type, query_uuid), manifold.get_channel(type, '*') ];
+
         $.each(channels, function(i, channel) {
             if (value === undefined)
                 $('.plugin').trigger(channel, [event_type]);
@@ -468,34 +465,17 @@ var manifold = {
     },
 
     /* Publish/subscribe channels for internal use */
-    get_query_channel:  function(uuid) { return '/query/'  + uuid },
-    get_record_channel: function(uuid) { return '/record/' + uuid },
+    get_channel: function(type, query_uuid) 
+    {
+        if ((type !== 'query') && (type != 'record'))
+            return null;
+        return '/' + type + '/' + query_uuid;
+    },
 
 }; // manifold object
 /* ------------------------------------------------------------ */
 
 (function($) {
-
-    /* NEW PLUGIN API
-     * 
-     * NOTE: Since we don't have a plugin class, we are extending all jQuery
-     * plugins...
-     */
-
-    /*!
-     * \brief Associates a query handler to the current plugin
-     * \param uuid (string) query uuid
-     * \param handler (function) handler callback
-     */
-    $.fn.set_query_handler = function(uuid, handler)
-    {
-        this.on(manifold.get_query_channel(uuid), handler);
-    }
-
-    $.fn.set_record_handler = function(uuid, handler)
-    {
-        this.on(manifold.get_record_channel(uuid), handler);
-    }
 
     // OLD PLUGIN API: extend jQuery/$ with pubsub capabilities
     // https://gist.github.com/661855
