@@ -1,0 +1,81 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}                
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
+<script type="text/javascript" src="{{STATIC_URL}}/jquery.validate.js"></script> 
+<script type="text/javascript" src="{{STATIC_URL}}/my_account.register.js"></script>
+{% endblock %}                              
+                                    
+{% block unfold1_main %}        
+
+
+
+
+
+
+
+
+<form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
+{% csrf_token %}
+ <fieldset>
+    <div class="fed4fireTitle">
+        <h2>OneLab Experimenter Registration</h2>
+        <h3>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
+    </div>
+   
+   <div class="field">
+     <label for="cname">First Name</label>
+     <input type="text" id="firstname" name="firstname" size="25" class="required" minlength="2" value="{{ form.field.value|default_if_none:"" }}" /> 
+     <p class="hint">Enter your first name</p>
+     <?php echo $errfName;?>
+   </div>
+   <div class="field">
+     <label for="lname">Last Name</label>
+     <input type="text" id="lastname" name="lastname" size="25" class="required" minlength="2" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <p class="hint">Enter your last name</p>
+     <?php echo $errlName;?>
+   </div>
+   <div class="field">
+     <label for="aff_list">Affiliation</label>
+     <input type="text" id="aff_list" name="affiliation" size="25" class="required"  value="{{ form.field.value|default_if_none:"" }}"/> 
+     <p class="hint">Enter your Institution name</p>
+     <?php echo $erraffiliation;?>
+   </div>
+   <div class="field">
+     <label for="cemail">Email</label>
+     <input type="text" id="email" name="email" size="25"  class="required email" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <p class="hint">Enter a valid email address</p>
+     <?php echo $errEmail; ?>
+   </div>
+   <div class="field">
+     <label for="password">Password</label>
+     <input type="password"  id="password" name="password"   class="required" minlength="4" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <p class="hint">Enter password</p>
+     <?php //echo $errPass;?>
+   </div>
+   <div class="field">
+     <label for="password">Confirm Password</label>
+     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value="{{ form.field.value|default_if_none:"" }}"/>
+     <p class="hint">Retype the password</p>
+   </div>
+   <div class="field">
+      <label for="question">My Public Key</label>
+      <select name="question" class="required" id="question">        
+        <option value="generate">Generate key pairs for me </option>
+        <option value="upload">Upload my public key </option>
+      </select> 
+      <?php echo $errFile; ?>
+   </div>
+   <div class="field" style="display:none;" id="upload_key">
+      <label for="file">Upload public key</label>
+      <input type="file" name="user_public_key" id="user_public_key"/>
+      <p class="hint">Upload a valid public key</p>
+   </div>
+   <div class="field">
+     <input class="submit" type="submit" name="submit" value="Register"/>
+   </div>
+ </fieldset>
+</form>
+
+{% endblock %}
+
