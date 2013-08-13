@@ -1,12 +1,10 @@
 /**
- * Description: associate with a Get query, maintains the 'Update' query that records pending changes
- * Copyright (c) 2012 UPMC Sorbonne Universite - INRIA
+ * Description: Manage query updates
+ * Copyright (c) 2012-2013 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
 
-// xxx this is ongoing work, very rough, and not working at all yet 
-
-( function ( $ ) {
+(function( $ ) {
     
     var debug=false;
 //    debug=true
@@ -48,8 +46,6 @@
         /*************************** QUERY HANDLER ****************************/
 
         /*************************** RECORD HANDLER ***************************/
-
-        on_query_status_
 
         /************************** PRIVATE METHODS ***************************/
 
@@ -142,5 +138,7 @@
         }
         */
     });
-})( jQuery );
 
+    $.plugin('Updater', Updater);
+
+})( jQuery );
