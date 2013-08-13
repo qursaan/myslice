@@ -24,9 +24,9 @@ from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
-from plugins.updater.updater         import Updater
+from plugins.updater                 import Updater
 
-tmp_default_slice='ple.inria.myslicedemo'
+tmp_default_slice='ple.upmc.myslicedemo'
 debug = True
 
 @login_required

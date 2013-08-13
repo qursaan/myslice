@@ -35,6 +35,7 @@ var DONE           = 102;
 /* Update requests from plugins */
 var SET_ADD        = 201;
 var SET_REMOVED    = 202;
+var RUN_UPDATE     = 203;
 
 /* Query status */
 var STATUS_NONE               = 500; // Query has not been started yet
@@ -51,18 +52,20 @@ var STATUS_UPDATE_ERROR       = 507;
 
 
 
-function QueryExt(query, parent_query, main_query) {
+function QueryExt(query, parent_query_ext, main_query_ext, update_query_ext, disabled) {
 
     /* Constructor */
     if (typeof query == "undefined")
         throw "Must pass a query in QueryExt constructor";
     this.query            = query
-    this.parent_query_ext = (typeof parent_query == "undefined") ? false : parent_query
-    this.main_query_ext   = (typeof main_query   == "undefined") ? false : main_query
+    this.parent_query_ext = (typeof parent_query_ext == "undefined") ? null : parent_query_ext
+    this.main_query_ext   = (typeof main_query_ext   == "undefined") ? null : main_query_ext
+    this.update_query_ext = (typeof update_query_ext   == "undefined") ? null : update_query_ext
+    this.disabled         = (typeof update_query_ext   == "undefined") ? false : disabled
     
     this.status       = null;
     this.results      = null;
-    this.update_query = null; // null unless we are a main_query (aka parent_query == null); only main_query_fields can be updated...
+    // update_query null unless we are a main_query (aka parent_query == null); only main_query_fields can be updated...
 }
 
 function QueryStore() {
@@ -74,12 +77,36 @@ function QueryStore() {
 
     this.insert = function(query)
     {
+        // We expect only main_queries are inserted
+
+        /* If the query has not been analyzed, then we analyze it */
         if (query.analyzed_query == null) {
             query.analyze_subqueries();
         }
 
-        query_ext = new QueryExt(query, null, null)
+        /* We prepare the update query corresponding to the main query and store both */
+        /* Note: they have the same UUID */
+
+        // XXX query.change_action() should become deprecated
+        update_query = query.clone();
+        update_query.action = 'update';
+        update_query.analyzed_query.action = 'update';
+        update_query.params = {};
+        update_query_ext = new QueryExt(update_query);
+        console.log("Update query created from Get query", update_query);
+
+        /* We store the main query */
+        query_ext = new QueryExt(query, null, null, update_query_ext, false);
         manifold.query_store.main_queries[query.query_uuid] = query_ext;
+        /* Note: the update query does not have an entry! */
+
+
+        // The query is disabled; since it is incomplete until we know the content of the set of subqueries
+        // XXX unless we have no subqueries ???
+        // we will complete with params when records are received... this has to be done by the manager
+        // SET_ADD, SET_REMOVE will change the status of the elements of the set
+        // UPDATE will change also, etc.
+        // XXX We need a proper structure to store this information...
 
         // We also need to insert all queries and subqueries from the analyzed_query
         // XXX We need the root of all subqueries
@@ -93,6 +120,8 @@ function QueryStore() {
             sq_ext = new QueryExt(sq, parent_query_ext, query_ext)
             manifold.query_store.analyzed_queries[sq.query_uuid] = sq_ext;
         });
+
+        // XXX We have spurious update queries...
     }
 
     /* Searching */
@@ -142,6 +171,62 @@ var manifold = {
             }
         } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
     },
+
+    /************************************************************************** 
+     * Metadata management
+     **************************************************************************/ 
+
+     metadata: {
+
+        get_table: function(method)
+        {
+            var table = MANIFOLD_METADATA[method];
+            return (typeof table === 'undefined') ? null : table;
+        },
+
+        get_columns: function(method)
+        {
+            var table = this.get_table(method);
+            if (!table) {
+                return null;
+            }
+
+            return (typeof table.column === 'undefined') ? null : table.column;
+        },
+
+        get_key: function(method)
+        {
+            var table = this.get_table(method);
+            if (!table)
+                return null;
+
+            return (typeof table.key === 'undefined') ? null : table.key;
+        },
+
+
+        get_column: function(method, name)
+        {
+            var columns = this.get_columns(method);
+            if (!columns)
+                return null;
+
+            $.each(columns, function(i, c) {
+                if (c.name == name)
+                    return c
+            });
+            return null;
+        },
+
+        get_type: function(method, name)
+        {
+            var table = this.get_table(method);
+            if (!table)
+                return null;
+
+            return (typeof table.type === 'undefined') ? null : table.type;
+        }
+
+     },
 
     /************************************************************************** 
      * Query management
@@ -357,6 +442,59 @@ var manifold = {
                 /* query is the query we sent to the backend; we need to find the
                  * corresponding analyezd_query in manifold.all_queries
                  */
+
+                // XXX We might need to update the corresponding update_query here 
+                query_ext = manifold.query_store.find_query_ext(query.query_uuid);
+                query = query_ext.query;
+
+                // We don't prepare an update query if the result has more than 1 entry
+                if (result.length == 1) {
+                    var res = result[0];
+
+                    console.log("Locating update query for updating params", update_query);
+                    update_query_ext = query_ext.update_query_ext;
+                    update_query = update_query_ext.query;
+
+                    // Testing whether the result has subqueries (one level deep only)
+                    // iif the query has subqueries
+                    var count = 0;
+                    var obj = query.analyzed_query.subqueries;
+                    for (method in obj) {
+                        if (obj.hasOwnProperty(method)) {
+                            var key = manifold.metadata.get_key(method);
+                            if (!key)
+                                continue;
+                            if (key.length > 1)
+                                continue;
+                            key = key[0];
+                            var sq_keys = [];
+                            var records = res[method];
+                            if (!records)
+                                continue
+                            $.each(records, function (i, obj) {
+                                sq_keys.push(obj[key]);
+                            });
+                            update_query.params[method] = sq_keys;
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        update_query_ext.disabled = false;
+                    }
+
+                }
+
+
+                
+                // We have results from the main query
+                // inspect subqueries and get the key for each
+
+                // XXX note that we might need the name for each relation, but
+                // this might be for SET_ADD, since we need to recursively find
+                // the path from the main query
+
+
                 tmp_query = manifold.find_query(query.query_uuid);
                 manifold.publish_result_rec(tmp_query.analyzed_query, result);
             //}
@@ -407,8 +545,19 @@ var manifold = {
 
                 // XXX we can only update subqueries of the main query. Check !
                 // assert query_ext.parent_query == query_ext.main_query
-                update_query = query_ext.parent_query_ext.update_query;
+                update_query = query_ext.main_query_ext.update_query_ext.query;
 
+                var path = "";
+                var sq = query_ext;
+                while (sq.parent_query_ext) {
+                    if (path != "")
+                        path = '.' + path;
+                    path = sq.query.object + path;
+                    sq = sq.parent_query_ext;
+                }
+
+                update_query.params[path].push(value);
+                console.log('Updated query params', update_query);
                 // NOTE: update might modify the fields in Get
                 // NOTE : we have to modify all child queries
                 // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
@@ -422,6 +571,13 @@ var manifold = {
             case SET_REMOVED:
                 // Query uuid has been updated with the key of a removed element
                 break;
+
+            case RUN_UPDATE:
+                update_query = query_ext.main_query_ext.update_query_ext.query;
+                
+                manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ], false);
+                break;
+
             case FILTER_ADDED:
                 break;
             case FILTER_REMOVED:

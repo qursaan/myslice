@@ -103,10 +103,10 @@ INSERT INTO object VALUES(field=value)
     this.iter_subqueries = function(callback, data)
     {
         rec = function(query, callback, data, parent_query) {
+            callback(query, data, parent_query);
             jQuery.each(query.subqueries, function(object, subquery) {
                 rec(subquery, callback, data, query);
             });
-            callback(query, data, parent_query);
         };
 
         if (this.analyzed_query !== undefined)
