@@ -561,7 +561,8 @@ def acc_process(request):
         message = 'You submitted an empty form.'
         return HttpResponse(message)
 
-
+def register_4m_f4f(request):
+    return render(request, 'register_4m_f4f.html')
 
 # view for contact form
 def contact(request):
