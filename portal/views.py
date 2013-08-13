@@ -62,6 +62,7 @@ class DashboardView(TemplateView):
         page.enqueue_query(slice_query)
         page.enqueue_query(auth_query)
 
+        page.expose_js_metadata()
         page.expose_queries()
 
         slicelist = SimpleList(
