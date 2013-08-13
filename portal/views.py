@@ -488,7 +488,7 @@ def acc_process(request):
         #approach borrowed from register view     
         #new_user = PendingUser.objects.create_inactive_user(edited_first_name, edited_last_name, email,  password, site) 
         #conventional approach
-        #b = PendingUser(first_name=edited_first_name, edited_last_name=last_name)
+        #b = PendingUser(first_name=edited_first_name, last_name=edited_last_name)
         #b.save()
         
         # select and update [will be used throughout this view]
@@ -563,6 +563,12 @@ def acc_process(request):
 
 def register_4m_f4f(request):
     return render(request, 'register_4m_f4f.html')
+
+def reg_4m_f4f_process(request):
+    if 'submit' in request.POST:
+        return HttpResponse('Registration Successful. Please wait for account validation')
+        
+    
 
 # view for contact form
 def contact(request):

@@ -46,6 +46,7 @@ urlpatterns = patterns('',
     url(r'^account/?$', views.my_account),
     url(r'^acc_process/?$', views.acc_process),
     url(r'^register/?$', views.register_4m_f4f),
+    url(r'^reg_process/?$', views.reg_4m_f4f_process),
     url(r'^contact/?$', views.contact),
     # Slice request
     url(r'^slice_request/?$', views.slice_request),
