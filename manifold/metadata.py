@@ -26,7 +26,7 @@ class MetaData:
             except:
                 print "metadata.work_offline: failed to decode %s"%offline_filename
         manifold_api = ManifoldAPI(self.auth)
-        fields = ['table', 'column.name', 'column.qualifier', 'column.type', 'column.is_array', 'column.description']
+        fields = ['table', 'column.name', 'column.qualifier', 'column.type', 'column.is_array', 'column.description', 'column.default', 'key', 'capability']
         #fields = ['table', 'column.column',
         #          'column.description','column.header', 'column.title',
         #          'column.unit', 'column.info_type',

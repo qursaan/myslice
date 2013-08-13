@@ -121,14 +121,15 @@
 
         addInfoWindow: function(marker, map)
         {
+            var self = this;
             google.maps.event.addListener(marker, 'click', function () {     
-                if(object.infowindow){
-                    object.infowindow.close();
+                if(self.infowindow){
+                    self.infowindow.close();
                 }
-                object.infowindow.setContent(marker.content);// = new google.maps.InfoWindow({ content: marker.content });
-                object.infowindow.open(map, marker);
+                self.infowindow.setContent(marker.content);// = new google.maps.InfoWindow({ content: marker.content });
+                self.infowindow.open(map, marker);
                 // onload of the infowindow on the map, bind a click on a button
-                google.maps.event.addListener(object.infowindow, 'domready', function() {
+                google.maps.event.addListener(self.infowindow, 'domready', function() {
                     jQuery('.map-button').unbind('click');
 //                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
                 });

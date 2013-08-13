@@ -69,7 +69,8 @@
 
         /* GUI MANIPULATION */
 
-        initialize_table: function() {
+        initialize_table: function() 
+        {
             /* Transforms the table into DataTable, and keep a pointer to it */
             var self = this;
             actual_options = {
@@ -360,7 +361,7 @@
             alert('Hazelnut::clear_fields() not implemented');
         },
 
-        /* RECORD HANDLERS */
+        /*************************** RECORD HANDLER ***************************/
 
         on_new_record: function(record)
         {
