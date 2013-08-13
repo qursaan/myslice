@@ -15,9 +15,9 @@ from plugins.raw.raw                 import Raw
 from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.lists.slicelist         import SliceList
-from plugins.hazelnut.hazelnut       import Hazelnut 
+from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
-from plugins.googlemap.googlemap     import GoogleMap 
+from plugins.googlemaps              import GoogleMaps
 from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
 from plugins.query_editor            import QueryEditor
@@ -163,7 +163,7 @@ def _slice_view (request, slicename):
         },
     ))
 
-    tab_resource_plugins.insert(GoogleMap(
+    tab_resource_plugins.insert(GoogleMaps(
         page       = page,
         title      = 'Geographic view',
         domid      = 'gmap',

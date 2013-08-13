@@ -6,7 +6,7 @@ input.login {
 }    
 input[type="password"] {
     border: solid 1px #444;
-    background-image: url( '/all-static/img/form_input_password.png' );
+    background-image: url( '../img/form_input_password.png' );
     background-repeat: repeat-x;
     background-position: top;
 }

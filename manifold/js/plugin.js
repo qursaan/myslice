@@ -40,7 +40,7 @@ var Plugin = Class.extend({
         return (typeof this.on_filter_added === 'function');
     },
 
-    _query_handler: function(e, event_type, data)
+    _query_handler: function(prefix, event_type, data)
     {
         // We suppose this.query_handler_prefix has been defined if this
         // callback is triggered    
@@ -68,7 +68,7 @@ var Plugin = Class.extend({
                 return;
         } // switch
         
-        fn = 'on_' + this.query_handler_prefix + fn;
+        fn = 'on_' + prefix + fn;
         if (typeof this[fn] === 'function') {
             // call with data as parameter
             // XXX implement anti loop
@@ -76,9 +76,51 @@ var Plugin = Class.extend({
         }
     },
 
-    listen_query: function(query_uuid, prefix) {
-        this.query_handler_prefix = (typeof prefix === 'undefined') ? '' : (prefix + manifold.separator);
-        this.$element.on(manifold.get_query_channel(query_uuid), $.proxy(this._query_handler, this));
+    _record_handler: function(prefix, event_type, record)
+    {
+        // We suppose this.query_handler_prefix has been defined if this
+        // callback is triggered    
+        var fn;
+        switch(event_type) {
+            case NEW_RECORD:
+                fn = 'new_record';
+                break;
+            case CLEAR_RECORDS:
+                fn = 'clear_records';
+                break;
+            case IN_PROGRESS:
+                fn = 'query_in_progress';
+                break;
+            case DONE:
+                fn = 'query_done';
+                break;
+            default:
+                return;
+        } // switch
+        
+        fn = 'on_' + prefix + fn;
+        if (typeof this[fn] === 'function') {
+            // call with data as parameter
+            // XXX implement anti loop
+            this[fn](record);
+        }
+    },
+
+    get_handler_function: function(type, prefix)
+    {
+        
+        return $.proxy(function(e, event_type, record) {
+            return this['_' + type + '_handler'](prefix, event_type, record);
+        }, this);
+    },
+
+    listen_query: function(query_uuid, prefix)
+    {
+        // default: prefix = ''
+        prefix = (typeof prefix === 'undefined') ? '' : (prefix + '_');
+
+        this.$element.on(manifold.get_channel('query', query_uuid),  this.get_handler_function('query',  prefix));
+        this.$element.on(manifold.get_channel('record', query_uuid),  this.get_handler_function('record', prefix));
     },
 
     default_options: {},
@@ -153,6 +195,16 @@ var Plugin = Class.extend({
         }
         // array = ['field', FIELD_NAME]
         return array[1];
+    },
+
+    spin: function()
+    {
+        manifold.spin(this.element);
+    },
+
+    unspin: function()
+    {
+        manifold.spin(this.element, false);
     },
 
 });

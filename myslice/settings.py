@@ -98,10 +98,12 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     # thierry os.path.join(ROOT,'all-static'),
     ('js', os.path.join(ROOT,'manifold/js')),
-    ('js', os.path.join(ROOT,'unfold/js')),
-    ('js', os.path.join(ROOT,'auth/js')),
     ('css', os.path.join(ROOT,'manifold/css')),
+    ('js', os.path.join(ROOT,'unfold/js')),
     ('css', os.path.join(ROOT,'unfold/css')),
+    ('js', os.path.join(ROOT,'auth/js')),
+    ('css', os.path.join(ROOT,'auth/css')),
+    ('img', os.path.join(ROOT,'auth/img')),
     ('css', os.path.join(ROOT,'views/css')),
     ('img', os.path.join(ROOT,'views/img')),
 )
