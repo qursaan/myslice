@@ -94,6 +94,9 @@ var Plugin = Class.extend({
             case DONE:
                 fn = 'query_done';
                 break;
+            case FIELD_STATE_CHANGED:
+                fn = 'field_state_changed';
+                break;
             default:
                 return;
         } // switch

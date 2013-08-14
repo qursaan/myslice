@@ -28,14 +28,24 @@ var FIELD_REMOVED  = 5;
 var CLEAR_FIELDS   = 6;
 var NEW_RECORD     = 7;
 var CLEAR_RECORDS  = 8;
+var FIELD_STATE_CHANGED = 9;
 
 var IN_PROGRESS    = 101;
 var DONE           = 102;
 
-/* Update requests from plugins */
+/* Update requests related to subqueries */
 var SET_ADD        = 201;
 var SET_REMOVED    = 202;
-var RUN_UPDATE     = 203;
+
+// request
+var FIELD_REQUEST_CHANGE  = 301;
+var FIELD_REQUEST_ADD     = 302;
+var FIELD_REQUEST_REMOVE  = 303;
+var FIELD_REQUEST_RESET   = 304;
+// status
+var FIELD_REQUEST_PENDING = 301;
+var FIELD_REQUEST_SUCCESS = 302;
+var FIELD_REQUEST_FAILURE = 303;
 
 /* Query status */
 var STATUS_NONE               = 500; // Query has not been started yet
@@ -46,7 +56,9 @@ var STATUS_UPDATE_PENDING     = 504;
 var STATUS_UPDATE_IN_PROGRESS = 505;
 var STATUS_UPDATE_RECEIVED    = 506;
 var STATUS_UPDATE_ERROR       = 507;
-// outdated ?
+
+/* Requests for query cycle */
+var RUN_UPDATE     = 601;
 
 // A structure for storing queries
 
@@ -290,6 +302,22 @@ var manifold = {
         }
     },
 
+    run_query: function(query, callback)
+    {
+        // default value for callback = null
+        if (typeof callback === 'undefined')
+            callback = null; 
+
+        var query_json = JSON.stringify(query);
+
+        /* Nothing related to pubsub here... for the moment at least. */
+        //query.iter_subqueries(function (sq) {
+        //    manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
+        //});
+
+        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback /*domid*/));
+    },
+
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_publish_dom_tuples) {
@@ -417,7 +445,8 @@ var manifold = {
         if (data.code == 1) { // WARNING
             messages.error("Some errors have been received from the manifold backend at " + MANIFOLD_URL + " [" + data.description + "]");
             // publish error code and text message on a separate channel for whoever is interested
-            jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
+            if (publish_uuid)
+                $.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
 
             $("#notifications").notify("create", "sticky", {
               title: 'Warning',
@@ -539,13 +568,39 @@ var manifold = {
         query = query_ext.query;
 
         switch(event_type) {
+            case FIELD_STATE_CHANGED:
+                // value is an object (request, key, value, status)
+                // update is only possible is the query is not pending, etc
+                // SET_ADD is on a subquery, FIELD_STATE_CHANGED on the query itself
+                // we should map SET_ADD on this...
+
+                // 1. Update internal query store about the change in status
+
+                // 2. Update the update query
+                update_query = query_ext.main_query_ext.update_query_ext.query;
+                update_query.params[value.key].push(value.value);
+
+                // 3. Inform others about the change
+                // a) the main query...
+                manifold.raise_record_event(query_uuid, event_type, value);
+
+                // b) subqueries eventually (dot in the key)
+                // XXX make this DOT a global variable... could be '/'
+                break;
+
             case SET_ADD:
+            case SET_REMOVED:
+    
                 // update is only possible is the query is not pending, etc
                 // CHECK status !
 
                 // XXX we can only update subqueries of the main query. Check !
                 // assert query_ext.parent_query == query_ext.main_query
-                update_query = query_ext.main_query_ext.update_query_ext.query;
+                // old // update_query = query_ext.main_query_ext.update_query_ext.query;
+
+                // This SET_ADD is called on a subquery, so we have to
+                // recontruct the path of the key in the main_query
+                // We then call FIELD_STATE_CHANGED which is the equivalent for the main query
 
                 var path = "";
                 var sq = query_ext;
@@ -556,8 +611,17 @@ var manifold = {
                     sq = sq.parent_query_ext;
                 }
 
-                update_query.params[path].push(value);
-                console.log('Updated query params', update_query);
+                main_query = query_ext.main_query_ext.query;
+                data = {
+                    request: (event_type == SET_ADD) ? FIELD_REQUEST_ADD : FIELD_REQUEST_REMOVE,
+                    key   : path,
+                    value : value,
+                    status: FIELD_REQUEST_PENDING,
+                };
+                this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, data);
+
+                // old //update_query.params[path].push(value);
+                // old // console.log('Updated query params', update_query);
                 // NOTE: update might modify the fields in Get
                 // NOTE : we have to modify all child queries
                 // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
@@ -566,21 +630,19 @@ var manifold = {
                 // object = the same as get
                 // filter = key : update a single object for now
                 // fields = the same as get
+                manifold.raise_query_event(query_uuid, event_type, value);
 
-                break;
-            case SET_REMOVED:
-                // Query uuid has been updated with the key of a removed element
                 break;
 
             case RUN_UPDATE:
-                update_query = query_ext.main_query_ext.update_query_ext.query;
-                
-                manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ], false);
+                manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 
             case FILTER_ADDED:
+                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
             case FILTER_REMOVED:
+                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
             case FIELD_ADDED:
                 main_query = query_ext.main_query_ext.query;
@@ -595,6 +657,7 @@ var manifold = {
                 // XXX When is an update query associated ?
                 // XXX main_update_query.select(value);
 
+                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
 
             case FIELD_REMOVED:

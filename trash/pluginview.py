@@ -18,7 +18,7 @@ from plugins.querycode.querycode        import QueryCode
 from plugins.raw.raw                    import Raw
 from plugins.messages.messages          import Messages
 from plugins.hazelnut                   import Hazelnut
-from plugins.updater.updater            import Updater
+from plugins.updater                    import Updater
 
 from myslice.viewutils                  import topmenu_items, the_user
 from myslice.viewutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias

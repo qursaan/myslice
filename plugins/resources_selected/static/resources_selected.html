@@ -1,10 +1,15 @@
-<table class='display' id='table-{{ domid }}'>
+<table class='display' id='{{domid}}__table'>
   <thead>
     <tr>
+      <th>action</th>
+      <th>key</th>
+      <th>value</th>
       <th>status</th>
-      <th>urn</th>
-      <th>slot</th>
       <th>+/-</th>
     </tr>
   </thead>
 </table>
+<input id="{{domid}}__update" type=button value="Update" />
+<input id="{{domid}}__refresh" type=button value="Refresh" />
+<input id="{{domid}}__reset" type=button value="Reset" />
+<input id="{{domid}}__clear_annotations" type=button value="Clear annotations" />

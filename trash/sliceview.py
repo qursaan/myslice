@@ -24,7 +24,7 @@ from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
-from plugins.updater                 import Updater
+#from plugins.updater                 import Updater
 
 tmp_default_slice='ple.upmc.myslicedemo'
 debug = True
@@ -180,17 +180,6 @@ def _slice_view (request, slicename):
 
     stack_resources.insert(tab_resource_plugins)
 
-    # --------------------------------------------------------------------------
-    # ResourcesSelected
-    #
-    stack_resources.insert(ResourcesSelected(
-        page                = page,
-        title               = 'Pending operations',
-        resource_query_uuid = sq_resource,
-        lease_query_uuid    = sq_lease,
-        togglable           = True,
-    ))
-
     sq_plugin.insert(stack_resources)
 
     ############################################################################
@@ -253,18 +242,28 @@ def _slice_view (request, slicename):
 
     main_plugin.insert(sq_plugin)
 
+    # --------------------------------------------------------------------------
+    # ResourcesSelected
+    #
+    main_plugin.insert(ResourcesSelected(
+        page                = page,
+        title               = 'Pending operations',
+        query               = main_query,
+        togglable           = True,
+    ))
+
     main_plugin.insert(Messages(
         page   = page,
         title  = "Runtime messages for slice %s"%slicename,
         domid  = "msgs-pre",
         levels = "ALL",
     ))
-    main_plugin.insert(Updater(
-        page   = page,
-        title  = "wont show up as non togglable by default",
-        query  = main_query,
-        label  = "Update slice",
-    ))
+#    main_plugin.insert(Updater(
+#        page   = page,
+#        title  = "wont show up as non togglable by default",
+#        query  = main_query,
+#        label  = "Update slice",
+#    ))
     
 
 
