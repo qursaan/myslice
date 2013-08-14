@@ -15,7 +15,7 @@
 
 
 
-<form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
+<form class="cmxform" id="commentForm" method="post" action="reg_process" enctype="multipart/form-data" >
 {% csrf_token %}
  <fieldset>
     <div class="fed4fireTitle">
@@ -55,7 +55,7 @@
    </div>
    <div class="field">
      <label for="password">Confirm Password</label>
-     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value="{{ form.field.value|default_if_none:"" }}"/>
+     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value='{{ form.field.value|default_if_none:"" }}'/>
      <p class="hint">Retype the password</p>
    </div>
    <div class="field">
