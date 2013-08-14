@@ -47,30 +47,83 @@
                 }
              });
             
+            // XXX This should not be done at init...
+            this.el('update').click(this, this.do_update);
+            this.el('refresh').click(this, this.do_refresh);
+            this.el('reset').click(this, this.do_reset);
+            this.el('clear_annotations').click(this, this.do_clear_annotations);
+
             this.listen_query(options.query_uuid);
         },
 
         /*************************** PLUGIN EVENTS ****************************/
 
         /***************************** GUI EVENTS *****************************/
-        
-        // Move through the query cycle
-        // XXX 'update', 'refresh', 'reset' and 'remove annotation' button
-        // This is a query scheduler
 
+        do_update: function(e) 
+        {
+            var self = e.data;
+            // XXX check that the query is not disabled
+            manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+        },
+
+        do_refresh: function(e)
+        {
+            throw 'Not implemented';
+        },
+
+        do_reset: function(e)
+        {
+            throw 'Not implemented';
+        },
+
+        do_clear_annotations: function(e)
+        {
+            throw 'Not implemented';
+        },
+        
         /************************** GUI MANIPULATION **************************/
+
+        
+        set_button_state: function(name, state)
+        {
+            this.el(name).attr('disabled', state ? false : 'disabled');
+        },
 
         clear: function()
         {
 
         },
 
+        find_row: function(key)
+        {
+            // key in third position, column id = 2
+            var KEY_POS = 2;
+
+            var cols = $.grep(this.table.fnSettings().aoData, function(col) {
+                return (col._aData[KEY_POS] == key);
+            } );
+
+            if (cols.length == 0)
+                return null;
+            if (cols.length > 1)
+                throw "Too many same-key rows in ResourceSelected plugin";
+
+            return cols[0];
+        },
+
         set_state: function(data)
         {
             var action;
-            var color;
             var msg;
             var button = '';
+
+            var row;
+
+            if (data.request == FIELD_REQUEST_RESET) {
+                // find line
+                // delete it
+            }
 
             switch(data.request) {
                 case FIELD_REQUEST_CHANGE:
@@ -87,29 +140,46 @@
             switch(data.status) {
                 case FIELD_REQUEST_PENDING:
                     msg   = 'PENDING';
-                    color = 'white';
                     button = "<span class='ui-icon ui-icon-close ResourceSelectedClose' id='" + data.key + "'/>";
                     break;
                 case FIELD_REQUEST_SUCCESS:
                     msg   = 'SUCCESS';
-                    color = 'green';
                     break;
                 case FIELD_REQUEST_FAILURE:
                     msg   = 'FAILURE';
-                    color = 'red';
                     break;
             }
 
-            var status = msg + color;
+            var status = msg + status;
 
-            this.table.fnAddData([
+            // find line
+            // if no, create it, else replace it
+            // XXX it's not just about adding lines, but sometimes removing some
+            // XXX how do we handle status reset ?
+            row = this.find_row(data.value);
+            newline = [
                 action,
                 data.key,
                 data.value,
                 msg,
                 button
-            ]);
-            // XXX change cell color according to status
+            ];
+            if (!row) {
+                // XXX second parameter refresh = false can improve performance. todo in hazelnut also
+                this.table.fnAddData(newline);
+                row = this.find_row(data.value);
+            } else {
+                // Update row text...
+                this.table.fnUpdate(newline, row.nTr);
+            }
+
+            // Change cell color according to status
+            if (row) {
+                $(row.nTr).removeClass('add remove')
+                var cls = action.toLowerCase();
+                if (cls)
+                    $(row.nTr).addClass(cls);
+            }
         },
 
         /*************************** QUERY HANDLER ****************************/

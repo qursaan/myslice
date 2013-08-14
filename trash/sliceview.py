@@ -24,7 +24,7 @@ from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter.quickfilter import QuickFilter
 from plugins.messages.messages       import Messages
-from plugins.updater                 import Updater
+#from plugins.updater                 import Updater
 
 tmp_default_slice='ple.upmc.myslicedemo'
 debug = True
@@ -258,12 +258,12 @@ def _slice_view (request, slicename):
         domid  = "msgs-pre",
         levels = "ALL",
     ))
-    main_plugin.insert(Updater(
-        page   = page,
-        title  = "wont show up as non togglable by default",
-        query  = main_query,
-        label  = "Update slice",
-    ))
+#    main_plugin.insert(Updater(
+#        page   = page,
+#        title  = "wont show up as non togglable by default",
+#        query  = main_query,
+#        label  = "Update slice",
+#    ))
     
 
 

@@ -33,15 +33,15 @@ var FIELD_STATE_CHANGED = 9;
 var IN_PROGRESS    = 101;
 var DONE           = 102;
 
-/* Update requests from plugins */
+/* Update requests related to subqueries */
 var SET_ADD        = 201;
 var SET_REMOVED    = 202;
-var RUN_UPDATE     = 203;
 
 // request
 var FIELD_REQUEST_CHANGE  = 301;
 var FIELD_REQUEST_ADD     = 302;
 var FIELD_REQUEST_REMOVE  = 303;
+var FIELD_REQUEST_RESET   = 304;
 // status
 var FIELD_REQUEST_PENDING = 301;
 var FIELD_REQUEST_SUCCESS = 302;
@@ -56,8 +56,9 @@ var STATUS_UPDATE_PENDING     = 504;
 var STATUS_UPDATE_IN_PROGRESS = 505;
 var STATUS_UPDATE_RECEIVED    = 506;
 var STATUS_UPDATE_ERROR       = 507;
-// outdated ?
 
+/* Requests for query cycle */
+var RUN_UPDATE     = 601;
 
 // A structure for storing queries
 
@@ -301,6 +302,22 @@ var manifold = {
         }
     },
 
+    run_query: function(query, callback)
+    {
+        // default value for callback = null
+        if (typeof callback === 'undefined')
+            callback = null; 
+
+        var query_json = JSON.stringify(query);
+
+        /* Nothing related to pubsub here... for the moment at least. */
+        //query.iter_subqueries(function (sq) {
+        //    manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
+        //});
+
+        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback /*domid*/));
+    },
+
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_publish_dom_tuples) {
@@ -428,7 +445,8 @@ var manifold = {
         if (data.code == 1) { // WARNING
             messages.error("Some errors have been received from the manifold backend at " + MANIFOLD_URL + " [" + data.description + "]");
             // publish error code and text message on a separate channel for whoever is interested
-            jQuery.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
+            if (publish_uuid)
+                $.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
 
             $("#notifications").notify("create", "sticky", {
               title: 'Warning',
@@ -617,9 +635,7 @@ var manifold = {
                 break;
 
             case RUN_UPDATE:
-                update_query = query_ext.main_query_ext.update_query_ext.query;
-                
-                manifold.asynchroneous_exec ( [ {'query_uuid': update_query.query_uuid, 'publish_uuid' : query_uuid} ], false);
+                manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 
             case FILTER_ADDED:

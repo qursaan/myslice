@@ -25,3 +25,10 @@ input.myslice_action {
    height:30px;
    background-color:#FF9933;
 }
+
+.ResourcesSelected .added {
+    background-color: #E3F6CE;
+}
+.ResourcesSelected .removed {
+    background-color: #F6CECE;
+}
