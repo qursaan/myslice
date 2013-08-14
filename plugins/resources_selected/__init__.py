@@ -13,7 +13,7 @@ class ResourcesSelected(Plugin):
         return reqs
 
     def json_settings_list (self):
-        return ['plugin_uuid', 'domid', 'resource_query_uuid', 'lease_query_uuid']
+        return ['plugin_uuid', 'domid', 'query_uuid']
 
     def export_json_settings (self):
         return True

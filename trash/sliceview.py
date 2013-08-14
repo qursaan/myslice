@@ -180,17 +180,6 @@ def _slice_view (request, slicename):
 
     stack_resources.insert(tab_resource_plugins)
 
-    # --------------------------------------------------------------------------
-    # ResourcesSelected
-    #
-    stack_resources.insert(ResourcesSelected(
-        page                = page,
-        title               = 'Pending operations',
-        resource_query_uuid = sq_resource,
-        lease_query_uuid    = sq_lease,
-        togglable           = True,
-    ))
-
     sq_plugin.insert(stack_resources)
 
     ############################################################################
@@ -252,6 +241,16 @@ def _slice_view (request, slicename):
     ))
 
     main_plugin.insert(sq_plugin)
+
+    # --------------------------------------------------------------------------
+    # ResourcesSelected
+    #
+    main_plugin.insert(ResourcesSelected(
+        page                = page,
+        title               = 'Pending operations',
+        query               = main_query,
+        togglable           = True,
+    ))
 
     main_plugin.insert(Messages(
         page   = page,
