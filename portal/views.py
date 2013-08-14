@@ -42,7 +42,9 @@ from manifold.core.query         import Query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
 from django.http                 import HttpResponseRedirect, HttpResponse
-import os.path, re
+
+from M2Crypto                    import Rand, RSA, BIO
+import os, re
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
@@ -510,8 +512,8 @@ def acc_process(request):
         get_user.save()
         return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
-        import os
-        from M2Crypto import Rand, RSA, BIO
+        #import os
+        #from M2Crypto import Rand, RSA, BIO
 
         KEY_LENGTH = 2048
 
@@ -535,9 +537,10 @@ def acc_process(request):
         private_key = pri_mem.getvalue()
         # Saving to DB
         keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-        #keypair = re.sub("\r", "", keypair)
-        #keypair = re.sub("\n", "\\n", keypair)
-        keypair = keypair.rstrip('\r\n')
+        keypair = re.sub("\r", "", keypair)
+        keypair = re.sub("\n", "\\n", keypair)
+        #keypair = keypair.rstrip('\r\n')
+        keypair = ''.join(keypair.split())
         get_user.keypair = keypair
         get_user.save()
         return HttpResponse('Success: New Keypair Generated! %s' % keypair)
@@ -552,6 +555,7 @@ def acc_process(request):
             file_content = '{"user_public_key":"'+ file_content +'"}'
             file_content = re.sub("\r", "", file_content)
             file_content = re.sub("\n", "\\n",file_content)
+            file_content = ''.join(file_content.split())
             get_user.keypair = file_content
             get_user.save()
             return HttpResponse('Success: Publickey uploaded! Old records overwritten')
@@ -567,7 +571,58 @@ def register_4m_f4f(request):
 
 def reg_4m_f4f_process(request):
     if 'submit' in request.POST:
-        return HttpResponse('Registration Successful. Please wait for account validation')
+        #get_email = PendingUser.objects.get(email)       
+        if PendingUser.objects.filter(email__iexact=request.POST['email']):
+            return HttpResponse("Email Already exist")
+        if 'generate' in request.POST['question']:
+            #import os
+            #from M2Crypto import Rand, RSA, BIO
+            
+            KEY_LENGTH = 2048
+
+            def blank_callback():
+                "Replace the default dashes"
+                return
+
+            # Random seed
+            Rand.rand_seed (os.urandom (KEY_LENGTH))
+            # Generate key pair
+            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+            # Create memory buffers
+            pri_mem = BIO.MemoryBuffer()
+            pub_mem = BIO.MemoryBuffer()
+            # Save keys to buffers
+            key.save_key_bio(pri_mem, None)
+            key.save_pub_key_bio(pub_mem)
+            # Get keys 
+            public_key = pub_mem.getvalue()
+            private_key = pri_mem.getvalue()
+            # Saving to DB
+            keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
+            keypair = re.sub("\r", "", keypair)
+            keypair = re.sub("\n", "\\n", keypair)
+            #keypair = keypair.rstrip('\r\n')
+            keypair = ''.join(keypair.split())
+            #return HttpResponse(keypair)
+        else:
+            up_file = request.FILES['user_public_key']
+            file_content =  up_file.read()
+            file_name = up_file.name
+            file_extension = os.path.splitext(file_name)[1]
+            allowed_extension =  ['.pub','.txt']
+            if file_extension in allowed_extension:
+                keypair = '{"user_public_key":"'+ file_content +'"}'
+                keypair = re.sub("\r", "", keypair)
+                keypair = re.sub("\n", "\\n",keypair)
+                keypair = ''.join(keypair.split())
+            else:
+                return HttpResponse('Please upload a valid public key.')
+
+        b = PendingUser(first_name=request.POST['firstname'], last_name=request.POST['lastname'], affiliation=request.POST['affiliation'], 
+                        email=request.POST['email'], password=request.POST['password'], keypair=keypair)
+        b.save()
+
+        return HttpResponse('Registration Successful. Please wait for account validation.')
         
     
 
