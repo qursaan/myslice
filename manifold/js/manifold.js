@@ -461,54 +461,56 @@ var manifold = {
         manifold.publish_result(query, result);
     },
 
-    process_get_query_records: function(query, records)
+    setup_update_query: function(query, records)
     {
-        /* This consists in managing the update query */
-
         // We don't prepare an update query if the result has more than 1 entry
-        if (records.length == 1) {
-            var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
+        if (records.length != 1)
+            continue;
+        var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
 
-            var record = records[0];
+        var record = records[0];
 
-            var update_query_ext = query_ext.update_query_ext;
-            var update_query = update_query_ext.query;
-            var update_query_ext = query_ext.update_query_ext;
-            var update_query_orig = query_ext.update_query_orig_ext.query;
+        var update_query_ext = query_ext.update_query_ext;
+        var update_query = update_query_ext.query;
+        var update_query_ext = query_ext.update_query_ext;
+        var update_query_orig = query_ext.update_query_orig_ext.query;
 
-            // Testing whether the result has subqueries (one level deep only)
-            // iif the query has subqueries
-            var count = 0;
-            var obj = query.analyzed_query.subqueries;
-            for (method in obj) {
-                if (obj.hasOwnProperty(method)) {
-                    var key = manifold.metadata.get_key(method);
-                    if (!key)
-                        continue;
-                    if (key.length > 1)
-                        continue;
-                    key = key[0];
-                    var sq_keys = [];
-                    var subrecords = record[method];
-                    if (!subrecords)
-                        continue
-                    $.each(subrecords, function (i, subrecord) {
-                        sq_keys.push(subrecord[key]);
-                    });
-                    update_query.params[method] = sq_keys;
-                    update_query_orig.params[method] = sq_keys.slice();
-                    count++;
-                }
-            }
-
-            if (count > 0) {
-                update_query_ext.disabled = false;
-                update_query_orig_ext.disabled = false;
+        // Testing whether the result has subqueries (one level deep only)
+        // iif the query has subqueries
+        var count = 0;
+        var obj = query.analyzed_query.subqueries;
+        for (method in obj) {
+            if (obj.hasOwnProperty(method)) {
+                var key = manifold.metadata.get_key(method);
+                if (!key)
+                    continue;
+                if (key.length > 1)
+                    continue;
+                key = key[0];
+                var sq_keys = [];
+                var subrecords = record[method];
+                if (!subrecords)
+                    continue
+                $.each(subrecords, function (i, subrecord) {
+                    sq_keys.push(subrecord[key]);
+                });
+                update_query.params[method] = sq_keys;
+                update_query_orig.params[method] = sq_keys.slice();
+                count++;
             }
         }
 
-        /* Publish results */
-        // NOTE: this is redundant only for Get queries
+        if (count > 0) {
+            update_query_ext.disabled = false;
+            update_query_orig_ext.disabled = false;
+        }
+    },
+
+    process_get_query_records: function(query, records)
+    {
+        this.setup_update_query(query, records);
+
+        /* Publish full results */
         tmp_query = manifold.find_query(query.query_uuid);
         manifold.publish_result_rec(tmp_query.analyzed_query, records);
     },
@@ -681,6 +683,9 @@ var manifold = {
                     break;
             }
         }
+        
+        // XXX Now we need to adapt 'update' and 'update_orig' queries as if we had done a get
+        this.setup_update_query(query, records);
     },
 
     process_query_records: function(query, records)
