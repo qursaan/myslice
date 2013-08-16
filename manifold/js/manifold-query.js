@@ -45,6 +45,7 @@ INSERT INTO object VALUES(field=value)
         q = new ManifoldQuery();
         return jQuery.extend(true, q, this);
     }
+
     this.add_filter = function(key, op, value) {
         this.filters.push(new Array(key, op, value));
     }
