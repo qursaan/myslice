@@ -465,7 +465,7 @@ var manifold = {
     {
         // We don't prepare an update query if the result has more than 1 entry
         if (records.length != 1)
-            continue;
+            return;
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
 
         var record = records[0];
