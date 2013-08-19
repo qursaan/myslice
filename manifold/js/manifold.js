@@ -17,6 +17,16 @@ function debug_query (msg, query) {
     else messages.debug ("debug_query: " + msg + " query= " + query);
 }
 
+// http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
+Object.toType = (function toType(global) {
+  return function(obj) {
+    if (obj === global) {
+      return "global";
+    }
+    return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+  }
+})(this);
+
 /* ------------------------------------------------------------ */
 
 // Constants that should be somehow moved to a plugin.js file
@@ -43,9 +53,9 @@ var FIELD_REQUEST_ADD     = 302;
 var FIELD_REQUEST_REMOVE  = 303;
 var FIELD_REQUEST_RESET   = 304;
 // status
-var FIELD_REQUEST_PENDING = 301;
-var FIELD_REQUEST_SUCCESS = 302;
-var FIELD_REQUEST_FAILURE = 303;
+var FIELD_REQUEST_PENDING = 401;
+var FIELD_REQUEST_SUCCESS = 402;
+var FIELD_REQUEST_FAILURE = 403;
 
 /* Query status */
 var STATUS_NONE               = 500; // Query has not been started yet
@@ -60,20 +70,26 @@ var STATUS_UPDATE_ERROR       = 507;
 /* Requests for query cycle */
 var RUN_UPDATE     = 601;
 
+/* MANIFOLD types */
+var TYPE_VALUE  = 1;
+var TYPE_RECORD = 2;
+var TYPE_LIST_OF_VALUES = 3;
+var TYPE_LIST_OF_RECORDS = 4;
+
+
 // A structure for storing queries
-
-
 
 function QueryExt(query, parent_query_ext, main_query_ext, update_query_ext, disabled) {
 
     /* Constructor */
     if (typeof query == "undefined")
         throw "Must pass a query in QueryExt constructor";
-    this.query            = query
-    this.parent_query_ext = (typeof parent_query_ext == "undefined") ? null : parent_query_ext
-    this.main_query_ext   = (typeof main_query_ext   == "undefined") ? null : main_query_ext
-    this.update_query_ext = (typeof update_query_ext   == "undefined") ? null : update_query_ext
-    this.disabled         = (typeof update_query_ext   == "undefined") ? false : disabled
+    this.query                 = query;
+    this.parent_query_ext      = (typeof parent_query_ext      == "undefined") ? null  : parent_query_ext;
+    this.main_query_ext        = (typeof main_query_ext        == "undefined") ? null  : main_query_ext;
+    this.update_query_ext      = (typeof update_query_ext      == "undefined") ? null  : update_query_ext;
+    this.update_query_orig_ext = (typeof update_query_orig_ext == "undefined") ? null  : update_query_orig_ext;
+    this.disabled              = (typeof update_query_ext      == "undefined") ? false : disabled;
     
     this.status       = null;
     this.results      = null;
@@ -105,10 +121,13 @@ function QueryStore() {
         update_query.analyzed_query.action = 'update';
         update_query.params = {};
         update_query_ext = new QueryExt(update_query);
-        console.log("Update query created from Get query", update_query);
+
+        /* We remember the original query to be able to reset it */
+        update_query_orig_ext = new QueryExt(update_query.clone());
+
 
         /* We store the main query */
-        query_ext = new QueryExt(query, null, null, update_query_ext, false);
+        query_ext = new QueryExt(query, null, null, update_query_ext, update_query_orig_ext, false);
         manifold.query_store.main_queries[query.query_uuid] = query_ext;
         /* Note: the update query does not have an entry! */
 
@@ -182,6 +201,22 @@ var manifold = {
                 $(locator).spin(false);
             }
         } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
+    },
+
+    get_type: function(variable)
+    {
+        switch(Object.toType(variable)) {
+            case 'number':
+            case 'string':
+                return TYPE_VALUE;
+            case 'object':
+                return TYPE_RECORD;
+            case 'array':
+                if ((variable.length > 0) && (Object.toType(variable[0]) === 'object'))
+                    return TYPE_LIST_OF_RECORDS;
+                else
+                    return TYPE_LIST_OF_VALUES;
+        }
     },
 
     /************************************************************************** 
@@ -426,6 +461,242 @@ var manifold = {
         manifold.publish_result(query, result);
     },
 
+    setup_update_query: function(query, records)
+    {
+        // We don't prepare an update query if the result has more than 1 entry
+        if (records.length != 1)
+            return;
+        var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
+
+        var record = records[0];
+
+        var update_query_ext = query_ext.update_query_ext;
+        var update_query = update_query_ext.query;
+        var update_query_ext = query_ext.update_query_ext;
+        var update_query_orig = query_ext.update_query_orig_ext.query;
+
+        // Testing whether the result has subqueries (one level deep only)
+        // iif the query has subqueries
+        var count = 0;
+        var obj = query.analyzed_query.subqueries;
+        for (method in obj) {
+            if (obj.hasOwnProperty(method)) {
+                var key = manifold.metadata.get_key(method);
+                if (!key)
+                    continue;
+                if (key.length > 1)
+                    continue;
+                key = key[0];
+                var sq_keys = [];
+                var subrecords = record[method];
+                if (!subrecords)
+                    continue
+                $.each(subrecords, function (i, subrecord) {
+                    sq_keys.push(subrecord[key]);
+                });
+                update_query.params[method] = sq_keys;
+                update_query_orig.params[method] = sq_keys.slice();
+                count++;
+            }
+        }
+
+        if (count > 0) {
+            update_query_ext.disabled = false;
+            update_query_orig_ext.disabled = false;
+        }
+    },
+
+    process_get_query_records: function(query, records)
+    {
+        this.setup_update_query(query, records);
+
+        /* Publish full results */
+        tmp_query = manifold.find_query(query.query_uuid);
+        manifold.publish_result_rec(tmp_query.analyzed_query, records);
+    },
+
+    /**
+     * 
+     * What we need to do when receiving results from an update query:
+     * - differences between what we had, what we requested, and what we obtained
+     *    . what we had : update_query_orig (simple fields and set fields managed differently)
+     *    . what we requested : update_query
+     *    . what we received : records
+     * - raise appropriate events
+     *
+     * The normal process is that results similar to Get will be pushed in the
+     * pubsub mechanism, thus repopulating everything while we only need
+     * diff's. This means we need to move the publish functionalities in the
+     * previous 'process_get_query_records' function.
+     */
+    process_update_query_records: function(query, records)
+    {
+        // First issue: we request everything, and not only what we modify, so will will have to ignore some fields
+        var query_uuid        = query.query_uuid;
+        var query_ext         = manifold.query_store.find_analyzed_query_ext(query_uuid);
+        var update_query      = query_ext.main_query_ext.update_query_ext.query;
+        var update_query_orig = query_ext.main_query_ext.update_query_orig_ext.query;
+        
+        // Since we update objects one at a time, we can get the first record
+        var record = records[0];
+
+        // Let's iterate over the object properties
+        for (var field in record) {
+            switch (this.get_type(record[field])) {
+                case TYPE_VALUE:
+                    // Did we ask for a change ?
+                    var update_value = update_query[field];
+                    if (!update_value)
+                        // Not requested, if it has changed: OUT OF SYNC
+                        // How we can know ?
+                        // We assume it won't have changed
+                        continue;
+
+                    var result_value = record[field];
+                    if (!result_value)
+                        throw "Internal error";
+
+                    data = {
+                        request: FIELD_REQUEST_CHANGE,
+                        key   : field,
+                        value : update_value,
+                        status: (update_value == result_value) ? FIELD_REQUEST_SUCCESS : FIELD_REQUEST_FAILURE,
+                    }
+                    manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+                    break;
+                case TYPE_RECORD:
+                    throw "Not implemented";
+                    break;
+
+                case TYPE_LIST_OF_VALUES:
+                    // Same as list of records, but we don't have to extract keys
+                    var result_keys  = record[field]
+                    
+                    // The rest of exactly the same (XXX factorize)
+                    var update_keys  = update_query_orig.params[field];
+                    var query_keys   = update_query.params[field];
+                    var added_keys   = $.grep(query_keys, function (x) { return $.inArray(x, update_keys) == -1 });
+                    var removed_keys = $.grep(update_keys, function (x) { return $.inArray(x, query_keys) == -1 });
+
+
+                    $.each(added_keys, function(i, key) {
+                        if ($.inArray(key, result_keys) == -1) {
+                            data = {
+                                request: FIELD_REQUEST_ADD,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_FAILURE,
+                            }
+                        } else {
+                            data = {
+                                request: FIELD_REQUEST_ADD,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_SUCCESS,
+                            }
+                        }
+                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+                    });
+                    $.each(removed_keys, function(i, key) {
+                        if ($.inArray(key, result_keys) == -1) {
+                            data = {
+                                request: FIELD_REQUEST_REMOVE,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_SUCCESS,
+                            }
+                        } else {
+                            data = {
+                                request: FIELD_REQUEST_REMOVE,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_FAILURE,
+                            }
+                        }
+                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+                    });
+
+
+                    break;
+                case TYPE_LIST_OF_RECORDS:
+                    // example: slice.resource
+                    //  - update_query_orig.params.resource = resources in slice before update
+                    //  - update_query.params.resource = resource requested in slice
+                    //  - keys from field = resources obtained
+                    var key = manifold.metadata.get_key(field);
+                    if (!key)
+                        continue;
+                    if (key.length > 1) {
+                        throw "Not implemented";
+                        continue;
+                    }
+                    key = key[0];
+
+                    /* XXX should be modified for multiple keys */
+                    var result_keys  = $.map(record[field], function(x) { return x[key]; });
+
+                    var update_keys  = update_query_orig.params[field];
+                    var query_keys   = update_query.params[field];
+                    var added_keys   = $.grep(query_keys, function (x) { return $.inArray(x, update_keys) == -1 });
+                    var removed_keys = $.grep(update_keys, function (x) { return $.inArray(x, query_keys) == -1 });
+
+
+                    $.each(added_keys, function(i, key) {
+                        if ($.inArray(key, result_keys) == -1) {
+                            data = {
+                                request: FIELD_REQUEST_ADD,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_FAILURE,
+                            }
+                        } else {
+                            data = {
+                                request: FIELD_REQUEST_ADD,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_SUCCESS,
+                            }
+                        }
+                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+                    });
+                    $.each(removed_keys, function(i, key) {
+                        if ($.inArray(key, result_keys) == -1) {
+                            data = {
+                                request: FIELD_REQUEST_REMOVE,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_SUCCESS,
+                            }
+                        } else {
+                            data = {
+                                request: FIELD_REQUEST_REMOVE,
+                                key   : field,
+                                value : key,
+                                status: FIELD_REQUEST_FAILURE,
+                            }
+                        }
+                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+                    });
+
+
+                    break;
+            }
+        }
+        
+        // XXX Now we need to adapt 'update' and 'update_orig' queries as if we had done a get
+        this.setup_update_query(query, records);
+    },
+
+    process_query_records: function(query, records)
+    {
+        if (query.action == 'get') {
+            this.process_get_query_records(query, records);
+        } else if (query.action == 'update') {
+            this.process_update_query_records(query, records);
+        }
+    },
+
     // if set domid allows the result to be directed to just one plugin
     // most of the time publish_uuid will be query.query_uuid
     // however in some cases we wish to publish the result under a different uuid
@@ -460,74 +731,12 @@ var manifold = {
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
         if (result) {
-            //if (!!callback /* domid */) {
-            //    /* Directly inform the requestor */
-            //    if (manifold.asynchroneous_debug) messages.debug("directing result to callback");
-            //    callback(result);
-            //    //if (manifold.asynchroneous_debug) messages.debug("directing result to " + domid);
-            //    //jQuery('#' + domid).trigger('results', [result]);
-            //} else {
-                /* XXX Jordan XXX I don't need publish_uuid here... What is it used for ? */
-                /* query is the query we sent to the backend; we need to find the
-                 * corresponding analyezd_query in manifold.all_queries
-                 */
+            /* Eventually update the content of related queries (update, etc) */
+            this.process_query_records(query, result);
 
-                // XXX We might need to update the corresponding update_query here 
-                query_ext = manifold.query_store.find_query_ext(query.query_uuid);
-                query = query_ext.query;
-
-                // We don't prepare an update query if the result has more than 1 entry
-                if (result.length == 1) {
-                    var res = result[0];
-
-                    console.log("Locating update query for updating params", update_query);
-                    update_query_ext = query_ext.update_query_ext;
-                    update_query = update_query_ext.query;
-
-                    // Testing whether the result has subqueries (one level deep only)
-                    // iif the query has subqueries
-                    var count = 0;
-                    var obj = query.analyzed_query.subqueries;
-                    for (method in obj) {
-                        if (obj.hasOwnProperty(method)) {
-                            var key = manifold.metadata.get_key(method);
-                            if (!key)
-                                continue;
-                            if (key.length > 1)
-                                continue;
-                            key = key[0];
-                            var sq_keys = [];
-                            var records = res[method];
-                            if (!records)
-                                continue
-                            $.each(records, function (i, obj) {
-                                sq_keys.push(obj[key]);
-                            });
-                            update_query.params[method] = sq_keys;
-                            count++;
-                        }
-                    }
-
-                    if (count > 0) {
-                        update_query_ext.disabled = false;
-                    }
-
-                }
-
-
-                
-                // We have results from the main query
-                // inspect subqueries and get the key for each
-
-                // XXX note that we might need the name for each relation, but
-                // this might be for SET_ADD, since we need to recursively find
-                // the path from the main query
-
-
-                tmp_query = manifold.find_query(query.query_uuid);
-                manifold.publish_result_rec(tmp_query.analyzed_query, result);
-            //}
-
+            /* Publish results: disabled here, done in the previous call */
+            //tmp_query = manifold.find_query(query.query_uuid);
+            //manifold.publish_result_rec(tmp_query.analyzed_query, result);
         }
     },
 
@@ -577,8 +786,32 @@ var manifold = {
                 // 1. Update internal query store about the change in status
 
                 // 2. Update the update query
-                update_query = query_ext.main_query_ext.update_query_ext.query;
-                update_query.params[value.key].push(value.value);
+                update_query      = query_ext.main_query_ext.update_query_ext.query;
+                update_query_orig = query_ext.main_query_ext.update_query_orig_ext.query;
+
+                switch(value.request) {
+                    case FIELD_REQUEST_CHANGE:
+                        update_query.params[value.key] = value.value;
+                        break;
+                    case FIELD_REQUEST_ADD:
+                        if ($.inArray(value.value, update_query_orig.params[value.key]) != -1)
+                            value.request = FIELD_REQUEST_RESET;
+                        update_query.params[value.key].push(value.value);
+                        break;
+                    case FIELD_REQUEST_REMOVE:
+                        if ($.inArray(value.value, update_query_orig.params[value.key]) == -1)
+                            value.request = FIELD_REQUEST_RESET;
+
+                        var arr = update_query.params[value.key];
+                        arr = $.grep(arr, function(x) { return x != value.value; });
+                        update_query.params[value.key] = arr;
+
+                        break;
+                    case FIELD_REQUEST_RESET:
+                        // XXX We would need to keep track of the original query
+                        throw "Not implemented";
+                        break;
+                }
 
                 // 3. Inform others about the change
                 // a) the main query...

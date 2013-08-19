@@ -123,6 +123,11 @@
             if (data.request == FIELD_REQUEST_RESET) {
                 // find line
                 // delete it
+                row = this.find_row(data.value);
+                if (row) {
+                    this.table.fnDeleteRow(row.nTr);
+                }
+                return;
             }
 
             switch(data.request) {
