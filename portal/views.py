@@ -551,7 +551,7 @@ def acc_process(request):
         file_name = up_file.name
         file_extension = os.path.splitext(file_name)[1] 
         allowed_extension =  ['.pub','.txt']
-        if file_extension in allowed_extension:
+        if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
             file_content = '{"user_public_key":"'+ file_content +'"}'
             file_content = re.sub("\r", "", file_content)
             file_content = re.sub("\n", "\\n",file_content)
@@ -560,7 +560,7 @@ def acc_process(request):
             get_user.save()
             return HttpResponse('Success: Publickey uploaded! Old records overwritten')
         else:
-            return HttpResponse('Please upload a valid public key [.txt or .pub].')    
+            return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
         
     else:
         message = 'You submitted an empty form.'
@@ -622,13 +622,13 @@ def reg_4m_f4f_process(request):
             file_name = up_file.name
             file_extension = os.path.splitext(file_name)[1]
             allowed_extension =  ['.pub','.txt']
-            if file_extension in allowed_extension:
+            if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
                 keypair = '{"user_public_key":"'+ file_content +'"}'
                 keypair = re.sub("\r", "", keypair)
                 keypair = re.sub("\n", "\\n",keypair)
                 keypair = ''.join(keypair.split())
             else:
-                return HttpResponse('Please upload a valid public key [.txt or .pub].')
+                return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')
 
         b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
                         email=reg_email, password=request.POST['password'], keypair=keypair)
