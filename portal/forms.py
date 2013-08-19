@@ -42,15 +42,15 @@ class UserRegisterForm(forms.Form): # Not ModelForm
     """
     required_css_class = 'required'
     
-    first_name = forms.RegexField(regex=r'^[\w.@+-]+$',
+    first_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
                                  max_length=30,
                                  label=_("First name"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    last_name = forms.RegexField(regex=r'^[\w.@+-]+$',
+    last_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
                                  max_length=30,
                                  label=_("Last name"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    affiliation = forms.RegexField(regex=r'^[\w.@+-]+$',
+    affiliation = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
                              max_length=30,
                              label=_("Affiliation"),
                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
@@ -61,7 +61,9 @@ class UserRegisterForm(forms.Form): # Not ModelForm
     password2 = forms.CharField(widget=forms.PasswordInput,
                                 label=_("Password (again)"))
     keypair    = forms.CharField( widget=forms.FileInput )
-
+   
+    #my_keypairs = forms.ChoiceField(widget = forms.Select(), 
+    #             choices = ([('1','generate'), ('2','upload')])) 
     tos = forms.BooleanField(widget=forms.CheckboxInput,
                              label=_(u'I have read and agree to the Terms of Service'),
                              error_messages={'required': _("You must agree to the terms to register")})
@@ -130,3 +132,4 @@ class SliceRequestForm(forms.Form):
     email = forms.EmailField()
     cc_myself = forms.BooleanField(required=False)
 
+    

@@ -560,7 +560,7 @@ def acc_process(request):
             get_user.save()
             return HttpResponse('Success: Publickey uploaded! Old records overwritten')
         else:
-            return HttpResponse('Please upload a valid public key.')    
+            return HttpResponse('Please upload a valid public key [.txt or .pub].')    
         
     else:
         message = 'You submitted an empty form.'
@@ -571,9 +571,21 @@ def register_4m_f4f(request):
 
 def reg_4m_f4f_process(request):
     if 'submit' in request.POST:
-        #get_email = PendingUser.objects.get(email)       
-        if PendingUser.objects.filter(email__iexact=request.POST['email']):
-            return HttpResponse("Email Already exist")
+        #get_email = PendingUser.objects.get(email)
+        reg_fname = request.POST['firstname']
+        reg_lname = request.POST['lastname']
+        reg_aff = request.POST['affiliation']
+        reg_email = request.POST['email'].lower()
+        
+        #POST value validation  
+        if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
+            return HttpResponse("Only Letters, Numbers, - and _ allowd in First Name")
+        if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
+            return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
+        if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
+            return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
+        if PendingUser.objects.filter(email__iexact=reg_email):
+            return HttpResponse("Email Already exists")
         if 'generate' in request.POST['question']:
             #import os
             #from M2Crypto import Rand, RSA, BIO
@@ -616,10 +628,10 @@ def reg_4m_f4f_process(request):
                 keypair = re.sub("\n", "\\n",keypair)
                 keypair = ''.join(keypair.split())
             else:
-                return HttpResponse('Please upload a valid public key.')
+                return HttpResponse('Please upload a valid public key [.txt or .pub].')
 
-        b = PendingUser(first_name=request.POST['firstname'], last_name=request.POST['lastname'], affiliation=request.POST['affiliation'], 
-                        email=request.POST['email'], password=request.POST['password'], keypair=keypair)
+        b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
+                        email=reg_email, password=request.POST['password'], keypair=keypair)
         b.save()
 
         return HttpResponse('Registration Successful. Please wait for account validation.')
