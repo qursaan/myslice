@@ -24,10 +24,17 @@
             this.in_set_buffer = Array();
 
             /* XXX Events XXX */
-            this.$element.on('show.Datatables', this.on_show);
+            // this.$element.on('show.Datatables', this.on_show);
+            this.el().on('show', this, this.on_show);
             // Unbind all events using namespacing
             // TODO in destructor
             // $(window).unbind('Hazelnut');
+
+            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
+            this.method = query.object;
+
+            var keys = manifold.metadata.get_key(this.method);
+            this.key = (keys && keys.length == 1) ? keys[0] : null;
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
@@ -43,17 +50,14 @@
 
         /* PLUGIN EVENTS */
 
-        on_show: function()
+        on_show: function(e)
         {
-            // XXX
-            var $this=$(this);
-            // xxx wtf. why [1] ? would expect 0...
-            if (debug)
-                messages.debug("Hitting suspicious line in hazelnut.show");
-            var oTable = $($('.dataTable', $this)[1]).dataTable();
-            oTable.fnAdjustColumnSizing()
+            var self = e.data;
+
+            self.table.fnAdjustColumnSizing()
         
             /* Refresh dataTabeles if click on the menu to display it : fix dataTables 1.9.x Bug */        
+            /* temp disabled... useful ? -- jordan
             $(this).each(function(i,elt) {
                 if (jQuery(elt).hasClass('dataTables')) {
                     var myDiv=jQuery('#hazelnut-' + this.id).parent();
@@ -63,6 +67,7 @@
                     }
                 }
             });
+            */
         }, // on_show
 
         /* GUI EVENTS */
@@ -222,19 +227,20 @@
  // UNUSED ? //         
  // UNUSED ? //         }, // update_plugin
 
-        checkbox: function (plugin_uuid, header, field, selected_str, disabled_str)
+        checkbox: function (plugin_uuid, header, field) //, selected_str, disabled_str)
         {
             var result="";
             if (header === null)
                 header = '';
             // Prefix id with plugin_uuid
             result += "<input";
-            result += " class='hazelnut-checkbox-" + plugin_uuid + "'";
-            result += " id='hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header).replace(/\\/g, '')  + "'";
+            result += " class='hazelnut-checkbox'";
+            result += " id='" + this.id('checkbox', this.id_from_key(this.key, unfold.get_value(header))) + "'";
+             //hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header).replace(/\\/g, '')  + "'";
             result += " name='" + unfold.get_value(field) + "'";
             result += " type='checkbox'";
-            result += selected_str;
-            result += disabled_str;
+            //result += selected_str;
+            //result += disabled_str;
             result += " autocomplete='off'";
             result += " value='" + unfold.get_value(header) + "'";
             result += "></input>";
@@ -274,16 +280,10 @@
             }
     
             /* catch up with the last column if checkboxes were requested */
-            if (this.options.checkboxes) {
-                var checked = '';
-                // xxx problem is, we don't get this 'sliver' thing set apparently
-                if (typeof(record['sliver']) != 'undefined') { /* It is equal to null when <sliver/> is present */
-                    checked = 'checked ';
-                    hazelnut.current_resources.push(record[ELEMENT_KEY]);
-                }
+            if (this.options.checkboxes)
                 // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox(this.options.plugin_uuid, record[ELEMENT_KEY], record['type'], checked, false));
-            }
+                // XXX remove the empty checked attribute
+                line.push(this.checkbox(this.options.plugin_uuid, record[ELEMENT_KEY], record['type']));
     
             // XXX Is adding an array of lines more efficient ?
             this.table.fnAddData(line);
@@ -318,12 +318,34 @@
                 this.table.fnSetColumnVis(index, false);
         },
 
-        set_checkbox: function(record)
+        set_checkbox: function(record, checked)
         {
-            // XXX urn should be replaced by the key
-            // XXX we should enforce that both queries have the same key !!
-            checkbox_id = "#hazelnut-checkbox-" + this.options.plugin_uuid + "-" + unfold.escape_id(record[ELEMENT_KEY].replace(/\\/g, ''))
-            $(checkbox_id, this.table.fnGetNodes()).attr('checked', true);
+            var key_value;
+            /* The function accepts both records and their key */
+            switch (manifold.get_type(record)) {
+                case TYPE_VALUE:
+                    key_value = record;
+                    break;
+                case TYPE_RECORD:
+                    /* XXX Test the key before ? */
+                    key_value = record[this.key];
+                    break;
+                default:
+                    throw "Not implemented";
+                    break;
+            }
+
+
+            var checkbox_id = this.id('checkbox', this.id_from_key(this.key, key_value));
+            checkbox_id = '#' + checkbox_id.replace(/\./g, '\\.');
+
+            var element = $(checkbox_id, this.table.fnGetNodes());
+
+            /* Default: swap check status */
+            if (typeof checked === 'undefined')
+                checked = !(element.is(':checked'));
+
+            element.attr('checked', checked);
         },
 
         /*************************** QUERY HANDLER ****************************/
@@ -368,7 +390,7 @@
             /* NOTE in fact we are doing a join here */
             if (this.received_all)
                 // update checkbox for record
-                this.set_checkbox(record);
+                this.set_checkbox(record, true);
             else
                 // store for later update of checkboxes
                 this.in_set_buffer.push(record);
@@ -389,6 +411,23 @@
             if (this.received_all)
                 this.unspin();
             this.received_set = true;
+        },
+        
+        on_field_state_changed: function(data)
+        {
+            switch(data.request) {
+                case FIELD_REQUEST_ADD:
+                    this.set_checkbox(data.value, true);
+                    break;
+                case FIELD_REQUEST_REMOVE:
+                    this.set_checkbox(data.value, false);
+                    break;
+                case FIELD_REQUEST_RESET:
+                    this.set_checkbox(data.value); // swap
+                    break;
+                default:
+                    break;
+            }
         },
 
         // all
@@ -419,7 +458,7 @@
 
                 /* ... and check the ones specified in the resource list */
                 $.each(this.in_set_buffer, function(i, record) {
-                    self.set_checkbox(record);
+                    self.set_checkbox(record, true);
                 });
 
                 this.unspin();
@@ -496,8 +535,7 @@
              * Handle clicks on checkboxes: reassociate checkbox click every time
              * the table is redrawn 
              */
-            $('.hazelnut-checkbox-' + this.options.plugin_uuid).unbind('click');
-            $('.hazelnut-checkbox-' + this.options.plugin_uuid).click({instance: this}, this._check_click);
+            this.els('hazelnut-checkbox').unbind('click').click(this, this._check_click);
 
             if (!this.table)
                 return;
@@ -524,10 +562,11 @@
         _check_click: function(e) 
         {
 
-            var self = e.data.instance;
+            var self = e.data;
 
             // XXX this.value = key of object to be added... what about multiple keys ?
             manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
+            //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },
 

@@ -18,10 +18,19 @@
             this.received_set = false;
             this.in_set_buffer = Array();
 
+            // key -> { marker, checked }
+            this.map_markers = {}
+
             /* XXX Events XXX */
-            this.$element.on('show.Datatables', this.on_show);
+            this.el().on('show', this, this.on_show);
             // TODO in destructor
             // $(window).unbind('Hazelnut');
+
+            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
+            this.method = query.object;
+
+            var keys = manifold.metadata.get_key(this.method);
+            this.key = (keys && keys.length == 1) ? keys[0] : null;
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
@@ -33,9 +42,10 @@
 
         /* PLUGIN EVENTS */
 
-        on_show: function()
+        on_show: function(e)
         {
-            google.maps.event.trigger(map, 'resize');
+            var self = e.data;
+            google.maps.event.trigger(self.map, 'resize');
         }, // on_show
 
         /* GUI EVENTS */
@@ -46,9 +56,7 @@
          */
         initialize_map: function()
         {
-            this.map = null;
             this.markerCluster = null;
-            this.markers = [];
             this.coords = new Array();
 
             var myLatlng = new google.maps.LatLng(this.options.latitude, this.options.longitude);
@@ -58,9 +66,79 @@
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             }
       
-            this.map = new google.maps.Map(document.getElementById("map"), myOptions);
+            var id = this.options.plugin_uuid + manifold.separator + 'map';
+            this.map = new google.maps.Map(document.getElementById(id), myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
+
+        set_checkbox: function(record, checked)
+        {
+            var key_value;
+            /* The function accepts both records and their key */
+            switch (manifold.get_type(record)) {
+                case TYPE_VALUE:
+                    key_value = record;
+                    break;
+                case TYPE_RECORD:
+                    /* XXX Test the key before ? */
+                    key_value = record[this.key];
+                    break;
+                default:
+                    throw "Not implemented";
+                    break;
+            }
+
+            // we cannot directly edit html, since nothing but marker is displayed
+            //var checkbox_id = this.id('checkbox', this.id_from_key(this.key, key_value));
+            //checkbox_id = '#' + checkbox_id.replace(/\./g, '\\.');
+            //$(checkbox_id, this.table.fnGetNodes()).attr('checked', checked);
+
+            var dict_info = this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')];
+
+            /* Default: swap check status */
+            if (typeof checked === 'undefined')
+                dict_info.in_set = !dict_info.in_set;
+            else
+                dict_info.in_set = checked;
+
+            // Update the marker content
+            dict_info.marker.content = this.get_marker_content(dict_info.record, checked);
+
+            // Update opened infowindow
+            // XXX Factor this code
+            this.infowindow.close();
+            this.infowindow.setContent(dict_info.marker.content);
+            this.infowindow.open(this.map, dict_info.marker);
+            this.els('map-button').unbind('click').click(this, this._button_click);
+
+            //var button = this.checkbox(record, checked);
+            //this.el('checkbox', this.id_from_record(method, record)).html(button);
+        }, 
+
+        checkbox: function(record, checked) 
+        {
+            if (typeof checked === 'undefined')
+                checked = false;
+
+            var method  = manifold.query_store.find_analyzed_query(this.options.query_uuid).object;
+            var action = checked ? 'checked' : 'del';
+            var ctx = {
+                action_class  : checked ? 'ui-icon-circle-minus' : 'ui-icon-circle-plus',
+                action_message: checked ? 'Remove from slice' : 'Add to slice',
+            };
+            var button = this.load_template('template', ctx);
+
+            var id_record = this.id_from_record(method, record);
+            if (!id_record)
+                return 'ERROR';
+            var id = this.id('checkbox', this.id_from_record(method, record));
+            return "<div id='" + id + "'>" + button + "</div>";
+        },
+        
+        get_marker_content: function(record, checked)
+        {
+            return '<p><b>' + this.method + '</b>: ' + get_value(record['resource_hrn']) + '<br/><b>network</b>: ' + get_value(record['network'])+'</p>' + this.checkbox(record, checked);
+        },
 
         /**
          */
@@ -85,17 +163,6 @@
                 // get the coordinate object
                 var myLatlng = new google.maps.LatLng(lat, lng);
             }
-            // If the node is attached to the slice, action will be Remove; else action will be add to slice
-            if (typeof(record['sliver']) != 'undefined') {
-                data.current_resources.push(record['urn']);
-                action="del";
-                action_class="ui-icon-circle-minus";
-                action_message="Remove from slice";
-            }else{
-                action="add";
-                action_class="ui-icon-circle-plus";
-                action_message="Add to slice";
-            }
             // XXX not working
             if (!(record['latitude'])) {
                 return true;
@@ -107,14 +174,19 @@
                     position: myLatlng,
                     title: get_value(record['hostname']),
                     // This should be done by the rendering
-                    content: '<p>Agent: ' + get_value(record['ip']) + ' (' + get_value(record['resource_hrn']) + ')<br/>Platform: ' + get_value(record['platform'])+'</p>' +
-                            '<div class="map-button" id="'+action+'/'+get_value(record['resource_hrn'])+'" style="cursor:pointer;">'+
-                            '<span class="ui-icon '+action_class+'" style="clear:both;float:left;"></span>'+action_message+
-                            '</div>'
+                    content: this.get_marker_content(record, false),
                 }); 
 
                 this.addInfoWindow(marker, this.map);
-                this.markers.push(marker);
+                var key_value = (this.key in record) ? record[this.key] : null;
+                if (!key_value)
+                    return;
+                this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')] = {
+                    marker: marker,
+                    in_set: false,
+                    record: record,
+                    value: key_value
+                }
             //}
 
         }, // new_record
@@ -130,19 +202,11 @@
                 self.infowindow.open(map, marker);
                 // onload of the infowindow on the map, bind a click on a button
                 google.maps.event.addListener(self.infowindow, 'domready', function() {
-                    jQuery('.map-button').unbind('click');
+                    self.els('map-button').unbind('click').click(self, self._button_click);
 //                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
                 });
             });
         }, // addInfoWindow
-
-        set_checkbox: function(record)
-        {
-            // XXX urn should be replaced by the key
-            // XXX we should enforce that both queries have the same key !!
-            //checkbox_id = "#hazelnut-checkbox-" + object.options.plugin_uuid + "-" + unfold.escape_id(record[ELEMENT_KEY].replace(/\\/g, ''))
-            //$(checkbox_id, object.table.fnGetNodes()).attr('checked', true);
-        }, // set_checkbox
 
 
         /*************************** QUERY HANDLER ****************************/
@@ -177,6 +241,24 @@
             this.received_set = true;
         },
 
+        on_field_state_changed: function(data)
+        {
+            switch(data.request) {
+                case FIELD_REQUEST_ADD:
+                    this.set_checkbox(data.value, true);
+                    break;
+                case FIELD_REQUEST_REMOVE:
+                    this.set_checkbox(data.value, false);
+                    break;
+                case FIELD_REQUEST_RESET:
+                    this.set_checkbox(data.value); // swap
+                    break;
+                default:
+                    break;
+            }
+        },
+
+
         // all
 
         on_all_new_record: function(record)
@@ -198,31 +280,34 @@
         {
 
             // MarkerClusterer
-            this.markerCluster = new MarkerClusterer(this.map, this.markers, {zoomOnClick: false});
-            google.maps.event.addListener(this.markerCluster, "clusterclick", function (cluster) {
-                var markers = cluster.getMarkers();
-                var bounds  = new google.maps.LatLngBounds();
-              /* 
-              * date: 24/05/2012
-              * author: lbaron
-              * Firefox JS Error - replaced $.each by JQuery.each
-              */                  
-              jQuery.each(markers, function(i, marker){
-                  bounds.extend(marker.getPosition()); 
-              });
+            var markers = [];
+            $.each(this.map_markers, function (k, v) { markers.push(v.marker); });
 
-              //map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
-              this.map.fitBounds(bounds);
+            this.markerCluster = new MarkerClusterer(this.map, markers, {zoomOnClick: false});
+            google.maps.event.addListener(this.markerCluster, "clusterclick", function (cluster) {
+                var cluster_markers = cluster.getMarkers();
+                var bounds  = new google.maps.LatLngBounds();
+                /* 
+                * date: 24/05/2012
+                * author: lbaron
+                * Firefox JS Error - replaced $.each by JQuery.each
+                */                  
+                jQuery.each(cluster_markers, function(i, marker){
+                    bounds.extend(marker.getPosition()); 
+                });
+
+                //map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
+                this.map.fitBounds(bounds);
             });
 
             var self = this;
             if (this.received_set) {
                 /* XXX needed ? XXX We uncheck all checkboxes ... */
-                $("[id^='datatables-checkbox-" + this.options.plugin_uuid +"']").attr('checked', false);
+                //$("[id^='datatables-checkbox-" + this.options.plugin_uuid +"']").attr('checked', false);
 
                 /* ... and check the ones specified in the resource list */
                 $.each(this.in_set_buffer, function(i, record) {
-                    self.set_checkbox(record);
+                    self.set_checkbox(record, true);
                 });
 
                 this.unspin();
@@ -235,12 +320,16 @@
 
         _button_click: function(e)
         {
-            var op_value=this.id.split("/");
-            if(op_value.length>0) {
-                var value = op_value[1];
-                manifold.raise_event(this.options.query_uuid, (op_value[0] == 'add')?SET_ADD:SET_REMOVED, value);
-            }
-        } // button_click
+            var self   = e.data;
+
+            var escaped_key = self.key_from_id($(this).parent().attr('id'), 'checkbox');
+            var info_dict = self.map_markers[escaped_key];
+            var in_set = info_dict.in_set;
+            var value = info_dict.value;
+
+            var escaped_key = self.map_markers[self.key_from_id($(this).parent().attr('id'), 'checkbox')]
+            manifold.raise_event(self.options.query_uuid, (in_set) ? SET_REMOVED : SET_ADD, value);
+        } // _button_click
 
     });
 

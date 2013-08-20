@@ -818,6 +818,21 @@ var manifold = {
                 manifold.raise_record_event(query_uuid, event_type, value);
 
                 // b) subqueries eventually (dot in the key)
+                // Let's unfold 
+                var path_array = value.key.split('.');
+                var value_key = value.key.split('.');
+
+                var cur_query = query;
+                if (cur_query.analyzed_query)
+                    cur_query = cur_query.analyzed_query;
+                $.each(path_array, function(i, method) {
+                    cur_query = cur_query.subqueries[method];
+                    value_key.shift(); // XXX check that method is indeed shifted
+                });
+                value.key = value_key;
+
+                manifold.raise_record_event(cur_query.query_uuid, event_type, value);
+
                 // XXX make this DOT a global variable... could be '/'
                 break;
 
