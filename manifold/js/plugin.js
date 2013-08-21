@@ -200,6 +200,50 @@ var Plugin = Class.extend({
         return array[1];
     },
 
+    id_from_key: function(key_field, value)
+    {
+        
+        return key_field + manifold.separator + unfold.escape_id(value).replace(/\\/g, '');
+    },
+
+    id_from_record: function(method, record)
+    {
+        var keys = manifold.metadata.get_key(method);
+        if (!keys)
+            return;
+        if (keys.length > 1)
+            return;
+
+        var key = keys[0];
+        switch (Object.toType(key)) {
+            case 'string':
+                if (!(key in record))
+                    return null;
+                return this.id_from_key(key, record[key]);
+    
+            default:
+                throw 'Not implemented';
+        }
+    },
+
+    key_from_id: function(id)
+    {
+        // NOTE this works only for simple keys
+
+        var array;
+        if (typeof id === 'string') {
+            array = id.split(manifold.separator);
+        } else { // We suppose we have an array ('object')
+            array = id;
+        }
+
+        // arguments has the initial id but lacks the key field name (see id_from_key), so we are even
+        // we finally add +1 for the plugin_uuid at the beginning
+        return array[arguments.length + 1];
+    },
+
+    /* SPIN */
+
     spin: function()
     {
         manifold.spin(this.element);
@@ -208,6 +252,13 @@ var Plugin = Class.extend({
     unspin: function()
     {
         manifold.spin(this.element, false);
+    },
+
+    /* TEMPLATE */
+
+    load_template: function(name, ctx)
+    {
+        return Mustache.render(this.el(name).html(), ctx);
     },
 
 });

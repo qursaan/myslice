@@ -42,8 +42,29 @@ INSERT INTO object VALUES(field=value)
     }	
 
     this.clone = function() {
-        q = new ManifoldQuery();
-        return jQuery.extend(true, q, this);
+        // 
+        var q = new ManifoldQuery();
+        q.action     = this.action;
+        q.object     = this.object;
+        q.timestamp  = this.timestamp;
+        q.filters    = this.filters.slice();
+        q.fields     = this.fields.slice();
+        q.query_uuid = this.query_uuid;
+
+        if (this.analyzed_query)
+            q.analyzed_query = this.analyzed_query.clone();
+        else
+            q.analyzed_query = null;
+
+        if (this.subqueries) {
+            q.subqueries = {}
+            for (method in this.subqueries)
+                q.subqueries[method] = this.subqueries[method].clone();
+        }
+
+        // deep extend not working for custom objects
+        // $.extend(true, q, this);
+        return q;
     }
 
     this.add_filter = function(key, op, value) {

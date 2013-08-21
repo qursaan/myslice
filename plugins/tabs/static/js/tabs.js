@@ -3,9 +3,8 @@
     $.fn.Tabs = function( method ) {
 
         $('a[data-toggle="tab"]').on('shown', function (e) {
-          google.maps.event.trigger(map, 'resize');
-          //e.target // current tab
-          //e.relatedTarget // previous tab
+          // find the plugin object inside the tab content referenced by the current tabs
+          $('.plugin', $($(e.target).attr('href'))).trigger('show');
         });
 
     };
