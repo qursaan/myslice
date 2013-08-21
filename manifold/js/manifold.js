@@ -51,7 +51,8 @@ var SET_REMOVED    = 202;
 var FIELD_REQUEST_CHANGE  = 301;
 var FIELD_REQUEST_ADD     = 302;
 var FIELD_REQUEST_REMOVE  = 303;
-var FIELD_REQUEST_RESET   = 304;
+var FIELD_REQUEST_ADD_RESET = 304;
+var FIELD_REQUEST_REMOVE_RESET = 305;
 // status
 var FIELD_REQUEST_PENDING = 401;
 var FIELD_REQUEST_SUCCESS = 402;
@@ -795,19 +796,20 @@ var manifold = {
                         break;
                     case FIELD_REQUEST_ADD:
                         if ($.inArray(value.value, update_query_orig.params[value.key]) != -1)
-                            value.request = FIELD_REQUEST_RESET;
+                            value.request = FIELD_REQUEST_ADD_RESET;
                         update_query.params[value.key].push(value.value);
                         break;
                     case FIELD_REQUEST_REMOVE:
                         if ($.inArray(value.value, update_query_orig.params[value.key]) == -1)
-                            value.request = FIELD_REQUEST_RESET;
+                            value.request = FIELD_REQUEST_REMOVE_RESET;
 
                         var arr = update_query.params[value.key];
                         arr = $.grep(arr, function(x) { return x != value.value; });
                         update_query.params[value.key] = arr;
 
                         break;
-                    case FIELD_REQUEST_RESET:
+                    case FIELD_REQUEST_ADD_RESET:
+                    case FIELD_REQUEST_REMOVE_RESET:
                         // XXX We would need to keep track of the original query
                         throw "Not implemented";
                         break;

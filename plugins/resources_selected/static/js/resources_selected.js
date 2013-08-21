@@ -120,17 +120,14 @@
 
             var row;
 
-            if (data.request == FIELD_REQUEST_RESET) {
-                // find line
-                // delete it
-                row = this.find_row(data.value);
-                if (row) {
-                    this.table.fnDeleteRow(row.nTr);
-                }
-                return;
-            }
-
             switch(data.request) {
+                case FIELD_REQUEST_ADD_RESET:
+                case FIELD_REQUEST_REMOVE_RESET:
+                    // find line and delete it
+                    row = this.find_row(data.value);
+                    if (row)
+                        this.table.fnDeleteRow(row.nTr);
+                    return;
                 case FIELD_REQUEST_CHANGE:
                     action = 'UPDATE';
                     break;

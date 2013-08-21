@@ -320,6 +320,10 @@
 
         set_checkbox: function(record, checked)
         {
+            /* Default: checked = true */
+            if (typeof checked === 'undefined')
+                checked = true;
+
             var key_value;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
@@ -340,10 +344,6 @@
             checkbox_id = '#' + checkbox_id.replace(/\./g, '\\.');
 
             var element = $(checkbox_id, this.table.fnGetNodes());
-
-            /* Default: swap check status */
-            if (typeof checked === 'undefined')
-                checked = !(element.is(':checked'));
 
             element.attr('checked', checked);
         },
@@ -417,13 +417,12 @@
         {
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
+                case FIELD_REQUEST_ADD_RESET:
                     this.set_checkbox(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
+                case FIELD_REQUEST_REMOVE_RESET:
                     this.set_checkbox(data.value, false);
-                    break;
-                case FIELD_REQUEST_RESET:
-                    this.set_checkbox(data.value); // swap
                     break;
                 default:
                     break;
@@ -561,6 +560,7 @@
 
         _check_click: function(e) 
         {
+            e.stopPropagation();
 
             var self = e.data;
 

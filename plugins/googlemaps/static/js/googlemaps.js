@@ -4,6 +4,10 @@
  * License: GPLv3
  */
 
+/* BUGS:
+ * - infowindow is not properly reopened when the maps has not the focus
+ */
+
 (function($){
 
    var GoogleMaps = Plugin.extend({
@@ -73,6 +77,10 @@
 
         set_checkbox: function(record, checked)
         {
+            /* Default: checked = true */
+            if (typeof checked === 'undefined')
+                checked = true;
+
             var key_value;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
@@ -95,20 +103,16 @@
 
             var dict_info = this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')];
 
-            /* Default: swap check status */
-            if (typeof checked === 'undefined')
-                dict_info.in_set = !dict_info.in_set;
-            else
-                dict_info.in_set = checked;
 
             // Update the marker content
+            dict_info.in_set = checked;
             dict_info.marker.content = this.get_marker_content(dict_info.record, checked);
 
             // Update opened infowindow
             // XXX Factor this code
             this.infowindow.close();
-            this.infowindow.setContent(dict_info.marker.content);
             this.infowindow.open(this.map, dict_info.marker);
+            this.infowindow.setContent(dict_info.marker.content);
             this.els('map-button').unbind('click').click(this, this._button_click);
 
             //var button = this.checkbox(record, checked);
@@ -245,13 +249,12 @@
         {
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
+                case FIELD_REQUEST_ADD_RESET:
                     this.set_checkbox(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
+                case FIELD_REQUEST_REMOVE_RESET:
                     this.set_checkbox(data.value, false);
-                    break;
-                case FIELD_REQUEST_RESET:
-                    this.set_checkbox(data.value); // swap
                     break;
                 default:
                     break;
