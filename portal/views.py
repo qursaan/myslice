@@ -473,7 +473,12 @@ class UserValidateView(ActivationView):
 
 # View for my_account form
 def my_account(request):
-    return render(request, 'my_account.html')
+    return render(request, 'my_account.html', {
+        #'form': form,
+        'topmenu_items': topmenu_items('My Account', request),
+        'username': the_user (request)
+    })
+
 
 #my_acc form value processing
 def acc_process(request):
@@ -567,9 +572,9 @@ def acc_process(request):
         return HttpResponse(message)
 
 def register_4m_f4f(request):
-    return render(request, 'register_4m_f4f.html')
+    #return render(request, 'register_4m_f4f.html')
 
-def reg_4m_f4f_process(request):
+#def reg_4m_f4f_process(request):
     if 'submit' in request.POST:
         #get_email = PendingUser.objects.get(email)
         reg_fname = request.POST['firstname']
@@ -579,13 +584,21 @@ def reg_4m_f4f_process(request):
         
         #POST value validation  
         if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
-            return HttpResponse("Only Letters, Numbers, - and _ allowd in First Name")
+            messages.error(request, 'First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            #return HttpResponse("Only Letters, Numbers, - and _ allowd in First Name")
+            return render(request, 'register_4m_f4f.html')
         if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
-            return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
+            messages.error(request, 'Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            #return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
+            return render(request, 'register_4m_f4f.html')
         if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
-            return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
+            messages.error(request, 'Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
+            return render(request, 'register_4m_f4f.html')
         if PendingUser.objects.filter(email__iexact=reg_email):
-            return HttpResponse("Email Already exists")
+            messages.error(request, 'Email already registered.Please provide a new email address.')
+            #return HttpResponse("Email Already exists")
+            return render(request, 'register_4m_f4f.html')
         if 'generate' in request.POST['question']:
             #import os
             #from M2Crypto import Rand, RSA, BIO
@@ -634,8 +647,8 @@ def reg_4m_f4f_process(request):
                         email=reg_email, password=request.POST['password'], keypair=keypair)
         b.save()
 
-        return HttpResponse('Registration Successful. Please wait for account validation.')
-        
+        return render(request, 'user_register_complete.html')
+    return render(request, 'register_4m_f4f.html')        
     
 
 # view for contact form
@@ -661,9 +674,12 @@ def contact(request):
             return render(request,'contact_sent.html') # Redirect after POST
     else:
         form = ContactForm() # An unbound form
-
+    
     return render(request, 'contact.html', {
         'form': form,
+        'topmenu_items': topmenu_items('Contact Us', request),
+        'username': the_user (request)
+
     })
 
 
