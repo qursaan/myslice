@@ -39,6 +39,9 @@
     position: relative;
     top: 1em;
     width: 45%;
+    min-height:200px;
+    height:auto !important;
+    height:200px; 
 }
 
 #ms-dashboard-slices {
@@ -54,6 +57,9 @@
     padding: 15px;
     top: 0.5em;
     width: 45%;
+    min-height:200px;
+    height:auto !important;
+    height:200px; 
 }
 
 li.icn {
