@@ -12,10 +12,16 @@
 
 
 
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 
 
-
-<form class="cmxform" id="commentForm" method="post" action="reg_process" enctype="multipart/form-data" >
+<form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
 {% csrf_token %}
  <fieldset>
     <div class="fed4fireTitle">

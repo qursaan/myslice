@@ -8,6 +8,7 @@ standard_topmenu_items = [
 #    { 'label':'One Plugin', 'href': '/plugin/'},
     { 'label':'Dashboard', 'href': '/portal/dashboard/'},
     { 'label':'Slice', 'href': '/slice/'},
+    #{'label':'My Account', 'href': '/portal/account/'}
     ]
 
 #login_out_items = { False: { 'label':'Login', 'href':'/login/'},
@@ -17,10 +18,14 @@ def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
     if has_user:
         result=deepcopy(standard_topmenu_items)
+        result.append({'label':'My Account', 'href': '/portal/account/'})
         result.append({ 'label':'Request a slice', 'href': '/portal/slice_request/'})
+        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     else:
         result = []
+        result.append({'label':'Home', 'href': '/login'})
         result.append({ 'label':'Register', 'href': '/portal/user/register/'})
+        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     for d in result:
         #if d['label'].lower()find(current)>=0: d['is_active']=True
         if d['label'] == current: d['is_active']=True
