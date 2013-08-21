@@ -13,7 +13,6 @@ See the devel/ subdir for more devel-oriented doc.
 * git clone ssh://yourlogin@git.onelab.eu/git/myslice-django.git
 
 * edit myslice/settings.py and
-** change DEVELOPER_ROOT if you didnt clone into ~/git/myslice-django
 ** change the location of your backend API (not yet supported)
 
 * edit myslice/config.py and enter the details of your manifold backend
@@ -22,7 +21,7 @@ See the devel/ subdir for more devel-oriented doc.
 $ manage.py syncdb
 
 * gather static files
-$ make static
+$ ./manage.py collectstatic (formerly, we used make static, which is deprecated)
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
