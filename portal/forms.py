@@ -27,82 +27,82 @@ from portal.models import PendingUser, PendingSlice
 #from crispy_forms.layout import Submit
 from django.utils.translation import ugettext_lazy as _
 
-class UserRegisterForm(forms.Form): # Not ModelForm
-    """
-    Form for registering a new user account.
-    
-    Validates that the requested username is not already in use, and
-    requires the password to be entered twice to catch typos.
-    
-    Subclasses should feel free to add any additional validation they
-    need, but should avoid defining a ``save()`` method -- the actual
-    saving of collected user data is delegated to the active
-    registration backend.
-
-    """
-    required_css_class = 'required'
-    
-    first_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
-                                 max_length=30,
-                                 label=_("First name"),
-                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    last_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
-                                 max_length=30,
-                                 label=_("Last name"),
-                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    affiliation = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
-                             max_length=30,
-                             label=_("Affiliation"),
-                             error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-
-    email = forms.EmailField(label=_("E-mail"))
-    password1 = forms.CharField(widget=forms.PasswordInput,
-                                label=_("Password"))
-    password2 = forms.CharField(widget=forms.PasswordInput,
-                                label=_("Password (again)"))
-    keypair    = forms.CharField( widget=forms.FileInput )
-   
-    #my_keypairs = forms.ChoiceField(widget = forms.Select(), 
-    #             choices = ([('1','generate'), ('2','upload')])) 
-    tos = forms.BooleanField(widget=forms.CheckboxInput,
-                             label=_(u'I have read and agree to the Terms of Service'),
-                             error_messages={'required': _("You must agree to the terms to register")})
-
-#    def clean_username(self):
-#        """
-#        Validate that the username is alphanumeric and is not already
-#        in use.
-#        
-#        """
-#        existing = User.objects.filter(username__iexact=self.cleaned_data['username'])
-#        if existing.exists():
-#            raise forms.ValidationError(_("A user with that username already exists."))
-#        else:
-#            return self.cleaned_data['username']
-
-    def clean_email(self):
-        """
-        Validate that the supplied email address is unique for the
-        site.
-        
-        """
-        if PendingUser.objects.filter(email__iexact=self.cleaned_data['email']):
-            raise forms.ValidationError(_("This email address is already in use. Please supply a different email address."))
-        return self.cleaned_data['email']
-
-    def clean(self):
-        """
-        Verifiy that the values entered into the two password fields
-        match. Note that an error here will end up in
-        ``non_field_errors()`` because it doesn't apply to a single
-        field.
-        
-        """
-        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
-            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-                raise forms.ValidationError(_("The two password fields didn't match."))
-        return self.cleaned_data
-
+# DEPRECATED # class UserRegisterForm(forms.Form): # Not ModelForm
+# DEPRECATED #     """
+# DEPRECATED #     Form for registering a new user account.
+# DEPRECATED #     
+# DEPRECATED #     Validates that the requested username is not already in use, and
+# DEPRECATED #     requires the password to be entered twice to catch typos.
+# DEPRECATED #     
+# DEPRECATED #     Subclasses should feel free to add any additional validation they
+# DEPRECATED #     need, but should avoid defining a ``save()`` method -- the actual
+# DEPRECATED #     saving of collected user data is delegated to the active
+# DEPRECATED #     registration backend.
+# DEPRECATED # 
+# DEPRECATED #     """
+# DEPRECATED #     required_css_class = 'required'
+# DEPRECATED #     
+# DEPRECATED #     first_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
+# DEPRECATED #                                  max_length=30,
+# DEPRECATED #                                  label=_("First name"),
+# DEPRECATED #                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+# DEPRECATED #     last_name = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
+# DEPRECATED #                                  max_length=30,
+# DEPRECATED #                                  label=_("Last name"),
+# DEPRECATED #                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+# DEPRECATED #     affiliation = forms.RegexField(regex=r'^[\w+\s.@+-]+$',
+# DEPRECATED #                              max_length=30,
+# DEPRECATED #                              label=_("Affiliation"),
+# DEPRECATED #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+# DEPRECATED # 
+# DEPRECATED #     email = forms.EmailField(label=_("E-mail"))
+# DEPRECATED #     password1 = forms.CharField(widget=forms.PasswordInput,
+# DEPRECATED #                                 label=_("Password"))
+# DEPRECATED #     password2 = forms.CharField(widget=forms.PasswordInput,
+# DEPRECATED #                                 label=_("Password (again)"))
+# DEPRECATED #     keypair    = forms.CharField( widget=forms.FileInput )
+# DEPRECATED #    
+# DEPRECATED #     #my_keypairs = forms.ChoiceField(widget = forms.Select(), 
+# DEPRECATED #     #             choices = ([('1','generate'), ('2','upload')])) 
+# DEPRECATED #     tos = forms.BooleanField(widget=forms.CheckboxInput,
+# DEPRECATED #                              label=_(u'I have read and agree to the Terms of Service'),
+# DEPRECATED #                              error_messages={'required': _("You must agree to the terms to register")})
+# DEPRECATED # 
+# DEPRECATED # #    def clean_username(self):
+# DEPRECATED # #        """
+# DEPRECATED # #        Validate that the username is alphanumeric and is not already
+# DEPRECATED # #        in use.
+# DEPRECATED # #        
+# DEPRECATED # #        """
+# DEPRECATED # #        existing = User.objects.filter(username__iexact=self.cleaned_data['username'])
+# DEPRECATED # #        if existing.exists():
+# DEPRECATED # #            raise forms.ValidationError(_("A user with that username already exists."))
+# DEPRECATED # #        else:
+# DEPRECATED # #            return self.cleaned_data['username']
+# DEPRECATED # 
+# DEPRECATED #     def clean_email(self):
+# DEPRECATED #         """
+# DEPRECATED #         Validate that the supplied email address is unique for the
+# DEPRECATED #         site.
+# DEPRECATED #         
+# DEPRECATED #         """
+# DEPRECATED #         if PendingUser.objects.filter(email__iexact=self.cleaned_data['email']):
+# DEPRECATED #             raise forms.ValidationError(_("This email address is already in use. Please supply a different email address."))
+# DEPRECATED #         return self.cleaned_data['email']
+# DEPRECATED # 
+# DEPRECATED #     def clean(self):
+# DEPRECATED #         """
+# DEPRECATED #         Verifiy that the values entered into the two password fields
+# DEPRECATED #         match. Note that an error here will end up in
+# DEPRECATED #         ``non_field_errors()`` because it doesn't apply to a single
+# DEPRECATED #         field.
+# DEPRECATED #         
+# DEPRECATED #         """
+# DEPRECATED #         if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
+# DEPRECATED #             if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+# DEPRECATED #                 raise forms.ValidationError(_("The two password fields didn't match."))
+# DEPRECATED #         return self.cleaned_data
+# DEPRECATED # 
 # DEPRECATED #    class Meta:
 # DEPRECATED #        model = PendingUser
 

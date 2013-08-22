@@ -171,13 +171,13 @@ alert("You have requested to generate new key pairs. Please download and save th
 function emailAlert()
 {
 alert("To edit email please contact the administratior. You will be redirected to the support page now");
-window.location.href = "/support";
+window.location.href = "/portal/contact/";
 }
 
 function affAlert()
 {
 alert("To edit affiliation please contact the administratior. You will be redirected to the support page now");
-window.location.href = "/support";
+window.location.href = "/portal/contact/";
 }
 /*
  // alert having ok or cancel option

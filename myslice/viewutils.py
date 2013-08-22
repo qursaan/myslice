@@ -24,7 +24,7 @@ def topmenu_items (current,request=None):
     else:
         result = []
         result.append({'label':'Home', 'href': '/login'})
-        result.append({ 'label':'Register', 'href': '/portal/user/register/'})
+        result.append({ 'label':'Register', 'href': '/portal/register/'})
         result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     for d in result:
         #if d['label'].lower()find(current)>=0: d['is_active']=True
