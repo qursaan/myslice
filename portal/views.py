@@ -35,7 +35,7 @@ from portal.event import Event
 import json
 
 from portal                      import signals
-from portal.forms                import UserRegisterForm, SliceRequestForm, ContactForm
+from portal.forms                import SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
