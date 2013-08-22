@@ -479,6 +479,41 @@ def my_account(request):
         'username': the_user (request)
     })
 
+# View for platforms
+class PlatformsView(TemplateView):
+    template_name = "platforms.html"
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        network_query  = Query().get('local:platform').select('platform')
+        page.enqueue_query(network_query)
+
+        page.expose_js_metadata()
+        page.expose_queries()
+
+        networklist = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'platform',
+            query = network_query,
+        )
+
+        context = super(PlatformsView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['networks'] = networklist.render(self.request)
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Platforms connected to MySlice'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('Platforms', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+
+        return context
 
 #my_acc form value processing
 def acc_process(request):

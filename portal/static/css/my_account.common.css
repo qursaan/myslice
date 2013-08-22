@@ -40,10 +40,10 @@ fieldset, img {
 
 body {
 	background-color: #fff;
-	font-family: "Segoe UI", "Lucida Grande", "Helvetica" , sans-serif;
-	font-size: 12pt;
-	  min-width: 1000px; /* ADDED July 2012 */
-	  margin: 0px auto; /* ADDED Aug 14, 2012 */
+	/* font-family: "Segoe UI", "Lucida Grande", "Helvetica" , sans-serif;
+	font-size: 12pt; */
+	min-width: 1000px; /* ADDED July 2012 */
+	margin: 0px auto; /* ADDED Aug 14, 2012 */
 }
 
 ol {
