@@ -215,6 +215,8 @@ class PendingUser(models.Model):
     password    = models.TextField()
     keypair     = models.TextField()
     # institution
+    authority_hrn = models.TextField()
+    # models.ForeignKey(Institution)
 
     objects = RegistrationManager()
 
@@ -308,3 +310,4 @@ class PendingUser(models.Model):
 
 class PendingSlice(models.Model):
     slice_name  = models.TextField()
+    authority_hrn = models.TextField(null=True)

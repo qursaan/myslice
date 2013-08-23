@@ -7,7 +7,6 @@
 (function($){
 
     // TEMP
-    var ELEMENT_KEY = 'resource_hrn';
     var debug=false;
     debug=true
 
@@ -227,22 +226,17 @@
  // UNUSED ? //         
  // UNUSED ? //         }, // update_plugin
 
-        checkbox: function (plugin_uuid, header, field) //, selected_str, disabled_str)
+        checkbox: function (key, value)
         {
             var result="";
-            if (header === null)
-                header = '';
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='hazelnut-checkbox'";
-            result += " id='" + this.id('checkbox', this.id_from_key(this.key, unfold.get_value(header))) + "'";
-             //hazelnut-checkbox-" + plugin_uuid + "-" + unfold.get_value(header).replace(/\\/g, '')  + "'";
-            result += " name='" + unfold.get_value(field) + "'";
+            result += " id='" + this.id('checkbox', this.id_from_key(key, value)) + "'";
+            result += " name='" + key + "'";
             result += " type='checkbox'";
-            //result += selected_str;
-            //result += disabled_str;
             result += " autocomplete='off'";
-            result += " value='" + unfold.get_value(header) + "'";
+            result += " value='" + value + "'";
             result += "></input>";
             return result;
         }, // checkbox
@@ -283,7 +277,7 @@
             if (this.options.checkboxes)
                 // Use a key instead of hostname (hard coded...)
                 // XXX remove the empty checked attribute
-                line.push(this.checkbox(this.options.plugin_uuid, record[ELEMENT_KEY], record['type']));
+                line.push(this.checkbox(this.key, record[this.key]));
     
             // XXX Is adding an array of lines more efficient ?
             this.table.fnAddData(line);

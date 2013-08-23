@@ -41,6 +41,7 @@ from portal.forms                import SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
+from manifold.manifoldapi        import execute_query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
 from django.http                 import HttpResponseRedirect, HttpResponse
@@ -68,6 +69,8 @@ class DashboardView(TemplateView):
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
         slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
         auth_query  = Query().get('network').select('network_hrn')
+        print "AUTH QUERY =====================", auth_query
+        print "filter", auth_query.filters
         page.enqueue_query(slice_query)
         page.enqueue_query(auth_query)
 
@@ -476,16 +479,6 @@ class DashboardView(TemplateView):
 # DEPRECATED #        context.update(page.prelude_env())
 # DEPRECATED #        return context
 
-
-@login_required
-# View for my_account form
-def my_account(request):
-    return render(request, 'my_account.html', {
-        #'form': form,
-        'topmenu_items': topmenu_items('My Account', request),
-        'username': the_user (request)
-    })
-
 # View for platforms
 class PlatformsView(TemplateView):
     template_name = "platforms.html"
@@ -537,6 +530,77 @@ class PlatformsView(TemplateView):
         context.update(page.prelude_env())
 
         return context
+
+
+
+# View for 1 platform and its details
+class PlatformView(TemplateView):
+    template_name = "platform.html"
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        for key, value in kwargs.iteritems():
+            print "%s = %s" % (key, value)       
+            if key == "platformname":
+                platformname=value
+                
+        network_query  = Query().get('local:platform').filter_by('platform', '==', platformname).select('platform','platform_longname','gateway_type')
+        page.enqueue_query(network_query)
+
+        page.expose_js_metadata()
+        page.expose_queries()
+        networklist = Hazelnut(
+            page  = page,
+            title = 'List',
+            domid = 'checkboxes',
+            # this is the query at the core of the slice list
+            query = network_query,
+            query_all = network_query,
+            checkboxes = False,
+            datatables_options = {
+            # for now we turn off sorting on the checkboxes columns this way
+            # this of course should be automatic in hazelnut
+            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+            'iDisplayLength' : 25,
+            'bLengthChange'  : True,
+            },
+        )
+#
+#        networklist = SimpleList(
+#            title = None,
+#            page  = page,
+#            key   = 'platform',
+#            query = network_query,
+#        )
+
+        context = super(PlatformView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['networks'] = networklist.render(self.request)
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Platforms connected to MySlice'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('Platforms', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+
+        return context
+
+
+@login_required
+# View for my_account form
+def my_account(request):
+    return render(request, 'my_account.html', {
+        #'form': form,
+        'topmenu_items': topmenu_items('My Account', request),
+        'username': the_user (request)
+    })
+
+
 @login_required
 #my_acc form value processing
 def acc_process(request):
@@ -631,11 +695,17 @@ def acc_process(request):
 
 def register_4m_f4f(request):
     errors = []
+
+    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
+    #authorities_query = Query.get('authority').select('authority_hrn')
+    authorities = execute_query(request, authorities_query)
+
     if request.method == 'POST':
         #get_email = PendingUser.objects.get(email)
         reg_fname = request.POST.get('firstname', '')
         reg_lname = request.POST.get('lastname', '')
         reg_aff = request.POST.get('affiliation','')
+        reg_auth = request.POST.get('authority_hrn', '')
         reg_email = request.POST.get('email','').lower()
         
         #POST value validation  
@@ -651,6 +721,7 @@ def register_4m_f4f(request):
             errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
             #return render(request, 'register_4m_f4f.html')
+        # XXX validate authority hrn !!
         if PendingUser.objects.filter(email__iexact=reg_email):
             errors.append('Email already registered.Please provide a new email address.')
             #return HttpResponse("Email Already exists")
@@ -704,6 +775,7 @@ def register_4m_f4f(request):
         #b.save()
         if not errors:
             b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff,
+                            authority_hrn=reg_auth,
                             email=reg_email, password=request.POST['password'], keypair=keypair)
             b.save()
             return render(request, 'user_register_complete.html')
@@ -714,8 +786,10 @@ def register_4m_f4f(request):
         'firstname': request.POST.get('firstname', ''),
         'lastname': request.POST.get('lastname', ''),
         'affiliation': request.POST.get('affiliation', ''),
+        'authority_hrn': request.POST.get('authority_hrn', ''),
         'email': request.POST.get('email', ''),
         'password': request.POST.get('password', ''),           
+        'authorities': authorities
     })        
     
 
@@ -962,3 +1036,215 @@ def pres_view_static(request, constraints, id):
 
     json_answer = json.dumps(cmd)
     return HttpResponse (json_answer, mimetype="application/json")
+
+class ValidatePendingView(TemplateView):
+    template_name = "validate_pending.html"
+
+    def get_context_data(self, **kwargs):
+        # We might have slices on different registries with different user accounts 
+        # We note that this portal could be specific to a given registry, to which we register users, but i'm not sure that simplifies things
+        # Different registries mean different identities, unless we identify via SFA HRN or have associated the user email to a single hrn
+
+        #messages.info(self.request, 'You have logged in')
+        page = Page(self.request)
+
+        ctx_my_authorities = {}
+        ctx_delegation_authorities = {}
+
+
+        # The user need to be logged in
+        if the_user(self.request):
+            # Who can a PI validate:
+            # His own authorities + those he has credentials for.
+            # In MySlice we need to look at credentials also.
+            
+
+            # XXX This will have to be asynchroneous. Need to implement barriers,
+            # for now it will be sufficient to have it working statically
+
+            # get user_id to later on query accounts
+            # XXX Having real query plan on local tables would simplify all this
+            # XXX $user_email is still not available for local tables
+            #user_query = Query().get('local:user').filter_by('email', '==', '$user_email').select('user_id')
+            user_query = Query().get('local:user').filter_by('email', '==', the_user(self.request)).select('user_id')
+            user, = execute_query(self.request, user_query)
+            user_id = user['user_id']
+
+            # Query manifold to learn about available SFA platforms for more information
+            # In general we will at least have the portal
+            # For now we are considering all registries
+            all_authorities = []
+            platform_ids = []
+            sfa_platforms_query = Query().get('local:platform').filter_by('gateway_type', '==', 'sfa').select('platform_id', 'platform', 'auth_type')
+            sfa_platforms = execute_query(self.request, sfa_platforms_query)
+            for sfa_platform in sfa_platforms:
+                print "SFA PLATFORM > ", sfa_platform['platform']
+                if not 'auth_type' in sfa_platform:
+                    continue
+                auth = sfa_platform['auth_type']
+                if not auth in all_authorities:
+                    all_authorities.append(auth)
+                platform_ids.append(sfa_platform['platform_id'])
+
+            # We can check on which the user has authoritity credentials = PI rights
+            credential_authorities = set()
+            credential_authorities_expired = set()
+
+            # User account on these registries
+            user_accounts_query = Query.get('local:account').filter_by('user_id', '==', user_id).filter_by('platform_id', 'included', platform_ids).select('config')
+            user_accounts = execute_query(self.request, user_accounts_query)
+            #print "=" * 80
+            #print user_accounts
+            #print "=" * 80
+            for user_account in user_accounts:
+                config = json.loads(user_account['config'])
+                creds = []
+                if 'authority_credentials' in config:
+                    for authority_hrn, credential in config['authority_credentials'].items():
+                        #if credential is not expired:
+                        credential_authorities.add(authority_hrn)
+                        #else
+                        #    credential_authorities_expired.add(authority_hrn)
+                if 'delegated_authority_credentials' in config:
+                    for authority_hrn, credential in config['delegated_authority_credentials'].items():
+                        #if credential is not expired:
+                        credential_authorities.add(authority_hrn)
+                        #else
+                        #    credential_authorities_expired.add(authority_hrn)
+
+            print 'credential_authorities =', credential_authorities
+            print 'credential_authorities_expired =', credential_authorities_expired
+
+            # ** Where am I a PI **
+            # For this we need to ask SFA (of all authorities) = PI function
+            pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
+            pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
+            pi_authorities = set()
+            for pa in pi_authorities_tmp:
+                pi_authorities |= set(pa['pi_authorities'])
+
+            print "pi_authorities =", pi_authorities
+            
+            # My authorities + I have a credential
+            pi_credential_authorities = pi_authorities & credential_authorities
+            pi_no_credential_authorities = pi_authorities - credential_authorities - credential_authorities_expired
+            pi_expired_credential_authorities = pi_authorities & credential_authorities_expired
+            # Authorities I've been delegated PI rights
+            pi_delegation_credential_authorities = credential_authorities - pi_authorities
+            pi_delegation_expired_authorities = credential_authorities_expired - pi_authorities
+
+            print "pi_credential_authorities =", pi_credential_authorities
+            print "pi_no_credential_authorities =", pi_no_credential_authorities
+            print "pi_expired_credential_authorities =", pi_expired_credential_authorities
+            print "pi_delegation_credential_authorities = ", pi_delegation_credential_authorities
+            print "pi_delegation_expired_authorities = ", pi_delegation_expired_authorities
+
+            # Summary intermediary
+            pi_my_authorities = pi_credential_authorities | pi_no_credential_authorities | pi_expired_credential_authorities
+            pi_delegation_authorities = pi_delegation_credential_authorities | pi_delegation_expired_authorities
+
+            print "--"
+            print "pi_my_authorities = ", pi_my_authorities
+            print "pi_delegation_authorities = ", pi_delegation_authorities
+
+            # Summary all
+            queried_pending_authorities = pi_my_authorities | pi_delegation_authorities
+            print "----"
+            print "queried_pending_authorities = ", queried_pending_authorities
+            
+            # Pending requests + authorities
+            #pending_users = PendingUser.objects.filter(authority_hrn__in = queried_pending_authorities).all() 
+            #pending_slices = PendingSlice.objects.filter(authority_hrn__in = queried_pending_authorities).all() 
+            pending_users = PendingUser.objects.all()
+            pending_slices = PendingSlice.objects.all()
+
+            # Dispatch requests and build the proper structure for the template:
+
+            print "pending users =", pending_users
+            print "pending slices =", pending_slices
+
+            for user in pending_users:
+                auth_hrn = user.authority_hrn
+
+                request = {}
+                request['type'] = 'user'
+                request['id'] = 'TODO' # XXX in DB ?
+                request['timestamp'] = 'TODO' # XXX in DB ?
+                request['details'] = "%s %s <%s>" % (user.first_name, user.last_name, user.email)
+
+                if auth_hrn in pi_my_authorities:
+                    dest = ctx_my_authorities
+
+                    # define the css class
+                    if auth_hrn in pi_credential_authorities:
+                        request['allowed'] = 'allowed'
+                    elif auth_hrn in pi_expired_credential_authorities:
+                        request['allowed'] = 'expired'
+                    else: # pi_no_credential_authorities
+                        request['allowed'] = 'denied'
+
+                elif auth_hrn in pi_delegation_authorities:
+                    dest = ctx_delegation_authorities
+
+                    if auth_hrn in pi_delegation_credential_authorities:
+                        request['allowed'] = 'allowed'
+                    else: # pi_delegation_expired_authorities
+                        request['allowed'] = 'expired'
+
+                else:
+                    continue
+                    
+                if not auth_hrn in dest:
+                    dest[auth_hrn] = []
+                print "auth_hrn [%s] was added %r" % (auth_hrn, request)
+                dest[auth_hrn].append(request) 
+
+            for slice in pending_slices:
+                auth_hrn = slice.authority_hrn
+                if not auth_hrn:
+                    auth_hrn = "ple.upmc" # XXX HARDCODED
+
+                request = {}
+                request['type'] = 'slice'
+                request['id'] = 'TODO' # XXX in DB ?
+                request['timestamp'] = 'TODO' # XXX in DB ?
+                request['details'] = "Number of nodes: %d -- Type of nodes: %s<br/>%s" % ('TODO', 'TODO', 'TODO') # XXX 
+                if auth_hrn in pi_my_authorities:
+                    dest = ctx_my_authorities
+
+                    # define the css class
+                    if auth_hrn in pi_credential_authorities:
+                        request['allowed'] = 'allowed'
+                    elif auth_hrn in pi_expired_credential_authorities:
+                        request['allowed'] = 'expired'
+                    else: # pi_no_credential_authorities
+                        request['allowed'] = 'denied'
+
+                elif auth_hrn in pi_delegation_authorities:
+                    dest = ctx_delegation_authorities
+
+                    if auth_hrn in pi_delegation_credential_authorities:
+                        request['allowed'] = 'allowed'
+                    else: # pi_delegation_expired_authorities
+                        request['allowed'] = 'expired'
+                    
+                if not auth_hrn in dest:
+                    dest[auth_hrn] = []
+                dest[auth_hrn].append(request) 
+
+        context = super(ValidatePendingView, self).get_context_data(**kwargs)
+        context['my_authorities']   = ctx_my_authorities
+        context['delegation_authorities'] = ctx_delegation_authorities
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Test view that combines various plugins'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
+        # so we can sho who is logged
+        context['username'] = the_user(self.request) 
+
+        # XXX We need to prepare the page for queries
+        #context.update(page.prelude_env())
+
+        return context

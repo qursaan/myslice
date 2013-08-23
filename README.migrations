@@ -1,0 +1,4 @@
+see reset.sh
+
+./manage.py schemamigration portal --initial
+./manage.py schemamigration portal extend_slice --auto

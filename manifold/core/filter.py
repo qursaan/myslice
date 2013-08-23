@@ -16,6 +16,9 @@ class Filter(set):
     A filter is a set of predicates
     """
 
+    #def __init__(self, s=()):
+    #    super(Filter, self).__init__(s)
+
     @staticmethod
     def from_list(l):
         f = Filter()
@@ -37,15 +40,29 @@ class Filter(set):
                 f.add(Predicate(key, '=', value))
         return f
 
+    def to_list(self):
+        ret = []
+        for predicate in self:
+            ret.append(predicate.to_list())
+        return ret
+        
+
+    @staticmethod
+    def from_clause(clause):
+        """
+        NOTE: We can only handle simple clauses formed of AND fields.
+        """
+        raise Exception, "Not implemented"
+
     def filter_by(self, predicate):
         self.add(predicate)
         return self
 
     def __str__(self):
-        return '<Filter: %s>' % ' AND '.join([str(pred) for pred in self])
+        return ' AND '.join([str(pred) for pred in self])
 
     def __repr__(self):
-        return self.__str__()
+        return '<Filter: %s>' % ' AND '.join([str(pred) for pred in self])
 
     def __key(self):
         return tuple([hash(pred) for pred in self])
@@ -60,6 +77,8 @@ class Filter(set):
 
     def keys(self):
         return set([x.key for x in self])
+
+    # XXX THESE FUNCTIONS SHOULD ACCEPT MULTIPLE FIELD NAMES
 
     def has(self, key):
         for x in self:
@@ -94,10 +113,15 @@ class Filter(set):
         #self = filter(lambda x: x.key != key, self)
 
     def get_op(self, key, op):
-        for x in self:
-            if x.key == key and x.op == op:
-                return x.value
-        raise KeyError, key
+        if isinstance(op, (list, tuple, set)):
+            for x in self:
+                if x.key == key and x.op in op:
+                    return x.value
+        else:
+            for x in self:
+                if x.key == key and x.op == op:
+                    return x.value
+        return None
 
     def get_eq(self, key):
         return self.get_op(key, eq)
@@ -127,9 +151,9 @@ class Filter(set):
 #            dic = predicate.filter(dic)
 #        return dic
 
-    def match(self, dic):
+    def match(self, dic, ignore_missing=True):
         for predicate in self:
-            if not predicate.match(dic, ignore_missing=True):
+            if not predicate.match(dic, ignore_missing):
                 return False
         return True
 
@@ -140,8 +164,11 @@ class Filter(set):
                 output.append(x)
         return output
 
-    def to_list(self):
-        return [list(pred.get_str_tuple()) for pred in self]
+    def get_field_names(self):
+        field_names = set()
+        for predicate in self:
+            field_names |= predicate.get_field_names()
+        return field_names
 
 #class OldFilter(Parameter, dict):
 #    """
