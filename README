@@ -222,6 +222,8 @@ that would reset all-static/ and all-templates/ for you from the other contents
 ======== update django database to reflect changes in existing models without any migration system (e.g., south) =========
 
 $python manage.py reset <your_app>
+#Django 1.5.1
+$python manage.py flush
 
 This will update the database tables for your app, but will completely destroy any data that existed in those tables. 
 If the changes you made to your app model do not break your old schema (for instance, you added a new, optional field) 
