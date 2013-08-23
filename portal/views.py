@@ -684,11 +684,17 @@ def acc_process(request):
 
 def register_4m_f4f(request):
     errors = []
+
+    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
+    #authorities_query = Query.get('authority').select('authority_hrn')
+    authorities = execute_query(request, authorities_query)
+
     if request.method == 'POST':
         #get_email = PendingUser.objects.get(email)
         reg_fname = request.POST.get('firstname', '')
         reg_lname = request.POST.get('lastname', '')
         reg_aff = request.POST.get('affiliation','')
+        reg_auth = request.POST.get('authority_hrn', '')
         reg_email = request.POST.get('email','').lower()
         
         #POST value validation  
@@ -704,6 +710,7 @@ def register_4m_f4f(request):
             errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
             #return render(request, 'register_4m_f4f.html')
+        # XXX validate authority hrn !!
         if PendingUser.objects.filter(email__iexact=reg_email):
             errors.append('Email already registered.Please provide a new email address.')
             #return HttpResponse("Email Already exists")
@@ -757,6 +764,7 @@ def register_4m_f4f(request):
         #b.save()
         if not errors:
             b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff,
+                            authority_hrn=reg_auth,
                             email=reg_email, password=request.POST['password'], keypair=keypair)
             b.save()
             return render(request, 'user_register_complete.html')
@@ -767,8 +775,10 @@ def register_4m_f4f(request):
         'firstname': request.POST.get('firstname', ''),
         'lastname': request.POST.get('lastname', ''),
         'affiliation': request.POST.get('affiliation', ''),
+        'authority_hrn': request.POST.get('authority_hrn', ''),
         'email': request.POST.get('email', ''),
         'password': request.POST.get('password', ''),           
+        'authorities': authorities
     })        
     
 
@@ -1144,8 +1154,6 @@ class ValidatePendingView(TemplateView):
 
             for user in pending_users:
                 auth_hrn = user.authority_hrn
-                if not auth_hrn:
-                    auth_hrn = "fed4fire.upmc" # XXX HARDCODED
 
                 request = {}
                 request['type'] = 'user'

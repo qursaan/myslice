@@ -45,6 +45,17 @@
      <p class="hint">Enter your Institution name</p>
      <?php echo $erraffiliation;?>
    </div>
+
+    <div class="field">
+      <label for="auth_list">Authority</label>
+      <select id="auth_list" name="authority_hrn" size="1" class="required">
+        {% for authority in authorities %}
+        <option value="{{ authority.authority_hrn }}"/>{{authority.name}} ({{authority.authority_hrn}})</option>
+        {% endfor %}
+     </select>
+     <p class="hint">Please select an authority responsible for vetting your account</p>
+   </div>
+
    <div class="field">
      <label for="cemail">Email</label>
      <input type="text" id="email" name="email" size="25"  class="required email" value="{{ email }}"/> 
