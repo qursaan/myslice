@@ -96,7 +96,7 @@
         if (key == 'slice.slice_hrn') {
             return "<i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + "</a>";
         } else if (key == 'network_hrn') {
-            return "<i class='icon-play-circle'></i>" + value ;
+            return "<i class='icon-play-circle'></i><a href='/portal/platform/" + value + "'>" + value + "</a>";
         } else {
             return value;
         }

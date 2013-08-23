@@ -583,7 +583,7 @@ class PlatformView(TemplateView):
         # more general variables expected in the template
         context['title'] = 'Platforms connected to MySlice'
         # the menu items on the top
-        # context['topmenu_items'] = topmenu_items('Platforms', self.request)
+        context['topmenu_items'] = topmenu_items('Platforms', self.request)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 
@@ -1145,7 +1145,7 @@ class ValidatePendingView(TemplateView):
             for user in pending_users:
                 auth_hrn = user.authority_hrn
                 if not auth_hrn:
-                    auth_hrn = "ple.upmc" # XXX HARDCODED
+                    auth_hrn = "fed4fire.upmc" # XXX HARDCODED
 
                 request = {}
                 request['type'] = 'user'
