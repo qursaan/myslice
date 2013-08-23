@@ -27,6 +27,8 @@ from django.contrib              import messages
 from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
+from django.utils.decorators     import method_decorator
+from django.contrib.auth.decorators import login_required
 
 from plugins.lists.simplelist    import SimpleList
 from plugins.hazelnut            import Hazelnut
@@ -48,6 +50,11 @@ import os, re
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
+    
+    #This view requires login 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DashboardView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # We might have slices on different registries with different user accounts 
@@ -470,7 +477,7 @@ class DashboardView(TemplateView):
 # DEPRECATED #        return context
 
 
-
+@login_required
 # View for my_account form
 def my_account(request):
     return render(request, 'my_account.html', {
@@ -530,7 +537,7 @@ class PlatformsView(TemplateView):
         context.update(page.prelude_env())
 
         return context
-
+@login_required
 #my_acc form value processing
 def acc_process(request):
     # getting the user_id from the session [now hardcoded]
@@ -743,7 +750,7 @@ def contact(request):
 
     })
 
-
+@login_required
 def slice_request(request):
     if request.method == 'POST': # If the form has been submitted...
         form = SliceRequestForm(request.POST) # A form bound to the POST data
