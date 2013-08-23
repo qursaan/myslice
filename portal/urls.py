@@ -22,8 +22,7 @@
 
 from django.conf.urls import patterns, include, url
 from portal           import views
-from portal.views     import  DashboardView, PresViewView
-from portal.views     import DashboardView, PresViewView, PlatformsView, PlatformView
+from portal.views     import DashboardView, PresViewView, PlatformsView, PlatformView, ValidatePendingView # UserRegisterView, UserValidateView
 from portal.util      import TemplateView
 
 # DEPRECATED #named_register_forms = (
@@ -54,6 +53,8 @@ urlpatterns = patterns('',
     url(r'^contact/?$', views.contact),
     # Slice request
     url(r'^slice_request/?$', views.slice_request),
+    # Validate pending requests
+    url(r'^validate/?$', ValidatePendingView.as_view()),
 
     url(r'^pres_view/?$', PresViewView.as_view(), name='pres_view'),
     (r'^methods/(?P<type>\w+)/?$', 'portal.views.pres_view_methods'),

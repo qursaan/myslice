@@ -50,6 +50,8 @@ urlpatterns = patterns(
     (r'^slice/(?P<slicename>[\w\.]+)/?$', 'trash.sliceview.slice_view'),
     # Portal
     url(r'^portal/', include('portal.urls')),
+    # Portal
+    url(r'^sample/', include('sample.urls')),
     # Debug
     url(r'^debug/', include('debug_platform.urls')),
     # Static files

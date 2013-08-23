@@ -2,3 +2,4 @@
 #Django==1.4
 django-registration==1.0
 Sphinx==1.1.3
+django-south

@@ -1,0 +1,49 @@
+.portal_validate_request {
+	background-repeat: no-repeat;
+	background-position: 10px center;
+	padding: 10px;
+	position:relative;
+}
+
+.portal_validate_request .slice {
+	background-image: url(../img/slice-icon.png);
+}
+
+.portal_validate_request.user {
+	background-image: url(../img/user-icon.png);
+}
+
+.portal_validate_request .authority {
+	background-image: url(../img/authority-icon.png);
+}
+
+.portal_validate_request .type {
+	position: relative;
+	left: 2%;
+}
+
+.portal_validate_request .id {
+	position: relative;
+	left: 5%;
+}
+.portal_validate_request .timestamp {
+	position: relative;
+	left: 10%;
+}
+.portal_validate_request .details {
+	position: relative;
+	left: 20%;
+}
+
+.portal_validate_request input {
+	position: relative;
+	left: 40%;
+}
+
+.portal_validate_request.even {
+	background-color: white;
+}
+
+.portal_validate_request.odd {
+	background-color: azure;
+}

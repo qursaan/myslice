@@ -61,3 +61,18 @@ class ManifoldAPI:
 
         return func
 
+def execute_query(request, query):
+    if not 'manifold' in request.session:
+        print "W: Used hardcoded demo account for execute_query"
+        manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+    else:
+        manifold_api_session_auth = request.session['manifold']['auth']
+    manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
+    print "-"*80
+    print query
+    print query.to_dict()
+    print "-"*80
+    result = manifold_api.forward(query.to_dict())
+    if result['code'] == 2:
+        raise Exception, 'Error running query'
+    return result['value'] 

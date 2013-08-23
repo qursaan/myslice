@@ -1,0 +1,66 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/validate_pending.css" />
+{% endblock %}
+
+{% block unfold1_main %}
+
+<h1>Pending requests</h1>
+
+<h2>My authorities</h2>
+
+{% if my_authorities %}
+
+{% for authority, requests in my_authorities.items %}
+<h3>{{authority}}</h3>
+    {% for request in requests %}
+    <div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'>
+		<span class='type'>{{ request.type }}</span>
+		<span class='id'>{{ request.id }}</span>
+		<span class='timestamp'>{{ request.timestamp }}</span>
+		<span class='details'>{{ request.details }}</span>
+		{% if request.allowed == 'allowed' %}
+		<input type='checkbox'/>
+		{% else %}
+			{% if request.allowed == 'expired' %}
+				expired
+			{% else %} {# denied #}
+				denied
+			{% endif %}
+		{% endif %}
+	</div>
+    {% endfor %}
+{% endfor %}
+
+{% else %}
+<i>There is no pending request waiting for validation.</i>
+{% endif %}
+
+{% if delegation_authorities %}
+<h2>Authorities with delegation</h2>
+
+{% for authority, requests in delegation_authorities.items %}
+<h3>{{authority}}</h3>
+    {% for request in requests %}
+    <div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'>
+		<span class='type'>{{ request.type }}</span>
+		<span class='id'>{{ request.id }}</span>
+		<span class='timestamp'>{{ request.timestamp }}</span>
+		<span class='details'>{{ request.details }}</span>
+		{% if request.allowed == 'allowed' %}
+		<input type='checkbox'/>
+		{% else %}
+			{% if request.allowed == 'expired' %}
+				expired
+			{% else %} {# denied #}
+				denied
+			{% endif %}
+		{% endif %}
+	</div>
+    {% endfor %}
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}
