@@ -22,7 +22,7 @@
 
 from django.conf.urls import patterns, include, url
 from portal           import views
-from portal.views     import UserRegisterView, UserValidateView, DashboardView, PresViewView, ValidatePendingView
+from portal.views     import DashboardView, PresViewView, PlatformsView, ValidatePendingView # UserRegisterView, UserValidateView
 from portal.util      import TemplateView
 
 # DEPRECATED #named_register_forms = (
@@ -35,15 +35,16 @@ from portal.util      import TemplateView
 
 urlpatterns = patterns('',
     # User registration
-    url(r'^user/register/?$', UserRegisterView.as_view(), name='user_register'),
+    #url(r'^user/register/?$', UserRegisterView.as_view(), name='user_register'),
     url(r'^user/register/complete/$',
         TemplateView.as_view(template_name='user_register_complete.html'),
         name='user_register_complete'),
     # User validation
-    url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
+    #url(r'^user/validate/?$', UserValidateView.as_view(), name='user_validate'),
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', views.my_account),
+    url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^acc_process/?$', views.acc_process),
     url(r'^register/?$', views.register_4m_f4f),
     #url(r'^reg_process/?$', views.reg_4m_f4f_process),

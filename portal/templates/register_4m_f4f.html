@@ -10,58 +10,56 @@
 
 
 
-
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+{% if errors %}
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 
 <form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
 {% csrf_token %}
  <fieldset>
-    <div class="fed4fireTitle">
+    <div class="OneLabTitle">
         <h2>OneLab Experimenter Registration</h2>
         <h3>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
     </div>
    
    <div class="field">
      <label for="cname">First Name</label>
-     <input type="text" id="firstname" name="firstname" size="25" class="required" minlength="2" value="{{ form.field.value|default_if_none:"" }}" /> 
+     <input type="text" id="firstname" name="firstname" size="25" class="required" minlength="2" value="{{ firstname}}" /> 
      <p class="hint">Enter your first name</p>
      <?php echo $errfName;?>
    </div>
    <div class="field">
      <label for="lname">Last Name</label>
-     <input type="text" id="lastname" name="lastname" size="25" class="required" minlength="2" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <input type="text" id="lastname" name="lastname" size="25" class="required" minlength="2" value="{{ lastname }}"/> 
      <p class="hint">Enter your last name</p>
      <?php echo $errlName;?>
    </div>
    <div class="field">
      <label for="aff_list">Affiliation</label>
-     <input type="text" id="aff_list" name="affiliation" size="25" class="required"  value="{{ form.field.value|default_if_none:"" }}"/> 
+     <input type="text" id="aff_list" name="affiliation" size="25" class="required"  value="{{ affiliation }}"/> 
      <p class="hint">Enter your Institution name</p>
      <?php echo $erraffiliation;?>
    </div>
    <div class="field">
      <label for="cemail">Email</label>
-     <input type="text" id="email" name="email" size="25"  class="required email" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <input type="text" id="email" name="email" size="25"  class="required email" value="{{ email }}"/> 
      <p class="hint">Enter a valid email address</p>
      <?php echo $errEmail; ?>
    </div>
    <div class="field">
      <label for="password">Password</label>
-     <input type="password"  id="password" name="password"   class="required" minlength="4" value="{{ form.field.value|default_if_none:"" }}"/> 
+     <input type="password"  id="password" name="password"   class="required" minlength="4" value="{{ password }}"/> 
      <p class="hint">Enter password</p>
      <?php //echo $errPass;?>
    </div>
    <div class="field">
      <label for="password">Confirm Password</label>
-     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value='{{ form.field.value|default_if_none:"" }}'/>
+     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value=""/>
      <p class="hint">Retype the password</p>
    </div>
    <div class="field">

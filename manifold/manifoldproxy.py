@@ -56,7 +56,7 @@ with the query passed using POST"""
         # retrieve session for request
 
         # We allow some requests to use the ADMIN user account
-        if manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create':
+        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
             print "W: Used hardcoded demo account for admin queries"
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
         else:

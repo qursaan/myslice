@@ -7,16 +7,19 @@
 
 {% block unfold1_main %}
 
-
-<div style=" padding-top: 12px; background-color: orange; border: 1px solid #61210B; text-align: center;">
-         <h3>Onelab Support</h3>
-         <h3>If you have already registered then send an <a href="mailto:support@myslice.info"> e-mail </a>  or <a href="http://trac.myslice.info/" >visit us</a></h3>
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
+<form class="cmxform" id="commentForm" action="#" method="post">{% csrf_token %}
+<fieldset>
+<div class="OneLabTitle" style="margin-bottom:20px;">
+         <h2>Onelab Support</h2>
+         <h4>If you have already registered then send an <a href="mailto:support@myslice.info"> e-mail </a>  or <a href="http://trac.myslice.info/" >visit us</a></h4>
 </div>
 
-<form action="#" method="post">{% csrf_token %}
 {{ form.as_p }}
-<input type="submit" value="Submit" />
+<p style="text-align: center;width: 80%;">
+    <input type="submit" value="Submit" />
+</p>
+</fieldset>
 </form>
-
 {% endblock %}
 

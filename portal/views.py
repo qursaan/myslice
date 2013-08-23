@@ -29,13 +29,13 @@ from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 
 from plugins.lists.simplelist    import SimpleList
-
+from plugins.hazelnut            import Hazelnut
 from plugins.pres_view           import PresView
 from portal.event import Event
 import json
 
 from portal                      import signals
-from portal.forms                import UserRegisterForm, SliceRequestForm, ContactForm
+from portal.forms                import SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from manifold.core.query         import Query
@@ -101,145 +101,145 @@ class DashboardView(TemplateView):
 
         return context
 
-class UserRegisterView(RegistrationView):
-    """
-    A registration backend which follows a simple workflow:
-
-    1. User signs up, inactive account is created.
-
-    2. Email is sent to user with activation link.
-
-    3. User clicks activation link, account is now active.
-
-    Using this backend requires that
-
-    * ``registration`` be listed in the ``INSTALLED_APPS`` setting
-      (since this backend makes use of models defined in this
-      application).
-
-    * The setting ``ACCOUNT_ACTIVATION_DAYS`` be supplied, specifying
-      (as an integer) the number of days from registration during
-      which a user may activate their account (after that period
-      expires, activation will be disallowed).
-
-    * The creation of the templates
-      ``registration/activation_email_subject.txt`` and
-      ``registration/activation_email.txt``, which will be used for
-      the activation email. See the notes for this backends
-      ``register`` method for details regarding these templates.
-
-    Additionally, registration can be temporarily closed by adding the
-    setting ``REGISTRATION_OPEN`` and setting it to
-    ``False``. Omitting this setting, or setting it to ``True``, will
-    be interpreted as meaning that registration is currently open and
-    permitt ed.
-
-    Internally, this is accomplished via storing an activation key in
-    an instance of ``registration.models.RegistrationProfile``. See
-    that model and its custom manager for full documentation of its
-    fields and supported operations.
-    
-    """
-    form_class = UserRegisterForm
-    
-    def register(self, request, **cleaned_data):
-        """
-        Given a username, email address and password, register a new
-        user account, which will initially be inactive.
-
-        Along with the new ``User`` object, a new
-        ``registration.models.RegistrationProfile`` will be created,
-        tied to that ``User``, containing the activation key which
-        will be used for this account.
-
-        An email will be sent to the supplied email address; this
-        email should contain an activation link. The email will be
-        rendered using two templates. See the documentation for
-        ``RegistrationProfile.send_activation_email()`` for
-        information about these templates and the contexts provided to
-        them.
-
-        After the ``User`` and ``RegistrationProfile`` are created and
-        the activation email is sent, the signal
-        ``registration.signals.user_registered`` will be sent, with
-        the new ``User`` as the keyword argument ``user`` and the
-        class of this backend as the sender.
-
-        """
-        first_name = cleaned_data['first_name']
-        last_name  = cleaned_data['last_name']
-        affiliation= cleaned_data['affiliation']
-        email      = cleaned_data['email']
-        password   = cleaned_data['password1']
-        
-        #password2  = cleaned_data['password2']
-        keypair    = cleaned_data['keypair']
-
-        #if Site._meta.installed:
-        #    site = Site.objects.get_current()
-        #else:
-        #    site = RequestSite(request) 
-        site = None
-
-        new_user = PendingUser.objects.create_inactive_user(first_name, last_name, email, password, site)
-        signals.user_registered.send(sender=self.__class__,
-                                     user=new_user,
-                                     request=request)
-        return new_user
-
-    def get_context_data(self, **kwargs):
-        context = super(UserRegisterView, self).get_context_data(**kwargs)
-        context['topmenu_items'] = topmenu_items('Register', self.request)
-        context['username'] = the_user (self.request)
-        return context
-
-    def registration_allowed(self, request):
-        """
-        Indicate whether account registration is currently permitted,
-        based on the value of the setting ``REGISTRATION_OPEN``. This
-        is determined as follows:
-
-        * If ``REGISTRATION_OPEN`` is not specified in settings, or is
-          set to ``True``, registration is permitted.
-
-        * If ``REGISTRATION_OPEN`` is both specified and set to
-          ``False``, registration is not permitted.
-        
-        """
-        return getattr(settings, 'REGISTRATION_OPEN', True)
-
-    def get_success_url(self, request, user):
-        """
-        Return the name of the URL to redirect to after successful
-        user registration.
-        
-        """
-        return ('user_register_complete', (), {})
-
-
-class UserValidateView(ActivationView):
-    def activate(self, request, activation_key):
-        """
-        Given an an activation key, look up and activate the user
-        account corresponding to that key (if possible).
-
-        After successful activation, the signal
-        ``registration.signals.user_activated`` will be sent, with the
-        newly activated ``User`` as the keyword argument ``user`` and
-        the class of this backend as the sender.
-        
-        """
-        activated_user = RegistrationProfile.objects.activate_user(activation_key)
-        if activated_user:
-            signals.user_activated.send(sender=self.__class__,
-                                        user=activated_user,
-                                        request=request)
-        return activated_user
-
-    def get_success_url(self, request, user):
-        return ('registration_activation_complete', (), {})
-
-
+# DEPRECATED #class UserRegisterView(RegistrationView):
+# DEPRECATED #    """
+# DEPRECATED #    A registration backend which follows a simple workflow:
+# DEPRECATED #
+# DEPRECATED #    1. User signs up, inactive account is created.
+# DEPRECATED #
+# DEPRECATED #    2. Email is sent to user with activation link.
+# DEPRECATED #
+# DEPRECATED #    3. User clicks activation link, account is now active.
+# DEPRECATED #
+# DEPRECATED #    Using this backend requires that
+# DEPRECATED #
+# DEPRECATED #    * ``registration`` be listed in the ``INSTALLED_APPS`` setting
+# DEPRECATED #      (since this backend makes use of models defined in this
+# DEPRECATED #      application).
+# DEPRECATED #
+# DEPRECATED #    * The setting ``ACCOUNT_ACTIVATION_DAYS`` be supplied, specifying
+# DEPRECATED #      (as an integer) the number of days from registration during
+# DEPRECATED #      which a user may activate their account (after that period
+# DEPRECATED #      expires, activation will be disallowed).
+# DEPRECATED #
+# DEPRECATED #    * The creation of the templates
+# DEPRECATED #      ``registration/activation_email_subject.txt`` and
+# DEPRECATED #      ``registration/activation_email.txt``, which will be used for
+# DEPRECATED #      the activation email. See the notes for this backends
+# DEPRECATED #      ``register`` method for details regarding these templates.
+# DEPRECATED #
+# DEPRECATED #    Additionally, registration can be temporarily closed by adding the
+# DEPRECATED #    setting ``REGISTRATION_OPEN`` and setting it to
+# DEPRECATED #    ``False``. Omitting this setting, or setting it to ``True``, will
+# DEPRECATED #    be interpreted as meaning that registration is currently open and
+# DEPRECATED #    permitt ed.
+# DEPRECATED #
+# DEPRECATED #    Internally, this is accomplished via storing an activation key in
+# DEPRECATED #    an instance of ``registration.models.RegistrationProfile``. See
+# DEPRECATED #    that model and its custom manager for full documentation of its
+# DEPRECATED #    fields and supported operations.
+# DEPRECATED #    
+# DEPRECATED #    """
+# DEPRECATED ## DEPRECATED #    form_class = UserRegisterForm
+# DEPRECATED #    
+# DEPRECATED #    def register(self, request, **cleaned_data):
+# DEPRECATED #        """
+# DEPRECATED #        Given a username, email address and password, register a new
+# DEPRECATED #        user account, which will initially be inactive.
+# DEPRECATED #
+# DEPRECATED #        Along with the new ``User`` object, a new
+# DEPRECATED #        ``registration.models.RegistrationProfile`` will be created,
+# DEPRECATED #        tied to that ``User``, containing the activation key which
+# DEPRECATED #        will be used for this account.
+# DEPRECATED #
+# DEPRECATED #        An email will be sent to the supplied email address; this
+# DEPRECATED #        email should contain an activation link. The email will be
+# DEPRECATED #        rendered using two templates. See the documentation for
+# DEPRECATED #        ``RegistrationProfile.send_activation_email()`` for
+# DEPRECATED #        information about these templates and the contexts provided to
+# DEPRECATED #        them.
+# DEPRECATED #
+# DEPRECATED #        After the ``User`` and ``RegistrationProfile`` are created and
+# DEPRECATED #        the activation email is sent, the signal
+# DEPRECATED #        ``registration.signals.user_registered`` will be sent, with
+# DEPRECATED #        the new ``User`` as the keyword argument ``user`` and the
+# DEPRECATED #        class of this backend as the sender.
+# DEPRECATED #
+# DEPRECATED #        """
+# DEPRECATED #        first_name = cleaned_data['first_name']
+# DEPRECATED #        last_name  = cleaned_data['last_name']
+# DEPRECATED #        affiliation= cleaned_data['affiliation']
+# DEPRECATED #        email      = cleaned_data['email']
+# DEPRECATED #        password   = cleaned_data['password1']
+# DEPRECATED #        
+# DEPRECATED #        #password2  = cleaned_data['password2']
+# DEPRECATED #        keypair    = cleaned_data['keypair']
+# DEPRECATED #
+# DEPRECATED #        #if Site._meta.installed:
+# DEPRECATED #        #    site = Site.objects.get_current()
+# DEPRECATED #        #else:
+# DEPRECATED #        #    site = RequestSite(request) 
+# DEPRECATED #        site = None
+# DEPRECATED #
+# DEPRECATED #        new_user = PendingUser.objects.create_inactive_user(first_name, last_name, email, password, site)
+# DEPRECATED #        signals.user_registered.send(sender=self.__class__,
+# DEPRECATED #                                     user=new_user,
+# DEPRECATED #                                     request=request)
+# DEPRECATED #        return new_user
+# DEPRECATED #
+# DEPRECATED #    def get_context_data(self, **kwargs):
+# DEPRECATED #        context = super(UserRegisterView, self).get_context_data(**kwargs)
+# DEPRECATED #        context['topmenu_items'] = topmenu_items('Register', self.request)
+# DEPRECATED #        context['username'] = the_user (self.request)
+# DEPRECATED #        return context
+# DEPRECATED #
+# DEPRECATED #    def registration_allowed(self, request):
+# DEPRECATED #        """
+# DEPRECATED #        Indicate whether account registration is currently permitted,
+# DEPRECATED #        based on the value of the setting ``REGISTRATION_OPEN``. This
+# DEPRECATED #        is determined as follows:
+# DEPRECATED #
+# DEPRECATED #        * If ``REGISTRATION_OPEN`` is not specified in settings, or is
+# DEPRECATED #          set to ``True``, registration is permitted.
+# DEPRECATED #
+# DEPRECATED #        * If ``REGISTRATION_OPEN`` is both specified and set to
+# DEPRECATED #          ``False``, registration is not permitted.
+# DEPRECATED #        
+# DEPRECATED #        """
+# DEPRECATED #        return getattr(settings, 'REGISTRATION_OPEN', True)
+# DEPRECATED #
+# DEPRECATED #    def get_success_url(self, request, user):
+# DEPRECATED #        """
+# DEPRECATED #        Return the name of the URL to redirect to after successful
+# DEPRECATED #        user registration.
+# DEPRECATED #        
+# DEPRECATED #        """
+# DEPRECATED #        return ('user_register_complete', (), {})
+# DEPRECATED #
+# DEPRECATED #
+# DEPRECATED #class UserValidateView(ActivationView):
+# DEPRECATED #    def activate(self, request, activation_key):
+# DEPRECATED #        """
+# DEPRECATED #        Given an an activation key, look up and activate the user
+# DEPRECATED #        account corresponding to that key (if possible).
+# DEPRECATED #
+# DEPRECATED #        After successful activation, the signal
+# DEPRECATED #        ``registration.signals.user_activated`` will be sent, with the
+# DEPRECATED #        newly activated ``User`` as the keyword argument ``user`` and
+# DEPRECATED #        the class of this backend as the sender.
+# DEPRECATED #        
+# DEPRECATED #        """
+# DEPRECATED #        activated_user = RegistrationProfile.objects.activate_user(activation_key)
+# DEPRECATED #        if activated_user:
+# DEPRECATED #            signals.user_activated.send(sender=self.__class__,
+# DEPRECATED #                                        user=activated_user,
+# DEPRECATED #                                        request=request)
+# DEPRECATED #        return activated_user
+# DEPRECATED #
+# DEPRECATED #    def get_success_url(self, request, user):
+# DEPRECATED #        return ('registration_activation_complete', (), {})
+# DEPRECATED #
+# DEPRECATED #
 # DEPRECATED #from portal.portalpage  import PortalPage
 # DEPRECATED #from plugins.wizard     import Wizard
 # DEPRECATED #from plugins.form       import CreateForm
@@ -482,6 +482,57 @@ def my_account(request):
         'username': the_user (request)
     })
 
+# View for platforms
+class PlatformsView(TemplateView):
+    template_name = "platforms.html"
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        page.enqueue_query(network_query)
+
+        page.expose_js_metadata()
+        page.expose_queries()
+        networklist = Hazelnut(
+            page  = page,
+            title = 'List',
+            domid = 'checkboxes',
+            # this is the query at the core of the slice list
+            query = network_query,
+            query_all = network_query,
+            checkboxes = False,
+            datatables_options = {
+            # for now we turn off sorting on the checkboxes columns this way
+            # this of course should be automatic in hazelnut
+            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+            'iDisplayLength' : 25,
+            'bLengthChange'  : True,
+            },
+        )
+#
+#        networklist = SimpleList(
+#            title = None,
+#            page  = page,
+#            key   = 'platform',
+#            query = network_query,
+#        )
+
+        context = super(PlatformsView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['networks'] = networklist.render(self.request)
+
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Platforms connected to MySlice'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('Platforms', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+
+        return context
 
 #my_acc form value processing
 def acc_process(request):
@@ -575,33 +626,31 @@ def acc_process(request):
         return HttpResponse(message)
 
 def register_4m_f4f(request):
-    #return render(request, 'register_4m_f4f.html')
-
-#def reg_4m_f4f_process(request):
-    if 'submit' in request.POST:
+    errors = []
+    if request.method == 'POST':
         #get_email = PendingUser.objects.get(email)
-        reg_fname = request.POST['firstname']
-        reg_lname = request.POST['lastname']
-        reg_aff = request.POST['affiliation']
-        reg_email = request.POST['email'].lower()
+        reg_fname = request.POST.get('firstname', '')
+        reg_lname = request.POST.get('lastname', '')
+        reg_aff = request.POST.get('affiliation','')
+        reg_email = request.POST.get('email','').lower()
         
         #POST value validation  
         if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
-            messages.error(request, 'First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers, - and _ allowd in First Name")
-            return render(request, 'register_4m_f4f.html')
+            #return render(request, 'register_4m_f4f.html')
         if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
-            messages.error(request, 'Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
-            return render(request, 'register_4m_f4f.html')
+            #return render(request, 'register_4m_f4f.html')
         if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
-            messages.error(request, 'Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
-            return render(request, 'register_4m_f4f.html')
+            #return render(request, 'register_4m_f4f.html')
         if PendingUser.objects.filter(email__iexact=reg_email):
-            messages.error(request, 'Email already registered.Please provide a new email address.')
+            errors.append('Email already registered.Please provide a new email address.')
             #return HttpResponse("Email Already exists")
-            return render(request, 'register_4m_f4f.html')
+            #return render(request, 'register_4m_f4f.html')
         if 'generate' in request.POST['question']:
             #import os
             #from M2Crypto import Rand, RSA, BIO
@@ -644,14 +693,26 @@ def register_4m_f4f(request):
                 keypair = re.sub("\n", "\\n",keypair)
                 keypair = ''.join(keypair.split())
             else:
-                return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')
+                errors.append('Please upload a valid RSA public key [.txt or .pub].')
 
-        b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
-                        email=reg_email, password=request.POST['password'], keypair=keypair)
-        b.save()
+        #b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
+        #                email=reg_email, password=request.POST['password'], keypair=keypair)
+        #b.save()
+        if not errors:
+            b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff,
+                            email=reg_email, password=request.POST['password'], keypair=keypair)
+            b.save()
+            return render(request, 'user_register_complete.html')
 
-        return render(request, 'user_register_complete.html')
-    return render(request, 'register_4m_f4f.html')        
+    return render(request, 'register_4m_f4f.html',{
+        'topmenu_items': topmenu_items('Register', request),
+        'errors': errors,
+        'firstname': request.POST.get('firstname', ''),
+        'lastname': request.POST.get('lastname', ''),
+        'affiliation': request.POST.get('affiliation', ''),
+        'email': request.POST.get('email', ''),
+        'password': request.POST.get('password', ''),           
+    })        
     
 
 # view for contact form
