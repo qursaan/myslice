@@ -22,7 +22,7 @@
 
 from django.conf.urls import patterns, include, url
 from portal           import views
-from portal.views     import DashboardView, PresViewView, PlatformsView, ValidatePendingView # UserRegisterView, UserValidateView
+from portal.views     import DashboardView, PresViewView, PlatformsView, PlatformView, ValidatePendingView # UserRegisterView, UserValidateView
 from portal.util      import TemplateView
 
 # DEPRECATED #named_register_forms = (
@@ -45,6 +45,8 @@ urlpatterns = patterns('',
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', views.my_account),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
+    #url(r'^portal/platform/?$', PlatformView.platform_view(), name='platform'),
+    url(r'^platform/(?P<platformname>[\w\.]+)/?$', PlatformView.as_view(), name='platform'),
     url(r'^acc_process/?$', views.acc_process),
     url(r'^register/?$', views.register_4m_f4f),
     #url(r'^reg_process/?$', views.reg_4m_f4f_process),
