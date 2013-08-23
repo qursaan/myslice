@@ -58,6 +58,9 @@ def _slice_view (request, slicename):
     resource_md = metadata.details_by_object('resource')
     resource_fields = [column['name'] for column in resource_md['column']]
 
+    user_md = metadata.details_by_object('user')
+    user_fields = ['user_hrn'] # [column['name'] for column in user_md['column']]
+
     # TODO The query to run is embedded in the URL
     main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
     main_query.select(
@@ -69,10 +72,12 @@ def _slice_view (request, slicename):
     )
 
     query_resource_all = Query.get('resource').select(resource_fields)
+    query_user_all = Query.get('user').select(user_fields)
 
     aq = AnalyzedQuery(main_query, metadata=metadata)
     page.enqueue_query(main_query, analyzed_query=aq)
     page.enqueue_query(query_resource_all)
+    page.enqueue_query(query_user_all)
 
     # Prepare the display according to all metadata
     # (some parts will be pending, others can be triggered by users).
@@ -203,6 +208,7 @@ def _slice_view (request, slicename):
         togglable   = False,
         # this is the query at the core of the slice list
         query       = sq_user,
+        query_all  = query_user_all,
         checkboxes  = True,
         datatables_options = { 
             # for now we turn off sorting on the checkboxes columns this way
