@@ -20,13 +20,12 @@ def topmenu_items (current,request=None):
         result=deepcopy(standard_topmenu_items)
         result.append({'label':'My Account', 'href': '/portal/account/'})
         result.append({ 'label':'Request a slice', 'href': '/portal/slice_request/'})
-        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     else:
         result = []
         result.append({'label':'Home', 'href': '/login'})
         result.append({ 'label':'Register', 'href': '/portal/user/register/'})
-        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     result.append({'label':'Platforms', 'href': '/portal/platforms/'})
+    result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     for d in result:
         #if d['label'].lower()find(current)>=0: d['is_active']=True
         if d['label'] == current: d['is_active']=True
