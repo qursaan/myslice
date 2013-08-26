@@ -640,35 +640,41 @@ def acc_process(request):
         get_user.save()
         return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
-        #import os
-        #from M2Crypto import Rand, RSA, BIO
-
-        KEY_LENGTH = 2048
-
-        def blank_callback():
-            "Replace the default dashes"
-            return
-
-        # Random seed
-        Rand.rand_seed (os.urandom (KEY_LENGTH))
-        # Generate key pair
-        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-        # Create memory buffers
-        pri_mem = BIO.MemoryBuffer()
-        pub_mem = BIO.MemoryBuffer()
-        # Save keys to buffers
-        key.save_key_bio(pri_mem, None)
-        key.save_pub_key_bio(pub_mem)
-
-        # Get keys 
-        public_key = pub_mem.getvalue()
-        private_key = pri_mem.getvalue()
+        # Generate public and private keys using SFA Library
+        from sfa.trust.certificate  import Keypair
+        k = Keypair(create=True)
+        public_key = k.get_pubkey_string()
+        private_key = k.as_pem()
+       
+# DEPRECATED
+#        KEY_LENGTH = 2048
+#
+#        def blank_callback():
+#            "Replace the default dashes"
+#            return
+#
+#        # Random seed
+#        Rand.rand_seed (os.urandom (KEY_LENGTH))
+#        # Generate key pair
+#        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+#        # Create memory buffers
+#        pri_mem = BIO.MemoryBuffer()
+#        pub_mem = BIO.MemoryBuffer()
+#        # Save keys to buffers
+#        key.save_key_bio(pri_mem, None)
+#        key.save_pub_key_bio(pub_mem)
+#
+#        # Get keys 
+#        public_key = pub_mem.getvalue()
+#        private_key = pri_mem.getvalue()
+        private_key = ''.join(private_key.split())
+        public_key = "ssh-rsa " + public_key
         # Saving to DB
         keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-        keypair = re.sub("\r", "", keypair)
-        keypair = re.sub("\n", "\\n", keypair)
-        #keypair = keypair.rstrip('\r\n')
-        keypair = ''.join(keypair.split())
+#        keypair = re.sub("\r", "", keypair)
+#        keypair = re.sub("\n", "\\n", keypair)
+#        #keypair = keypair.rstrip('\r\n')
+#        keypair = ''.join(keypair.split())
         get_user.keypair = keypair
         get_user.save()
         return HttpResponse('Success: New Keypair Generated! %s' % keypair)
@@ -728,35 +734,44 @@ def register_4m_f4f(request):
             #return HttpResponse("Email Already exists")
             #return render(request, 'register_4m_f4f.html')
         if 'generate' in request.POST['question']:
-            #import os
-            #from M2Crypto import Rand, RSA, BIO
-            
-            KEY_LENGTH = 2048
+            # Generate public and private keys using SFA Library
+            from sfa.trust.certificate  import Keypair
+            k = Keypair(create=True)
+            public_key = k.get_pubkey_string()
+            private_key = k.as_pem()
 
-            def blank_callback():
-                "Replace the default dashes"
-                return
+# DEPRECATED
+#            #import os
+#            #from M2Crypto import Rand, RSA, BIO
+#            
+#            KEY_LENGTH = 2048
+#
+#            def blank_callback():
+#                "Replace the default dashes"
+#                return
+#
+#            # Random seed
+#            Rand.rand_seed (os.urandom (KEY_LENGTH))
+#            # Generate key pair
+#            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+#            # Create memory buffers
+#            pri_mem = BIO.MemoryBuffer()
+#            pub_mem = BIO.MemoryBuffer()
+#            # Save keys to buffers
+#            key.save_key_bio(pri_mem, None)
+#            key.save_pub_key_bio(pub_mem)
+#            # Get keys 
+#            public_key = pub_mem.getvalue()
+#            private_key = pri_mem.getvalue()
 
-            # Random seed
-            Rand.rand_seed (os.urandom (KEY_LENGTH))
-            # Generate key pair
-            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-            # Create memory buffers
-            pri_mem = BIO.MemoryBuffer()
-            pub_mem = BIO.MemoryBuffer()
-            # Save keys to buffers
-            key.save_key_bio(pri_mem, None)
-            key.save_pub_key_bio(pub_mem)
-            # Get keys 
-            public_key = pub_mem.getvalue()
-            private_key = pri_mem.getvalue()
+            private_key = ''.join(private_key.split())
+            public_key = "ssh-rsa " + public_key
             # Saving to DB
             keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-            keypair = re.sub("\r", "", keypair)
-            keypair = re.sub("\n", "\\n", keypair)
-            #keypair = keypair.rstrip('\r\n')
-            keypair = ''.join(keypair.split())
-            #return HttpResponse(keypair)
+#            keypair = re.sub("\r", "", keypair)
+#            keypair = re.sub("\n", "\\n", keypair)
+#            #keypair = keypair.rstrip('\r\n')
+#            keypair = ''.join(keypair.split())
         else:
             up_file = request.FILES['user_public_key']
             file_content =  up_file.read()
