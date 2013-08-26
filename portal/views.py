@@ -486,7 +486,8 @@ class PlatformsView(TemplateView):
     def get_context_data(self, **kwargs):
         page = Page(self.request)
 
-        network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        network_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
         page.enqueue_query(network_query)
 
         page.expose_js_metadata()

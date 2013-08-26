@@ -62,7 +62,7 @@ class ManifoldAPI:
         return func
 
 def execute_query(request, query):
-    if not 'manifold' in request.session:
+    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
         print "W: Used hardcoded demo account for execute_query"
         manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
     else:
