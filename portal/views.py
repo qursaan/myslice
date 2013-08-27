@@ -592,14 +592,62 @@ class PlatformView(TemplateView):
         return context
 
 
+
+#class for my_account
+class AccountView(TemplateView):
+    template_name = "my_account.html"
+    
+    #This view requires login 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AccountView, self).dispatch(*args, **kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        network_query  = Query().get('local:user').select('user_id','email','config')
+        page.enqueue_query(network_query)
+
+        page.expose_js_metadata()
+        page.expose_queries()
+
+        userlist = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'user_id',
+            query = network_query,
+        )
+
+        context = super(AccountView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['users'] = userlist.render(self.request)
+        
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Platforms connected to MySlice'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('My Account', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+        return context
+
+
+
+
+
+
 @login_required
 # View for my_account form
-def my_account(request):
-    return render(request, 'my_account.html', {
-        #'form': form,
-        'topmenu_items': topmenu_items('My Account', request),
-        'username': the_user (request)
-    })
+#def my_account(request):
+#    return render(request, 'my_account.html', {
+#        #'form': form,
+#        'topmenu_items': topmenu_items('My Account', request),
+#        'username': the_user (request)
+#    })
 
 
 @login_required
@@ -607,6 +655,7 @@ def my_account(request):
 def acc_process(request):
     # getting the user_id from the session [now hardcoded]
     get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+    # getting user info from manifold
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
@@ -630,7 +679,7 @@ def acc_process(request):
         get_user.last_name = edited_last_name
         get_user.save() 
 
-        return HttpResponse('Success: Name Updated!!')       
+        return HttpResponse('Sucess: First Name and Last Name Updated!')       
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
         # select the logged in user [for the moment hard coded]
