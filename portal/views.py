@@ -27,6 +27,8 @@ from django.contrib              import messages
 from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
+from django.template.loader      import render_to_string
+from django.core.mail            import send_mail
 
 from plugins.lists.simplelist    import SimpleList
 from plugins.hazelnut            import Hazelnut
@@ -38,6 +40,7 @@ from portal                      import signals
 from portal.forms                import SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
+from portal.actions              import authority_get_pi_emails, get_request_by_authority
 from manifold.core.query         import Query
 from manifold.manifoldapi        import execute_query
 from unfold.page                 import Page
@@ -690,6 +693,8 @@ def register_4m_f4f(request):
     authorities = execute_query(request, authorities_query)
 
     if request.method == 'POST':
+        # We shall use a form here
+
         #get_email = PendingUser.objects.get(email)
         reg_fname = request.POST.get('firstname', '')
         reg_lname = request.POST.get('lastname', '')
@@ -763,10 +768,35 @@ def register_4m_f4f(request):
         #                email=reg_email, password=request.POST['password'], keypair=keypair)
         #b.save()
         if not errors:
-            b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff,
-                            authority_hrn=reg_auth,
-                            email=reg_email, password=request.POST['password'], keypair=keypair)
+            b = PendingUser(
+                first_name=reg_fname, 
+                last_name=reg_lname, 
+                affiliation=reg_aff,
+                authority_hrn=reg_auth,
+                email=reg_email, 
+                password=request.POST['password'],
+                keypair=keypair
+            )
             b.save()
+
+            # Send email
+            ctx = {
+                first_name   : reg_fname, 
+                last_name    : reg_lname, 
+                affiliation  : reg_aff,
+                authority_hrn: reg_auth,
+                email        : reg_email, 
+                keypair      : keypair,
+                cc_myself    : True # form.cleaned_data['cc_myself']
+            }
+
+            recipients = authority_get_pi_emails(authority_hrn)
+            if ctx['cc_myself']:
+                recipients.append(ctx['email'])
+
+            msg = render_to_string('user_request_email.txt', ctx)
+            send_mail("Onelab New User request submitted", msg, email, recipients)
+
             return render(request, 'user_register_complete.html')
 
     return render(request, 'register_4m_f4f.html',{
@@ -796,6 +826,7 @@ def contact(request):
             email = form.cleaned_data['email'] # email of the sender
             cc_myself = form.cleaned_data['cc_myself']
 
+            #recipients = authority_get_pi_emails(authority_hrn)
             recipients = ['yasin.upmc@gmail.com']
             if cc_myself:
                 recipients.append(email)
@@ -815,26 +846,54 @@ def contact(request):
 
 
 def slice_request(request):
-    if request.method == 'POST': # If the form has been submitted...
-        form = SliceRequestForm(request.POST) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            # Process the data in form.cleaned_data
-            slice_name = form.cleaned_data['slice_name']
+    errors = []
+
+    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
+    #authorities_query = Query.get('authority').select('authority_hrn')
+    authorities = execute_query(request, authorities_query)
+
+    authority_hrn_tuple = []
+    for authority in authorities:
+        authority_hrn_tuple.append((authority['authority_hrn'], authority['name']))
+    authority_hrn_initial = {'authority_hrn': authority_hrn_tuple}
+        
+    # request.POST or None ?
+    if request.method == 'POST':
+        # The form has been submitted
+        form = SliceRequestForm(request.POST, initial=authority_hrn_initial) 
+
+        if form.is_valid():
+            slice_name      = form.cleaned_data['slice_name']
+            authority_hrn   = form.cleaned_data['authority_hrn']
             number_of_nodes = form.cleaned_data['number_of_nodes']
-            type_of_nodes = form.cleaned_data['type_of_nodes']
-            purpose = form.cleaned_data['purpose']
+            type_of_nodes   = form.cleaned_data['type_of_nodes']
+            purpose         = form.cleaned_data['purpose']
+            
+            s = PendingSlice(
+                slice_name      = slice_name,
+                authority_hrn   = authority_hrn,
+                number_of_nodes = number_of_nodes,
+                type_of_nodes   = type_of_nodes,
+                purpose         = purpose
+            )
+            s.save()
+
+            # All validation rules pass; process data in form.cleaned_data
+            # slice_name, number_of_nodes, type_of_nodes, purpose
             email = form.cleaned_data['email'] # email of the sender
             cc_myself = form.cleaned_data['cc_myself']
 
-            recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
+            # The recipients are the PI of the authority
+            recipients = authority_get_pi_emails(authority_hrn)
+            #recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
             if cc_myself:
                 recipients.append(email)
+            msg = render_to_string('slice_request_email.txt', form.cleaned_data)
+            send_mail("Onelab New Slice request form submitted", msg, email, recipients)
 
-            from django.core.mail import send_mail
-            send_mail("Onelab New Slice request form submitted", [slice_name,number_of_nodes,type_of_nodes,purpose], email, recipients)
             return render(request,'slicereq_recvd.html') # Redirect after POST
     else:
-        form = SliceRequestForm() # An unbound form
+        form = SliceRequestForm(initial=authority_hrn_initial)
 
 #    template_env = {}
 #    template_env['form'] = form
@@ -1140,26 +1199,10 @@ class ValidatePendingView(TemplateView):
             queried_pending_authorities = pi_my_authorities | pi_delegation_authorities
             print "----"
             print "queried_pending_authorities = ", queried_pending_authorities
-            
-            # Pending requests + authorities
-            #pending_users = PendingUser.objects.filter(authority_hrn__in = queried_pending_authorities).all() 
-            #pending_slices = PendingSlice.objects.filter(authority_hrn__in = queried_pending_authorities).all() 
-            pending_users = PendingUser.objects.all()
-            pending_slices = PendingSlice.objects.all()
 
-            # Dispatch requests and build the proper structure for the template:
-
-            print "pending users =", pending_users
-            print "pending slices =", pending_slices
-
-            for user in pending_users:
-                auth_hrn = user.authority_hrn
-
-                request = {}
-                request['type'] = 'user'
-                request['id'] = 'TODO' # XXX in DB ?
-                request['timestamp'] = 'TODO' # XXX in DB ?
-                request['details'] = "%s %s <%s>" % (user.first_name, user.last_name, user.email)
+            requests = get_request_by_authority(queried_pending_authorities)
+            for request in requests:
+                auth_hrn = request['authority_hrn']
 
                 if auth_hrn in pi_my_authorities:
                     dest = ctx_my_authorities
@@ -1182,45 +1225,11 @@ class ValidatePendingView(TemplateView):
 
                 else:
                     continue
-                    
-                if not auth_hrn in dest:
-                    dest[auth_hrn] = []
-                print "auth_hrn [%s] was added %r" % (auth_hrn, request)
-                dest[auth_hrn].append(request) 
 
-            for slice in pending_slices:
-                auth_hrn = slice.authority_hrn
-                if not auth_hrn:
-                    auth_hrn = "ple.upmc" # XXX HARDCODED
-
-                request = {}
-                request['type'] = 'slice'
-                request['id'] = 'TODO' # XXX in DB ?
-                request['timestamp'] = 'TODO' # XXX in DB ?
-                request['details'] = "Number of nodes: %d -- Type of nodes: %s<br/>%s" % ('TODO', 'TODO', 'TODO') # XXX 
-                if auth_hrn in pi_my_authorities:
-                    dest = ctx_my_authorities
-
-                    # define the css class
-                    if auth_hrn in pi_credential_authorities:
-                        request['allowed'] = 'allowed'
-                    elif auth_hrn in pi_expired_credential_authorities:
-                        request['allowed'] = 'expired'
-                    else: # pi_no_credential_authorities
-                        request['allowed'] = 'denied'
-
-                elif auth_hrn in pi_delegation_authorities:
-                    dest = ctx_delegation_authorities
-
-                    if auth_hrn in pi_delegation_credential_authorities:
-                        request['allowed'] = 'allowed'
-                    else: # pi_delegation_expired_authorities
-                        request['allowed'] = 'expired'
-                    
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
                 dest[auth_hrn].append(request) 
-
+        
         context = super(ValidatePendingView, self).get_context_data(**kwargs)
         context['my_authorities']   = ctx_my_authorities
         context['delegation_authorities'] = ctx_delegation_authorities

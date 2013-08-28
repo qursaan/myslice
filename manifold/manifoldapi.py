@@ -74,5 +74,10 @@ def execute_query(request, query):
     print "-"*80
     result = manifold_api.forward(query.to_dict())
     if result['code'] == 2:
-        raise Exception, 'Error running query'
+        raise Exception, 'Error running query: %r' % result
+
+    # XXX Handle errors
+    #Error running query: {'origin': [0, 'XMLRPCAPI'], 'code': 2, 'description': 'No such session: No row was found for one()', 'traceback': 'Traceback (most recent call last):\n  File "/usr/local/lib/python2.7/dist-packages/manifold/core/xmlrpc_api.py", line 68, in xmlrpc_forward\n    user = Auth(auth).check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 245, in check\n    return self.auth_method.check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 95, in check\n    raise AuthenticationFailure, "No such session: %s" % e\nAuthenticationFailure: No such session: No row was found for one()\n', 'type': 2, 'ts': None, 'value': None}
+
+
     return result['value'] 

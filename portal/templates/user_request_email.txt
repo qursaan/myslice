@@ -1,0 +1,9 @@
+NEW USER REQUEST
+
+first_name   : {{first_name}}
+last_name    : {{last_name}} 
+authority_hrn: {{authority_hrn}}
+keypair      : {{keypair}}
+email        : {{email}}
+cc myself    : {{cc_myself}}
+

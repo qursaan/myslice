@@ -55,6 +55,9 @@ urlpatterns = patterns('',
     url(r'^slice_request/?$', views.slice_request),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
+    # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
+    # (r'^validate_action/(?P<constraints>[^/]+)/(?P<id>\w+)/?$', 'portal.views.pres_view_static'),
+     (r'^validate_action(?P<id>(?:/\w+)+)/?$', 'portal.actions.validate_action'),
 
     url(r'^pres_view/?$', PresViewView.as_view(), name='pres_view'),
     (r'^methods/(?P<type>\w+)/?$', 'portal.views.pres_view_methods'),

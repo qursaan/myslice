@@ -309,5 +309,8 @@ class PendingUser(models.Model):
 
 
 class PendingSlice(models.Model):
-    slice_name  = models.TextField()
-    authority_hrn = models.TextField(null=True)
+    slice_name      = models.TextField()
+    authority_hrn   = models.TextField(null=True)
+    number_of_nodes = models.TextField(default=0)
+    type_of_nodes   = models.TextField(default='NA')
+    purpose         = models.TextField(default='NA')

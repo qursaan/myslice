@@ -5,7 +5,7 @@
 	position:relative;
 }
 
-.portal_validate_request .slice {
+.portal_validate_request.slice {
 	background-image: url(../img/slice-icon.png);
 }
 
@@ -13,7 +13,7 @@
 	background-image: url(../img/user-icon.png);
 }
 
-.portal_validate_request .authority {
+.portal_validate_request.authority {
 	background-image: url(../img/authority-icon.png);
 }
 
@@ -23,21 +23,33 @@
 }
 
 .portal_validate_request .id {
-	position: relative;
+	position: absolute;
 	left: 5%;
 }
-.portal_validate_request .timestamp {
-	position: relative;
-	left: 10%;
+
+.portal_validate_request .authority {
+	position: absolute;
+	left: 7%;
 }
+
 .portal_validate_request .details {
-	position: relative;
-	left: 20%;
+	position: absolute;
+	left: 15%;
+}
+
+.portal_validate_request .timestamp {
+	position: absolute;
+	left: 50%;
+}
+
+.portal_validate_request .status {
+	position: absolute;
+	left: 65%;
 }
 
 .portal_validate_request input {
-	position: relative;
-	left: 40%;
+	position: absolute;
+	left: 60%;
 }
 
 .portal_validate_request.even {
