@@ -29,6 +29,8 @@ from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from django.template.loader      import render_to_string
 from django.core.mail            import send_mail
+from django.utils.decorators     import method_decorator
+from django.contrib.auth.decorators import login_required
 
 from plugins.lists.simplelist    import SimpleList
 from plugins.hazelnut            import Hazelnut
@@ -52,6 +54,11 @@ import os, re
 
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
+    
+    #This view requires login 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DashboardView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # We might have slices on different registries with different user accounts 
@@ -475,16 +482,6 @@ class DashboardView(TemplateView):
 # DEPRECATED #        context.update(page.prelude_env())
 # DEPRECATED #        return context
 
-
-
-# View for my_account form
-def my_account(request):
-    return render(request, 'my_account.html', {
-        #'form': form,
-        'topmenu_items': topmenu_items('My Account', request),
-        'username': the_user (request)
-    })
-
 # View for platforms
 class PlatformsView(TemplateView):
     template_name = "platforms.html"
@@ -492,7 +489,8 @@ class PlatformsView(TemplateView):
     def get_context_data(self, **kwargs):
         page = Page(self.request)
 
-        network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        network_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
         page.enqueue_query(network_query)
 
         page.expose_js_metadata()
@@ -536,6 +534,8 @@ class PlatformsView(TemplateView):
         context.update(page.prelude_env())
 
         return context
+
+
 
 # View for 1 platform and its details
 class PlatformView(TemplateView):
@@ -594,10 +594,71 @@ class PlatformView(TemplateView):
 
         return context
 
+
+
+#class for my_account
+class AccountView(TemplateView):
+    template_name = "my_account.html"
+    
+    #This view requires login 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AccountView, self).dispatch(*args, **kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        network_query  = Query().get('local:user').select('user_id','email','config')
+        page.enqueue_query(network_query)
+
+        page.expose_js_metadata()
+        page.expose_queries()
+
+        userlist = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'user_id',
+            query = network_query,
+        )
+
+        context = super(AccountView, self).get_context_data(**kwargs)
+        context['person']   = self.request.user
+        context['users'] = userlist.render(self.request)
+        
+        # XXX This is repeated in all pages
+        # more general variables expected in the template
+        context['title'] = 'Platforms connected to MySlice'
+        # the menu items on the top
+        context['topmenu_items'] = topmenu_items('My Account', self.request)
+        # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        context.update(page.prelude_env())
+        return context
+
+
+
+
+
+
+@login_required
+# View for my_account form
+#def my_account(request):
+#    return render(request, 'my_account.html', {
+#        #'form': form,
+#        'topmenu_items': topmenu_items('My Account', request),
+#        'username': the_user (request)
+#    })
+
+
+@login_required
 #my_acc form value processing
 def acc_process(request):
     # getting the user_id from the session [now hardcoded]
     get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
+    # getting user info from manifold
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
@@ -621,7 +682,7 @@ def acc_process(request):
         get_user.last_name = edited_last_name
         get_user.save() 
 
-        return HttpResponse('Success: Name Updated!!')       
+        return HttpResponse('Sucess: First Name and Last Name Updated!')       
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
         # select the logged in user [for the moment hard coded]
@@ -631,35 +692,41 @@ def acc_process(request):
         get_user.save()
         return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
-        #import os
-        #from M2Crypto import Rand, RSA, BIO
-
-        KEY_LENGTH = 2048
-
-        def blank_callback():
-            "Replace the default dashes"
-            return
-
-        # Random seed
-        Rand.rand_seed (os.urandom (KEY_LENGTH))
-        # Generate key pair
-        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-        # Create memory buffers
-        pri_mem = BIO.MemoryBuffer()
-        pub_mem = BIO.MemoryBuffer()
-        # Save keys to buffers
-        key.save_key_bio(pri_mem, None)
-        key.save_pub_key_bio(pub_mem)
-
-        # Get keys 
-        public_key = pub_mem.getvalue()
-        private_key = pri_mem.getvalue()
+        # Generate public and private keys using SFA Library
+        from sfa.trust.certificate  import Keypair
+        k = Keypair(create=True)
+        public_key = k.get_pubkey_string()
+        private_key = k.as_pem()
+       
+# DEPRECATED
+#        KEY_LENGTH = 2048
+#
+#        def blank_callback():
+#            "Replace the default dashes"
+#            return
+#
+#        # Random seed
+#        Rand.rand_seed (os.urandom (KEY_LENGTH))
+#        # Generate key pair
+#        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+#        # Create memory buffers
+#        pri_mem = BIO.MemoryBuffer()
+#        pub_mem = BIO.MemoryBuffer()
+#        # Save keys to buffers
+#        key.save_key_bio(pri_mem, None)
+#        key.save_pub_key_bio(pub_mem)
+#
+#        # Get keys 
+#        public_key = pub_mem.getvalue()
+#        private_key = pri_mem.getvalue()
+        private_key = ''.join(private_key.split())
+        public_key = "ssh-rsa " + public_key
         # Saving to DB
         keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-        keypair = re.sub("\r", "", keypair)
-        keypair = re.sub("\n", "\\n", keypair)
-        #keypair = keypair.rstrip('\r\n')
-        keypair = ''.join(keypair.split())
+#        keypair = re.sub("\r", "", keypair)
+#        keypair = re.sub("\n", "\\n", keypair)
+#        #keypair = keypair.rstrip('\r\n')
+#        keypair = ''.join(keypair.split())
         get_user.keypair = keypair
         get_user.save()
         return HttpResponse('Success: New Keypair Generated! %s' % keypair)
@@ -721,35 +788,44 @@ def register_4m_f4f(request):
             #return HttpResponse("Email Already exists")
             #return render(request, 'register_4m_f4f.html')
         if 'generate' in request.POST['question']:
-            #import os
-            #from M2Crypto import Rand, RSA, BIO
-            
-            KEY_LENGTH = 2048
+            # Generate public and private keys using SFA Library
+            from sfa.trust.certificate  import Keypair
+            k = Keypair(create=True)
+            public_key = k.get_pubkey_string()
+            private_key = k.as_pem()
 
-            def blank_callback():
-                "Replace the default dashes"
-                return
+# DEPRECATED
+#            #import os
+#            #from M2Crypto import Rand, RSA, BIO
+#            
+#            KEY_LENGTH = 2048
+#
+#            def blank_callback():
+#                "Replace the default dashes"
+#                return
+#
+#            # Random seed
+#            Rand.rand_seed (os.urandom (KEY_LENGTH))
+#            # Generate key pair
+#            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
+#            # Create memory buffers
+#            pri_mem = BIO.MemoryBuffer()
+#            pub_mem = BIO.MemoryBuffer()
+#            # Save keys to buffers
+#            key.save_key_bio(pri_mem, None)
+#            key.save_pub_key_bio(pub_mem)
+#            # Get keys 
+#            public_key = pub_mem.getvalue()
+#            private_key = pri_mem.getvalue()
 
-            # Random seed
-            Rand.rand_seed (os.urandom (KEY_LENGTH))
-            # Generate key pair
-            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-            # Create memory buffers
-            pri_mem = BIO.MemoryBuffer()
-            pub_mem = BIO.MemoryBuffer()
-            # Save keys to buffers
-            key.save_key_bio(pri_mem, None)
-            key.save_pub_key_bio(pub_mem)
-            # Get keys 
-            public_key = pub_mem.getvalue()
-            private_key = pri_mem.getvalue()
+            private_key = ''.join(private_key.split())
+            public_key = "ssh-rsa " + public_key
             # Saving to DB
             keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-            keypair = re.sub("\r", "", keypair)
-            keypair = re.sub("\n", "\\n", keypair)
-            #keypair = keypair.rstrip('\r\n')
-            keypair = ''.join(keypair.split())
-            #return HttpResponse(keypair)
+#            keypair = re.sub("\r", "", keypair)
+#            keypair = re.sub("\n", "\\n", keypair)
+#            #keypair = keypair.rstrip('\r\n')
+#            keypair = ''.join(keypair.split())
         else:
             up_file = request.FILES['user_public_key']
             file_content =  up_file.read()
@@ -844,7 +920,7 @@ def contact(request):
 
     })
 
-
+@login_required
 def slice_request(request):
     errors = []
 

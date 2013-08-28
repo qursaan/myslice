@@ -18,7 +18,7 @@
     </div>
     <div class='ms-dashboard-content' id='tophat__list__user_hrn'>
             <div id="main">
-                    <div id="middle">
+                    <div id="middle" align="center">
                        <form id="editForm"  method="POST" action="acc_process" enctype="multipart/form-data">
 						{% csrf_token %}
                        <table class="profile">          
@@ -64,7 +64,7 @@
                                 <tr class="even">
                                             <td class="key">Full Name</td>
                                             <td class="value">
-                                                    <span id="nameval" class="value" >Yasin Rahman </span>
+                                                    <span id="nameval" class="value" >{{ users }} </span>
                                                     <span class="hide_this" id="span_name">
                                                             <button type="button" class="cancel" title="Cancel" id="cancel_name_change"> Cancel </button>
                                                             

@@ -7,12 +7,18 @@
 
 {% block unfold1_main %}
 
-  <h1>Request a Slice</h1>
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
 
- 
-<form action="#" method="post">{% csrf_token %}
+<form id="commentForm" action="" method="post">{% csrf_token %}
+
+<div class="OneLabTitle" style="margin-bottom:20px;">
+         <h2>Request a Slice</h2>
+</div>
+
 {{ form.as_p }}
-<input type="submit" value="Submit" />
+<p style="text-align: center;width: 80%;">
+	<input type="submit" value="Submit" />
+</p>
 </form>
 
 {% endblock %}
