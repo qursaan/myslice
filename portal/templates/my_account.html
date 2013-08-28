@@ -3,12 +3,31 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/my_account.common.css" />
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/my_account.profile.css" />
+<!-- <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/dashboard.css" /> !-->
 <script type="text/javascript" src="{{STATIC_URL}}/jquery.validate.js"></script> 
 <script type="text/javascript" src="{{STATIC_URL}}/my_account.edit_profile.js"></script>
 <script type="text/javascript" src="{{STATIC_URL}}/my_account.register.js"></script>
 {% endblock %}
 
 {% block unfold1_main %}
+
+
+<h2>Platform Access</h2>
+<table border="2" bordercolor="FFCC00" style="table-layout:fixedbackground-color:FFFFCCwidth:830px" cellpadding="12" cellspacing="12"> 
+	<tr> 
+    	<th align="center" style="width:15%">Platform</th> 
+        <th align="center" style="width:15%">Account Type</th> 
+        <th align="center" style="width:15%">user_hrn</th>
+        <th align="center">Pub Key</th>
+    </tr>            
+   	<tr>
+    	<td align="center"> {{ platform_name }} </td>
+        <td align="center"> {{ account_type }} </td>
+       	<td align="center" style="word-wrap: break-word"> {{ account_usr_hrn }}  </td>
+        <td align="center" style="word-wrap: break-word"> {{ account_pub_key }} </td>
+    </tr>                
+</table>
+
 
 
 

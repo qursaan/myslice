@@ -609,14 +609,41 @@ class AccountView(TemplateView):
     def get_context_data(self, **kwargs):
         #page = Page(self.request)
 
-        user_query  = Query().get('local:user').select('config')
-        user_accounts = execute_query(self.request, user_query)
+        user_query  = Query().get('local:user').select('config','email')
+        user_details = execute_query(self.request, user_query)
         
-        for user_account in user_accounts:
-            config = json.loads(user_account['config'])
+        for user_detail in user_details:
+            #email = user_detail['email']
+            if user_detail['config']:
+                config = json.loads(user_detail['config'])
 
-        #print "THis is a test"
-        #print config['firstname'] 
+        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+        platform_details = execute_query(self.request, platform_query)
+        account_details = execute_query(self.request, account_query)
+       
+        # initial assignment needed for users having no account  
+        platform_name = ''
+        account_type = ''
+        account_usr_hrn = ''
+        account_pub_key = ''       
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    platform_name = platform_detail['platform']
+                    account_type = account_detail['auth_type']
+                    account_config = json.loads(account_detail['config'])
+                    
+                    if 'user_hrn' in account_config:
+                        account_usr_hrn = account_config['user_hrn']
+                    else:
+                        account_usr_hrn = 'N/A'
+                    if 'user_public_key' in account_config:
+                        account_pub_key = account_config['user_public_key']
+                    else:
+                        account_pub_key = 'N/A'            
+                        #print "THis is a test"
+                        #print account_pub_key
         
         #page.enqueue_query(network_query)
 
@@ -631,6 +658,10 @@ class AccountView(TemplateView):
         #)
 
         context = super(AccountView, self).get_context_data(**kwargs)
+        context['platform_name'] = platform_name
+        context['account_type'] = account_type
+        context['account_usr_hrn'] = account_usr_hrn
+        context['account_pub_key'] = account_pub_key 
         context['person']   = self.request.user
         context ['fullname'] = config['firstname'] +' '+ config['lastname']    
         context ['firstname'] = config['firstname']
