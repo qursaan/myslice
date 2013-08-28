@@ -607,25 +607,36 @@ class AccountView(TemplateView):
 
 
     def get_context_data(self, **kwargs):
-        page = Page(self.request)
+        #page = Page(self.request)
 
-        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
-        network_query  = Query().get('local:user').select('user_id','email','config')
-        page.enqueue_query(network_query)
+        user_query  = Query().get('local:user').select('config')
+        user_accounts = execute_query(self.request, user_query)
+        
+        for user_account in user_accounts:
+            config = json.loads(user_account['config'])
 
-        page.expose_js_metadata()
-        page.expose_queries()
+        #print "THis is a test"
+        #print config['firstname'] 
+        
+        #page.enqueue_query(network_query)
 
-        userlist = SimpleList(
-            title = None,
-            page  = page,
-            key   = 'user_id',
-            query = network_query,
-        )
+        #page.expose_js_metadata()
+        #page.expose_queries()
+
+        #userlist = SimpleList(
+        #    title = None,
+        #    page  = page,
+        #    key   = 'user_id',
+        #    query = network_query,
+        #)
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
-        context['users'] = userlist.render(self.request)
+        context ['fullname'] = config['firstname'] +' '+ config['lastname']    
+        context ['firstname'] = config['firstname']
+        context ['lastname'] = config['lastname']
+        context ['affiliation'] = config['affiliation']
+        #context['users'] = userlist.render(self.request)
         
         # XXX This is repeated in all pages
         # more general variables expected in the template
@@ -634,8 +645,8 @@ class AccountView(TemplateView):
         context['topmenu_items'] = topmenu_items('My Account', self.request)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-
-        context.update(page.prelude_env())
+        context ['firstname'] = config['firstname']
+        #context.update(page.prelude_env())
         return context
 
 
