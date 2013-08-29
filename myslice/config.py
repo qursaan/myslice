@@ -1,13 +1,15 @@
 class Config:
 
-    # production should use https of course
-
 # this version of unfold expects a backend that runs a new API
-# xxx
-# -- although currently (april 2013) there are missing features
-# e.g. GetSession and GetPersons are still there -- they should go away
-# also the code for retrieving metadata does not work as-is
+
+# production should probably use https of course
+
+
+# if you use a development backend running on this box
 #    manifold_url = "http://localhost:7080/"
+# the INRIA setup
+#    manifold_url = "http://manifold.pl.sophia.inria.fr:7080/"
+# the OpenLab-wide backend as managed by UPMC
     manifold_url = "http://dev.myslice.info:7080/"
 
     # exporting these details to js
