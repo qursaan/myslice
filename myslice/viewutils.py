@@ -1,13 +1,14 @@
 # a set of utilities to help make the global layout consistent across views
 
-from copy import deepcopy
-
+# this 
 standard_topmenu_items = [ 
 #    { 'label':'Tab', 'href': '/tab/'},
 #    { 'label':'Scroll', 'href': '/scroll/'},
 #    { 'label':'One Plugin', 'href': '/plugin/'},
-    { 'label':'Dashboard', 'href': '/portal/dashboard/'},
-    { 'label':'Slice', 'href': '/slice/'},
+# Thierry : using this goes to some test slice that not every one is in
+# besides, the topmenu needs to be shrunk down horizontally
+# otherwise the topmenu takes more vertical space than avail. and the layout is broken
+#    { 'label':'Slice', 'href': '/slice/'},
     #{'label':'My Account', 'href': '/portal/account/'}
     ]
 
@@ -16,15 +17,18 @@ standard_topmenu_items = [
 
 def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
+    result=[]
     if has_user:
-        result=deepcopy(standard_topmenu_items)
-        result.append({'label':'My Account', 'href': '/portal/account/'})
+        result.append({'label':'Platforms', 'href': '/portal/platforms/'})
+        result.append({ 'label':'Dashboard', 'href': '/portal/dashboard/'})
+        # This should probably go in dashboard at some point
         result.append({ 'label':'Request a slice', 'href': '/portal/slice_request/'})
+        result.append({'label':'My Account', 'href': '/portal/account/'})
     else:
-        result = []
         result.append({'label':'Home', 'href': '/login'})
+        # looks like this is accessible to non-logged users
+        result.append({'label':'Platforms', 'href': '/portal/platforms/'})
         result.append({ 'label':'Register', 'href': '/portal/register/'})
-    result.append({'label':'Platforms', 'href': '/portal/platforms/'})
     result.append({'label':'Contact Support', 'href': '/portal/contact/'})
     for d in result:
         #if d['label'].lower()find(current)>=0: d['is_active']=True
