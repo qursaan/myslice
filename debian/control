@@ -7,11 +7,11 @@ Build-Depends: devscripts, debhelper (>=7.0.50~), debconf, dpatch, python-setupt
 
 Package: myslice
 Architecture: any
-Depends: unfold
+Depends: unfold, python-django-south
 Description: Myslice plugins, based on django and unfold frontend
 
 # Thierry: the recipe I'm using somehow only works with several packages
 Package: unfold
 Architecture: any
-Depends: python, python-django
+Depends: python, python-django, python-pyparsing
 Description: Generic django-based frontend for manifold backends
