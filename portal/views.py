@@ -612,6 +612,8 @@ class AccountView(TemplateView):
         user_query  = Query().get('local:user').select('config','email')
         user_details = execute_query(self.request, user_query)
         
+        # not always found in user_details...
+        config={}
         for user_detail in user_details:
             #email = user_detail['email']
             if user_detail['config']:
@@ -637,17 +639,9 @@ class AccountView(TemplateView):
                     platform_name = platform_detail['platform']
                     account_type = account_detail['auth_type']
                     account_config = json.loads(account_detail['config'])
-                    
-                    if 'user_hrn' in account_config:
-                        account_usr_hrn = account_config['user_hrn']
-                    else:
-                        account_usr_hrn = 'N/A'
-                    if 'user_public_key' in account_config:
-                        account_pub_key = account_config['user_public_key']
-                    else:
-                        account_pub_key = 'N/A'            
-                        #print "THis is a test"
-                        #print account_pub_key
+                    # a bit more pythonic
+                    account_usr_hrn = account_config.get('user_hrn','N/A')
+                    account_pub_key = account_config.get('user_public_key','N/A')
                     
                     platform_name_list.append(platform_name)
                     account_type_list.append(account_type)
@@ -662,10 +656,10 @@ class AccountView(TemplateView):
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
         context['person']   = self.request.user
-        context ['fullname'] = config['firstname'] +' '+ config['lastname']    
-        context ['firstname'] = config['firstname']
-        context ['lastname'] = config['lastname']
-        context ['affiliation'] = config['affiliation']
+        context ['firstname'] = config.get('firstname',"?")
+        context ['lastname'] = config.get('lastname',"?")
+        context ['fullname'] = context['firstname'] +' '+ context['lastname']
+        context ['affiliation'] = config.get('affiliation',"Unknown Affiliation")
         #context['users'] = userlist.render(self.request)
         
         # XXX This is repeated in all pages
@@ -675,7 +669,7 @@ class AccountView(TemplateView):
         context['topmenu_items'] = topmenu_items('My Account', self.request)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-        context ['firstname'] = config['firstname']
+#        context ['firstname'] = config['firstname']
         #context.update(page.prelude_env())
         return context
 

@@ -1,9 +1,16 @@
+# any local dbfile
+*.sqlite3
+# here is a mode to 'record' the backend answers and replay them offline
+offline-*
+# the usual useless crap
 TAGS
 *.pyc
-*.sqlite3
 *~
+# these essentially are copies/links from other places
 all-static/
 all-templates/
-offline-*
+django-static/
+# various working files
 play/
 *.leftovers
+entrypoints.ongoing/
