@@ -13,7 +13,7 @@
 	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% else %}
 	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% endif %} {% endfor %}
 	</ul> {# logout.js will attach a click function on that button, which then retrieves the 'username' attribute #}
-	<span class="navbar-text pull-right"> {% if username %} Logged in as {{ username }}
+	<span class="navbar-text pull-right logged-in"> {% if username %} Logged in as {{ username }}
 	<button id='logout' class='btn btn-danger' username='{{ username }}'>Logout</a> {% else %}Not logged in{% endif %}</span>
       </div><!--nav-collapse-->
     </div><!--container-fluid-->
