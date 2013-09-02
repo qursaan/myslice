@@ -13,4 +13,5 @@ django-static/
 # various working files
 play/
 *.leftovers
+*.hide
 entrypoints.ongoing/
