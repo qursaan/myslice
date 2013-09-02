@@ -628,35 +628,33 @@ class AccountView(TemplateView):
         platform_name = ''
         account_type = ''
         account_usr_hrn = ''
-        account_pub_key = ''       
+        account_pub_key = ''
+        platform_name_list = []
+        account_type_list = []
+        usr_hrn_list = []
+        pub_key_list = []          
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
                     account_type = account_detail['auth_type']
                     account_config = json.loads(account_detail['config'])
-                    
                     # a bit more pythonic
                     account_usr_hrn = account_config.get('user_hrn','N/A')
                     account_pub_key = account_config.get('user_public_key','N/A')
+                    
+                    platform_name_list.append(platform_name)
+                    account_type_list.append(account_type)
+                    usr_hrn_list.append(account_usr_hrn)
+                    pub_key_list.append(account_pub_key)
         
-        #page.enqueue_query(network_query)
-
-        #page.expose_js_metadata()
-        #page.expose_queries()
-
-        #userlist = SimpleList(
-        #    title = None,
-        #    page  = page,
-        #    key   = 'user_id',
-        #    query = network_query,
-        #)
+        # combining 4 lists into 1 [to render in the template] 
+        lst = [{'platform_name': t[0], 'account_type': t[1], 'usr_hrn':t[2], 'usr_pubkey':t[3]} for t in zip(platform_name_list, account_type_list, usr_hrn_list, pub_key_list)]    
+        #print "test"
+        #print lst
 
         context = super(AccountView, self).get_context_data(**kwargs)
-        context['platform_name'] = platform_name
-        context['account_type'] = account_type
-        context['account_usr_hrn'] = account_usr_hrn
-        context['account_pub_key'] = account_pub_key 
+        context['data'] = lst
         context['person']   = self.request.user
         context ['firstname'] = config.get('firstname',"?")
         context ['lastname'] = config.get('lastname',"?")
