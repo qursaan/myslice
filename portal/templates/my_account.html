@@ -13,19 +13,21 @@
 
 
 <h2>Platform Access</h2>
-<table border="2" bordercolor="FFCC00" style="table-layout:fixedbackground-color:FFFFCCwidth:830px" cellpadding="12" cellspacing="12"> 
+<table border="2" bordercolor="C1DAD7" style="table-layout:fixedbackground-color:FFFFCCwidth:830px" cellpadding="12" cellspacing="12"> 
 	<tr> 
     	<th align="center" style="width:15%">Platform</th> 
         <th align="center" style="width:15%">Account Type</th> 
         <th align="center" style="width:15%">user_hrn</th>
         <th align="center">Pub Key</th>
-    </tr>            
+    </tr>   
+	{% for row in data %}         
    	<tr>
-    	<td align="center"> {{ platform_name }} </td>
-        <td align="center"> {{ account_type }} </td>
-       	<td align="center" style="word-wrap: break-word"> {{ account_usr_hrn }}  </td>
-        <td align="center" style="word-wrap: break-word"> {{ account_pub_key }} </td>
-    </tr>                
+    	<td align="center"> {{ row.platform_name }} </td>
+        <td align="center"> {{ row.account_type }} </td>
+       	<td align="center" style="word-wrap: break-word"> {{ row.usr_hrn }}  </td>
+        <td align="center" style="word-wrap: break-word"> {{ row.usr_pubkey }} </td>
+    </tr> 
+	{%endfor%}               
 </table>
 
 
