@@ -6,18 +6,13 @@
 
 {% block unfold2_main %}
 <!--
-<code> This page is currently connected to two authentication systems:</code>
+<code> This page is currently connected to one authentication system:</code>
 <ul>
 <li> A manifold server, located at <code>{{ manifold_url }}</code>, (configured in <code>myslice/config.py</code>), and</li>
-<li>
-as a proof of concept, a set of hardwired user accounts, see <code>auth/backend.py</code> for more details. However these won't of course have the ability to run real queries at the backend so it's more for testing login and all this.
-Currently hard wired users are:
-<ul>
-  {% for k,v in hard_wired_users.iteritems %}
-  <li class='well'> Name= <code>{{ k }}</code>, Password= <code>{{ v }}</code> </li>
-  {% endfor %}
 </ul>
-</li></ul>
+<p>
+as a proof of concept, a set of hardwired user accounts used to be available but as these would not let you do anything valuable with the backend it is now turned off.
+</p>
 -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
 <div style='padding: 20px;'>
@@ -37,6 +32,7 @@ testbeds including PlanetLab Europe, the NITOS wireless testbed, and other
 federated testbeds.
   </p>
   <div class="item-separator"></div>
+<p>This UI server is connected to the manifold backend running at <code>{{ manifold_url }}</code>.</p>
 </div>
 
 {% endblock unfold2_main %}
