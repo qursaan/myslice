@@ -11,7 +11,7 @@ from manifold.manifoldresult         import ManifoldException
 from manifold.metadata               import MetaData as Metadata
 # need to remove this dep.
 from trash.trashutils                import quickfilter_criterias
-from myslice.viewutils               import topmenu_items, the_user
+from myslice.viewutils               import topmenu_items, the_user, logout_on_manifold_exception
 
 from plugins.raw.raw                 import Raw
 from plugins.stack.stack             import Stack
@@ -31,27 +31,9 @@ from plugins.messages.messages       import Messages
 tmp_default_slice='ple.upmc.myslicedemo'
 debug = True
 
+@logout_on_manifold_exception
 @login_required
 def slice_view (request, slicename=tmp_default_slice):
-    # xxx Thierry - ugly hack
-    # fetching metadata here might fail - e.g. with an expired session..
-    # let's catch this early on and log out our user if needed
-    # it should of course be handled in a more generic way
-    try:
-        return _slice_view(request,slicename)
-    except ManifoldException, manifold_result:
-        # xxx needs a means to display this message to user...
-        from django.contrib.auth import logout
-        logout(request)
-        return HttpResponseRedirect ('/')
-    except Exception, e:
-        # xxx we need to sugarcoat this error message in some error template...
-        print "Unexpected exception",e
-        import traceback
-        traceback.print_exc()
-        # return ...
-
-def _slice_view (request, slicename):
 
     page = Page(request)
     page.expose_js_metadata()
