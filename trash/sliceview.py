@@ -9,7 +9,9 @@ from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 from manifold.manifoldresult         import ManifoldException
 from manifold.metadata               import MetaData as Metadata
-from myslice.viewutils               import quickfilter_criterias, topmenu_items, the_user
+# need to remove this dep.
+from trash.trashutils                import quickfilter_criterias
+from myslice.viewutils               import topmenu_items, the_user
 
 from plugins.raw.raw                 import Raw
 from plugins.stack.stack             import Stack

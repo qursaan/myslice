@@ -8,7 +8,7 @@ from unfold.prelude import Prelude
 
 from myslice.viewutils import topmenu_items, the_user
 # tmp
-from myslice.viewutils import lorem, hard_wired_slice_names
+from trash.trashutils  import lorem, hard_wired_slice_names
 
 @login_required
 def tab_view (request):

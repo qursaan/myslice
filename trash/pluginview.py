@@ -21,7 +21,7 @@ from plugins.hazelnut                   import Hazelnut
 from plugins.updater                    import Updater
 
 from myslice.viewutils                  import topmenu_items, the_user
-from myslice.viewutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
+from trash.trashutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 @login_required
 def test_plugin_view (request):
