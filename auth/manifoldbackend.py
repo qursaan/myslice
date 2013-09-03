@@ -21,18 +21,6 @@ class ManifoldBackend:
 
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
             api = ManifoldAPI(auth)
-#old            # Authenticate user and get session key
-#old            # the new API would expect Get('local:session') instead
-#old            session_result = api.GetSession()
-#old            session = session_result.ok_value()
-#old            if not session:
-#old                print "GetSession failed",session_result.error()
-#old                return
-#old            print 'DEALING with session',session
-#old            #self.session = session
-#old            # Change GetSession() at some point to return expires as well
-#old            expires = time.time() + (24 * 60 * 60)
-
             sessions_result = api.forward(Query.create('local:session').to_dict())
             print "result"
             sessions = sessions_result.ok_value()
