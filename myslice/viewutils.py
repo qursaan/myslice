@@ -1,9 +1,5 @@
 # a set of utilities to help make the global layout consistent across views
 
-from django.http                     import HttpResponseRedirect
-
-from manifold.manifoldresult         import ManifoldException
-
 def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
     result=[]
@@ -33,30 +29,4 @@ def the_user (request):
         return ''
     else: 
         return request.user.email
-
-
-# a decorator for view classes to catch manifold exceptions
-# by design views should not directly exercise a manifold query
-# given that these are asynchroneous, you would expect a view to just 
-# return a mundane skeleton
-# however of course this is not always true, and if only for metadata 
-# that for some reason we deal with some other way, it is often a good idea
-# for a view to monitor these exceptions - and to take this opportunity to 
-# logout people if it's a matter of expired session for example
-def logout_on_manifold_exception (view_as_a_function):
-    def wrapped (request, *args, **kwds):
-        try:
-            return view_as_a_function(request,*args, **kwds)
-        except ManifoldException, manifold_result:
-            # xxx we need a means to display this message to user...
-            from django.contrib.auth import logout
-            logout(request)
-            return HttpResponseRedirect ('/')
-        except Exception, e:
-            # xxx we need to sugarcoat this error message in some error template...
-            print "Unexpected exception",e
-            import traceback
-            traceback.print_exc()
-            return HttpResponseRedirect ('/')
-    return wrapped
 

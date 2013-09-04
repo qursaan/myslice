@@ -9,6 +9,8 @@ from django.conf      import settings
 from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
+import portal.sliceview
+
 # main entry point (set to the / URL)
 default_view='trash.pluginview.test_plugin_view'
 #default_view='portal.views.PlatformsView'
@@ -43,8 +45,9 @@ urlpatterns = patterns(
     # 
     # the slice view
     #
-    (r'^slice/?$',                        'portal.sliceview.slice_view'),
-    (r'^slice/(?P<slicename>[\w\.]+)/?$', 'portal.sliceview.slice_view'),
+    (r'^slice/?$',                        portal.sliceview.SliceView.as_view()),
+    (r'^slice/(?P<slicename>[\w\.]+)/?$', portal.sliceview.SliceView.as_view()),
+    #
     # various trash views
     #
     (r'^tab/?$',                          'trash.sampleviews.tab_view'),
