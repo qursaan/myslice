@@ -42,7 +42,7 @@ from portal                      import signals
 from portal.forms                import SliceRequestForm, ContactForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
-from portal.actions              import authority_get_pi_emails, get_request_by_authority
+from portal.actions              import authority_get_pi_emails, get_request_by_authority, manifold_add_user, manifold_update_user
 from manifold.core.query         import Query
 from manifold.manifoldapi        import execute_query
 from unfold.page                 import Page
@@ -713,9 +713,22 @@ def acc_process(request):
         # select the logged in user [for the moment hard coded]
         #get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
         # update first and last name
-        get_user.first_name = edited_first_name
-        get_user.last_name = edited_last_name
-        get_user.save() 
+        #get_user.first_name = edited_first_name
+        #get_user.last_name = edited_last_name
+        #get_user.save()
+        #user_params = {'config':'hello'}
+        #query = Query.update('local:user').set(user_params).select('config')
+        #results = execute_query(request,query)
+        #if not results:
+        #    raise Exception, "Failed to update user: %s" % user_params['config']
+        #result, = results
+        #return result['config']
+        # create user is working fine :)
+        #user_params = ({'config':'"firstname":"HELLO"'},{'password':'hello'})
+        #user_params = { 'config':'{"firstname":"HEY"}'}
+        #user_params = {'email':'aa@aa.com','password':'demo'}
+        #manifold_add_user(request,user_params)        
+        #manifold_update_user(request,user_params)
 
         return HttpResponse('Sucess: First Name and Last Name Updated!')       
     elif 'submit_pass' in request.POST:

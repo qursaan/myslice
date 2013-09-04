@@ -13,19 +13,19 @@
 
 
 <h2>Platform Access</h2>
-<table border="2" bordercolor="#C1DAD7" style="table-layout:fixed;background-color:FFFFFF;width:830px" cellpadding="12" cellspacing="12" align="center"> 
-	<tr> 
-    	<th align="center" style="width:15%">Platform</th> 
-        <th align="center" style="width:15%">Account Type</th> 
-        <th align="center" style="width:15%">user_hrn</th>
-        <th align="center">Pub Key</th>
+<table class="mytable"> 
+	<tr class="odd"> 
+    	<th>Platform</th> 
+        <th>Account Type</th> 
+        <th>user_hrn</th>
+        <th>Pub Key</th>
     </tr>   
 	{% for row in data %}         
-   	<tr>
-    	<td align="center"> {{ row.platform_name }} </td>
-        <td align="center"> {{ row.account_type }} </td>
-       	<td align="center" style="word-wrap: break-word"> {{ row.usr_hrn }}  </td>
-        <td align="center" style="word-wrap: break-word"> {{ row.usr_pubkey }} </td>
+   	<tr class="even">
+    	<td class="odd"> {{ row.platform_name }} </td>
+        <td class="even"> {{ row.account_type }} </td>
+       	<td class="odd"> {{ row.usr_hrn }}  </td>
+        <td class="even"> {{ row.usr_pubkey }} </td>
     </tr> 
 	{%endfor%}               
 </table>
