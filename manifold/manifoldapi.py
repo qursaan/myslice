@@ -31,7 +31,11 @@ class ManifoldAPI:
         if not result:                        print "[no/empty result]"
         elif isinstance (result,str):         print "result is '%s'"%result
         elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
-        else:                                 print "[dont know how to display result]"
+        elif isinstance (result,dict):        
+            print "result is a dict with %d keys : %s"%(len(result),result.keys())
+            for (k,v) in result.iteritems(): print '...',k,':',v
+            print "result is a dict with %d keys : %s"%(len(result),result.keys()),
+        else:                                 print "[dont know how to display result] %s"%result
 
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
     # as of march 2013 we work with an API that essentially either returns the value, or raises 
