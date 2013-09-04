@@ -1,5 +1,7 @@
 This file documents the contents of this module
 
+Last update sept. 2013
+
 See the devel/ subdir for more devel-oriented doc.
 
 ==================== 1 minute howto
@@ -8,12 +10,9 @@ See the devel/ subdir for more devel-oriented doc.
 ** should be straightforward
 ** see devel/django-install.txt in case of trouble
 
-* git clone git://git.onelab.eu/myslice-django.git
+* git clone git://git.onelab.eu/myslice.git
 -- or --
-* git clone ssh://yourlogin@git.onelab.eu/git/myslice-django.git
-
-* edit myslice/settings.py and
-** change the location of your backend API (not yet supported)
+* git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
 
 * edit myslice/config.py and enter the details of your manifold backend
 
@@ -22,6 +21,8 @@ $ manage.py syncdb
 
 * gather static files
 $ ./manage.py collectstatic (formerly, we used make static, which is deprecated)
+-- or --
+$ ./manage.py collectstatic --noinput
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
@@ -32,20 +33,22 @@ when you just need to hit ^C yourself when your static files need to be refreshe
 * use it from your browser 
 (See more notes on using the development server below)
 
-* install dependencies
+* install dependencies 
 $ pip install -r path/to/requirements/file.txt
+Note. not quite sure what this is about, I could not spot this file..
 
 ==================== Status
 
 *** Authentication ***
 
-Although there still are a few hard-coded accounts in the system, you
-will only be able to see some static views and won't be able to send
-real queries if you use these, so you'd better use a real account (one
-that your manifold backend knows about).
+Should be mostly fine
+Not quite sure if/how the user gets proper notifications when
+. his session has expired (i.e. his frontend is not logged into the backend any longer)
+. his credentials have expired (i.e. the uploaded credentials, e.g. SFA delegated cred)
+  expired and she needs to run e.g. sfi myslice again
 
-For logging out: click on 'logged as *jean*', this shows a
-confirmation page for logging out. this is intended to be temporary.
+Hard-coded accounts (from a very early stage) are gone
+
 
 *** Packaging ***
 
@@ -56,35 +59,9 @@ It seems like our app won't work on f14 as is because Django is only 1.3.1 on f1
 Plan is to target f18 but I lack a test machine.
 Also of course I'll try to tackle debian/ubunti at some point.
 
-*** Features ***
+There also is a working packaging for debian(s) and ubuntu(s) that we use 
+on an almost daily basis to upgrade manifold.pl.sophia.inria.fr
 
-We have a basic model for asynchroneous queries (referring to manifold
-queries) and for plugins (in the most general sense a plugin is just a
-piece of the output that may be connected to a query)
-
-Right now the UI has a handful of demo views only; as of this writing
-only the list of slices actually comes from the manifold backend in an
-asynchroneous way.
-
-Also all the views are gathered in the trash/ locations for now, being
-that they're only for assessment purposes.
-
-* dahsboard : has one async. query and 2 plugins that share that
-  query; the intent was to demo a different layout in both cases,
-  although the datatables one won't work yet at this point.
-
-* the 'Plugin' view demonstrates most of the available plugins.
-
-* slice view : only demonstrates how to use URLs to pass arguments along
-
-* scroll view : mostly it only illustrates that some pages can be made
-  public (no need to login)
-
-* tab view : a hand-made tab widget
-
-Not much effort has yet been put into coming up with a nice layout,
-feel free to tweak that but it's probably still way too early for
-this.
 
 ==================== 
 
@@ -94,35 +71,46 @@ Third party tools shipped:
 * datatables
 * spin
 * bootstrap
-* and others are added as we build the system when they become needed
 
-I've tried to keep track of the version I picked and to have an easy upgrade path.
+Others are added as we build the system when they become needed
+Look in third-party/ for a more detailed list
+
+As a rule of thumb, please try to keep in mind that these will need to
+be upgraded over time I've tried to keep track of the version I picked
+and to have an easy upgrade path (depending on the way the original
+package is published)
 
 ==================== Contents: 1st level subdirs
 
 ========== code from git
-* myslice: 
+
+* myslice/
   this is the django 'project', where to look for
   . settings.py
   . urls.py
 
-* manifold:
+* manifold/
   the code for dealing with queries, sending them to the backend, and offering the /manifold/proxy/ URL
 
-* unfold:
+* unfold/
   the code for building / rendering plugins 
 
-* plugins:
+* plugins/
   the actual code for plugins
 
-* auth: 
+* auth/ 
   a django 'app' that deals with authentication; see especially
   auth.backend.MyCustomBackend 
   for how to use a separate authentication system, 
   as well as settings.py for how to enable it
 
+* portal/
+  this is where the first implementation of myslice, with complete
+  user-management including registration, is taking place
+
 * trash/
-  rough/preliminary views in here - as the name suggests this is temporary
+  rough/preliminary scaffolding views are in here
+  as the name suggests this is temporary
 
 * views/
   will receive actual views over time 
@@ -147,6 +135,8 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
   $ make static 
   $ make clean-static 
 
+* django-static
+
 * myslice.sqlite3
   this is where django stores its own stuff, as per settings.py
 
@@ -164,8 +154,8 @@ I've tried to keep track of the version I picked and to have an easy upgrade pat
       plugins/templates/plugins.html,
       plugins/static/js/simplelist.js 
       plugins/static/css/simplelist.css
-   which I have tried doing for a while but I found mmyself just hopping around in the file tree all
-   day long, wasting cycles all along
+   which I have tried doing for a while but I found myself just hopping around in the file tree all
+   day long, wasting cycles big time
 
 .. as that does not make sense IMHO, I've rewritten the tool for gathering these pieces (this is in
    the Makefile). Bottom line is we can essentially store this wherever we want.
