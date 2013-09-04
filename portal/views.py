@@ -659,7 +659,7 @@ class AccountView(TemplateView):
         context ['firstname'] = config.get('firstname',"?")
         context ['lastname'] = config.get('lastname',"?")
         context ['fullname'] = context['firstname'] +' '+ context['lastname']
-        context ['affiliation'] = config.get('affiliation',"Unknown Affiliation")
+        context ['authority'] = config.get('authority',"Unknown Authority")
         #context['users'] = userlist.render(self.request)
         
         # XXX This is repeated in all pages
@@ -673,71 +673,42 @@ class AccountView(TemplateView):
         #context.update(page.prelude_env())
         return context
 
-
-
-
-
-
-@login_required
-# View for my_account form
-#def my_account(request):
-#    return render(request, 'my_account.html', {
-#        #'form': form,
-#        'topmenu_items': topmenu_items('My Account', request),
-#        'username': the_user (request)
-#    })
-
-
-@login_required
 #my_acc form value processing
+@login_required
 def acc_process(request):
-    # getting the user_id from the session [now hardcoded]
-    get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
-    # getting user info from manifold
+    
+    user_query  = Query().get('local:user').select('password','config')
+    user_details = execute_query(request, user_query)
+
+
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
-        #email = 'test_email@gmail.com'
-        #password = 'test_pp'
-        #message = 'F_Name: %s L_name: %s dummy_pp: %s' % (first_name, last_name, password)
-        #site = None
         
-        # insert into DB [needed for registration page]
-        #approach borrowed from register view     
-        #new_user = PendingUser.objects.create_inactive_user(edited_first_name, edited_last_name, email,  password, site) 
-        #conventional approach
-        #b = PendingUser(first_name=edited_first_name, last_name=edited_last_name)
-        #b.save()
+        config={}
+        for user_config in user_details:
+        #email = user_detail['email']
+            if user_config['config']:
+                config = json.loads(user_config['config'])
+                config['firstname'] = edited_first_name
+                config['lastname'] = edited_last_name
+                config['authority'] = config.get('authority','Unknown Authority')
+                updated_config = json.dumps(config)
         
-        # select and update [will be used throughout this view]
-        # select the logged in user [for the moment hard coded]
-        #get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
-        # update first and last name
-        #get_user.first_name = edited_first_name
-        #get_user.last_name = edited_last_name
-        #get_user.save()
-        #user_params = {'config':'hello'}
-        #query = Query.update('local:user').set(user_params).select('config')
-        #results = execute_query(request,query)
-        #if not results:
-        #    raise Exception, "Failed to update user: %s" % user_params['config']
-        #result, = results
-        #return result['config']
-        # create user is working fine :)
-        #user_params = ({'config':'"firstname":"HELLO"'},{'password':'hello'})
-        #user_params = { 'config':'{"firstname":"HEY"}'}
-        #user_params = {'email':'aa@aa.com','password':'demo'}
-        #manifold_add_user(request,user_params)        
-        #manifold_update_user(request,user_params)
-
+        # updating config local:user in manifold       
+        user_params = { 'config': updated_config}
+        manifold_update_user(request,user_params)
+        # this will be depricated, we will show the success msg in same page
         return HttpResponse('Sucess: First Name and Last Name Updated!')       
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
-        # select the logged in user [for the moment hard coded]
-        #get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
-        # update password
-        get_user.password = edited_password
-        get_user.save()
+        
+        for user_pass in user_details:
+            user_pass['password'] = edited_password
+        #updating password in local:user
+        user_params = { 'password': user_pass['password']}
+        manifold_update_user(request,user_params)
+
         return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
         # Generate public and private keys using SFA Library
@@ -745,28 +716,6 @@ def acc_process(request):
         k = Keypair(create=True)
         public_key = k.get_pubkey_string()
         private_key = k.as_pem()
-       
-# DEPRECATED
-#        KEY_LENGTH = 2048
-#
-#        def blank_callback():
-#            "Replace the default dashes"
-#            return
-#
-#        # Random seed
-#        Rand.rand_seed (os.urandom (KEY_LENGTH))
-#        # Generate key pair
-#        key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-#        # Create memory buffers
-#        pri_mem = BIO.MemoryBuffer()
-#        pub_mem = BIO.MemoryBuffer()
-#        # Save keys to buffers
-#        key.save_key_bio(pri_mem, None)
-#        key.save_pub_key_bio(pub_mem)
-#
-#        # Get keys 
-#        public_key = pub_mem.getvalue()
-#        private_key = pri_mem.getvalue()
         private_key = ''.join(private_key.split())
         public_key = "ssh-rsa " + public_key
         # Saving to DB
@@ -841,31 +790,6 @@ def register_4m_f4f(request):
             k = Keypair(create=True)
             public_key = k.get_pubkey_string()
             private_key = k.as_pem()
-
-# DEPRECATED
-#            #import os
-#            #from M2Crypto import Rand, RSA, BIO
-#            
-#            KEY_LENGTH = 2048
-#
-#            def blank_callback():
-#                "Replace the default dashes"
-#                return
-#
-#            # Random seed
-#            Rand.rand_seed (os.urandom (KEY_LENGTH))
-#            # Generate key pair
-#            key = RSA.gen_key (KEY_LENGTH, 65537, blank_callback)
-#            # Create memory buffers
-#            pri_mem = BIO.MemoryBuffer()
-#            pub_mem = BIO.MemoryBuffer()
-#            # Save keys to buffers
-#            key.save_key_bio(pri_mem, None)
-#            key.save_pub_key_bio(pub_mem)
-#            # Get keys 
-#            public_key = pub_mem.getvalue()
-#            private_key = pri_mem.getvalue()
-
             private_key = ''.join(private_key.split())
             public_key = "ssh-rsa " + public_key
             # Saving to DB

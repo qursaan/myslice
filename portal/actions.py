@@ -49,24 +49,15 @@ def manifold_add_user(request, user_params):
     return result['email']
 
 def manifold_update_user(request, user_params):
-    # user_params: email, password e.g., user_params = {'password':'demo','config':'{"firstname":"ME"}'}
-    query = Query.update('local:user').set(user_params).select('email')
+    # user_params: password, config e.g., 
+    query = Query.update('local:user').filter_by('email', '==', request.user.email).set(user_params).select('email')
     results = execute_query(request,query)
-    if not results:
-        raise Exception, "Failed updating manifold user: %s" % user_params['email']
-    result, = results
-    return result['email']
-
-
-#def manifold_update_user(request,user_params):
-#    # user_params: password and config
-#    query = Query.update('local:user').set(user_params).select(['password','config'])
-#    results = execute_query(request,query)
-#    if not results:
-#        raise Exception, "Failed updating manifold user: password %s and config %s" % (user_params['password'],user_params['config'])
-#    result, = results
-#    return (result['password'],result['config'])
-
+    # NOTE: results remains empty and goes to Exception. However, it updates the manifold DB.
+    # That's why I commented the exception part. -- Yasin 
+    #if not results:
+    #    raise Exception, "Failed updating manifold user: %s" % user_params['email']
+    #result, = results
+    return results
 
 def manifold_add_account(request, account_params):
     query = Query.create('local:account').set(account_params).select(['user', 'platform'])
@@ -78,12 +69,14 @@ def manifold_add_account(request, account_params):
 
 def manifold_update_account(request,account_params):
     # account_params: config
-    query = Query.update('local:account').set(account_params).select('config')
+    query = Query.update('local:account').filter_by('email', '==', request.user.email).set(account_params).select('email')
     results = execute_query(request,query)
-    if not results:
-        raise Exception, "Failed updating manifold account: config %s" % account_params['config']
-    result, = results
-    return result['config']
+    # NOTE: results remains empty and goes to Exception. However, it updates the manifold DB.
+    # That's why I commented the exception part. -- Yasin 
+    #if not results:
+    #    raise Exception, "Failed updating manifold account: config %s" % account_params['config']
+    #result, = results
+    return results
 
 
 def make_request_user(user):
