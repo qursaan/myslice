@@ -10,12 +10,16 @@ from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
 import portal.sliceview
+import portal.platformsview
+import portal.dashboardview
 
 # main entry point (set to the / URL)
-default_view='trash.pluginview.test_plugin_view'
-#default_view='portal.views.PlatformsView'
+## beware before adopting this one
+# if anything goes wrong in this page you end up in an endless cycle
+#default_view=portal.platformsview.PlatformsView.as_view()
+default_view='auth.views.login_user'
 # where to be redirected after login
-after_login_view='trash.dashboard.dashboard_view'
+after_login_view=portal.dashboardview.DashboardView.as_view()
 
 urlpatterns = patterns(
     '',
