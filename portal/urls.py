@@ -22,7 +22,8 @@
 
 from django.conf.urls           import patterns, include, url
 from portal                     import views
-from portal.views               import PresViewView, PlatformsView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
+from portal.views               import PresViewView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
+from portal.platformsview       import PlatformsView
 from portal.dashboardview       import DashboardView
 from portal.util                import TemplateView
 
