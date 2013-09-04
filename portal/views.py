@@ -260,7 +260,7 @@ class AccountView(TemplateView):
 
 @login_required
 #my_acc form value processing
-def acc_process(request):
+def account_process(request):
     # getting the user_id from the session [now hardcoded]
     get_user = PendingUser.objects.get(id='1') # here we will get the id/email from session e.g., person.email
     # getting user info from manifold
