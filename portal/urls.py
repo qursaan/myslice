@@ -20,10 +20,11 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf.urls import patterns, include, url
-from portal           import views
-from portal.views     import DashboardView, PresViewView, PlatformsView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
-from portal.util      import TemplateView
+from django.conf.urls           import patterns, include, url
+from portal                     import views
+from portal.views               import PresViewView, PlatformsView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
+from portal.dashboardview       import DashboardView
+from portal.util                import TemplateView
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
