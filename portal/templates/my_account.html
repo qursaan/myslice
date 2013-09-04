@@ -14,154 +14,154 @@
 
 <h2>Platform Access</h2>
 <table border="2" bordercolor="#C1DAD7" style="table-layout:fixed;background-color:FFFFFF;width:830px" cellpadding="12" cellspacing="12" align="center"> 
-	<tr> 
-    	<th align="center" style="width:15%">Platform</th> 
-        <th align="center" style="width:15%">Account Type</th> 
-        <th align="center" style="width:15%">user_hrn</th>
-        <th align="center">Pub Key</th>
-    </tr>   
-	{% for row in data %}         
-   	<tr>
-    	<td align="center"> {{ row.platform_name }} </td>
-        <td align="center"> {{ row.account_type }} </td>
-       	<td align="center" style="word-wrap: break-word"> {{ row.usr_hrn }}  </td>
-        <td align="center" style="word-wrap: break-word"> {{ row.usr_pubkey }} </td>
-    </tr> 
-	{%endfor%}               
+  <tr> 
+    <th align="center" style="width:15%">Platform</th> 
+    <th align="center" style="width:15%">Account Type</th> 
+    <th align="center" style="width:15%">user_hrn</th>
+    <th align="center">Pub Key</th>
+  </tr>   
+  {% for row in data %}         
+  <tr>
+    <td align="center"> {{ row.platform_name }} </td>
+    <td align="center"> {{ row.account_type }} </td>
+    <td align="center" style="word-wrap: break-word"> {{ row.usr_hrn }}  </td>
+    <td align="center" style="word-wrap: break-word"> {{ row.usr_pubkey }} </td>
+  </tr> 
+  {%endfor%}               
 </table>
 
 
 
 
 <div class='ms-dashboard-panel' id='ms-dashboard-slices' style=" display:block; float:none"  >
-    <div class='ms-dashboard-caption'>
-      <h2>MySlice  Account</h2>
+  <div class='ms-dashboard-caption'>
+    <h2>MySlice  Account</h2>
+  </div>
+  <div class='ms-dashboard-content' id='tophat__list__user_hrn'>
+    <div id="main">
+      <div id="middle" align="center">
+	<form id="editForm"  method="POST" action="acc_process" enctype="multipart/form-data">
+	  {% csrf_token %}
+	  <table class="profile">          
+	    <tr class="odd">
+	      <td colspan="2">
+		<div id="info">Personal Details</div>
+	      </td>
+	    </tr>
+	    <tr class="even">
+	      <td class="key">Email</td>
+	      <td class="value">
+		<span id="emailval" class="value" >{{ person.email }}</span>
+		<img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="emailAlert()"  title="To change your email please contact the administrator" style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; margin-top: -9px;">
+		</td>
+	      </tr>
+	      <tr class="odd">
+		<td class="key">Password</td>
+		<td class="value"> 
+		  <button class="edit" type="button" title="Password" name="edit_pass" id="edit_pass">Edit</button>
+		  <span id="passval"class="value">******** </span>
+		  <span class="hide_this" id="span_pass">
+		    <button type="button" class="cancel" title="Cancel" id="cancel_pass_change"> Cancel </button>
+		    <div style='display:none;' id="pass_form">
+		    <input type='hidden'  value='' /></div>
+		    <table id="edit_password">
+		      <tr>
+			<td>Enter password: </td>
+			<td class="field"> 
+			  <input type="password" name="password" id="password" />
+			</td>
+		      </tr>
+		      <tr>
+			<td>Confirm password: </td>
+			<td class="field"> 
+			  <input type="password" name="confirmpassword" id="confirmpassword" /> 
+			  <input type="submit" name="submit_pass" value="Save"/> 
+			</td>
+		      </tr>
+		    </table>
+		  </span>	
+		</td>
+	      </tr>
+	      <tr class="even">
+		<td class="key">Full Name</td>
+		<td class="value">
+		  <span id="nameval" class="value" >{{ fullname }} </span>
+		  <span class="hide_this" id="span_name">
+		    <button type="button" class="cancel" title="Cancel" id="cancel_name_change"> Cancel </button>
+		    
+		    <div style='display:none;'><input type='hidden'  name='nameform'  /></div>
+		    <input id="fname" type="text" name="fname" class="required"  maxlength="200" value="{{firstname}}" />
+		    <input id="lname" type="text" name="lname" class="required"  maxlength="200" value="{{lastname}}" />
+		    <input type="submit" name="submit_name" value="Save"/>
+		  </span>
+		  <button class="edit" type="button"title="Full Name" id="edit_name">Edit</button>
+		</td>
+
+	      </tr>
+	      <tr class="odd">
+		<td class="key">Affiliation</td>
+		<td class="value">
+		  <span id="affval" class="value">{{ affiliation }}</span>
+		  <img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="affAlert()"  title="To change your affiliation please contact the administrator" style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; ">
+		  </td>
+		</tr>
+		
+		<tr class="even">
+		  <td class="key">Generate Keys</td>
+		  <td> 
+		  </div>
+		  <button id="generate_keypair" name="generate" type="submit" onclick="myFunction()" title="Generate a new key pair. After it is generated, you will need to download your public and private keys again.">Generate a new Key Pair </button>
+		</div>
+	      </td> 
+	    </tr>
+	    <tr class="odd">
+	      <td class="key">Public Key
+	      </td>
+	      <td class="value">
+		
+		<span id="keyval" class="value">******** </span>
+		<span class="hide_this" id="span_upload">
+		  <button type="button" class="cancel" title="Cancel" id="cancel_upload"> Cancel </button>
+		  <div style='display:none;'>
+		  <input type='hidden'  name='upload'  /></div>
+		  <input type="file" name="pubkey" class="required" id="pubkey"/> 
+		  
+		  <button name="upload_key" id="upload_key"  type="submit" title="Delete your private key">Upload </button>
+		  
+		</span>
+		<div style='display:none;'>
+		  <input type='hidden'  name='dload'  />
+		</div> 
+		<button type="submit" name="dl_pubkey" class="download" title="Download your public key" id="dl_file"> Download </button>
+		<button id="upload_file" type="button" title="Upload a public key"> Upload </button>       
+	      </td>
+	    </tr>
+	    <tr class="even" id="pkey_row" display="none">
+	      <td class="key">Private Key </td>
+	      <td class="value">********<a href="#">
+	      <button type="submit" name="dl_pkey" class="download" title="Download your privaye key" id="dl_pkey"> Download </button>
+	      <button id="delete" name="delete" type="submit" title="Delete your private key">Delete </button>
+	    </td>
+	  </tr>
+	  <tr class="odd">
+	    <td colspan="2">
+
+	      <p class="warning" id="pkey_del_msg"> For better
+	      security we recommend that you
+	      download and delete your 
+	      private key from the 
+	      server. Always store your 
+	      private key in a secure 
+	      location. </p>
+	    </td>
+	  </tr>
+
+	</table>
+      </form>
     </div>
-    <div class='ms-dashboard-content' id='tophat__list__user_hrn'>
-            <div id="main">
-                    <div id="middle" align="center">
-                       <form id="editForm"  method="POST" action="acc_process" enctype="multipart/form-data">
-						{% csrf_token %}
-                       <table class="profile">          
-                                    <tr class="odd">
-                                            <td colspan="2">
-                                                <div id="info">Personal Details</div>
-                                            </td>
-                                    </tr>
-                                <tr class="even">
-                                            <td class="key">Email</td>
-                                            <td class="value">
-                                                   <span id="emailval" class="value" >{{ person.email }}</span>
-                                                   <img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="emailAlert()"  title="To change your email please contact the administrator" style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; margin-top: -9px;">
-                                            </td>
-                                    </tr>
-                                <tr class="odd">
-                                            <td class="key">Password</td>
-                                            <td class="value"> 
-                                                <button class="edit" type="button" title="Password" name="edit_pass" id="edit_pass">Edit</button>
-                                                    <span id="passval"class="value">******** </span>
-                                                    <span class="hide_this" id="span_pass">
-                                                            <button type="button" class="cancel" title="Cancel" id="cancel_pass_change"> Cancel </button>
-                                                                <div style='display:none;' id="pass_form">
-                                                                    <input type='hidden'  value='' /></div>
-                                                                    <table id="edit_password">
-                                                                            <tr>
-                                                                                    <td>Enter password: </td>
-                                                                                    <td class="field"> 
-                                                                                        <input type="password" name="password" id="password" />
-                                                                                    </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                    <td>Confirm password: </td>
-                                                                                    <td class="field"> 
-                                                                                        <input type="password" name="confirmpassword" id="confirmpassword" /> 
-                                                                                        <input type="submit" name="submit_pass" value="Save"/> 
-                                                                                    </td>
-                                                                            </tr>
-                                                                    </table>
-                                                    </span>	
-                                            </td>
-                                </tr>
-                                <tr class="even">
-                                            <td class="key">Full Name</td>
-                                            <td class="value">
-                                                    <span id="nameval" class="value" >{{ fullname }} </span>
-                                                    <span class="hide_this" id="span_name">
-                                                            <button type="button" class="cancel" title="Cancel" id="cancel_name_change"> Cancel </button>
-                                                            
-                                                                <div style='display:none;'><input type='hidden'  name='nameform'  /></div>
-                                                                    <input id="fname" type="text" name="fname" class="required"  maxlength="200" value="{{firstname}}" />
-                                                                    <input id="lname" type="text" name="lname" class="required"  maxlength="200" value="{{lastname}}" />
-                                                                    <input type="submit" name="submit_name" value="Save"/>
-                                                    </span>
-                                                    <button class="edit" type="button"title="Full Name" id="edit_name">Edit</button>
-                                            </td>
-
-                                </tr>
-                                <tr class="odd">
-                                            <td class="key">Affiliation</td>
-                                            <td class="value">
-                                                    <span id="affval" class="value">{{ affiliation }}</span>
-                                                    <img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="affAlert()"  title="To change your affiliation please contact the administrator" style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; ">
-                                            </td>
-                                    </tr>
-                            
-                        <tr class="even">
-                                    <td class="key">Generate Keys</td>
-                                    <td> 
-                                        </div>
-                                            <button id="generate_keypair" name="generate" type="submit" onclick="myFunction()" title="Generate a new key pair. After it is generated, you will need to download your public and private keys again.">Generate a new Key Pair </button>
-                                         </div>
-                                    </td> 
-                            </tr>
-                            <tr class="odd">
-                                    <td class="key">Public Key
-                                    </td>
-                                    <td class="value">
-                                            
-                                            <span id="keyval" class="value">******** </span>
-                                            <span class="hide_this" id="span_upload">
-                                                    <button type="button" class="cancel" title="Cancel" id="cancel_upload"> Cancel </button>
-                                                        <div style='display:none;'>
-                                                            <input type='hidden'  name='upload'  /></div>
-                                                            <input type="file" name="pubkey" class="required" id="pubkey"/> 
-                                                            
-                                                            <button name="upload_key" id="upload_key"  type="submit" title="Delete your private key">Upload </button>
-                                                            
-                                            </span>
-                                                <div style='display:none;'>
-                                                    <input type='hidden'  name='dload'  />
-                                                </div> 
-                                                    <button type="submit" name="dl_pubkey" class="download" title="Download your public key" id="dl_file"> Download </button>
-                                             <button id="upload_file" type="button" title="Upload a public key"> Upload </button>       
-                                    </td>
-                            </tr>
-                                    <tr class="even" id="pkey_row" display="none">
-                                            <td class="key">Private Key </td>
-                                            <td class="value">********<a href="#">
-                                                 <button type="submit" name="dl_pkey" class="download" title="Download your privaye key" id="dl_pkey"> Download </button>
-                                                 <button id="delete" name="delete" type="submit" title="Delete your private key">Delete </button>
-                                            </td>
-                                    </tr>
-                                    <tr class="odd">
-                                            <td colspan="2">
-
-                                                    <p class="warning" id="pkey_del_msg"> For better
-                                                    security we recommend that you
-                                                    download and delete your 
-                                                    private key from the 
-                                                    server. Always store your 
-                                                    private key in a secure 
-                                                    location. </p>
-                                            </td>
-                                    </tr>
-
-                            </table>
-                          </form>
-                    </div>
-            </div>
-    	
-    </div>
- </div>
+  </div>
+  
+</div>
+</div>
 
 {% endblock %}
