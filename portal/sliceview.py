@@ -2,9 +2,8 @@
 
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
-from django.contrib.auth.decorators  import login_required
 
-from portal.templateviews            import LoginRequiredView,LogoutOnManifoldExceptionView
+from portal.templateviews            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
@@ -31,12 +30,12 @@ from plugins.messages.messages       import Messages
 tmp_default_slice='ple.upmc.myslicedemo'
 debug = True
 
-class SliceView (LoginRequiredView, LogoutOnManifoldExceptionView):
+class SliceView (LoginRequiredAutoLogoutView):
 
 #    def __init__ (self, slicename=None):
 #        self.slicename = slicename or tmp_default_slice
 
-    def get_or_logout (self,request, slicename=tmp_default_slice):
+    def get (self,request, slicename=tmp_default_slice):
     
         page = Page(request)
         page.expose_js_metadata()

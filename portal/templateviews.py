@@ -10,8 +10,8 @@ from manifold.manifoldresult            import ManifoldException
 class LoginRequiredView (TemplateView):
 
     @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LoginRequiredView, self).dispatch(*args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LoginRequiredView, self).dispatch(request, *args, **kwargs)
 
 
 ########## the base class for views that need to protect against ManifoldException
@@ -24,10 +24,11 @@ class LoginRequiredView (TemplateView):
 # it is often a good idea for a view to monitor these exceptions
 # and to take this opportunity to logout people 
 
-def logout_on_manifold_exception (view_as_a_function):
+def logout_on_manifold_exception (fun_that_returns_httpresponse):
     def wrapped (request, *args, **kwds):
+        print 'wrapped by logout_on_manifold_exception'
         try:
-            return view_as_a_function(request,*args, **kwds)
+            return fun_that_returns_httpresponse(request,*args, **kwds)
         except ManifoldException, manifold_result:
             # xxx we need a means to display this message to user...
             from django.contrib.auth import logout
@@ -42,11 +43,11 @@ def logout_on_manifold_exception (view_as_a_function):
     return wrapped
 
 # at first sight this matters only for views that require login
-# however we prefer this to be explicit
-# i.e. a user class has to inherit both LoginRequiredView and LogoutOnManifoldExceptionView
-
-class LogoutOnManifoldExceptionView (TemplateView):
+# so for now we expose a single class that behaves like 
+# login_required + logout_on_manifold_exception
+class LoginRequiredAutoLogoutView (TemplateView):
 
     @logout_on_manifold_exception
-    def get (self, request, *args, **kwds):
-        return self.get_or_logout (request, *args, **kwds)
+    @method_decorator(login_required)
+    def dispatch (self, request, *args, **kwds):
+        return super(LoginRequiredAutoLogoutView,self).dispatch(request,*args,**kwds)

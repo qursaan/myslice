@@ -20,9 +20,9 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf.urls import patterns, include, url
-from debug_platform.views      import PlatformView
-from portal.views import DashboardView
+from django.conf.urls           import patterns, include, url
+from debug_platform.views       import PlatformView
+from portal.dashboardview       import DashboardView
 
 urlpatterns = patterns('',
     #(r'platform/(?P<platform_name>[\w\.]+)/?$', 'debug.platform'),

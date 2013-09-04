@@ -20,10 +20,12 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf.urls import patterns, include, url
-from portal           import views
-from portal.views     import DashboardView, PresViewView, PlatformsView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
-from portal.util      import TemplateView
+from django.conf.urls           import patterns, include, url
+from portal                     import views
+from portal.views               import PresViewView, PlatformView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
+from portal.platformsview       import PlatformsView
+from portal.dashboardview       import DashboardView
+from portal.util                import TemplateView
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -47,7 +49,7 @@ urlpatterns = patterns('',
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     #url(r'^portal/platform/?$', PlatformView.platform_view(), name='platform'),
     url(r'^platform/(?P<platformname>[\w\.]+)/?$', PlatformView.as_view(), name='platform'),
-    url(r'^account/acc_process/?$', views.acc_process),
+    url(r'^account/account_process/?$', views.account_process),
     url(r'^register/?$', views.register_4m_f4f),
     #url(r'^reg_process/?$', views.reg_4m_f4f_process),
     url(r'^contact/?$', views.contact),
