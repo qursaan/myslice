@@ -3,7 +3,6 @@
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 from django.contrib.auth.decorators  import login_required
-from django.http                     import HttpResponseRedirect
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
@@ -264,7 +263,7 @@ def slice_view (request, slicename=tmp_default_slice):
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
-    template_env [ 'title' ] = '%(slicename)s (test view that combines various plugins)'%locals()
+    template_env [ 'title' ] = '%(slicename)s'%locals()
     # the menu items on the top
     template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
     # so we can sho who is logged

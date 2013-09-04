@@ -1,5 +1,9 @@
 # a set of utilities to help make the global layout consistent across views
 
+from django.http                     import HttpResponseRedirect
+
+from manifold.manifoldresult         import ManifoldException
+
 def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
     result=[]
