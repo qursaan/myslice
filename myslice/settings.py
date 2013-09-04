@@ -231,7 +231,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', 'auth.manifoldbackend.ManifoldBackend', )
+AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend', )
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine

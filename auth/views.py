@@ -5,17 +5,15 @@ from django.shortcuts import render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 
-from auth.backend import MyCustomBackend
-
 from myslice.viewutils import topmenu_items, the_user
 from myslice.config import Config
 
 def login_user(request):
     state = "Please log in below..."
     username = password = ''
-    env={'hard_wired_users':MyCustomBackend.hard_wired_users,
-         'manifold_url':Config.manifold_url,
-         }
+    env={
+        'manifold_url':Config.manifold_url,
+        }
 
     if request.POST:
         username = request.POST.get('username')

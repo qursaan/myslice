@@ -9,8 +9,11 @@ from django.conf      import settings
 from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
+import portal.sliceview
+
 # main entry point (set to the / URL)
 default_view='trash.pluginview.test_plugin_view'
+#default_view='portal.views.PlatformsView'
 # where to be redirected after login
 after_login_view='trash.dashboard.dashboard_view'
 
@@ -39,15 +42,18 @@ urlpatterns = patterns(
     # the manifold proxy
     #
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifold.manifoldproxy.proxy'),
+    # 
+    # the slice view
+    #
+    (r'^slice/?$',                        portal.sliceview.SliceView.as_view()),
+    (r'^slice/(?P<slicename>[\w\.]+)/?$', portal.sliceview.SliceView.as_view()),
     #
     # various trash views
     #
-    (r'^tab/?$', 'trash.sampleviews.tab_view'),
-    (r'^scroll/?$', 'trash.sampleviews.scroll_view'),
-    (r'^plugin/?$', 'trash.pluginview.test_plugin_view'),
-    (r'^dashboard/?$', 'trash.dashboard.dashboard_view'),
-    (r'^slice/?$', 'trash.sliceview.slice_view'),
-    (r'^slice/(?P<slicename>[\w\.]+)/?$', 'trash.sliceview.slice_view'),
+    (r'^tab/?$',                          'trash.sampleviews.tab_view'),
+    (r'^scroll/?$',                       'trash.sampleviews.scroll_view'),
+    (r'^plugin/?$',                       'trash.pluginview.test_plugin_view'),
+    (r'^dashboard/?$',                    'trash.dashboard.dashboard_view'),
     # Portal
     url(r'^portal/', include('portal.urls')),
     # Portal
