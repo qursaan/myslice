@@ -23,29 +23,24 @@
 
 import json
 
-from django.http                 import HttpResponseRedirect, HttpResponse
-from django.views.generic.base   import TemplateView
-from django.shortcuts            import render
-from django.template.loader      import render_to_string
-from django.core.mail            import send_mail
-from django.utils.decorators     import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.http                import HttpResponseRedirect, HttpResponse
+from django.views.generic.base  import TemplateView
+from django.shortcuts           import render
+from django.template.loader     import render_to_string
 
-from myslice.viewutils           import topmenu_items, the_user
+from myslice.viewutils          import topmenu_items, the_user
 
-from plugins.lists.simplelist    import SimpleList
-from plugins.hazelnut            import Hazelnut
-from plugins.pres_view           import PresView
-from portal.event import Event
+from plugins.pres_view          import PresView
+from portal.event               import Event
 
-from portal                      import signals
-from portal.forms                import SliceRequestForm
-from portal.util                 import RegistrationView, ActivationView
-from portal.models               import PendingUser, PendingSlice
-from portal.actions              import authority_get_pi_emails, get_request_by_authority, manifold_add_user, manifold_update_user
-from manifold.manifoldapi        import execute_query
-from manifold.core.query         import Query
-from unfold.page                 import Page
+# these seem totally unused for now
+#from portal.util                import RegistrationView, ActivationView
+
+from portal.models              import PendingUser, PendingSlice
+from portal.actions             import get_request_by_authority
+from manifold.manifoldapi       import execute_query
+from manifold.core.query        import Query
+from unfold.page                import Page
 
 # NOTE
 # initially all the portal views were defined in this single file
