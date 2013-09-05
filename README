@@ -236,11 +236,15 @@ $./manage.py migrate
 
 if it fails:
 
-sqlite> DROP TABLE my_table [from your DB]
+1. go to myslice directory
+2. do sqlite3 myslice.sqlite3 [if sqlite3: command not found, do $apt-get install sqlite3]
+3. check the list of tables with sqlite> .tables
+4. if you find those tables that was mentioned in the failure message while running $./manage.py migrate
+	do sqlite> DROP TABLE mentioned_table 
+	[mentioned_table = the tables that was explicity mentioned in the failure message of $./manage.py migrate]
+5. sqlite> .quit
+6. $./manage.py migrate  
 
-then
-
-$./manage.py migrate
 
 
 
