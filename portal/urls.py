@@ -24,7 +24,8 @@ from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
 from portal.views               import PresViewView, ValidatePendingView
-from portal.views               import account_process, slice_request, register_4m_f4f
+from portal.views               import slice_request, register_4m_f4f
+from portal.accountview         import account_process
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.dashboardview       import DashboardView
