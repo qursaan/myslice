@@ -216,7 +216,7 @@ def register_4m_f4f(request):
         #get_email = PendingUser.objects.get(email)
         reg_fname = request.POST.get('firstname', '')
         reg_lname = request.POST.get('lastname', '')
-        reg_aff = request.POST.get('affiliation','')
+        #reg_aff = request.POST.get('affiliation','')
         reg_auth = request.POST.get('authority_hrn', '')
         reg_email = request.POST.get('email','').lower()
         
@@ -229,8 +229,8 @@ def register_4m_f4f(request):
             errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
             #return render(request, 'register_4m_f4f.html')
-        if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
-            errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+#        if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
+#            errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
             #return render(request, 'register_4m_f4f.html')
         # XXX validate authority hrn !!
@@ -273,7 +273,7 @@ def register_4m_f4f(request):
             b = PendingUser(
                 first_name=reg_fname, 
                 last_name=reg_lname, 
-                affiliation=reg_aff,
+                #affiliation=reg_aff,
                 authority_hrn=reg_auth,
                 email=reg_email, 
                 password=request.POST['password'],
@@ -285,7 +285,7 @@ def register_4m_f4f(request):
             ctx = {
                 first_name   : reg_fname, 
                 last_name    : reg_lname, 
-                affiliation  : reg_aff,
+                #affiliation  : reg_aff,
                 authority_hrn: reg_auth,
                 email        : reg_email, 
                 keypair      : keypair,
@@ -306,7 +306,7 @@ def register_4m_f4f(request):
         'errors': errors,
         'firstname': request.POST.get('firstname', ''),
         'lastname': request.POST.get('lastname', ''),
-        'affiliation': request.POST.get('affiliation', ''),
+        #'affiliation': request.POST.get('affiliation', ''),
         'authority_hrn': request.POST.get('authority_hrn', ''),
         'email': request.POST.get('email', ''),
         'password': request.POST.get('password', ''),           
