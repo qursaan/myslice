@@ -10,6 +10,12 @@ from manifold.core.result_value import ResultValue
 debug=False
 debug=True
 
+def mytruncate (obj, l):
+    # we will add '..' 
+    l1=l-2
+    repr="%s"%obj
+    return (repr[:l1]+'..') if len(repr)>l1 else repr
+
 class ManifoldAPI:
 
     def __init__(self, auth=None, cainfo=None):
@@ -33,8 +39,9 @@ class ManifoldAPI:
         elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
         elif isinstance (result,dict):        
             print "result is a dict with %d keys : %s"%(len(result),result.keys())
-            for (k,v) in result.iteritems(): print '...',k,':',v
-            print "result is a dict with %d keys : %s"%(len(result),result.keys()),
+            for (k,v) in result.iteritems(): 
+                if v is None: continue
+                print '+++',k,':',mytruncate (v,60)
         else:                                 print "[dont know how to display result] %s"%result
 
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
@@ -46,12 +53,14 @@ class ManifoldAPI:
     def __getattr__(self, methodName):
         def func(*args, **kwds):
             try:
-                if debug: print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
+                if debug:
+                    print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
                 result=getattr(self.server, methodName)(self.auth, *args, **kwds)
                 if debug:
                     print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
                     print '.ctd. Authmethod=',self.auth['AuthMethod'], self.url,'->',
                     self._print_result(result)
+                    print '===== ManifoldAPI call done'
 
                 return ResultValue(**result)
 
