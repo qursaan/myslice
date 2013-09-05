@@ -1,9 +1,11 @@
 from portal.templateviews            import LoginRequiredAutoLogoutView
 #
 from manifold.core.query             import Query
+from manifold.manifoldapi            import execute_query
 #
 from myslice.viewutils               import topmenu_items, the_user
 #
+import json
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
