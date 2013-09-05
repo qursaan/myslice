@@ -20,13 +20,16 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
-from portal                     import views
-from portal.views               import PresViewView, ValidatePendingView, AccountView # UserRegisterView, UserValidateView
+
+from portal.views               import PresViewView, ValidatePendingView
+from portal.views               import account_process, contact, slice_request, register_4m_f4f
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.dashboardview       import DashboardView
-from portal.util                import TemplateView
+from portal.accountview         import AccountView
+
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -49,12 +52,11 @@ urlpatterns = patterns('',
     url(r'^account/?$', AccountView.as_view(), name='account'),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.]+)/?$', PlatformView.as_view(), name='platform'),
-    url(r'^account/account_process/?$', views.account_process),
-    url(r'^register/?$', views.register_4m_f4f),
-    #url(r'^reg_process/?$', views.reg_4m_f4f_process),
-    url(r'^contact/?$', views.contact),
+    url(r'^account/account_process/?$', account_process),
+    url(r'^register/?$', register_4m_f4f),
+    url(r'^contact/?$', contact),
     # Slice request
-    url(r'^slice_request/?$', views.slice_request),
+    url(r'^slice_request/?$', slice_request),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
