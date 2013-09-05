@@ -21,144 +21,32 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os.path, re
 import json
 
-from django.http                 import HttpResponseRedirect, HttpResponse
-from django.views.generic.base   import TemplateView
-from django.shortcuts            import render
-from django.template.loader      import render_to_string
-from django.core.mail            import send_mail
-from django.utils.decorators     import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.http                import HttpResponseRedirect, HttpResponse
+from django.views.generic.base  import TemplateView
+from django.shortcuts           import render
+from django.template.loader     import render_to_string
 
-from myslice.viewutils           import topmenu_items, the_user
+from myslice.viewutils          import topmenu_items, the_user
 
-from plugins.lists.simplelist    import SimpleList
-from plugins.hazelnut            import Hazelnut
-from plugins.pres_view           import PresView
-from portal.event import Event
+from plugins.pres_view          import PresView
+from portal.event               import Event
 
-from portal                      import signals
-from portal.forms                import SliceRequestForm
-from portal.util                 import RegistrationView, ActivationView
-from portal.models               import PendingUser, PendingSlice
-from portal.actions              import authority_get_pi_emails, get_request_by_authority, manifold_add_user, manifold_update_user
-from manifold.manifoldapi        import execute_query
-from manifold.core.query         import Query
-from unfold.page                 import Page
+# these seem totally unused for now
+#from portal.util                import RegistrationView, ActivationView
 
-def register_4m_f4f(request):
-    errors = []
+from portal.models              import PendingUser, PendingSlice
+from portal.actions             import get_request_by_authority
+from manifold.manifoldapi       import execute_query
+from manifold.core.query        import Query
+from unfold.page                import Page
 
-    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
-    #authorities_query = Query.get('authority').select('authority_hrn')
-    authorities = execute_query(request, authorities_query)
-
-    if request.method == 'POST':
-        # We shall use a form here
-
-        #get_email = PendingUser.objects.get(email)
-        reg_fname = request.POST.get('firstname', '')
-        reg_lname = request.POST.get('lastname', '')
-        #reg_aff = request.POST.get('affiliation','')
-        reg_auth = request.POST.get('authority_hrn', '')
-        reg_email = request.POST.get('email','').lower()
-        
-        #POST value validation  
-        if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
-            errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            #return HttpResponse("Only Letters, Numbers, - and _ allowd in First Name")
-            #return render(request, 'register_4m_f4f.html')
-        if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
-            errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            #return HttpResponse("Only Letters, Numbers, - and _ is allowed in Last name")
-            #return render(request, 'register_4m_f4f.html')
-#        if (re.search(r'^[\w+\s.@+-]+$', reg_aff) == None):
-#            errors.append('Affiliation may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            #return HttpResponse("Only Letters, Numbers and _ is allowed in Affiliation")
-            #return render(request, 'register_4m_f4f.html')
-        # XXX validate authority hrn !!
-        if PendingUser.objects.filter(email__iexact=reg_email):
-            errors.append('Email already registered.Please provide a new email address.')
-            #return HttpResponse("Email Already exists")
-            #return render(request, 'register_4m_f4f.html')
-        if 'generate' in request.POST['question']:
-            # Generate public and private keys using SFA Library
-            from sfa.trust.certificate  import Keypair
-            k = Keypair(create=True)
-            public_key = k.get_pubkey_string()
-            private_key = k.as_pem()
-            private_key = ''.join(private_key.split())
-            public_key = "ssh-rsa " + public_key
-            # Saving to DB
-            keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-#            keypair = re.sub("\r", "", keypair)
-#            keypair = re.sub("\n", "\\n", keypair)
-#            #keypair = keypair.rstrip('\r\n')
-#            keypair = ''.join(keypair.split())
-        else:
-            up_file = request.FILES['user_public_key']
-            file_content =  up_file.read()
-            file_name = up_file.name
-            file_extension = os.path.splitext(file_name)[1]
-            allowed_extension =  ['.pub','.txt']
-            if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
-                keypair = '{"user_public_key":"'+ file_content +'"}'
-                keypair = re.sub("\r", "", keypair)
-                keypair = re.sub("\n", "\\n",keypair)
-                keypair = ''.join(keypair.split())
-            else:
-                errors.append('Please upload a valid RSA public key [.txt or .pub].')
-
-        #b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
-        #                email=reg_email, password=request.POST['password'], keypair=keypair)
-        #b.save()
-        if not errors:
-            b = PendingUser(
-                first_name=reg_fname, 
-                last_name=reg_lname, 
-                #affiliation=reg_aff,
-                authority_hrn=reg_auth,
-                email=reg_email, 
-                password=request.POST['password'],
-                keypair=keypair
-            )
-            b.save()
-
-            # Send email
-            ctx = {
-                first_name   : reg_fname, 
-                last_name    : reg_lname, 
-                #affiliation  : reg_aff,
-                authority_hrn: reg_auth,
-                email        : reg_email, 
-                keypair      : keypair,
-                cc_myself    : True # form.cleaned_data['cc_myself']
-            }
-
-            recipients = authority_get_pi_emails(authority_hrn)
-            if ctx['cc_myself']:
-                recipients.append(ctx['email'])
-
-            msg = render_to_string('user_request_email.txt', ctx)
-            send_mail("Onelab New User request submitted", msg, email, recipients)
-
-            return render(request, 'user_register_complete.html')
-
-    return render(request, 'register_4m_f4f.html',{
-        'topmenu_items': topmenu_items('Register', request),
-        'errors': errors,
-        'firstname': request.POST.get('firstname', ''),
-        'lastname': request.POST.get('lastname', ''),
-        #'affiliation': request.POST.get('affiliation', ''),
-        'authority_hrn': request.POST.get('authority_hrn', ''),
-        'email': request.POST.get('email', ''),
-        'password': request.POST.get('password', ''),           
-        'authorities': authorities
-    })        
-    
-
+# NOTE
+# initially all the portal views were defined in this single file
+# all the other ones have now migrated into separate classes/files for more convenience
+# I'm leaving these ones here for now as I could not exactly figure what the purpose was 
+# (i.e. what the correct name should be, as presviewview was a bit cryptic)
 class PresViewView(TemplateView):
     template_name = "view-unfold1.html"
 
