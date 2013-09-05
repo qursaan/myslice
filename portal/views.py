@@ -24,12 +24,15 @@
 import os.path, re
 import json
 
+from django.http                 import HttpResponseRedirect, HttpResponse
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from django.template.loader      import render_to_string
 from django.core.mail            import send_mail
 from django.utils.decorators     import method_decorator
 from django.contrib.auth.decorators import login_required
+
+from myslice.viewutils           import topmenu_items, the_user
 
 from plugins.lists.simplelist    import SimpleList
 from plugins.hazelnut            import Hazelnut
@@ -44,9 +47,6 @@ from portal.actions              import authority_get_pi_emails, get_request_by_
 from manifold.manifoldapi        import execute_query
 from manifold.core.query         import Query
 from unfold.page                 import Page
-from myslice.viewutils           import topmenu_items, the_user
-from django.http                 import HttpResponseRedirect, HttpResponse
-
 
 def register_4m_f4f(request):
     errors = []
@@ -158,75 +158,6 @@ def register_4m_f4f(request):
         'authorities': authorities
     })        
     
-
-@login_required
-def slice_request(request):
-    errors = []
-
-    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
-    #authorities_query = Query.get('authority').select('authority_hrn')
-    authorities = execute_query(request, authorities_query)
-
-    authority_hrn_tuple = []
-    for authority in authorities:
-        authority_hrn_tuple.append((authority['authority_hrn'], authority['name']))
-    authority_hrn_initial = {'authority_hrn': authority_hrn_tuple}
-        
-    # request.POST or None ?
-    if request.method == 'POST':
-        # The form has been submitted
-        form = SliceRequestForm(request.POST, initial=authority_hrn_initial) 
-
-        if form.is_valid():
-            slice_name      = form.cleaned_data['slice_name']
-            authority_hrn   = form.cleaned_data['authority_hrn']
-            number_of_nodes = form.cleaned_data['number_of_nodes']
-            type_of_nodes   = form.cleaned_data['type_of_nodes']
-            purpose         = form.cleaned_data['purpose']
-            
-            s = PendingSlice(
-                slice_name      = slice_name,
-                authority_hrn   = authority_hrn,
-                number_of_nodes = number_of_nodes,
-                type_of_nodes   = type_of_nodes,
-                purpose         = purpose
-            )
-            s.save()
-
-            # All validation rules pass; process data in form.cleaned_data
-            # slice_name, number_of_nodes, type_of_nodes, purpose
-            email = form.cleaned_data['email'] # email of the sender
-            cc_myself = form.cleaned_data['cc_myself']
-
-            # The recipients are the PI of the authority
-            recipients = authority_get_pi_emails(authority_hrn)
-            #recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
-            if cc_myself:
-                recipients.append(email)
-            msg = render_to_string('slice_request_email.txt', form.cleaned_data)
-            send_mail("Onelab New Slice request form submitted", msg, email, recipients)
-
-            return render(request,'slicereq_recvd.html') # Redirect after POST
-    else:
-        form = SliceRequestForm(initial=authority_hrn_initial)
-
-#    template_env = {}
-#    template_env['form'] = form
-#    template_env['topmenu_items'] = topmenu_items('Request a slice', request) 
-#    template_env['unfold1_main'] = render(request, 'slice_request_.html', {
-#        'form': form,
-#    })
-#    from django.shortcuts                import render_to_response
-#    from django.template                 import RequestContext
-#    return render_to_response ('view-unfold1.html',template_env,
-#                               context_instance=RequestContext(request))
-
-    return render(request, 'slice_request.html', {
-        'form': form,
-        'topmenu_items': topmenu_items('Request a slice', request),
-        'username': the_user (request) 
-    })
-
 
 class PresViewView(TemplateView):
     template_name = "view-unfold1.html"

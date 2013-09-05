@@ -24,13 +24,13 @@ from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
 from portal.views               import PresViewView, ValidatePendingView
-from portal.views               import slice_request, register_4m_f4f
-from portal.accountview         import account_process
+from portal.views               import register_4m_f4f
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.dashboardview       import DashboardView
-from portal.accountview         import AccountView
+from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
+from portal.slicerequestview    import SliceRequestView
 
 
 # DEPRECATED #named_register_forms = (
@@ -58,7 +58,7 @@ urlpatterns = patterns('',
     url(r'^register/?$', register_4m_f4f),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
     # Slice request
-    url(r'^slice_request/?$', slice_request),
+    url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
