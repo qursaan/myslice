@@ -1,5 +1,6 @@
 from django.template.loader      import render_to_string
 from django.shortcuts            import render
+from django.core.mail            import send_mail
 
 from manifold.core.query         import Query
 from manifold.manifoldapi        import execute_query
@@ -49,7 +50,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             cc_myself = form.cleaned_data['cc_myself']
 
             # The recipients are the PI of the authority
-            recipients = authority_get_pi_emails(authority_hrn)
+            recipients = authority_get_pi_emails(request,authority_hrn)
             #recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
             if cc_myself:
                 recipients.append(email)

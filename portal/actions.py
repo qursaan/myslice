@@ -6,19 +6,22 @@ import json
 
 # Get the list of authorities
 
-def authority_get_pis(authority_hrn):
+def authority_get_pis(request, authority_hrn):
     query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
-    results = execute_query(query)
-    if not results:
-        raise Exception, "Authority not found: %s" % authority_hrn
-    result, = results
-    return result['pi_users']
+    results = execute_query(request, query)
+    # NOTE: temporarily commented. Because results is giving empty list. 
+    # Needs more debugging
+    #if not results:
+    #    raise Exception, "Authority not found: %s" % authority_hrn
+    #result, = results
+    #return result['pi_users']
+    return results
 
-def authority_get_pi_emails(authority_hrn):
-    user_hrns = authority_get_pis(authority_hrn)
+def authority_get_pi_emails(request,authority_hrn):
+    user_hrns = authority_get_pis(request,authority_hrn)
     
     query = Query.get('user').filter_by('user_hrn', 'included', user_hrns).select('user_email')
-    results = execute_query(query)
+    results = execute_query(request,query)
     
     return [result['user_email'] for result in results]
 
