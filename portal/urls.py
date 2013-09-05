@@ -23,7 +23,6 @@
 from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
-from portal.views               import PresViewView, ValidatePendingView
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.dashboardview       import DashboardView
@@ -31,6 +30,9 @@ from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
+# hopefully these should move in dedicated source files too
+from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
+from portal.views               import ValidatePendingView
 
 
 # DEPRECATED #named_register_forms = (
