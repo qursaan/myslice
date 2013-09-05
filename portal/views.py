@@ -21,10 +21,10 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.conf                 import settings
-from django.contrib.sites.models import Site, RequestSite
-from django.contrib              import messages
-from django.views.generic        import View
+import os.path, re
+import json
+
+#from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from django.template.loader      import render_to_string
@@ -36,7 +36,6 @@ from plugins.lists.simplelist    import SimpleList
 from plugins.hazelnut            import Hazelnut
 from plugins.pres_view           import PresView
 from portal.event import Event
-import json
 
 from portal                      import signals
 from portal.forms                import SliceRequestForm, ContactForm
@@ -48,9 +47,6 @@ from manifold.core.query         import Query
 from unfold.page                 import Page
 from myslice.viewutils           import topmenu_items, the_user
 from django.http                 import HttpResponseRedirect, HttpResponse
-
-from M2Crypto                    import Rand, RSA, BIO
-import os, re
 
 #class for my_account
 class AccountView(TemplateView):
