@@ -6,10 +6,11 @@ from myslice.viewutils          import topmenu_items, the_user
 
 from portal.forms               import ContactForm
 
-# view for contact form
+# splitting the 2 functions done here
+# GET is for displaying the empty form
+# POST is to process it once filled - or show the form again if anything is missing
 class ContactView (View):
-  def dispatch(self, request):
-    if request.method == 'POST': # If the form has been submitted...
+    def post (self, request):
         form = ContactForm(request.POST) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
@@ -29,13 +30,15 @@ class ContactView (View):
             from django.core.mail import send_mail
             send_mail("Onelab user submitted a query ", [first_name,last_name,affiliation,subject,message], email, recipients)
             return render(request,'contact_sent.html') # Redirect after POST
-    else:
-        form = ContactForm() # An unbound form
-    
-    return render(request, 'contact.html', {
-        'form': form,
-        'topmenu_items': topmenu_items('Contact Us', request),
-        'username': the_user (request)
+        else:
+            return self._display (request, form)
 
-    })
-
+    def get (self, request):
+        return self._display (request, ContactForm()) # A fresh unbound form
+        
+    def _display (self, request, form):
+        return render(request, 'contact.html', {
+                'form': form,
+                'topmenu_items': topmenu_items('Contact Us', request),
+                'username': the_user (request)
+                })
