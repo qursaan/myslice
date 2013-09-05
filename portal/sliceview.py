@@ -1,5 +1,3 @@
-# Create your views here.
-
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 
@@ -7,8 +5,6 @@ from portal.templateviews            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
-from manifold.manifoldresult         import ManifoldException
-from manifold.metadata               import MetaData as Metadata
 
 from myslice.viewutils               import topmenu_items, the_user
 
@@ -28,7 +24,6 @@ from plugins.messages.messages       import Messages
 #from plugins.updater                 import Updater
 
 tmp_default_slice='ple.upmc.myslicedemo'
-debug = True
 
 class SliceView (LoginRequiredAutoLogoutView):
 
