@@ -24,7 +24,6 @@
 import os.path, re
 import json
 
-#from django.views.generic        import View
 from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from django.template.loader      import render_to_string
@@ -38,7 +37,7 @@ from plugins.pres_view           import PresView
 from portal.event import Event
 
 from portal                      import signals
-from portal.forms                import SliceRequestForm, ContactForm
+from portal.forms                import SliceRequestForm
 from portal.util                 import RegistrationView, ActivationView
 from portal.models               import PendingUser, PendingSlice
 from portal.actions              import authority_get_pi_emails, get_request_by_authority, manifold_add_user, manifold_update_user
@@ -233,38 +232,6 @@ def register_4m_f4f(request):
         'authorities': authorities
     })        
     
-
-# view for contact form
-def contact(request):
-    if request.method == 'POST': # If the form has been submitted...
-        form = ContactForm(request.POST) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            # Process the data in form.cleaned_data
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            affiliation = form.cleaned_data['affiliation']
-            subject = form.cleaned_data['subject']
-            message = form.cleaned_data['message']
-            email = form.cleaned_data['email'] # email of the sender
-            cc_myself = form.cleaned_data['cc_myself']
-
-            #recipients = authority_get_pi_emails(authority_hrn)
-            recipients = ['yasin.upmc@gmail.com']
-            if cc_myself:
-                recipients.append(email)
-
-            from django.core.mail import send_mail
-            send_mail("Onelab user submitted a query ", [first_name,last_name,affiliation,subject,message], email, recipients)
-            return render(request,'contact_sent.html') # Redirect after POST
-    else:
-        form = ContactForm() # An unbound form
-    
-    return render(request, 'contact.html', {
-        'form': form,
-        'topmenu_items': topmenu_items('Contact Us', request),
-        'username': the_user (request)
-
-    })
 
 @login_required
 def slice_request(request):

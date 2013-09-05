@@ -24,11 +24,12 @@ from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
 from portal.views               import PresViewView, ValidatePendingView
-from portal.views               import account_process, contact, slice_request, register_4m_f4f
+from portal.views               import account_process, slice_request, register_4m_f4f
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.dashboardview       import DashboardView
 from portal.accountview         import AccountView
+from portal.contactview         import ContactView
 
 
 # DEPRECATED #named_register_forms = (
@@ -54,7 +55,7 @@ urlpatterns = patterns('',
     url(r'^platform/(?P<platformname>[\w\.]+)/?$', PlatformView.as_view(), name='platform'),
     url(r'^account/account_process/?$', account_process),
     url(r'^register/?$', register_4m_f4f),
-    url(r'^contact/?$', contact),
+    url(r'^contact/?$', ContactView.as_view(), name='contact'),
     # Slice request
     url(r'^slice_request/?$', slice_request),
     # Validate pending requests
