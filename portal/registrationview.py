@@ -6,6 +6,8 @@ from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
 
+from myslice.viewutils          import topmenu_items
+
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query
 
