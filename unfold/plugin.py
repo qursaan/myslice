@@ -169,11 +169,14 @@ class Plugin:
         self.need_toggle = False
         if self.toggled=='persistent':
             # start with everything turned off and let the js callback do its job
-            env.update({'persistent_toggle':True,'display_hide_button':False,'display_show_button':False,'display_body':False})
+            env.update({'persistent_toggle':True,'display_hide_button':False,
+                        'display_show_button':False,'display_body':False})
         elif self.toggled==False:
-            env.update({'persistent_toggle':False,'display_hide_button':False,'display_show_button':True,'display_body':False})
+            env.update({'persistent_toggle':False,'display_hide_button':False,
+                        'display_show_button':True,'display_body':False})
         else:
-            env.update({'persistent_toggle':False,'display_hide_button':True,'display_show_button':False,'display_body':True})
+            env.update({'persistent_toggle':False,'display_hide_button':True,
+                        'display_show_button':False,'display_body':True})
         if self.need_debug(): 
             print "rendering plugin.html with env keys %s"%env.keys()
             for (k,v) in env.items(): 
