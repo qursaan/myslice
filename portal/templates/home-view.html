@@ -1,7 +1,9 @@
 {% extends 'layout-unfold2.html' %}
 
 {% block unfold2_margin %}
+{% if not username %}
 {% include 'widget-login.html' %}
+{% endif %}
 {% endblock unfold2_margin %}
 
 {% block unfold2_main %}

@@ -9,17 +9,24 @@ from django.conf      import settings
 from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
-import portal.sliceview
 import portal.platformsview
 import portal.dashboardview
+import portal.homeview
 
+home_view=portal.homeview.HomeView.as_view()
+dashboard_view=portal.dashboardview.DashboardView.as_view()
+platforms_view=portal.platformsview.PlatformsView.as_view()
+
+#### high level choices
 # main entry point (set to the / URL)
-## beware before adopting this one
-# if anything goes wrong in this page you end up in an endless cycle
-#default_view=portal.platformsview.PlatformsView.as_view()
-default_view='auth.views.login_user'
+# beware that if this view is broken you end up in an endless cycle...
+# maybe platforms_view would be best on the longer run
+the_default_view=home_view
 # where to be redirected after login
-after_login_view=portal.dashboardview.DashboardView.as_view()
+the_after_login_view=home_view #dashboard_view
+# where to redirect when login is required
+# might need another one ?
+the_login_view=home_view
 
 urlpatterns = patterns(
     '',
@@ -33,31 +40,20 @@ urlpatterns = patterns(
     #
     # default / view
     #
-    (r'^/?$', default_view),
+    (r'^/?$', the_default_view),
     #
     # login / logout
     #
-    (r'^login-ok/?$', after_login_view),
+    (r'^login-ok/?$', the_after_login_view, {'state': 'Welcome to MySlice'} ),
     # seems to be what login_required uses to redirect ...
-    (r'^accounts/login/$', 'auth.views.login_user'),
-    (r'^login/?$', 'auth.views.login_user'),
+    (r'^accounts/login/$', the_login_view),
+    (r'^login/?$', the_login_view),
     (r'^logout/?$', 'auth.views.logout_user'),
     #
     # the manifold proxy
     #
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifold.manifoldproxy.proxy'),
-    # 
-    # the slice view
     #
-    (r'^slice/?$',                        portal.sliceview.SliceView.as_view()),
-    (r'^slice/(?P<slicename>[\w\.]+)/?$', portal.sliceview.SliceView.as_view()),
-    #
-    # various trash views
-    #
-    (r'^tab/?$',                          'trash.sampleviews.tab_view'),
-    (r'^scroll/?$',                       'trash.sampleviews.scroll_view'),
-    (r'^plugin/?$',                       'trash.pluginview.test_plugin_view'),
-    (r'^dashboard/?$',                    'trash.dashboard.dashboard_view'),
     # Portal
     url(r'^portal/', include('portal.urls')),
     # Portal
@@ -66,6 +62,12 @@ urlpatterns = patterns(
     url(r'^debug/', include('debug_platform.urls')),
     # Static files
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
-
+    #
+    # various trash views - bound to go away 
+    #
+    (r'^tab/?$',                          'trash.sampleviews.tab_view'),
+    (r'^scroll/?$',                       'trash.sampleviews.scroll_view'),
+    (r'^plugin/?$',                       'trash.pluginview.test_plugin_view'),
+    (r'^dashboard/?$',                    'trash.dashboard.dashboard_view'),
 
 )

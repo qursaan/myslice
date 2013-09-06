@@ -30,6 +30,8 @@ from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
+from portal.sliceview           import SliceView
+
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
 from portal.views               import ValidatePendingView
@@ -56,6 +58,8 @@ urlpatterns = patterns('',
     url(r'^account/?$', AccountView.as_view(), name='account'),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.]+)/?$', PlatformView.as_view(), name='platform'),
+    url(r'^slice/?$',SliceView.as_view(),name='slice'),
+    url(r'^slice/(?P<slicename>[\w\.]+)/?$', SliceView.as_view(),name='slice'),
     url(r'^account/account_process/?$', account_process),
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),

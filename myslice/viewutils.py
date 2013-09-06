@@ -23,9 +23,8 @@ def topmenu_items (current,request=None):
     return result
 
 def the_user (request):
-    "This code below is broken"
+    "retrieves logged in user's email, or empty string"
     if not request.user.is_authenticated (): 
-#        print 'void user!'
         return ''
     else: 
         return request.user.email

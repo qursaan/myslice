@@ -94,7 +94,7 @@
     // hard-wire a separate presentation depending on the key being used....
     function cell(key, value) {
         if (key == 'slice.slice_hrn') {
-            return "<i class='icon-play-circle'></i><a href='/slice/" + value + "'>" + value + "</a>";
+            return "<i class='icon-play-circle'></i><a href='/portal/slice/" + value + "'>" + value + "</a>";
         } else if (key == 'network_hrn') {
             return "<i class='icon-play-circle'></i><a href='/portal/platform/" + value + "'>" + value + "</a>";
         } else {
