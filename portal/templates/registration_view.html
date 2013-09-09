@@ -1,7 +1,9 @@
 {% extends "layout-unfold1.html" %}
 
 {% block head %}                
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+<!-- xxx ideally only onelab.css but ... xxx -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
 <script type="text/javascript" src="{{STATIC_URL}}/jquery.validate.js"></script> 
 <script type="text/javascript" src="{{STATIC_URL}}/my_account.register.js"></script>
 {% endblock %}                              
@@ -9,24 +11,24 @@
 {% block unfold1_main %}        
 
 
-
 {% if errors %}
-        <ul>
-            {% for error in errors %}
-            <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+<ul>
+  {% for error in errors %}
+  <li>{{ error }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 
 
+<div class="onelab-title well well-lg">
+  <h2>OneLab Experimenter Registration</h2>
+  <h4>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
+</div>
+   
+<div class="well">
 <form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
 {% csrf_token %}
  <fieldset>
-    <div class="OneLabTitle">
-        <h2>OneLab Experimenter Registration</h2>
-        <h3>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
-    </div>
-   
    <div class="field">
      <label for="cname">First Name</label>
      <input type="text" id="firstname" name="firstname" size="25" class="required" minlength="2" value="{{ firstname}}" /> 
@@ -87,11 +89,12 @@
       <input type="file" name="user_public_key" class="required" id="user_public_key"/>
       <p class="hint">Upload a valid public key</p>
    </div>
-   <div class="field">
-     <input class="submit" type="submit" name="submit" value="Register"/>
+   <div class="field" id="register">
+     <input class="submit btn" type="submit"  name="submit" value="Register"/>
    </div>
  </fieldset>
 </form>
+</div>
 
 {% endblock %}
 

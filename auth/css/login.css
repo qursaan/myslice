@@ -1,3 +1,7 @@
+p.login-status {
+    font-weight: bold;
+}
+
 p.login { 
     font-style: italic;
 }

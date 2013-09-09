@@ -1,5 +1,4 @@
 {% extends "layout-unfold1.html" %}
-{% load i18n %}
 
 {% block head %}
 {{ wizard.form.media }}
@@ -10,11 +9,13 @@
 
   <h1>User registration</h1>
 
-{% if envoi %}Votre message a bien été envoyé !{% endif %}
+{% if envoi %}Your registration message has been sent !{% endif %}
  
+<div class='well'>
 <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
 {{ form.as_p }}
 <input type="submit" value="Submit" />
 </form>
+</div>
 
 {% endblock %}

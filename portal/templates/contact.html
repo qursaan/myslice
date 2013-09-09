@@ -1,5 +1,4 @@
 {% extends "layout-unfold1.html" %}
-{% load i18n %}
 
 {% block head %}
 {{ wizard.form.media }}
@@ -7,19 +6,24 @@
 
 {% block unfold1_main %}
 
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/register.css" />
-<form class="cmxform" id="commentForm" action="#" method="post">{% csrf_token %}
-<fieldset>
-<div class="OneLabTitle" style="margin-bottom:20px;">
-         <h2>Onelab Support</h2>
-         <h4>If you have already registered then send an <a href="mailto:support@myslice.info"> e-mail </a>  or <a href="http://trac.myslice.info/" >visit us</a></h4>
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+<!-- xxx ideally only onelab.css but ... xxx -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
+<div class="onelab-title well well-lg">
+  <h2>Onelab Support</h2>
+  <h4>If you have already registered, then please <a href="mailto:support@myslice.info">send an e-mail</a>
+  or <a href="http://trac.myslice.info/" >visit us</a></h4>
 </div>
 
+<div class='well'>
+<form class="cmxform" id="commentForm" action="#" method="post">{% csrf_token %}
+<fieldset>
 {{ form.as_p }}
 <p style="text-align: center;width: 80%;">
-    <input type="submit" value="Submit" />
+  <input class="btn" type="submit" value="Submit" />
 </p>
 </fieldset>
 </form>
+</div>
 {% endblock %}
 

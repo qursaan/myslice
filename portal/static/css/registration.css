@@ -1,44 +1,50 @@
+/* Thierry's Note 
+it seems to me that most of the stuff here is not register-related,
+but general-purpose settings for an openlab style
+I've started to move over such stuff in onelab.css
+feel free to add to this collection
+*/
 #commentForm {
-    
     margin:0 auto;
     width:800px;
     padding:10px;
     font-size:12pt;
     overflow:auto;
-    }    
+}    
+#register {
+    text-align: center;
+}
+/*
 input {
-        /*border:2px solid #456879;*/
-        height: 22px;
-        width: 200px;
-        /* font-size: 10px; */
-    }    
+    height: 22px;
+    width: 200px;
+}
+*/
+/*
+    border:2px solid #456879;
+    font-size: 10px; 
+*/
 label { 
-        float: left;
-        font-weight: bold;
-        text-align: right;
-        margin-right: 20px;
-        width: 200px;
-        display: inline-block;
+    float: left;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 20px;
+    width: 200px;
+    display: inline-block;
         
 }
-.OneLabTitle{
-    padding-top: 12px;
-    background-color: #C1DAD7;
-    border: 1px solid #61210B;
-    text-align: center;
+label.error { 
+    float: none;
+    color: red;
+    padding-left: .5em;
+    vertical-align:
+    top; 
+    font-size: 12px; 
 }
-.fed4fireTitle{
-    padding-top: 12px;
-    background-color: orange; 
-    border: 1px solid #61210B;
-    text-align: center;
-}
-
-label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-size: 12px; }
 
 p {
-/*border-bottom:1px solid #B7DDF2;*/
-color:#666666;
+    color:#666666;
+/* border-bottom:1px solid #B7DDF2; */
 /* font-size:10px; */
 /* margin-bottom:20px; */
 /* padding-bottom:10px; */
@@ -64,21 +70,22 @@ textarea:focus, input:focus {
     border: 2px solid #900;
 }
 
-.required{
-font-size:12pt;
+.required {
+    font-size:12pt;
 }
-.submit {
-/* float:right; */
-text-align: center;
-margin-top: 15px;
-margin-left: 250px;
+/* 
+   .submit {
+    text-align: center;
+    margin-top: 15px;
+    margin-left: 250px;
 }
+*/
 .field {
-padding:10px;
+    padding:10px;
 }
-.hint{
+.hint {
     display:none;
-    }
+}
 .field:hover .hint {
     position: absolute;
     display: block;
@@ -90,8 +97,4 @@ padding:10px;
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
     border-radius: 7px;
-    }
-    
-
-    
-    
+}

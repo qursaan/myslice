@@ -116,7 +116,7 @@ class RegistrationView (View):
                 recipients.append(ctx['email'])
 
             msg = render_to_string('user_request_email.txt', ctx)
-            send_mail("Onelab New User request submitted", msg, email, recipients)
+            send_mail("Onelab New User request for %s submitted"%email, msg, email, recipients)
 
             return render(request, 'user_register_complete.html')
 

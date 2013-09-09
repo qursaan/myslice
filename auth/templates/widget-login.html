@@ -1,14 +1,16 @@
 {% insert_str prelude 'css/login.css' %}
 <p class='login-status'> {{ state }} </p>
 <!--<a href="/" alt="Home"><img class="logo" src="{{ STATIC_URL }}img/myslice-logo.png" alt="MySlice" /></a>-->
+<div class='well well-lg'>
 <form action="/login/" method="post">
   {% csrf_token %}
   {% if next %}
   <input type="hidden" name="next" value="{{ next }}" />
   {% endif %}
-  <p class='login'>username</p>
+  <p class='login'>Username</p>
   <input class='login' type="text" name="username" value="{{ username}}" /><br />
-  <p class='login'>password</p>
+  <p class='login'>Password</p>
   <input class='login' type="password" name="password" value="" /><br />
   <input type="submit" value="Log In" />
 </form>
+</div>

@@ -28,7 +28,8 @@ class ContactView (View):
                 recipients.append(email)
 
             from django.core.mail import send_mail
-            send_mail("Onelab user submitted a query ", [first_name,last_name,affiliation,subject,message], email, recipients)
+            send_mail("Onelab user %s submitted a query "%email, 
+                      [first_name,last_name,affiliation,subject,message], email, recipients)
             return render(request,'contact_sent.html') # Redirect after POST
         else:
             return self._display (request, form)

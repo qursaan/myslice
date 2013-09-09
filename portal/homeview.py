@@ -43,6 +43,6 @@ class HomeView (View):
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items('', request)
         if state: env['state'] = state
-        elif not env['username']: env['state'] = "Please log in below..."
+        elif not env['username']: env['state'] = "Please sign in"
         return render_to_response('home-view.html',env, context_instance=RequestContext(request))
 
