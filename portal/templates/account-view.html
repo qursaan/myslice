@@ -10,24 +10,34 @@
 {% block unfold1_main %}
 
 
-<h2>Platform Access</h2>
-<table class="mytable"> 
-	<tr class="odd"> 
-    	<th>Platform</th> 
-        <th>Account Type</th> 
-        <th>user_hrn</th>
-        <th>Pub Key</th>
-    </tr>   
-	{% for row in data %}         
-   	<tr class="even">
-    	<td class="odd"> {{ row.platform_name }} </td>
-        <td class="even"> {{ row.account_type }} </td>
-       	<td class="odd"> {{ row.usr_hrn }}  </td>
-        <td class="even"> {{ row.usr_pubkey }} </td>
-    </tr> 
-	{%endfor%}               
-</table>
+<div class='ms-dashboard-panel' id='ms-dashboard-slices' style=" display:block; float:none"  >
+  <div class='ms-dashboard-caption'>
+    <h2>Platform Access</h2>
+  </div>
+  <div class='ms-dashboard-content' id='tophat__list__user_hrn'>
+    <div id="main">
+      <div id="middle" align="center">
 
+		<table class="mytable"> 
+			<tr class="odd"> 
+    			<th>Platform</th> 
+        		<th>Account Type</th> 
+        		<th>user_hrn</th>
+        		<th>Pub Key</th>
+    		</tr>   
+			{% for row in data %}         
+   			<tr class="even">
+    			<td class="odd"> {{ row.platform_name }} </td>
+        		<td class="even"> {{ row.account_type }} </td>
+       			<td class="odd"> {{ row.usr_hrn }}  </td>
+        		<td class="even"> {{ row.usr_pubkey }} </td>
+    		</tr> 
+			{%endfor%}               
+		</table>
+	  </div>
+    </div>
+  </div>
+</div>
 
 
 
