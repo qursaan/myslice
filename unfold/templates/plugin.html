@@ -1,5 +1,5 @@
 {% if visible %}
-<div id='complete-{{ domid }}' class='{% if need_toggle %}plugin-toggle{% endif %}{% if need_spin %} need-spin{% endif %}{% if persistent_toggle %} persistent-toggle{% endif %}'>
+<div id='complete-{{ domid }}' class='{% if need_toggle %}plugin-toggle{% endif %}{% if need_spin %} need-spin{% endif %}{% if persistent_toggle %} persistent-toggle{% endif %}{% if outline_complete %} plugin-outline-complete{% endif %}'>
 {% if togglable %}
 <h4 id='show-{{ domid }}' class='plugin-show'{% if not display_show_button %} style='display:none;'{% endif %}><i class="icon-hand-right"></i>
 <a href='#' class='plugin-tooltip' data-toggle='tooltip' data-original-title='Show plugin "{{ title }}" ({{ classname }})'>{{ title }}</a></h4>
@@ -10,7 +10,7 @@
 {% endif %}{# togglable #}
 {% endif %}{# visible #}
 
-<div class='plugin {{ classname }}' id='{{ domid }}'{% if not display_body %} style='display:none;'{% endif %}>
+<div class='plugin {{ classname }}{% if outline_body %} plugin-outline-body{% endif %}' id='{{ domid }}'{% if not display_body %} style='display:none;'{% endif %}>
 {{ plugin_content|safe }}
 </div>{# plugin #}
 

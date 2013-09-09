@@ -27,12 +27,10 @@ tmp_default_slice='ple.upmc.myslicedemo'
 
 class SliceView (LoginRequiredAutoLogoutView):
 
-#    def __init__ (self, slicename=None):
-#        self.slicename = slicename or tmp_default_slice
-
     def get (self,request, slicename=tmp_default_slice):
     
         page = Page(request)
+        page.add_css_files ('css/slice-view.css')
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
@@ -60,37 +58,6 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.enqueue_query(query_resource_all)
         page.enqueue_query(query_user_all)
     
-        # Prepare the display according to all metadata
-        # (some parts will be pending, others can be triggered by users).
-        # 
-        # For example slice measurements will not be requested by default...
-    
-        # Create the base layout (Stack)...
-        main_plugin = Stack (
-            page=page,
-            title="Slice !!view for %s"%slicename,
-            sons=[],
-        )
-    
-        # ... responsible for the slice properties...
-    
-    
-        main_plugin.insert (
-            Raw (page=page,togglable=False, toggled=True,html="<h2> Slice page for %s</h2>"%slicename)
-        )
-    
-        main_plugin.insert(
-            Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
-        )
-    
-        sq_plugin = Tabs (
-            page=page,
-            title="Slice view for %s"%slicename,
-            togglable=False,
-            sons=[],
-        )
-    
-    
         # ... and for the relations
         # XXX Let's hardcode resources for now
         sq_resource = aq.subquery('resource')
@@ -99,42 +66,38 @@ class SliceView (LoginRequiredAutoLogoutView):
         sq_measurement = aq.subquery('measurement')
         
     
-        ############################################################################
-        # RESOURCES
+        # Prepare the display according to all metadata
+        # (some parts will be pending, others can be triggered by users).
         # 
-        # A stack inserted in the subquery tab that will hold all operations
-        # related to resources
-        # 
-        
-        stack_resources = Stack(
-            page = page,
-            title        = 'Resources',
+        # For example slice measurements will not be requested by default...
+    
+        # Create the base layout (Stack)...
+        main_stack = Stack (
+            page=page,
+            title="Slice %s"%slicename,
             sons=[],
         )
     
-        resource_query_editor = QueryEditor(
-            page  = page,
-            query = sq_resource,
-        )
-        stack_resources.insert(resource_query_editor)
+        # ... responsible for the slice properties...
     
-        resource_active_filters = ActiveFilters(
-            page  = page,
-            query = sq_resource,
-        )
-        stack_resources.insert(resource_active_filters)
-    
-        # --------------------------------------------------------------------------
-        # Different displays = DataTables + GoogleMaps
-        #
-        tab_resource_plugins = Tabs(
-            page    = page,
-            sons = []
+        # a nice header
+        main_stack.insert (
+            Raw (page=page,
+                 togglable=False, 
+                 toggled=True,
+                 html="<h2 class='well well-lg'> Slice %s</h2>"%slicename)
         )
     
-        tab_resource_plugins.insert(Hazelnut( 
+#        main_stack.insert(
+#            Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
+#        )
+    
+        # the resources part is made of a Stack, 
+        # with first a Tabs (List, Geographic), 
+        # and second the QueryEditor to tweak the set of attributes to show
+        resources_as_list = Hazelnut( 
             page       = page,
-            title      = 'List',
+            title      = 'Resources as a List',
             domid      = 'checkboxes',
             # this is the query at the core of the slice list
             query      = sq_resource,
@@ -146,10 +109,10 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'aoColumns'      : [None, None, None, None, {'bSortable': False}],
                 'iDisplayLength' : 25,
                 'bLengthChange'  : True,
-            },
-        ))
-    
-        tab_resource_plugins.insert(GoogleMaps(
+                },
+            )
+
+        resources_as_map = GoogleMaps(
             page       = page,
             title      = 'Geographic view',
             domid      = 'gmap',
@@ -162,28 +125,83 @@ class SliceView (LoginRequiredAutoLogoutView):
             latitude   = 49.,
             longitude  = 2.2,
             zoom       = 3,
-        ))
+        )
+
+        resources_query_editor = QueryEditor(
+            page  = page,
+            query = sq_resource,
+            )
+        resources_active_filters = ActiveFilters(
+            page  = page,
+            query = sq_resource,
+            )
+
+        resources_area = Stack (
+            page=page,
+            domid="resources",
+            togglable=True,
+            title="Resources",
+            outline_complete=True,
+            sons = [
+                Tabs ( page=page, 
+                       sons=[ resources_as_list, resources_as_map, ] 
+                       ),
+                Stack ( page=page,
+                        title="Customize",
+                        togglable=True,
+                        sons = [ resources_query_editor, resources_active_filters, ]
+                        ),
+                ]
+            )
+
+        main_stack.insert (resources_area)
+
+
+#        sq_plugin = Tabs (
+#            page=page,
+#            title="Slice view for %s"%slicename,
+#            togglable=True,
+#            sons=[],
+#        )
     
-        stack_resources.insert(tab_resource_plugins)
     
-        sq_plugin.insert(stack_resources)
+        ############################################################################
+        # RESOURCES
+        # 
+        # A stack inserted in the subquery tab that will hold all operations
+        # related to resources
+        # 
+        
+#        stack_resources = Stack(
+#            page = page,
+#            title = 'Resources',
+#            sons=[],
+#        )
+    
+#        stack_resources.insert(resource_active_filters)
+#    
+#    
+#        stack_resources.insert(tab_resource_plugins)
+    
+#        sq_plugin.insert(stack_resources)
     
         ############################################################################
         # USERS
         # 
     
         tab_users = Tabs(
-            page         = page,
-            title        = 'Users',
-            domid        = 'thetabs2',
-            # activeid   = 'checkboxes',
-            active_domid = 'checkboxes2',
+            page                = page,
+            domid               = 'users',
+            outline_complete    = True,
+            togglable           = True,
+            title               = 'Users',
+            active_domid        = 'checkboxes2',
         )
-        sq_plugin.insert(tab_users)
+        main_stack.insert(tab_users)
     
         tab_users.insert(Hazelnut( 
             page        = page,
-            title       = 'List',
+            title       = 'Users List',
             domid       = 'checkboxes2',
             # tab's sons preferably turn this off
             togglable   = False,
@@ -201,17 +219,18 @@ class SliceView (LoginRequiredAutoLogoutView):
         ))
     
         tab_measurements = Tabs (
-            page         = page,
-            title        = 'Measurements',
-            domid        = 'thetabs3',
-            # activeid   = 'checkboxes',
-            active_domid = 'checkboxes3',
+            page                = page,
+            active_domid        = 'checkboxes3',
+            outline_complete    = True,
+            togglable           = True,
+            title               = 'Measurements',
+            domid               = 'measurements',
         )
-        sq_plugin.insert(tab_measurements)
+        main_stack.insert(tab_measurements)
     
         tab_measurements.insert(Hazelnut( 
             page        = page,
-            title       = 'List',
+            title       = 'Measurements',
             domid       = 'checkboxes3',
             # tab's sons preferably turn this off
             togglable   = False,
@@ -227,25 +246,27 @@ class SliceView (LoginRequiredAutoLogoutView):
             },
         ))
     
-        main_plugin.insert(sq_plugin)
+#        main_stack.insert(sq_plugin)
     
         # --------------------------------------------------------------------------
         # ResourcesSelected
         #
-        main_plugin.insert(ResourcesSelected(
+        main_stack.insert(ResourcesSelected(
             page                = page,
             title               = 'Pending operations',
             query               = main_query,
             togglable           = True,
+            domid               = 'pending',
+            outline_complete    = True,
         ))
     
-        main_plugin.insert(Messages(
+        main_stack.insert(Messages(
             page   = page,
             title  = "Runtime messages for slice %s"%slicename,
             domid  = "msgs-pre",
             levels = "ALL",
         ))
-    #    main_plugin.insert(Updater(
+    #    main_stack.insert(Updater(
     #        page   = page,
     #        title  = "wont show up as non togglable by default",
     #        query  = main_query,
@@ -258,7 +279,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         template_env = {}
         
         # define 'unfold1_main' to the template engine - the main contents
-        template_env [ 'unfold1_main' ] = main_plugin.render(request)
+        template_env [ 'unfold1_main' ] = main_stack.render(request)
     
         # more general variables expected in the template
         template_env [ 'title' ] = '%(slicename)s'%locals()

@@ -5,7 +5,12 @@ div.plugin-toggle {
     border-width:	1px;
 }
 div.plugin, div.plugin-toggle {
+}
+div.plugin-outline-complete, div.plugin-outline-body {
     border-radius:	8px;
+    border:		1px solid;
+    padding:		5px;
+    margin:		5px;
 }
 h4.plugin-show {
     cursor: s-resize;

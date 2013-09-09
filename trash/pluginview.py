@@ -41,29 +41,32 @@ def test_plugin_view (request):
         Stack (
         page=page,
         title='thestack',
-        togglable=False,
+        togglable=True,
         domid='stack',
         sons=[ \
-            Updater (
-                    page=page,
-                    title="wont show up as non togglable by default",
-                    query=main_query,
-                    label="Update me",
-                    domid="the-updater",
-                    ),
-            # make sure the 2 things work together
+# this updater thing never made it to production                
+#            Updater (
+#                    page=page,
+#                    title="Won't show up as non togglable",
+#                    query=main_query,
+#                    label="Update me",
+#                    domid="the-updater",
+#                ),
+        # make sure the 2 things work together
             Hazelnut (
                     page=page,
                     title="Slice %s - checkboxes interacting w/ updater"%slicename,
                     query=main_query,
                     domid="hazelnut",
                     checkboxes=True,
+                    togglable=True,
                     ),
             Messages (
                     page=page,
                     title="Runtime messages",
-                    domid="msgs-pre",
+                    domid="messages",
                     levels='ALL',
+                    togglable=True,
                     ),
             ])
 
