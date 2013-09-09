@@ -25,11 +25,20 @@ WARNING: version 1.3 !!
 (Fedora17 has 1.4.2)
 ======================================== debian(wheezy)
 $ sudo apt-get install python-django
--> 1.4.1_2
+-> 1.5.2
 
 NOTE. (this has more to do with my own vserver-based technique to
 create debian VM's)
 
+======================================== Install from tarball
+
+https://www.djangoproject.com/download/
+
+$tar xzvf Django-1.5.2.tar.gz
+$cd Django-1.5.2
+$sudo python setup.py install
+
+=============== Install locales [needed]
 I found it useful to also do the following at some point 
 # apt-get install locales
 # dpkg-reconfigure locales
