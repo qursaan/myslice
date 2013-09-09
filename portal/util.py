@@ -169,7 +169,7 @@ def slice_request(request):
             slice_name = form.cleaned_data['slice_name']
     else:
         form = SliceRequestForm()
-    return render(request, 'slice_request.html', locals())
+    return render(request, 'slice-request-view.html', locals())
 
 def slice_validate(request):
     pass
