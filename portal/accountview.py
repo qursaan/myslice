@@ -135,8 +135,8 @@ def account_process(request):
 #        keypair = re.sub("\n", "\\n", keypair)
 #        #keypair = keypair.rstrip('\r\n')
 #        keypair = ''.join(keypair.split())
-        get_user.keypair = keypair
-        get_user.save()
+        #get_user.keypair = keypair
+        #get_user.save()
         return HttpResponse('Success: New Keypair Generated! %s' % keypair)
 
     elif 'upload_key' in request.POST:
@@ -150,8 +150,8 @@ def account_process(request):
             file_content = re.sub("\r", "", file_content)
             file_content = re.sub("\n", "\\n",file_content)
             file_content = ''.join(file_content.split())
-            get_user.keypair = file_content
-            get_user.save()
+            #get_user.keypair = file_content
+            #get_user.save()
             return HttpResponse('Success: Publickey uploaded! Old records overwritten')
         else:
             return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
