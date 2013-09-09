@@ -1,6 +1,6 @@
 %define name myslice
-%define version 0.1
-%define taglevel 3
+%define version 0.2
+%define taglevel 2
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
@@ -46,6 +46,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/myslice/*
 
 %changelog
+* Mon Sep 09 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-0.2-2
+- cleaner tag, using module-tag for consistent numbering
+
 * Mon Apr 08 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-django-0.1-3
 - a small number of representative plugins are available
 - next step is to correlate a Get query with its corresponding Update like in slice.php
