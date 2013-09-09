@@ -12,7 +12,7 @@ import json
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
-    template_name = "my_account.html"
+    template_name = "account-view.html"
     
     def dispatch(self, *args, **kwargs):
         return super(AccountView, self).dispatch(*args, **kwargs)
