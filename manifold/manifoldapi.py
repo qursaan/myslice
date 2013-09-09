@@ -3,10 +3,18 @@ import xmlrpclib
 
 from myslice.config import Config
 
-from manifoldresult import ManifoldResult, ManifoldCode
+from django.contrib import messages
+from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException
+from manifold.core.result_value import ResultValue
 
 debug=False
 debug=True
+
+def mytruncate (obj, l):
+    # we will add '..' 
+    l1=l-2
+    repr="%s"%obj
+    return (repr[:l1]+'..') if len(repr)>l1 else repr
 
 class ManifoldAPI:
 
@@ -24,6 +32,18 @@ class ManifoldAPI:
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
 
+    # a one-liner to give a hint of what the return value looks like
+    def _print_result (self, result):
+        if not result:                        print "[no/empty result]"
+        elif isinstance (result,str):         print "result is '%s'"%result
+        elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
+        elif isinstance (result,dict):        
+            print "result is a dict with %d keys : %s"%(len(result),result.keys())
+            for (k,v) in result.iteritems(): 
+                if v is None: continue
+                print '+++',k,':',mytruncate (v,60)
+        else:                                 print "[dont know how to display result] %s"%result
+
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
     # as of march 2013 we work with an API that essentially either returns the value, or raises 
     # an xmlrpclib.Fault exception with always the same 8002 code
@@ -32,55 +52,45 @@ class ManifoldAPI:
     # a SESSION_EXPIRED code
     def __getattr__(self, methodName):
         def func(*args, **kwds):
-            if (debug): 
-                print "entering ManifoldAPI.%s"%methodName,
-                print "args",args,
-                print "kwds",kwds
             try:
+                if debug:
+                    print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
                 result=getattr(self.server, methodName)(self.auth, *args, **kwds)
-                ### attempt to cope with old APIs and new APIs
-                if isinstance (result, dict) and 'code' in result:
-                    # this sounds like a result from a new API, leave it untouched
-                    pass
-                else:
-                    if debug:
-                        print '<=== backend call', methodName, args, kwds
-                        print '.... ctd', 'Authmethod=',self.auth['AuthMethod'], self.url,'->',
-                        if not result:                        print "[no/empty result]"
-                        elif isinstance (result,str):         print "result is '%s'"%result
-                        elif isinstance (result,list):        print "result is a %d-elts list"%len(result)
-                        else:                                 print "[dont know how to display result]"
-                    return ManifoldResult (code=ManifoldCode.SUCCESS, value=result)
-            except xmlrpclib.Fault, error:
-                ### xxx this is very rough for now
-                # until we have some agreement about how the API calls should return error conditions
-                # in some less unpolite way than this anonymous exception, we assume it's a problem with the session
-                # that needs to be refreshed
-                if error.faultCode == 8002:
-                    reason="most likely your session has expired"
-                    reason += " (the manifold API has no unambiguous error reporting mechanism yet)"
-                    return ManifoldResult (code=ManifoldCode.SESSION_EXPIRED, output=reason)
-                else:
-                    reason="xmlrpclib.Fault with faultCode = %s (not taken as session expired)"%error.faultCode
-                    return ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output=reason)
+                if debug:
+                    print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
+                    print '.ctd. Authmethod=',self.auth['AuthMethod'], self.url,'->',
+                    self._print_result(result)
+                    print '===== ManifoldAPI call done'
+
+                return ResultValue(**result)
+
             except Exception,error:
-                print "ManifoldAPI: unexpected exception",error
-                return ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error)
+                # XXX Connection refused for example
+                print "** API ERROR **"
+                import traceback
+                traceback.print_exc()
+                if debug: print "KO (unexpected exception)",error
+                raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error) )
+
         return func
 
-    def send_manifold_query (self, query):
-        (action,subject)= (query.action,query.subject)
-        # use e.g. self.Get rather than self.server.Get so we use the __getattr__ code
-        if action=='get':
-# this makes the backend to squeak and one can't login anymore...
-#            return self.Get(subject, query.filters, query.timestamp, query.fields)
-            return self.Get(subject, query.filters, {}, query.fields)
-        elif action=='update':
-            answer=self.Update(subject, query.filters, query.params, query.fields)
-            if not isinstance (answer, ManifoldResult): print "UNEXECPECTED answer", answer
-            return answer
-        else:
-            warning="WARNING: ManifoldAPI.send_manifold_query: %s not implemented for now"%action
-            print warning
-            print 3
-            return ManifoldResult(code=ManifoldCode.NOT_IMPLEMENTED, output=warning)
+def execute_query(request, query):
+    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
+        print "W: Used hardcoded demo account for execute_query"
+        manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+    else:
+        manifold_api_session_auth = request.session['manifold']['auth']
+    manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
+    print "-"*80
+    print query
+    print query.to_dict()
+    print "-"*80
+    result = manifold_api.forward(query.to_dict())
+    if result['code'] == 2:
+        raise Exception, 'Error running query: %r' % result
+
+    # XXX Handle errors
+    #Error running query: {'origin': [0, 'XMLRPCAPI'], 'code': 2, 'description': 'No such session: No row was found for one()', 'traceback': 'Traceback (most recent call last):\n  File "/usr/local/lib/python2.7/dist-packages/manifold/core/xmlrpc_api.py", line 68, in xmlrpc_forward\n    user = Auth(auth).check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 245, in check\n    return self.auth_method.check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 95, in check\n    raise AuthenticationFailure, "No such session: %s" % e\nAuthenticationFailure: No such session: No row was found for one()\n', 'type': 2, 'ts': None, 'value': None}
+
+
+    return result['value'] 

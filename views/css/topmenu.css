@@ -9,3 +9,4 @@ button#logout {
     margin-left: 8px; 
     margin-bottom: 10px; 
 }
+span.logged-in { font-size: x-small; }

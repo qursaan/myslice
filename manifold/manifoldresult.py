@@ -15,17 +15,23 @@ class ManifoldResult (dict):
         self['code']=code
         self['value']=value
         self['output']=output
+        self['description'] = '' # Jordan: needed by javascript code
 
     def from_json (self, json_string):
         d=json.dumps(json_string)
         for k in ['code','value','output']:
             self[k]=d[k]
 
+    # raw accessors
+    def code (self): return self['code']
+    def output (self): return self['output']
+
     # this returns None if there's a problem, the value otherwise
     def ok_value (self):
         if self['code']==ManifoldCode.SUCCESS:
             return self['value']
 
+    # both data in a single string
     def error (self):
         return "code=%s -- %s"%(self['code'],self['output'])
     
@@ -35,8 +41,17 @@ class ManifoldResult (dict):
         if self['code']==0:
             value=self['value']
             if isinstance(value,list): result += " [value=list with %d elts]"%len(value)
-            else: result += " [value=other %s]"%value
+            elif isinstance(value,dict): result += " [value=dict with keys %s]"%value.keys()
+            else: result += " [value=%s: %s]"%(type(value).__name__,value)
         else:
             result += " [output=%s]"%self['output']
         result += "]]"
         return result
+
+# probably simpler to use a single class and transport the whole result there
+# instead of a clumsy set of derived classes 
+class ManifoldException (Exception):
+    def __init__ (self, manifold_result):
+        self.manifold_result=manifold_result
+    def __repr__ (self):
+        return "Manifold Exception %s"%(self.manifold_result.error())

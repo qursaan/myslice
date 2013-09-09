@@ -8,14 +8,15 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
-from manifold.manifoldquery import ManifoldQuery
+from manifold.core.query import Query
+#from manifold.manifoldquery import ManifoldQuery
 
 from plugins.stack.stack import Stack
 from plugins.lists.slicelist import SliceList
 from plugins.querycode.querycode import QueryCode
 from plugins.quickfilter.quickfilter import QuickFilter
 
-from myslice.viewutils import quickfilter_criterias
+from trash.trashutils  import quickfilter_criterias
 
 # 
 from myslice.viewutils import topmenu_items, the_user
@@ -25,16 +26,12 @@ def dashboard_view (request):
     
     page = Page(request)
 
-    slices_query = ManifoldQuery (action='get',
-                                  subject='slice',
-                                  timestamp='latest',
-                                  fields=['slice_hrn'],
-                                  filters=[],
-                                  # xxx filter : should filter on the slices the logged user can see
-                                  # we don't have the user's hrn yet
-                                  # in addition this currently returns all slices anyways
-                                  # filter = ...
-                                  sort='slice_hrn',)
+    slices_query = Query.get('slice').select('slice_hrn')
+#old#                                  # xxx filter : should filter on the slices the logged user can see
+#old#                                  # we don't have the user's hrn yet
+#old#                                  # in addition this currently returns all slices anyways
+#old#                                  # filter = ...
+#old#                                  sort='slice_hrn',)
     page.enqueue_query (slices_query)
 
     main_plugin = Stack (

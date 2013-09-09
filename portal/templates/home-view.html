@@ -1,0 +1,31 @@
+{% extends 'layout-unfold2.html' %}
+
+{% block unfold2_margin %}
+{% if not username %}
+{% include 'widget-login.html' %}
+{% endif %}
+{% endblock unfold2_margin %}
+
+{% block unfold2_main %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+<!-- xxx ideally only onelab.css but ... xxx -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
+<div class='well well-lg onelab-title'>
+  <h2 style="font-weight: bold;">Welcome to the OneLab portal !</h2>
+  <h4>New to OneLab? Please <a href="/portal/register">register</a> or learn more about <a href="http://www.onelab.eu/" target="_blank">the project</a>.</h3>
+</div>
+<div class='well'>
+<p>
+Experimentally-driven research is key to success in exploring the possible
+futures of the Internet. The OneLab initiative provides an open,
+general-purpose, shared experimental facility, both large-scale and
+sustainable, which allows European industry and academia to innovate and assess
+the performance of their solutions. Based on the results of several different
+European and national projects, OneLab offers access to a range of  tools and
+testbeds including PlanetLab Europe, the NITOS wireless testbed, and other
+federated testbeds.
+</p>
+<p>This UI server is connected to the manifold backend running at <code>{{ manifold_url }}</code>.</p>
+</div>
+
+{% endblock unfold2_main %}

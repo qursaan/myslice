@@ -1,0 +1,40 @@
+<div id="wrapper">
+	<div id="gmaps">
+		<script type="text/javascript">
+                	initialiser();
+		</script>
+	</div>
+	<div id="sbar">
+			<h3>Viewing options</h3>
+		<div id="accordion">
+				<h3 class="ui-accordion-header ui-corner-top"  onclick="if(direct){ client.ape_quit();direct=0}">Static</h3>
+				<div class="sbar_cont ui-accordion-content ui-widget-content ui-corner-bottom" id="opt_static" >
+					<script type="text/javascript">
+						recup_liste("static");
+					</script>
+				</div>
+
+				<h3 class="ui-accordion-header ui-corner-top" onclick="if ( direct== 0 ){ape_load();direct=1}">Dynamic</h3>
+				<div class="sbar_cont ui-accordion-content ui-widget-content ui-corner-bottom" id="opt_dynamic">
+					<script type="text/javascript">
+						recup_liste("dynamic");
+					</script>
+				</div>
+
+				<h3 class="ui-accordion-header ui-corner-top"  onclick="if(direct){ client.ape_quit();direct=0}">Animation</h3>
+				<div class="sbar_cont ui-accordion-content ui-widget-content ui-corner-bottom">
+					<div id="interval_animation" class="masterTooltip" title="Choisir la vitesse de l'animation"></div>
+					<div id="opt_animation">
+						<script type="text/javascript">
+							recup_liste("animation");
+						</script>
+					</div>
+				</div>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<div id="statusbar">
+		<div id="sb1"></div>
+		<div id="sb2"></div>
+	</div>
+</div>

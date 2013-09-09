@@ -3,8 +3,11 @@ import json
 #from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
 
-from manifold.manifoldquery import ManifoldQuery
+#from manifold.manifoldquery import ManifoldQuery
+from manifold.core.query import Query
+from manifold.core.result_value import ResultValue
 from manifold.manifoldapi import ManifoldAPI
+from manifold.manifoldresult import ManifoldException
 
 debug=False
 debug=True
@@ -46,11 +49,19 @@ with the query passed using POST"""
     try:
         # translate incoming POST request into a query object
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
-        manifold_query = ManifoldQuery()
+        manifold_query = Query()
+        #manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
-        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.subject)
+        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.object)
         # retrieve session for request
-        manifold_api_session_auth = request.session['manifold']['auth']
+
+        # We allow some requests to use the ADMIN user account
+        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
+            print "W: Used hardcoded demo account for admin queries"
+            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+        else:
+            manifold_api_session_auth = request.session['manifold']['auth']
+
         if debug_empty and manifold_query.action.lower()=='get':
             json_answer=json.dumps({'code':0,'value':[]})
             print "By-passing : debug_empty & 'get' request : returning a fake empty list"
@@ -71,29 +82,33 @@ with the query passed using POST"""
                 
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
-        if debug: print 'manifoldproxy.proxy: sending to backend', manifold_query
-        answer=manifold_api.send_manifold_query (manifold_query)
-        if debug: 
-            print '<=== manifoldproxy.proxy: received from backend with code', answer['code']
-            if answer['code']==0:
-                print ".... ctd ",
-                value=answer['value']
-                if isinstance (value, list): print "result is a list with %d entries"%len(value)
-                elif isinstance (value, dict): print "result is a dict with keys %s"%value.keys()
-                else: print "result is other (type=%s) : %s"%(type(value),value)
-        json_answer=json.dumps(answer)
+        if debug: print '===> manifoldproxy.proxy: sending to backend', manifold_query
+        # for the benefit of the python code, manifoldAPI raises an exception if something is wrong
+        # however in this case we want to propagate the complete manifold result to the js world
+
+
+        result = manifold_api.forward(manifold_query.to_dict())
+
+        # XXX TEMP HACK
+        if 'description' in result and result['description'] and isinstance(result['description'], (tuple, list, set, frozenset)):
+            result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
+
+        json_answer=json.dumps(result)
         # if in debug mode we save this so we can use offline mode later
-        if (debug):
+        if debug:
             with (file(offline_filename,"w")) as f:
                 f.write(json_answer)
+
         # this is an artificial delay added for debugging purposes only
         if debug_spin>0:
             print "Adding additional artificial delay",debug_spin
             import time
             time.sleep(debug_spin)
+
         return HttpResponse (json_answer, mimetype="application/json")
 
     except:
+        print "** PROXY ERROR **"
         import traceback
         traceback.print_exc()
 

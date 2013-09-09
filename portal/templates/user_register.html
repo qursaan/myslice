@@ -1,0 +1,21 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/smart_wizard.css" />
+{% endblock %}
+
+{% block unfold1_main %}
+
+  <h1>User registration</h1>
+
+{% if envoi %}Your registration message has been sent !{% endif %}
+ 
+<div class='well'>
+<form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+</div>
+
+{% endblock %}

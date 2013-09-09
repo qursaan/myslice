@@ -1,32 +1,9 @@
-{# This is required by insert_above #}{% insert_handler %}<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html lang="en"> <head>
-<title> MySlice - {{ title }} </title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{# This is where insert_str will end up #}{% media_container prelude %}
-<script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
-<style type="text/css">{# In case we need to add raw css code #}{% container prelude_css %}</style>
-{{ header_prelude }}
-</head>{# let's add these ones no matter what #}
-{# not yet needed {% insert_str prelude "css/layout-unfold1.css" %} #}
-{% insert_str prelude "js/jquery.min.js" %}
-{% insert_str prelude "js/jquery.html5storage.min.js" %}
-{% insert_str prelude "js/messages-runtime.js" %}
-{% insert_str prelude "js/plugin.js" %}
-<body>
-{% block container %}
-<div id="container">
-  {% block topmenu %}
-  {% include 'widget-topmenu.html' %}
-  {% endblock topmenu %}
-<div class="container-fluid">
-  <div class="row-fluid">
+{% extends "base.html" %}
+
+{% block base_content %}
     <div id="unfold1-main" class="span12 columns">
       {% block unfold1_main %}
       "The main content area (define block 'unfold1_main')"
       {% endblock unfold1_main %}
     </div><!--span12-->
-  </div><!--raw-fluid-->
-</div><!--container-fluid-->
-{% endblock container %}
-</body>
-</html>
+{% endblock %}

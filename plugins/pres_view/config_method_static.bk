@@ -1,0 +1,3 @@
+#Nom;id;contrainte;adresse_serveur;nom_method_a_utiliser;attributs;type_affichage;options_affichage;
+Sites;2;descriptif sites;[{"ens":[{"type":"date","variable":"date_created","op":"]"}]}];xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};GetSites;'site_id','name','date_created';marker;{"icon":"green"};
+Sites-cercles;3;descriptif sites;[{"ens":[{"type":"date","variable":"date_created","op":"]"}]}];xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};GetSites;'site_id','name','date_created';circle;{"visible":"true","color":"#00FF00","circle_radius_arg":"date_created","size":{"tiny":10,"small":50,"avg":100,"big":1000,"giant":5000}};

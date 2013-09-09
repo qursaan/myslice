@@ -53,9 +53,17 @@ class Page:
     # in this case (exec=True) the js async callback (see manifold.asynchroneous_success)
     # offers the option to deliver the result to a specific DOM elt (in this case, set domid)
     # otherwise (i.e. if domid not provided), it goes through the pubsub system (so all plugins can receive it)
-    def enqueue_query (self, query, run_it=True, domid=None):
+    # 
+    # NOTE:
+    # analyzed_query is required because it contains query_uuid that the
+    # plugins initialized in the python part will listen to. When a result is
+    # received in javascript, subresults should be publish to the appropriate
+    # query_uuid.
+    # 
+    def enqueue_query (self, query, run_it=True, domid=None, analyzed_query=None):
         # _queries is the set of all known queries
-        self._queries = self._queries.union(set( [ query, ] ))
+        # XXX complex XXX self._queries = self._queries.union(set( [ query, ] ))
+        self._queries.add((query, analyzed_query))
         # _queue is the list of queries that need to be triggered, with an optional domid
         # we only do this if run_it is set
         if run_it: self._queue.append ( (query.query_uuid,domid) )
@@ -67,7 +75,7 @@ class Page:
         # compute variables to expose to the template
         env = {}
         # expose the json definition of all queries
-        env['queries_json'] = [ query.to_json() for query in self._queries ]
+        env['queries_json'] = [ query.to_json(analyzed_query=aq) for (query, aq) in self._queries ]
         def query_publish_dom_tuple (a,b):
             result={'query_uuid':a}
             if b: result['domid']=b
@@ -80,24 +88,49 @@ class Page:
         self.expose_js_manifold_config()
 
 
+# DEPRECATED #    # needs to be called explicitly and only when metadata is actually required
+# DEPRECATED #    # in particular user needs to be logged
+# DEPRECATED #    def get_metadata (self):
+# DEPRECATED #        # look in session's cache - we don't want to retrieve this for every request
+# DEPRECATED #        session=self.request.session
+# DEPRECATED #        if 'manifold' not in session:
+# DEPRECATED #            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
+# DEPRECATED #            return
+# DEPRECATED #        manifold=session['manifold']
+# DEPRECATED #        # if cached, use it
+# DEPRECATED #        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
+# DEPRECATED #            if debug: print "Page.get_metadata: return cached value"
+# DEPRECATED #            return manifold['metadata']
+# DEPRECATED #        # otherwise retrieve it
+# DEPRECATED #        manifold_api_session_auth = session['manifold']['auth']
+# DEPRECATED #        print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
+# DEPRECATED #        metadata=MetaData (manifold_api_session_auth)
+# DEPRECATED #        metadata.fetch()
+# DEPRECATED #        # store it for next time
+# DEPRECATED #        manifold['metadata']=metadata
+# DEPRECATED #        if debug: print "Page.get_metadata: return new value"
+# DEPRECATED #        return metadata
+
     # needs to be called explicitly and only when metadata is actually required
     # in particular user needs to be logged
     def get_metadata (self):
         # look in session's cache - we don't want to retrieve this for every request
         session=self.request.session
+
         if 'manifold' not in session:
-            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
-            return
-        manifold=session['manifold']
+            session['manifold'] = {}
+        manifold = session['manifold']
+
         # if cached, use it
         if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
             if debug: print "Page.get_metadata: return cached value"
             return manifold['metadata']
-        # otherwise retrieve it
-        manifold_api_session_auth = session['manifold']['auth']
-        metadata=MetaData (manifold_api_session_auth)
+
+        metadata_auth = {'AuthMethod':'anonymous'}
+
+        metadata=MetaData (metadata_auth)
         metadata.fetch()
-            # store it for next time
+        # store it for next time
         manifold['metadata']=metadata
         if debug: print "Page.get_metadata: return new value"
         return metadata

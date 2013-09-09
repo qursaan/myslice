@@ -1,0 +1,44 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/dashboard.css" />
+{% endblock %}
+
+{% block unfold1_main %}
+
+<div id='tophat_status'></div>
+<div id='ms-dashboard'>
+
+  <div class='ms-dashboard-panel' id="ms-dashboard-profile">
+    <div class='ms-dashboard-caption'>
+      <h2>User profile</h2>
+    </div>
+    <div class='ms-dashboard-content'>
+      <ul>
+        <li><span id='username'>{{person.first_name}} {{person.last_name}}</span></li>
+        <li><b>Email: </b><a href='mailto:#'>{{person.email}}</a></li>
+      </ul>
+      <button id="account" onclick="location.href='{{URL}}/portal/account'" class="btn">Modify</button>
+    </div>
+  </div>
+
+  <div class='ms-dashboard-panel' id='ms-dashboard-testbeds'>
+    <div class='ms-dashboard-caption'>
+      <h2>Testbeds access</h2>
+    </div>
+    <div class='ms-dashboard-content' id='tophat__list__network_hrn__network_name'>
+    {{networks}}
+	</div>
+  </div>
+
+  <div class='ms-dashboard-panel' id='ms-dashboard-slices'>
+    <div class='ms-dashboard-caption'>
+      <h2>Slices</h2>
+    </div>
+    <div class='ms-dashboard-content' id='tophat__list__slice_hrn__slice_hrn'>
+    {{slices}}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

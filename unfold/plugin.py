@@ -22,6 +22,8 @@ DEBUG= False
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
     def actual (self, *args, **kwds):
+        if not self.page: # jordan
+            return None
         prelude_method=Prelude.__dict__[method.__name__]
         return prelude_method(self.page.prelude,*args, **kwds)
     return actual
@@ -76,7 +78,7 @@ class Plugin:
         if not domid: domid=self.newdomid()
         self.domid=domid
         # title is shown when togglable
-        if not title: title="Plugin title for %s"%domid
+        #if not title: title="Plugin title for %s"%domid
         self.title=title
         self.classname=self._py_classname()
         self.plugin_classname=self._js_classname()
@@ -95,7 +97,8 @@ class Plugin:
             for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
             print "%s init dbg .... END"%self.classname
         # do this only once the structure is fine
-        self.page.record_plugin(self)
+        if self.page: # I assume we can have a None page (Jordan)
+            self.page.record_plugin(self)
 
     def __repr__ (self):
         return "[%s]:%s"%(self.classname,self.domid)
@@ -163,16 +166,19 @@ class Plugin:
         self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
         # translate high-level 'toggled' into 4 different booleans
+        self.need_toggle = False
         if self.toggled=='persistent':
             # start with everything turned off and let the js callback do its job
-            env.update({'persistent_toggle':True,'display_hide_button':False,'display_show_button':False,'display_body':False})
+            env.update({'persistent_toggle':True,'display_hide_button':False,
+                        'display_show_button':False,'display_body':False})
         elif self.toggled==False:
-            env.update({'persistent_toggle':False,'display_hide_button':False,'display_show_button':True,'display_body':False})
+            env.update({'persistent_toggle':False,'display_hide_button':False,
+                        'display_show_button':True,'display_body':False})
         else:
-            env.update({'persistent_toggle':False,'display_hide_button':True,'display_show_button':False,'display_body':True})
+            env.update({'persistent_toggle':False,'display_hide_button':True,
+                        'display_show_button':False,'display_body':True})
         if self.need_debug(): 
             print "rendering plugin.html with env keys %s"%env.keys()
-            print "rendering plugin.html with env"
             for (k,v) in env.items(): 
                 if "display" in k or "persistent" in k: print k,'->',v
         result = render_to_string ('plugin.html',env)
@@ -257,7 +263,7 @@ class Plugin:
     def template_file (self):           return "undefined_template"
     def template_env (self, request):   return {}
 
-    def default_togglable (self):       return True
+    def default_togglable (self):       return False
     def default_toggled (self):         return 'persistent'
 
 #    # tell the framework about requirements (for the document <header>)

@@ -1,27 +1,27 @@
 # Create your views here.
 
-from django.core.context_processors import csrf
-from django.template import RequestContext
-from django.template.loader import render_to_string
-from django.shortcuts import render_to_response
+from django.core.context_processors     import csrf
+from django.template                    import RequestContext
+from django.template.loader             import render_to_string
+from django.shortcuts                   import render_to_response
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators     import login_required
 
-from unfold.page import Page
-from manifold.manifoldquery import ManifoldQuery
+from unfold.page                        import Page
+from manifold.core.query                import Query
 
-from plugins.stack.stack import Stack
-from plugins.tabs.tabs import Tabs
-from plugins.lists.staticlist import StaticList
-from plugins.quickfilter.quickfilter import QuickFilter
-from plugins.querycode.querycode import QueryCode
-from plugins.raw.raw import Raw
-from plugins.messages.messages import Messages
-from plugins.hazelnut.hazelnut import Hazelnut
-from plugins.updater.updater import Updater
+from plugins.stack.stack                import Stack
+from plugins.tabs.tabs                  import Tabs
+from plugins.lists.staticlist           import StaticList
+from plugins.quickfilter.quickfilter    import QuickFilter
+from plugins.querycode.querycode        import QueryCode
+from plugins.raw.raw                    import Raw
+from plugins.messages.messages          import Messages
+from plugins.hazelnut                   import Hazelnut
+from plugins.updater                    import Updater
 
-from myslice.viewutils import topmenu_items, the_user
-from myslice.viewutils import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
+from myslice.viewutils                  import topmenu_items, the_user
+from trash.trashutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 @login_required
 def test_plugin_view (request):
@@ -32,12 +32,7 @@ def test_plugin_view (request):
     template_env = {}
     
     slicename='ple.inria.heartbeat'
-    main_query = ManifoldQuery (action='get',
-                                subject='resource',
-                                timestamp='latest',
-                                fields=['network','type','hrn','hostname','sliver'],
-                                filters= [ [ 'slice_hrn', '=', slicename, ] ],
-                                )
+    main_query = Query.get('resource').filter_by('slice_hrn', '=', slicename).select(['network','type','hrn','hostname','sliver'])
     # without an hazelnut, this would use use : run_it=False as nothing would listen to the results
     page.enqueue_query (main_query, # run_it=False
                         )

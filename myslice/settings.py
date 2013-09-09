@@ -24,10 +24,18 @@ if not ROOT:
 
 ####################
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    # ('your_name', 'your_email@test.com'),
 )
 
 MANAGERS = ADMINS
+
+# Mail configuration
+#DEFAULT_FROM_EMAIL = "root@theseus.ipv6.lip6.fr"
+#EMAIL_HOST_PASSWORD = "mypassword"
+
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
 
 DATABASES = {
     'default': {
@@ -80,23 +88,50 @@ STATIC_ROOT = os.path.join(ROOT,'django-static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/all-static/'
+# thierry STATIC_URL = '/all-static/'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT,'all-static'),
+    # thierry os.path.join(ROOT,'all-static'),
+    ('js', os.path.join(ROOT,'manifold/js')),
+    ('css', os.path.join(ROOT,'manifold/css')),
+    ('js', os.path.join(ROOT,'unfold/js')),
+    ('css', os.path.join(ROOT,'unfold/css')),
+    ('js', os.path.join(ROOT,'auth/js')),
+    ('css', os.path.join(ROOT,'auth/css')),
+    ('img', os.path.join(ROOT,'auth/img')),
+    ('css', os.path.join(ROOT,'views/css')),
+    ('img', os.path.join(ROOT,'views/img')),
 )
+
+# Needed by PluginFinder
+PLUGIN_DIR = os.path.join(ROOT,'plugins')
+# ThirdPartyFinder
+THIRDPARTY_DIR = os.path.join(ROOT, 'third-party')
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'unfold.static.PluginFinder',
+    'unfold.static.ThirdPartyFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+#TEMPLATE_CONTEXT_PROCESSORS = (
+#    'django.contrib.auth.context_processors.auth',
+#    'django.core.context_processors.debug',
+#    'django.core.context_processors.i18n',
+#    'django.core.context_processors.media',
+#    'django.core.context_processors.static',
+#    'django.core.context_processors.request',
+#    'django.contrib.messages.context_processors.messages',
+#)
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 't%n(3h)&amp;r^n8(+8)(sp29t^$c2#t(m3)e2!02l8w1#36tl#t27'
@@ -149,11 +184,23 @@ INSTALLED_APPS = (
     # views - more or less stable 
     'views',
     'trash',
+    'south', # managing database migrations
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'portal',
+    'sample',
+# DEPRECATED #    'django.contrib.formtools',
+# DEPRECATED ##    'crispy_forms',
+# DEPRECATED #
+# DEPRECATED #    # User registration
+# DEPRECATED #    'django.contrib.auth',
+# DEPRECATED #    'django.contrib.sites',
+# DEPRECATED #    'registration',
 )
+
+ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -184,7 +231,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.backend.MyCustomBackend', 'auth.manifoldbackend.ManifoldBackend', )
+AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend', )
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine

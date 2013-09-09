@@ -1,0 +1,4 @@
+#Nom;id;contrainte;adresse_serveur;nom_method_a_utiliser;attributs;type_affichage;options_affichage;
+Noeud;2000;descriptif noeud animation;{};xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};GetNodes;'site_id','name','date_created';;;
+Sites;2001;descriptif site animation;[{"ens":[{"type":"date","variable":"date_created","op":"]"}]}];xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};GetSites;'site_id','name','date_created';marker;{"icon":"green"};
+CPU;2002;descriptif cpu animation;{};xmlrpc;{"server":"https://www.planet-lab.eu/PLCAPI/"};getCPU;'site_id','name','date_created';;;
