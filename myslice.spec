@@ -1,6 +1,6 @@
 %define name myslice
-%define version 0.1
-%define taglevel 3
+%define version 0.2
+%define taglevel 1
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
