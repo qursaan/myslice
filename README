@@ -6,7 +6,7 @@ See the devel/ subdir for more devel-oriented doc.
 
 ==================== 1 minute howto
 
-*  REQUIREMENTS  is to have python + django installed django
+*  REQUIREMENTS  is to have python + django (1.5.2) installed django
 ** should be straightforward
 ** see devel/django-install.txt in case of trouble
 
@@ -23,6 +23,7 @@ $ manage.py syncdb
 $ ./manage.py collectstatic (formerly, we used make static, which is deprecated)
 -- or --
 $ ./manage.py collectstatic --noinput
+$ make 
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
