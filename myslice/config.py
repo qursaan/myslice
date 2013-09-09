@@ -10,7 +10,8 @@ class Config:
 # the INRIA setup
 #    manifold_url = "http://manifold.pl.sophia.inria.fr:7080/"
 # the OpenLab-wide backend as managed by UPMC
-    manifold_url = "http://dev.myslice.info:7080/"
+# note that dev.myslice.info runs a more unstable code
+    manifold_url = "http://test.myslice.info:7080/"
 
     # exporting these details to js
     @staticmethod
