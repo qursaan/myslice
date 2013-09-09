@@ -61,6 +61,13 @@ class Plugin:
     #                     since domid is the key for storing that data in the browser storage space
     #   .. None         : if not passed to __init__ at all, then the default_toggled() method is called
     #   ..              : anything else, defaults to True
+    # . outline_complete: whether the overall plugin (body + toggle buttons/title) needs to receive
+    #                     a border and extra space
+    # . outline_body    : same but for the plugin body only
+    #      for these 2 outline_ flags, possible values mimick the above behaviour, i.e.:
+    #   .. True:        : outline is on
+    #   .. False:       : outline is off
+    #   .. None:        : calls default_outline_complete() on the plugin object
     #
     #### internal data
     # . domid: created internally, but can be set at creation time if needed
@@ -72,7 +79,9 @@ class Plugin:
     # which will result in 'foo' being accessible to the template engine
     # 
     def __init__ (self, page, title=None, domid=None,
-                  visible=True, togglable=None, toggled=None, **settings):
+                  visible=True, togglable=None, toggled=None,
+                  outline_complete=None, outline_body=None,
+                  **settings):
         self.page = page
         # callers can provide their domid for css'ing 
         if not domid: domid=self.newdomid()
@@ -83,10 +92,14 @@ class Plugin:
         self.classname=self._py_classname()
         self.plugin_classname=self._js_classname()
         self.visible=visible
-        if togglable is None:   self.togglable=self.default_togglable()
-        else:                   self.togglable=togglable
-        if toggled is None:     self.toggled=self.default_toggled()
-        else:                   self.toggled=toggled
+        if togglable is None:           self.togglable=self.default_togglable()
+        else:                           self.togglable=togglable
+        if toggled is None:             self.toggled=self.default_toggled()
+        else:                           self.toggled=toggled
+        if outline_complete is None:    self.outline_complete=self.default_outline_complete()
+        else:                           self.outline_complete=outline_complete
+        if outline_body is None:        self.outline_body=self.default_outline_body()
+        else:                           self.outline_body=outline_body
         # what comes from subclasses
         for (k,v) in settings.iteritems():
             setattr(self,k,v)
@@ -265,6 +278,8 @@ class Plugin:
 
     def default_togglable (self):       return False
     def default_toggled (self):         return 'persistent'
+    def default_outline_complete (self):return False
+    def default_outline_body(self):     return False
 
 #    # tell the framework about requirements (for the document <header>)
 #    # the notion of 'Media' in django provides for medium-dependant
