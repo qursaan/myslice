@@ -151,10 +151,10 @@ package is published)
 
 .. the recommended layout for the various files and pieces (py, html, js and css) with django is
    IMHO really painful; we *SHOULD* use e.g. 
-      plugins/simplelist.py, 
-      plugins/templates/plugins.html,
-      plugins/static/js/simplelist.js 
-      plugins/static/css/simplelist.css
+      plugins/quickfilter/quickfilter.py, 
+      plugins/quickfilter/templates/quickfilter.html,
+      plugins/quickfilter/static/js/quickfilter.js 
+      plugins/quickfilter/static/css/quickfilter.css
    which I have tried doing for a while but I found myself just hopping around in the file tree all
    day long, wasting cycles big time
 
