@@ -104,10 +104,9 @@ function QueryStore() {
 
     /* Insertion */
 
-    this.insert = function(query)
-    {
+    this.insert = function(query) {
         // We expect only main_queries are inserted
-
+	
         /* If the query has not been analyzed, then we analyze it */
         if (query.analyzed_query == null) {
             query.analyze_subqueries();
@@ -158,23 +157,19 @@ function QueryStore() {
 
     /* Searching */
 
-    this.find_query_ext = function(query_uuid)
-    {
+    this.find_query_ext = function(query_uuid) {
         return this.main_queries[query_uuid];
     }
 
-    this.find_query = function(query_uuid)
-    {
+    this.find_query = function(query_uuid) {
         return this.find_query_ext(query_uuid).query;
     }
 
-    this.find_analyzed_query_ext = function(query_uuid)
-    {
+    this.find_analyzed_query_ext = function(query_uuid) {
         return this.analyzed_queries[query_uuid];
     }
 
-    this.find_analyzed_query = function(query_uuid)
-    {
+    this.find_analyzed_query = function(query_uuid) {
         return this.find_analyzed_query_ext(query_uuid).query;
     }
 }
@@ -204,8 +199,7 @@ var manifold = {
         } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
     },
 
-    get_type: function(variable)
-    {
+    get_type: function(variable) {
         switch(Object.toType(variable)) {
             case 'number':
             case 'string':
@@ -226,14 +220,12 @@ var manifold = {
 
      metadata: {
 
-        get_table: function(method)
-        {
+        get_table: function(method) {
             var table = MANIFOLD_METADATA[method];
             return (typeof table === 'undefined') ? null : table;
         },
 
-        get_columns: function(method)
-        {
+        get_columns: function(method) {
             var table = this.get_table(method);
             if (!table) {
                 return null;
@@ -242,8 +234,7 @@ var manifold = {
             return (typeof table.column === 'undefined') ? null : table.column;
         },
 
-        get_key: function(method)
-        {
+        get_key: function(method) {
             var table = this.get_table(method);
             if (!table)
                 return null;
@@ -252,8 +243,7 @@ var manifold = {
         },
 
 
-        get_column: function(method, name)
-        {
+        get_column: function(method, name) {
             var columns = this.get_columns(method);
             if (!columns)
                 return null;
@@ -265,8 +255,7 @@ var manifold = {
             return null;
         },
 
-        get_type: function(method, name)
-        {
+        get_type: function(method, name) {
             var table = this.get_table(method);
             if (!table)
                 return null;
@@ -331,15 +320,13 @@ var manifold = {
      * \brief We use js function closure to be able to pass the query (array)
      * to the callback function used when data is received
      */
-    success_closure: function(query, publish_uuid, callback /*domid*/)
-    {
+    success_closure: function(query, publish_uuid, callback /*domid*/) {
         return function(data, textStatus) {
             manifold.asynchroneous_success(data, query, publish_uuid, callback /*domid*/);
         }
     },
 
-    run_query: function(query, callback)
-    {
+    run_query: function(query, callback) {
         // default value for callback = null
         if (typeof callback === 'undefined')
             callback = null; 
@@ -384,7 +371,7 @@ var manifold = {
 
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-                jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
+            jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
         })
     },
 
@@ -462,8 +449,7 @@ var manifold = {
         manifold.publish_result(query, result);
     },
 
-    setup_update_query: function(query, records)
-    {
+    setup_update_query: function(query, records) {
         // We don't prepare an update query if the result has more than 1 entry
         if (records.length != 1)
             return;
@@ -507,8 +493,7 @@ var manifold = {
         }
     },
 
-    process_get_query_records: function(query, records)
-    {
+    process_get_query_records: function(query, records) {
         this.setup_update_query(query, records);
 
         /* Publish full results */
@@ -530,8 +515,7 @@ var manifold = {
      * diff's. This means we need to move the publish functionalities in the
      * previous 'process_get_query_records' function.
      */
-    process_update_query_records: function(query, records)
-    {
+    process_update_query_records: function(query, records) {
         // First issue: we request everything, and not only what we modify, so will will have to ignore some fields
         var query_uuid        = query.query_uuid;
         var query_ext         = manifold.query_store.find_analyzed_query_ext(query_uuid);
@@ -689,8 +673,7 @@ var manifold = {
         this.setup_update_query(query, records);
     },
 
-    process_query_records: function(query, records)
-    {
+    process_query_records: function(query, records) {
         if (query.action == 'get') {
             this.process_get_query_records(query, records);
         } else if (query.action == 'update') {
@@ -704,14 +687,24 @@ var manifold = {
     // e.g. an updater wants to publish its result as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, callback /*domid*/) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
+	
+	if (manifold.asynchroneous_debug)
+	    messages.debug(">>> asynchroneous_success (json returned) for " + publish_uuid);
 
         /* If a callback has been specified, we redirect results to it */
-        if (!!callback) { callback(data); return; }
+        if (!!callback) { 
+	    callback(data); 
+	    if (manifold.asynchroneous_debug)
+		messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- callback ended");
+	    return; 
+	}
 
         if (data.code == 2) { // ERROR
             // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
             window.location="/logout/";
+	    if (manifold.asynchroneous_debug)
+		messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- error returned - logging out");
             return;
         }
         if (data.code == 1) { // WARNING
@@ -729,6 +722,9 @@ var manifold = {
             });
             
         }
+	if (manifold.asynchroneous_debug)
+	    messages.debug ("=== asynchroneous_success " + publish_uuid + " -- before process_query_records");
+
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
         if (result) {
@@ -739,14 +735,15 @@ var manifold = {
             //tmp_query = manifold.find_query(query.query_uuid);
             //manifold.publish_result_rec(tmp_query.analyzed_query, result);
         }
+	if (manifold.asynchroneous_debug)
+	    messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- done");
     },
 
     /************************************************************************** 
      * Plugin API helpers
      **************************************************************************/ 
 
-    raise_event_handler: function(type, query_uuid, event_type, value)
-    {
+    raise_event_handler: function(type, query_uuid, event_type, value) {
         if ((type != 'query') && (type != 'record'))
             throw 'Incorrect type for manifold.raise_event()';
 
@@ -760,19 +757,16 @@ var manifold = {
         });
     },
 
-    raise_query_event: function(query_uuid, event_type, value)
-    {
+    raise_query_event: function(query_uuid, event_type, value) {
         manifold.raise_event_handler('query', query_uuid, event_type, value);
     },
 
-    raise_record_event: function(query_uuid, event_type, value)
-    {
+    raise_record_event: function(query_uuid, event_type, value) {
         manifold.raise_event_handler('record', query_uuid, event_type, value);
     },
 
 
-    raise_event: function(query_uuid, event_type, value)
-    {
+    raise_event: function(query_uuid, event_type, value) {
         // Query uuid has been updated with the key of a new element
         query_ext    = manifold.query_store.find_analyzed_query_ext(query_uuid);
         query = query_ext.query;
@@ -934,8 +928,7 @@ var manifold = {
     },
 
     /* Publish/subscribe channels for internal use */
-    get_channel: function(type, query_uuid) 
-    {
+    get_channel: function(type, query_uuid) {
         if ((type !== 'query') && (type != 'record'))
             return null;
         return '/' + type + '/' + query_uuid;
