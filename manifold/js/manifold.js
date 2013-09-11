@@ -689,13 +689,13 @@ var manifold = {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
 	
 	if (manifold.asynchroneous_debug)
-	    messages.debug(">>> asynchroneous_success (json returned) for " + publish_uuid);
+	    messages.debug(">>> asynchroneous_success (json returned) for " + query.object + " " + publish_uuid);
 
         /* If a callback has been specified, we redirect results to it */
         if (!!callback) { 
 	    callback(data); 
 	    if (manifold.asynchroneous_debug)
-		messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- callback ended");
+		messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- callback ended");
 	    return; 
 	}
 
@@ -704,7 +704,7 @@ var manifold = {
             alert("Your session has expired, please log in again");
             window.location="/logout/";
 	    if (manifold.asynchroneous_debug)
-		messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- error returned - logging out");
+		messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- error returned - logging out");
             return;
         }
         if (data.code == 1) { // WARNING
@@ -723,7 +723,7 @@ var manifold = {
             
         }
 	if (manifold.asynchroneous_debug)
-	    messages.debug ("=== asynchroneous_success " + publish_uuid + " -- before process_query_records");
+	    messages.debug ("=== asynchroneous_success " + query.object + " " + publish_uuid + " -- before process_query_records");
 
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
@@ -736,7 +736,7 @@ var manifold = {
             //manifold.publish_result_rec(tmp_query.analyzed_query, result);
         }
 	if (manifold.asynchroneous_debug)
-	    messages.debug ("<<< asynchroneous_success " + publish_uuid + " -- done");
+	    messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- done");
     },
 
     /************************************************************************** 
