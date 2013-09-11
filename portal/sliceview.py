@@ -88,6 +88,18 @@ class SliceView (LoginRequiredAutoLogoutView):
                  html="<h2 class='well well-lg'> Slice %s</h2>"%slicename)
         )
     
+        # --------------------------------------------------------------------------
+        # ResourcesSelected
+        #
+        main_stack.insert(ResourcesSelected(
+            page                = page,
+            title               = 'Pending operations',
+            query               = main_query,
+            togglable           = True,
+            domid               = 'pending',
+            outline_complete    = True,
+        ))
+    
 #        main_stack.insert(
 #            Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
 #        )
@@ -246,33 +258,12 @@ class SliceView (LoginRequiredAutoLogoutView):
             },
         ))
     
-#        main_stack.insert(sq_plugin)
-    
-        # --------------------------------------------------------------------------
-        # ResourcesSelected
-        #
-        main_stack.insert(ResourcesSelected(
-            page                = page,
-            title               = 'Pending operations',
-            query               = main_query,
-            togglable           = True,
-            domid               = 'pending',
-            outline_complete    = True,
-        ))
-    
         main_stack.insert(Messages(
             page   = page,
             title  = "Runtime messages for slice %s"%slicename,
             domid  = "msgs-pre",
             levels = "ALL",
         ))
-    #    main_stack.insert(Updater(
-    #        page   = page,
-    #        title  = "wont show up as non togglable by default",
-    #        query  = main_query,
-    #        label  = "Update slice",
-    #    ))
-        
     
     
         # variables that will get passed to the view-unfold1.html template
