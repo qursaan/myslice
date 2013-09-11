@@ -7,8 +7,9 @@ div.plugin-toggle {
 div.plugin, div.plugin-toggle {
 }
 div.plugin-outline-complete, div.plugin-outline-body {
-    border-radius:	8px;
     border:		1px solid;
+    border-radius:	8px;
+    border-color:	#ccc;
     padding:		5px;
     margin:		5px;
 }
