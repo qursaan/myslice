@@ -263,6 +263,12 @@ class SliceView (LoginRequiredAutoLogoutView):
             title  = "Runtime messages for slice %s"%slicename,
             domid  = "msgs-pre",
             levels = "ALL",
+            # plain messages are probably less nice for production but more reliable for development for now
+            transient = False,
+            # these make sense only in non-transient mode..
+            togglable = True,
+            toggled = 'persistent',
+            outline_complete = True,
         ))
     
     
