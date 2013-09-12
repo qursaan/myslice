@@ -17,7 +17,8 @@ See the devel/ subdir for more devel-oriented doc.
 * edit myslice/config.py and enter the details of your manifold backend
 
 * init django
-$ manage.py syncdb
+$ ./manage.py syncdb
+$ ./manage.py migrate
 
 * gather static files
 $ ./manage.py collectstatic (formerly, we used make static, which is deprecated)
