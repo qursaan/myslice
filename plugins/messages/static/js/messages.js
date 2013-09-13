@@ -69,7 +69,10 @@
 	    html += "<li class='" + level +"'"; 
 	    if ( ! this.is_active(level) ) html += " style='display:none'";
 	    html += ">";
-	    html += "<span class='messages-date'>" + new Date() + "</span>";
+	    html += "<span class='messages-date'>";
+	    d=new Date();
+	    html += d.getHours() + ":" +d.getMinutes() + ":" + d.getSeconds() + "--" + d.getMilliseconds();
+	    html += "</span>";
 	    html += "<span class='messages-level'>" + level + "</span>";
 	    //	html += "[" + domid + "]";
 	    html += " " + incoming + "</li>";
