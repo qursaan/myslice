@@ -116,7 +116,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         resources_as_list = Hazelnut( 
             page       = page,
             title      = 'Resources as a List',
-            domid      = 'checkboxes',
+            domid      = 'resources_list',
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
@@ -124,9 +124,10 @@ class SliceView (LoginRequiredAutoLogoutView):
             datatables_options = { 
                 # for now we turn off sorting on the checkboxes columns this way
                 # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
+                'aoColumns'     : [None, None, None, None, {'bSortable': False}],
+                'iDisplayLength': 25,
+                'bLengthChange' : True,
+                'bAutiWidth'    : True,
                 },
             )
 
@@ -148,10 +149,12 @@ class SliceView (LoginRequiredAutoLogoutView):
         resources_query_editor = QueryEditor(
             page  = page,
             query = sq_resource,
+            title = "Select Columns",
             )
         resources_active_filters = ActiveFilters(
             page  = page,
             query = sq_resource,
+            title = "Active Filters ?",
             )
 
         resources_area = Stack (
@@ -162,13 +165,17 @@ class SliceView (LoginRequiredAutoLogoutView):
             outline_complete=True,
             sons = [
                 Tabs ( page=page, 
-                       sons=[ resources_as_list, resources_as_map, ] 
+                       sons=[ resources_as_list, resources_as_map, ] ,
+                       active_domid = 'gmap',
                        ),
-                Stack ( page=page,
-                        title="Customize",
-                        togglable=True,
-                        sons = [ resources_query_editor, resources_active_filters, ]
-                        ),
+                Tabs ( page=page,
+                       title="Customize Resources layout",
+                       togglable=True,
+                       toggled='persistent',
+                       domid="customize-resources",
+                       outline_complete=True,
+                       sons = [ resources_query_editor, resources_active_filters, ],
+                       ),
                 ]
             )
 
