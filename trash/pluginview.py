@@ -23,11 +23,14 @@ from plugins.updater                    import Updater
 from myslice.viewutils                  import topmenu_items, the_user
 from trash.trashutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
-@login_required
+#might be useful or not depending on the context
+#@login_required
 def test_plugin_view (request):
 
     page = Page(request)
     
+    page.expose_js_metadata()
+
     # variables that will get passed to this template
     template_env = {}
     
@@ -53,6 +56,12 @@ def test_plugin_view (request):
 #                    domid="the-updater",
 #                ),
         # make sure the 2 things work together
+            Messages (
+                    page=page,
+                    title="Transient Runtime messages",
+                    domid="messages-transient",
+                    levels='ALL',
+                    ),
             Hazelnut (
                     page=page,
                     title="Slice %s - checkboxes interacting w/ updater"%slicename,
@@ -63,12 +72,26 @@ def test_plugin_view (request):
                     ),
             Messages (
                     page=page,
-                    title="Runtime messages",
+                    title="Inline Runtime messages",
                     domid="messages",
                     levels='ALL',
                     togglable=True,
+                    transient=False,
+                    ),
+            Raw (
+                    page=page,
+                    title="issue messages",
+                    togglable=True,
+                    html="""
+<input type="button" id="bouton" value="Click me" />
+""",
                     ),
             ])
+
+    page.add_js_chunks ( """
+function issue_debug() {console.log("issue_debug");messages.debug("issue_debug");};
+$(function(){$("#bouton").click(issue_debug);});
+""")
 
     # define 'unfold1_main' to the template engine
     template_env [ 'unfold1_main' ] = main_plugin.render(request)
