@@ -22,8 +22,7 @@ $.plugin = function(name, object) {
 
 var Plugin = Class.extend({
 
-    init: function(options, element)
-    {
+    init: function(options, element) {
         // Mix in the passed in options with the default options
         this.options = $.extend({}, this.default_options, options);
 
@@ -40,32 +39,31 @@ var Plugin = Class.extend({
         return (typeof this.on_filter_added === 'function');
     },
 
-    _query_handler: function(prefix, event_type, data)
-    {
+    _query_handler: function(prefix, event_type, data) {
         // We suppose this.query_handler_prefix has been defined if this
         // callback is triggered    
         var fn;
         switch(event_type) {
-            case FILTER_ADDED:
-                fn = 'filter_added';
-                break;
-            case FILTER_REMOVED:
-                fn = 'filter_removed';
-                break;
-            case CLEAR_FILTERS:
-                fn = 'filter_clear';
-                break;
-            case FIELD_ADDED:
-                fn = 'field_added';
-                break;
-            case FIELD_REMOVED:
-                fn = 'field_removed';
-                break;
-            case CLEAR_FIELDS:
-                fn = 'field_clear';
-                break;
-            default:
-                return;
+        case FILTER_ADDED:
+            fn = 'filter_added';
+            break;
+        case FILTER_REMOVED:
+            fn = 'filter_removed';
+            break;
+        case CLEAR_FILTERS:
+            fn = 'filter_clear';
+            break;
+        case FIELD_ADDED:
+            fn = 'field_added';
+            break;
+        case FIELD_REMOVED:
+            fn = 'field_removed';
+            break;
+        case CLEAR_FIELDS:
+            fn = 'field_clear';
+            break;
+        default:
+            return;
         } // switch
         
         fn = 'on_' + prefix + fn;
@@ -76,29 +74,28 @@ var Plugin = Class.extend({
         }
     },
 
-    _record_handler: function(prefix, event_type, record)
-    {
+    _record_handler: function(prefix, event_type, record) {
         // We suppose this.query_handler_prefix has been defined if this
         // callback is triggered    
         var fn;
         switch(event_type) {
-            case NEW_RECORD:
-                fn = 'new_record';
-                break;
-            case CLEAR_RECORDS:
-                fn = 'clear_records';
-                break;
-            case IN_PROGRESS:
-                fn = 'query_in_progress';
-                break;
-            case DONE:
-                fn = 'query_done';
-                break;
-            case FIELD_STATE_CHANGED:
-                fn = 'field_state_changed';
-                break;
-            default:
-                return;
+        case NEW_RECORD:
+            fn = 'new_record';
+            break;
+        case CLEAR_RECORDS:
+            fn = 'clear_records';
+            break;
+        case IN_PROGRESS:
+            fn = 'query_in_progress';
+            break;
+        case DONE:
+            fn = 'query_done';
+            break;
+        case FIELD_STATE_CHANGED:
+            fn = 'field_state_changed';
+            break;
+        default:
+            return;
         } // switch
         
         fn = 'on_' + prefix + fn;
@@ -109,16 +106,14 @@ var Plugin = Class.extend({
         }
     },
 
-    get_handler_function: function(type, prefix)
-    {
+    get_handler_function: function(type, prefix) {
         
         return $.proxy(function(e, event_type, record) {
             return this['_' + type + '_handler'](prefix, event_type, record);
         }, this);
     },
 
-    listen_query: function(query_uuid, prefix)
-    {
+    listen_query: function(query_uuid, prefix) {
         // default: prefix = ''
         prefix = (typeof prefix === 'undefined') ? '' : (prefix + '_');
 
@@ -130,8 +125,7 @@ var Plugin = Class.extend({
 
     /* Helper functions for naming HTML elements (ID, classes), with support for filters and fields */
 
-    id: function()
-    {
+    id: function() {
         var ret = this.options.plugin_uuid;
         for (var i = 0; i < arguments.length; i++) {
             ret = ret + manifold.separator + arguments[i];
@@ -139,8 +133,7 @@ var Plugin = Class.extend({
         return ret;
     },
 
-    el: function()
-    {
+    el: function() {
         if (arguments.length == 0) {
             return $('#' + this.id());
         } else {
@@ -149,13 +142,11 @@ var Plugin = Class.extend({
         }
     },
 
-    els: function(cls)
-    {
+    els: function(cls) {
         return $('.' + cls, this.el());
     },
 
-    id_from_filter: function(filter, use_value)
-    {
+    id_from_filter: function(filter, use_value) {
         use_value = typeof use_value !== 'undefined' ? use_value : true;
 
         var key    = filter[0];
@@ -171,25 +162,21 @@ var Plugin = Class.extend({
         }
     },
 
-    str_from_filter: function(filter)
-    {
+    str_from_filter: function(filter) {
         return filter[0] + ' ' + filter[1] + ' ' + filter[2];
     },
 
-    array_from_id: function(id)
-    {
+    array_from_id: function(id) {
         var ret = id.split(manifold.separator);
         ret.shift(); // remove plugin_uuid at the beginning
         return ret;
     },
 
-    id_from_field: function(field)
-    {
+    id_from_field: function(field) {
         return 'field' + manifold.separator + field;
     },
 
-    field_from_id: function(id)
-    {
+    field_from_id: function(id) {
         var array;
         if (typeof id === 'string') {
             array = id.split(manifold.separator);
@@ -200,14 +187,12 @@ var Plugin = Class.extend({
         return array[1];
     },
 
-    id_from_key: function(key_field, value)
-    {
+    id_from_key: function(key_field, value) {
         
         return key_field + manifold.separator + unfold.escape_id(value).replace(/\\/g, '');
     },
 
-    id_from_record: function(method, record)
-    {
+    id_from_record: function(method, record) {
         var keys = manifold.metadata.get_key(method);
         if (!keys)
             return;
@@ -216,18 +201,17 @@ var Plugin = Class.extend({
 
         var key = keys[0];
         switch (Object.toType(key)) {
-            case 'string':
-                if (!(key in record))
-                    return null;
-                return this.id_from_key(key, record[key]);
-    
-            default:
-                throw 'Not implemented';
+        case 'string':
+            if (!(key in record))
+                return null;
+            return this.id_from_key(key, record[key]);
+	    
+        default:
+            throw 'Not implemented';
         }
     },
 
-    key_from_id: function(id)
-    {
+    key_from_id: function(id) {
         // NOTE this works only for simple keys
 
         var array;
@@ -244,20 +228,17 @@ var Plugin = Class.extend({
 
     /* SPIN */
 
-    spin: function()
-    {
+    spin: function() {
         manifold.spin(this.element);
     },
 
-    unspin: function()
-    {
+    unspin: function() {
         manifold.spin(this.element, false);
     },
 
     /* TEMPLATE */
 
-    load_template: function(name, ctx)
-    {
+    load_template: function(name, ctx) {
         return Mustache.render(this.el(name).html(), ctx);
     },
 
