@@ -314,7 +314,10 @@ var manifold = {
     // trigger a query asynchroneously
     proxy_url : '/manifold/proxy/json/',
 
+    // reasonably low-noise, shows manifold requests coming in and out
     asynchroneous_debug : true,
+    // print our more details on result publication and related callbacks
+    publish_result_debug : false,
 
     /**
      * \brief We use js function closure to be able to pass the query (array)
@@ -371,7 +374,8 @@ var manifold = {
 
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-            jQuery.post(manifold.proxy_url, {'json':query_json} , manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
+            jQuery.post(manifold.proxy_url, {'json':query_json}, 
+			manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
         })
     },
 
@@ -384,7 +388,8 @@ var manifold = {
      */
     forward: function(query, callback /*domid*/) {
         var query_json = JSON.stringify(query);
-        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, query.query_uuid, callback/*domid*/));
+        $.post(manifold.proxy_url, {'json': query_json} , 
+	       manifold.success_closure(query, query.query_uuid, callback/*domid*/));
     },
 
     /*!
@@ -439,6 +444,7 @@ var manifold = {
          * otherwise, publish the main object as well as subqueries
          * XXX how much recursive are we ?
          */
+	if (manifold.publish_result_debug) messages.debug (">>>>> publish_result_rec " + query.object);
         if (manifold.query_expects_unique_result(query)) {
             /* Also publish subqueries */
             jQuery.each(query.subqueries, function(object, subquery) {
@@ -446,7 +452,9 @@ var manifold = {
                 /* TODO remove object from result */
             });
         }
+	if (manifold.publish_result_debug) messages.debug ("===== publish_result_rec " + query.object);
         manifold.publish_result(query, result);
+	if (manifold.publish_result_debug) messages.debug ("<<<<< publish_result_rec " + query.object);
     },
 
     setup_update_query: function(query, records) {
@@ -688,14 +696,17 @@ var manifold = {
     asynchroneous_success : function (data, query, publish_uuid, callback /*domid*/) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
 	
+	var start = new Date();
 	if (manifold.asynchroneous_debug)
-	    messages.debug(">>> asynchroneous_success (json returned) for " + query.object + " " + publish_uuid);
+	    messages.debug(">>>>>>>>>> asynchroneous_success query.object=" + query.object);
 
         /* If a callback has been specified, we redirect results to it */
         if (!!callback) { 
 	    callback(data); 
-	    if (manifold.asynchroneous_debug)
-		messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- callback ended");
+	    if (manifold.asynchroneous_debug) {
+		duration=new Date()-start;
+		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- callback ended " + duration + " ms");
+	    }
 	    return; 
 	}
 
@@ -703,8 +714,10 @@ var manifold = {
             // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
             window.location="/logout/";
-	    if (manifold.asynchroneous_debug)
-		messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- error returned - logging out");
+	    if (manifold.asynchroneous_debug) {
+		duration=new Date()-start;
+		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- error returned - logging out " + duration + " ms");
+	    }
             return;
         }
         if (data.code == 1) { // WARNING
@@ -722,8 +735,8 @@ var manifold = {
             });
             
         }
-	if (manifold.asynchroneous_debug)
-	    messages.debug ("=== asynchroneous_success " + query.object + " " + publish_uuid + " -- before process_query_records");
+	if (manifold.asynchroneous_debug) 
+	    messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
 
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
@@ -735,8 +748,11 @@ var manifold = {
             //tmp_query = manifold.find_query(query.query_uuid);
             //manifold.publish_result_rec(tmp_query.analyzed_query, result);
         }
-	if (manifold.asynchroneous_debug)
-	    messages.debug ("<<< asynchroneous_success " + query.object + " " + publish_uuid + " -- done");
+	if (manifold.asynchroneous_debug) {
+	    duration=new Date()-start;
+	    messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- done " + duration + " ms");
+	}
+
     },
 
     /************************************************************************** 
@@ -750,10 +766,11 @@ var manifold = {
         var channels = [ manifold.get_channel(type, query_uuid), manifold.get_channel(type, '*') ];
 
         $.each(channels, function(i, channel) {
-            if (value === undefined)
+            if (value === undefined) {
                 $('.plugin').trigger(channel, [event_type]);
-            else
+	    } else {
                 $('.plugin').trigger(channel, [event_type, value]);
+	    }
         });
     },
 
@@ -870,7 +887,8 @@ var manifold = {
                 // NOTE : we have to modify all child queries
                 // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
 
-                // if everything is done right, update_query should not be null. It is updated when we received results from the get query
+                // if everything is done right, update_query should not be null. 
+	        // It is updated when we received results from the get query
                 // object = the same as get
                 // filter = key : update a single object for now
                 // fields = the same as get
@@ -1015,4 +1033,3 @@ $.ajaxSetup({
          }
      } 
 });
-
