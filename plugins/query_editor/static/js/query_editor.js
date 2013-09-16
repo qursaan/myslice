@@ -37,13 +37,13 @@
 
             this.listen_query(options.query_uuid);
 
-            this.els('queryeditor-auto-filter').change(this.event_filter_added('='));
-            this.els('queryeditor-filter').change(this.event_filter_added('='));
-            this.els('queryeditor-filter-min').change(this.event_filter_added('>'));
-            this.els('queryeditor-filter-max').change(this.event_filter_added('<'));
+            this.elts('queryeditor-auto-filter').change(this.event_filter_added('='));
+            this.elts('queryeditor-filter').change(this.event_filter_added('='));
+            this.elts('queryeditor-filter-min').change(this.event_filter_added('>'));
+            this.elts('queryeditor-filter-max').change(this.event_filter_added('<'));
 
             var self = this;
-            this.els('queryeditor-check').click(function() { 
+            this.elts('queryeditor-check').click(function() { 
                 manifold.raise_event(self.options.query_uuid, this.checked?FIELD_ADDED:FIELD_REMOVED, this.value);
             });
 

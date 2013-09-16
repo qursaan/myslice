@@ -13,7 +13,7 @@
         init: function(options, element) {
             this._super(options, element);
 
-            this.els('closeButton').click(function() {
+            this.elts('closeButton').click(function() {
                 manifold.raise_event(options.query_uuid, FILTER_REMOVED, filter);
             });
 
@@ -60,7 +60,7 @@
         check_and_hide_clear_button: function()
         {
             // Count the number of filter _inside_ the current plugin
-            var count = this.els('filterButton').length;
+            var count = this.elts('filterButton').length;
             if (count == 1) { // Including the template
                 this.el('clearFilters').hide();
             }
@@ -85,7 +85,7 @@
 
             // Add an event on click on the close button, call function removeFilter
             var self = this;
-            this.els('closeButton').last().click(function() {
+            this.elts('closeButton').last().click(function() {
                 manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, filter);
             });
 

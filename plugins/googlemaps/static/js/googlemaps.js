@@ -121,7 +121,7 @@ googlemaps_debug_detailed=false;
 	    //            this.infowindow.close();
 	    //            this.infowindow.open(this.map, dict_info.marker);
 	    //            this.infowindow.setContent(dict_info.marker.content);
-	    //            this.els('map-button').unbind('click').click(this, this._button_click);
+	    //            this.elts('map-button').unbind('click').click(this, this._button_click);
 	    // END turning off temporarily
             //var button = this.checkbox(record, checked);
             //this.el('checkbox', this.id_from_record(method, record)).html(button);
@@ -214,7 +214,7 @@ googlemaps_debug_detailed=false;
                 self.infowindow.open(map, marker);
                 // onload of the infowindow on the map, bind a click on a button
                 google.maps.event.addListener(self.infowindow, 'domready', function() {
-                    self.els('map-button').unbind('click').click(self, self._button_click);
+                    self.elts('map-button').unbind('click').click(self, self._button_click);
 		    //                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
                 });
             });

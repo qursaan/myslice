@@ -142,7 +142,7 @@ var Plugin = Class.extend({
         }
     },
 
-    els: function(cls) {
+    elts: function(cls) {
         return $('.' + cls, this.el());
     },
 

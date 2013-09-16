@@ -528,7 +528,7 @@
              * Handle clicks on checkboxes: reassociate checkbox click every time
              * the table is redrawn 
              */
-            this.els('hazelnut-checkbox').unbind('click').click(this, this._check_click);
+            this.elts('hazelnut-checkbox').unbind('click').click(this, this._check_click);
 
             if (!this.table)
                 return;
