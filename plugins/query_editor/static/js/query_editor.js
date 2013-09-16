@@ -56,17 +56,17 @@
             nCloneTh.innerHTML = '<b>Info</b>';
             nCloneTd.className = "center";
             nCloneTh.className = "center";
-            this.el('table thead tr').each(function() {
+            this.elmt('table thead tr').each(function() {
                 this.insertBefore(nCloneTh, this.childNodes[0]);
             });
-            this.el('table tbody tr').each(function() {
+            this.elmt('table tbody tr').each(function() {
                 this.insertBefore(nCloneTd.cloneNode( true ), this.childNodes[0]);
             });
             */
          
             // We are currently using a DataTable display, but another browsing component could be better
             //jQuery('#'+this.options.plugin_uuid+'-table').dataTable...
-            var  metaTable = this.el('table').dataTable({
+            var  metaTable = this.elmt('table').dataTable({
                 bFilter     : false,
                 bPaginate   : false,
                 bInfo       : false,
@@ -84,7 +84,7 @@
 
             var self = this;
             // Actions on the newly added fields
-            this.el('table tbody td span').on('click', function() {
+            this.elmt('table tbody td span').on('click', function() {
                 var nTr = this.parentNode.parentNode;
                 // use jQuery UI instead of images to keep a common UI
                 // class="ui-icon treeclick ui-icon-triangle-1-s tree-minus"
@@ -101,7 +101,7 @@
                 }
             });
 
-            this.el('table_wrapper').css({
+            this.elmt('table_wrapper').css({
                 'padding-top'   : '0em',
                 'padding-bottom': '0em'
             });
@@ -112,12 +112,12 @@
 
         check_field: function(field)
         {
-            this.el('check', field).attr('checked', true);
+            this.elmt('check', field).attr('checked', true);
         },
 
         uncheck_field: function(field)
         {
-            this.el('check', field).attr('checked', false);
+            this.elmt('check', field).attr('checked', false);
         },
 
         update_filter_value: function(filter, removed)
@@ -131,17 +131,17 @@
             var id = this.id_from_field(key);
 
             if (op == '=') {
-                var element = this.el(id);
+                var element = this.elmt(id);
             } else {
                 var suffix;
                 if (op == '<') {
-                    this.el(id, 'max').val(value);
+                    this.elmt(id, 'max').val(value);
                 } else if (op == '>') {
-                    this.el(id, 'min').val(value);
+                    this.elmt(id, 'min').val(value);
                 } else {
                     return;
                 }
-                var element = this.el(id, suffix);
+                var element = this.elmt(id, suffix);
             }
 
             element.val(removed?null:value);

@@ -29,7 +29,7 @@ googlemaps_debug_detailed=false;
             this.map_markers = {}
 
             /* XXX Events XXX */
-            this.el().on('show', this, this.on_show);
+            this.elmt().on('show', this, this.on_show);
             // TODO in destructor
             // $(window).unbind('Hazelnut');
 
@@ -124,7 +124,7 @@ googlemaps_debug_detailed=false;
 	    //            this.elts('map-button').unbind('click').click(this, this._button_click);
 	    // END turning off temporarily
             //var button = this.checkbox(record, checked);
-            //this.el('checkbox', this.id_from_record(method, record)).html(button);
+            //this.elmt('checkbox', this.id_from_record(method, record)).html(button);
         }, 
 
         checkbox: function(record, checked) {

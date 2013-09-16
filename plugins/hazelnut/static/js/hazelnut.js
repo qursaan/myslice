@@ -24,7 +24,7 @@
 
             /* XXX Events XXX */
             // this.$element.on('show.Datatables', this.on_show);
-            this.el().on('show', this, this.on_show);
+            this.elmt().on('show', this, this.on_show);
             // Unbind all events using namespacing
             // TODO in destructor
             // $(window).unbind('Hazelnut');
@@ -93,7 +93,7 @@
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
             //  XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
-            this.table = this.el('table').dataTable(actual_options);
+            this.table = this.elmt('table').dataTable(actual_options);
 
             /* Setup the SelectAll button in the dataTable header */
             /* xxx not sure this is still working */

@@ -133,17 +133,17 @@ var Plugin = Class.extend({
         return ret;
     },
 
-    el: function() {
+    elmt: function() {
         if (arguments.length == 0) {
             return $('#' + this.id());
         } else {
             // We make sure to search _inside_ the dom tag of the plugin
-            return $('#' + this.id.apply(this, arguments), this.el());
+            return $('#' + this.id.apply(this, arguments), this.elmt());
         }
     },
 
     elts: function(cls) {
-        return $('.' + cls, this.el());
+        return $('.' + cls, this.elmt());
     },
 
     id_from_filter: function(filter, use_value) {
@@ -239,7 +239,7 @@ var Plugin = Class.extend({
     /* TEMPLATE */
 
     load_template: function(name, ctx) {
-        return Mustache.render(this.el(name).html(), ctx);
+        return Mustache.render(this.elmt(name).html(), ctx);
     },
 
 });
