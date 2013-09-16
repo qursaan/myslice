@@ -5,15 +5,18 @@
  */
 
 /* BUGS:
- * - infowindow is not properly reopened when the maps has not the focus
+ * - infowindow is not properly reopened when the maps does not have the focus
  */
+
+googlemaps_debug=true;
+googlemaps_debug_detailed=false;
 
 (function($){
 
    var GoogleMaps = Plugin.extend({
 
-        init: function(options, element)
-        {
+        init: function(options, element) {
+	    if (googlemaps_debug) messages.debug("GoogleMaps.init");
             this._super(options, element);
 
             /* Member variables */
@@ -46,8 +49,8 @@
 
         /* PLUGIN EVENTS */
 
-        on_show: function(e)
-        {
+        on_show: function(e) {
+	    if (googlemaps_debug) messages.debug("on_show");
             var self = e.data;
             google.maps.event.trigger(self.map, 'resize');
         }, // on_show
@@ -58,8 +61,8 @@
 
         /**
          */
-        initialize_map: function()
-        {
+        initialize_map: function() {
+	    if (googlemaps_debug) messages.debug("initialize_map");
             this.markerCluster = null;
             this.coords = new Array();
 
@@ -67,16 +70,18 @@
             var myOptions = {
                 zoom: this.options.zoom,
                 center: myLatlng,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
       
-            var id = this.options.plugin_uuid + manifold.separator + 'map';
-            this.map = new google.maps.Map(document.getElementById(id), myOptions);
+            var domid = this.options.plugin_uuid + manifold.separator + 'map';
+	    var el = document.getElementById(domid);
+	    if (googlemaps_debug) messages.debug("gmap.initialize_map based on  domid=" + id + " el=" + el);
+            this.map = new google.maps.Map(el, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
 
-        set_checkbox: function(record, checked)
-        {
+        set_checkbox: function(record, checked) {
+	    if (googlemaps_debug_detailed) messages.debug ("set_checkbox");
             /* Default: checked = true */
             if (typeof checked === 'undefined')
                 checked = true;
@@ -119,8 +124,8 @@
             //this.el('checkbox', this.id_from_record(method, record)).html(button);
         }, 
 
-        checkbox: function(record, checked) 
-        {
+        checkbox: function(record, checked) {
+	    if (googlemaps_debug_detailed) messages.debug ("checkbox");
             if (typeof checked === 'undefined')
                 checked = false;
 
@@ -139,15 +144,15 @@
             return "<div id='" + id + "'>" + button + "</div>";
         },
         
-        get_marker_content: function(record, checked)
-        {
+        get_marker_content: function(record, checked) {
+	    if (googlemaps_debug_detailed) messages.debug ("get_marker_content");
             return '<p><b>' + this.method + '</b>: ' + get_value(record['resource_hrn']) + '<br/><b>network</b>: ' + get_value(record['network'])+'</p>' + this.checkbox(record, checked);
         },
 
         /**
          */
-        new_record: function(record)
-        {
+        new_record: function(record) {
+	    if (googlemaps_debug_detailed) messages.debug ("new_record");
             // get the coordinates
             var latitude=get_value(record['latitude']);
             var longitude=get_value(record['longitude']);
@@ -195,8 +200,8 @@
 
         }, // new_record
 
-        addInfoWindow: function(marker, map)
-        {
+        addInfoWindow: function(marker, map) {
+	    if (googlemaps_debug_detailed) messages.debug ("addInfoWindow");
             var self = this;
             google.maps.event.addListener(marker, 'click', function () {     
                 if(self.infowindow){
@@ -217,8 +222,8 @@
 
         /*************************** RECORD HANDLER ***************************/
 
-        on_new_record: function(record)
-        {
+        on_new_record: function(record) {
+	    if (googlemaps_debug_detailed) messages.debug("on_new_record");
             if (this.received_all)
                 // update checkbox for record
                 this.set_checkbox(record);
@@ -227,26 +232,25 @@
                 this.in_set_buffer.push(record);
         },
 
-        on_clear_records: function(record)
-        {
-
+        on_clear_records: function(record) {
+	    if (googlemaps_debug_detailed) messages.debug("on_clear_records");
         },
 
         // Could be the default in parent
-        on_query_in_progress: function()
-        {
+        on_query_in_progress: function() {
+	    if (googlemaps_debug) messages.debug("on_query_in_progress");
             this.spin();
         },
 
-        on_query_done: function()
-        {
+        on_query_done: function() {
+	    if (googlemaps_debug) messages.debug("on_query_done");	    
             if (this.received_all)
                 this.unspin();
             this.received_set = true;
         },
 
-        on_field_state_changed: function(data)
-        {
+        on_field_state_changed: function(data) {
+	    if (googlemaps_debug) messages.debug("on_field_state_changed");	    
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
@@ -264,24 +268,23 @@
 
         // all
 
-        on_all_new_record: function(record)
-        {
+        on_all_new_record: function(record) {
+	    if (googlemaps_debug_detailed) messages.debug("on_all_new_record");
             this.new_record(record);
         },
 
-        on_all_clear_records: function()
-        {
+        on_all_clear_records: function() {
+	    if (googlemaps_debug) messages.debug("on_all_clear_records");	    
         },
 
-        on_all_query_in_progress: function()
-        {
+        on_all_query_in_progress: function() {
+	    if (googlemaps_debug) messages.debug("on_all_query_in_progress");
             // XXX parent
             this.spin();
         },
 
-        on_all_query_done: function()
-        {
-
+        on_all_query_done: function() {
+	    if (googlemaps_debug) messages.debug("on_all_query_done");
             // MarkerClusterer
             var markers = [];
             $.each(this.map_markers, function (k, v) { markers.push(v.marker); });
@@ -321,8 +324,8 @@
 
         /************************** PRIVATE METHODS ***************************/
 
-        _button_click: function(e)
-        {
+        _button_click: function(e) {
+	    if (googlemaps_debug) messages.debug("_button_click");
             var self   = e.data;
 
             var escaped_key = self.key_from_id($(this).parent().attr('id'), 'checkbox');
