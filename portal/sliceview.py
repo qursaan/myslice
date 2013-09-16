@@ -11,7 +11,6 @@ from myslice.viewutils               import topmenu_items, the_user
 from plugins.raw.raw                 import Raw
 from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
-from plugins.lists.slicelist         import SliceList
 from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
 from plugins.googlemaps              import GoogleMaps
@@ -31,6 +30,7 @@ class SliceView (LoginRequiredAutoLogoutView):
     
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
+        page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
@@ -60,9 +60,9 @@ class SliceView (LoginRequiredAutoLogoutView):
     
         # ... and for the relations
         # XXX Let's hardcode resources for now
-        sq_resource = aq.subquery('resource')
-        sq_user     = aq.subquery('user')
-        sq_lease    = aq.subquery('lease')
+        sq_resource    = aq.subquery('resource')
+        sq_user        = aq.subquery('user')
+        sq_lease       = aq.subquery('lease')
         sq_measurement = aq.subquery('measurement')
         
     
@@ -211,24 +211,24 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
         main_stack.insert(tab_users)
     
-        tab_users.insert(Hazelnut( 
-            page        = page,
-            title       = 'Users List',
-            domid       = 'checkboxes2',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            # this is the query at the core of the slice list
-            query       = sq_user,
-            query_all  = query_user_all,
-            checkboxes  = True,
-            datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
-            },
-        ))
+#        tab_users.insert(Hazelnut( 
+#            page        = page,
+#            title       = 'Users List',
+#            domid       = 'checkboxes2',
+#            # tab's sons preferably turn this off
+#            togglable   = False,
+#            # this is the query at the core of the slice list
+#            query       = sq_user,
+#            query_all  = query_user_all,
+#            checkboxes  = True,
+#            datatables_options = { 
+#                # for now we turn off sorting on the checkboxes columns this way
+#                # this of course should be automatic in hazelnut
+#                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+#                'iDisplayLength' : 25,
+#                'bLengthChange'  : True,
+#            },
+#        ))
     
         tab_measurements = Tabs (
             page                = page,
