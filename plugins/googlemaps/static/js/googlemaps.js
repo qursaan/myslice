@@ -23,7 +23,7 @@ googlemaps_debug_detailed=false;
             // query status
             this.received_all = false;
             this.received_set = false;
-            this.in_set_buffer = Array();
+            this.in_set_buffer = [];
 
             // key -> { marker, checked }
             this.map_markers = {}
@@ -318,6 +318,8 @@ googlemaps_debug_detailed=false;
                 $.each(this.in_set_buffer, function(i, record) {
                     self.set_checkbox(record, true);
                 });
+		// reset 
+		self.in_set_buffer = [];
 
                 this.unspin();
             }
