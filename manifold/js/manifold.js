@@ -419,17 +419,22 @@ var manifold = {
 
         // NEW PLUGIN API
         manifold.raise_record_event(query.query_uuid, CLEAR_RECORDS);
+        if (manifold.publish_result_debug) messages.debug(".. publish_result (1) ");
+	var count=0;
         $.each(result, function(i, record) {
             manifold.raise_record_event(query.query_uuid, NEW_RECORD, record);
+	    count += 1;
         });
+        if (manifold.publish_result_debug) messages.debug(".. publish_result NEW API (2) count=" + count);
         manifold.raise_record_event(query.query_uuid, DONE);
 
         // OLD PLUGIN API BELOW
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
-        if (manifold.asynchroneous_debug)
-            messages.debug("publishing result on " + channel);
+        if (manifold.publish_result_debug) messages.debug(".. publish_result OLD API (3) " + channel);
         jQuery.publish(channel, [result, query]);
+
+	if (manifold.publish_result_debug) messages.debug(".. publish_result - END (4) q=" + query.__repr());
     },
 
     /*!
