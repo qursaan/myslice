@@ -34,7 +34,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
         page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
-        page.add_js_chunks ('$(function() { console.log("users turned %s"); });'%"on" if do_query_users else "off")
+        page.add_js_chunks ('$(function() { console.log("users turned %s"); });'%("on" if do_query_users else "off"))
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
