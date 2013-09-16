@@ -13,7 +13,7 @@ googlemaps_debug_detailed=false;
 
 (function($){
 
-   var GoogleMaps = Plugin.extend({
+    var GoogleMaps = Plugin.extend({
 
         init: function(options, element) {
 	    if (googlemaps_debug) messages.debug("GoogleMaps.init");
@@ -72,7 +72,7 @@ googlemaps_debug_detailed=false;
                 center: myLatlng,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
-      
+	    
             var domid = this.options.plugin_uuid + manifold.separator + 'map';
 	    var el = document.getElementById(domid);
 	    if (googlemaps_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " el=" + el);
@@ -89,16 +89,16 @@ googlemaps_debug_detailed=false;
             var key_value;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
-                case TYPE_VALUE:
-                    key_value = record;
-                    break;
-                case TYPE_RECORD:
-                    /* XXX Test the key before ? */
-                    key_value = record[this.key];
-                    break;
-                default:
-                    throw "Not implemented";
-                    break;
+            case TYPE_VALUE:
+                key_value = record;
+                break;
+            case TYPE_RECORD:
+                /* XXX Test the key before ? */
+                key_value = record[this.key];
+                break;
+            default:
+                throw "Not implemented";
+                break;
             }
 
             // we cannot directly edit html, since nothing but marker is displayed
@@ -113,16 +113,16 @@ googlemaps_debug_detailed=false;
             dict_info.in_set = checked;
             dict_info.marker.content = this.get_marker_content(dict_info.record, checked);
 
-// Thierry - this code seems to cause the googlmap area to go all grayed out 
-// once all the quesries have come back
-// BEG turning off temporarily
-//            // Update opened infowindow
-//            // XXX Factor this code
-//            this.infowindow.close();
-//            this.infowindow.open(this.map, dict_info.marker);
-//            this.infowindow.setContent(dict_info.marker.content);
-//            this.els('map-button').unbind('click').click(this, this._button_click);
-// END turning off temporarily
+	    // Thierry - this code seems to cause the googlmap area to go all grayed out 
+	    // once all the quesries have come back
+	    // BEG turning off temporarily
+	    //            // Update opened infowindow
+	    //            // XXX Factor this code
+	    //            this.infowindow.close();
+	    //            this.infowindow.open(this.map, dict_info.marker);
+	    //            this.infowindow.setContent(dict_info.marker.content);
+	    //            this.els('map-button').unbind('click').click(this, this._button_click);
+	    // END turning off temporarily
             //var button = this.checkbox(record, checked);
             //this.el('checkbox', this.id_from_record(method, record)).html(button);
         }, 
@@ -182,23 +182,23 @@ googlemaps_debug_detailed=false;
 
             //jQuery(".map-button").click(button_click);
             //if(jQuery.inArray(record, rows)>-1){
-                var marker = new google.maps.Marker({
-                    position: myLatlng,
-                    title: get_value(record['hostname']),
-                    // This should be done by the rendering
-                    content: this.get_marker_content(record, false),
-                }); 
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                title: get_value(record['hostname']),
+                // This should be done by the rendering
+                content: this.get_marker_content(record, false),
+            }); 
 
-                this.addInfoWindow(marker, this.map);
-                var key_value = (this.key in record) ? record[this.key] : null;
-                if (!key_value)
-                    return;
-                this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')] = {
-                    marker: marker,
-                    in_set: false,
-                    record: record,
-                    value: key_value
-                }
+            this.addInfoWindow(marker, this.map);
+            var key_value = (this.key in record) ? record[this.key] : null;
+            if (!key_value)
+                return;
+            this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')] = {
+                marker: marker,
+                in_set: false,
+                record: record,
+                value: key_value
+            }
             //}
 
         }, // new_record
@@ -215,7 +215,7 @@ googlemaps_debug_detailed=false;
                 // onload of the infowindow on the map, bind a click on a button
                 google.maps.event.addListener(self.infowindow, 'domready', function() {
                     self.els('map-button').unbind('click').click(self, self._button_click);
-//                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
+		    //                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
                 });
             });
         }, // addInfoWindow
@@ -255,16 +255,16 @@ googlemaps_debug_detailed=false;
         on_field_state_changed: function(data) {
 	    if (googlemaps_debug) messages.debug("on_field_state_changed");	    
             switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
-                    break;
-                default:
-                    break;
+            case FIELD_REQUEST_ADD:
+            case FIELD_REQUEST_ADD_RESET:
+                this.set_checkbox(data.value, true);
+                break;
+            case FIELD_REQUEST_REMOVE:
+            case FIELD_REQUEST_REMOVE_RESET:
+                this.set_checkbox(data.value, false);
+                break;
+            default:
+                break;
             }
         },
 
@@ -297,10 +297,10 @@ googlemaps_debug_detailed=false;
                 var cluster_markers = cluster.getMarkers();
                 var bounds  = new google.maps.LatLngBounds();
                 /* 
-                * date: 24/05/2012
-                * author: lbaron
-                * Firefox JS Error - replaced $.each by JQuery.each
-                */                  
+                 * date: 24/05/2012
+                 * author: lbaron
+                 * Firefox JS Error - replaced $.each by JQuery.each
+                 */                  
                 jQuery.each(cluster_markers, function(i, marker){
                     bounds.extend(marker.getPosition()); 
                 });
