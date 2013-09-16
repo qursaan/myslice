@@ -75,7 +75,7 @@ googlemaps_debug_detailed=false;
       
             var domid = this.options.plugin_uuid + manifold.separator + 'map';
 	    var el = document.getElementById(domid);
-	    if (googlemaps_debug) messages.debug("gmap.initialize_map based on  domid=" + id + " el=" + el);
+	    if (googlemaps_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " el=" + el);
             this.map = new google.maps.Map(el, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
