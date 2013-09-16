@@ -24,6 +24,9 @@ from plugins.messages.messages       import Messages
 
 tmp_default_slice='ple.upmc.myslicedemo'
 
+# temporary : turn off the users part to speed things up
+do_query_users=true
+
 class SliceView (LoginRequiredAutoLogoutView):
 
     def get (self,request, slicename=tmp_default_slice):
@@ -51,12 +54,14 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
     
         query_resource_all = Query.get('resource').select(resource_fields)
-        query_user_all = Query.get('user').select(user_fields)
+        if do_query_users:
+            query_user_all = Query.get('user').select(user_fields)
     
         aq = AnalyzedQuery(main_query, metadata=metadata)
         page.enqueue_query(main_query, analyzed_query=aq)
         page.enqueue_query(query_resource_all)
-        page.enqueue_query(query_user_all)
+        if do_query_users:
+            page.enqueue_query(query_user_all)
     
         # ... and for the relations
         # XXX Let's hardcode resources for now
