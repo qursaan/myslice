@@ -25,7 +25,7 @@ from plugins.messages.messages       import Messages
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-do_query_users=true
+do_query_users=True
 
 class SliceView (LoginRequiredAutoLogoutView):
 
@@ -34,6 +34,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
         page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
+        page.add_js_chunks ('$(function() { console.log("users turned %s"); });'%"on" if do_query_users else "off")
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
@@ -206,34 +207,35 @@ class SliceView (LoginRequiredAutoLogoutView):
         # USERS
         # 
     
-        tab_users = Tabs(
-            page                = page,
-            domid               = 'users',
-            outline_complete    = True,
-            togglable           = True,
-            title               = 'Users',
-            active_domid        = 'checkboxes2',
-        )
-        main_stack.insert(tab_users)
+        if do_query_users:
+            tab_users = Tabs(
+                page                = page,
+                domid               = 'users',
+                outline_complete    = True,
+                togglable           = True,
+                title               = 'Users',
+                active_domid        = 'checkboxes2',
+                )
+            main_stack.insert(tab_users)
     
-#        tab_users.insert(Hazelnut( 
-#            page        = page,
-#            title       = 'Users List',
-#            domid       = 'checkboxes2',
-#            # tab's sons preferably turn this off
-#            togglable   = False,
-#            # this is the query at the core of the slice list
-#            query       = sq_user,
-#            query_all  = query_user_all,
-#            checkboxes  = True,
-#            datatables_options = { 
-#                # for now we turn off sorting on the checkboxes columns this way
-#                # this of course should be automatic in hazelnut
-#                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-#                'iDisplayLength' : 25,
-#                'bLengthChange'  : True,
-#            },
-#        ))
+            tab_users.insert(Hazelnut( 
+                page        = page,
+                title       = 'Users List',
+                domid       = 'checkboxes2',
+                # tab's sons preferably turn this off
+                togglable   = False,
+                # this is the query at the core of the slice list
+                query       = sq_user,
+                query_all  = query_user_all,
+                checkboxes  = True,
+                datatables_options = { 
+                    # for now we turn off sorting on the checkboxes columns this way
+                    # this of course should be automatic in hazelnut
+                    'aoColumns'      : [None, None, None, None, {'bSortable': False}],
+                    'iDisplayLength' : 25,
+                    'bLengthChange'  : True,
+                },
+            ))
     
         tab_measurements = Tabs (
             page                = page,
