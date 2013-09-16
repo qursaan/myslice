@@ -113,13 +113,16 @@ googlemaps_debug_detailed=false;
             dict_info.in_set = checked;
             dict_info.marker.content = this.get_marker_content(dict_info.record, checked);
 
-            // Update opened infowindow
-            // XXX Factor this code
-            this.infowindow.close();
-            this.infowindow.open(this.map, dict_info.marker);
-            this.infowindow.setContent(dict_info.marker.content);
-            this.els('map-button').unbind('click').click(this, this._button_click);
-
+// Thierry - this code seems to cause the googlmap area to go all grayed out 
+// once all the quesries have come back
+// BEG turning off temporarily
+//            // Update opened infowindow
+//            // XXX Factor this code
+//            this.infowindow.close();
+//            this.infowindow.open(this.map, dict_info.marker);
+//            this.infowindow.setContent(dict_info.marker.content);
+//            this.els('map-button').unbind('click').click(this, this._button_click);
+// END turning off temporarily
             //var button = this.checkbox(record, checked);
             //this.el('checkbox', this.id_from_record(method, record)).html(button);
         }, 
