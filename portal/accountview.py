@@ -105,9 +105,12 @@ def account_process(request):
                 config['lastname'] = edited_last_name
                 config['authority'] = config.get('authority','Unknown Authority')
                 updated_config = json.dumps(config)
-        
+                user_params = {'config': updated_config}
+            else: # it's needed if the config is empty 
+                user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
+                user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
-        user_params = { 'config': updated_config}
+        #user_params = { 'config': updated_config}
         manifold_update_user(request,user_params)
         # this will be depricated, we will show the success msg in same page
         return HttpResponse('Sucess: First Name and Last Name Updated!')       
