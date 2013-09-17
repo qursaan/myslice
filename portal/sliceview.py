@@ -13,7 +13,7 @@ from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
-from plugins.googlemaps              import GoogleMaps
+from plugins.googlemap              import GoogleMap
 from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
 from plugins.query_editor            import QueryEditor
@@ -34,7 +34,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
         page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
-        page.add_js_chunks ('$(function() { console.log("users turned %s"); });'%("on" if do_query_users else "off"))
+        page.add_js_chunks ('$(function() { console.log("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
@@ -131,7 +131,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_as_map = GoogleMaps(
+        resources_as_map = GoogleMap(
             page       = page,
             title      = 'Geographic view',
             domid      = 'gmap',

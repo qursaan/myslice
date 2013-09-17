@@ -5,28 +5,31 @@
  */
 
 /* BUGS:
- * - infowindow is not properly reopened when the maps has not the focus
+ * - infowindow is not properly reopened when the maps does not have the focus
  */
+
+googlemap_debug=true;
+googlemap_debug_detailed=false;
 
 (function($){
 
-   var GoogleMaps = Plugin.extend({
+    var GoogleMap = Plugin.extend({
 
-        init: function(options, element)
-        {
+        init: function(options, element) {
+	    if (googlemap_debug) messages.debug("GoogleMap.init");
             this._super(options, element);
 
             /* Member variables */
             // query status
             this.received_all = false;
             this.received_set = false;
-            this.in_set_buffer = Array();
+            this.in_set_buffer = [];
 
             // key -> { marker, checked }
             this.map_markers = {}
 
             /* XXX Events XXX */
-            this.el().on('show', this, this.on_show);
+            this.elmt().on('show', this, this.on_show);
             // TODO in destructor
             // $(window).unbind('Hazelnut');
 
@@ -46,8 +49,8 @@
 
         /* PLUGIN EVENTS */
 
-        on_show: function(e)
-        {
+        on_show: function(e) {
+	    if (googlemap_debug) messages.debug("on_show");
             var self = e.data;
             google.maps.event.trigger(self.map, 'resize');
         }, // on_show
@@ -58,8 +61,8 @@
 
         /**
          */
-        initialize_map: function()
-        {
+        initialize_map: function() {
+	    if (googlemap_debug) messages.debug("initialize_map");
             this.markerCluster = null;
             this.coords = new Array();
 
@@ -67,16 +70,18 @@
             var myOptions = {
                 zoom: this.options.zoom,
                 center: myLatlng,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
-      
-            var id = this.options.plugin_uuid + manifold.separator + 'map';
-            this.map = new google.maps.Map(document.getElementById(id), myOptions);
+	    
+            var domid = this.options.plugin_uuid + manifold.separator + 'map';
+	    var el = document.getElementById(domid);
+	    if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " el=" + el);
+            this.map = new google.maps.Map(el, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
 
-        set_checkbox: function(record, checked)
-        {
+        set_checkbox: function(record, checked) {
+	    if (googlemap_debug_detailed) messages.debug ("set_checkbox");
             /* Default: checked = true */
             if (typeof checked === 'undefined')
                 checked = true;
@@ -84,16 +89,16 @@
             var key_value;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
-                case TYPE_VALUE:
-                    key_value = record;
-                    break;
-                case TYPE_RECORD:
-                    /* XXX Test the key before ? */
-                    key_value = record[this.key];
-                    break;
-                default:
-                    throw "Not implemented";
-                    break;
+            case TYPE_VALUE:
+                key_value = record;
+                break;
+            case TYPE_RECORD:
+                /* XXX Test the key before ? */
+                key_value = record[this.key];
+                break;
+            default:
+                throw "Not implemented";
+                break;
             }
 
             // we cannot directly edit html, since nothing but marker is displayed
@@ -108,19 +113,22 @@
             dict_info.in_set = checked;
             dict_info.marker.content = this.get_marker_content(dict_info.record, checked);
 
-            // Update opened infowindow
-            // XXX Factor this code
-            this.infowindow.close();
-            this.infowindow.open(this.map, dict_info.marker);
-            this.infowindow.setContent(dict_info.marker.content);
-            this.els('map-button').unbind('click').click(this, this._button_click);
-
+	    // Thierry - this code seems to cause the googlemap area to go all grayed out 
+	    // once all the quesries have come back
+	    // BEG turning off temporarily
+	    //            // Update opened infowindow
+	    //            // XXX Factor this code
+	    //            this.infowindow.close();
+	    //            this.infowindow.open(this.map, dict_info.marker);
+	    //            this.infowindow.setContent(dict_info.marker.content);
+	    //            this.elts('map-button').unbind('click').click(this, this._button_click);
+	    // END turning off temporarily
             //var button = this.checkbox(record, checked);
-            //this.el('checkbox', this.id_from_record(method, record)).html(button);
+            //this.elmt('checkbox', this.id_from_record(method, record)).html(button);
         }, 
 
-        checkbox: function(record, checked) 
-        {
+        checkbox: function(record, checked) {
+	    if (googlemap_debug_detailed) messages.debug ("checkbox");
             if (typeof checked === 'undefined')
                 checked = false;
 
@@ -139,15 +147,15 @@
             return "<div id='" + id + "'>" + button + "</div>";
         },
         
-        get_marker_content: function(record, checked)
-        {
+        get_marker_content: function(record, checked) {
+	    if (googlemap_debug_detailed) messages.debug ("get_marker_content");
             return '<p><b>' + this.method + '</b>: ' + get_value(record['resource_hrn']) + '<br/><b>network</b>: ' + get_value(record['network'])+'</p>' + this.checkbox(record, checked);
         },
 
         /**
          */
-        new_record: function(record)
-        {
+        new_record: function(record) {
+	    if (googlemap_debug_detailed) messages.debug ("new_record");
             // get the coordinates
             var latitude=get_value(record['latitude']);
             var longitude=get_value(record['longitude']);
@@ -174,29 +182,29 @@
 
             //jQuery(".map-button").click(button_click);
             //if(jQuery.inArray(record, rows)>-1){
-                var marker = new google.maps.Marker({
-                    position: myLatlng,
-                    title: get_value(record['hostname']),
-                    // This should be done by the rendering
-                    content: this.get_marker_content(record, false),
-                }); 
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                title: get_value(record['hostname']),
+                // This should be done by the rendering
+                content: this.get_marker_content(record, false),
+            }); 
 
-                this.addInfoWindow(marker, this.map);
-                var key_value = (this.key in record) ? record[this.key] : null;
-                if (!key_value)
-                    return;
-                this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')] = {
-                    marker: marker,
-                    in_set: false,
-                    record: record,
-                    value: key_value
-                }
+            this.addInfoWindow(marker, this.map);
+            var key_value = (this.key in record) ? record[this.key] : null;
+            if (!key_value)
+                return;
+            this.map_markers[unfold.escape_id(key_value).replace(/\\/g, '')] = {
+                marker: marker,
+                in_set: false,
+                record: record,
+                value: key_value
+            }
             //}
 
         }, // new_record
 
-        addInfoWindow: function(marker, map)
-        {
+        addInfoWindow: function(marker, map) {
+	    if (googlemap_debug_detailed) messages.debug ("addInfoWindow");
             var self = this;
             google.maps.event.addListener(marker, 'click', function () {     
                 if(self.infowindow){
@@ -206,8 +214,8 @@
                 self.infowindow.open(map, marker);
                 // onload of the infowindow on the map, bind a click on a button
                 google.maps.event.addListener(self.infowindow, 'domready', function() {
-                    self.els('map-button').unbind('click').click(self, self._button_click);
-//                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
+                    self.elts('map-button').unbind('click').click(self, self._button_click);
+		    //                    jQuery(".map-button").click({instance: instance_, infoWindow: object.infowindow}, button_click);                     
                 });
             });
         }, // addInfoWindow
@@ -217,8 +225,8 @@
 
         /*************************** RECORD HANDLER ***************************/
 
-        on_new_record: function(record)
-        {
+        on_new_record: function(record) {
+	    if (googlemap_debug_detailed) messages.debug("on_new_record");
             if (this.received_all)
                 // update checkbox for record
                 this.set_checkbox(record);
@@ -227,61 +235,59 @@
                 this.in_set_buffer.push(record);
         },
 
-        on_clear_records: function(record)
-        {
-
+        on_clear_records: function(record) {
+	    if (googlemap_debug_detailed) messages.debug("on_clear_records");
         },
 
         // Could be the default in parent
-        on_query_in_progress: function()
-        {
+        on_query_in_progress: function() {
+	    if (googlemap_debug) messages.debug("on_query_in_progress");
             this.spin();
         },
 
-        on_query_done: function()
-        {
+        on_query_done: function() {
+	    if (googlemap_debug) messages.debug("on_query_done");	    
             if (this.received_all)
                 this.unspin();
             this.received_set = true;
         },
 
-        on_field_state_changed: function(data)
-        {
+        on_field_state_changed: function(data) {
+	    if (googlemap_debug) messages.debug("on_field_state_changed");	    
             switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
-                    break;
-                default:
-                    break;
+            case FIELD_REQUEST_ADD:
+            case FIELD_REQUEST_ADD_RESET:
+                this.set_checkbox(data.value, true);
+                break;
+            case FIELD_REQUEST_REMOVE:
+            case FIELD_REQUEST_REMOVE_RESET:
+                this.set_checkbox(data.value, false);
+                break;
+            default:
+                break;
             }
         },
 
 
         // all
 
-        on_all_new_record: function(record)
-        {
+        on_all_new_record: function(record) {
+	    if (googlemap_debug_detailed) messages.debug("on_all_new_record");
             this.new_record(record);
         },
 
-        on_all_clear_records: function()
-        {
+        on_all_clear_records: function() {
+	    if (googlemap_debug) messages.debug("on_all_clear_records");	    
         },
 
-        on_all_query_in_progress: function()
-        {
+        on_all_query_in_progress: function() {
+	    if (googlemap_debug) messages.debug("on_all_query_in_progress");
             // XXX parent
             this.spin();
         },
 
-        on_all_query_done: function()
-        {
-
+        on_all_query_done: function() {
+	    if (googlemap_debug) messages.debug("on_all_query_done");
             // MarkerClusterer
             var markers = [];
             $.each(this.map_markers, function (k, v) { markers.push(v.marker); });
@@ -291,10 +297,10 @@
                 var cluster_markers = cluster.getMarkers();
                 var bounds  = new google.maps.LatLngBounds();
                 /* 
-                * date: 24/05/2012
-                * author: lbaron
-                * Firefox JS Error - replaced $.each by JQuery.each
-                */                  
+                 * date: 24/05/2012
+                 * author: lbaron
+                 * Firefox JS Error - replaced $.each by JQuery.each
+                 */                  
                 jQuery.each(cluster_markers, function(i, marker){
                     bounds.extend(marker.getPosition()); 
                 });
@@ -312,6 +318,8 @@
                 $.each(this.in_set_buffer, function(i, record) {
                     self.set_checkbox(record, true);
                 });
+		// reset 
+		self.in_set_buffer = [];
 
                 this.unspin();
             }
@@ -321,8 +329,8 @@
 
         /************************** PRIVATE METHODS ***************************/
 
-        _button_click: function(e)
-        {
+        _button_click: function(e) {
+	    if (googlemap_debug) messages.debug("_button_click");
             var self   = e.data;
 
             var escaped_key = self.key_from_id($(this).parent().attr('id'), 'checkbox');
@@ -336,6 +344,6 @@
 
     });
 
-    $.plugin('GoogleMaps', GoogleMaps);
+    $.plugin('GoogleMap', GoogleMap);
 
 })(jQuery);

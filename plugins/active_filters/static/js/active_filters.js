@@ -4,7 +4,7 @@
  * License: GPLv3
  */
 
-// NOTE: We are not making use of element, but this.el() instead...
+// NOTE: We are not making use of element, but this.elmt() instead...
 
 (function($){
 
@@ -13,11 +13,11 @@
         init: function(options, element) {
             this._super(options, element);
 
-            this.els('closeButton').click(function() {
+            this.elts('closeButton').click(function() {
                 manifold.raise_event(options.query_uuid, FILTER_REMOVED, filter);
             });
 
-            this.el('clearFilters').click(function () {
+            this.elmt('clearFilters').click(function () {
                 manifold.raise_event(options.query_uuid, CLEAR_FILTERS);
             });
             this.check_and_hide_clear_button();
@@ -49,20 +49,20 @@
 
         show_clear_button: function()
         {
-            this.el('clearFilters').show();
+            this.elmt('clearFilters').show();
         },
 
         hide_clear_button: function()
         {
-            this.el('clearFilters').hide();
+            this.elmt('clearFilters').hide();
         },
 
         check_and_hide_clear_button: function()
         {
             // Count the number of filter _inside_ the current plugin
-            var count = this.els('filterButton').length;
+            var count = this.elts('filterButton').length;
             if (count == 1) { // Including the template
-                this.el('clearFilters').hide();
+                this.elmt('clearFilters').hide();
             }
         },
 
@@ -74,18 +74,18 @@
 
         add_filter: function(filter)
         {
-            var template = this.el('template').html();
+            var template = this.elmt('template').html();
             var ctx = {
                 id:   this.id(this.id_from_filter(filter, false)),
                 span: this.str_from_filter(filter)
             };
             var output = Mustache.render(template, ctx);
 
-            this.el('myActiveFilters').append(output);
+            this.elmt('myActiveFilters').append(output);
 
             // Add an event on click on the close button, call function removeFilter
             var self = this;
-            this.els('closeButton').last().click(function() {
+            this.elts('closeButton').last().click(function() {
                 manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, filter);
             });
 
@@ -94,7 +94,7 @@
         
         remove_filter: function(filter)
         {
-            this.el(this.id_from_filter(filter, false)).remove();
+            this.elmt(this.id_from_filter(filter, false)).remove();
             this.check_and_hide_clear_button();
         },
 

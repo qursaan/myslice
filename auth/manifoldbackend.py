@@ -2,7 +2,7 @@ import time
 
 from django.contrib.auth.models import User
 
-from manifold.manifoldapi import ManifoldAPI, ManifoldResult
+from manifold.manifoldapi import ManifoldAPI, ManifoldException, ManifoldResult
 from manifold.core.query        import Query
 
 # Name my backend 'ManifoldBackend'
@@ -30,7 +30,6 @@ class ManifoldBackend:
                 return
             print "first", sessions
             session = sessions[0]
-            print "SESSION=", session
 
             # Change to session authentication
             api.auth = {'AuthMethod': 'session', 'session': session['session']}
@@ -47,6 +46,9 @@ class ManifoldBackend:
             print "PERSON=", person
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
+        except ManifoldException, e:
+            print "Caught ManifoldException, returning corresponding ManifoldResult"
+            return e.manifold_result
         except Exception, e:
             print "E: manifoldbackend", e
             import traceback

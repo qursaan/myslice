@@ -25,7 +25,7 @@
 
         arm_button: function()
         {
-	        this.el('updater').click(this, this.submit_update_request);
+	        this.elmt('updater').click(this, this.submit_update_request);
         },
 
         submit_update_request: function (e) 
@@ -40,7 +40,7 @@
 
         disable_update_button: function()
         {
-            this.el('updater').attr('disabled', 'disabled');
+            this.elmt('updater').attr('disabled', 'disabled');
         },
 
         /*************************** QUERY HANDLER ****************************/

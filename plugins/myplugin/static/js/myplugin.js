@@ -61,7 +61,7 @@
 
         show_hide_button: function() 
         {
-            // this.id, this.el, this.cl, this.els
+            // this.id, this.el, this.cl, this.elts
             // same output as a jquery selector with some guarantees
         },
 

@@ -30,7 +30,7 @@
             this._super(options, element);
 
             var self = this;
-            this.table = this.el('table').dataTable({
+            this.table = this.elmt('table').dataTable({
                 //sPaginationType: 'full_numbers',  // Use pagination
                 sPaginationType: 'bootstrap',
                 //bJQueryUI      : true,
@@ -48,10 +48,10 @@
              });
             
             // XXX This should not be done at init...
-            this.el('update').click(this, this.do_update);
-            this.el('refresh').click(this, this.do_refresh);
-            this.el('reset').click(this, this.do_reset);
-            this.el('clear_annotations').click(this, this.do_clear_annotations);
+            this.elmt('update').click(this, this.do_update);
+            this.elmt('refresh').click(this, this.do_refresh);
+            this.elmt('reset').click(this, this.do_reset);
+            this.elmt('clear_annotations').click(this, this.do_clear_annotations);
 
             this.listen_query(options.query_uuid);
         },
@@ -87,7 +87,7 @@
         
         set_button_state: function(name, state)
         {
-            this.el(name).attr('disabled', state ? false : 'disabled');
+            this.elmt(name).attr('disabled', state ? false : 'disabled');
         },
 
         clear: function()

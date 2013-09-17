@@ -95,7 +95,9 @@ THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.c
 THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
 # Mustache.js
 THIRD-PARTY-RESOURCES += $(shell ls third-party/mustache/mustache.js)
-
+# markerclustererplus for the googlemap plugin
+THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer.js)
+THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer_packed.js)
 
 thirdparty-js:
 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
