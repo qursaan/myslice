@@ -65,8 +65,11 @@ class ManifoldAPI:
                 return ResultValue(**result)
 
             except Exception,error:
-                # XXX Connection refused for example
-                print "** API ERROR **"
+                if "Connection refused" in error:
+                    raise ManifoldException ( ManifoldResult (code=ManifoldCode.SERVER_UNREACHABLE,
+                                                              output="%s answered %s"%(self.url,error)))
+                # otherwise
+                print "** MANIFOLD API ERROR **"
                 import traceback
                 traceback.print_exc()
                 if debug: print "KO (unexpected exception)",error
@@ -76,7 +79,7 @@ class ManifoldAPI:
 
 def execute_query(request, query):
     if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
-        print "W: Used hardcoded demo account for execute_query"
+        print "W: Using hardcoded demo account for execute_query"
         manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
     else:
         manifold_api_session_auth = request.session['manifold']['auth']

@@ -3,11 +3,14 @@ def enum(*sequential, **named):
     return type('Enum', (), enums)
 
 ManifoldCode = enum (
+    UNKNOWN_ERROR=-1,
     SUCCESS=0,
     SESSION_EXPIRED=1,
     NOT_IMPLEMENTED=2,
-    UNKNOWN_ERROR=3,
+    SERVER_UNREACHABLE=3,
 )
+
+_messages_ = { -1 : "Unknown", 0: "OK", 1: "Session Expired", 2: "Not Implemented", 3: "Backend server unreachable"}
 
 # being a dict this can be used with json.dumps
 class ManifoldResult (dict):
@@ -37,8 +40,9 @@ class ManifoldResult (dict):
     
 
     def __repr__ (self):
-        result="[[MFresult code=%s"%self['code']
-        if self['code']==0:
+        code=self['code']
+        result="[[MFresult %s (code=%s)"%(_messages_.get(code,"???"),code)
+        if code==0:
             value=self['value']
             if isinstance(value,list): result += " [value=list with %d elts]"%len(value)
             elif isinstance(value,dict): result += " [value=dict with keys %s]"%value.keys()
