@@ -13,7 +13,7 @@ from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
-from plugins.googlemaps              import GoogleMaps
+from plugins.googlemap              import GoogleMap
 from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
 from plugins.query_editor            import QueryEditor
@@ -131,7 +131,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_as_map = GoogleMaps(
+        resources_as_map = GoogleMap(
             page       = page,
             title      = 'Geographic view',
             domid      = 'gmap',
