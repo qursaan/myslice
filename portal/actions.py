@@ -72,7 +72,7 @@ def manifold_add_account(request, account_params):
 
 def manifold_update_account(request,account_params):
     # account_params: config
-    query = Query.update('local:account').filter_by('email', '==', request.user.email).set(account_params).select('email')
+    query = Query.update('local:account').filter_by('platform', '==', 'myslice').set(account_params).select('user_id')
     results = execute_query(request,query)
     # NOTE: results remains empty and goes to Exception. However, it updates the manifold DB.
     # That's why I commented the exception part. -- Yasin 

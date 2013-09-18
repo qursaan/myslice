@@ -2,13 +2,13 @@ from portal.templateviews            import LoginRequiredAutoLogoutView
 #
 from manifold.core.query             import Query
 from manifold.manifoldapi            import execute_query
-from portal.actions                  import manifold_update_user
+from portal.actions                  import manifold_update_user, manifold_update_account
 #
 from myslice.viewutils               import topmenu_items, the_user
 #
 from django.http                     import HttpResponse
 from django.contrib.auth.decorators  import login_required
-import json
+import json, os, re
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
@@ -132,14 +132,15 @@ def account_process(request):
         private_key = k.as_pem()
         private_key = ''.join(private_key.split())
         public_key = "ssh-rsa " + public_key
+        print "testing"
         # Saving to DB
         keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
 #        keypair = re.sub("\r", "", keypair)
 #        keypair = re.sub("\n", "\\n", keypair)
 #        #keypair = keypair.rstrip('\r\n')
 #        keypair = ''.join(keypair.split())
-        get_user.keypair = keypair
-        get_user.save()
+        user_params = { 'config': keypair}
+        manifold_update_account(request,user_params)
         return HttpResponse('Success: New Keypair Generated! %s' % keypair)
 
     elif 'upload_key' in request.POST:
@@ -150,11 +151,12 @@ def account_process(request):
         allowed_extension =  ['.pub','.txt']
         if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
             file_content = '{"user_public_key":"'+ file_content +'"}'
-            file_content = re.sub("\r", "", file_content)
-            file_content = re.sub("\n", "\\n",file_content)
+            #file_content = re.sub("\r", "", file_content)
+            #file_content = re.sub("\n", "\\n",file_content)
             file_content = ''.join(file_content.split())
-            get_user.keypair = file_content
-            get_user.save()
+            # update manifold account table
+            user_params = { 'config': file_content}
+            manifold_update_account(request,user_params)
             return HttpResponse('Success: Publickey uploaded! Old records overwritten')
         else:
             return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    

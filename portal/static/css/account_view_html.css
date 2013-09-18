@@ -205,21 +205,11 @@ ul.errorlist li {
 
 
 
-table.mytable { border-collapse: collapse; border: 1px solid #839E99; 
-background: #f1f8ee; font: .9em/1.2em Georgia, "Times New Roman", Times, serif; color: #033;table-layout:fixed; }
-.mytable caption { font-size: 1.3em; font-weight: bold; text-align: left; padding: 1em 4px; }
+table.mytable { border-collapse: collapse; border: 1px solid #839E99;background: #f1f8ee; font: .9em/1.2em Georgia, "Times New Roman", Times, serif; color: #033;  table-layout:fixed; width:870px}
 .mytable td, th { padding: 3px 3px .75em 3px; line-height: 1.3em; }
-.mytable th { background: #839E99; color: #fff; font-weight: bold; text-align: left; padding-right: .5em; vertical-align: top; align="center" style="width:15%;word-wrap: break-word" }
-.mytable thead th { background: #2C5755; text-align: center; }
-.mytable thead td {style="width:15%;word-wrap: break-word"}
-.mytable .odd td { background: #DBE6DD; style="width:15%;word-wrap: break-word"}
-.mytable .odd th { background: #6E8D88; }
-.mytable td a, td a:link { color: #325C91; }
-.mytable td a:visited { color: #466C8E; }
-.mytable td a:hover, td a:focus { color: #1E4C94; }
-.mytable th a, td a:active { color: #fff; }
-.mytable tfoot th, tfoot td { background: #2C5755; color: #fff; }
-.mytable th + td { padding-left: .5em; }
+.mytable th { background: #839E99; color: #fff; font-weight: bold;  padding-right: .5em; vertical-align: top; text-align:center }
+.mytable  td {word-wrap: break-word; text-align:center}
+tr.border_bottom td {border-bottom:1pt solid green;}
 
 
 /******************************
