@@ -95,8 +95,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
     
         # --------------------------------------------------------------------------
-        # ResourcesSelected
-        #
+        # ResourcesSelected (Pending Operations)
+
         main_stack.insert(ResourcesSelected(
             page                = page,
             title               = 'Pending operations',
@@ -106,17 +106,28 @@ class SliceView (LoginRequiredAutoLogoutView):
             outline_complete    = True,
         ))
     
-#        main_stack.insert(
-#            Raw (page=page,togglable=False, toggled=True,html='<b>Description:</b> TODO')
-#        )
-    
-        # the resources part is made of a Stack, 
-        # with first a Tabs (List, Geographic), 
-        # and second the QueryEditor to tweak the set of attributes to show
+        # --------------------------------------------------------------------------
+        # RESOURCES
+        # the resources part is made of a Tabs (Geographic, List), 
+
+        resources_as_map = GoogleMap(
+            page       = page,
+            title      = 'Geographic view',
+            domid      = 'resources-map',
+            # tab's sons preferably turn this off
+            togglable  = False,
+            query      = sq_resource,
+            query_all  = query_resource_all,
+            checkboxes = True,
+            # center on Paris
+            latitude   = 49.,
+            longitude  = 2.2,
+            zoom       = 3,
+        )
+
         resources_as_list = Hazelnut( 
             page       = page,
-            title      = 'Resources as a List',
-            domid      = 'resources_list',
+            domid      = 'resources-list',
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
@@ -131,21 +142,6 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_as_map = GoogleMap(
-            page       = page,
-            title      = 'Geographic view',
-            domid      = 'gmap',
-            # tab's sons preferably turn this off
-            togglable  = False,
-            query      = sq_resource,
-            query_all  = query_resource_all,
-            checkboxes = True,
-            # center on Paris
-            latitude   = 49.,
-            longitude  = 2.2,
-            zoom       = 3,
-        )
-
         resources_query_editor = QueryEditor(
             page  = page,
             query = sq_resource,
@@ -157,62 +153,36 @@ class SliceView (LoginRequiredAutoLogoutView):
             title = "Active Filters ?",
             )
 
-        resources_area = Stack (
-            page=page,
-            domid="resources",
-            togglable=True,
-            title="Resources",
-            outline_complete=True,
-            sons = [
-                Tabs ( page=page, 
-                       sons=[ resources_as_list, resources_as_map, ] ,
-                       active_domid = 'gmap',
-                       ),
-                Tabs ( page=page,
-                       title="Customize Resources layout",
-                       togglable=True,
-                       toggled='persistent',
-                       domid="customize-resources",
-                       outline_complete=True,
-                       sons = [ resources_query_editor, resources_active_filters, ],
-                       ),
-                ]
+        # List area itself is a Stack with hazelnut on top,
+        # and a togglable tabs for customization plugins 
+        resources_as_list_area = Stack(
+            page        = page,
+            title       = 'Resources as a List',
+            domid       = 'resources-list-area',
+            sons= [ resources_as_list, 
+                    Tabs ( page=page,
+                           title="Customize Resources layout",
+                           togglable=True,
+                           toggled='persistent',
+                           domid="customize-resources",
+                           outline_complete=True,
+                           sons = [ resources_query_editor, resources_active_filters, ],
+                           ),
+                    ],
             )
-
+        resources_area = Tabs ( page=page, 
+                                domid="resources",
+                                togglable=True,
+                                title="Resources",
+                                outline_complete=True,
+                                sons=[ resources_as_map, resources_as_list_area, ],
+                                active_domid = 'resources-map',
+                                )
         main_stack.insert (resources_area)
 
 
-#        sq_plugin = Tabs (
-#            page=page,
-#            title="Slice view for %s"%slicename,
-#            togglable=True,
-#            sons=[],
-#        )
-    
-    
-        ############################################################################
-        # RESOURCES
-        # 
-        # A stack inserted in the subquery tab that will hold all operations
-        # related to resources
-        # 
-        
-#        stack_resources = Stack(
-#            page = page,
-#            title = 'Resources',
-#            sons=[],
-#        )
-    
-#        stack_resources.insert(resource_active_filters)
-#    
-#    
-#        stack_resources.insert(tab_resource_plugins)
-    
-#        sq_plugin.insert(stack_resources)
-    
-        ############################################################################
+        # --------------------------------------------------------------------------
         # USERS
-        # 
     
         if do_query_users:
             tab_users = Tabs(
@@ -244,6 +214,8 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             ))
     
+        # --------------------------------------------------------------------------
+        # MEASUREMENTS
         tab_measurements = Tabs (
             page                = page,
             active_domid        = 'checkboxes3',
@@ -272,6 +244,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             },
         ))
     
+        # --------------------------------------------------------------------------
+        # MESSAGES (we use transient=False for now)
         main_stack.insert(Messages(
             page   = page,
             title  = "Runtime messages for slice %s"%slicename,
