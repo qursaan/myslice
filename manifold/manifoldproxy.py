@@ -107,8 +107,8 @@ with the query passed using POST"""
 
         return HttpResponse (json_answer, mimetype="application/json")
 
-    except:
-        print "** PROXY ERROR **"
+    except Exception,e:
+        print "** PROXY ERROR **",e
         import traceback
         traceback.print_exc()
 

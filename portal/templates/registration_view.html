@@ -1,6 +1,6 @@
 {% extends "layout-unfold1.html" %}
 
-{% block head %}                
+{% block head %}
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
 <!-- xxx ideally only onelab.css but ... xxx -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
@@ -77,17 +77,20 @@
      <p class="hint">Retype the password</p>
    </div>
    <div class="field">
-      <label for="question">My Public Key</label>
+      <label for="question">My Keys</label>
       <select name="question" class="required" id="question">        
         <option value="generate">Generate key pairs for me </option>
         <option value="upload">Upload my public key </option>
-      </select> 
+      </select>
+		<p class="hint">Genkey: Account Delegation Automatic (Recommended)</p> 
       <?php echo $errFile; ?>
    </div>
    <div class="field" style="display:none;" id="upload_key">
       <label for="file">Upload public key</label>
       <input type="file" name="user_public_key" class="required" id="user_public_key"/>
-      <p class="hint">Upload a valid public key</p>
+      <p class="hint">Account Delegation: Manual (Advanced Users)</p>
+	  <p class="warning" id="pkey_del_msg">Once your account is validated, you have to delegate your credentials manually using SFA [Advanced users only]</p>
+
    </div>
    <div class="field" id="register">
      <input class="submit btn" type="submit"  name="submit" value="Register"/>
