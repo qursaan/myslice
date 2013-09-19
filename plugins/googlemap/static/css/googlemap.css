@@ -1,15 +1,27 @@
-#map-container {
+div.geo {
+  height: 500px;
+/* these don't play out too well - somehow the bottom is off
   padding: 6px;
   border-width: 1px;
   border-style: solid;
-  border-color: #ccc #ccc #999 #ccc;
-  -webkit-box-shadow: rgba(64, 64, 64, 0.5) 0 2px 5px;
-  -moz-box-shadow: rgba(64, 64, 64, 0.5) 0 2px 5px;
-  box-shadow: rgba(64, 64, 64, 0.1) 0 2px 5px;
-  /*width: 800px;*/
+  border-color: #ccaaaa;
+*/
 }
 
-.map {
-  /*width: 800px;*/
-  height: 500px;
+/* the content of the info windows */
+p.geo {
+    text-align: center;
+    font-weight: bold;
+}
+
+ul.geo {
+    list-style-type: none;
+    text-align: left;
+}
+
+li.geo {
+    font-style: italic;
+}
+span.geo {
+    padding-left: 20px;
 }
