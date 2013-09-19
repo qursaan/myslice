@@ -41,7 +41,7 @@ class PluginFinder(FileSystemFinder):
 
 class ThirdPartyFinder(BaseFinder):
     """
-    A static files inder that looks in the directory of each third-party
+    A static files finder that looks in the directory of each third-party
     resources and tries to preserve the location of each file
     """
     # third-party/MODULE/path/to/js
