@@ -132,16 +132,15 @@ def account_process(request):
         private_key = k.as_pem()
         private_key = ''.join(private_key.split())
         public_key = "ssh-rsa " + public_key
-        print "testing"
         # Saving to DB
         keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
 #        keypair = re.sub("\r", "", keypair)
 #        keypair = re.sub("\n", "\\n", keypair)
 #        #keypair = keypair.rstrip('\r\n')
 #        keypair = ''.join(keypair.split())
-        user_params = { 'config': keypair}
+        user_params = { 'config': keypair, 'auth_type':'managed'}
         manifold_update_account(request,user_params)
-        return HttpResponse('Success: New Keypair Generated! %s' % keypair)
+        return HttpResponse('Success: New Keypair Generated!')
 
     elif 'upload_key' in request.POST:
         up_file = request.FILES['pubkey']
@@ -155,12 +154,12 @@ def account_process(request):
             #file_content = re.sub("\n", "\\n",file_content)
             file_content = ''.join(file_content.split())
             # update manifold account table
-            user_params = { 'config': file_content}
+            user_params = { 'config': file_content, 'auth_type':'user'}
             manifold_update_account(request,user_params)
-            return HttpResponse('Success: Publickey uploaded! Old records overwritten')
+            return HttpResponse('Success: Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
         else:
             return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
         
     else:
-        message = 'You submitted an empty form.'
+        message = 'Under Construction.'
         return HttpResponse(message)

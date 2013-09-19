@@ -14,3 +14,13 @@ div.onelab-title{
     background-color: #e0f0f0;
 }
 
+/***** Notifications *****/
+.warning {
+    border: 1px solid red;
+    margin: 20px 60px;
+    padding: 10px 20px;
+    color: red;
+    background-color: #f2dbdb;
+    text-align: center;
+}
+

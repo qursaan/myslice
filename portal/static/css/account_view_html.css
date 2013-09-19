@@ -146,14 +146,6 @@ code {
 
 /***** Notifications *****/
 
-.warning {
-	border: 1px solid red;
-	margin: 20px 60px;
-	padding: 10px 20px;
-	color: red;
-	background-color: #f2dbdb;
-	text-align: center;
-}
 .warning2 {
 	border: 1px solid red;
 	margin: 20px 60px;
