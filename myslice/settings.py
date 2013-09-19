@@ -116,9 +116,9 @@ THIRDPARTY_DIR = os.path.join(ROOT, 'third-party')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'unfold.static.PluginFinder',
-    'unfold.static.ThirdPartyFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'unfold.collectstatic.PluginFinder',
+    'unfold.collectstatic.ThirdPartyFinder',
+###    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 #TEMPLATE_CONTEXT_PROCESSORS = (

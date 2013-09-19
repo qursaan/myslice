@@ -7,9 +7,8 @@ TAGS
 *.pyc
 *~
 # these essentially are copies/links from other places
-all-static/
+static/
 all-templates/
-django-static/
 # various working files
 play/
 *.leftovers
