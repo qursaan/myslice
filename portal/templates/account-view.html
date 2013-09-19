@@ -35,6 +35,16 @@
 
 
 <h2>MySlice  Account</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
 <div id="middle" align="center">
 	<div class="well">
 		<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
@@ -133,8 +143,9 @@
 	  			</tr>
 	  			<tr class="odd">
 	    			<td colspan="2">
-	      				<p class="warning" id="pkey_del_msg"> For better security we recommend that you download and delete your private key from the server. 
-														  	  Always store your private key in a secure location. 
+	      				<p class="message" id="pkey_del_msg"> Tradeoff: Ease of use and security.
+							Ease of use: Automatic account delegation. Don't delete private key.
+							Better Security: Manual account delegation. Download & Delete private key.
 						</p>
 	    			</td>
 	  			</tr>
