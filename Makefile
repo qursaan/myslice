@@ -13,7 +13,8 @@ bindir := /usr/bin
 
 PWD := $(shell pwd)
 
-build: static templates
+# as of sept. 2013, we collect static files using manage.py
+build: templates
 	python setup.py build
 
 install: 
@@ -52,72 +53,72 @@ debian.clean:
 	find . -name '*.pyc' -delete
 
 
-#################### third-party layout is kind of special 
-# because we have differents versions, and also we 
-# try to preserve the file structure from upstream
-# so let's handle this manually
-THIRD-PARTY-RESOURCES =
-# ignore variants, use the main symlink	third-party/bootstrap
-THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
-# just the single js as identified with a symlink
-THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.bootstrap.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootstrap.css)
-# likewise
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.min.js)
-# for storing the visible status of plugins
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.min.js)
-# creating queries uuids on the fly
-THIRD-PARTY-RESOURCES += $(shell ls third-party/uuid/Math.uuid.js)
-# spin comes in plain or min, + the jquery plugin, and our own settings
-THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
-# used in QueryCode
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shCore.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shAutoloader.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushPython.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushRuby.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCore.css)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCoreDefault.css)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shThemeDefault.css)
-# wizard plugin
-THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.js)
-#THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.min.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart_wizard.css)
-# jquery.notify
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.min.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
-# CodeMirror
-THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.js) 
-THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.css) 
-THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
-# Mustache.js
-THIRD-PARTY-RESOURCES += $(shell ls third-party/mustache/mustache.js)
-# markerclustererplus for the googlemap plugin
-THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer.js)
-THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer_packed.js)
-
-thirdparty-js:
-	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
-thirdparty-css:
-	@find $(THIRD-PARTY-RESOURCES) -name '*.css'
-thirdparty-img:
-	@find $(THIRD-PARTY-RESOURCES) -name '*.png' -o -name '*.ico'
-
-# we might have any of these as templates - e.g. ./unfold/templates/plugin-init.js
-# so if there's a /templates/ in the path ignore the file
-local-js: force
-	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'
-local-css: force
-	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
-local-img: force
-	@find . -type f -name '*.png' -o -name '*.ico' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
-
-list-js: thirdparty-js local-js
-list-css: thirdparty-css local-css
-list-img: thirdparty-img local-img
+### #################### third-party layout is kind of special 
+### # because we have differents versions, and also we 
+### # try to preserve the file structure from upstream
+### # so let's handle this manually
+### THIRD-PARTY-RESOURCES =
+### # ignore variants, use the main symlink	third-party/bootstrap
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
+### # just the single js as identified with a symlink
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.bootstrap.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootstrap.css)
+### # likewise
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.min.js)
+### # for storing the visible status of plugins
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.min.js)
+### # creating queries uuids on the fly
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/uuid/Math.uuid.js)
+### # spin comes in plain or min, + the jquery plugin, and our own settings
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
+### # used in QueryCode
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shCore.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shAutoloader.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushPython.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushRuby.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCore.css)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCoreDefault.css)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shThemeDefault.css)
+### # wizard plugin
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.js)
+### #THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.min.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart_wizard.css)
+### # jquery.notify
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.min.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
+### # CodeMirror
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.js) 
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.css) 
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
+### # Mustache.js
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/mustache/mustache.js)
+### # markerclustererplus for the googlemap plugin
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer.js)
+### THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer_packed.js)
+### 
+### thirdparty-js:
+### 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
+### thirdparty-css:
+### 	@find $(THIRD-PARTY-RESOURCES) -name '*.css'
+### thirdparty-img:
+### 	@find $(THIRD-PARTY-RESOURCES) -name '*.png' -o -name '*.ico'
+### 
+### # we might have any of these as templates - e.g. ./unfold/templates/plugin-init.js
+### # so if there's a /templates/ in the path ignore the file
+### local-js: force
+### 	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'
+### local-css: force
+### 	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
+### local-img: force
+### 	@find . -type f -name '*.png' -o -name '*.ico' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
+### 
+### list-js: thirdparty-js local-js
+### list-css: thirdparty-css local-css
+### list-img: thirdparty-img local-img
 
 # having templates in a templates/ subdir is fine most of the time except for plugins
 plugins-templates: force
@@ -127,17 +128,17 @@ local-templates: force
 
 list-templates: plugins-templates local-templates
 
-#################### manage static contents (extract from all the modules into the single all-static location)
-static run-static static-run: force
-	mkdir -p ./all-static/js all-static/css all-static/img
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-js),../../$(x)) ./all-static/js
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-css),../../$(x)) ./all-static/css
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-img),../../$(x)) ./all-static/img
-
-clean-static static-clean: force
-	rm -rf ./all-static
-
-all-static: clean-static run-static
+### #################### manage static contents (extract from all the modules into the single all-static location)
+### static run-static static-run: force
+### 	mkdir -p ./all-static/js all-static/css all-static/img
+### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-js),../../$(x)) ./all-static/js
+### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-css),../../$(x)) ./all-static/css
+### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-img),../../$(x)) ./all-static/img
+### 
+### clean-static static-clean: force
+### 	rm -rf ./all-static
+### 
+### all-static: clean-static run-static
 
 #################### manage templates for the plugin area
 templates run-templates templates-run: force
@@ -150,7 +151,7 @@ clean-templates templates-clean: force
 all-templates: clean-templates run-templates
 
 ####################
-list-all list-resources: list-templates list-js list-css list-img
+### list-all list-resources: list-templates list-js list-css list-img
 
 #################### compute emacs tags
 # list files under git but exclude third-party stuff like bootstrap and jquery

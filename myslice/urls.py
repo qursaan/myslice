@@ -60,8 +60,6 @@ urlpatterns = patterns(
     url(r'^sample/', include('sample.urls')),
     # Debug
     url(r'^debug/', include('debug_platform.urls')),
-    # Static files
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
     #
     # various trash views - bound to go away 
     #

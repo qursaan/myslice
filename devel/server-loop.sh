@@ -8,6 +8,7 @@ hostname | grep -q '^z' && port=8080 || port=80
 
 while true; do 
     ./manage.py collectstatic --noinput
+    make all-templates
     ./manage.py runserver 0.0.0.0:$port
 	sleep 1
 done

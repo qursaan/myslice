@@ -84,11 +84,10 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(ROOT,'django-static')
+STATIC_ROOT = os.path.join(ROOT,'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-# thierry STATIC_URL = '/all-static/'
 STATIC_URL = '/static/'
 
 # Additional locations of static files
@@ -96,7 +95,6 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    # thierry os.path.join(ROOT,'all-static'),
     ('js', os.path.join(ROOT,'manifold/js')),
     ('css', os.path.join(ROOT,'manifold/css')),
     ('js', os.path.join(ROOT,'unfold/js')),
