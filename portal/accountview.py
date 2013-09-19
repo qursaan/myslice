@@ -1,13 +1,15 @@
 from portal.templateviews            import LoginRequiredAutoLogoutView
 #
 from manifold.core.query             import Query
-from manifold.manifoldapi            import execute_query
-from portal.actions                  import manifold_update_user, manifold_update_account
+from manifold.manifoldapi               import execute_query
+from portal.actions                     import manifold_update_user, manifold_update_account
 #
-from myslice.viewutils               import topmenu_items, the_user
+from myslice.viewutils                  import topmenu_items, the_user
 #
-from django.http                     import HttpResponse
-from django.contrib.auth.decorators  import login_required
+from django.http                        import HttpResponse, HttpResponseRedirect
+from django.contrib                     import messages
+from django.contrib.auth.decorators     import login_required
+#
 import json, os, re
 
 # requires login
@@ -113,7 +115,10 @@ def account_process(request):
         #user_params = { 'config': updated_config}
         manifold_update_user(request,user_params)
         # this will be depricated, we will show the success msg in same page
-        return HttpResponse('Sucess: First Name and Last Name Updated!')       
+#        return HttpResponse('Sucess: First Name and Last Name Updated!')
+        # Redirect to same page with success message
+        messages.success(request, 'Sucess: First Name and Last Name Updated.')
+        return HttpResponseRedirect("/portal/account/")       
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
         
@@ -122,8 +127,10 @@ def account_process(request):
         #updating password in local:user
         user_params = { 'password': user_pass['password']}
         manifold_update_user(request,user_params)
+#        return HttpResponse('Success: Password Changed!!')
+        messages.success(request, 'Sucess: Password Updated.')
+        return HttpResponseRedirect("/portal/account/")
 
-        return HttpResponse('Success: Password Changed!!')
     elif 'generate' in request.POST:
         # Generate public and private keys using SFA Library
         from sfa.trust.certificate  import Keypair
@@ -140,7 +147,9 @@ def account_process(request):
 #        keypair = ''.join(keypair.split())
         user_params = { 'config': keypair, 'auth_type':'managed'}
         manifold_update_account(request,user_params)
-        return HttpResponse('Success: New Keypair Generated!')
+#        return HttpResponse('Success: New Keypair Generated!')
+        messages.success(request, 'Sucess: New Keypair Generated!')
+        return HttpResponseRedirect("/portal/account/")
 
     elif 'upload_key' in request.POST:
         up_file = request.FILES['pubkey']
@@ -156,10 +165,17 @@ def account_process(request):
             # update manifold account table
             user_params = { 'config': file_content, 'auth_type':'user'}
             manifold_update_account(request,user_params)
-            return HttpResponse('Success: Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+#            return HttpResponse('Success: Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+            messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+            return HttpResponseRedirect("/portal/account/")
+
         else:
-            return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
-        
+#            return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
+            messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
+            return HttpResponseRedirect("/portal/account/")
+       
     else:
-        message = 'Under Construction.'
-        return HttpResponse(message)
+        messages.info(request, 'Under Construction. Please try again later!')
+        return HttpResponseRedirect("/portal/account/")
+
+

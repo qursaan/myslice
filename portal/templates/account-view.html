@@ -35,6 +35,16 @@
 
 
 <h2>MySlice  Account</h2>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+
 <div id="middle" align="center">
 	<div class="well">
 		<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
