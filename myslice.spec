@@ -1,6 +1,6 @@
 %define name myslice
 %define version 0.2
-%define taglevel 2
+%define taglevel 3
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
@@ -46,6 +46,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/myslice/*
 
 %changelog
+* Fri Sep 20 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-0.2-3
+- checkpoint for deployment on test.myslice.info
+
 * Mon Sep 09 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-0.2-2
 - cleaner tag, using module-tag for consistent numbering
 
