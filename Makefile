@@ -2,10 +2,13 @@ SHELL = /bin/bash
 
 MAKE-SILENT = $(MAKE) --no-print-directory
 
-### first purpose, build and install from the specfile
+### first purpose, build and install from setup.py
 all: build
 
 force:
+
+# clean up and recompute
+redo: redo-static redo-templates
 
 DESTDIR := /
 datadir := /usr/share
@@ -13,8 +16,8 @@ bindir := /usr/bin
 
 PWD := $(shell pwd)
 
-# as of sept. 2013, we collect static files using manage.py
-build: templates
+# 
+build: static templates force
 	python setup.py build
 
 install: 
@@ -22,6 +25,10 @@ install:
 	    --install-purelib=$(DESTDIR)/$(datadir)/unfold \
 	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
 	    --install-data=$(DESTDIR)/$(datadir)/unfold
+
+redo-static static: force
+	rm -rf static/
+	./manage.py collectstatic --noinput
 
 ####################
 # general stuff
@@ -141,14 +148,14 @@ list-templates: plugins-templates local-templates
 ### all-static: clean-static run-static
 
 #################### manage templates for the plugin area
-templates run-templates templates-run: force
-	mkdir -p all-templates
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./all-templates
+templates: force
+	mkdir -p templates
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./templates
 
 clean-templates templates-clean: force
-	rm -rf ./all-templates
+	rm -rf ./templates
 
-all-templates: clean-templates run-templates
+redo-templates: clean-templates templates
 
 ####################
 ### list-all list-resources: list-templates list-js list-css list-img
@@ -173,7 +180,7 @@ SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 ### rsync options
 # the config file should probably not be overridden ??
 # --exclude settings.py 
-LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude config.py --exclude all-static --exclude all-templates --exclude '*.sqlite3'  --exclude play/ 
+LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude config.py --exclude static --exclude templates --exclude '*.sqlite3'  --exclude play/ 
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 

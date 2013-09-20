@@ -15,9 +15,9 @@ packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/_
 setup(packages = packages,
       scripts = [],
       data_files = [ 
-        ( 'all-static/js', glob ('all-static/js/*')),
-        ( 'all-static/css', glob ('all-static/css/*')),
-        ( 'all-static/img', glob ('all-static/img/*')),
-        ( 'all-templates', glob ('all-templates/*')),
+        ( 'static/js', glob ('static/js/*')),
+        ( 'static/css', glob ('static/css/*')),
+        ( 'static/img', glob ('static/img/*')),
+        ( 'templates', glob ('templates/*')),
         ( 'apache', [ 'apache/myslice.conf', 'apache/myslice.wsgi' ]),
         ])

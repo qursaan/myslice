@@ -7,10 +7,11 @@ TAGS
 *.pyc
 *~
 # these essentially are copies/links from other places
-static/
-all-templates/
+/static/
+/templates/
 # various working files
 play/
 *.leftovers
 *.hide
 entrypoints.ongoing/
+build/

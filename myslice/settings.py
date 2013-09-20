@@ -95,15 +95,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    ('js', os.path.join(ROOT,'manifold/js')),
-    ('css', os.path.join(ROOT,'manifold/css')),
-    ('js', os.path.join(ROOT,'unfold/js')),
-    ('css', os.path.join(ROOT,'unfold/css')),
-    ('js', os.path.join(ROOT,'auth/js')),
-    ('css', os.path.join(ROOT,'auth/css')),
-    ('img', os.path.join(ROOT,'auth/img')),
-    ('css', os.path.join(ROOT,'views/css')),
-    ('img', os.path.join(ROOT,'views/img')),
+    # Thierry : we do not need to detail the contents 
+    # of our 'apps' since they're mentioned in INSTALLED_APPS
 )
 
 # Needed by PluginFinder
@@ -114,7 +107,8 @@ THIRDPARTY_DIR = os.path.join(ROOT, 'third-party')
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
+# Thierry : no need for this one    
+#    'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'unfold.collectstatic.PluginFinder',
     'unfold.collectstatic.ThirdPartyFinder',
@@ -160,7 +154,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT,"all-templates"),
+    os.path.join(ROOT,"templates"),
 )
 
 INSTALLED_APPS = (
@@ -181,8 +175,10 @@ INSTALLED_APPS = (
     'plugins',
     # views - more or less stable 
     'views',
+    # temporary
     'trash',
-    'south', # managing database migrations
+    # managing database migrations
+    'south', 
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -240,4 +236,3 @@ CSRF_FAILURE_VIEW = 'manifold.manifoldproxy.csrf_failure'
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"
 # put stuff under static/
 # IA_MEDIA_PREFIX = '/code/'
-

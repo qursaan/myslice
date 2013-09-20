@@ -39,6 +39,7 @@ class PluginFinder(FileSystemFinder):
         return [os.path.join(dir, name, 'static') for name in os.listdir(dir) 
                 if os.path.isdir(os.path.join(dir, name))]
 
+# as these are a django-specific notion
 class ThirdPartyFinder(BaseFinder):
     """
     A static files finder that looks in the directory of each third-party
@@ -47,7 +48,8 @@ class ThirdPartyFinder(BaseFinder):
     # third-party/MODULE/path/to/js
     extensions = {
         # PREFIX : EXTENSIONS
-        ''   : ('.html',),
+# third party stuff is not expected to provide templates,
+#        ''   : ('.html',),
         'js' : ('.js',),
         'css': ('.css',),
         'img': ('.png', '.ico',),
@@ -76,6 +78,7 @@ class ThirdPartyFinder(BaseFinder):
                         matched_path = os.path.join(path, file) 
                         if not all:
                             return matched_path
+                        print 'ThirdPartyFinder, adding',matched_path
                         matches.append(matched_path)
         return matches
 
