@@ -2,13 +2,12 @@ SHELL = /bin/bash
 
 MAKE-SILENT = $(MAKE) --no-print-directory
 
-### first purpose, build and install from setup.py
-all: build
-
-force:
+all: static templates
 
 # clean up and recompute
 redo: redo-static redo-templates
+
+force:
 
 DESTDIR := /
 datadir := /usr/share
@@ -26,9 +25,13 @@ install:
 	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
 	    --install-data=$(DESTDIR)/$(datadir)/unfold
 
-redo-static static: force
-	rm -rf static/
+static: force
 	./manage.py collectstatic --noinput
+
+clean-static:
+	rm -rf static/
+
+redo-static: clean-static static
 
 ####################
 # general stuff
@@ -131,7 +134,7 @@ debian.clean:
 plugins-templates: force
 	@find plugins -type f -name '*.html' 
 local-templates: force
-	@$(foreach tmpl,$(shell find . -name templates),ls -1 $(tmpl)/*;)
+	@$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),ls -1 $(tmpl)/*;)
 
 list-templates: plugins-templates local-templates
 
