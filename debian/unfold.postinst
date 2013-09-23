@@ -1,3 +1,5 @@
 #!/bin/bash
 # if this requires a service to be running, add something like this
 # update-rc.d unfold defaults
+
+[ -f /etc/apache2/apache2.conf ] && echo "WSGIScriptAlias / /usr/share/unfold/apache/myslice.wsgi"  >> /etc/apache2/apache2.conf
