@@ -1,4 +1,4 @@
-from views.loginrequired                import LoginRequiredAutoLogoutView
+from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query

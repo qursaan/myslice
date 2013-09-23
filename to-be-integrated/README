@@ -1,0 +1,17 @@
+-- Thierry - sept. 23 2013
+
+This area is for pieces that need a bit more tuning before being plugged into the framework
+
+** pres_view
+
+. the whole naming presview / presviewview kind of sucks overall - an understatement
+. please at least rename the plugin into something that does not have 'view' in it
+. also please review the static contents to re-use what we already have as third-party, 
+  or to add in there what is still missing
+
+** code editor / codemirror
+
+. I could not find where this is used
+. the most painful impact of this is that it depends on codemirror, that comes with a huge amount
+  of static files
+. this is why I move it away for now
