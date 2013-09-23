@@ -18,7 +18,6 @@ from plugins.querycode                  import QueryCode
 from plugins.raw                        import Raw
 from plugins.messages                   import Messages
 from plugins.hazelnut                   import Hazelnut
-from plugins.updater                    import Updater
 
 from myslice.viewutils                  import topmenu_items, the_user
 from trash.trashutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
@@ -47,14 +46,6 @@ def test_plugin_view (request):
         togglable=True,
         domid='stack',
         sons=[ \
-# this updater thing never made it to production                
-#            Updater (
-#                    page=page,
-#                    title="Won't show up as non togglable",
-#                    query=main_query,
-#                    label="Update me",
-#                    domid="the-updater",
-#                ),
         # make sure the 2 things work together
             Messages (
                     page=page,
@@ -64,7 +55,7 @@ def test_plugin_view (request):
                     ),
             Hazelnut (
                     page=page,
-                    title="Slice %s - checkboxes interacting w/ updater"%slicename,
+                    title="Slice %s - checkboxes"%slicename,
                     query=main_query,
                     domid="hazelnut",
                     checkboxes=True,
