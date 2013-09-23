@@ -5,7 +5,10 @@ MAKE-SILENT = $(MAKE) --no-print-directory
 all: static templates
 
 # clean up and recompute
-redo: redo-static redo-templates
+redo: clean-oldies redo-static redo-templates 
+
+clean-oldies:
+	rm -rf all-static all-templates django-static 
 
 force:
 
