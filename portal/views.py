@@ -30,8 +30,10 @@ from django.template.loader     import render_to_string
 
 from myslice.viewutils          import topmenu_items, the_user
 
-from plugins.pres_view          import PresView
 from portal.event               import Event
+# presview is put in observation for now
+#from plugins.pres_view          import PresView
+from plugins.raw                import Raw
 
 # these seem totally unused for now
 #from portal.util                import RegistrationView, ActivationView
@@ -54,7 +56,8 @@ class PresViewView(TemplateView):
 
         page = Page(self.request)
 
-        pres_view = PresView(page = page)
+#        pres_view = PresView(page = page)
+        pres_view = Raw(page = page,html="<h1>PresView needs to be integrated</h1>")
 
         context = super(PresViewView, self).get_context_data(**kwargs)
 

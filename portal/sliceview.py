@@ -1,7 +1,7 @@
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 
-from views.loginrequired             import LoginRequiredAutoLogoutView
+from unfold.loginrequired            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery

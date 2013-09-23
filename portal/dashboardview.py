@@ -3,7 +3,7 @@ from unfold.page                 import Page
 
 from plugins.lists.simplelist    import SimpleList
 
-from views.loginrequired         import LoginRequiredAutoLogoutView
+from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
 from myslice.viewutils           import topmenu_items, the_user
 

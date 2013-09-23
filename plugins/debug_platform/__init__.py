@@ -1,6 +1,6 @@
 from unfold.plugin       import Plugin
 from unfold.page         import Page
-from plugins.code_editor import CodeEditor
+#from plugins.code_editor import CodeEditor
 from plugins.hazelnut    import Hazelnut
 
 class DebugPlatform(Plugin):
