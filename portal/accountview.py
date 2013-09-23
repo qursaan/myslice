@@ -1,4 +1,4 @@
-from portal.templateviews               import LoginRequiredAutoLogoutView
+from views.loginrequired                import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query

@@ -141,18 +141,6 @@ local-templates: force
 
 list-templates: plugins-templates local-templates
 
-### #################### manage static contents (extract from all the modules into the single all-static location)
-### static run-static static-run: force
-### 	mkdir -p ./all-static/js all-static/css all-static/img
-### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-js),../../$(x)) ./all-static/js
-### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-css),../../$(x)) ./all-static/css
-### 	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-img),../../$(x)) ./all-static/img
-### 
-### clean-static static-clean: force
-### 	rm -rf ./all-static
-### 
-### all-static: clean-static run-static
-
 #################### manage templates for the plugin area
 templates: force
 	mkdir -p templates

@@ -1,4 +1,0 @@
-This plugin was an early attempt at implementing the widget that would
-. actually gather pending changes
-. and have an 'Update' button so as to post them
-However this work has been put on hold and is currently not used in real apps.

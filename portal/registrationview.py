@@ -1,6 +1,6 @@
 import os.path, re
 
-from django.core.mail            import send_mail
+from django.core.mail           import send_mail
 
 from django.views.generic       import View
 from django.template.loader     import render_to_string

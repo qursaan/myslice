@@ -1,7 +1,7 @@
 	//initialisation no conflict et de la config APE
 	
 	j = jQuery.noConflict();
-	j.getScript('/all-static/js/config.js');
+	j.getScript('/static/js/config.js');
 	
 	//fin
 	
