@@ -1,7 +1,7 @@
 import os
 import sys
 
-path = '/usr/share/myslice'
+path = '/usr/share/unfold'
 if path not in sys.path:
     sys.path.append(path)
 
