@@ -10,13 +10,13 @@ from django.contrib.auth.decorators     import login_required
 from unfold.page                        import Page
 from manifold.core.query                import Query
 
-from plugins.stack.stack                import Stack
-from plugins.tabs.tabs                  import Tabs
+from plugins.stack                      import Stack
+from plugins.tabs                       import Tabs
 from plugins.lists.staticlist           import StaticList
-from plugins.quickfilter.quickfilter    import QuickFilter
-from plugins.querycode.querycode        import QueryCode
-from plugins.raw.raw                    import Raw
-from plugins.messages.messages          import Messages
+from plugins.quickfilter                import QuickFilter
+from plugins.querycode                  import QueryCode
+from plugins.raw                        import Raw
+from plugins.messages                   import Messages
 from plugins.hazelnut                   import Hazelnut
 from plugins.updater                    import Updater
 
