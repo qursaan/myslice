@@ -1,9 +1,9 @@
-from manifold.core.query        import Query
-from unfold.page                import Page
+from manifold.core.query         import Query
+from unfold.page                 import Page
 
 from plugins.lists.simplelist    import SimpleList
 
-from portal.templateviews       import LoginRequiredAutoLogoutView
+from views.loginrequired         import LoginRequiredAutoLogoutView
 
 from myslice.viewutils           import topmenu_items, the_user
 

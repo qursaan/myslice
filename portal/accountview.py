@@ -1,6 +1,6 @@
-from portal.templateviews            import LoginRequiredAutoLogoutView
+from views.loginrequired                import LoginRequiredAutoLogoutView
 #
-from manifold.core.query             import Query
+from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account
 #

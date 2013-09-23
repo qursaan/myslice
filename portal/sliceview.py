@@ -1,7 +1,7 @@
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 
-from portal.templateviews            import LoginRequiredAutoLogoutView
+from views.loginrequired             import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
@@ -13,7 +13,7 @@ from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
-from plugins.googlemap              import GoogleMap
+from plugins.googlemap               import GoogleMap
 from plugins.senslabmap.senslabmap   import SensLabMap
 from plugins.querycode.querycode     import QueryCode
 from plugins.query_editor            import QueryEditor

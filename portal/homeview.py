@@ -12,6 +12,7 @@ from myslice.config import Config
 
 class HomeView (View):
 
+    # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
         return { 
                  'manifold_url':Config.manifold_url,
