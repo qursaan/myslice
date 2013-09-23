@@ -98,7 +98,7 @@
 			//APE + no conflit
             j = jQuery.noConflict();
 		    ape_initialize();
-		    j.getScript('/all-static/js/config.js');
+		    j.getScript('/static/js/config.js');
 
 			// jquery:datepicker
 			j(".datepicker").datepicker({
