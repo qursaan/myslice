@@ -17,7 +17,8 @@ Packager: OpenLab <thierry.parmentelat@inria.fr>
 URL: %{SCMURL}
 
 Requires: python >= 2.7
-Requires: Django
+# in f14 this used to be called Django
+Requires: python-django
 Requires: httpd
 Requires: mod_wsgi
 BuildRequires: python-setuptools make

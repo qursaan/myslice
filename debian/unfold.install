@@ -1,5 +1,5 @@
-usr/share/unfold/all-static
-usr/share/unfold/all-templates
+usr/share/unfold/static
+usr/share/unfold/templates
 usr/share/unfold/apache
 usr/share/unfold/auth
 usr/share/unfold/insert_above
