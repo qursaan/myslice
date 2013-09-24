@@ -26,77 +26,80 @@
 </div>
    
 <div class="well">
-<form class="cmxform" id="commentForm" method="post" action="" enctype="multipart/form-data" >
-{% csrf_token %}
- <fieldset>
-   <div class="field">
-     <label for="cname">First Name</label>
-     <input type="text" id="firstname" name="firstname" size="25" class="required" minlength="2" value="{{ firstname}}" /> 
-     <p class="hint">Enter your first name</p>
-     <?php echo $errfName;?>
-   </div>
-   <div class="field">
-     <label for="lname">Last Name</label>
-     <input type="text" id="lastname" name="lastname" size="25" class="required" minlength="2" value="{{ lastname }}"/> 
-     <p class="hint">Enter your last name</p>
-     <?php echo $errlName;?>
-   </div>
-   <!-- DEPRECATED
-	<div class="field">
-     <label for="aff_list">Affiliation</label>
-     <input type="text" id="aff_list" name="affiliation" size="25" class="required"  value="{{ affiliation }}"/> 
-     <p class="hint">Enter your Institution name</p>
-     <?php echo $erraffiliation;?>
-   </div>
-	-->
-    <div class="field">
-      <label for="auth_list">Authority</label>
-      <select id="auth_list" name="authority_hrn" size="1" class="required">
-        {% for authority in authorities %}
-        <option value="{{ authority.authority_hrn }}"/>{{authority.name}} ({{authority.authority_hrn}})</option>
-        {% endfor %}
-     </select>
-     <p class="hint">Please select an authority responsible for vetting your account</p>
-   </div>
-
-   <div class="field">
-     <label for="cemail">Email</label>
-     <input type="text" id="email" name="email" size="25"  class="required email" value="{{ email }}"/> 
-     <p class="hint">Enter a valid email address</p>
-     <?php echo $errEmail; ?>
-   </div>
-   <div class="field">
-     <label for="password">Password</label>
-     <input type="password"  id="password" name="password"   class="required" minlength="4" value="{{ password }}"/> 
-     <p class="hint">Enter password</p>
-     <?php //echo $errPass;?>
-   </div>
-   <div class="field">
-     <label for="password">Confirm Password</label>
-     <input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required" value=""/>
-     <p class="hint">Retype the password</p>
-   </div>
-   <div class="field">
-      <label for="question">My Keys</label>
-      <select name="question" class="required" id="question">        
-        <option value="generate">Generate key pairs for me </option>
-        <option value="upload">Upload my public key </option>
-      </select>
-		<p class="hint">Genkey: Account Delegation Automatic (Recommended)</p> 
-      <?php echo $errFile; ?>
-   </div>
-   <div class="field" style="display:none;" id="upload_key">
-      <label for="file">Upload public key</label>
-      <input type="file" name="user_public_key" class="required" id="user_public_key"/>
-      <p class="hint">Account Delegation: Manual (Advanced Users)</p>
-	  <p class="warning" id="pkey_del_msg">Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]</p>
-
-   </div>
-   <div class="field" id="register">
-     <input class="submit btn" type="submit"  name="submit" value="Register"/>
-   </div>
- </fieldset>
-</form>
+  <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="firstname" class="col-md-4 control-label">First Name</label>
+      <div class="col-md-4">
+	<input type="text" name="firstname" class="required form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" />
+	<p class="hint">Enter your first name</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="lastname" class="col-md-4 control-label">Last Name</label>
+      <div class="col-md-4">
+	<input type="text" name="lastname" size="25" class="required form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" />
+	<p class="hint">Enter your last name</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="auth_list" class="col-md-4 control-label">Authority</label>
+      <div class="col-md-4">
+	<select id="auth_list" name="authority_hrn" size="1" class="required form-control">
+	  {% for authority in authorities %}
+	  <option value="{{ authority.authority_hrn }}"/>{{authority.name}} ({{authority.authority_hrn}})</option>
+	  {% endfor %}
+	</select>
+	<p class="hint">Please select an authority responsible for vetting your account</p>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="email" class="col-md-4 control-label">Email</label>
+      <div class="col-md-4">
+	<input type="email" name="email" size="25"  class="required form-control" value="{{ email }}"/> 
+	<p class="hint">Enter a valid email address</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password" class="col-md-4 control-label">Password</label>
+      <div class="col-md-4">
+	<input type="password"  id="password" name="password"   class="required form-control" minlength="4" value="{{ password }}"/> 
+	<p class="hint">Enter password</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="password" class="col-md-4 control-label">Confirm Password</label>
+      <div class="col-md-4">
+	<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required form-control" 
+	       value="" placeholder="Confirm Password"/>
+	<p class="hint">Retype the password</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="question" class="col-md-4 control-label">My Keys</label>
+      <div class="col-md-4">
+	<select name="question" class="required form-control" id="question">        
+	  <option value="generate">Generate key pairs for me </option>
+	  <option value="upload">Upload my public key </option>
+	</select>
+	<p class="hint">Genkey: Account Delegation Automatic (Recommended)</p> 
+      </div>
+    </div>
+    <div class="form-group" style="display:none;" id="upload_key">
+      <label for="file" class="col-md-4 control-label">Upload public key</label>
+      <div class="col-md-4">
+	<input type="file" name="user_public_key" class="required" id="user_public_key"/>
+	<p class="hint">Account Delegation: Manual (Advanced Users)</p>
+	<p class="warning" id="pkey_del_msg">Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]</p>
+      </div>
+    </div>
+    <div class="form-group" id="register">
+      <div class="col-md-offset-4 col-md-4">
+	<button class="submit btn btn-default" type="submit">Register</button>
+      </div>
+    </div>
+  </form>  
 </div>
 
 {% endblock %}
