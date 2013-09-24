@@ -6,9 +6,10 @@ body {
 
 /* center the buttons vertically in the header */
 div.topmenu { padding-top: 7px; }
-ul.logged-in { padding-top: 10px; }
+ul.logged-in { padding-top: 12px; }
 button#logout { 
 /*    margin-left: 8px;  */
     margin-bottom: 10px; 
 }
-ul.logged-in, button.logged-in { font-size: x-small; }
+ul.logged-in { font-size: x-small; }
+button.logged-in { font-size: small; }

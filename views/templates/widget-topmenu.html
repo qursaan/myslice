@@ -2,7 +2,8 @@
 {% insert_str prelude "css/bootstrap.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-myslice-collapse">
       <span class="sr-only">Toggle navigation</span>
       <span class="icon-bar"></span>
@@ -12,11 +13,25 @@
     <a class="navbar-brand" href="#">
       <img src="{{ STATIC_URL }}img/onelab-logo.png" height="30" alt="OneLab logo" />
     </a>
-    <div class="collapse navbar-collapse navbar-myslice-collapse topmenu">
+  </div>
+  <div class="collapse navbar-collapse navbar-myslice-collapse topmenu">
     <ul class="nav navbar-nav">
-	{% for d in topmenu_items %} {% if d.is_active %}
-	  <li class='active'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% else %}
-	  <li class='other'> <a href="{{ d.href }}"> {{ d.label }} </a> </li> {% endif %} {% endfor %}
+	{% for d in topmenu_items %} 
+	{% if d.dropdown %}
+	<li class="dropdown">
+	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}"> {{ d.label }}</a>
+	  <ul class="dropdown-menu">
+	  {% for dd in d.contents %}
+	  {% if dd.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
+	  <a class="dropdown-toggle" href="{{ dd.href }}"> {{ dd.label }} </a> </li>
+	  {% endfor %}
+	</ul>
+        </li>
+        {% else %} 
+	{% if d.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
+	<a href="{{ d.href }}"> {{ d.label }} </a> </li>
+	{% endif %}
+	{% endfor %}
     </ul> {# logout.js will attach a click function on that button, which then retrieves the 'username' attribute #}
     <ul class="nav navbar-nav pull-right logged-in">
       <li> {% if username %}
@@ -25,5 +40,5 @@
       Not logged in{% endif %}
       </li>
     </ul>
-    </div>
-</div>
+  </div>
+</nav>
