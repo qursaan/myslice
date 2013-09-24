@@ -311,10 +311,20 @@ input,
 button,
 select,
 textarea {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
 }
+
+label,
+input,
+button,
+select,
+textarea {
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+}
+
 
 button,
 input,

@@ -305,9 +305,9 @@ table.profile form{
 
 #generate_keypair {
   position:relative;
-  width: 183px;
+  width: 175px;
   float: right;
-  margin-right: 11px;
+  margin-right: 15px;
 
 }
 #edit_password table {
