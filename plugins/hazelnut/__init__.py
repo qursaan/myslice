@@ -49,6 +49,9 @@ class Hazelnut (Plugin):
                            ] ,
             'css_files': [ "css/hazelnut.css" , 
                            "css/dataTables.bootstrap.css",
+                           # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
+                           # for now we use full_numbers\, with our own ad hoc css 
+                           "css/dataTables.full_numbers.css",
                            ],
             }
         return reqs

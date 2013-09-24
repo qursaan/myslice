@@ -80,8 +80,11 @@
             actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-                sDom: "<'row-fluid'<'span5'l><'span1'r><'span6'f>>t<'row-fluid'<'span5'i><'span7'p>>",
-                sPaginationType: 'bootstrap',
+                sDom: "<'row'<'col-md-5'l><'col-md-1'r><'col-md-6'f>>t<'row'<'col-md-5'i><'col-md-7'p>>",
+		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
+		// hopefully this would come with dataTables v1.10 ?
+		// in any case, search for 'sPaginationType' all over the code for more comments
+                sPaginationType: 'full_numbers',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
                 aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
