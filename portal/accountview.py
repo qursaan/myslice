@@ -129,6 +129,7 @@ def account_process(request):
         # Redirect to same page with success message
         messages.success(request, 'Sucess: First Name and Last Name Updated.')
         return HttpResponseRedirect("/portal/account/")       
+    
     elif 'submit_pass' in request.POST:
         edited_password = request.POST['password']
         
@@ -142,46 +143,56 @@ def account_process(request):
         return HttpResponseRedirect("/portal/account/")
 
     elif 'generate' in request.POST:
-        # Generate public and private keys using SFA Library
-        from sfa.trust.certificate  import Keypair
-        k = Keypair(create=True)
-        public_key = k.get_pubkey_string()
-        private_key = k.as_pem()
-        private_key = ''.join(private_key.split())
-        public_key = "ssh-rsa " + public_key
-        # Saving to DB
-        keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
-#        keypair = re.sub("\r", "", keypair)
-#        keypair = re.sub("\n", "\\n", keypair)
-#        #keypair = keypair.rstrip('\r\n')
-#        keypair = ''.join(keypair.split())
-        user_params = { 'config': keypair, 'auth_type':'managed'}
-        manifold_update_account(request,user_params)
-#        return HttpResponse('Success: New Keypair Generated!')
-        messages.success(request, 'Sucess: New Keypair Generated!')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'upload_key' in request.POST:
-        up_file = request.FILES['pubkey']
-        file_content =  up_file.read()
-        file_name = up_file.name
-        file_extension = os.path.splitext(file_name)[1] 
-        allowed_extension =  ['.pub','.txt']
-        if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
-            file_content = '{"user_public_key":"'+ file_content +'"}'
-            #file_content = re.sub("\r", "", file_content)
-            #file_content = re.sub("\n", "\\n",file_content)
-            file_content = ''.join(file_content.split())
-            # update manifold account table
-            user_params = { 'config': file_content, 'auth_type':'user'}
-            manifold_update_account(request,user_params)
-#            return HttpResponse('Success: Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
-            messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
-            return HttpResponseRedirect("/portal/account/")
-
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        # Generate public and private keys using SFA Library
+                        from sfa.trust.certificate  import Keypair
+                        k = Keypair(create=True)
+                        public_key = k.get_pubkey_string()
+                        private_key = k.as_pem()
+                        private_key = ''.join(private_key.split())
+                        public_key = "ssh-rsa " + public_key
+                        keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
+#                       keypair = re.sub("\r", "", keypair)
+#                       keypair = re.sub("\n", "\\n", keypair)
+#                       #keypair = keypair.rstrip('\r\n')
+#                       keypair = ''.join(keypair.split())
+                        # updating maniolf local:account table
+                        user_params = { 'config': keypair, 'auth_type':'managed'}
+                        manifold_update_account(request,user_params)
+                        messages.success(request, 'Sucess: New Keypair Generated!')
+                        return HttpResponseRedirect("/portal/account/")
         else:
-#            return HttpResponse('Please upload a valid RSA public key [.txt or .pub].')    
-            messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            return HttpResponseRedirect("/portal/account/")
+                       
+    elif 'upload_key' in request.POST:
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        up_file = request.FILES['pubkey']
+                        file_content =  up_file.read()
+                        file_name = up_file.name
+                        file_extension = os.path.splitext(file_name)[1] 
+                        allowed_extension =  ['.pub','.txt']
+                        if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
+                            file_content = '{"user_public_key":"'+ file_content +'"}'
+                            #file_content = re.sub("\r", "", file_content)
+                            #file_content = re.sub("\n", "\\n",file_content)
+                            file_content = ''.join(file_content.split())
+                            #update manifold local:account table
+                            user_params = { 'config': file_content, 'auth_type':'user'}
+                            manifold_update_account(request,user_params)
+                            messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+                            return HttpResponseRedirect("/portal/account/")
+                        else:
+                            messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
+                            return HttpResponseRedirect("/portal/account/")
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
 
     elif 'dl_pubkey' in request.POST:
@@ -230,9 +241,9 @@ def account_process(request):
                             messages.error(request, 'Delete error: Private key is not stored in the server')
                             return HttpResponseRedirect("/portal/account/")
                            
-
-        #messages.success(request, 'delete key en cours')
-        #return HttpResponseRedirect("/portal/account/")
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
+            return HttpResponseRedirect("/portal/account/")
            
        
     else:
