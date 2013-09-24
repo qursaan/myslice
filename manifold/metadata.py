@@ -1,4 +1,5 @@
 import json 
+import os.path
 
 from manifold.manifoldresult import ManifoldResult
 from manifold.manifoldapi import ManifoldAPI
@@ -17,7 +18,7 @@ class MetaData:
         self.hash_by_object={}
 
     def fetch (self):
-        offline_filename="offline-metadata.json"
+        offline_filename="%s/../offline-metadata.json"%os.path.dirname(__file__)
         if work_offline:
             try:
                 with file(offline_metadata) as f:
