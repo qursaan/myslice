@@ -21,18 +21,13 @@
 {% insert_str prelude "css/manifold.css" %}
 <body>
 {% block container %}
-<div id="container">
   {% block topmenu %}
   {% include 'widget-topmenu.html' %}
   {% endblock topmenu %}
-{% include 'messages.html' %}
-<div class="container-fluid">
-  <div class="row-fluid">
-
+{% include 'messages-transient.html' %}
+<div class="container"> <div class="row">
    {% block base_content%}{% endblock %}
-
-  </div><!--raw-fluid-->
-</div><!--container-fluid-->
+</div></div>
 {% endblock container %}
 </body>
 </html>
