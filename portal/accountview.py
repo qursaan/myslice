@@ -196,7 +196,7 @@ def account_process(request):
                         return response
                         break
         else:
-            messages.success(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
                
     elif 'dl_pkey' in request.POST:
@@ -205,19 +205,34 @@ def account_process(request):
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
-                        print "hello"
                         if 'user_private_key' in account_config:
                             private_key = account_config['user_private_key']
                             response = HttpResponse(private_key, content_type='text/plain')
                             response['Content-Disposition'] = 'attachment; filename="privkey.txt"'
                             return response
                         else:
-                            messages.success(request, 'download error: Private key is not stored in the server')
+                            messages.error(request, 'Download error: Private key is not stored in the server')
                             return HttpResponseRedirect("/portal/account/")
 
         else:
-            messages.success(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
+    
+    elif 'delete' in request.POST:
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        if 'user_private_key' in account_config:
+                            pass
+                        else:
+                            messages.error(request, 'Delete error: Private key is not stored in the server')
+                            return HttpResponseRedirect("/portal/account/")
+                           
+
+        #messages.success(request, 'delete key en cours')
+        #return HttpResponseRedirect("/portal/account/")
            
        
     else:
