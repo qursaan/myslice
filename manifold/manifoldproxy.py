@@ -1,4 +1,6 @@
 import json
+import os.path
+
 # this is for django objects only
 #from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden
@@ -52,7 +54,7 @@ with the query passed using POST"""
         manifold_query = Query()
         #manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
-        offline_filename="offline-%s-%s.json"%(manifold_query.action,manifold_query.object)
+        offline_filename="%s/../offline-%s-%s.json"%(os.path.dirname(__file__),manifold_query.action,manifold_query.object)
         # retrieve session for request
 
         # We allow some requests to use the ADMIN user account

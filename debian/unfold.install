@@ -11,3 +11,5 @@ usr/share/unfold/myslice
 usr/share/unfold/sample
 usr/share/unfold/trash
 usr/share/unfold/debug_platform
+myslice/manage.py usr/share/unfold/manage.py
+/etc/apache2/sites-available/myslice.conf
