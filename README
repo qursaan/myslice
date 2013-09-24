@@ -30,7 +30,7 @@ $ make static (which is a shorthand for cleaning up and run manage collectstatic
 * gather templates files 
   for now we still seem to rely on a make-based templates-collection process
   that creates templates/ 
-$ make templates
+$ make templates [$ make redo (each time when you pull, do that and restart the server)]
 
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
