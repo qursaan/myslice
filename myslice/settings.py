@@ -175,8 +175,6 @@ INSTALLED_APPS = (
     'plugins',
     # views - more or less stable 
     'views',
-    # temporary
-    'trash',
     # managing database migrations
     'south', 
     # Uncomment the next line to enable the admin:
@@ -184,6 +182,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    # temporary - not packaged
+    'trash',
     'sample',
 # DEPRECATED #    'django.contrib.formtools',
 # DEPRECATED ##    'crispy_forms',
