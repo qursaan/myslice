@@ -241,9 +241,9 @@ def account_process(request):
                             messages.error(request, 'Delete error: Private key is not stored in the server')
                             return HttpResponseRedirect("/portal/account/")
                            
-
-        #messages.success(request, 'delete key en cours')
-        #return HttpResponseRedirect("/portal/account/")
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
+            return HttpResponseRedirect("/portal/account/")
            
        
     else:
