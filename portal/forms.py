@@ -27,14 +27,31 @@ from portal.models import PendingUser, PendingSlice
 #from crispy_forms.layout import Submit
 from django.utils.translation import ugettext_lazy as _
 
+# xxx painful, but... 
+# bootstrap3 requires the <input> fields to be tagged class='form-control'
+# my first idea was to add this in the view template of course, BUT
+# I can't find a way to access the 'type=' value for a given field
+# I've looked rather deeply out there but to no avail so far
+# so as we have a demo coming up soon, and until we can come with a less intrusive way to handle this...
+# 
+# initial version was
+#class ContactForm(forms.Form):
+#    first_name = forms.CharField()
+#    last_name = forms.CharField()
+#    affiliation = forms.CharField()
+#    subject = forms.CharField(max_length=100)
+#    message = forms.CharField(widget=forms.Textarea)
+#    email = forms.EmailField()
+#    cc_myself = forms.BooleanField(required=False)
+
 class ContactForm(forms.Form):
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    affiliation = forms.CharField()
-    subject = forms.CharField(max_length=100)
-    message = forms.CharField(widget=forms.Textarea)
-    email = forms.EmailField()
-    cc_myself = forms.BooleanField(required=False)
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    affiliation = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    subject = forms.CharField(max_length=100,widget=forms.TextInput(attrs={'class':'form-control'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class SliceRequestForm(forms.Form):
     slice_name = forms.CharField()
