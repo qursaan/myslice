@@ -1,10 +1,5 @@
-
 .ms-dashboard {
     width: 100%;
-}
-
-.ms-dashboard-panel {
-
 }
 
 .ms-dashboard-caption {
@@ -33,36 +28,6 @@
     background: no-repeat url(../img/experiments.png);
 }   
 
-
-/*
-#ms-dashboard-profile {
-    float: left;
-    position: relative;
-    top: 1em;
-    width: 45%;
-    min-height:200px;
-    height:auto !important;
-    height:200px; 
-}
-
-#ms-dashboard-testbeds {
-    float: right;
-    border: 1px #CCC;
-    padding: 15px;
-    top: 0.5em;
-    width: 45%;
-    min-height:200px;
-    height:auto !important;
-    height:200px; 
-}
-
-#ms-dashboard-slices {
-    float: left;
-    position: relative;
-    width: 45%;
-    padding-top: 1em;
-}
-*/
 
 li.icn {
     padding: 0 0 0 0;
