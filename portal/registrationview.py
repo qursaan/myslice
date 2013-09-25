@@ -11,6 +11,9 @@ from myslice.viewutils          import topmenu_items
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query
 
+from portal.models              import PendingUser
+from portal.actions             import authority_get_pi_emails 
+
 # This is a rough porting from views.py
 # the former function-based view is now made a class
 # we redefine dispatch as it is simple
@@ -102,21 +105,20 @@ class RegistrationView (View):
 
             # Send email
             ctx = {
-                first_name   : reg_fname, 
-                last_name    : reg_lname, 
-                #affiliation  : reg_aff,
-                authority_hrn: reg_auth,
-                email        : reg_email, 
-                keypair      : keypair,
-                cc_myself    : True # form.cleaned_data['cc_myself']
+                'first_name'   : reg_fname, 
+                'last_name'    : reg_lname, 
+                'authority_hrn': reg_auth,
+                'email'        : reg_email, 
+                'keypair'      : keypair,
+                'cc_myself'    : True # form.cleaned_data['cc_myself']
             }
 
-            recipients = authority_get_pi_emails(authority_hrn)
+            recipients = authority_get_pi_emails(request,reg_auth)
             if ctx['cc_myself']:
                 recipients.append(ctx['email'])
 
             msg = render_to_string('user_request_email.txt', ctx)
-            send_mail("Onelab New User request for %s submitted"%email, msg, email, recipients)
+            send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
 
             return render(request, 'user_register_complete.html')
 
