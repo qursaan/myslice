@@ -70,6 +70,7 @@ class ManifoldAPI:
                                                               output="%s answered %s"%(self.url,error)))
                 # otherwise
                 print "** MANIFOLD API ERROR **"
+                print "====> ERROR On ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
                 import traceback
                 traceback.print_exc()
                 if debug: print "KO (unexpected exception)",error

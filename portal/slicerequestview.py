@@ -14,9 +14,10 @@ from myslice.viewutils           import topmenu_items, the_user
 class SliceRequestView (LoginRequiredAutoLogoutView):
 
     def authority_hrn_initial (self, request):
-        authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
-#        authorities_query = Query.get('authority').select('authority_hrn')
+#        authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
+        authorities_query = Query.get('authority').select('authority_hrn')
         authorities = execute_query(request, authorities_query)
+        authorities = sorted(authorities)
         
         authority_hrn_tuples = [ (authority['authority_hrn'], authority['name'],) for authority in authorities ]
         return {'authority_hrn': authority_hrn_tuples}

@@ -31,7 +31,7 @@ EOF; -->
         <td class='center'>{{ field.type }}</td>
         <td class='center'>{{ field.filter_input }}</td>
         <td class='center'>
-          <input class='queryeditor-check' id='{{domid}}__check__{{ field.name }}' name='{{ field.header }}' type='checkbox' autocomplete='off' value='{{ field.name }}' {% if field.checked %} checked {% endif %}></input>
+          <input class='queryeditor-check' id='{{domid}}__check__{{ field.name }}' name='{{ field.header }}' type='checkbox' autocomplete='on' value='{{ field.name }}' {% if field.checked %} checked {% endif %}></input>
         </td>
       </tr>
 		

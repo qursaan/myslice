@@ -53,7 +53,7 @@
       <label for="auth_list">Authority</label>
       <select id="auth_list" name="authority_hrn" size="1" class="required">
         {% for authority in authorities %}
-        <option value="{{ authority.authority_hrn }}"/>{{authority.name}} ({{authority.authority_hrn}})</option>
+        <option value="{{ authority.authority_hrn }}"/>{{authority.authority_hrn}}</option>
         {% endfor %}
      </select>
      <p class="hint">Please select an authority responsible for vetting your account</p>

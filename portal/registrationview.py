@@ -25,9 +25,10 @@ class RegistrationView (View):
 
     errors = []
 
-    authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
-    #authorities_query = Query.get('authority').select('authority_hrn')
+    #authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
+    authorities_query = Query.get('authority').select('authority_hrn')
     authorities = execute_query(request, authorities_query)
+    authorities = sorted(authorities)
 
     if request.method == 'POST':
         # We shall use a form here
