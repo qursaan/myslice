@@ -16,10 +16,19 @@
 </div>
 
 <div class='well'>
-<form id="commentForm" action="" method="post">{% csrf_token %}
-{{ form.as_p }}
-<input class="btn" type="submit" value="Submit" />
-</form>
+  <form id="commentForm" class="form-horizontal" action="" method="post" role="form">{% csrf_token %}
+  <fieldset>
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.html_name }}" class="col-md-4 control-label">{{ field.label }}</label>
+      <div class="col-md-4"> {{ field }} <p class="hint">{{ field.help_text }}</p> </div>
+    </div>
+    {% endfor %}
+    <div class="col-md-offset-4 col-md-4">
+      <button class="submit btn btn-default" type="submit">Submit</button>
+    </div>
+  </fieldset>
+  </form>
 </div>
 
 {% endblock %}

@@ -54,13 +54,21 @@ class ContactForm(forms.Form):
     cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class SliceRequestForm(forms.Form):
-    slice_name = forms.CharField()
-    authority_hrn = forms.ChoiceField(choices=[(1, 'un')])
-    number_of_nodes  = forms.DecimalField()
-    type_of_nodes = forms.CharField()
-    purpose = forms.CharField(widget=forms.Textarea)
-    email = forms.EmailField()
-    cc_myself = forms.BooleanField(required=False)
+#    slice_name = forms.CharField()
+#    authority_hrn = forms.ChoiceField(choices=[(1, 'un')])
+#    number_of_nodes  = forms.DecimalField()
+#    type_of_nodes = forms.CharField()
+#    purpose = forms.CharField(widget=forms.Textarea)
+#    email = forms.EmailField()
+#    cc_myself = forms.BooleanField(required=False)
+
+    slice_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    authority_hrn = forms.ChoiceField(choices=[(1, 'un')],widget=forms.Select(attrs={'class':'form-control'}))
+    number_of_nodes  = forms.DecimalField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    type_of_nodes = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    purpose = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
     def __init__(self, *args, **kwargs):
         initial =  kwargs.get('initial', {})
