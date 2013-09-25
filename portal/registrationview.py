@@ -6,6 +6,7 @@ from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
 
+from unfold.page                import Page
 from myslice.viewutils          import topmenu_items
 
 from manifold.manifoldapi       import execute_query
@@ -33,6 +34,14 @@ class RegistrationView (View):
             select('name', 'authority_hrn')
         #authorities_query = Query.get('authority').select('authority_hrn')
         authorities = execute_query(request, authorities_query)
+        # xxx tocheck - if authorities is empty, it's no use anyway
+        # (users won't be able to validate the form anyway)
+
+        page = Page(request)
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
+
+        print 'registration view, method',request.method
 
         if request.method == 'POST':
             # We shall use a form here
@@ -114,14 +123,16 @@ class RegistrationView (View):
 
             return render(request, 'user_register_complete.html')
 
-        return render(request, 'registration_view.html',{
-            'topmenu_items': topmenu_items('Register', request),
-            'errors': errors,
-            'firstname': request.POST.get('firstname', ''),
-            'lastname': request.POST.get('lastname', ''),
-            #'affiliation': request.POST.get('affiliation', ''),
-            'authority_hrn': request.POST.get('authority_hrn', ''),
-            'email': request.POST.get('email', ''),
-            'password': request.POST.get('password', ''),           
-            'authorities': authorities,
-            })
+        template_env = {
+          'topmenu_items': topmenu_items('Register', request),
+          'errors': errors,
+          'firstname': request.POST.get('firstname', ''),
+          'lastname': request.POST.get('lastname', ''),
+          #'affiliation': request.POST.get('affiliation', ''),
+          'authority_hrn': request.POST.get('authority_hrn', ''),
+          'email': request.POST.get('email', ''),
+          'password': request.POST.get('password', ''),           
+          'authorities': authorities,
+          }
+        template_env.update(page.prelude_env ())
+        return render(request, 'registration_view.html',template_env)

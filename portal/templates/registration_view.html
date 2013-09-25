@@ -1,13 +1,5 @@
 {% extends "layout-unfold1.html" %}
 
-{% block head %}
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
-<!-- xxx ideally only onelab.css but ... xxx -->
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-<script type="text/javascript" src="{{STATIC_URL}}/js/jquery.validate.js"></script> 
-<script type="text/javascript" src="{{STATIC_URL}}/js/my_account.register.js"></script>
-{% endblock %}                              
-                                    
 {% block unfold1_main %}        
 
 <div class="onelab-title well well-lg">
@@ -92,7 +84,7 @@
     <div class="form-group" style="display:none;" id="upload_key">
       <label for="file" class="col-md-4 control-label">Upload public key</label>
       <div class="col-md-4">
-	<input type="file" name="user_public_key" class="form-control" id="user_public_key" required/>
+	<input type="file" name="user_public_key" class="form-control" id="user_public_key" />
 	<p class="warning" id="pkey_del_msg">Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]</p>
       </div>
       <div class="col-md-4"><p class="form-hint">Account Delegation: Manual (Advanced Users)</p></div>
