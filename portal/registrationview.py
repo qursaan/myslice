@@ -131,5 +131,5 @@ class RegistrationView (View):
         'authority_hrn': request.POST.get('authority_hrn', ''),
         'email': request.POST.get('email', ''),
         'password': request.POST.get('password', ''),           
-        'authorities': authorities
+        'authorities': authorities,
     })        
