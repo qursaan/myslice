@@ -8,7 +8,7 @@ Copyright 2013, UPMC Sorbonne Universités / LIP6
 */
 jQuery(document).ready(function(){
     
-    jQuery("#commentForm").validate({
+    jQuery("#registrationForm").validate({
         rules: {
           password: { 
                 required: true
@@ -19,7 +19,7 @@ jQuery(document).ready(function(){
         }
     });
     // upload button
-    jQuery("#question").change(function(){
+    jQuery("#key-policy").change(function(){
         if(this.value=="upload"){
             jQuery("#upload_key").show();
         }else{
