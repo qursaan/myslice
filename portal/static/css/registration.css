@@ -13,6 +13,19 @@ label.error {
     font-size: 12px; 
 }
 
-.hint {
+.form-hint {
     display:none;
+}
+/* show up hints when hovering on a the field */
+/* pick a small font to avoid flickering effects */
+div.form-group:hover p.form-hint {
+    display: block;
+    color: #FFFFFF;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 3px 10px;
+    font-size: small;
+    
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
 }
