@@ -1,6 +1,7 @@
 from django.shortcuts           import render
-
+from django.template.loader      import render_to_string
 from django.views.generic       import View
+from django.core.mail           import send_mail
 
 from myslice.viewutils          import topmenu_items, the_user
 
@@ -27,9 +28,8 @@ class ContactView (View):
             if cc_myself:
                 recipients.append(email)
 
-            from django.core.mail import send_mail
-            send_mail("Onelab user %s submitted a query "%email, 
-                      [first_name,last_name,affiliation,subject,message], email, recipients)
+            msg = render_to_string('slice-request-email.txt', form.cleaned_data)
+            send_mail("Onelab user %s submitted a query "%email, msg, email, recipients)
             return render(request,'contact_sent.html') # Redirect after POST
         else:
             return self._display (request, form)
