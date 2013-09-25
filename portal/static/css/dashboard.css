@@ -34,6 +34,7 @@
 }   
 
 
+/*
 #ms-dashboard-profile {
     float: left;
     position: relative;
@@ -42,13 +43,6 @@
     min-height:200px;
     height:auto !important;
     height:200px; 
-}
-
-#ms-dashboard-slices {
-    float: left;
-    position: relative;
-    width: 45%;
-    padding-top: 1em;
 }
 
 #ms-dashboard-testbeds {
@@ -61,6 +55,14 @@
     height:auto !important;
     height:200px; 
 }
+
+#ms-dashboard-slices {
+    float: left;
+    position: relative;
+    width: 45%;
+    padding-top: 1em;
+}
+*/
 
 li.icn {
     padding: 0 0 0 0;
