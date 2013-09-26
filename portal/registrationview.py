@@ -86,6 +86,8 @@ class RegistrationView (View):
                     keypair = re.sub("\r", "", keypair)
                     keypair = re.sub("\n", "\\n",keypair)
                     keypair = ''.join(keypair.split())
+                    # for sending email
+                    public_key = file_content
                 else:
                     errors.append('Please upload a valid RSA public key [.txt or .pub].')
 
@@ -106,18 +108,18 @@ class RegistrationView (View):
 
                 # Send email
                 ctx = {
-                    'first_name'   : reg_fname, 
-                    'last_name'    : reg_lname, 
-                    'authority_hrn': reg_auth,
-                    'email'        : reg_email, 
-                    'keypair'      : keypair,
-                    'cc_myself'    : True # form.cleaned_data['cc_myself']
+                    'First Name'    : reg_fname, 
+                    'Last Name'     : reg_lname, 
+                    'Authority'     : reg_auth,
+                    'Email'         : reg_email, 
+                    'Public Key'    : public_key,
+                    'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
                 #not working
                 #recipients = authority_get_pi_emails(request,reg_auth)
                 recipients = ['devel@myslice.info']
                 if ctx['cc_myself']:
-                    recipients.append(ctx['email'])
+                    recipients.append(ctx['Email'])
 
                 msg = render_to_string('user_request_email.txt', ctx)
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
