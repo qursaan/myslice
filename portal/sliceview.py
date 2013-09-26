@@ -137,7 +137,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'aoColumns'     : [None, None, None, None, {'bSortable': False}],
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
-                'bAutiWidth'    : True,
+                'bAutoWidth'    : True,
                 },
             )
 
