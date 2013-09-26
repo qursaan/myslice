@@ -28,13 +28,11 @@ class PlatformsView(TemplateView):
             query = platform_query,
             query_all = platform_query,
             checkboxes = False,
-            datatables_options = {
-            # for now we turn off sorting on the checkboxes columns this way
-            # this of course should be automatic in hazelnut
-            'aoColumns'      : [None, None, None, None, {'bSortable': False}],
-            'iDisplayLength' : 25,
-            'bLengthChange'  : True,
-            },
+            datatables_options = { 
+                'iDisplayLength': 10,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
         )
 
         context = super(PlatformsView, self).get_context_data(**kwargs)
