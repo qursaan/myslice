@@ -15,18 +15,18 @@ from manifold.metadata               import MetaData as Metadata
 from myslice.viewutils               import topmenu_items, the_user
 
 from plugins.raw                     import Raw
-from plugins.stack.stack             import Stack
+from plugins.stack                   import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.lists.slicelist         import SliceList
-from plugins.hazelnut           import Hazelnut 
+from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap.senslabmap   import SensLabMap
-from plugins.querycode.querycode     import QueryCode
+from plugins.querycode               import QueryCode
 from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
-from plugins.quickfilter.quickfilter import QuickFilter
-from plugins.messages.messages       import Messages
+from plugins.quickfilter             import QuickFilter
+from plugins.messages                import Messages
 #from plugins.updater                 import Updater
 
 tmp_default_slice='ple.upmc.myslicedemo'
