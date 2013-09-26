@@ -14,19 +14,19 @@ class PlatformsView(TemplateView):
     def get_context_data(self, **kwargs):
         page = Page(self.request)
 
-        #network_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
-        network_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
-        page.enqueue_query(network_query)
+        #platform_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
+        platform_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
+        page.enqueue_query(platform_query)
 
         page.expose_js_metadata()
         page.expose_queries()
-        networklist = Hazelnut(
+        platformlist = Hazelnut(
             page  = page,
             title = 'List',
             domid = 'checkboxes',
             # this is the query at the core of the slice list
-            query = network_query,
-            query_all = network_query,
+            query = platform_query,
+            query_all = platform_query,
             checkboxes = False,
             datatables_options = {
             # for now we turn off sorting on the checkboxes columns this way
@@ -36,17 +36,10 @@ class PlatformsView(TemplateView):
             'bLengthChange'  : True,
             },
         )
-#
-#        networklist = SimpleList(
-#            title = None,
-#            page  = page,
-#            key   = 'platform',
-#            query = network_query,
-#        )
 
         context = super(PlatformsView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
-        context['networks'] = networklist.render(self.request)
+        context['platforms'] = platformlist.render(self.request)
 
         # XXX This is repeated in all pages
         # more general variables expected in the template
