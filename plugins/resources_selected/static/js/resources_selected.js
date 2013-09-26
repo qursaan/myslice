@@ -32,7 +32,7 @@
             var self = this;
             this.table = this.elmt('table').dataTable({
                 //sPaginationType: 'full_numbers',  // Use pagination
-                sPaginationType: 'bootstrap',
+                sPaginationType: 'full_numbers',
                 //bJQueryUI      : true,
                 //bRetrieve      : true,
                 sScrollX       : '100%',                 // Horizontal scrolling 

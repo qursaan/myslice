@@ -139,7 +139,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'aoColumns'     : [None, None, None, None, {'bSortable': False}],
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
-                'bAutiWidth'    : True,
+                'bAutoWidth'    : True,
                 },
             )
 
@@ -207,11 +207,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                 query_all  = query_user_all,
                 checkboxes  = True,
                 datatables_options = { 
-                    # for now we turn off sorting on the checkboxes columns this way
-                    # this of course should be automatic in hazelnut
-                    'aoColumns'      : [None, None, None, None, {'bSortable': False}],
                     'iDisplayLength' : 25,
                     'bLengthChange'  : True,
+                    'bAutoWidth'     : True,
                 },
             ))
     
@@ -237,11 +235,9 @@ class SliceView (LoginRequiredAutoLogoutView):
             query       = sq_measurement,
             checkboxes  = True,
             datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'      : [None, None, None, None, {'bSortable': False}],
                 'iDisplayLength' : 25,
                 'bLengthChange'  : True,
+                'bAutoWidth'     : True,
             },
         ))
     
