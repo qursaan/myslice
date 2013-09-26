@@ -14,7 +14,7 @@ from manifold.metadata               import MetaData as Metadata
 #from myslice.viewutils               import quickfilter_criterias, topmenu_items, the_user
 from myslice.viewutils               import topmenu_items, the_user
 
-from plugins.raw.raw                 import Raw
+from plugins.raw                     import Raw
 from plugins.stack.stack             import Stack
 from plugins.tabs.tabs               import Tabs
 from plugins.lists.slicelist         import SliceList
