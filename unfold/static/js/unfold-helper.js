@@ -34,7 +34,11 @@ var unfold = {
     },
 
     escape_id: function(id) {
-        return id.replace( /(:|\.|\[|\])/g, "\\$1" );
+        if(typeof id != 'undefined'){
+            return id.replace( /(:|\.|\[|\])/g, "\\$1" );
+        }else{
+            return "fake-id";
+        }
     }
 
 } // global unfold

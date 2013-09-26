@@ -9,36 +9,39 @@
 <div id='tophat_status'></div>
 <div id='ms-dashboard'>
 
-  <div class='ms-dashboard-panel' id="ms-dashboard-profile">
-    <div class='ms-dashboard-caption'>
-      <h2>User profile</h2>
-    </div>
-    <div class='ms-dashboard-content'>
-      <ul>
-        <li><span id='username'>{{person.first_name}} {{person.last_name}}</span></li>
-        <li><b>Email: </b><a href='mailto:#'>{{person.email}}</a></li>
-      </ul>
-      <button id="account" onclick="location.href='{{URL}}/portal/account'" class="btn">Modify</button>
-    </div>
-  </div>
-
-  <div class='ms-dashboard-panel' id='ms-dashboard-testbeds'>
-    <div class='ms-dashboard-caption'>
-      <h2>Testbeds access</h2>
-    </div>
-    <div class='ms-dashboard-content' id='tophat__list__network_hrn__network_name'>
-    {{networks}}
+  <div class="container">
+    <div class="row">
+      <div class='col-md-4' id="ms-dashboard-profile">
+	<div class='ms-dashboard-caption'>
+	  <h2>User profile</h2>
 	</div>
-  </div>
+	<div class='ms-dashboard-content'>
+	  <ul>
+	    {% if person.last_name %} <li><span id='username'>{{person.first_name}} {{person.last_name}}</span></li> {% endif %}
+	    <li><b>Email: </b><a href='mailto:#'>{{person.email}}</a></li>
+	  </ul>
+	  <button id="account" onclick="location.href='{{URL}}/portal/account'" class="btn btn-default">Modify</button>
+	</div>
+      </div>
 
-  <div class='ms-dashboard-panel' id='ms-dashboard-slices'>
-    <div class='ms-dashboard-caption'>
-      <h2>Slices</h2>
-    </div>
-    <div class='ms-dashboard-content' id='tophat__list__slice_hrn__slice_hrn'>
-    {{slices}}
+      <div class='col-md-4' id='ms-dashboard-testbeds'>
+	<div class='ms-dashboard-caption'>
+	  <h2>Testbeds</h2>
+	</div>
+	<div class='ms-dashboard-content' id='tophat__list__network_hrn__network_name'>
+	  {{networks}}
+	</div>
+      </div>
+
+      <div class='col-md-4' id='ms-dashboard-slices'>
+	<div class='ms-dashboard-caption'>
+	  <h2>Slices</h2>
+	</div>
+	<div class='ms-dashboard-content' id='tophat__list__slice_hrn__slice_hrn'>
+	  {{slices}}
+	</div>
+      </div>
     </div>
   </div>
 </div>
-
 {% endblock %}

@@ -4,96 +4,27 @@ but general-purpose settings for an openlab style
 I've started to move over such stuff in onelab.css
 feel free to add to this collection
 */
-#commentForm {
-    margin:0 auto;
-    width:800px;
-    padding:10px;
-    font-size:12pt;
-    overflow:auto;
-}    
-#register {
-    text-align: center;
-}
-/*
-input {
-    height: 22px;
-    width: 200px;
-}
-*/
-/*
-    border:2px solid #456879;
-    font-size: 10px; 
-*/
-label { 
-    float: left;
-    font-weight: bold;
-    text-align: right;
-    margin-right: 20px;
-    width: 200px;
-    display: inline-block;
-        
-}
+   
 label.error { 
     float: none;
     color: red;
     padding-left: .5em;
-    vertical-align:
-    top; 
+    vertical-align: top; 
     font-size: 12px; 
 }
 
-p {
-    color:#666666;
-/* border-bottom:1px solid #B7DDF2; */
-/* font-size:10px; */
-/* margin-bottom:20px; */
-/* padding-bottom:10px; */
-}
-
-
-
-legend {
-    position: relative;
-    top: -2px;
-    background: cornsilk;
-    padding: 10px 100px;
-    border: 2px groove threedface;
-    border-top: none;
-    box-shadow: inset 0 -5px 5px rgba(0,0,0,.2);
-    text-shadow: 1px 1px 2px rgba(0,0,0,.3);
-    font-weight: bold;
-    font-size: 25px;
-    margin-left: 90px;
-}
-
-textarea:focus, input:focus {
-    border: 2px solid #900;
-}
-
-.required {
-    font-size:12pt;
-}
-/* 
-   .submit {
-    text-align: center;
-    margin-top: 15px;
-    margin-left: 250px;
-}
-*/
-.field {
-    padding:10px;
-}
-.hint {
+.form-hint {
     display:none;
 }
-.field:hover .hint {
-    position: absolute;
+/* show up hints when hovering on a the field */
+/* pick a small font to avoid flickering effects */
+div.form-group:hover p.form-hint {
     display: block;
-    margin: -30px 0 0 455px;
     color: #FFFFFF;
-    padding: 7px 10px;
     background: rgba(0, 0, 0, 0.6);
- 
+    padding: 3px 10px;
+    font-size: small;
+    
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
     border-radius: 7px;

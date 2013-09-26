@@ -1,6 +1,5 @@
 usr/share/unfold/static
 usr/share/unfold/templates
-usr/share/unfold/apache
 usr/share/unfold/auth
 usr/share/unfold/insert_above
 usr/share/unfold/manifold
@@ -11,3 +10,6 @@ usr/share/unfold/myslice
 usr/share/unfold/sample
 usr/share/unfold/trash
 usr/share/unfold/debug_platform
+manage.py usr/share/unfold/
+apache/myslice.conf /etc/apache2/sites-available
+apache/myslice.wsgi usr/share/unfold/apache
