@@ -30,7 +30,10 @@ from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
-from portal.sliceview           import SliceView
+#from portal.sliceview           import SliceView
+
+# DEMO
+from portal.demo_sliceview      import SliceView
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
