@@ -108,20 +108,22 @@ class RegistrationView (View):
 
                 # Send email
                 ctx = {
-                    'First Name'    : reg_fname, 
-                    'Last Name'     : reg_lname, 
-                    'Authority'     : reg_auth,
-                    'Email'         : reg_email, 
-                    'Public Key'    : public_key,
+                    'first_name'    : reg_fname, 
+                    'last_name'     : reg_lname, 
+                    'authority_hrn' : reg_auth,
+                    'email'         : reg_email, 
+                    'keypair'       : 'Public Key :' + public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
                 #not working
                 #recipients = authority_get_pi_emails(request,reg_auth)
                 recipients = ['devel@myslice.info']
                 if ctx['cc_myself']:
-                    recipients.append(ctx['Email'])
+                    recipients.append(ctx['email'])
 
                 msg = render_to_string('user_request_email.txt', ctx)
+                print "tesing msg"
+                print msg
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
 
                 return render(request, 'user_register_complete.html')
