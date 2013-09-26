@@ -16,10 +16,16 @@
         event_filter_added: function(op, suffix) {
             suffix = (typeof suffix === 'undefined') ? '' : manifold.separator + suffix;
             var self = this;
-            return function(e) {
+            return function(e, ui) {
                 var array = self.array_from_id(e.target.id);
                 var key   = self.field_from_id(array); // No need to remove suffix...
-                var value = e.target.value;
+
+                // using autocomplete ui
+                if(typeof(ui) != "undefined"){
+                    var value = ui.item.value;
+                }else{
+                    var value = e.target.value;
+                }
 
                 if (value) {
                     // XXX This should be handled by manifold
@@ -34,7 +40,7 @@
 
         init: function(options, element) {
             this._super(options, element);
-
+            console.log("init Query_Editor");
             this.listen_query(options.query_uuid);
 
             this.elts('queryeditor-auto-filter').change(this.event_filter_added('='));
@@ -82,7 +88,6 @@
                 ]
             });
 
-            var self = this;
             // Actions on the newly added fields
             this.elmt('table tbody td span').on('click', function() {
                 var nTr = this.parentNode.parentNode;
@@ -105,6 +110,9 @@
                 'padding-top'   : '0em',
                 'padding-bottom': '0em'
             });
+            
+            // autocomplete list of tags
+            this.availableTags = {};
 
         }, // init
 
@@ -162,12 +170,37 @@
 
         on_field_added: function(field)
         {
+            console.log("on_field_added : "+field);
             this.check_field(field);
         },
 
         on_field_removed: function(field)
         {
             this.uncheck_field(field);
+        },
+
+        /* RECORD HANDLERS */
+        on_query_done: function()
+        {
+            //console.log("Query_Editor: query_done!");
+            //console.log(this.availableTags);
+        },
+        on_new_record: function(record)
+        {
+            //console.log("Query_Editor: new_record!");
+            //console.log(record);
+            availableTags = this.availableTags;           
+            jQuery.each(record,function(key,value){
+                value = get_value(value);
+                if(!availableTags.hasOwnProperty(key)){availableTags[key]=new Array();}
+                //availableTags[key].push(value);
+                var currentArray = availableTags[key];
+                if(value!=null){
+                    if(jQuery.inArray(value,currentArray)==-1){availableTags[key].push(value);}
+                }
+           });
+           this.availableTags = availableTags;
+           this.update_autocomplete(availableTags);
         },
 
         /* Former code not used at the moment */
@@ -236,6 +269,23 @@
             return output;
         },
 
+        update_autocomplete: function(availableTags)
+        {
+            var self = this;
+            var domid = this.options.plugin_uuid;
+            
+            jQuery.each(availableTags, function(key, value){
+                value.sort();
+                jQuery("#"+domid+"__field__"+key).autocomplete({
+                            source: value,
+                            selectFirst: true,
+                            minLength: 0, // allows to browse items with no value typed in
+                            select: self.event_filter_added('=')
+                });
+            });                
+        }, // update_autocomplete     
+
+/*
         update_autocomplete: function(e, rows, current_query)
         {
             var d = data;
@@ -272,7 +322,7 @@
                 });
             });                
         }, // update_autocomplete     
-
+*/
         fnFormatDetails: function( metaTable, nTr, div_id ) 
         {
             var aData = metaTable.fnGetData( nTr );

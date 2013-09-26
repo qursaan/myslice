@@ -86,6 +86,8 @@ class RegistrationView (View):
                     keypair = re.sub("\r", "", keypair)
                     keypair = re.sub("\n", "\\n",keypair)
                     keypair = ''.join(keypair.split())
+                    # for sending email
+                    public_key = file_content
                 else:
                     errors.append('Please upload a valid RSA public key [.txt or .pub].')
 
@@ -93,35 +95,38 @@ class RegistrationView (View):
             #                email=reg_email, password=request.POST['password'], keypair=keypair)
             #b.save()
             if not errors:
-              b = PendingUser(
-                first_name=reg_fname, 
-                last_name=reg_lname, 
-                #affiliation=reg_aff,
-                authority_hrn=reg_auth,
-                email=reg_email, 
-                password=request.POST['password'],
-                keypair=keypair
-                )
-              b.save()
+                b = PendingUser(
+                    first_name=reg_fname, 
+                    last_name=reg_lname, 
+                    #affiliation=reg_aff,
+                    authority_hrn=reg_auth,
+                    email=reg_email, 
+                    password=request.POST['password'],
+                    keypair=keypair
+                    )
+                b.save()
 
-              # Send email
-              ctx = {
-                'first_name'   : reg_fname, 
-                'last_name'    : reg_lname, 
-                'authority_hrn': reg_auth,
-                'email'        : reg_email, 
-                'keypair'      : keypair,
-                'cc_myself'    : True # form.cleaned_data['cc_myself']
-                }
+                # Send email
+                ctx = {
+                    'first_name'    : reg_fname, 
+                    'last_name'     : reg_lname, 
+                    'authority_hrn' : reg_auth,
+                    'email'         : reg_email, 
+                    'keypair'       : 'Public Key :' + public_key,
+                    'cc_myself'     : True # form.cleaned_data['cc_myself']
+                    }
+                #not working
+                #recipients = authority_get_pi_emails(request,reg_auth)
+                recipients = ['devel@myslice.info']
+                if ctx['cc_myself']:
+                    recipients.append(ctx['email'])
 
-              recipients = authority_get_pi_emails(request,reg_auth)
-              if ctx['cc_myself']:
-                  recipients.append(ctx['email'])
+                msg = render_to_string('user_request_email.txt', ctx)
+                print "tesing msg"
+                print msg
+                send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
 
-            msg = render_to_string('user_request_email.txt', ctx)
-            send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
-
-            return render(request, 'user_register_complete.html')
+                return render(request, 'user_register_complete.html')
 
         template_env = {
           'topmenu_items': topmenu_items('Register', request),

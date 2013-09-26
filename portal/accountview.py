@@ -236,7 +236,15 @@ def account_process(request):
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         if 'user_private_key' in account_config:
-                            pass
+                            for key in account_config.keys():
+                                if key== 'user_private_key':    
+                                    del account_config[key]
+                                
+                            updated_config = json.dumps(account_config)
+                            user_params = { 'config': updated_config, 'auth_type':'user'}
+                            manifold_update_account(request,user_params)
+                            messages.success(request, 'Private Key deleted. You need to delegate credentials manually once it expires.')
+                            return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'Delete error: Private key is not stored in the server')
                             return HttpResponseRedirect("/portal/account/")

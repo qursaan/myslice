@@ -24,7 +24,8 @@ from plugins.messages                import Messages
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-do_query_users=True
+#do_query_users=True
+do_query_users=False
 
 class SliceView (LoginRequiredAutoLogoutView):
 
@@ -32,6 +33,7 @@ class SliceView (LoginRequiredAutoLogoutView):
     
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
+        page.add_js_files  ( [ "js/common.functions.js" ] )
         page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
         page.add_js_chunks ('$(function() { console.log("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
         page.expose_js_metadata()
@@ -143,7 +145,7 @@ class SliceView (LoginRequiredAutoLogoutView):
 
         resources_query_editor = QueryEditor(
             page  = page,
-            query = sq_resource,
+            query = query_resource_all,
             title = "Select Columns",
             )
         resources_active_filters = ActiveFilters(

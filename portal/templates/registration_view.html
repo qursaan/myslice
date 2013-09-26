@@ -16,7 +16,7 @@
 {% endif %}
    
 <div class="well">
-  <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
+ <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
     <fieldset>
     {% csrf_token %}
     <div class="form-group">
@@ -39,7 +39,8 @@
 	<select id="auth_list" name="authority_hrn" size="1" class="form-control" required>
 	  {% if authorities %}
 	  {% for authority in authorities %}
-	  <option value="{{ authority.authority_hrn }}">{{authority.name}} ({{authority.authority_hrn}})</option>
+      <option value="{{ authority.authority_hrn }}"/>{{authority.authority_hrn}}</option>
+	  <!-- <option value="{{ authority.authority_hrn }}">{{authority.name}} ({{authority.authority_hrn}})</option> -->
 	  {% endfor %}
 	  {% else %} <!-- should not happen -->
 	  <option value="test">No authority found !!! </option>

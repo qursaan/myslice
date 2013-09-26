@@ -62,7 +62,8 @@ class SliceRequestForm(forms.Form):
 #    email = forms.EmailField()
 #    cc_myself = forms.BooleanField(required=False)
 
-    slice_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    slice_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}),
+                                 help_text="This shows up as a hint")
     authority_hrn = forms.ChoiceField(choices=[(1, 'un')],widget=forms.Select(attrs={'class':'form-control'}))
     number_of_nodes  = forms.DecimalField(widget=forms.TextInput(attrs={'class':'form-control'}))
     type_of_nodes = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))

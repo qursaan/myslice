@@ -86,8 +86,7 @@
         // ... be sure to list all events here
 
         /* RECORD HANDLERS */
-        
-        on_record_received: function(record)
+        on_all_new_record: function(record)
         {
             //
         },
