@@ -1,0 +1,33 @@
+<div id='main-{{ domid }}'>
+  <table class='table table-striped table-bordered dataTable' id='{{domid}}__table'>
+    <thead>
+      <tr>
+        {% for column in columns %}
+        <th>{{ column }}</th>
+        {% endfor %} 
+        {% for column in hidden_columns %}
+        <th>{{ column }}</th>
+        {% endfor %} 
+        {% if checkboxes %}
+		<th>+/-</th>
+		{% endif %}
+	  </tr>
+	</thead> 
+    <tbody>
+    </tbody>
+    <tfoot>
+      <tr>
+        {% for column in columns %}
+	    <th>{{ column }}</th>
+        {% endfor %} 
+        {% for column in hidden_columns %}
+	    <th>{{ column }}</th>
+        {% endfor %} 
+        {% if checkboxes %}
+		<th>+/-</th>
+		{% endif %}
+	  </tr>
+    </tfoot> 
+  </table>
+</div>
+<div class="hazelnut-spacer"></div>
