@@ -1,13 +1,5 @@
 {% extends "layout-unfold1.html" %}
 
-{% block head %}
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
-<!-- xxx ideally only onelab.css but ... xxx -->
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-<script type="text/javascript" src="{{STATIC_URL}}/js/jquery.validate.js"></script> 
-<script type="text/javascript" src="{{STATIC_URL}}/js/my_account.register.js"></script>
-{% endblock %}                              
-                                    
 {% block unfold1_main %}        
 
 <div class="onelab-title well well-lg">
@@ -25,28 +17,33 @@
    
 <div class="well">
   <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
+    <fieldset>
     {% csrf_token %}
     <div class="form-group">
       <label for="firstname" class="col-md-4 control-label">First Name</label>
       <div class="col-md-4">
-	<input type="text" name="firstname" class="required form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" />
+	<input type="text" name="firstname" class="form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" required />
       </div>
       <div class="col-md-4"> <p class="form-hint">Enter your first name</p> </div>
     </div>
     <div class="form-group">
       <label for="lastname" class="col-md-4 control-label">Last Name</label>
       <div class="col-md-4">
-	<input type="text" name="lastname" size="25" class="required form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" />
+	<input type="text" name="lastname" size="25" class="form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" required />
       </div>
       <div class="col-md-4"><p class="form-hint">Enter your last name</p></div>
     </div>
     <div class="form-group">
       <label for="auth_list" class="col-md-4 control-label">Authority</label>
       <div class="col-md-4">
-	<select id="auth_list" name="authority_hrn" size="1" class="required form-control">
+	<select id="auth_list" name="authority_hrn" size="1" class="form-control" required>
+	  {% if authorities %}
 	  {% for authority in authorities %}
-	  <option value="{{ authority.authority_hrn }}"/>{{authority.name}} ({{authority.authority_hrn}})</option>
+	  <option value="{{ authority.authority_hrn }}">{{authority.name}} ({{authority.authority_hrn}})</option>
 	  {% endfor %}
+	  {% else %} <!-- should not happen -->
+	  <option value="test">No authority found !!! </option>
+	  {% endif %}
 	</select>
       </div>
       <div class="col-md-4"><p class="form-hint">Please select an authority responsible for vetting your account</p></div>
@@ -55,29 +52,29 @@
     <div class="form-group">
       <label for="email" class="col-md-4 control-label">Email</label>
       <div class="col-md-4">
-	<input type="email" name="email" size="25"  class="required form-control" value="{{ email }}"/> 
+	<input type="email" name="email" size="25"  class="form-control" value="{{ email }}" required/> 
       </div>
       <div class="col-md-4"><p class="form-hint">Enter a valid email address</p></div>
     </div>
     <div class="form-group">
       <label for="password" class="col-md-4 control-label">Password</label>
       <div class="col-md-4">
-	<input type="password"  id="password" name="password"   class="required form-control" minlength="4" value="{{ password }}"/> 
+	<input type="password"  id="password" name="password"   class="form-control" minlength="4" value="{{ password }}" required/> 
       </div>
       <div class="col-md-4"><p class="form-hint">Enter password</p></div>
     </div>
     <div class="form-group">
       <label for="password" class="col-md-4 control-label">Confirm Password</label>
       <div class="col-md-4">
-	<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="required form-control" 
-	       value="" placeholder="Confirm Password"/>
+	<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="form-control" 
+	       value="" placeholder="Confirm Password" required/>
       </div>
       <div class="col-md-4"><p class="form-hint">Retype the password</p></div>
     </div>
     <div class="form-group">
       <label for="question" class="col-md-4 control-label">My Keys</label>
       <div class="col-md-4">
-	<select name="question" class="required form-control" id="question">        
+	<select name="question" class="form-control" id="key-policy" required>        
 	  <option value="generate">Generate key pairs for me </option>
 	  <option value="upload">Upload my public key </option>
 	</select>
@@ -87,7 +84,7 @@
     <div class="form-group" style="display:none;" id="upload_key">
       <label for="file" class="col-md-4 control-label">Upload public key</label>
       <div class="col-md-4">
-	<input type="file" name="user_public_key" class="required" id="user_public_key"/>
+	<input type="file" name="user_public_key" class="form-control" id="user_public_key" required/>
 	<p class="warning" id="pkey_del_msg">Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]</p>
       </div>
       <div class="col-md-4"><p class="form-hint">Account Delegation: Manual (Advanced Users)</p></div>
@@ -97,6 +94,7 @@
 	<button class="submit btn btn-default" type="submit">Register</button>
       </div>
     </div>
+  </fieldset>
   </form>  
 </div>
 

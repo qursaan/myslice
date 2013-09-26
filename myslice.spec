@@ -1,6 +1,6 @@
 %define name myslice
 %define version 0.2
-%define taglevel 3
+%define taglevel 4
 
 %define release %{taglevel}%{?pldistro:.%{pldistro}}%{?date:.%{date}}
 
@@ -47,6 +47,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/myslice/*
 
 %changelog
+* Wed Sep 25 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-0.2-4
+- move to bootstrap v3 complete - hopefully
+- static files directory is now plain static/
+- templates files directory is now plain templates/
+- packaging for debian should be working fine, using apache+wsgi
+
 * Fri Sep 20 2013 Thierry Parmentelat <thierry.parmentelat@sophia.inria.fr> - myslice-0.2-3
 - checkpoint for deployment on test.myslice.info
 

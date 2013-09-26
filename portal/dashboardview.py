@@ -53,7 +53,7 @@ class DashboardView (LoginRequiredAutoLogoutView):
 
         # XXX This is repeated in all pages
         # more general variables expected in the template
-        context['title'] = 'Test view that combines various plugins'
+        context['title'] = 'Dashboard'
         # the menu items on the top
         context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
         # so we can sho who is logged

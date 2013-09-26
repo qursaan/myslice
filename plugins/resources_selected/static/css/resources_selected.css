@@ -16,16 +16,6 @@ tr.remove td{
     cursor: pointer;
 }
 
-input.myslice_action {
-   font-size:13px;
-   font-family:Arial,sans-serif;
-   font-weight:bold;
-   color:#0066CC;
-   width:100px;
-   height:30px;
-   background-color:#FF9933;
-}
-
 .ResourcesSelected .added {
     background-color: #E3F6CE;
 }
