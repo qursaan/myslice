@@ -24,8 +24,7 @@ from plugins.messages                import Messages
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-#do_query_users=True
-do_query_users=False
+do_query_users=True
 
 class SliceView (LoginRequiredAutoLogoutView):
 
