@@ -24,14 +24,13 @@ var nodes = [];
 function init() {
   var particles, particle;
   
-  div3d = JQuery('#div3d');
-  nodebox = JQuery('#nodebox');
-  infobox = JQuery('#infobox');
-  titlebox = JQuery('#titlebox');
+  div3d = document.getElementById('div3d');
+  nodebox = document.getElementById('nodebox');
+  infobox = document.getElementById('infobox');
+  titlebox = document.getElementById('titlebox');
   
-  var offset = div3d.offset;
-  offY = div3d.top;
-  offX = div3d.left;
+  offY = div3d.offsetTop;
+  offX = div3d.offsetLeft;
   
   //titlebox.innerHTML = 'Grenoble Site ' + nodes.length + " nodes";
   infobox.innerHTML = 'Node info : ';
@@ -44,7 +43,7 @@ function init() {
   
   renderer = new THREE.CanvasRenderer();
   
-  div3d.append(renderer.domElement);
+  div3d.appendChild(renderer.domElement);
   
   window.addEventListener('resize', set3dsize, false);
   scene.add(camera);
@@ -116,11 +115,10 @@ function init() {
 }
 
 function set3dsize() {
-  var offset = div3d.offset;
-  offY = offset.top;
-  offX = offset.left;
-  window3DWidth = offset.width;
-  window3DHeight = offset.height;
+  offY = div3d.offsetTop;
+  offX = div3d.offsetLeft;
+  window3DWidth = div3d.offsetWidth;
+  window3DHeight = div3d.offsetHeight;
   renderer.setSize(window3DWidth, window3DHeight);
   
   camera.aspect = window3DWidth / window3DHeight;

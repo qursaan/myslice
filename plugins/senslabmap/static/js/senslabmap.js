@@ -9,8 +9,6 @@
       this.received_set = false;
       this.in_set_buffer = Array();
       
-      this.el().on('show', this, this.on_show);
-      
       var query = manifold.query_store.find_analyzed_query(options.query_uuid);
       this.method = query.object;
       
