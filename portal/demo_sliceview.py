@@ -156,6 +156,14 @@ class SliceView (LoginRequiredAutoLogoutView):
             },
         ))
 
+        tab_resource_plugins.insert(SensLabMap(
+            page  = page,
+            title = 'SensLab Map',
+            domid = 'senslabmap',
+            query = sq_resource, # query slice resources
+            query_all  = query_resource_all # query all resources
+        ))
+
         tab_resource_plugins.insert(GoogleMap(
             page       = page,
             title      = 'Geographic view',
