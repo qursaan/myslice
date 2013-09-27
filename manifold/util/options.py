@@ -1,10 +1,16 @@
-import sys, optparse, cfgparse
+import sys
 import os.path
+import optparse
+# xxx warning : this is not taken care of by the debian packaging
+# cfgparse seems to be available by pip only (on debian, that is)
+# there seems to be another package that might be used to do similar stuff
+# python-configglue - Glues together optparse.OptionParser and ConfigParser.ConfigParser
+# additionally argumentparser would probably be the way to go, notwithstanding
+import cfgparse
 
 from manifold.util.singleton    import Singleton
 
 # http://docs.python.org/dev/library/argparse.html#upgrading-optparse-code
-
 
 class Options(object):
 
