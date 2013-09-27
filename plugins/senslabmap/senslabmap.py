@@ -5,9 +5,11 @@ class SensLabMap (Plugin):
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
-    def __init__ (self, query, **settings):
+    def __init__ (self, query, query_all, **settings):
         Plugin.__init__ (self, **settings)
-        self.query=query
+        self.query = query
+        self.query_all = query_all
+        self.query_all_uuid = query_all.query_uuid
 
     def template_file (self):
         return "senslabmap.html"
@@ -28,4 +30,4 @@ class SensLabMap (Plugin):
         return reqs
 
     # the list of things passed to the js plugin
-    def json_settings_list (self): return ['plugin_uuid','query_uuid']
+    def json_settings_list (self): return ['plugin_uuid', 'dom_id', 'query_uuid', 'query_all_uuid']
