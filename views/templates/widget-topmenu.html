@@ -19,13 +19,13 @@
 	{% for d in topmenu_items %} 
 	{% if d.dropdown %}
 	<li class="dropdown">
-	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}"> {{ d.label }}<b class="caret"></b></a>
+	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}">{{ d.label }}<b class="caret"></b></a>
 	  <ul class="dropdown-menu">
-	  {% for dd in d.contents %}
-	  {% if dd.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
-	  <a class="dropdown-toggle" href="{{ dd.href }}"> {{ dd.label }} </a> </li>
-	  {% endfor %}
-	</ul>
+	    {% for dd in d.contents %}
+	    {% if dd.is_active %}<li class='active'>{% else %}<li class='other'>{% endif %}
+	    <a class="dropdown-toggle" href="{{ dd.href }}"> {{ dd.label }} </a> </li>
+	    {% endfor %}
+	  </ul>
         </li>
         {% else %} 
 	{% if d.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
