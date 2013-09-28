@@ -21,7 +21,7 @@
     {% for field in form %}
     <div class="form-group">
       <label for="{{ field.html_name }}" class="col-md-4 control-label">{{ field.label }}</label>
-      <div class="col-md-4"> {{ field.errors }} {{ field }} <p class="hint">{{ field.help_text }}</p> </div>
+      <div class="col-md-4"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
     </div>
     {% endfor %}
     <div class="col-md-offset-4 col-md-4">
