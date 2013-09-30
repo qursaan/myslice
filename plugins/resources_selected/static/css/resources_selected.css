@@ -22,3 +22,15 @@ tr.remove td{
 .ResourcesSelected .removed {
     background-color: #F6CECE;
 }
+
+div.resources-selected-spacer {
+    margin: 20px 15px;
+}
+
+#pending__table_paginate {
+    margin-bottom: 10px;
+}
+
+thead.resources-selected th, tfoot.resources-selected th {
+    background: url('../img/tablesort-header.png') repeat-x; 
+}
