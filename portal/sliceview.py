@@ -6,7 +6,7 @@ from unfold.loginrequired            import LoginRequiredAutoLogoutView
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 
-from myslice.viewutils               import topmenu_items, the_user
+from ui.topmenu                      import topmenu_items, the_user
 
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack

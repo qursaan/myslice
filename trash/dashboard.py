@@ -16,10 +16,10 @@ from plugins.lists.slicelist import SliceList
 from plugins.querycode import QueryCode
 from plugins.quickfilter import QuickFilter
 
-from trash.trashutils  import quickfilter_criterias
+from trash.trashutils import quickfilter_criterias
 
 # 
-from myslice.viewutils import topmenu_items, the_user
+from ui.topmenu import topmenu_items, the_user
 
 @login_required
 def dashboard_view (request):

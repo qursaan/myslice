@@ -174,7 +174,7 @@ INSTALLED_APPS = (
     # plugins
     'plugins',
     # views - more or less stable 
-    'views',
+    'ui',
     # managing database migrations
     'south', 
     # Uncomment the next line to enable the admin:

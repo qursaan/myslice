@@ -29,7 +29,7 @@ from django.views.generic.base   import TemplateView
 from django.shortcuts            import render
 from manifold.core.query         import Query
 from unfold.page                 import Page
-from myslice.viewutils           import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items, the_user
 from django.http                 import HttpResponseRedirect
 from plugins.debug_platform      import DebugPlatform
 

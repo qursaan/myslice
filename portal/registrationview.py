@@ -7,7 +7,7 @@ from django.template.loader     import render_to_string
 from django.shortcuts           import render
 
 from unfold.page                import Page
-from myslice.viewutils          import topmenu_items
+from ui.topmenu                 import topmenu_items
 
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query

@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from manifold.manifoldresult import ManifoldResult
-from myslice.viewutils import topmenu_items, the_user
+from ui.topmenu import topmenu_items, the_user
 from myslice.config import Config
 
 class HomeView (View):

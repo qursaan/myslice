@@ -112,6 +112,11 @@ package is published)
   for how to use a separate authentication system, 
   as well as settings.py for how to enable it
 
+* ui/
+  provides building blocks for the UI, especially layouts (1 or 2 columns) as
+  well as the topmenu widget
+  + some global static files (css, js, images..)
+
 * portal/
   this is where the first implementation of myslice, with complete
   user-management including registration, is taking place
@@ -119,11 +124,6 @@ package is published)
 * trash/
   rough/preliminary scaffolding views are in here
   as the name suggests this is temporary
-
-* views/
-  will receive actual views over time 
-  currently has some global html templates as well
-  + some global static files (css, js, images..)
 
 * insert_above: 
   a third-party django app for adding on-the-fly mentions to css or js files that need to go in the header

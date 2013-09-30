@@ -4,7 +4,7 @@ from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account
 #
-from myslice.viewutils                  import topmenu_items, the_user
+from ui.topmenu                         import topmenu_items, the_user
 #
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages

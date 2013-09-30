@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 
 from unfold.prelude import Prelude
 
-from myslice.viewutils import topmenu_items, the_user
+from ui.topmenu import topmenu_items, the_user
 # tmp
-from trash.trashutils  import lorem, hard_wired_slice_names
+from trash.trashutils import lorem, hard_wired_slice_names
 
 @login_required
 def tab_view (request):

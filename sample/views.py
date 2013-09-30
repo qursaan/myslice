@@ -21,7 +21,7 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from django.views.generic.base   import TemplateView
-from myslice.viewutils           import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items, the_user
 
 class WebSocketsView(TemplateView):
     template_name = "websockets.html"

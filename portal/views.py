@@ -28,7 +28,7 @@ from django.views.generic.base  import TemplateView
 from django.shortcuts           import render
 from django.template.loader     import render_to_string
 
-from myslice.viewutils          import topmenu_items, the_user
+from ui.topmenu                 import topmenu_items, the_user
 
 from portal.event               import Event
 # presview is put in observation for now

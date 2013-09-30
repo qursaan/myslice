@@ -19,8 +19,8 @@ from plugins.raw                        import Raw
 from plugins.messages                   import Messages
 from plugins.hazelnut                   import Hazelnut
 
-from myslice.viewutils                  import topmenu_items, the_user
-from trash.trashutils                  import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
+from ui.topmenu                         import topmenu_items, the_user
+from trash.trashutils                   import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 #might be useful or not depending on the context
 #@login_required

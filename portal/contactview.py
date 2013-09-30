@@ -1,9 +1,9 @@
 from django.shortcuts           import render
-from django.template.loader      import render_to_string
+from django.template.loader     import render_to_string
 from django.views.generic       import View
 from django.core.mail           import send_mail
 
-from myslice.viewutils          import topmenu_items, the_user
+from ui.topmenu                 import topmenu_items, the_user
 
 from portal.forms               import ContactForm
 

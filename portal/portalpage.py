@@ -2,7 +2,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from unfold.page import Page
-from myslice.viewutils import topmenu_items, the_user
+from ui.topmenu import topmenu_items, the_user
 
 class PortalPage(Page):
     def __init__(self, request):

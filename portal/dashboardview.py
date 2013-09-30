@@ -5,7 +5,7 @@ from plugins.lists.simplelist    import SimpleList
 
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
-from myslice.viewutils           import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items, the_user
 
 #This view requires login 
 class DashboardView (LoginRequiredAutoLogoutView):

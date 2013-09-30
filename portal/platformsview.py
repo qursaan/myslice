@@ -3,7 +3,7 @@ from django.views.generic.base   import TemplateView
 from manifold.core.query         import Query
 from unfold.page                 import Page
 
-from myslice.viewutils           import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items, the_user
 
 from plugins.hazelnut            import Hazelnut
 

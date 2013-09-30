@@ -40,4 +40,3 @@ def the_user (request):
         return ''
     else: 
         return request.user.email
-

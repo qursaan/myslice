@@ -9,7 +9,7 @@ from portal.models               import PendingSlice
 from portal.actions              import authority_get_pi_emails
 from portal.forms                import SliceRequestForm
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
-from myslice.viewutils           import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items, the_user
 
 class SliceRequestView (LoginRequiredAutoLogoutView):
 
