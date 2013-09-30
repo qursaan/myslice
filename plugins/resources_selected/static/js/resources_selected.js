@@ -70,17 +70,17 @@
 
         do_refresh: function(e)
         {
-            throw 'Not implemented';
+            throw 'resource_selected.do_refresh Not implemented';
         },
 
         do_reset: function(e)
         {
-            throw 'Not implemented';
+            throw 'resources_selected.do_reset Not implemented';
         },
 
         do_clear_annotations: function(e)
         {
-            throw 'Not implemented';
+            throw 'resources_selected.do_clear_annotations Not implemented';
         },
         
         /************************** GUI MANIPULATION **************************/

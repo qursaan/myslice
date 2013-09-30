@@ -192,7 +192,7 @@
                 // XXX remove the empty checked attribute
                 line.push(this.checkbox(this.key, record[this.key]));
     
-            // XXX Is adding an array of lines more efficient ?
+// adding an array in one call is *much* more efficient
 //            this.table.fnAddData(line);
 	    this.buffered_lines.push(line)
 
