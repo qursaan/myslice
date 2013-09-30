@@ -17,6 +17,7 @@
     
     initialize_map: function() {
       this.nodes = [];
+      this.id = 0;
     },
 
     refresh: function() {
@@ -31,8 +32,10 @@
     on_all_new_record: function(n) {
       // format is : [name, x, y, z, uid, state]
       // state = "Busy", "Alive" or "Down"
-      node = [42, n.x, n.y, n.z, "bb40", "Alive"];
+      this.id++;
+      node = [this.id, n.x, n.y, n.z, this.id, "Alive"];
       this.nodes.push(node);
+      console.log("node id " + this.id);
     },
     
     on_all_query_done: function() {
