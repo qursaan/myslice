@@ -121,8 +121,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             checkboxes = True,
             # center on Paris
             latitude   = 49.,
-            longitude  = 2.2,
-            zoom       = 3,
+            longitude  = 9,
+            zoom       = 4,
         )
 
         resources_as_list = Hazelnut( 
