@@ -49,8 +49,6 @@
              });
             
             // XXX This should not be done at init...
-	    console.log("elmt(update) is " + this.elmt('update'));
-
             this.elmt('update').click(this, this.do_update);
             this.elmt('refresh').click(this, this.do_refresh);
             this.elmt('reset').click(this, this.do_reset);
@@ -65,7 +63,6 @@
 
         do_update: function(e) 
         {
-	    console.log ("in do_update");
             var self = e.data;
             // XXX check that the query is not disabled
             manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
