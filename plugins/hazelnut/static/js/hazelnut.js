@@ -39,6 +39,9 @@
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');
 
+	    /* an internal buffer for keeping lines and display them in one call to fnAddData */
+	    this.buffered_lines = [];
+
             /* GUI setup and event binding */
             this.initialize_table();
         },
@@ -283,7 +286,8 @@
                 line.push(this.checkbox(this.key, record[this.key]));
     
             // XXX Is adding an array of lines more efficient ?
-            this.table.fnAddData(line);
+//            this.table.fnAddData(line);
+	    this.buffered_lines.push(line)
 
         },
 
@@ -459,6 +463,8 @@
 
                 this.unspin();
             }
+	    this.table.fnAddData (this.buffered_lines);
+	    this.buffered_lines=[];
             this.received_all = true;
 
         }, // on_all_query_done
