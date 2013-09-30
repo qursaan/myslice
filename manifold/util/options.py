@@ -6,7 +6,8 @@ import optparse
 # there seems to be another package that might be used to do similar stuff
 # python-configglue - Glues together optparse.OptionParser and ConfigParser.ConfigParser
 # additionally argumentparser would probably be the way to go, notwithstanding
-import cfgparse
+# xxx Moving this into the parse method so this module can at least be imported
+#import cfgparse
 
 from manifold.util.singleton    import Singleton
 
@@ -44,6 +45,7 @@ class Options(object):
         # get defaults too
         
         # Initialize options to default values
+        import cfgparse
         cfg = cfgparse.ConfigParser()
         cfg.add_optparse_help_option(self._opt)
 
