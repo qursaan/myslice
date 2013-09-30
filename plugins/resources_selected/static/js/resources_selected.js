@@ -31,23 +31,26 @@
 
             var self = this;
             this.table = this.elmt('table').dataTable({
-                //sPaginationType: 'full_numbers',  // Use pagination
+//                sDom: "<'row'<'col-md-5'l><'col-md-1'r><'col-md-6'f>>t<'row'<'col-md-5'i><'col-md-7'p>>",
                 sPaginationType: 'full_numbers',
+		bAutoWidth: true,
                 //bJQueryUI      : true,
                 //bRetrieve      : true,
-                sScrollX       : '100%',                 // Horizontal scrolling 
-                bSortClasses   : false,              // Disable style for the sorted column
-                aaSorting      : [[ 0, 'asc' ]],        // Default sorting on URN
-                fnDrawCallback: function() {      // Reassociate close click every time the table is redrawn
-                    /* Prevent to loop on click while redrawing table  */
-                    $('.ResourceSelectedClose').unbind('click');
-                    /* Handle clicks on close span */
-                    /* Reassociate close click every time the table is redrawn */
-                    $('.ResourceSelectedClose').bind('click', self, self._close_click);
-                }
+//                sScrollX       : '100%',                 // Horizontal scrolling 
+//                bSortClasses   : false,              // Disable style for the sorted column
+//                aaSorting      : [[ 0, 'asc' ]],        // Default sorting on URN
+//                fnDrawCallback: function() {      // Reassociate close click every time the table is redrawn
+//                    /* Prevent to loop on click while redrawing table  */
+//                    $('.ResourceSelectedClose').unbind('click');
+//                    /* Handle clicks on close span */
+//                    /* Reassociate close click every time the table is redrawn */
+//                    $('.ResourceSelectedClose').bind('click', self, self._close_click);
+//                }
              });
             
             // XXX This should not be done at init...
+	    console.log("elmt(update) is " + this.elmt('update'));
+
             this.elmt('update').click(this, this.do_update);
             this.elmt('refresh').click(this, this.do_refresh);
             this.elmt('reset').click(this, this.do_reset);
@@ -62,6 +65,7 @@
 
         do_update: function(e) 
         {
+	    console.log ("in do_update");
             var self = e.data;
             // XXX check that the query is not disabled
             manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
