@@ -229,7 +229,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             togglable   = False,
             # this is the query at the core of the slice list
             query       = sq_measurement,
-            checkboxes  = False,
+            checkboxes  = True,
             datatables_options = { 
                 'iDisplayLength' : 25,
                 'bLengthChange'  : True,
