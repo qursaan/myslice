@@ -17,10 +17,17 @@
             this._super(options, element);
 
             /* Member variables */
-            // query status
-            this.received_all = false;
-            this.received_set = false;
-            this.in_set_buffer = Array();
+	    // in general we expect 2 queries here
+	    // query_uuid refers to a single object (typically a slice)
+	    // query_all_uuid refers to a list (typically resources or users)
+	    // these can return in any order so we keep track of which has been received yet
+            this.received_all_query = false;
+            this.received_query = false;
+
+            // an internal buffer for records that are 'in' and thus need to be checked 
+            this.buffered_records_to_check = [];
+	    // an internal buffer for keeping lines and display them in one call to fnAddData
+	    this.buffered_lines = [];
 
             /* XXX Events XXX */
             // this.$element.on('show.Datatables', this.on_show);
@@ -38,9 +45,6 @@
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');
-
-	    /* an internal buffer for keeping lines and display them in one call to fnAddData */
-	    this.buffered_lines = [];
 
             /* GUI setup and event binding */
             this.initialize_table();
@@ -298,13 +302,14 @@
 
         on_new_record: function(record)
         {
-            /* NOTE in fact we are doing a join here */
-            if (this.received_all)
-                // update checkbox for record
+            if (this.received_all_query) {
+		// if the 'all' query has been dealt with already we may turn on the checkbox
                 this.set_checkbox(record, true);
-            else
-                // store for later update of checkboxes
-                this.in_set_buffer.push(record);
+	    } else {
+		// otherwise we need to remember that and do it later on
+                this.buffered_records_to_check.push(record);
+		console.log ("Remembering record to check " + record);
+	    }
         },
 
         on_clear_records: function()
@@ -319,9 +324,9 @@
 
         on_query_done: function()
         {
-            if (this.received_all)
+            if (this.received_all_query)
                 this.unspin();
-            this.received_set = true;
+            this.received_query = true;
         },
         
         on_field_state_changed: function(data)
@@ -362,12 +367,12 @@
         on_all_query_done: function()
         {
             var self = this;
-            if (this.received_set) {
+            if (this.received_query) {
                 /* XXX needed ? XXX We uncheck all checkboxes ... */
                 $("[id^='datatables-checkbox-" + this.options.plugin_uuid +"']").attr('checked', false);
 
                 /* ... and check the ones specified in the resource list */
-                $.each(this.in_set_buffer, function(i, record) {
+                $.each(this.buffered_records_to_check, function(i, record) {
                     self.set_checkbox(record, true);
                 });
 
@@ -375,7 +380,7 @@
             }
 	    this.table.fnAddData (this.buffered_lines);
 	    this.buffered_lines=[];
-            this.received_all = true;
+            this.received_all_query = true;
 
         }, // on_all_query_done
 
