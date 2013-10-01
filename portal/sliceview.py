@@ -21,6 +21,8 @@ from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
 
+from myslice.config                  import Config
+
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
@@ -33,8 +35,9 @@ class SliceView (LoginRequiredAutoLogoutView):
         page = Page(request)
         page.add_css_files ('css/slice-view.css')
         page.add_js_files  ( [ "js/common.functions.js" ] )
-        page.add_js_chunks ('$(function() { console.log("sliceview: jQuery version " + $.fn.jquery); });')
-        page.add_js_chunks ('$(function() { console.log("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
+        page.add_js_chunks ('$(function() { messages.debug("sliceview: jQuery version " + $.fn.jquery); });')
+        page.add_js_chunks ('$(function() { messages.debug("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
+        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(Config.manifold_url()))
         page.expose_js_metadata()
     
         metadata = page.get_metadata()

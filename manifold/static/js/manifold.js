@@ -364,8 +364,7 @@ var manifold = {
             // by default we publish using the same uuid of course
             if (publish_uuid==undefined) publish_uuid=query.query_uuid;
             if (manifold.asynchroneous_debug) {
-                messages.debug("sending POST on " + manifold.proxy_url + " to be published on " + publish_uuid);
-                messages.debug("... ctd... with actual query= " + query.__repr());
+                messages.debug("sending POST on " + manifold.proxy_url + query.__repr());
             }
 
             query.iter_subqueries(function (sq) {
