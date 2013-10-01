@@ -50,10 +50,6 @@
             this.initialize_table();
         },
 
-        default_options: {
-            'checkboxes': false
-        },
-
         /* PLUGIN EVENTS */
 
         on_show: function(e)
@@ -84,7 +80,7 @@
         {
             /* Transforms the table into DataTable, and keep a pointer to it */
             var self = this;
-            actual_options = {
+            var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
                 sDom: "<'row'<'col-md-5'l><'col-md-1'r><'col-md-6'f>>t<'row'<'col-md-5'i><'col-md-7'p>>",
@@ -105,6 +101,12 @@
 	    // xxx DISABLED by jordan: was causing errors in datatables.js
 	    // xxx turned back on by Thierry - this is the code that takes python-provided options into account
 	    // check your datatables_options tag instead 
+	    // however, we have to accumulate in aoColumnDefs from here (above) 
+	    // and from the python wrapper (checkboxes management, plus any user-provided aoColumnDefs)
+	    if ( 'aoColumnDefs' in this.options.datatables_options) {
+		actual_options['aoColumnDefs']=this.options.datatables_options['aoColumnDefs'].concat(actual_options['aoColumnDefs']);
+		delete this.options.datatables_options['aoColumnDefs'];
+	    }
 	    $.extend(actual_options, this.options.datatables_options );
             this.table = this.elmt('table').dataTable(actual_options);
 
@@ -146,7 +148,7 @@
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
-        checkbox: function (key, value)
+        checkbox_html : function (key, value)
         {
             var result="";
             // Prefix id with plugin_uuid
@@ -193,14 +195,14 @@
                 }
             }
     
-            /* catch up with the last column if checkboxes were requested */
-            if (this.options.checkboxes)
+            // catch up with the last column if checkboxes were requested 
+            if (this.options.checkboxes) {
                 // Use a key instead of hostname (hard coded...)
-                // XXX remove the empty checked attribute
-                line.push(this.checkbox(this.key, record[this.key]));
+                line.push(this.checkbox_html(this.key, record[this.key]));
+	    }
     
-// adding an array in one call is *much* more efficient
-//            this.table.fnAddData(line);
+	    // adding an array in one call is *much* more efficient
+	    // this.table.fnAddData(line);
 	    this.buffered_lines.push(line)
 
         },
