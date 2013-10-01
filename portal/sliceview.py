@@ -188,14 +188,14 @@ class SliceView (LoginRequiredAutoLogoutView):
                 outline_complete    = True,
                 togglable           = True,
                 title               = 'Users',
-                active_domid        = 'checkboxes2',
+                active_domid        = 'users-list',
                 )
             main_stack.insert(tab_users)
     
             tab_users.insert(Hazelnut( 
                 page        = page,
                 title       = 'Users List',
-                domid       = 'checkboxes2',
+                domid       = 'users-list',
                 # tab's sons preferably turn this off
                 togglable   = False,
                 # this is the query at the core of the slice list
@@ -213,7 +213,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # MEASUREMENTS
         tab_measurements = Tabs (
             page                = page,
-            active_domid        = 'checkboxes3',
+            active_domid        = 'measurements-list',
             outline_complete    = True,
             togglable           = True,
             title               = 'Measurements',
@@ -224,12 +224,12 @@ class SliceView (LoginRequiredAutoLogoutView):
         tab_measurements.insert(Hazelnut( 
             page        = page,
             title       = 'Measurements',
-            domid       = 'checkboxes3',
+            domid       = 'measurements-list',
             # tab's sons preferably turn this off
             togglable   = False,
             # this is the query at the core of the slice list
             query       = sq_measurement,
-            checkboxes  = True,
+            checkboxes  = False,
             datatables_options = { 
                 'iDisplayLength' : 25,
                 'bLengthChange'  : True,
