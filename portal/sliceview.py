@@ -232,6 +232,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             togglable   = False,
             # this is the query at the core of the slice list
             query       = sq_measurement,
+            # do NOT set checkboxes to False
+            # this table being otherwise empty, it just does not fly with dataTables
             checkboxes  = True,
             datatables_options = { 
                 'iDisplayLength' : 25,
