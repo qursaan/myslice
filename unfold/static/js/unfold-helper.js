@@ -37,7 +37,7 @@ var unfold = {
         if(typeof id != 'undefined'){
             return id.replace( /(:|\.|\[|\])/g, "\\$1" );
         }else{
-            return "fake-id";
+            return "undefined-id";
         }
     }
 
