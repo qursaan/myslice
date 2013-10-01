@@ -31,7 +31,7 @@ INSERT INTO object VALUES(field=value)
     
     this.__repr = function () {
 	res  = "ManifoldQuery ";
-	res += " id=" + this.query_uuid;
+//	res += " id=" + this.query_uuid;
 	res += " a=" + this.action;
 	res += " o=" + this.object;
 	res += " ts=" + this.timestamp;
