@@ -133,9 +133,6 @@ class SliceView (LoginRequiredAutoLogoutView):
             query_all  = query_resource_all,
             checkboxes = True,
             datatables_options = { 
-                # for now we turn off sorting on the checkboxes columns this way
-                # this of course should be automatic in hazelnut
-                'aoColumns'     : [None, None, None, None, {'bSortable': False}],
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
                 'bAutoWidth'    : True,

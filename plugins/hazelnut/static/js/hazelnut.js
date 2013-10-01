@@ -98,7 +98,10 @@
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
-            //  XXX DISABLED by jordan: was causing errors in datatables.js     $.extend(actual_options, options.datatables_options );
+	    // xxx DISABLED by jordan: was causing errors in datatables.js
+	    // xxx turned back on by Thierry - this is the code that takes python-provided options into account
+	    // check your datatables_options tag instead 
+	    $.extend(actual_options, this.options.datatables_options );
             this.table = this.elmt('table').dataTable(actual_options);
 
             /* Setup the SelectAll button in the dataTable header */
@@ -504,4 +507,16 @@
 
     $.plugin('Hazelnut', Hazelnut);
 
+  /* define the 'dom-checkbox' type for sorting in datatables 
+     http://datatables.net/examples/plug-ins/dom_sort.html
+     using trial and error I found that the actual column number
+     was in fact given as a third argument, and not second 
+     as the various online resources had it - go figure */
+    $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
+	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
+	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
+	} );
+    }
+
 })(jQuery);
+

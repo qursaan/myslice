@@ -5,6 +5,8 @@ class Hazelnut (Plugin):
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
+    # also please refrain from passing an 'aoColumns' as datatables_options
+    # as we use 'aoColumnDefs' instead
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
                   datatables_options={}, **settings):
@@ -21,7 +23,7 @@ class Hazelnut (Plugin):
         elif self.query:
             self.columns = self.query.fields
             if query_all:
-                # We need a list because sets are not JSON-serilizable
+                # We need a list because sets are not JSON-serializable
                 self.hidden_columns = list(self.query_all.fields - self.query.fields)
             else:
                 self.hidden_columns = []
@@ -29,6 +31,19 @@ class Hazelnut (Plugin):
             self.columns = []
             self.hidden_columns = []
         self.datatables_options=datatables_options
+        # if checkboxes were required, we tell datatables about this column's type
+        # so that sorting can take place on a selected-first basis (or -last of course)
+        # this relies on the template exposing the checkboxes 'th' with class 'checkbox'
+        if self.checkboxes:
+            # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
+            if 'aoColumns' in self.datatables_options:
+                print 'WARNING: hazelnut uses aoColumnDefs, your aoColumns spec. is discarded'
+                del self.datatables_options['aoColumns']
+            # set aoColumnDefs in datatables_options - might already have stuff in there
+            aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])
+            # here 'checkbox' is the class that we give to the <th> dom elem
+            # dom-checkbox is a sorting type that we define in hazelnut.js
+            aoColumnDefs.append ( {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
 
     def template_file (self):
         return "hazelnut.html"
@@ -41,17 +56,19 @@ class Hazelnut (Plugin):
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/hazelnut.js", 
-                           "js/manifold.js", "js/manifold-query.js", 
+            'js_files' : [ "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
-                           "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                           "js/manifold.js", "js/manifold-query.js", 
                            "js/unfold-helper.js",
+                          # hazelnut.js needs to be loaded after dataTables.js as it extends 
+                          # dataTableExt.afnSortData
+                           "js/hazelnut.js", 
                            ] ,
-            'css_files': [ "css/hazelnut.css" , 
-                           "css/dataTables.bootstrap.css",
+            'css_files': [ "css/dataTables.bootstrap.css",
                            # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
                            # for now we use full_numbers\, with our own ad hoc css 
                            "css/dataTables.full_numbers.css",
+                           "css/hazelnut.css" , 
                            ],
             }
         return reqs
