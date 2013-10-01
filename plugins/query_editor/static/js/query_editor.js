@@ -40,7 +40,6 @@
 
         init: function(options, element) {
             this._super(options, element);
-            console.log("init Query_Editor");
             this.listen_query(options.query_uuid);
 
             this.elts('queryeditor-auto-filter').change(this.event_filter_added('='));
