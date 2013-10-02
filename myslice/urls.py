@@ -23,7 +23,7 @@ platforms_view=portal.platformsview.PlatformsView.as_view()
 # maybe platforms_view would be best on the longer run
 the_default_view=home_view
 # where to be redirected after login
-the_after_login_view=home_view #dashboard_view
+the_after_login_view=dashboard_view
 # where to redirect when login is required
 # might need another one ?
 the_login_view=home_view
