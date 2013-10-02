@@ -203,7 +203,7 @@
     
 	    // adding an array in one call is *much* more efficient
 	    // this.table.fnAddData(line);
-	    this.buffered_lines.push(line)
+	    this.buffered_lines.push(line);
 
         },
 

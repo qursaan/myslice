@@ -34,7 +34,7 @@ var unfold = {
     },
 
     escape_id: function(id) {
-        if(typeof id != 'undefined'){
+        if( id !== undefined){
             return id.replace( /(:|\.|\[|\])/g, "\\$1" );
         }else{
             return "undefined-id";
