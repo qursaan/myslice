@@ -8,7 +8,7 @@
 
     // TEMP
     var debug=false;
-    debug=true
+//    debug=true
 
     var Hazelnut = Plugin.extend({
 
@@ -260,7 +260,7 @@
             var checkbox_id = this.flat_id(this.id('checkbox', key_value));
             checkbox_id = '#' + checkbox_id;
             var element = $(checkbox_id, this.table.fnGetNodes());
-//	    messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
+	    if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
         },
 
@@ -305,11 +305,12 @@
         {
             if (this.received_all_query) {
 		// if the 'all' query has been dealt with already we may turn on the checkbox
+		if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
                 this.set_checkbox(record, true);
 	    } else {
 		// otherwise we need to remember that and do it later on
+		if (debug) messages.debug ("Remembering record to check " + record[this.key]);
                 this.buffered_records_to_check.push(record);
-		console.log ("Remembering record to check " + record);
 	    }
         },
 
@@ -374,6 +375,7 @@
 
                 /* ... and check the ones specified in the resource list */
                 $.each(this.buffered_records_to_check, function(i, record) {
+		    if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
                     self.set_checkbox(record, true);
                 });
 
