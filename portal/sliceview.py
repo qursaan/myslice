@@ -51,7 +51,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                'resource.resource_hrn', 'resource.hostname', 'resource.type', 'resource.network_hrn',
+                'resource.resource_hrn', 'resource.hostname', 'resource.type', 
+                #'resource.network_hrn',
                 #'lease.urn',
                 'user.user_hrn',
                 #'application.measurement_point.counter'
