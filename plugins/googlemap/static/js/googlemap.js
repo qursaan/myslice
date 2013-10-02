@@ -102,7 +102,7 @@ googlemap_debug_detailed=false;
                 throw "Not implemented";
                 break;
             }
-	    return unfold.escape_id(key_value).replace(/\\/g, '');
+	    return this.escape_id(key_value).replace(/\\/g, '');
 	},	    
 
 	// return { marker: gmap_marker, ul : <ul DOM> }
@@ -174,7 +174,7 @@ googlemap_debug_detailed=false;
 	    var checkbox = this.create_record_checkbox (record, ul, false);
 	    if ( ! this.key in record ) return;
             var key_value = record[this.key];
-	    var hrn = unfold.escape_id(key_value).replace(/\\/g, '');
+	    var hrn = this.escape_id(key_value).replace(/\\/g, '');
             this.by_hrn[hrn] = {
 		checkbox: checkbox,
 		// xxx Thierry sept 2013

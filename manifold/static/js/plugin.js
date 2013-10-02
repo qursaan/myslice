@@ -189,7 +189,7 @@ var Plugin = Class.extend({
 
     id_from_key: function(key_field, value) {
         
-        return key_field + manifold.separator + unfold.escape_id(value).replace(/\\/g, '');
+        return key_field + manifold.separator + this.escape_id(value).replace(/\\/g, '');
     },
 
     // we do not need to carry around all the nonsense about backslashing dots in hrns
@@ -203,6 +203,15 @@ var Plugin = Class.extend({
     // "ple-aluiple-host147-82-static-93-94-b-business-telecomitalia-it"
     flat_id : function (id_in) {
 	return id_in.replace(/\\\./g,"-").replace(/\\/g,"-").replace(/\./g,"-");
+    },
+
+    // escape (read: backslashes) some meta-chars in input
+    escape_id: function(id) {
+        if( id !== undefined){
+            return id.replace( /(:|\.|\[|\])/g, "\\$1" );
+        }else{
+            return "undefined-id";
+        }
     },
 
     id_from_record: function(method, record) {

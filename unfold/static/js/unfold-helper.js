@@ -31,14 +31,6 @@ var unfold = {
         } else {
             return value;
         }
-    },
-
-    escape_id: function(id) {
-        if( id !== undefined){
-            return id.replace( /(:|\.|\[|\])/g, "\\$1" );
-        }else{
-            return "undefined-id";
-        }
     }
 
 } // global unfold
