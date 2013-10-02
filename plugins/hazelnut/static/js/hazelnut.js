@@ -154,7 +154,7 @@
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='hazelnut-checkbox'";
-            result += " id='" + this.id('checkbox', this.id_from_key(key, value)) + "'";
+            result += " id='" + this.flat_id(this.id('checkbox', value)) + "'";
             result += " name='" + key + "'";
             result += " type='checkbox'";
             result += " autocomplete='off'";
@@ -257,11 +257,10 @@
             }
 
 
-            var checkbox_id = this.id('checkbox', this.id_from_key(this.key, key_value));
-            checkbox_id = '#' + checkbox_id.replace(/\./g, '\\.');
-
+            var checkbox_id = this.flat_id(this.id('checkbox', key_value));
+            checkbox_id = '#' + checkbox_id;
             var element = $(checkbox_id, this.table.fnGetNodes());
-
+//	    messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
         },
 

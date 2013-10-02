@@ -192,6 +192,19 @@ var Plugin = Class.extend({
         return key_field + manifold.separator + unfold.escape_id(value).replace(/\\/g, '');
     },
 
+    // we do not need to carry around all the nonsense about backslashing dots in hrns
+    // likewise, DOM ids do not like to have dots in them
+    // because "#foo.bar" matches an elem named foo with class bar - not an id that is foo.bar
+    // so this method gives you a valid DOMID but that cannot be 'reversed' back to retrieve an hrn or the like
+    // e.g. 
+    // input=input="ple.aluiple.host147-82-static\\.93-94-b\\.business\\.telecomitalia\\.it"
+    // > "ple.aluiple.host147-82-static\.93-94-b\.business\.telecomitalia\.it"
+    // flat_id(input)
+    // "ple-aluiple-host147-82-static-93-94-b-business-telecomitalia-it"
+    flat_id : function (id_in) {
+	return id_in.replace(/\\\./g,"-").replace(/\\/g,"-").replace(/\./g,"-");
+    },
+
     id_from_record: function(method, record) {
         var keys = manifold.metadata.get_key(method);
         if (!keys)
