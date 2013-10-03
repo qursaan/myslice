@@ -4,6 +4,11 @@
  * License: GPLv3
  */
 
+//debug_table = function (table,message) {
+//    messages.debug ( message + ":   " + table.fnSettings().aoColumns.length + " columns");
+//    messages.debug ( message + ":..." + table.fnGetNodes().length + " lines");
+//};
+
 (function($){
 
     // TEMP
@@ -238,8 +243,7 @@
         set_checkbox: function(record, checked)
         {
             /* Default: checked = true */
-            if (typeof checked === 'undefined')
-                checked = true;
+            if (checked === undefined) checked = true;
 
             var key_value;
             /* The function accepts both records and their key */
@@ -259,7 +263,8 @@
 
             var checkbox_id = this.flat_id(this.id('checkbox', key_value));
             checkbox_id = '#' + checkbox_id;
-            var element = $(checkbox_id, this.table.fnGetNodes());
+	    // using dataTables's $ to search also in nodes that are not currently displayed
+            var element = this.table.$(checkbox_id);
 	    if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
         },
@@ -326,9 +331,9 @@
 
         on_query_done: function()
         {
-            if (this.received_all_query)
-                this.unspin();
             this.received_query = true;
+	    // unspin once we have received both
+            if (this.received_all_query && this.received_query) this.unspin();
         },
         
         on_field_state_changed: function(data)
@@ -368,22 +373,22 @@
 
         on_all_query_done: function()
         {
-            var self = this;
-            if (this.received_query) {
-                /* XXX needed ? XXX We uncheck all checkboxes ... */
-                $("[id^='datatables-checkbox-" + this.options.plugin_uuid +"']").attr('checked', false);
-
-                /* ... and check the ones specified in the resource list */
-                $.each(this.buffered_records_to_check, function(i, record) {
-		    if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
-                    self.set_checkbox(record, true);
-                });
-
-                this.unspin();
-            }
+	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
 	    this.table.fnAddData (this.buffered_lines);
 	    this.buffered_lines=[];
+	    
+            var self = this;
+	    // if we've already received the slice query, we have not been able to set 
+	    // checkboxes on the fly at that time (dom not yet created)
+            $.each(this.buffered_records_to_check, function(i, record) {
+		if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
+                self.set_checkbox(record, true);
+            });
+	    this.buffered_records_to_check = [];
+
             this.received_all_query = true;
+	    // unspin once we have received both
+            if (this.received_all_query && this.received_query) this.unspin();
 
         }, // on_all_query_done
 
