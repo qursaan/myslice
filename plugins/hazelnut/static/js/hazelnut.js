@@ -82,7 +82,7 @@
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-                sDom: "<'row'<'col-md-5'l><'col-md-1'r><'col-md-6'f>>t<'row'<'col-md-5'i><'col-md-7'p>>",
+                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
