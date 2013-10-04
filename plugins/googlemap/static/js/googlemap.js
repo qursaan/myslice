@@ -59,8 +59,7 @@ googlemap_debug_detailed=false;
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-//	    if (googlemap_debug) messages.debug("on_show");
-	    messages.debug("on_show");
+	    if (googlemap_debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
         }, // on_show

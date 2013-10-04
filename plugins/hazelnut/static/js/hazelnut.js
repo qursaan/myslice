@@ -4,14 +4,8 @@
  * License: GPLv3
  */
 
-//debug_table = function (table,message) {
-//    messages.debug ( message + ":   " + table.fnSettings().aoColumns.length + " columns");
-//    messages.debug ( message + ":..." + table.fnGetNodes().length + " lines");
-//};
-
 (function($){
 
-    // TEMP
     var debug=false;
 //    debug=true
 
