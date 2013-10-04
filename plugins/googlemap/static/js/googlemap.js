@@ -101,7 +101,12 @@ googlemap_debug_detailed=false;
                 throw "Not implemented";
                 break;
             }
-	    return this.escape_id(key_value).replace(/\\/g, '');
+	    // XXX BACKSLASHES original code was reading like this
+	    //return this.escape_id(key_value).replace(/\\/g, '');
+	    //  however this sequence removes backslashes from hrn's and as a result
+	    // resources_selected was getting all mixed up
+	    // hazelnut does publish hrn's with backslashes and that seems like the thing to do
+	    return key_value;
 	},	    
 
 	// return { marker: gmap_marker, ul : <ul DOM> }
@@ -174,7 +179,9 @@ googlemap_debug_detailed=false;
 	    var checkbox = this.create_record_checkbox (record, ul, false);
 	    if ( ! this.key in record ) return;
             var key_value = record[this.key];
-	    var hrn = this.escape_id(key_value).replace(/\\/g, '');
+	    // see XXX BACKSLASHES 
+	    //var hrn = this.escape_id(key_value).replace(/\\/g, '');
+	    var hrn = key_value;
             this.by_hrn[hrn] = {
 		checkbox: checkbox,
 		// xxx Thierry sept 2013
