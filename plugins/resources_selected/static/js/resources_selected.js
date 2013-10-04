@@ -31,7 +31,7 @@
 
             var self = this;
             this.table = this.elmt('table').dataTable({
-//                sDom: "<'row'<'col-md-5'l><'col-md-1'r><'col-md-6'f>>t<'row'<'col-md-5'i><'col-md-7'p>>",
+                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
                 sPaginationType: 'full_numbers',
 		bAutoWidth: true,
                 //bJQueryUI      : true,
