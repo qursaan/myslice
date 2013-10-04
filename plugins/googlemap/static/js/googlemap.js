@@ -132,6 +132,7 @@ googlemap_debug_detailed=false;
 	    // the callback for when a user clicks
 	    // NOTE: this will *not* be called for changes done by program
 	    checkbox.change( function (e) {
+		if (googlemap_debug) messages.debug("googlemap click handler checked= " + this.checked + " hrn=" + hrn);
 		manifold.raise_event (googlemap.options.query_uuid, 
 				      this.checked ? SET_ADD : SET_REMOVED, hrn);
 	    });

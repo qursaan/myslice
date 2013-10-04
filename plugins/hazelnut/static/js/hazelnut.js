@@ -491,6 +491,7 @@
             var self = e.data;
 
             // XXX this.value = key of object to be added... what about multiple keys ?
+	    if (debug) messages.debug("hazelnut click handler checked=" + this.checked + " hrn=" + this.value);
             manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
