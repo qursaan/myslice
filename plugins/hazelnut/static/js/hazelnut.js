@@ -86,7 +86,7 @@
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
-                sPaginationType: 'full_numbers',
+                sPaginationType: 'bootstrap',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
                 aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
