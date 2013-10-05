@@ -31,11 +31,15 @@
 
             var self = this;
             this.table = this.elmt('table').dataTable({
-                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-                sPaginationType: 'full_numbers',
+// the original hazelnut layout was
+//                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+// however the bottom line with 'showing blabla...' and the navigation widget are not really helpful
+                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t>",
+// so this does not matter anymore now that the pagination area is turned off
+//                sPaginationType: 'bootstrap',
 		bAutoWidth: true,
-                //bJQueryUI      : true,
-                //bRetrieve      : true,
+//                bJQueryUI      : true,
+//                bRetrieve      : true,
 //                sScrollX       : '100%',                 // Horizontal scrolling 
 //                bSortClasses   : false,              // Disable style for the sorted column
 //                aaSorting      : [[ 0, 'asc' ]],        // Default sorting on URN
