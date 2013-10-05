@@ -27,7 +27,7 @@ div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Haze
     border-bottom: 1px solid #C1DAD7;
 }
 div.Hazelnut table.dataTable td {
-    padding-left: 4px 8px 4px 8px;
+    padding: 4px 8px 4px 8px;
     /* this applies on even rows only, odd ones have a setting in bootstrap of rbg 249.249.249 */
     background-color: #f4f4f4;
 }
