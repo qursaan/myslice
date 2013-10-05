@@ -14,11 +14,6 @@ function getKeySplitId(id,separator){
     return key;
 }
 
-function errorDisplay(error){
-    var out = '<div class="error"><dl id="system-message"><dt class="error">Notice</dt><dd class="error message"><ul><li>' + error + '</li></ul></dd></dl></div>';
-    return out;
-}
-
 function arrays_equal(a,b) { return !(a<b || b<a); }
 
 function arrayInArray(elt,tab){

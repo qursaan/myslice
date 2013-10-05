@@ -20,10 +20,6 @@ var unfold = {
 	return "<button class='unfold-error btn btn-danger'>"+text+"</button>"; 
     },
 
-    errorDisplay : function (error) {
-	return '<div class="error"><dl id="system-message"><dt class="error">Notice</dt><dd class="error message"><ul><li>' + error + '</li></ul></dd></dl></div>';
-    },
-
     get_value: function (value) {
         //if(typeof(jQuery(value).attr('value'))!="undefined"){
         if (/<span value=['"].*['"]>.*<\/span>/i.test(value)) {
@@ -36,5 +32,4 @@ var unfold = {
 } // global unfold
 
 // xxx tmp - until all plugins are ported
-errorDisplay	= unfold.errorDisplay;
 get_value	= unfold.get_value;
