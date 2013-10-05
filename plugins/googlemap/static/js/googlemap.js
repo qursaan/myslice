@@ -158,8 +158,8 @@ googlemap_debug_detailed=false;
             if (!(record['latitude'])) return false;
 	    
             // get the coordinates
-            var latitude=get_value(record['latitude']);
-            var longitude=get_value(record['longitude']);
+            var latitude=unfold.get_value(record['latitude']);
+            var longitude=unfold.get_value(record['longitude']);
             var lat_lon = latitude + longitude;
 
 	    // check if we've seen anything at that place already

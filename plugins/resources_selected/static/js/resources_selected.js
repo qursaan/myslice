@@ -340,7 +340,7 @@
             var remove_urn = this.id; 
             var current_resources = event.data.instance.current_resources;
             var list_resources = $.grep(current_resources, function(x) {return x.urn != remove_urn});
-            //jQuery.publish('selected', 'cancel/'+this.id+'/'+get_value(firstCellVal));
+            //jQuery.publish('selected', 'cancel/'+this.id+'/'+unfold.get_value(firstCellVal));
             $.publish('/update-set/' + event.data.instance.options.resource_query_uuid, [list_resources, true]);
         },
 

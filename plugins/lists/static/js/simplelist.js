@@ -67,10 +67,10 @@
 	    $plugindiv.closest('.need-spin').spin(false);
 
         if (rows.length == 0) {
-	        if (use_datatables)
-                 datatables_set_message ($table, $tbody, unfold.warning("No result"));
-	        else
-        		regular_set_message ($table, $tbody, unfold.warning("No result"));
+	    if (use_datatables)
+                datatables_set_message ($table, $tbody, unfold.warning("No result"));
+	    else
+        	regular_set_message ($table, $tbody, unfold.warning("No result"));
             return;
         }
 

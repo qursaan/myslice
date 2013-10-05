@@ -31,5 +31,3 @@ var unfold = {
 
 } // global unfold
 
-// xxx tmp - until all plugins are ported
-get_value	= unfold.get_value;

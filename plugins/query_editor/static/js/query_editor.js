@@ -190,7 +190,7 @@
             //console.log(record);
             availableTags = this.availableTags;           
             jQuery.each(record,function(key,value){
-                value = get_value(value);
+                value = unfold.get_value(value);
                 if(!availableTags.hasOwnProperty(key)){availableTags[key]=new Array();}
                 //availableTags[key].push(value);
                 var currentArray = availableTags[key];
@@ -292,7 +292,7 @@
             var availableTags={};
             jQuery.each (rows, function(index, obj) {                    
                 jQuery.each(obj,function(key,value){                       
-                    value = get_value(value); 
+                    value = unfold.get_value(value); 
                     if(!availableTags.hasOwnProperty(key)){availableTags[key]=new Array();}
                     //availableTags[key].push(value);
                     var currentArray=availableTags[key];
