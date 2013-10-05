@@ -1,3 +1,9 @@
+table.query-editor {
+    width: 95%;
+/* what is going on in there ? */
+/*    border: 1px solid #ff0000; */
+}
+
 /* Add a scrollbar to autocomplete fields */
 .ui-autocomplete {
         max-height: 100px;
