@@ -48,7 +48,6 @@ class ActiveFilters(Plugin):
                 'js/active_filters.js',
              ],
             'css_files': [ 
-#                'css/demo_table.css',
                 'css/active_filters.css'
             ]
         }
