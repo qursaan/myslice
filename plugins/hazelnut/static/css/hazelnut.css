@@ -1,7 +1,5 @@
-div.hazelnut-spacer {
-    height:10px;
-    clear: both;
-}
+/* the bottom of the datatable needs more space */
+div.hazelnut-spacer { padding: 8px 4px 15px 4px; }
 
 div.Hazelnut table.dataTable th {
     font: bold 12px/22px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
