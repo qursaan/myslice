@@ -106,6 +106,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             title               = 'Pending operations',
             query               = main_query,
             togglable           = True,
+            # start turned off, it will open up itself when stuff comes in
+            toggled             = False, 
             domid               = 'pending',
             outline_complete    = True,
         ))

@@ -248,6 +248,16 @@ var Plugin = Class.extend({
         return array[arguments.length + 1];
     },
 
+    // TOGGLE
+    // plugin-helper.js is about managing toggled state
+    // it would be beneficial to merge it in here
+    toggle_on: function () { return this.toggle("true"); },
+    toggle_off: function () { return this.toggle("false"); },
+    toggle: function (status) {
+	messages.debug("toggle domid="+this.options.plugin_uuid);
+	plugin_helper.set_toggle_status (this.options.plugin_uuid,status);
+    },
+
     /* SPIN */
 
     spin: function() {
