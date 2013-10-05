@@ -254,7 +254,6 @@ var Plugin = Class.extend({
     toggle_on: function () { return this.toggle("true"); },
     toggle_off: function () { return this.toggle("false"); },
     toggle: function (status) {
-	messages.debug("toggle domid="+this.options.plugin_uuid);
 	plugin_helper.set_toggle_status (this.options.plugin_uuid,status);
     },
 
