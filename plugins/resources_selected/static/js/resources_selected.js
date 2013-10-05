@@ -68,6 +68,7 @@
             manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
         },
 
+	// related buttons are also disabled in the html template
         do_refresh: function(e)
         {
             throw 'resource_selected.do_refresh Not implemented';
