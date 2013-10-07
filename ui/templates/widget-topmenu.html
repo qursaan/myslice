@@ -34,9 +34,9 @@
 	{% endfor %}
     </ul> {# logout.js will attach a click function on that button, which then retrieves the 'username' attribute #}
     <ul class="nav navbar-nav pull-right logged-in">
-      <li> {% if username %}
+      <li class='username'> {% if username %}
       Logged in as {{ username }}
-      <button id='logout' class='btn btn-danger logged-in' username='{{ username }}'>Logout</button> {% else %}
+      <button id='logout' class='btn btn-xs btn-danger logged-in' username='{{ username }}'>Logout</button> {% else %}
       Not logged in{% endif %}
       </li>
     </ul>
