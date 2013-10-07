@@ -72,19 +72,21 @@
             // We are currently using a DataTable display, but another browsing component could be better
             //jQuery('#'+this.options.plugin_uuid+'-table').dataTable...
             var  metaTable = this.elmt('table').dataTable({
-                bFilter     : false,
-                bPaginate   : false,
-                bInfo       : false,
-                sScrollX    : '100%',         // Horizontal scrolling
-                sScrollY    : '200px',
-                //bJQueryUI   : true,           // Use jQuery UI
-                bProcessing : true,           // Loading
-                aaSorting   : [[ 1, "asc" ]], // sort by column fields on load
-                aoColumnDefs: [
-                    { 'bSortable': false, 'aTargets': [ 0 ]},
-                    { 'sWidth': '8px', 'aTargets': [ 0 ] },
-                    { 'sWidth': '8px', 'aTargets': [ 4 ] } // XXX NB OF COLS
-                ]
+// Thierry : I'm turning off all the dataTables options for now, so that
+// the table displays more properly again, might need more tuning though
+//                bFilter     : false,
+//                bPaginate   : false,
+//                bInfo       : false,
+//                sScrollX    : '100%',         // Horizontal scrolling
+//                sScrollY    : '200px',
+//                //bJQueryUI   : true,           // Use jQuery UI
+//                bProcessing : true,           // Loading
+//                aaSorting   : [[ 1, "asc" ]], // sort by column fields on load
+//                aoColumnDefs: [
+//                    { 'bSortable': false, 'aTargets': [ 0 ]},
+//                    { 'sWidth': '8px', 'aTargets': [ 0 ] },
+//                    { 'sWidth': '8px', 'aTargets': [ 4 ] } // XXX NB OF COLS
+//                ]
             });
 
             // Actions on the newly added fields
