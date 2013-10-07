@@ -6,55 +6,55 @@ table.query-editor {
 
 /* Add a scrollbar to autocomplete fields */
 .ui-autocomplete {
-        max-height: 100px;
-        overflow-y: auto;
-        /* prevent horizontal scrollbar */
-        overflow-x: hidden;
-        /* add padding to account for vertical scrollbar */
-        padding-right: 20px;
-        
-        /* NEED TO BE IMPROVED LATER... */
-        /* How to use properties from content class in /templates/myslice/css/myslice.css ? */
-        /* How to factorize this ? Maybe applied differently in other plugins ? */        
-        font-size: 11px;
+    max-height: 100px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* add padding to account for vertical scrollbar */
+    padding-right: 20px;
+    
+    /* NEED TO BE IMPROVED LATER... */
+    /* How to use properties from content class in /templates/myslice/css/myslice.css ? */
+    /* How to factorize this ? Maybe applied differently in other plugins ? */        
+    font-size: 11px;
 }
 .queryeditor-auto-filter{
     width:200px;
 }
 /* IE 6 doesn't support max-height
-    * we use height instead, but this forces the menu to always be this tall
-    */
+ * we use height instead, but this forces the menu to always be this tall
+ */
 * html .ui-autocomplete {
-        height: 100px;
+    height: 100px;
 }
 
 table.columns {
-	margin: 0 auto;
-	clear: both;
-	/* width: 80%;*/
-	width: 300px;
+    margin: 0 auto;
+    clear: both;
+    /* width: 80%;*/
+    width: 300px;
 }
 
 table.columns thead th {
-	padding: 3px 18px 3px 3px; 
-	border-bottom: 1px solid black;
-	font-weight: bold;
-	cursor: pointer;
-	* cursor: hand;
+    padding: 3px 18px 3px 3px; 
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    cursor: pointer;
+    * cursor: hand;
 }
 
 table.columns tfoot th {
-	padding: 3px 18px 3px 10px;
-	border-top: 1px solid black;
-	font-weight: bold;
+    padding: 3px 18px 3px 10px;
+    border-top: 1px solid black;
+    font-weight: bold;
 }
 
 table.columns td {
-	padding: 3px 5px;
+    padding: 3px 5px;
 }
 
 table.columns td.center {
-	text-align: center;
+    text-align: center;
 }
 
 
@@ -62,71 +62,71 @@ table.columns td.center {
  * DataTables row classes
  */
 table.columns tr.odd.gradeA {
-	background-color: #ddffdd;
+    background-color: #ddffdd;
 }
 
 table.columns tr.even.gradeA {
-	background-color: #eeffee;
+    background-color: #eeffee;
 }
 
 table.columns tr.odd.gradeC {
-	background-color: #ddddff;
+    background-color: #ddddff;
 }
 
 table.columns tr.even.gradeC {
-	background-color: #eeeeff;
+    background-color: #eeeeff;
 }
 
 table.columns tr.odd.gradeX {
-	background-color: #ffdddd;
+    background-color: #ffdddd;
 }
 
 table.columns tr.even.gradeX {
-	background-color: #ffeeee;
+    background-color: #ffeeee;
 }
 
 table.columns tr.odd.gradeU {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 
 table.columns tr.even.gradeU {
-	background-color: #eee;
+    background-color: #eee;
 }
 
 /* change color: T / even -> odd +1 +5 -3*/
 table.columns tr.odd.row_sliver td {
-	background-color: #9FAFD1;
+    background-color: #9FAFD1;
 }
 
 table.columns tr.even.row_added td {
-	background-color: #b1d19f;
+    background-color: #b1d19f;
 }
 table.columns tr.odd.row_added td {
-	background-color: #a3c98f;
+    background-color: #a3c98f;
 }
 
 table.columns tr.even.row_removed td {
-	background-color: #d9b0b0;
+    background-color: #d9b0b0;
 }
 
 table.columns tr.odd.row_removed td {
-	background-color: #d1a09f;
+    background-color: #d1a09f;
 }
 
 table.columns tr.gradeA {
-	background-color: #eeffee;
+    background-color: #eeffee;
 }
 
 table.columns tr.gradeC {
-	background-color: #ddddff;
+    background-color: #ddddff;
 }
 
 table.columns tr.gradeX {
-	background-color: #ffdddd;
+    background-color: #ffdddd;
 }
 
 table.columns tr.gradeU {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 
 
@@ -171,7 +171,7 @@ div#selectdescr {
 }
 
 span.short {
-height:10px;
+    height:10px;
 }
 
 span.column-title {
@@ -198,37 +198,42 @@ span.filter_info {
 
 /* column configuation style */
 
-OPTION.out{background-color:white; color:black}
-OPTION.in{background-color:#CAE8EA; color:#4f6b72}
+OPTION.out{
+    background-color:white;
+    color:black;
+}
+OPTION.in{
+    background-color:#CAE8EA; 
+    color:#4f6b72;
+}
 
 /* jordan disabled
-div.out{background-color:white; color:black}
-div.in{background-color:#CAE8EA; color:#4f6b72}
-div.selected{background-color:gray; color:black}
-div.invisible{display:none}
-*/
+   div.out{background-color:white; color:black}
+   div.in{background-color:#CAE8EA; color:#4f6b72}
+   div.selected{background-color:gray; color:black}
+   div.invisible{display:none}
+   */
 
 div.note-div {
- 	padding: 4px;
- 	background-color: #cae8ea;
- 	width: 800px;
-	margin-left:auto;
-	margin-right:auto;
-
+    padding: 4px;
+    background-color: #cae8ea;
+    width: 800px;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 div#scrolldiv_old {
-	border : solid 2px grey; 
-	padding:4px; 
-	width:300px; 
-	height:180px; 
-	overflow:auto;
+    border : solid 2px grey; 
+    padding:4px; 
+    width:300px; 
+    height:180px; 
+    overflow:auto;
 }
 
 th,td.top {
-	vertical-align: top;
-	text-align: left;
-	padding:10px;
+    vertical-align: top;
+    text-align: left;
+    padding:10px;
 }
 
 tr.hidden {
@@ -236,73 +241,73 @@ tr.hidden {
 }
 
 td.smallright {
-	text-align: right;
-	width:20px;
+    text-align: right;
+    width:20px;
 }
 
 table.center {
-	margin-left:auto; 
-	margin-right:auto;
+    margin-left:auto; 
+    margin-right:auto;
 }
 
 table.columnlist {
-	width:270px;
+    width:270px;
 }
 
 table.columns td.header {
-	background-color: #CAE8EA;
-	text-align: center;
-	width:30px;
+    background-color: #CAE8EA;
+    text-align: center;
+    width:30px;
 }
 
 span.header {
-	font-weight: bold;
-	color: #3399CC;
+    font-weight: bold;
+    color: #3399CC;
 }
 
 a.source-url{
-        font-weight: bold;
+    font-weight: bold;
 }
 
 span.menubig {
-        font-size: 16px;
-        font-weight: bold;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 span.menusmall {
-        font-size: 14px;
-        font-weight: bold;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 span.menuright {
-        font-weight: bold;
-	float: right;
+    font-weight: bold;
+    float: right;
 }
 
 span.simpleright {
-	float: right;
+    float: right;
 }
 
 span.gray{
-        color: #555555;
+    color: #555555;
 }
 
 span.short {
-	height:10px;
+    height:10px;
 }
 
 span.column-title {
-        font-size: 13px;
-        font-weight: bold;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 span.column-detail {
-        font-size: 11px; 
-        font-style: italic;
+    font-size: 11px; 
+    font-style: italic;
 }
 
 span.myslice_small {
-        font-size: 11px; 
+    font-size: 11px; 
 }
 
 span#username {
@@ -315,7 +320,7 @@ span#username {
     float: right;
     z-index:24;
     background: url('images/myslice-icon-filter.png') no-repeat;
-    //background-color:#ccc;
+    /*background-color:#ccc;*/
     width: 200px;
     height: 300px;
     color:#000;
@@ -325,15 +330,17 @@ span#username {
 
 .filter_popup:hover{
     z-index:25;
-    //background-color:#ff0
+/*background-color:#ff0*/
 }
 
-.filter_popup span{display: none}
+.filter_popup span{
+    display: none;
+}
 
 .filter_popup:hover span{ /*the span will display just on :hover state*/
     display:block;
     position:absolute;
-    //top:1em;
+    /*top:1em;*/
     left:-19em;
     width: 20em;
     font-size: 8pt;
@@ -343,5 +350,3 @@ span#username {
     text-align: left;
     padding: 0em 0em 0em 1em;
 }
-
-
