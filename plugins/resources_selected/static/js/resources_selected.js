@@ -153,7 +153,7 @@
             switch(data.status) {
                 case FIELD_REQUEST_PENDING:
                     msg   = 'PENDING';
-                    button = "<span class='ui-icon ui-icon-close ResourceSelectedClose' id='" + data.key + "'/>";
+                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
                     break;
                 case FIELD_REQUEST_SUCCESS:
                     msg   = 'SUCCESS';
@@ -394,7 +394,7 @@
                 var urn = r.urn;
                 time = r.timeslot;
                               
-                var SPAN = "<span class='ui-icon ui-icon-close ResourceSelectedClose' id='"+urn+"'/>";
+                var SPAN = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='"+urn+"'/>";
                 var slot = "<span id='resource_"+urn+"'>" + time + "</span>"; //ioi
                 // ioi
                 var newline=Array();
@@ -411,7 +411,7 @@
                 var node = r.urn;
                 time = r.timeslot;
 
-                var SPAN = "<span class='ui-icon ui-icon-close ResourceSelectedClose' id='"+node+"'/>";
+                var SPAN = "<span class='glyphicon glyphicon-renomve ResourceSelectedClose' id='"+node+"'/>";
                 var slot = "<span id='resource_"+node+"'>" + time + "</span>"; //ioi
                 // ioi
                 var newline=Array();
@@ -426,7 +426,7 @@
                 var node = r.urn;
                 var time = r.timeslot;
                     
-                var SPAN = "<span class='ui-icon ui-icon-close ResourceSelectedClose' id='"+node+"'/>";
+                var SPAN = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='"+node+"'/>";
                 var slot = "<span id='resource_"+node+"'>" + time + "</span>";
                 // ioi
                 var newline=Array();

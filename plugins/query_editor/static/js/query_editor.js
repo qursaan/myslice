@@ -56,7 +56,7 @@
             // XXX Why isn't it done statically ?
             var nCloneTh = document.createElement( 'th' );
             var nCloneTd = document.createElement( 'td' );
-            nCloneTd.innerHTML = "<span class='ui-icon ui-icon-triangle-1-e' style='cursor:pointer'></span>";
+            nCloneTd.innerHTML = "<span class='glyphicon glyphicon-chevron-right' style='cursor:pointer'></span>";
             //nCloneTd.innerHTML = '<img src="/components/com_tophat/images/details_open.png">';
             nCloneTh.innerHTML = '<b>Info</b>';
             nCloneTd.className = "center";
@@ -93,16 +93,16 @@
             this.elmt('table tbody td span').on('click', function() {
                 var nTr = this.parentNode.parentNode;
                 // use jQuery UI instead of images to keep a common UI
-                // class="ui-icon treeclick ui-icon-triangle-1-s tree-minus"
-                // East oriented Triangle class="ui-icon-triangle-1-e"
-                // South oriented Triangle class="ui-icon-triangle-1-s"
+                // class="glyphicon glyphicon-chevron-down treeclick tree-minus"
+                // East oriented Triangle class="glyphicon-chevron-right"
+                // South oriented Triangle class="glyphicon-chevron-down"
                 
-                if (this.className=="ui-icon ui-icon-triangle-1-e") {
-                    this.removeClass("ui-icon-triangle-1-e").addClass("ui-icon-triangle-1-s");
+                if (this.hasClass("glyphicon-chevron-right")) {
+                    this.removeClass("glyphicon-chevron-right").addClass("glyphicon-chevron-down");
                     // XXX ??????
                     metaTable.fnOpen(nTr, this.fnFormatDetails(metaTable, nTr, self.options.plugin_uuid+'_div'), 'details' );
                 } else {
-                    this.removeClass("ui-icon-triangle-1-s").addClass("ui-icon-triangle-1-e");
+                    this.removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-right");
                     metaTable.fnClose(nTr);
                 }
             });

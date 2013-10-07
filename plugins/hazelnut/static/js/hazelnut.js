@@ -112,7 +112,7 @@
             /* Setup the SelectAll button in the dataTable header */
             /* xxx not sure this is still working */
             var oSelectAll = $('#datatableSelectAll-'+ this.options.plugin_uuid);
-            oSelectAll.html("<span class='ui-icon ui-icon-check' style='float:right;display:inline-block;'></span>Select All");
+            oSelectAll.html("<span class='glyphicon glyphicon-ok' style='float:right;display:inline-block;'></span>Select All");
             oSelectAll.button();
             oSelectAll.css('font-size','11px');
             oSelectAll.css('float','right');
