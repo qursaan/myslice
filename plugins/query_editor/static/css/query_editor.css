@@ -35,6 +35,10 @@ table.columns {
     width: 300px;
 }
 
+table.columns input { 
+    font: normal 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+}    
+
 table.columns thead th {
     padding: 3px 18px 3px 3px; 
     border-bottom: 1px solid black;
@@ -50,10 +54,11 @@ table.columns tfoot th {
 }
 
 table.columns td {
-    padding: 3px 5px;
+    padding: 2px 5px;
+    font: normal 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
 }
 
-table.columns td.center {
+table.columns td.center, table.columns th.center {
     text-align: center;
 }
 
