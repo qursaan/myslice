@@ -161,15 +161,15 @@ class ActivationView(TemplateView):
 # DEPRECATED #
 # DEPRECATED #def user_validate(request):
 # DEPRECATED #    pass
-
-def slice_request(request):
-    if request.method == 'POST':
-        form = SliceRequestForm(request.POST)
-        if form.is_valid():
-            slice_name = form.cleaned_data['slice_name']
-    else:
-        form = SliceRequestForm()
-    return render(request, 'slice-request-view.html', locals())
-
-def slice_validate(request):
-    pass
+# DEPRECATED #
+# DEPRECATED #def slice_request(request):
+# DEPRECATED #    if request.method == 'POST':
+# DEPRECATED #        form = SliceRequestForm(request.POST)
+# DEPRECATED #        if form.is_valid():
+# DEPRECATED #            slice_name = form.cleaned_data['slice_name']
+# DEPRECATED #    else:
+# DEPRECATED #        form = SliceRequestForm()
+# DEPRECATED #    return render(request, 'slice-request-view.html', locals())
+# DEPRECATED #
+# DEPRECATED #def slice_validate(request):
+# DEPRECATED #    pass
