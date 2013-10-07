@@ -28,18 +28,18 @@ table.query-editor {
     height: 100px;
 }
 
-table.columns {
+table.query-editor {
     margin: 0 auto;
     clear: both;
     /* width: 80%;*/
     width: 300px;
 }
 
-table.columns input { 
+table.query-editor input { 
     font: normal 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
 }    
 
-table.columns thead th {
+table.query-editor thead th {
     padding: 3px 18px 3px 3px; 
     border-bottom: 1px solid black;
     font-weight: bold;
@@ -47,18 +47,18 @@ table.columns thead th {
     * cursor: hand;
 }
 
-table.columns tfoot th {
+table.query-editor tfoot th {
     padding: 3px 18px 3px 10px;
     border-top: 1px solid black;
     font-weight: bold;
 }
 
-table.columns td {
+table.query-editor td {
     padding: 2px 5px;
     font: normal 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
 }
 
-table.columns td.center, table.columns th.center {
+table.query-editor td.center, table.query-editor th.center {
     text-align: center;
 }
 
@@ -66,71 +66,71 @@ table.columns td.center, table.columns th.center {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables row classes
  */
-table.columns tr.odd.gradeA {
+table.query-editor tr.odd.gradeA {
     background-color: #ddffdd;
 }
 
-table.columns tr.even.gradeA {
+table.query-editor tr.even.gradeA {
     background-color: #eeffee;
 }
 
-table.columns tr.odd.gradeC {
+table.query-editor tr.odd.gradeC {
     background-color: #ddddff;
 }
 
-table.columns tr.even.gradeC {
+table.query-editor tr.even.gradeC {
     background-color: #eeeeff;
 }
 
-table.columns tr.odd.gradeX {
+table.query-editor tr.odd.gradeX {
     background-color: #ffdddd;
 }
 
-table.columns tr.even.gradeX {
+table.query-editor tr.even.gradeX {
     background-color: #ffeeee;
 }
 
-table.columns tr.odd.gradeU {
+table.query-editor tr.odd.gradeU {
     background-color: #ddd;
 }
 
-table.columns tr.even.gradeU {
+table.query-editor tr.even.gradeU {
     background-color: #eee;
 }
 
 /* change color: T / even -> odd +1 +5 -3*/
-table.columns tr.odd.row_sliver td {
+table.query-editor tr.odd.row_sliver td {
     background-color: #9FAFD1;
 }
 
-table.columns tr.even.row_added td {
+table.query-editor tr.even.row_added td {
     background-color: #b1d19f;
 }
-table.columns tr.odd.row_added td {
+table.query-editor tr.odd.row_added td {
     background-color: #a3c98f;
 }
 
-table.columns tr.even.row_removed td {
+table.query-editor tr.even.row_removed td {
     background-color: #d9b0b0;
 }
 
-table.columns tr.odd.row_removed td {
+table.query-editor tr.odd.row_removed td {
     background-color: #d1a09f;
 }
 
-table.columns tr.gradeA {
+table.query-editor tr.gradeA {
     background-color: #eeffee;
 }
 
-table.columns tr.gradeC {
+table.query-editor tr.gradeC {
     background-color: #ddddff;
 }
 
-table.columns tr.gradeX {
+table.query-editor tr.gradeX {
     background-color: #ffdddd;
 }
 
-table.columns tr.gradeU {
+table.query-editor tr.gradeU {
     background-color: #ddd;
 }
 
@@ -259,7 +259,7 @@ table.columnlist {
     width:270px;
 }
 
-table.columns td.header {
+table.query-editor td.header {
     background-color: #CAE8EA;
     text-align: center;
     width:30px;
