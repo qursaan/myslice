@@ -1,7 +1,10 @@
+div.query-editor-spacer {
+    padding: 15px 5px;
+}
+
 table.query-editor {
     width: 95%;
-/* what is going on in there ? */
-/*    border: 1px solid #ff0000; */
+    padding-bottom: 10px;
 }
 
 /* Add a scrollbar to autocomplete fields */

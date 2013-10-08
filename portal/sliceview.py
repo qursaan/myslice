@@ -149,6 +149,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             page  = page,
             query = query_resource_all,
             title = "Select Columns",
+            domid = 'select-columns',
             )
         resources_active_filters = ActiveFilters(
             page  = page,
