@@ -30,12 +30,12 @@ class QueryEditor(Plugin):
 
     def template_env(self, request):
         fields = []
+        #hidden_columns = self.hidden_columns
         metadata = self.page.get_metadata()
         md_fields = metadata.details_by_object('resource')
 
         # XXX use django templating system here
         for md_field in md_fields['column']:
-
             if md_field['type'] == 'string':
                 if 'allowed_values' in md_field:
                     allowed_values = md_field['allowed_values'].split(',')
@@ -81,4 +81,5 @@ class QueryEditor(Plugin):
                 'header':        None,
                 'checked':       md_field['name'] in self.query.get_select()
             })
+        #return { 'fields': fields, 'hidden_columns': hidden_columns }
         return { 'fields': fields }

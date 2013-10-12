@@ -95,7 +95,7 @@
     function cell(key, value) {
         if (key == 'slice.slice_hrn') {
             return "<i class='icon-play-circle'></i><a href='/portal/slice/" + value + "'>" + value + "</a>";
-        } else if (key == 'network_hrn') {
+        } else if (key == 'platform') {
             return "<i class='icon-play-circle'></i><a href='/portal/platform/" + value + "'>" + value + "</a>";
         } else {
             return value;
