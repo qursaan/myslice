@@ -11,14 +11,16 @@ def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
     result=[]
     if has_user:
-        result.append({'label':'Platforms', 'href': '/portal/platforms/'})
         result.append({'label':'Dashboard', 'href': '/portal/dashboard/'})
-        # This should probably go in dashboard at some point
-        dropdown = []
-        dropdown.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
-        dropdown.append({'label':'My Account', 'href': '/portal/account/'})
-        dropdown.append({'label':'Contact Support', 'href': '/portal/contact/'})
-        result.append({'label': 'More', 'href':"#", 'dropdown':True, 'contents':dropdown})
+        result.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
+        result.append({'label':'My Account', 'href': '/portal/account/'})
+        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
+# Not really useful at this point, is it ?
+# This should probably go into dashboard at some point
+#        result.append({'label':'Platforms', 'href': '/portal/platforms/'})
+# the code for building a dropdown instead - but somehow this is broken
+#        dropdown = [ {'label':'..', 'href': '..'}, ...]
+#        result.append({'label': 'More', 'href':"#", 'dropdown':True, 'contents':dropdown})
     else:
         result.append({'label':'Home', 'href': '/login'})
         # looks like this is accessible to non-logged users
