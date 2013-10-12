@@ -186,6 +186,9 @@
                         line.push('');
                     else
                         line.push(record['hostname']);
+
+                } else if (colnames[j] == 'hrn' && typeof(record) != 'undefined') {
+                    line.push('<a href="../resource/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record['hrn']);
                 } else {
                     if (record[colnames[j]])
                         line.push(record[colnames[j]]);
