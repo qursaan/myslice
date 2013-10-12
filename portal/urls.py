@@ -25,6 +25,7 @@ from django.conf.urls           import patterns, include, url
 
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
+from portal.resourceview        import ResourceView
 from portal.dashboardview       import DashboardView
 from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
@@ -58,6 +59,7 @@ urlpatterns = patterns('',
     url(r'^account/?$', AccountView.as_view(), name='account'),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.\-]+)/?$', PlatformView.as_view(), name='platform'),
+    url(r'^resource/(?P<urn>[\w\.\-\+\:]+)/?$', ResourceView.as_view(), name='resource'),
     url(r'^slice/?$',SliceView.as_view(),name='slice'),
     url(r'^slice/(?P<slicename>[\w\.]+)/?$', SliceView.as_view(),name='slice'),
     url(r'^account/account_process/?$', account_process),
