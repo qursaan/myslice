@@ -9,9 +9,11 @@ TAGS
 # these essentially are copies/links from other places
 /static/
 /templates/
-# various working files
-play/
-*.leftovers
-*.hide
-entrypoints.ongoing/
+# sequels of running setup.py
 build/
+# css, js and html stuff for plugins should comply with
+# the general django layout (templates/ and statics/{css,js}/)
+# however symlinks can be convenient in a work tree
+plugins/*/*.css
+plugins/*/*.js
+plugins/*/*.html
