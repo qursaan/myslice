@@ -1,0 +1,12 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/dashboard.css" />
+{% endblock %}
+
+{% block unfold1_main %}
+
+<h1>Resource</h1>
+{{resource}}
+{{resource_as_map}}
+{% endblock %}
