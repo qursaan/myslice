@@ -171,7 +171,6 @@
 
         on_field_added: function(field)
         {
-            console.log("on_field_added : "+field);
             this.check_field(field);
         },
 

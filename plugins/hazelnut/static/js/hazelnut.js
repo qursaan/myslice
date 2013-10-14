@@ -133,7 +133,8 @@
 
             /* Processing hidden_columns */
             $.each(this.options.hidden_columns, function(i, field) {
-                self.hide_column(field);
+                manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
+                //self.hide_column(field);
             });
         }, // initialize_table
 
@@ -201,12 +202,11 @@
             if (this.options.checkboxes) {
                 // Use a key instead of hostname (hard coded...)
                 line.push(this.checkbox_html(this.key, record[this.key]));
-	    }
+	        }
     
-	    // adding an array in one call is *much* more efficient
-	    // this.table.fnAddData(line);
-	    this.buffered_lines.push(line);
-
+    	    // adding an array in one call is *much* more efficient
+	        // this.table.fnAddData(line);
+	        this.buffered_lines.push(line);
         },
 
         clear_table: function()
@@ -260,9 +260,9 @@
 
             var checkbox_id = this.flat_id(this.id('checkbox', key_value));
             checkbox_id = '#' + checkbox_id;
-	    // using dataTables's $ to search also in nodes that are not currently displayed
+	        // using dataTables's $ to search also in nodes that are not currently displayed
             var element = this.table.$(checkbox_id);
-	    if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
+	        if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
         },
 
@@ -301,19 +301,56 @@
             alert('Hazelnut::clear_fields() not implemented');
         },
 
+        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
+        /*************************** ALL QUERY HANDLER ****************************/
+
+        on_all_filter_added: function(filter)
+        {
+            // XXX
+            this.redraw_table();
+        },
+
+        on_all_filter_removed: function(filter)
+        {
+            // XXX
+            this.redraw_table();
+        },
+        
+        on_all_filter_clear: function()
+        {
+            // XXX
+            this.redraw_table();
+        },
+
+        on_all_field_added: function(field)
+        {
+            this.show_column(field);
+        },
+
+        on_all_field_removed: function(field)
+        {
+            this.hide_column(field);
+        },
+
+        on_all_field_clear: function()
+        {
+            alert('Hazelnut::clear_fields() not implemented');
+        },
+
+
         /*************************** RECORD HANDLER ***************************/
 
         on_new_record: function(record)
         {
             if (this.received_all_query) {
-		// if the 'all' query has been dealt with already we may turn on the checkbox
-		if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
+        		// if the 'all' query has been dealt with already we may turn on the checkbox
+        		if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
                 this.set_checkbox(record, true);
-	    } else {
-		// otherwise we need to remember that and do it later on
-		if (debug) messages.debug ("Remembering record to check " + record[this.key]);
+        	} else {
+        		// otherwise we need to remember that and do it later on
+        		if (debug) messages.debug("Remembering record to check " + record[this.key]);
                 this.buffered_records_to_check.push(record);
-	    }
+        	}
         },
 
         on_clear_records: function()
@@ -329,7 +366,7 @@
         on_query_done: function()
         {
             this.received_query = true;
-	    // unspin once we have received both
+    	    // unspin once we have received both
             if (this.received_all_query && this.received_query) this.unspin();
         },
         
@@ -349,7 +386,23 @@
             }
         },
 
+        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
         // all
+        on_all_field_state_changed: function(data)
+        {
+            switch(data.request) {
+                case FIELD_REQUEST_ADD:
+                case FIELD_REQUEST_ADD_RESET:
+                    this.set_checkbox(data.value, true);
+                    break;
+                case FIELD_REQUEST_REMOVE:
+                case FIELD_REQUEST_REMOVE_RESET:
+                    this.set_checkbox(data.value, false);
+                    break;
+                default:
+                    break;
+            }
+        },
 
         on_all_new_record: function(record)
         {

@@ -111,7 +111,33 @@ class SliceView (LoginRequiredAutoLogoutView):
             domid               = 'pending',
             outline_complete    = True,
         ))
-    
+
+        # --------------------------------------------------------------------------
+        # Filter Resources
+       
+        filter_query_editor = QueryEditor(
+            page  = page,
+            query = query_resource_all,
+            title = "Select Columns",
+            domid = 'select-columns',
+            )
+        filter_active_filters = ActiveFilters(
+            page  = page,
+            query = sq_resource,
+            title = "Active Filters",
+            )
+        filters_area = Stack(
+            page                = page,
+            title               = 'Filter Resources',
+            domid               = 'filters',
+            sons                = [filter_query_editor, filter_active_filters],
+            togglable           = True,
+            # start turned off, it will open up itself when stuff comes in
+            toggled             = False,
+            outline_complete    = True, 
+        )
+        main_stack.insert (filters_area)
+
         # --------------------------------------------------------------------------
         # RESOURCES
         # the resources part is made of a Tabs (Geographic, List), 
@@ -145,18 +171,6 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_query_editor = QueryEditor(
-            page  = page,
-            query = query_resource_all,
-            title = "Select Columns",
-            domid = 'select-columns',
-            )
-        resources_active_filters = ActiveFilters(
-            page  = page,
-            query = sq_resource,
-            title = "Active Filters ?",
-            )
-
         # List area itself is a Stack with hazelnut on top,
         # and a togglable tabs for customization plugins 
         resources_as_list_area = Stack(
@@ -170,7 +184,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                            toggled='persistent',
                            domid="customize-resources",
                            outline_complete=True,
-                           sons = [ resources_query_editor, resources_active_filters, ],
+                           #sons = [ resources_query_editor, resources_active_filters, ],
                            ),
                     ],
             )
