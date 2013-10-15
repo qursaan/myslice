@@ -117,7 +117,8 @@ class SliceView (LoginRequiredAutoLogoutView):
        
         filter_query_editor = QueryEditor(
             page  = page,
-            query = query_resource_all,
+            query = sq_resource, 
+            query_all = query_resource_all,
             title = "Select Columns",
             domid = 'select-columns',
             )
