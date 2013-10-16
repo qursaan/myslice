@@ -14,7 +14,7 @@ from plugins.tabs                    import Tabs
 from plugins.hazelnut                import Hazelnut 
 from plugins.resources_selected      import ResourcesSelected
 from plugins.googlemap               import GoogleMap
-from plugins.senslabmap.senslabmap   import SensLabMap
+from plugins.senslabmap              import SensLabMap
 from plugins.querycode               import QueryCode
 from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
