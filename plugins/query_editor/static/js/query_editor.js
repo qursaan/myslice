@@ -92,6 +92,7 @@
 //                    { 'sWidth': '8px', 'aTargets': [ 4 ] } // XXX NB OF COLS
 //                ]
             });
+            this.table = metaTable;
 
             // Actions on the newly added fields
             this.elmt('table tbody td span').on('click', function() {
@@ -279,7 +280,10 @@
             
             jQuery.each(availableTags, function(key, value){
                 value.sort();
-                jQuery("#"+domid+"__field__"+key).autocomplete({
+                // using dataTables's $ to search also in nodes that are not currently displayed
+                var element = self.table.$("#"+domid+"__field__"+key);
+
+                element.autocomplete({
                             source: value,
                             selectFirst: true,
                             minLength: 0, // allows to browse items with no value typed in
