@@ -61,16 +61,24 @@ class RegistrationView (View):
             # XXX validate authority hrn !!
             if PendingUser.objects.filter(email__iexact=reg_email):
                 errors.append('Email already registered.Please provide a new email address.')
+
+# XXX TODO: Factorize with portal/accountview.py
             if 'generate' in request.POST['question']:
-                # Generate public and private keys using SFA Library
-                from sfa.trust.certificate  import Keypair
-                k = Keypair(create=True)
-                public_key = k.get_pubkey_string()
-                private_key = k.as_pem()
-                private_key = ''.join(private_key.split())
-                public_key = "ssh-rsa " + public_key
+                from Crypto.PublicKey import RSA
+                private = RSA.generate(1024)
+                private_key = json.dumps(private.exportKey())
+                public  = private.publickey()
+                public_key = json.dumps(public.exportKey(format='OpenSSH'))
+
+#                # Generate public and private keys using SFA Library
+#                from sfa.trust.certificate  import Keypair
+#                k = Keypair(create=True)
+#                public_key = k.get_pubkey_string()
+#                private_key = k.as_pem()
+#                private_key = ''.join(private_key.split())
+#                public_key = "ssh-rsa " + public_key
                 # Saving to DB
-                keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
+                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + '}'
                 #keypair = re.sub("\r", "", keypair)
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')

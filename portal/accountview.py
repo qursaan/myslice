@@ -142,19 +142,26 @@ def account_process(request):
         messages.success(request, 'Sucess: Password Updated.')
         return HttpResponseRedirect("/portal/account/")
 
+# XXX TODO: Factorize with portal/registrationview.py
+
     elif 'generate' in request.POST:
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
+                        from Crypto.PublicKey import RSA
+                        private = RSA.generate(1024)
+                        private_key = json.dumps(private.exportKey())
+                        public  = private.publickey()
+                        public_key = json.dumps(public.exportKey(format='OpenSSH'))
                         # Generate public and private keys using SFA Library
-                        from sfa.trust.certificate  import Keypair
-                        k = Keypair(create=True)
-                        public_key = k.get_pubkey_string()
-                        private_key = k.as_pem()
-                        private_key = ''.join(private_key.split())
-                        public_key = "ssh-rsa " + public_key
-                        keypair = '{"user_public_key":"'+ public_key + '", "user_private_key":"'+ private_key + '"}'
+#                        from sfa.trust.certificate  import Keypair
+#                        k = Keypair(create=True)
+#                        public_key = k.get_pubkey_string()
+#                        private_key = k.as_pem()
+#                        private_key = ''.join(private_key.split())
+#                        public_key = "ssh-rsa " + public_key
+                        keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + '}'
 #                       keypair = re.sub("\r", "", keypair)
 #                       keypair = re.sub("\n", "\\n", keypair)
 #                       #keypair = keypair.rstrip('\r\n')
