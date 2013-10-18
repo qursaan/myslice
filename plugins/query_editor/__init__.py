@@ -5,6 +5,12 @@ from django.template.loader import render_to_string
 # XXX We need naming helpers in the python Plugin class also, used in template
 
 class QueryEditor(Plugin):
+    def __init__ (self, query, query_all = None, **settings):
+        Plugin.__init__ (self, **settings)
+        self.query=query
+        self.query_uuid = query.query_uuid
+        self.query_all = query_all
+        self.query_all_uuid = query_all.query_uuid if query_all else None
 
     def template_file(self):
         return "query_editor.html"
@@ -21,9 +27,6 @@ class QueryEditor(Plugin):
             ]
         }
         return reqs
-
-    def json_settings_list (self):
-        return ['plugin_uuid', 'domid', 'query_uuid']
 
     def export_json_settings (self):
         return True
@@ -82,4 +85,7 @@ class QueryEditor(Plugin):
                 'checked':       md_field['name'] in self.query.get_select()
             })
         #return { 'fields': fields, 'hidden_columns': hidden_columns }
+        #return { 'fields': fields , 'query_uuid': self.query_uuid, 'query_all_uuid': self.query_all_uuid }
         return { 'fields': fields }
+
+    def json_settings_list (self): return ['plugin_uuid', 'domid', 'query_uuid', 'query_all_uuid', ]

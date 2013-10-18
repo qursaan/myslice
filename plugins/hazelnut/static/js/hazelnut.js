@@ -133,8 +133,8 @@
 
             /* Processing hidden_columns */
             $.each(this.options.hidden_columns, function(i, field) {
-                manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
-                //self.hide_column(field);
+                //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
+                self.hide_column(field);
             });
         }, // initialize_table
 

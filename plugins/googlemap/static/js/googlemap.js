@@ -154,7 +154,7 @@ googlemap_debug_detailed=false;
 
 	// this record is *in* the slice
         new_record: function(record) {
-	    if (googlemap_debug_detailed) messages.debug ("new_record");
+	        if (googlemap_debug_detailed) messages.debug ("new_record");
             if (!(record['latitude'])) return false;
 	    
             // get the coordinates
@@ -162,33 +162,33 @@ googlemap_debug_detailed=false;
             var longitude=unfold.get_value(record['longitude']);
             var lat_lon = latitude + longitude;
 
-	    // check if we've seen anything at that place already
-	    // xxx might make sense to allow for some fuzziness, 
-	    // i.e. consider 2 places equal if not further away than 300m or so...
-	    var marker_s = this.by_lat_lon [lat_lon];
-	    if ( marker_s == null ) {
-		marker_s = this.create_marker_struct (this.object, latitude, longitude);
-		this.by_lat_lon [ lat_lon ] = marker_s;
-		this.arm_marker(marker_s.marker, this.map);
-	    }
+    	    // check if we've seen anything at that place already
+    	    // xxx might make sense to allow for some fuzziness, 
+    	    // i.e. consider 2 places equal if not further away than 300m or so...
+    	    var marker_s = this.by_lat_lon [lat_lon];
+    	    if ( marker_s == null ) {
+        		marker_s = this.create_marker_struct (this.object, latitude, longitude);
+        		this.by_lat_lon [ lat_lon ] = marker_s;
+        		this.arm_marker(marker_s.marker, this.map);
+	        }
 	    
-	    // now add a line for this resource in the marker
-	    // xxx should compute checked here ?
-	    // this is where the checkbox will be appended
-	    var ul=marker_s.ul;
-	    var checkbox = this.create_record_checkbox (record, ul, false);
-	    if ( ! this.key in record ) return;
+    	    // now add a line for this resource in the marker
+    	    // xxx should compute checked here ?
+    	    // this is where the checkbox will be appended
+    	    var ul=marker_s.ul;
+    	    var checkbox = this.create_record_checkbox (record, ul, false);
+    	    if ( ! this.key in record ) return;
             var key_value = record[this.key];
-	    // see XXX BACKSLASHES 
-	    //var hrn = this.escape_id(key_value).replace(/\\/g, '');
-	    var hrn = key_value;
+    	    // see XXX BACKSLASHES 
+    	    //var hrn = this.escape_id(key_value).replace(/\\/g, '');
+    	    var hrn = key_value;
             this.by_hrn[hrn] = {
-		checkbox: checkbox,
-		// xxx Thierry sept 2013
-		// xxx actually we might have just used a domid-based scheme instead of the hash
-		// since at this point we only need to retrieve the checkbox from an hrn
-		// but I was not sure enough that extra needs would not show up so I kept this in place
-		// xxx not sure these are actually useful :
+    		    checkbox: checkbox,
+        		// xxx Thierry sept 2013
+        		// xxx actually we might have just used a domid-based scheme instead of the hash
+        		// since at this point we only need to retrieve the checkbox from an hrn
+        		// but I was not sure enough that extra needs would not show up so I kept this in place
+        		// xxx not sure these are actually useful :
                 value: key_value,
                 record: record,
             }

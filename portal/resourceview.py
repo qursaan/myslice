@@ -47,7 +47,7 @@ class ResourceView(TemplateView):
             title      = 'Geographic view',
             domid      = 'resources-map',
             # tab's sons preferably turn this off
-            togglable  = False,
+            togglable  = True,
             query      = resource_query,
             query_all  = resource_query,
             checkboxes = False,

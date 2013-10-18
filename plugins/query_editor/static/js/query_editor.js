@@ -41,6 +41,10 @@
         init: function(options, element) {
             this._super(options, element);
             this.listen_query(options.query_uuid);
+            // this one is the complete list of resources
+            // and will be bound to callbacks like on_all_new_record
+            this.listen_query(options.query_all_uuid, 'all');
+
 
             this.elts('queryeditor-auto-filter').change(this.event_filter_added('='));
             this.elts('queryeditor-filter').change(this.event_filter_added('='));
@@ -88,6 +92,7 @@
 //                    { 'sWidth': '8px', 'aTargets': [ 4 ] } // XXX NB OF COLS
 //                ]
             });
+            this.table = metaTable;
 
             // Actions on the newly added fields
             this.elmt('table tbody td span').on('click', function() {
@@ -185,10 +190,9 @@
             //console.log("Query_Editor: query_done!");
             //console.log(this.availableTags);
         },
-        on_new_record: function(record)
+        /* Autocomplete based on query_all to get all the fields, where query get only the fields selected  */
+        on_all_new_record: function(record)
         {
-            //console.log("Query_Editor: new_record!");
-            //console.log(record);
             availableTags = this.availableTags;           
             jQuery.each(record,function(key,value){
                 value = unfold.get_value(value);
@@ -276,7 +280,10 @@
             
             jQuery.each(availableTags, function(key, value){
                 value.sort();
-                jQuery("#"+domid+"__field__"+key).autocomplete({
+                // using dataTables's $ to search also in nodes that are not currently displayed
+                var element = self.table.$("#"+domid+"__field__"+key);
+
+                element.autocomplete({
                             source: value,
                             selectFirst: true,
                             minLength: 0, // allows to browse items with no value typed in
