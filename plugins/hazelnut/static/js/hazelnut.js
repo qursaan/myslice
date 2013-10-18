@@ -259,7 +259,8 @@
 
 
             var checkbox_id = this.flat_id(this.id('checkbox', key_value));
-            checkbox_id = '#' + checkbox_id;
+            // function escape_id(myid) is defined in portal/static/js/common.functions.js
+            checkbox_id = escape_id(checkbox_id);
 	        // using dataTables's $ to search also in nodes that are not currently displayed
             var element = this.table.$(checkbox_id);
 	        if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);

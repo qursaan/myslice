@@ -314,9 +314,11 @@
         // - Key and confirmation could be sufficient, or key and record state
         // XXX move record state to the manifold plugin API
 
-        on_field_state_changed: function(request, key, value, status)
+        on_field_state_changed: function(result)
         {
-            this.set_state(request, key, value, status);
+            console.log(result)
+            /* this.set_state(result.request, result.key, result.value, result.status); */
+            this.set_state(result);
         },
 
         // XXX we will have the requests for change
