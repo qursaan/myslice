@@ -63,6 +63,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             if cc_myself:
                 recipients.append(email)
             msg = render_to_string('slice-request-email.txt', form.cleaned_data)
+            print "email, msg, email, recipients", email , msg, email, recipients 
             send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
 
             return render(request,'slice-request-ack-view.html') # Redirect after POST
