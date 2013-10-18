@@ -103,5 +103,8 @@ class SliceRequestForm(forms.Form):
         if authority_hrn:# and authority_hrn[0] not in (c[0] for c in authority_hrn):
             # XXX This does not work, the choicefield is not updated...
             #self.fields['authority_hrn'].choices.extend(authority_hrn)
-            self.fields['authority_hrn'] = forms.ChoiceField( choices=authority_hrn)
+            self.fields['authority_hrn'] = forms.ChoiceField(
+                widget    = forms.Select(attrs={'class':'form-control'}),
+                choices   = authority_hrn,
+                help_text = "Please select an authority responsible for vetting your slice")
     
