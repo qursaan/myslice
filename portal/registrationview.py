@@ -9,7 +9,7 @@ from django.shortcuts           import render
 from unfold.page                import Page
 from ui.topmenu                 import topmenu_items
 
-from manifold.manifoldapi       import execute_query
+from manifold.manifoldapi       import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser
@@ -30,10 +30,17 @@ class RegistrationView (View):
         errors = []
 
         authorities_query = Query.get('authority').\
-            filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).\
             select('name', 'authority_hrn')
-        #authorities_query = Query.get('authority').select('authority_hrn')
-        authorities = execute_query(request, authorities_query)
+        
+        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
+        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        if onelab_enabled:
+            print "ONELAB ENABLED"
+            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc'])
+        else:
+            print "FIREXP ENABLED"
+
+        authorities = execute_admin_query(request, authorities_query)
         # xxx tocheck - if authorities is empty, it's no use anyway
         # (users won't be able to validate the form anyway)
 
