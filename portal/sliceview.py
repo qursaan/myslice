@@ -133,8 +133,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             domid               = 'filters',
             sons                = [filter_query_editor, filter_active_filters],
             togglable           = True,
-            # start turned off, it will open up itself when stuff comes in
-            toggled             = False,
+            toggled             = 'persistent',
             outline_complete    = True, 
         )
         main_stack.insert (filters_area)
@@ -161,6 +160,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         resources_as_list = Hazelnut( 
             page       = page,
             domid      = 'resources-list',
+            title      = 'List view',
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
@@ -172,23 +172,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        # List area itself is a Stack with hazelnut on top,
-        # and a togglable tabs for customization plugins 
-        resources_as_list_area = Stack(
-            page        = page,
-            title       = 'Resources as a List',
-            domid       = 'resources-list-area',
-            sons= [ resources_as_list, 
-                    Tabs ( page=page,
-                           title="Customize Resources layout",
-                           togglable=True,
-                           toggled='persistent',
-                           domid="customize-resources",
-                           outline_complete=True,
-                           #sons = [ resources_query_editor, resources_active_filters, ],
-                           ),
-                    ],
-            )
+        # with the new 'Filter' stuff on top, no need for anything but the hazelnut
+        resources_as_list_area = resources_as_list 
+
         resources_area = Tabs ( page=page, 
                                 domid="resources",
                                 togglable=True,
