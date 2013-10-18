@@ -904,8 +904,10 @@ var manifold = {
                 manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 
-            case FILTER_ADDED:
-                manifold.raise_query_event(query_uuid, event_type, value);
+            case FILTER_ADDED: 
+// Thierry - this is probably wrong but intended as a hotfix 
+// http://trac.myslice.info/ticket/32
+//                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
             case FILTER_REMOVED:
                 manifold.raise_query_event(query_uuid, event_type, value);
