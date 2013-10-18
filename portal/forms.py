@@ -62,13 +62,29 @@ class SliceRequestForm(forms.Form):
 #    email = forms.EmailField()
 #    cc_myself = forms.BooleanField(required=False)
 
-    slice_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    authority_hrn = forms.ChoiceField(choices=[(1, 'un')],widget=forms.Select(attrs={'class':'form-control'}))
-    number_of_nodes  = forms.DecimalField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    type_of_nodes = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    purpose = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
-    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
+    slice_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class':'form-control'}), 
+        help_text="Enter a name for the slice you wish to create")
+    authority_hrn = forms.ChoiceField(
+        widget    = forms.Select(attrs={'class':'form-control'}),
+        choices   = [],
+        help_text = "Please select an authority responsible for vetting your slice")
+    number_of_nodes = forms.DecimalField(
+        widget    = forms.TextInput(attrs={'class':'form-control'}),
+        help_text = "Enter the number of nodes you expect to request (informative only)")
+    type_of_nodes = forms.CharField(
+        widget    = forms.TextInput(attrs={'class':'form-control'}),
+        help_text = "Enter the type of nodes you expect to request (informative only)")
+    purpose = forms.CharField(
+        widget    = forms.Textarea(attrs={'class':'form-control'}),
+        help_text = "Enter the purpose of your experiment (informative only)")
+    email = forms.EmailField(
+        widget    = forms.TextInput(attrs={'class':'form-control'}),
+        help_text = "Enter your email address")
+    cc_myself = forms.BooleanField(
+        widget    = forms.CheckboxInput(attrs={'class':'form-control'}),
+        required  = False,
+        help_text = "Please indicate whether you would like to be CC'ed to the request email")
 
     def __init__(self, *args, **kwargs):
         initial =  kwargs.get('initial', {})

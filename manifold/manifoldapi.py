@@ -78,12 +78,7 @@ class ManifoldAPI:
 
         return func
 
-def execute_query(request, query):
-    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
-        print "W: Using hardcoded demo account for execute_query"
-        manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
-    else:
-        manifold_api_session_auth = request.session['manifold']['auth']
+def _execute_query(request, query, manifold_api_session_auth):
     manifold_api = ManifoldAPI(auth=manifold_api_session_auth)
     print "-"*80
     print query
@@ -97,3 +92,15 @@ def execute_query(request, query):
     #Error running query: {'origin': [0, 'XMLRPCAPI'], 'code': 2, 'description': 'No such session: No row was found for one()', 'traceback': 'Traceback (most recent call last):\n  File "/usr/local/lib/python2.7/dist-packages/manifold/core/xmlrpc_api.py", line 68, in xmlrpc_forward\n    user = Auth(auth).check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 245, in check\n    return self.auth_method.check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 95, in check\n    raise AuthenticationFailure, "No such session: %s" % e\nAuthenticationFailure: No such session: No row was found for one()\n', 'type': 2, 'ts': None, 'value': None}
 
     return result['value'] 
+
+def execute_query(request, query):
+    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
+        raise Exception, "User not authenticated"
+    manifold_api_session_auth = request.session['manifold']['auth']
+    return _execute_query(request, query, manifold_api_session_auth)
+
+def execute_admin_query(request, query):
+    config = Config()
+    admin_user, admin_password = config.manifold_admin_user_password()
+    admin_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
+    return _execute_query(request, query, admin_auth)

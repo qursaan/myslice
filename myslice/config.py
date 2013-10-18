@@ -16,11 +16,15 @@ class Config:
     # if you use a development backend running on this box, use "http://localhost:7080/"
     # the INRIA setup is with "http://manifold.pl.sophia.inria.fr:7080/"
 
+    default_manifold_admin_user     = 'admin'
+    default_manifold_admin_password = None
+
     _config_parser = None
 
     # having grown tired of screwing up with git stashes 
     # taking away my local config, we now more properly use
     # an external config file to override teh default
+    # XXX we might use support from manifold util classes --jordan
     @staticmethod
     def manifold_url ():
         if Config._config_parser: 
@@ -31,6 +35,20 @@ class Config:
         config.read (os.path.join(ROOT,'myslice/myslice.ini'))
         Config._config_parser=config
         return Config.manifold_url()
+
+    @staticmethod
+    def manifold_admin_user_password():
+        if Config._config_parser: 
+            admin_user = Config._config_parser.get('manifold','admin_user')
+            admin_password = Config._config_parser.get('manifold','admin_password')
+            return (admin_user, admin_password)
+        config = RawConfigParser ()
+        config.add_section('manifold')
+        config.set ('manifold', 'admin_user', Config.default_manifold_admin_user)
+        config.set ('manifold', 'admin_password', Config.default_manifold_admin_password)
+        config.read (os.path.join(ROOT,'myslice/myslice.ini'))
+        Config._config_parser=config
+        return Config.manifold_admin_user_password()
 
     # exporting these details to js
     @staticmethod

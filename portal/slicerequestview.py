@@ -3,7 +3,7 @@ from django.shortcuts            import render
 from django.core.mail            import send_mail
 
 from manifold.core.query         import Query
-from manifold.manifoldapi        import execute_query
+from manifold.manifoldapi        import execute_admin_query, execute_query
 
 from portal.models               import PendingSlice
 from portal.actions              import authority_get_pi_emails
@@ -14,12 +14,19 @@ from ui.topmenu                  import topmenu_items, the_user
 class SliceRequestView (LoginRequiredAutoLogoutView):
 
     def authority_hrn_initial (self, request):
-#        authorities_query = Query.get('authority').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc']).select('name', 'authority_hrn')
-        authorities_query = Query.get('authority').select('authority_hrn')
-        authorities = execute_query(request, authorities_query)
-        authorities = sorted(authorities)
+        authorities_query = Query.get('authority').\
+            select('name', 'authority_hrn')
         
-        authority_hrn_tuples = [ (authority['authority_hrn'], authority['name'],) for authority in authorities ]
+        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
+        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        if onelab_enabled:
+            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc'])
+
+        authorities = execute_admin_query(request, authorities_query)
+        #authorities = sorted(authorities)
+        
+        authority_hrn_tuples = [ (authority['authority_hrn'], authority['name'] if authority['name'] else authority['authority_hrn'],) for authority in authorities ]
+        print "authority_hrn_tuples=", authority_hrn_tuples
         return {'authority_hrn': authority_hrn_tuples}
 
     # because we inherit LoginRequiredAutoLogoutView that is implemented by redefining 'dispatch'
