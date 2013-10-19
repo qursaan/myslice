@@ -2,6 +2,7 @@ from unfold.plugin import Plugin
 
 # lists levels and sets them to enabled or not at startup
 default_levels = {'fatal': True, 'error': True, 'warning' : True, 'info' : True, 'debug' : False}
+#default_levels = {'fatal': False, 'error': False, 'warning' : False, 'info' : False, 'debug' : False}
 
 # there are two implementations available here
 # one shows up in the main page like a regular part of the page,

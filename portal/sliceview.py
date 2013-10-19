@@ -216,52 +216,52 @@ class SliceView (LoginRequiredAutoLogoutView):
                     'bAutoWidth'     : True,
                 },
             ))
-    
+# DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS
-        tab_measurements = Tabs (
-            page                = page,
-            active_domid        = 'measurements-list',
-            outline_complete    = True,
-            togglable           = True,
-            title               = 'Measurements',
-            domid               = 'measurements',
-        )
-        main_stack.insert(tab_measurements)
-    
-        tab_measurements.insert(Hazelnut( 
-            page        = page,
-            title       = 'Measurements',
-            domid       = 'measurements-list',
-            # tab's sons preferably turn this off
-            togglable   = False,
-            # this is the query at the core of the slice list
-            query       = sq_measurement,
-            # do NOT set checkboxes to False
-            # this table being otherwise empty, it just does not fly with dataTables
-            checkboxes  = True,
-            datatables_options = { 
-                'iDisplayLength' : 25,
-                'bLengthChange'  : True,
-                'bAutoWidth'     : True,
-            },
-        ))
-    
-        # --------------------------------------------------------------------------
-        # MESSAGES (we use transient=False for now)
-        main_stack.insert(Messages(
-            page   = page,
-            title  = "Runtime messages for slice %s"%slicename,
-            domid  = "msgs-pre",
-            levels = "ALL",
-            # plain messages are probably less nice for production but more reliable for development for now
-            transient = False,
-            # these make sense only in non-transient mode..
-            togglable = True,
-            toggled = 'persistent',
-            outline_complete = True,
-        ))
-    
+#        tab_measurements = Tabs (
+#            page                = page,
+#            active_domid        = 'measurements-list',
+#            outline_complete    = True,
+#            togglable           = True,
+#            title               = 'Measurements',
+#            domid               = 'measurements',
+#        )
+#        main_stack.insert(tab_measurements)
+#    
+#        tab_measurements.insert(Hazelnut( 
+#            page        = page,
+#            title       = 'Measurements',
+#            domid       = 'measurements-list',
+#            # tab's sons preferably turn this off
+#            togglable   = False,
+#            # this is the query at the core of the slice list
+#            query       = sq_measurement,
+#            # do NOT set checkboxes to False
+#            # this table being otherwise empty, it just does not fly with dataTables
+#            checkboxes  = True,
+#            datatables_options = { 
+#                'iDisplayLength' : 25,
+#                'bLengthChange'  : True,
+#                'bAutoWidth'     : True,
+#            },
+#        ))
+#    
+#        # --------------------------------------------------------------------------
+#        # MESSAGES (we use transient=False for now)
+#        main_stack.insert(Messages(
+#            page   = page,
+#            title  = "Runtime messages for slice %s"%slicename,
+#            domid  = "msgs-pre",
+#            levels = "ALL",
+#            # plain messages are probably less nice for production but more reliable for development for now
+#            transient = False,
+#            # these make sense only in non-transient mode..
+#            togglable = True,
+#            toggled = 'persistent',
+#            outline_complete = True,
+#        ))
+#    
     
         # variables that will get passed to the view-unfold1.html template
         template_env = {}

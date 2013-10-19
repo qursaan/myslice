@@ -2,10 +2,13 @@ import os.path
 from ConfigParser import RawConfigParser
 from myslice.settings import ROOT
 
+# myslice/myslice.ini
 # as this code suggests, you have the option to write myslice/myslice.ini
 # that looks like this
 #[manifold]
 #url = http://manifold.pl.sophia.inria.fr:7080/
+#admin_user = admin
+#admin_password = admin
 
 class Config:
 

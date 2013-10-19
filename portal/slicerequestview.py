@@ -18,9 +18,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             select('name', 'authority_hrn')
         
         onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
-        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        onelab_enabled = True
         if onelab_enabled:
-            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc'])
+            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple'])
 
         authorities = execute_admin_query(request, authorities_query)
         #authorities = sorted(authorities)
