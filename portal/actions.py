@@ -18,12 +18,12 @@ def authority_get_pis(request, authority_hrn):
     return results
 
 def authority_get_pi_emails(request,authority_hrn):
-    user_hrns = authority_get_pis(request,authority_hrn)
-    
-    query = Query.get('user').filter_by('user_hrn', 'included', user_hrns).select('user_email')
+    pi_users = authority_get_pis(request,authority_hrn)
+    pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
+    query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
     results = execute_query(request,query)
-    
-    return [result['user_email'] for result in results]
+    print "mails",  [result['email'] for result in results]
+    return [result['email'] for result in results]
 
 # SFA add record (user, slice)
 

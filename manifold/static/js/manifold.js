@@ -730,6 +730,7 @@ var manifold = {
             if (publish_uuid)
                 $.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
 
+/* DEMO - Debug Messages desactivated
             $("#notifications").notify("create", "sticky", {
               title: 'Warning',
               text: data.description
@@ -737,7 +738,7 @@ var manifold = {
               expires: false,
               speed: 1000
             });
-            
+*/            
         }
 	if (manifold.asynchroneous_debug) 
 	    messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
@@ -904,8 +905,10 @@ var manifold = {
                 manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 
-            case FILTER_ADDED:
-                manifold.raise_query_event(query_uuid, event_type, value);
+            case FILTER_ADDED: 
+// Thierry - this is probably wrong but intended as a hotfix 
+// http://trac.myslice.info/ticket/32
+//                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
             case FILTER_REMOVED:
                 manifold.raise_query_event(query_uuid, event_type, value);
