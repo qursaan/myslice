@@ -8,6 +8,7 @@ from ui.topmenu                  import topmenu_items, the_user
 from plugins.googlemap           import GoogleMap
 from plugins.hazelnut            import Hazelnut
 from plugins.lists.simplelist    import SimpleList
+from plugins.slicestat           import Slicestat
 
 # View for 1 platform and its details
 class ResourceView(TemplateView):
@@ -23,7 +24,7 @@ class ResourceView(TemplateView):
                 
         resource_query  = Query().get('resource')\
             .filter_by('urn', '==', resource_urn)\
-            .select('type','hrn','urn', 'latitude', 'longitude', 'country')
+            .select('hostname','type','hrn','urn', 'latitude', 'longitude', 'country')
         page.enqueue_query(resource_query)
 
         page.expose_js_metadata()
@@ -63,10 +64,18 @@ class ResourceView(TemplateView):
 #            query = resource_query,
 #        )
 
+        resource_stats = Slicestat(
+            title = None,
+            page  = page,
+            key   = 'hrn',
+            query = resource_query
+        )
+
         context = super(ResourceView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
         context['resource'] = resourcelist.render(self.request)
         context['resource_as_map'] = resource_as_map.render(self.request)
+        context['resource_stats'] = resource_stats.render(self.request)
 
         # XXX This is repeated in all pages
         # more general variables expected in the template
