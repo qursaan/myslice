@@ -23,7 +23,7 @@
 	  <ul class="dropdown-menu">
 	    {% for dd in d.contents %}
 	    {% if dd.is_active %}<li class='active'>{% else %}<li class='other'>{% endif %}
-	    <a class="dropdown-toggle" href="{{ dd.href }}"> {{ dd.label }} </a> </li>
+	    <a href="{{ dd.href }}"> {{ dd.label }} </a> </li>
 	    {% endfor %}
 	  </ul>
         </li>
