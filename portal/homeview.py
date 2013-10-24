@@ -14,8 +14,9 @@ class HomeView (View):
 
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
+        config=Config()
         return { 
-                 'MANIFOLD_URL':Config.manifold_url(),
+                 'MANIFOLD_URL':config.manifold_url(),
                  }
 
     def post (self,request):
