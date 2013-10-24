@@ -24,10 +24,7 @@
          */
         init: function(options, element) {
             // Call the parent constructor, see FAQ when forgotten
-            this._super(options, element);
-			
-			google.load("visualization", "1.0", {packages:["corechart"]});
-			 
+            this._super(options, element);			 
 			
 
             /* Member variables */
@@ -93,52 +90,8 @@
         {
             console.log(record);
             
-            var node = record.hostname;
-			var slice = 'root';
-			
-			google.setOnLoadCallback(function() {
-			
-				var options = {
-				  		pointSize: 2,
-						lineWidth: 1,
-				 		title: 'Slice '+slice+' last 24 hours', 'width':780, 'height':400,
-					vAxes: { 
-							0: {format: '###,##%'},
-							1: {format: '#Kb',}
-							},
-					hAxis: { title: "", format: 'HH:mm'},
-				    series: {
-				        0: { type: "line", targetAxisIndex: 0},
-				        1: { type: "line", targetAxisIndex: 0},
-				        2: { type: "line", targetAxisIndex: 1},
-				        3: { type: "line", targetAxisIndex: 1}
-				    }
-				};
-			
-				var jsonData = $.ajax({
-				        type: 'POST',
-				    	url: "/db/slice",
-				    	dataType: "json",
-				    	async: false,
-				    	data: { period: 'day', resources: 'cpu,pmc_per,asb,arb', slice: slice, node: node },
-				        success: function(ret) {
-				        	var result = [];
-				        	var data = new google.visualization.DataTable();
-							data.addColumn('datetime', 'Date');
-							data.addColumn('number', 'CPU (%)');
-							data.addColumn('number', 'MEM (%)');
-							data.addColumn('number', 'Traffic Sent (Kb)');
-							data.addColumn('number', 'Traffic Received (Kb)');
-							$.each(ret, function() {
-								result.push([new Date(this[0]), this[1], this[2], this[3], this[4]]);
-							});
-							data.addRows(result);
-							var chart = new google.visualization.LineChart(document.getElementById('graph'));
-							chart.draw(data, options);
-				        }
-				    }).responseText;
-			
-			});
+            $('iframe#slicestat_resource').attr('src','http://plestats.planet-lab.eu/node.php?node='+record.hostname);
+            
         },
 
         /* INTERNAL FUNCTIONS */
