@@ -272,6 +272,7 @@
         on_filter_added: function(filter)
         {
             // XXX
+            console.log(filter);
             this.redraw_table();
         },
 
