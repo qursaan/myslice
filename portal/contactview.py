@@ -40,6 +40,6 @@ class ContactView (View):
     def _display (self, request, form):
         return render(request, 'contact.html', {
                 'form': form,
-                'topmenu_items': topmenu_items('Contact Us', request),
+                'topmenu_items': topmenu_items('Contact', request),
                 'username': the_user (request)
                 })

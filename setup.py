@@ -20,5 +20,5 @@ setup(packages = packages,
         ( 'static/img', glob ('static/img/*')),
         ( 'static/fonts', glob ('static/fonts/*')),
         ( 'templates', glob ('templates/*')),
-        ( 'apache', [ 'apache/myslice.conf', 'apache/myslice.wsgi' ]),
+        ( 'apache', [ 'apache/myslice.conf' ]),
         ])

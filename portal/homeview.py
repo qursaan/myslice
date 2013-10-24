@@ -14,8 +14,9 @@ class HomeView (View):
 
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
+        config=Config()
         return { 
-                 'MANIFOLD_URL':Config.manifold_url(),
+                 'MANIFOLD_URL':config.manifold_url(),
                  }
 
     def post (self,request):
@@ -56,7 +57,7 @@ class HomeView (View):
     def get (self, request, state=None):
         env = self.default_env()
         env['username']=the_user(request)
-        env['topmenu_items'] = topmenu_items('', request)
+        env['topmenu_items'] = topmenu_items(None, request)
         if state: env['state'] = state
         elif not env['username']: env['state'] = "Please sign in"
         return render_to_response('home-view.html',env, context_instance=RequestContext(request))

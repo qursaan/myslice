@@ -2,15 +2,19 @@ import os.path
 from ConfigParser import RawConfigParser
 from myslice.settings import ROOT
 
-# myslice/myslice.ini
-# as this code suggests, you have the option to write myslice/myslice.ini
+# as this code suggests, you have the option to override these defaults
+# by writing a file myslice/myslice.ini
 # that looks like this
 #[manifold]
 #url = http://manifold.pl.sophia.inria.fr:7080/
 #admin_user = admin
 #admin_password = admin
 
-class Config:
+# use a singleton instead of staticmethods
+from manifold.util.singleton    import Singleton
+
+class Config(object):
+    __metaclass__ = Singleton
 
     # the OpenLab-wide backend as managed by UPMC
     # xxx production should probably use https of course
@@ -20,40 +24,25 @@ class Config:
     # the INRIA setup is with "http://manifold.pl.sophia.inria.fr:7080/"
 
     default_manifold_admin_user     = 'admin'
-    default_manifold_admin_password = None
+    default_manifold_admin_password = 'demo'
 
-    _config_parser = None
 
-    # having grown tired of screwing up with git stashes 
-    # taking away my local config, we now more properly use
-    # an external config file to override teh default
-    # XXX we might use support from manifold util classes --jordan
-    @staticmethod
-    def manifold_url ():
-        if Config._config_parser: 
-            return Config._config_parser.get('manifold','url')
-        config = RawConfigParser ()
-        config.add_section('manifold')
-        config.set ('manifold', 'url', Config.default_manifold_url)
-        config.read (os.path.join(ROOT,'myslice/myslice.ini'))
-        Config._config_parser=config
-        return Config.manifold_url()
+    def __init__ (self):
+        parser = RawConfigParser ()
+        parser.add_section('manifold')
+        parser.set ('manifold', 'url', Config.default_manifold_url)
+        parser.set ('manifold', 'admin_user', Config.default_manifold_admin_user)
+        parser.set ('manifold', 'admin_password', Config.default_manifold_admin_password)
+        parser.read (os.path.join(ROOT,'myslice/myslice.ini'))
+        self.config_parser=parser
 
-    @staticmethod
-    def manifold_admin_user_password():
-        if Config._config_parser: 
-            admin_user = Config._config_parser.get('manifold','admin_user')
-            admin_password = Config._config_parser.get('manifold','admin_password')
-            return (admin_user, admin_password)
-        config = RawConfigParser ()
-        config.add_section('manifold')
-        config.set ('manifold', 'admin_user', Config.default_manifold_admin_user)
-        config.set ('manifold', 'admin_password', Config.default_manifold_admin_password)
-        config.read (os.path.join(ROOT,'myslice/myslice.ini'))
-        Config._config_parser=config
-        return Config.manifold_admin_user_password()
+    def manifold_url (self):
+        return self.config_parser.get('manifold','url')
+
+    def manifold_admin_user_password(self):
+        return (self.config_parser.get('manifold','admin_user'),
+                self.config_parser.get('manifold','admin_password'))
 
     # exporting these details to js
-    @staticmethod
-    def manifold_js_export ():
-        return "var MANIFOLD_URL = '%s';\n"%Config.manifold_url();
+    def manifold_js_export (self):
+        return "var MANIFOLD_URL = '%s';\n"%self.manifold_url();

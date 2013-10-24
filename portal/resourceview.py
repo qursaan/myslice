@@ -8,6 +8,7 @@ from ui.topmenu                  import topmenu_items, the_user
 from plugins.googlemap           import GoogleMap
 from plugins.hazelnut            import Hazelnut
 from plugins.lists.simplelist    import SimpleList
+from plugins.slicestat           import SliceStat
 
 # View for 1 platform and its details
 class ResourceView(TemplateView):
@@ -15,6 +16,8 @@ class ResourceView(TemplateView):
 
     def get_context_data(self, **kwargs):
         page = Page(self.request)
+        
+        page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
             print "%s = %s" % (key, value)       
@@ -23,7 +26,7 @@ class ResourceView(TemplateView):
                 
         resource_query  = Query().get('resource')\
             .filter_by('urn', '==', resource_urn)\
-            .select('type','hrn','urn', 'latitude', 'longitude', 'country')
+            .select('hostname','type','hrn','urn', 'latitude', 'longitude', 'country')
         page.enqueue_query(resource_query)
 
         page.expose_js_metadata()
@@ -63,16 +66,25 @@ class ResourceView(TemplateView):
 #            query = resource_query,
 #        )
 
+        resource_stats = SliceStat(
+            title = None,
+            page  = page,
+            stats = 'node',
+            key   = 'hrn',
+            query = resource_query
+        )
+
         context = super(ResourceView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
         context['resource'] = resourcelist.render(self.request)
         context['resource_as_map'] = resource_as_map.render(self.request)
+        context['resource_stats'] = resource_stats.render(self.request)
 
         # XXX This is repeated in all pages
         # more general variables expected in the template
         context['title'] = 'Information about a resource'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Dashboard', self.request)
+        context['topmenu_items'] = topmenu_items(None, self.request)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 

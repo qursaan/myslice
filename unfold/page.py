@@ -141,7 +141,8 @@ class Page:
         self.add_js_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
 
     def expose_js_manifold_config (self):
-        self.add_js_chunks(Config.manifold_js_export())
+        config=Config()
+        self.add_js_chunks(config.manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above

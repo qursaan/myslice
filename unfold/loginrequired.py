@@ -32,7 +32,9 @@ def logout_on_manifold_exception (fun_that_returns_httpresponse):
         except ManifoldException, manifold_result:
             # xxx we need a means to display this message to user...
             from django.contrib.auth import logout
-            logout(request)
+            # in some unusual cases, this might fail
+            try: logout(request)
+            except: pass
             return HttpResponseRedirect ('/')
         except Exception, e:
             # xxx we need to sugarcoat this error message in some error template...

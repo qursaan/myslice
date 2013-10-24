@@ -20,13 +20,13 @@ class ManifoldAPI:
 
     def __init__(self, auth=None, cainfo=None):
         
-        config = Config()
         self.auth = auth
         self.cainfo = cainfo
         self.errors = []
         self.trace = []
         self.calls = {}
         self.multicall = False
+        config = Config()
         self.url = config.manifold_url()
         self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
