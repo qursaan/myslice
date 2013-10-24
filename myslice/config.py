@@ -24,7 +24,7 @@ class Config(object):
     # the INRIA setup is with "http://manifold.pl.sophia.inria.fr:7080/"
 
     default_manifold_admin_user     = 'admin'
-    default_manifold_admin_password = 'admin'
+    default_manifold_admin_password = 'demo'
 
 
     def __init__ (self):
