@@ -81,7 +81,7 @@ class ResourceView(TemplateView):
         # more general variables expected in the template
         context['title'] = 'Information about a resource'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Dashboard', self.request)
+        context['topmenu_items'] = topmenu_items(None, self.request)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 

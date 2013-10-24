@@ -56,7 +56,7 @@ class HomeView (View):
     def get (self, request, state=None):
         env = self.default_env()
         env['username']=the_user(request)
-        env['topmenu_items'] = topmenu_items('', request)
+        env['topmenu_items'] = topmenu_items(None, request)
         if state: env['state'] = state
         elif not env['username']: env['state'] = "Please sign in"
         return render_to_response('home-view.html',env, context_instance=RequestContext(request))
