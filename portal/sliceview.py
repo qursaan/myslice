@@ -37,7 +37,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
         page.add_js_chunks ('$(function() { messages.debug("sliceview: jQuery version " + $.fn.jquery); });')
         page.add_js_chunks ('$(function() { messages.debug("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
-        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(Config.manifold_url()))
+        config=Config()
+        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
         page.expose_js_metadata()
     
         metadata = page.get_metadata()

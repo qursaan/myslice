@@ -7,33 +7,35 @@
 # ### a dropdown
 # { 'label': ..., 'href'=..., 'dropdown':True, 'contents': [ { 'label':.., 'href'} ] }
 # , ..]
+
+# current: the beginning of the label in the menu that you want to outline
 def topmenu_items (current,request=None):
     has_user=request.user.is_authenticated()
     result=[]
     if has_user:
         result.append({'label':'Dashboard', 'href': '/portal/dashboard/'})
         result.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
-        result.append({'label':'My Account', 'href': '/portal/account/'})
-        result.append({'label':'Contact Support', 'href': '/portal/contact/'})
-# Not really useful at this point, is it ?
-# This should probably go into dashboard at some point
-#        result.append({'label':'Platforms', 'href': '/portal/platforms/'})
-# the code for building a dropdown instead - but somehow this is broken
-#        dropdown = [ {'label':'..', 'href': '..'}, ...]
-#        result.append({'label': 'More', 'href':"#", 'dropdown':True, 'contents':dropdown})
+        dropdown = []
+        dropdown.append({'label':'My Account', 'href': '/portal/account/'})
+        dropdown.append({'label':'Contact Support', 'href': '/portal/contact/'})
+        result.append({'label': 'More', 'href':"#", 'dropdown':True, 'contents':dropdown})
     else:
         result.append({'label':'Home', 'href': '/login'})
         # looks like this is accessible to non-logged users
         result.append({'label':'Platforms', 'href': '/portal/platforms/'})
         result.append({'label':'Register', 'href': '/portal/register/'})
         result.append({'label':'Contact Support', 'href': '/portal/contact/'})
-    # mark active
-    for d in result:
-        if 'dropdown' in d:
-            for dd in d['contents']:
-                if dd['label'] == current: dd['is_active']=True
-        else:
-            if d['label'] == current: d['is_active']=True
+    # mark active if the provided 'current', even if shorter, matches the beginning of d['label']
+    
+    if current is not None:
+        current=current.lower()
+        curlen=len(current)
+        def mark_active(d):
+            if d['label'][:curlen].lower() == current: d['is_active']=True
+        for d in result:
+            mark_active(d)
+            if 'dropdown' in d:
+                for dd in d['contents']: mark_active(dd)
     return result
 
 def the_user (request):
