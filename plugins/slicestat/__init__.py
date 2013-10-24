@@ -12,8 +12,9 @@ class Slicestat(Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [
-                'js/date.js',
-                'js/slicestat.js'
+                
+                'js/slicestat.js',
+
             ],
             'css_files': [
                 'css/slicestat.css',
