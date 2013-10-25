@@ -20,6 +20,7 @@ from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
+from plugins.slicestat               import Slicestat
 
 from myslice.config                  import Config
 
@@ -173,6 +174,50 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
+        resources_stats_cpu = Slicestat(
+            title = "CPU Usage",
+            domid = 'resources-stats-cpu',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'cpu'
+        )
+        
+        resources_stats_mem = Slicestat(
+            title = "Memory Usage",
+            domid = 'resources-stats-mem',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'mem'
+        )
+        
+        resources_stats_asb = Slicestat(
+            title = "Traffic Sent",
+            domid = 'resources-stats-asb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'asb'
+        )
+        
+        resources_stats_arb = Slicestat(
+            title = "Traffic Received",
+            domid = 'resources-stats-arb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'arb'
+        )
+        
         # with the new 'Filter' stuff on top, no need for anything but the hazelnut
         resources_as_list_area = resources_as_list 
 
@@ -181,11 +226,10 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_map, resources_as_list_area, ],
+                                sons=[ resources_as_map, resources_as_list_area, resources_stats_cpu, resources_stats_mem, resources_stats_asb, resources_stats_arb ],
                                 active_domid = 'resources-map',
                                 )
         main_stack.insert (resources_area)
-
 
         # --------------------------------------------------------------------------
         # USERS
@@ -217,6 +261,8 @@ class SliceView (LoginRequiredAutoLogoutView):
                     'bAutoWidth'     : True,
                 },
             ))
+            
+        
 # DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS
