@@ -56,14 +56,14 @@ class Institution(models.Model):
 class PendingUser(models.Model):
     # NOTE We might consider migrating the fields to CharField, which would
     # simplify form creation in forms.py
-    first_name  = models.TextField()
-    last_name   = models.TextField()
-#    affiliation = models.TextField()
-    email       = models.EmailField() #validators=[validate_email])
-    password    = models.TextField()
-    keypair     = models.TextField()
-    # institution
+    first_name    = models.TextField()
+    last_name     = models.TextField()
+    email         = models.EmailField() #validators=[validate_email])
+    password      = models.TextField()
+    keypair       = models.TextField()
     authority_hrn = models.TextField()
+    login         = models.TextField()
+    created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 
 class PendingSlice(models.Model):
@@ -72,3 +72,4 @@ class PendingSlice(models.Model):
     number_of_nodes = models.TextField(default=0)
     type_of_nodes   = models.TextField(default='NA')
     purpose         = models.TextField(default='NA')
+    created         = models.DateTimeField(auto_now_add = True)

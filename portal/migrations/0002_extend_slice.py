@@ -33,7 +33,6 @@ class Migration(SchemaMigration):
         },
         u'portal.pendinguser': {
             'Meta': {'object_name': 'PendingUser'},
-            'affiliation': ('django.db.models.fields.TextField', [], {}),
             'authority_hrn': ('django.db.models.fields.TextField', [], {}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'first_name': ('django.db.models.fields.TextField', [], {}),

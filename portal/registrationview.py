@@ -27,15 +27,13 @@ from portal.actions             import authority_get_pi_emails
 class RegistrationView (View):
 
     def dispatch (self, request):
-
         errors = []
 
         authorities_query = Query.get('authority').\
             select('name', 'authority_hrn')
         
-        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
-        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
-        onelab_enabled = True
+        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
+        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
         if onelab_enabled:
             print "ONELAB ENABLED"
             authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple'])
@@ -56,11 +54,12 @@ class RegistrationView (View):
             # We shall use a form here
 
             #get_email = PendingUser.objects.get(email)
-            reg_fname = request.POST.get('firstname', '')
-            reg_lname = request.POST.get('lastname', '')
-            #reg_aff = request.POST.get('affiliation','')
-            reg_auth = request.POST.get('authority_hrn', '')
-            reg_email = request.POST.get('email','').lower()
+            reg_fname  = request.POST.get('firstname', '')
+            reg_lname  = request.POST.get('lastname', '')
+            #reg_aff   = request.POST.get('affiliation','')
+            reg_auth   = request.POST.get('authority_hrn', '')
+            reg_login  = request.POST.get('login', '')
+            reg_email  = request.POST.get('email','').lower()
       
             #POST value validation  
             if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
@@ -113,14 +112,15 @@ class RegistrationView (View):
             #b.save()
             if not errors:
                 b = PendingUser(
-                    first_name=reg_fname, 
-                    last_name=reg_lname, 
-                    #affiliation=reg_aff,
-                    authority_hrn=reg_auth,
-                    email=reg_email, 
-                    password=request.POST['password'],
-                    keypair=keypair
-                    )
+                    first_name    = reg_fname, 
+                    last_name     = reg_lname, 
+                    #affiliation  = reg_aff,
+                    authority_hrn = reg_auth,
+                    login         = reg_login,
+                    email         = reg_email, 
+                    password      = request.POST['password'],
+                    keypair       = keypair,
+                )
                 b.save()
 
                 # Send email
@@ -132,15 +132,13 @@ class RegistrationView (View):
                     'keypair'       : 'Public Key :' + public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
-                #not working
-                #recipients = authority_get_pi_emails(request,reg_auth)
-                recipients = ['devel@myslice.info']
+
+                recipients = authority_get_pi_emails(request,reg_auth)
+
                 if ctx['cc_myself']:
                     recipients.append(ctx['email'])
 
                 msg = render_to_string('user_request_email.txt', ctx)
-                print "tesing msg"
-                print msg
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
 
                 return render(request, 'user_register_complete.html')

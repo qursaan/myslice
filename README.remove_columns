@@ -1,0 +1,7 @@
+sqlite> CREATE TEMPORARY TABLE portal_pendinguser_backup(id,first_name,last_name,email,password,keypair,authority_hrn);
+sqlite> INSERT INTO portal_pendinguser_backup SELECT id,first_name,last_name,email,password,keypair,authority_hrn FROM portal_pendinguser;
+sqlite> DROP TABLE portal_pendinguser;
+sqlite> CREATE TABLE portal_pendinguser(id,first_name,last_name,email,password,keypair,authority_hrn);
+sqlite> INSERT INTO portal_pendinguser SELECT id,first_name,last_name,email,password,keypair,authority_hrn FROM portal_pendinguser_backup;
+sqlite> DROP TABLE portal_pendinguser_backup;
+sqlite> COMMIT;

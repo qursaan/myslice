@@ -8,31 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'PendingSlice.number_of_nodes'
-        db.add_column(u'portal_pendingslice', 'number_of_nodes',
-                      self.gf('django.db.models.fields.TextField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'PendingSlice.type_of_nodes'
-        db.add_column(u'portal_pendingslice', 'type_of_nodes',
-                      self.gf('django.db.models.fields.TextField')(default='NA'),
-                      keep_default=False)
-
-        # Adding field 'PendingSlice.purpose'
-        db.add_column(u'portal_pendingslice', 'purpose',
-                      self.gf('django.db.models.fields.TextField')(default='NA'),
+        # Adding field 'PendingUser.created'
+        db.add_column(u'portal_pendinguser', 'created',
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2013, 10, 25, 0, 0), blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'PendingSlice.number_of_nodes'
-        db.delete_column(u'portal_pendingslice', 'number_of_nodes')
-
-        # Deleting field 'PendingSlice.type_of_nodes'
-        db.delete_column(u'portal_pendingslice', 'type_of_nodes')
-
-        # Deleting field 'PendingSlice.purpose'
-        db.delete_column(u'portal_pendingslice', 'purpose')
+        # Deleting field 'PendingUser.created'
+        db.delete_column(u'portal_pendinguser', 'created')
 
 
     models = {
@@ -53,11 +37,13 @@ class Migration(SchemaMigration):
         u'portal.pendinguser': {
             'Meta': {'object_name': 'PendingUser'},
             'authority_hrn': ('django.db.models.fields.TextField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'first_name': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'keypair': ('django.db.models.fields.TextField', [], {}),
             'last_name': ('django.db.models.fields.TextField', [], {}),
+            'login': ('django.db.models.fields.TextField', [], {}),
             'password': ('django.db.models.fields.TextField', [], {})
         }
     }
