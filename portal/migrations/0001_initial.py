@@ -20,7 +20,6 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('first_name', self.gf('django.db.models.fields.TextField')()),
             ('last_name', self.gf('django.db.models.fields.TextField')()),
-            ('affiliation', self.gf('django.db.models.fields.TextField')()),
             ('email', self.gf('django.db.models.fields.EmailField')(max_length=75)),
             ('password', self.gf('django.db.models.fields.TextField')()),
             ('keypair', self.gf('django.db.models.fields.TextField')()),
@@ -60,7 +59,6 @@ class Migration(SchemaMigration):
         },
         u'portal.pendinguser': {
             'Meta': {'object_name': 'PendingUser'},
-            'affiliation': ('django.db.models.fields.TextField', [], {}),
             'authority_hrn': ('django.db.models.fields.TextField', [], {}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'first_name': ('django.db.models.fields.TextField', [], {}),

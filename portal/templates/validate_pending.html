@@ -6,7 +6,7 @@
 	function on_click_event() {
 		var ids = []; 
 		$('.portal__validate__checkbox').each(function(i, el) {
-			if ($(el).attr('checked')) {
+			if ($(el).prop('checked')) {
 				// portal__validate__checkbox__slice__2
 				var id_array = $(el).attr('id').split('__');
 				// push(slice__2)
@@ -28,10 +28,10 @@
 								status_str += ' -- ';
 
 							if (result.status) {
-								status_str += '<font color="green">' + name + '</font>';
+								status_str += '<font color="green">OK</font>';
 								$('#portal__validate__checkbox__' + request_type__id).hide();
 							} else {
-								status_str += '<font color="red">' + name + ' (' + result.description + ')</font>';
+								status_str += '<font color="red">ERROR: ' + result.description + '</font>';
 							}
 						});
 						$('#portal__status__' + request_type__id).html(status_str)

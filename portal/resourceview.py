@@ -8,7 +8,7 @@ from ui.topmenu                  import topmenu_items, the_user
 from plugins.googlemap           import GoogleMap
 from plugins.hazelnut            import Hazelnut
 from plugins.lists.simplelist    import SimpleList
-from plugins.slicestat           import Slicestat
+from plugins.slicestat           import SliceStat
 
 # View for 1 platform and its details
 class ResourceView(TemplateView):
@@ -66,7 +66,7 @@ class ResourceView(TemplateView):
 #            query = resource_query,
 #        )
 
-        resource_stats = Slicestat(
+        resource_stats = SliceStat(
             title = None,
             page  = page,
             stats = 'node',

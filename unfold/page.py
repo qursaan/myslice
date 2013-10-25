@@ -34,6 +34,7 @@ class Page:
         self._queue=[]
         # global prelude object
         self.prelude=Prelude(css_files='css/plugin.css')
+        self.prelude=Prelude(css_files='css/onelab_marko.css')
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):

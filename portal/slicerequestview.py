@@ -18,8 +18,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             select('name', 'authority_hrn')
         
         onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
-        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
-        onelab_enabled = True
+        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
         if onelab_enabled:
             authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple'])
 
@@ -59,8 +58,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             cc_myself = form.cleaned_data['cc_myself']
 
             # The recipients are the PI of the authority
-            recipients = authority_get_pi_emails(request,authority_hrn)
-            #recipients = ['yasin.upmc@gmail.com','jordan.auge@lip6.fr']
+            recipients = authority_get_pi_emails(request, authority_hrn)
+
             if cc_myself:
                 recipients.append(email)
             msg = render_to_string('slice-request-email.txt', form.cleaned_data)

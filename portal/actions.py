@@ -4,6 +4,10 @@ from manifold.manifoldapi        import execute_query
 from portal.models               import PendingUser, PendingSlice
 import json
 
+# XXX sfa dependency, should be moved to SFA gateway
+from sfa.util.xrn                import Xrn 
+
+
 # Get the list of authorities
 
 def authority_get_pis(request, authority_hrn):
@@ -17,35 +21,38 @@ def authority_get_pis(request, authority_hrn):
     #return result['pi_users']
     return results
 
-def authority_get_pi_emails(request,authority_hrn):
+def authority_get_pi_emails(request, authority_hrn):
+    return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
+
     pi_users = authority_get_pis(request,authority_hrn)
     pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
     query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
-    results = execute_query(request,query)
+    results = execute_query(request, query)
     print "mails",  [result['email'] for result in results]
     return [result['email'] for result in results]
 
 # SFA add record (user, slice)
 
-def sfa_add_user(user_params):
-    # sfi.py add --xrn=fed4fire.upmc.timur_friedman --type=user --key=/root/.sfi/timur.pub --email=timur.friedman@lip6.fr --extra=first_name=Timur --extra=last_name=Friedman --extra=enabled=true
-    # user_params: xrn type key email + first_name last_name enabled
+def sfa_add_user(request, user_params):
     query = Query.create('user').set(user_params).select('user_hrn')
-    results = execute_query(query)
+    results = execute_query(request, query)
     if not results:
-        raise Exception, "Failed creating SFA user: %s" % user_params['user_hrn']
-    result, = results
-    return result['user_hrn']
+        raise Exception, "Could not create %s. Already exists ?" % user_params['hrn']
+    return results
 
-def sfa_add_slice(slice_params):
-    pass
+def sfa_add_slice(request, slice_params):
+    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    results = execute_query(request, query)
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
+    return results
 
 # Propose hrn
 
 def manifold_add_user(request, user_params):
     # user_params: email, password e.g., user_params = {'email':'aa@aa.com','password':'demo'}
     query = Query.create('local:user').set(user_params).select('email')
-    results = execute_query(request,query)
+    results = execute_query(request, query)
     if not results:
         raise Exception, "Failed creating manifold user: %s" % user_params['email']
     result, = results
@@ -84,21 +91,24 @@ def manifold_update_account(request,account_params):
 
 def make_request_user(user):
     request = {}
-    request['type'] = 'user'
-    request['id'] = user.id
-    request['timestamp'] = 'TODO' # XXX in DB ?
+    request['type']          = 'user'
+    request['id']            = user.id
+    request['timestamp']     = user.created # XXX in DB ?
     request['authority_hrn'] = user.authority_hrn
-    request['first_name'] = user.first_name
-    request['last_name'] = user.last_name
-    request['email'] = user.email
+    request['first_name']    = user.first_name
+    request['last_name']     = user.last_name
+    request['email']         = user.email
+    request['login']         = user.login
+    request['keypair']       = user.keypair
     return request
 
 def make_request_slice(slice):
     request = {}
     request['type'] = 'slice'
     request['id'] = slice.id
-    request['timestamp'] = 'TODO' # XXX in DB ?
+    request['timestamp'] = slice.created
     request['authority_hrn'] = slice.authority_hrn
+    request['slice_name'] = slice.slice_name
     request['number_of_nodes'] = slice.number_of_nodes
     request['type_of_nodes'] = slice.type_of_nodes
     request['purpose'] = slice.purpose
@@ -140,12 +150,9 @@ def get_request_by_authority(authority_hrns):
 
     return make_requests(pending_users, pending_slices)
     
-SFA_USER_KEYS         = ['xrn', 'type', 'key', 'first_name', 'last_name', 'email']
-SFA_SLICE_KEYS        = []
-MANIFOLD_USER_KEYS    = ['email', 'password']
-MANIFOLD_ACCOUNT_KEYS = []
+# XXX Is it in sync with the form fields ?
 
-def portal_validate_request(request_ids):
+def portal_validate_request(wsgi_request, request_ids):
     status = {}
 
     if not isinstance(request_ids, list):
@@ -160,45 +167,85 @@ def portal_validate_request(request_ids):
         
         request_status = {}
 
+        print "REQUEST", request
         if request['type'] == 'user':
+
             try:
-                sfa_user_params = { key: request[key] for key in SFA_USER_KEYS }
-                sfa_user_params['enabled'] = True
-                # XXX # sfa_add_user(sfa_user_params)
+                hrn = "%s.%s" % (request['authority_hrn'], request['login'])
+                urn = Xrn(hrn, request['type']).get_urn()
+
+                sfa_user_params = {
+                    'hrn'        : hrn, 
+                    'urn'        : urn,
+                    'type'       : request['type'],
+                    'keys'       : [json.loads(request['keypair'])['user_public_key']],
+                    'first_name' : request['first_name'],
+                    'last_name'  : request['last_name'],
+                    'email'      : request['email'],
+                    #'slices'    : None,
+                    #'researcher': None,
+                    #'pi'        : None,
+                    'enabled'    : True
+                }
+                # ignored in request: id, timestamp, password
+
+                sfa_add_user(wsgi_request, sfa_user_params)
+
+                # XXX Remove from database
+
+
                 request_status['SFA user'] = {'status': True }
+
             except Exception, e:
                 request_status['SFA user'] = {'status': False, 'description': str(e)}
 
-            try:
-                manifold_user_params = { key: request[key] for key in MANIFOLD_USER_KEYS }
-                # XXX # manifold_add_user(manifold_user_params)
-                request_status['MySlice user'] = {'status': True }
-            except Exception, e:
-                request_status['MySlice user'] = {'status': False, 'description': str(e)}
+            # MANIFOLD user should be added beforehand, during registration
+            #try:
+            #    manifold_user_params = { key: request[key] for key in MANIFOLD_USER_KEYS }
+            #    # XXX # manifold_add_user(manifold_user_params)
+            #    request_status['MySlice user'] = {'status': True }
+            #except Exception, e:
+            #    request_status['MySlice user'] = {'status': False, 'description': str(e)}
 
             # XXX
             #manifold_account_params = { key: request[key] for key in MANIFOLD_ACCOUNT_KEYS }
             #manifold_add_account(manifold_account_params)
-            request_status['MySlice testbed accounts'] = {'status': False }
+            #request_status['MySlice testbed accounts'] = {'status': False }
 
         elif request['type'] == 'slice':
             try:
-                sfa_slice_params = { key: request[key] for key in SFA_SLICE_KEYS }
-                # XXX # sfa_add_slice(sfa_slice_params)
+                hrn = "%s.%s" % (request['authority_hrn'], request['slice_name'])
+                urn = Xrn(hrn, request['type']).get_urn()
+
+                sfa_slice_params = {
+                    'hrn'        : hrn, 
+                    'urn'        : urn,
+                    'type'       : request['type'],
+                    #'slices'    : None,
+                    #'researcher': None,
+                    #'pi'        : None,
+                    'enabled'    : True
+                }
+                # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
+
+                sfa_add_slice(wsgi_request, sfa_slice_params)
+
+                # XXX Remove from database
+
+            
                 request_status['SFA slice'] = {'status': True }
+
             except Exception, e:
                 request_status['SFA slice'] = {'status': False, 'description': str(e)}
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
 
-    # XXX remove from database succeeded actions
-
     return status
 
 
-def validate_action(*args, **kwargs):
+def validate_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
-    status = portal_validate_request(ids)
+    status = portal_validate_request(request, ids)
     json_answer = json.dumps(status)
     return HttpResponse (json_answer, mimetype="application/json")
 

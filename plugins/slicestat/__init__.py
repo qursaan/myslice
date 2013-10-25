@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class Slicestat(Plugin):
+class SliceStat(Plugin):
     
     def __init__ (self, query, **settings):
         Plugin.__init__ (self, **settings)

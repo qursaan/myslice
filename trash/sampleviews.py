@@ -12,6 +12,8 @@ from trash.trashutils import lorem, hard_wired_slice_names
 
 @login_required
 def tab_view (request):
+    print "request", request.__class__
+    print request
     prelude=Prelude( js_files='js/bootstrap.js', css_files='css/bootstrap.css')
     prelude_env = prelude.prelude_env()
 

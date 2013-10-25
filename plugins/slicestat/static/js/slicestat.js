@@ -13,7 +13,7 @@
 
 (function($){
 
-    var Slicestat = Plugin.extend({
+    var SliceStat = Plugin.extend({
 
         /** XXX to check
          * @brief Plugin constructor
@@ -110,7 +110,7 @@
     });
 
     /* Plugin registration */
-    $.plugin('Slicestat', Slicestat);
+    $.plugin('SliceStat', SliceStat);
 
     // TODO Here use cases for instanciating plugins in different ways like in the pastie.
 

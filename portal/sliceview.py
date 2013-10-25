@@ -27,7 +27,8 @@ from myslice.config                  import Config
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-do_query_users=True
+#do_query_users=True
+do_query_users=False
 
 class SliceView (LoginRequiredAutoLogoutView):
 
@@ -234,6 +235,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # --------------------------------------------------------------------------
         # USERS
     
+<<<<<<< HEAD
         if do_query_users:
             tab_users = Tabs(
                 page                = page,
@@ -263,6 +265,35 @@ class SliceView (LoginRequiredAutoLogoutView):
             ))
             
         
+=======
+        if do_query_users:
+            tab_users = Tabs(
+                page                = page,
+                domid               = 'users',
+                outline_complete    = True,
+                togglable           = True,
+                title               = 'Users',
+                active_domid        = 'users-list',
+                )
+            main_stack.insert(tab_users)
+    
+            tab_users.insert(Hazelnut( 
+                page        = page,
+                title       = 'Users List',
+                domid       = 'users-list',
+                # tab's sons preferably turn this off
+                togglable   = False,
+                # this is the query at the core of the slice list
+                query       = sq_user,
+                query_all  = query_user_all,
+                checkboxes  = True,
+                datatables_options = { 
+                    'iDisplayLength' : 25,
+                    'bLengthChange'  : True,
+                    'bAutoWidth'     : True,
+                },
+            ))
+>>>>>>> 0c8a634162f3271018102e75a3934c5db5e48f59
 # DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS
