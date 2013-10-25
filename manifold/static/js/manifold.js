@@ -738,7 +738,7 @@ var manifold = {
               expires: false,
               speed: 1000
             });
-*/            
+*/
         }
 	if (manifold.asynchroneous_debug) 
 	    messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");

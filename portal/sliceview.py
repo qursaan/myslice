@@ -26,7 +26,8 @@ from myslice.config                  import Config
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-do_query_users=True
+#do_query_users=True
+do_query_users=False
 
 class SliceView (LoginRequiredAutoLogoutView):
 
@@ -37,7 +38,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
         page.add_js_chunks ('$(function() { messages.debug("sliceview: jQuery version " + $.fn.jquery); });')
         page.add_js_chunks ('$(function() { messages.debug("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
-        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(Config.manifold_url()))
+        config=Config()
+        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
         page.expose_js_metadata()
     
         metadata = page.get_metadata()
@@ -189,33 +191,33 @@ class SliceView (LoginRequiredAutoLogoutView):
         # --------------------------------------------------------------------------
         # USERS
     
-        if do_query_users:
-            tab_users = Tabs(
-                page                = page,
-                domid               = 'users',
-                outline_complete    = True,
-                togglable           = True,
-                title               = 'Users',
-                active_domid        = 'users-list',
-                )
-            main_stack.insert(tab_users)
-    
-            tab_users.insert(Hazelnut( 
-                page        = page,
-                title       = 'Users List',
-                domid       = 'users-list',
-                # tab's sons preferably turn this off
-                togglable   = False,
-                # this is the query at the core of the slice list
-                query       = sq_user,
-                query_all  = query_user_all,
-                checkboxes  = True,
-                datatables_options = { 
-                    'iDisplayLength' : 25,
-                    'bLengthChange'  : True,
-                    'bAutoWidth'     : True,
-                },
-            ))
+#        if do_query_users:
+#            tab_users = Tabs(
+#                page                = page,
+#                domid               = 'users',
+#                outline_complete    = True,
+#                togglable           = True,
+#                title               = 'Users',
+#                active_domid        = 'users-list',
+#                )
+#            main_stack.insert(tab_users)
+#    
+#            tab_users.insert(Hazelnut( 
+#                page        = page,
+#                title       = 'Users List',
+#                domid       = 'users-list',
+#                # tab's sons preferably turn this off
+#                togglable   = False,
+#                # this is the query at the core of the slice list
+#                query       = sq_user,
+#                query_all  = query_user_all,
+#                checkboxes  = True,
+#                datatables_options = { 
+#                    'iDisplayLength' : 25,
+#                    'bLengthChange'  : True,
+#                    'bAutoWidth'     : True,
+#                },
+#            ))
 # DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS

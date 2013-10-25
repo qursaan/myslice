@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class Slicestat(Plugin):
+class SliceStat(Plugin):
     
     def __init__ (self, query, **settings):
         Plugin.__init__ (self, **settings)
@@ -12,8 +12,9 @@ class Slicestat(Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [
-                'js/date.js',
-                'js/slicestat.js'
+                
+                'js/slicestat.js',
+
             ],
             'css_files': [
                 'css/slicestat.css',

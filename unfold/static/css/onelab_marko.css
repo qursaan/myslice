@@ -1,0 +1,410 @@
+/* @override 
+	http://test.myslice.info/static/css/plugin.css
+*/
+
+
+
+/*-------------------------------- MARKO'S STYLES -----*/
+
+
+/* GENERAL */
+
+.container {
+	padding: 0 !important;
+	color: #fff;
+}
+
+.container h1 {
+	color: #fff !important;
+	font-family: Ubuntu;
+	margin-top: 60px;
+}
+
+div.plugin-outline-complete, 
+div.plugin-outline-body {
+    border: 0px solid;
+    border-radius: 0;
+    border-color: #ccc;
+    -webkit-transition: padding 200ms ease-out;
+    -moz-transition: padding 200ms ease-out;
+    -o-transition: padding 200ms ease-out;
+    transition: padding 0.2s ease-out;
+    padding: 20px;
+    margin: 0;
+}
+/*
+div.plugin-outline-complete:hover, 
+div.plugin-outline-body:hover {
+    padding: 80px 80px 120px 80px; 
+}
+*/
+a.plugin-tooltip { 
+    font-size: 130%;
+    font-style: normal;
+    font-weight: bold;
+    padding: 5px;
+    color: #333;
+    font-family: Ubuntu, Arial, sans-serif;
+    text-transform: uppercase;
+}
+
+a.plugin-tooltip:hover { 
+    color: #fff; 
+    text-decoration: none;
+}
+
+
+
+/* LIST VIEW */
+
+h2.well.well-lg {
+	border-radius:0;
+	border: 0;
+	font-family: Ubuntu, arial, sans-serif;
+	text-transform: ;
+	font-weight: normal;
+	font-size: 40px;
+	/* color: #30196d; */
+    color: white;
+	margin-bottom: 0px;
+	margin-top: 0;
+	padding: 30px;
+	opacity: 1;
+	text-align: center;
+	background-color: #30196d;
+}
+
+#complete-resources {
+/*    background-color: #92f79e !important; */
+    background-color: #B8B2FF !important;
+}
+
+#complete-filters {
+/*    background-color: #4af25d; */
+    background-color: #add7ff;
+}
+
+#complete-users {
+/*    background-color: #ff7394 !important; */
+    background-color: #add7ff !important;
+}
+
+#complete-measurements {
+    background-color: !important;
+}
+
+#complete-pending {
+/*    background-color: #add7ff !important; */
+    background-color: #B8B2FF !important;
+
+}
+
+#complete-customize-resources {
+    background-color: #efdfdf;
+}
+
+#complete-msgs-pre {
+    background-color: #ccc;
+}
+
+#complete-resources, 
+#complete-filters, 
+#complete-users, 
+#complete-measurements,
+#complete-pending,
+#complete-customize-resources,
+#complete-msgs-pre {
+	opacity: 1;
+	text-align: center;
+	color: #333;
+}
+
+#complete-resources:hover, 
+#complete-filters:hover, 
+#complete-users:hover, 
+#complete-measurements:hover,
+#complete-pending:hover,
+#complete-customize-resources:hover,
+#complete-msgs-pre:hover {
+	opacity: 1;
+}
+
+.nav.nav-tabs {
+	font-family: Ubuntu, Arial, sans-serif;
+	border: 0 !important;
+	border-bottom: 3px solid #fff !important;
+	margin-bottom: 40px;
+}
+
+.nav.nav-tabs li.active a {
+	color: #572bc9;
+	border-left: 0px solid #572bc9;
+	border-top: 0px solid #572bc9;
+	border-right: 0px solid #572bc9;
+}
+
+.nav.nav-tabs li a {
+	color: #333;
+	border: 0 !important;
+	margin-right: 5px;
+}
+
+.nav.nav-tabs li a:hover {
+	color: #333;
+	background: #572bc9;
+	color: #fff;
+	border: 0 !important;
+}
+
+
+
+
+
+/* TOPMENU.CSS */
+
+body {
+	background: #30196d !important;
+    padding-top: 60px;
+    padding-bottom: 0px;
+}
+
+div.topmenu { 
+	padding-top: 0px;
+	font-family: Ubuntu, Arial, sans-serif;
+	font-weight: bold;
+	text-transform: ;
+	background: #fff;
+	-webkit-box-shadow: 0px 10px 10px rgba(50, 50, 50, 0.44);
+	-moz-box-shadow:    0px 10px 10px rgba(50, 50, 50, 0.44);
+	box-shadow:         0px 10px 10px rgba(50, 50, 50, 0.44);
+}
+
+.navbar-nav li a,
+.navbar-nav li.other a {
+	padding-top: 25px;
+	padding-bottom: 20px;
+}
+
+.navbar-nav li a:hover {
+	color: #572bc9 !important;
+}
+
+.navbar-nav li.active a {
+.navbar-nav li.active a {
+	background: #eee !important;
+}
+
+ul.logged-in { 
+    padding-top: 25px; 
+}
+button.logged-in { 
+    font-size: 1em;
+    font-weight: bold; 
+    margin-left: 5px;
+    margin-top: -5px;
+    background: #572bc9;
+    border: 2px solid #572bc9;
+    color: #eee;
+    padding: 5px 15px;
+    border-radius:5px;
+}
+
+button.logged-in:hover { 
+    background: #4af25d;
+    border: 2px solid #4af25d;
+    color: #333;
+}
+li.username {
+    margin-bottom: 10px;
+    font-size: 0.8em;
+    text-transform: none;
+    font-weight: normal; 
+    color: #999;
+}
+
+
+/* BOOTSTRAP */
+
+
+ul.pagination li a {
+	background: ;
+	color: #572bc9;
+	font-family: Ubuntu, Arial, sans-serif;
+}
+
+ul.pagination li.active a {
+	background: #572bc9;
+	border: 1px solid #572bc9;
+}
+
+.btn.btn-default {
+	background: #572bc9;
+	color: #ccc;
+	font-family: Ubuntu, Arial, sans-serif;
+	font-weight: bold;
+	border: 0px;
+}
+
+.btn.btn-default:hover {
+	background: #4af25d;
+	color: #333;
+	font-family: Ubuntu, Arial, sans-serif;
+	font-weight: bold;
+	border: 0px;
+}
+
+input {
+	border-radius: 3px;
+	border: none;
+	border: 1px solid #ccc;
+}
+
+
+div.dataTables_length label, 
+div.dataTables_filter label,
+div.dataTables_info {
+	font-family: Ubuntu, Arial, sans-serif !important;
+}
+
+
+
+
+/* HAZELNUT */
+
+div.Hazelnut table.dataTable th {
+    font: bold 12px/22px Ubuntu, Arial, sans-serif;
+    color: #333 !important;
+    border-right: 0px solid #333 !important;
+    border-bottom: 0px solid #C1DAD7 !important;
+    border-top: 0px solid #C1DAD7 !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 8px 12px 4px 20px;
+    vertical-align:middle;
+    background: # url(../img/tablesort-header.jpg) no-repeat !important; 
+}
+
+div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Hazelnut table.dataTable input [type="text"] {
+    font: normal 12px Ubuntu, Arial, Helvetica, sans-serif;
+    border-right: 0px solid #fff !important;
+    border-bottom: 1px solid #fff !important;
+}
+
+div.Hazelnut table.dataTable thead { 
+    background: url('../img/tablesort-header.png') repeat-x !important;
+    background-color: #caebea;
+}
+
+div.Hazelnut table.dataTable tfoot { 
+    background: url('../img/tablesort-header.png') repeat-x !important;
+    background-color: # !important;
+}
+
+
+/* QUERY EDITOR */
+
+table.query-editor {
+    margin: 40px auto !important;
+    clear: both;
+    /* width: 80%;*/
+    width: 100% !important;
+    font-family: Ubuntu;
+}
+
+.query-editor-spacer,
+.plugin.ResourcesSelected,
+.plugin.Tabs {
+    margin-top: 60px !important;
+}
+
+table.query-editor td {
+    padding: 5px 5px !important;
+    font: normal 12px Ubuntu, Arial, sans-serif !important;
+}
+
+
+
+/* DASHBOARD */
+
+#ms-dashboard-profile,
+#ms-dashboard-testbeds,
+#ms-dashboard-slices {
+	-webkit-transition: all 50ms ease-out;
+    -moz-transition: all 50ms ease-out;
+    -o-transition: all 50ms ease-out;
+    transition: all 0.05s ease-out;
+	padding-top: 140px;
+	padding-bottom: 60px;
+	margin-top: 60px;
+	color: #fff;
+	font-family: Ubuntu, Arial, sans-serif;
+	text-align: center;
+	
+}
+
+#ms-dashboard-profile:hover,
+#ms-dashboard-testbeds:hover,
+#ms-dashboard-slices:hover {
+	margin-top: 65px;
+}
+
+#ms-dashboard-profile {
+	background: url("../img/icon_users_color.png") top center no-repeat;
+	
+}
+
+#ms-dashboard-testbeds {
+	background: url("../img/icon_testbed_color.png") top center no-repeat;
+}
+
+#ms-dashboard-slices {
+	background: url("../img/icon_slices_color.png") top center no-repeat;
+}
+
+.ms-dashboard-content ul {
+	list-style-type: none !important;
+	padding-left: 0;
+	text-align: center !important;
+}
+
+.ms-dashboard-content {
+	padding: 0 !important;
+}
+
+.ms-dashboard-content a {
+	color: /*#572bc9*/ #ff7394 !important;
+}
+
+.ms-dashboard-caption h2 {
+	font-family: Ubuntu, Arial, sans-serif;
+	border-bottom: 0 !important;
+	text-transform: uppercase;
+}
+
+#ms-dashboard-profile>div.ms-dashboard-caption {
+    background: no-repeat url(#) !important;
+    padding-left: 0 !important;
+}   
+
+#ms-dashboard-testbeds>div.ms-dashboard-caption {
+    background: no-repeat url(#) !important;
+    padding-left: 0 !important;
+}   
+
+#ms-dashboard-slices>div.ms-dashboard-caption {
+    background: no-repeat url(#) !important;
+    padding-left: 0 !important;
+}   
+
+.simplelist {
+	font-size: 100%;
+	text-align: center !important;
+	margin: 0 auto;
+}
+
+
+
+
+
+
