@@ -6,7 +6,6 @@
 
 /*-------------------------------- MARKO'S STYLES -----*/
 
-
 /* GENERAL */
 
 .container {
@@ -61,14 +60,14 @@ h2.well.well-lg {
 	border-radius:0;
 	border: 0;
 	font-family: Ubuntu, arial, sans-serif;
-	text-transform: ;
+	/* text-transform: ; */
 	font-weight: normal;
 	font-size: 40px;
 	/* color: #30196d; */
     color: white;
 	margin-bottom: 0px;
 	margin-top: 0;
-	padding: 30px;
+	padding: 40px;
 	opacity: 1;
 	text-align: center;
 	background-color: #30196d;
@@ -88,11 +87,11 @@ h2.well.well-lg {
 /*    background-color: #ff7394 !important; */
     background-color: #add7ff !important;
 }
-
+/*
 #complete-measurements {
     background-color: !important;
 }
-
+*/
 #complete-pending {
 /*    background-color: #add7ff !important; */
     background-color: #B8B2FF !important;
@@ -172,7 +171,7 @@ div.topmenu {
 	padding-top: 0px;
 	font-family: Ubuntu, Arial, sans-serif;
 	font-weight: bold;
-	text-transform: ;
+	/* text-transform: ; */
 	background: #fff;
 	-webkit-box-shadow: 0px 10px 10px rgba(50, 50, 50, 0.44);
 	-moz-box-shadow:    0px 10px 10px rgba(50, 50, 50, 0.44);
@@ -189,7 +188,6 @@ div.topmenu {
 	color: #572bc9 !important;
 }
 
-.navbar-nav li.active a {
 .navbar-nav li.active a {
 	background: #eee !important;
 }
@@ -210,8 +208,9 @@ button.logged-in {
 }
 
 button.logged-in:hover { 
-    background: #4af25d;
-    border: 2px solid #4af25d;
+    /* background: #4af25d; */
+    background: #ff7394;
+    border: 2px solid #ff7394;
     color: #333;
 }
 li.username {
@@ -227,7 +226,7 @@ li.username {
 
 
 ul.pagination li a {
-	background: ;
+	/* background: ; */
 	color: #572bc9;
 	font-family: Ubuntu, Arial, sans-serif;
 }
@@ -246,7 +245,8 @@ ul.pagination li.active a {
 }
 
 .btn.btn-default:hover {
-	background: #4af25d;
+	/* background: #4af25d; */
+	background: #ff7394;
 	color: #333;
 	font-family: Ubuntu, Arial, sans-serif;
 	font-weight: bold;
@@ -282,7 +282,7 @@ div.Hazelnut table.dataTable th {
     text-align: left;
     padding: 8px 12px 4px 20px;
     vertical-align:middle;
-    background: # url(../img/tablesort-header.jpg) no-repeat !important; 
+    background: url('../img/tablesort-header.jpg') no-repeat !important; 
 }
 
 div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Hazelnut table.dataTable input [type="text"] {
@@ -298,7 +298,7 @@ div.Hazelnut table.dataTable thead {
 
 div.Hazelnut table.dataTable tfoot { 
     background: url('../img/tablesort-header.png') repeat-x !important;
-    background-color: # !important;
+    /* background-color: # !important; */
 }
 
 
@@ -351,7 +351,6 @@ table.query-editor td {
 
 #ms-dashboard-profile {
 	background: url("../img/icon_users_color.png") top center no-repeat;
-	
 }
 
 #ms-dashboard-testbeds {
@@ -373,9 +372,13 @@ table.query-editor td {
 }
 
 .ms-dashboard-content a {
-	color: /*#572bc9*/ #ff7394 !important;
+	color: #ff7394 !important;
+	/* color: #ff0099 !important; */
 }
 
+.ms-dashboard-content a:hover {
+    color: white !important;
+}
 .ms-dashboard-caption h2 {
 	font-family: Ubuntu, Arial, sans-serif;
 	border-bottom: 0 !important;

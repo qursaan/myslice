@@ -18,7 +18,7 @@
     <ul class="nav navbar-nav">
 	{% for d in topmenu_items %} 
 	{% if d.dropdown %}
-	<li class="dropdown">
+	<li class="other">
 	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}">{{ d.label }}<b class="caret"></b></a>
 	  <ul class="dropdown-menu">
 	    {% for dd in d.contents %}

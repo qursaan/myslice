@@ -90,7 +90,7 @@ def dashboard_view (request):
     template_env [ 'unfold2_margin' ] = related_plugin.render (request)
     
     # add our own css in the mix
-    page.add_css_files ( 'css/dashboard.css')
+    #page.add_css_files ( 'css/dashboard.css')
     
     # don't forget to run the requests
     page.expose_queries ()

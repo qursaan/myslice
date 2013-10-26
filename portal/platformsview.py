@@ -13,7 +13,7 @@ class PlatformsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         page = Page(self.request)
-
+        page.add_js_files  ( [ "js/common.functions.js" ] )
         platform_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform','platform_longname','gateway_type')
         #platform_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
         page.enqueue_query(platform_query)
