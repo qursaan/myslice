@@ -13,7 +13,7 @@ class PlatformView(TemplateView):
 
     def get_context_data(self, **kwargs):
         page = Page(self.request)
-
+        page.add_js_files  ( [ "js/common.functions.js" ] )
         for key, value in kwargs.iteritems():
             print "%s = %s" % (key, value)       
             if key == "platformname":

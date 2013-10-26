@@ -20,6 +20,7 @@ from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
+from plugins.slicestat               import SliceStat
 
 from myslice.config                  import Config
 
@@ -174,6 +175,50 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
+        resources_stats_cpu = SliceStat(
+            title = "CPU Usage",
+            domid = 'resources-stats-cpu',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'cpu'
+        )
+        
+        resources_stats_mem = SliceStat(
+            title = "Memory Usage",
+            domid = 'resources-stats-mem',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'mem'
+        )
+        
+        resources_stats_asb = SliceStat(
+            title = "Traffic Sent",
+            domid = 'resources-stats-asb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'asb'
+        )
+        
+        resources_stats_arb = SliceStat(
+            title = "Traffic Received",
+            domid = 'resources-stats-arb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'arb'
+        )
+        
         # with the new 'Filter' stuff on top, no need for anything but the hazelnut
         resources_as_list_area = resources_as_list 
 
@@ -182,42 +227,42 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_map, resources_as_list_area, ],
+                                sons=[ resources_as_map, resources_as_list_area, resources_stats_cpu, resources_stats_mem, resources_stats_asb, resources_stats_arb ],
                                 active_domid = 'resources-map',
                                 )
         main_stack.insert (resources_area)
 
-
         # --------------------------------------------------------------------------
         # USERS
     
-#        if do_query_users:
-#            tab_users = Tabs(
-#                page                = page,
-#                domid               = 'users',
-#                outline_complete    = True,
-#                togglable           = True,
-#                title               = 'Users',
-#                active_domid        = 'users-list',
-#                )
-#            main_stack.insert(tab_users)
-#    
-#            tab_users.insert(Hazelnut( 
-#                page        = page,
-#                title       = 'Users List',
-#                domid       = 'users-list',
-#                # tab's sons preferably turn this off
-#                togglable   = False,
-#                # this is the query at the core of the slice list
-#                query       = sq_user,
-#                query_all  = query_user_all,
-#                checkboxes  = True,
-#                datatables_options = { 
-#                    'iDisplayLength' : 25,
-#                    'bLengthChange'  : True,
-#                    'bAutoWidth'     : True,
-#                },
-#            ))
+        if do_query_users:
+            tab_users = Tabs(
+                page                = page,
+                domid               = 'users',
+                outline_complete    = True,
+                togglable           = True,
+                title               = 'Users',
+                active_domid        = 'users-list',
+                )
+            main_stack.insert(tab_users)
+    
+            tab_users.insert(Hazelnut( 
+                page        = page,
+                title       = 'Users List',
+                domid       = 'users-list',
+                # tab's sons preferably turn this off
+                togglable   = False,
+                # this is the query at the core of the slice list
+                query       = sq_user,
+                query_all  = query_user_all,
+                checkboxes  = True,
+                datatables_options = { 
+                    'iDisplayLength' : 25,
+                    'bLengthChange'  : True,
+                    'bAutoWidth'     : True,
+                },
+            ))
+
 # DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS

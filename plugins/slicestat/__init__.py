@@ -23,7 +23,7 @@ class SliceStat(Plugin):
         return reqs
 
     def json_settings_list (self):
-        return ['plugin_uuid', 'domid', 'query_uuid']
+        return ['plugin_uuid', 'domid', 'query_uuid', 'slicename', 'o']
 
     def export_json_settings (self):
         return True

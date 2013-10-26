@@ -26,7 +26,7 @@
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);			 
 			
-
+			
             /* Member variables */
 
             /* Plugin events */
@@ -37,10 +37,17 @@
             // What happens when we don't define some events ?
             // Some can be less efficient
             this.listen_query(options.query_uuid);
-
+			
             /* GUI setup and event binding */
             // call function
-
+			if (typeof options.slicename != 'undefined') {
+        		options.slicename = options.slicename.replace("ple.","").replace(".","_");
+        	}
+        	if (typeof options.o == 'undefined') {
+        		//options.o = 'cpu';
+        	}
+        	
+        	this.elmt().on('show', options, this.on_show);
         },
 
         /* PLUGIN EVENTS */
@@ -64,7 +71,11 @@
             // this.id, this.el, this.cl, this.elts
             // same output as a jquery selector with some guarantees
         },
-
+		
+		on_show: function(ev) 
+		{
+			$('iframe#' + ev.target.id + '-iframe').attr('src','http://plestats.planet-lab.eu/nodes.php?slice='+ev.data.slicename+'&order='+ev.data.o);
+		},
         /* TEMPLATES */
 
         // see in the html template
@@ -88,10 +99,7 @@
         /* RECORD HANDLERS */
         on_new_record: function(record)
         {
-            console.log(record);
-            
-            $('iframe#slicestat_resource').attr('src','http://plestats.planet-lab.eu/node.php?node='+record.hostname);
-            
+        	$('iframe#' + this.elmt().attr('id') + '-iframe').attr('src','http://plestats.planet-lab.eu/node.php?node='+record.hostname);            
         },
 
         /* INTERNAL FUNCTIONS */
