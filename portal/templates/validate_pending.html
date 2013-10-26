@@ -49,29 +49,25 @@
 
 <h1>Pending requests</h1>
 
+<hr/>
 <h2>My authorities</h2>
 
 {% if my_authorities %}
 
 {% for authority, requests in my_authorities.items %}
 <h3>{{authority}}</h3>
+    <table width=100% border=1>
+      <th>
+        <td>type</td>
+        <td>id</td>
+        <td>details</td>
+        <td>timestamp</td>
+        <td>status</td>
+      </th>
     {% for request in requests %}
-    <div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'>
-		<span class='type'>{{ request.type }}</span>
-		<span class='id'>{{ request.id }}</span>
-		<span class='timestamp'>{{ request.timestamp }}</span>
-		<span class='authority'>{{ request.authority_hrn }}</span>
-        
-        {% if request.type == 'user' %}
-        <span class='details'>First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}</span>
-        {% else %}
-            {% if request.type == 'slice' %}
-        <span class='details'>Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}</span>
-            {% else %} {# authority #}
-        <span class='details'>TODO</span>
-            {% endif %}
-        {% endif %}
 
+	  <tr>
+		<td>
 		{% if request.allowed == 'allowed' %}
 		<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
 		{% else %}
@@ -81,26 +77,53 @@
 				denied
 			{% endif %}
 		{% endif %}
-		<span class='status' id='portal__status__{{request.type}}__{{request.id}}'></span>
-	</div>
+		</td>
+		<td>{{ request.type }}</td>
+		<td>{{ request.id }}</td>
+		<td>
+        {% if request.type == 'user' %}
+        Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
+        {% else %}
+            {% if request.type == 'slice' %}
+        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+            {% else %} {# authority #}
+        TODO
+            {% endif %}
+        {% endif %}
+		</td>
+		<td>{{ request.timestamp }}</td>
+		
+		<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
+
+    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+	  </tr>
+
     {% endfor %}
+	</table>
 {% endfor %}
 
 {% else %}
 <i>There is no pending request waiting for validation.</i>
 {% endif %}
 
+
 {% if delegation_authorities %}
+<hr/>
 <h2>Authorities with delegation</h2>
 
 {% for authority, requests in delegation_authorities.items %}
 <h3>{{authority}}</h3>
+    <table width=100% border=1>
+      <th>
+        <td>type</td>
+        <td>id</td>
+        <td>details</td>
+        <td>timestamp</td>
+        <td>status</td>
+      </th>
     {% for request in requests %}
-    <div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'>
-		<span class='type'>{{ request.type }}</span>
-		<span class='id'>{{ request.id }}</span>
-		<span class='timestamp'>{{ request.timestamp }}</span>
-		<span class='details'>{{ request.details }}</span>
+	  <tr>
+		<td>
 		{% if request.allowed == 'allowed' %}
 		<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
 		{% else %}
@@ -110,10 +133,30 @@
 				denied
 			{% endif %}
 		{% endif %}
-		<span class='status' id='portal__status__{{request.type}}__{{request.id}}'></span>
-	</div>
+		</td>
+		<td>{{ request.type }}</td>
+		<td>{{ request.id }}</td>
+		<td>
+        {% if request.type == 'user' %}
+        Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
+        {% else %}
+            {% if request.type == 'slice' %}
+        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+            {% else %} {# authority #}
+        TODO
+            {% endif %}
+        {% endif %}
+		</td>
+		<td>{{ request.timestamp }}</td>
+		
+		<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
+
+    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+	  </tr>
     {% endfor %}
+    </table>
 {% endfor %}
+<hr/>
 
 {% endif %}
 
