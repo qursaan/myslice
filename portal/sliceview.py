@@ -175,51 +175,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_stats_cpu = SliceStat(
-            title = "CPU Usage",
-            domid = 'resources-stats-cpu',
-            page  = page,
-            stats = 'slice',
-            key   = 'hrn',
-            query = 'none',
-            slicename = slicename,
-            o = 'cpu'
-        )
-        
-        resources_stats_mem = SliceStat(
-            title = "Memory Usage",
-            domid = 'resources-stats-mem',
-            page  = page,
-            stats = 'slice',
-            key   = 'hrn',
-            query = 'none',
-            slicename = slicename,
-            o = 'mem'
-        )
-        
-        resources_stats_asb = SliceStat(
-            title = "Traffic Sent",
-            domid = 'resources-stats-asb',
-            page  = page,
-            stats = 'slice',
-            key   = 'hrn',
-            query = 'none',
-            slicename = slicename,
-            o = 'asb'
-        )
-        
-        resources_stats_arb = SliceStat(
-            title = "Traffic Received",
-            domid = 'resources-stats-arb',
-            page  = page,
-            stats = 'slice',
-            key   = 'hrn',
-            query = 'none',
-            slicename = slicename,
-            o = 'arb'
-        )
-        
-        # with the new 'Filter' stuff on top, no need for anything but the hazelnut
+       # with the new 'Filter' stuff on top, no need for anything but the hazelnut
         resources_as_list_area = resources_as_list 
 
         resources_area = Tabs ( page=page, 
@@ -227,7 +183,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_map, resources_as_list_area, resources_stats_cpu, resources_stats_mem, resources_stats_asb, resources_stats_arb ],
+                                sons=[ resources_as_map, resources_as_list_area ],
                                 active_domid = 'resources-map',
                                 )
         main_stack.insert (resources_area)
@@ -266,6 +222,60 @@ class SliceView (LoginRequiredAutoLogoutView):
 # DEMO    
         # --------------------------------------------------------------------------
         # MEASUREMENTS
+        measurements_stats_cpu = SliceStat(
+            title = "CPU Usage",
+            domid = 'resources-stats-cpu',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'cpu'
+        )
+        
+        measurements_stats_mem = SliceStat(
+            title = "Memory Usage",
+            domid = 'resources-stats-mem',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'mem'
+        )
+        
+        measurements_stats_asb = SliceStat(
+            title = "Traffic Sent",
+            domid = 'resources-stats-asb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'asb'
+        )
+        
+        measurements_stats_arb = SliceStat(
+            title = "Traffic Received",
+            domid = 'resources-stats-arb',
+            page  = page,
+            stats = 'slice',
+            key   = 'hrn',
+            query = 'none',
+            slicename = slicename,
+            o = 'arb'
+        )
+
+        tab_measurements = Tabs ( page=page,
+                                domid="measurements",
+                                togglable=True,
+                                title="Measurements",
+                                outline_complete=True,
+                                sons=[ measurements_stats_cpu, measurements_stats_mem, measurements_stats_asb, measurements_stats_arb ],
+                                active_domid = 'measurements_stats_cpu',
+                                )
+        main_stack.insert (tab_measurements)
+        
 #        tab_measurements = Tabs (
 #            page                = page,
 #            active_domid        = 'measurements-list',

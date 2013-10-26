@@ -14,16 +14,16 @@ from ui.topmenu                  import topmenu_items, the_user
 class SliceRequestView (LoginRequiredAutoLogoutView):
 
     def authority_hrn_initial (self, request):
-        authorities_query = Query.get('authority').\
-            select('name', 'authority_hrn')
+        #authorities_query = Query.get('authority').\
+        #    select('name', 'authority_hrn')
         
-        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
-        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
-        if onelab_enabled:
-            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple'])
+        #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
+        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        #if onelab_enabled:
+        authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple','ple.nitos'])
 
         authorities = execute_admin_query(request, authorities_query)
-        #authorities = sorted(authorities)
+        authorities = sorted(authorities)
         
         authority_hrn_tuples = [ (authority['authority_hrn'], authority['name'] if authority['name'] else authority['authority_hrn'],) for authority in authorities ]
         print "authority_hrn_tuples=", authority_hrn_tuples

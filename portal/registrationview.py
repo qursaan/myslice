@@ -29,14 +29,15 @@ class RegistrationView (View):
     def dispatch (self, request):
         errors = []
 
-        authorities_query = Query.get('authority').\
-            select('name', 'authority_hrn')
+        #authorities_query = Query.get('authority').\
+        #    select('name', 'authority_hrn')
         
-        onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
-        onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
-        if onelab_enabled:
+        #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
+        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
+        #if onelab_enabled:
+        if True:
             print "ONELAB ENABLED"
-            authorities_query = authorities_query.filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple'])
+            authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
         else:
             print "FIREXP ENABLED"
 
