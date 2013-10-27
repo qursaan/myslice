@@ -15,6 +15,7 @@ def topmenu_items (current,request=None):
     if has_user:
         result.append({'label':'Dashboard', 'href': '/portal/dashboard/'})
         result.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
+        result.append({'label':'Validation', 'href': '/portal/validate/'})
         dropdown = []
         dropdown.append({'label':'My Account', 'href': '/portal/account/'})
         dropdown.append({'label':'Contact Support', 'href': '/portal/contact/'})

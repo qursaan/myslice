@@ -269,6 +269,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         tab_measurements = Tabs ( page=page,
                                 domid="measurements",
                                 togglable=True,
+                                toggled  = False,
                                 title="Measurements",
                                 outline_complete=True,
                                 sons=[ measurements_stats_cpu, measurements_stats_mem, measurements_stats_asb, measurements_stats_arb ],

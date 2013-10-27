@@ -302,7 +302,7 @@ class ValidatePendingView(TemplateView):
 
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
-            pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
+            pi_authorities_query = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
             pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
             pi_authorities = set()
             for pa in pi_authorities_tmp:
@@ -375,7 +375,7 @@ class ValidatePendingView(TemplateView):
         # more general variables expected in the template
         context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
+        context['topmenu_items'] = topmenu_items('Validation', self.request) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 
