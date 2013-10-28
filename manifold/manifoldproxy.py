@@ -11,6 +11,7 @@ from manifold.core.result_value import ResultValue
 from manifold.manifoldapi       import ManifoldAPI
 from manifold.manifoldresult    import ManifoldException
 from manifold.util.log          import Log
+from myslice.config             import Config
 
 debug=False
 debug=True
@@ -60,8 +61,8 @@ with the query passed using POST"""
 
         # We allow some requests to use the ADMIN user account
         if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
-            print "W: Used hardcoded demo account for admin queries"
-            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+            admin_user, admin_password = Config().manifold_admin_user_password()
+            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
             manifold_api_session_auth = request.session['manifold']['auth']
 
