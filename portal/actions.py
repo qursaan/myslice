@@ -4,8 +4,10 @@ from manifold.manifoldapi        import execute_query
 from portal.models               import PendingUser, PendingSlice
 import json
 
-# XXX sfa dependency, should be moved to SFA gateway
-from sfa.util.xrn                import Xrn 
+# Thierry: moving this right into the code so 
+# most people can use myslice without having to install sfa
+# XXX tmp sfa dependency, should be moved to SFA gateway
+#from sfa.util.xrn                import Xrn 
 
 
 # Get the list of authorities
@@ -172,6 +174,8 @@ def portal_validate_request(wsgi_request, request_ids):
 
             try:
                 hrn = "%s.%s" % (request['authority_hrn'], request['login'])
+                # XXX tmp sfa dependency
+                from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
 
                 sfa_user_params = {
@@ -215,6 +219,8 @@ def portal_validate_request(wsgi_request, request_ids):
         elif request['type'] == 'slice':
             try:
                 hrn = "%s.%s" % (request['authority_hrn'], request['slice_name'])
+                # XXX tmp sfa dependency
+                from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
 
                 sfa_slice_params = {
