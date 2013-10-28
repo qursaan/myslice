@@ -271,26 +271,37 @@ class ValidatePendingView(TemplateView):
                     all_authorities.append(auth)
                 platform_ids.append(sfa_platform['platform_id'])
 
+            print "W: Hardcoding platform myslice"
+            platform_ids.append(5);
+
             # We can check on which the user has authoritity credentials = PI rights
             credential_authorities = set()
             credential_authorities_expired = set()
 
             # User account on these registries
-            user_accounts_query = Query.get('local:account').filter_by('user_id', '==', user_id).filter_by('platform_id', 'included', platform_ids).select('config')
+            user_accounts_query = Query.get('local:account').filter_by('user_id', '==', user_id).filter_by('platform_id', 'included', platform_ids).select('auth_type', 'config')
             user_accounts = execute_query(self.request, user_accounts_query)
             #print "=" * 80
             #print user_accounts
             #print "=" * 80
             for user_account in user_accounts:
+
+                print "USER ACCOUNT", user_account
+                if user_account['auth_type'] == 'reference':
+                    continue # we hardcoded the myslice platform...
+
                 config = json.loads(user_account['config'])
                 creds = []
+                print "CONFIG KEYS", config.keys()
                 if 'authority_credentials' in config:
+                    print "***", config['authority_credentials'].keys()
                     for authority_hrn, credential in config['authority_credentials'].items():
                         #if credential is not expired:
                         credential_authorities.add(authority_hrn)
                         #else
                         #    credential_authorities_expired.add(authority_hrn)
                 if 'delegated_authority_credentials' in config:
+                    print "***", config['delegated_authority_credentials'].keys()
                     for authority_hrn, credential in config['delegated_authority_credentials'].items():
                         #if credential is not expired:
                         credential_authorities.add(authority_hrn)
