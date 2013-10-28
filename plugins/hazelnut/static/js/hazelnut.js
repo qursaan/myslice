@@ -23,6 +23,9 @@
             this.received_all_query = false;
             this.received_query = false;
 
+            // We need to remember the active filter for datatables filtering
+            this.filters = Array(); 
+
             // an internal buffer for records that are 'in' and thus need to be checked 
             this.buffered_records_to_check = [];
 	    // an internal buffer for keeping lines and display them in one call to fnAddData
@@ -126,9 +129,9 @@
              */
             $.fn.dataTableExt.afnFiltering.push(function( oSettings, aData, iDataIndex ) { 
                 /* No filtering if the table does not match */
-                if (oSettings.nTable.id != "hazelnut-" + self.options.plugin_uuid)
+                if (oSettings.nTable.id != self.options.plugin_uuid + '__table')
                     return true;
-                return this._hazelnut_filter.call(self, oSettings, aData, iDataIndex);
+                return self._hazelnut_filter.call(self, oSettings, aData, iDataIndex);
             });
 
             /* Processing hidden_columns */
@@ -271,14 +274,16 @@
 
         on_filter_added: function(filter)
         {
-            // XXX
-            console.log(filter);
+            this.filters.push(filter);
             this.redraw_table();
         },
 
         on_filter_removed: function(filter)
         {
-            // XXX
+            // Remove corresponding filters
+            this.filters = $.grep(this.filters, function(x) {
+                return x != filter;
+            });
             this.redraw_table();
         },
         
@@ -451,19 +456,8 @@
          */
         _hazelnut_filter: function(oSettings, aData, iDataIndex)
         {
-            var cur_query = this.current_query;
-            if (!cur_query) return true;
             var ret = true;
-
-            /* We have an array of filters : a filter is an array (key op val) 
-             * field names (unless shortcut)    : oSettings.aoColumns  = [ sTitle ]
-             *     can we exploit the data property somewhere ?
-             * field values (unless formatting) : aData
-             *     formatting should leave original data available in a hidden field
-             *
-             * The current line should validate all filters
-             */
-            $.each (cur_query.filters, function(index, filter) { 
+            $.each (this.filters, function(index, filter) { 
                 /* XXX How to manage checkbox ? */
                 var key = filter[0]; 
                 var op = filter[1];
