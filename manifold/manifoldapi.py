@@ -55,7 +55,11 @@ class ManifoldAPI:
             try:
                 if debug:
                     print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
-                result=getattr(self.server, methodName)(self.auth, *args, **kwds)
+                annotations = {
+                    'authentication': self.auth
+                }
+                args += (annotations,)
+                result=getattr(self.server, methodName)(*args, **kwds)
                 if debug:
                     print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
                     print '.ctd. Authmethod=',self.auth['AuthMethod'], self.url,'->',

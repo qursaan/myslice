@@ -34,7 +34,8 @@ class MetaData:
         #          'column.resource_type', 'column.value_type',
         #          'column.allowed_values', 'column.platforms.platform',
         #          'column.platforms.platform_url']
-        result = manifold_api.Get({
+        result = manifold_api.forward({
+            'action': 'get',
             'object': 'local:object', # proposed to replace metadata:table
             'fields':     fields 
         })
