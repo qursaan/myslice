@@ -21,6 +21,8 @@ Requires: python >= 2.7
 Requires: python-django
 Requires: httpd
 Requires: mod_wsgi
+# for c_rehash
+Requires: openssl-perl
 BuildRequires: python-setuptools make
 
 %description 

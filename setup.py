@@ -13,7 +13,7 @@ from distutils.core import setup
 packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/__init__.py")) ]
 
 setup(packages = packages,
-      scripts = [],
+      scripts = [ 'apache/unfold-init-ssl.sh' ],
       data_files = [ 
         ( 'static/js', glob ('static/js/*')),
         ( 'static/css', glob ('static/css/*')),
