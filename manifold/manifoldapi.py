@@ -54,7 +54,9 @@ class ManifoldAPI:
         def func(*args, **kwds):
             try:
                 if debug:
-                    print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
+                    print "====> ManifoldAPI.%s"%methodName,"url",self.url
+                    print "=> auth",self.auth
+                    print "=> args",args,"kwds",kwds
                 annotations = {
                     'authentication': self.auth
                 }
@@ -78,6 +80,7 @@ class ManifoldAPI:
                 import traceback
                 traceback.print_exc()
                 if debug: print "KO (unexpected exception)",error
+                print '===== ManifoldAPI call exiting'
                 raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error) )
 
         return func
