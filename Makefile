@@ -101,14 +101,22 @@ tags: force
 ftags: force
 	find . -type f | fgrep -v '/.git/' | xargs etags
 
-#################### sync : push current code on a (devel) box running myslice
+########################################
+### devel-oriented
+########################################
+
+#################### sync : push current code on a box running myslice
+# this for now targets deployments based on the debian packaging
 SSHURL:=root@$(MYSLICEBOX):/
 SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 
 ### rsync options
 # the config file should probably not be overridden ??
 # --exclude settings.py 
-LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude config.py --exclude static --exclude templates --exclude '*.sqlite3'  --exclude play/ 
+LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc'
+LOCAL_RSYNC_EXCLUDES	+= --exclude '*.sqlite3' --exclude myslice.ini
+LOCAL_RSYNC_EXCLUDES	+= --exclude static --exclude templates --exclude build
+LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party --exclude 'offline*'
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
@@ -116,27 +124,39 @@ RSYNC_COND_DRY_RUN	:= $(if $(findstring n,$(MAKEFLAGS)),--dry-run,)
 # putting it together
 RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 
-##### convenience for development only, push code on a specific test box
+#################### minimal convenience for pushing work-in-progress in an apache-based depl.
 # xxx until we come up with a packaging this is going to be a wild guess
 # on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
-#INSTALLED=/usr/share/myslice
-INSTALLED=/root/myslice
+INSTALLED_MAIN		=/usr/share/unfold
+# this is for a debian box
+INSTALLED_APACHE	=/etc/apache2/sites-available/
 
-sync:
+sync: sync-main sync-apache
+
+sync-main:
 ifeq (,$(MYSLICEBOX))
 	@echo "you need to set MYSLICEBOX, like in e.g."
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	+$(RSYNC) ./ $(SSHURL)/$(INSTALLED)/
+	+$(RSYNC) ./ $(SSHURL)/$(INSTALLED_MAIN)/
 endif
 
-# xxx likewise until we run this under apache it's probably hard to restart from here
+sync-apache:
+ifeq (,$(MYSLICEBOX))
+	@echo "you need to set MYSLICEBOX, like in e.g."
+	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
+	@exit 1
+else
+	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
+	+$(RSYNC) ./apache/init-ssl.sh ./apache/init-ssl.py $(SSHURL)/$(bindir)/
+endif
+
 restart:
 ifeq (,$(MYSLICEBOX))
 	@echo "you need to set MYSLICEBOX, like in e.g."
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	@echo "$@" target not yet implemented - for an apache based depl it would read ...; exit; @$(SSHCOMMAND) /etc/init.d/apache2 restart
+	+$(SSHCOMMAND) apachectl restart
 endif
