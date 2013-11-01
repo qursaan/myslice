@@ -6,6 +6,13 @@ from django.views.generic.base          import TemplateView
 
 from manifold.manifoldresult            import ManifoldException
 
+###
+# IMPORTANT NOTE
+# the implementation of the classes in this file rely on redefining 'dispatch'
+# for this reason if you inherit any of these, please do not redefine 'dispatch' yourself,
+# but rather redefine 'get' and 'post' instead
+###
+
 ########## the base class for views that require a login
 class LoginRequiredView (TemplateView):
 
@@ -26,7 +33,7 @@ class LoginRequiredView (TemplateView):
 
 def logout_on_manifold_exception (fun_that_returns_httpresponse):
     def wrapped (request, *args, **kwds):
-        print 'wrapped by logout_on_manifold_exception'
+#        print 'wrapped by logout_on_manifold_exception'
         try:
             return fun_that_returns_httpresponse(request,*args, **kwds)
         except ManifoldException, manifold_result:
@@ -53,3 +60,11 @@ class LoginRequiredAutoLogoutView (TemplateView):
     @method_decorator(login_required)
     def dispatch (self, request, *args, **kwds):
         return super(LoginRequiredAutoLogoutView,self).dispatch(request,*args,**kwds)
+
+# we have more and more views that actually send manifold queries
+# so for these we need to protect against manifold exceptions
+# even though login is not required
+class FreeAccessView (TemplateView):
+
+    def dispatch (self, request, *args, **kwds):
+        return super(FreeAccessView,self).dispatch(request,*args,**kwds)

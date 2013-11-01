@@ -1,16 +1,17 @@
 # this somehow is not used anymore - should it not be ?
-from django.views.generic import View
 from django.core.context_processors import csrf
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
+from unfold.loginrequired import FreeAccessView
+
 from manifold.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
 from myslice.config import Config
 
-class HomeView (View):
+class HomeView (FreeAccessView):
 
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
