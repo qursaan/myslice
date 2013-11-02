@@ -49,7 +49,7 @@ class ManifoldResult (dict):
             else: result += " [value=%s: %s]"%(type(value).__name__,value)
         else:
             result += " [output=%s]"%self['output']
-        result += "]]"
+        result += "]"
         return result
 
 # probably simpler to use a single class and transport the whole result there
