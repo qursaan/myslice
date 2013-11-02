@@ -60,7 +60,8 @@ with the query passed using POST"""
         # retrieve session for request
 
         # We allow some requests to use the ADMIN user account
-        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
+        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') \
+                or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
             admin_user, admin_password = Config().manifold_admin_user_password()
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
@@ -93,7 +94,8 @@ with the query passed using POST"""
         result = manifold_api.forward(manifold_query.to_dict())
 
         # XXX TEMP HACK
-        if 'description' in result and result['description'] and isinstance(result['description'], (tuple, list, set, frozenset)):
+        if 'description' in result and result['description'] \
+                and isinstance(result['description'], (tuple, list, set, frozenset)):
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)
