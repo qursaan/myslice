@@ -29,3 +29,8 @@ div.form-group:hover p.form-hint {
     -webkit-border-radius: 7px;
     border-radius: 7px;
 }
+
+/* avoid blinking effect with the rhs hints */
+select#auth_list {
+    height: 34px;
+}

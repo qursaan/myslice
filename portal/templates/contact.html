@@ -13,16 +13,18 @@
   or <a href="http://trac.myslice.info/" >visit us</a></h4>
 </div>
 
+<!-- no hint for this form, moreover we need more space to write stuff down
+     so we use a 3-6-3 layout -->
 <div class='well'>
   <form class="cmxform form-horizontal" id="commentForm" action="#" method="post" role="form">{% csrf_token %}
   <fieldset>
     {% for field in form %}
     <div class="form-group">
-      <label for="{{ field.html_name }}" class="col-xs-4 control-label">{{ field.label }}</label>
-      <div class="col-xs-4"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
+      <label for="{{ field.html_name }}" class="col-xs-3 control-label">{{ field.label }}</label>
+      <div class="col-xs-6"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
     </div>
     {% endfor %}
-    <button class="submit btn btn-default col-md-offset-4 col-xs-4" type="submit">Send to Support</button>
+    <button class="submit btn btn-default col-xs-12" type="submit">Send to Support</button>
   </fieldset>
   </form>
 </div>
