@@ -20,12 +20,12 @@
   <fieldset>
     {% for field in form %}
     <div class="form-group">
-      <label for="{{ field.html_name }}" class="col-xs-4 control-label">{{ field.label }}</label>
+      <label for="{{ field.html_name }}" class="col-xs-2 control-label">{{ field.label }}</label>
       <div class="col-xs-4"> {{ field.errors }} {{ field }} </div>
-      <div class="col-xs-4"> <p class="form-hint">{{ field.help_text }}</p> </div>
+      <div class="col-xs-6"> <p class="form-hint">{{ field.help_text }}</p> </div>
     </div>
     {% endfor %}
-    <button class="submit btn btn-default col-md-offset-4 col-xs-4" type="submit">Request Slice</button>
+    <button class="submit btn btn-default col-xs-12" type="submit">Request Slice</button>
   </fieldset>
   </form>
 </div>
