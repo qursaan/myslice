@@ -31,12 +31,15 @@ def topmenu_items (current,request=None):
     if current is not None:
         current=current.lower()
         curlen=len(current)
-        def mark_active(d):
-            if d['label'][:curlen].lower() == current: d['is_active']=True
+        def mark_active(d,up=None):
+            if d['label'][:curlen].lower() == current: 
+                d['is_active']=True
+                if up is not None: up['is_active']=True
+            print 'mark_active OUT','d=',d,'up',up
         for d in result:
             mark_active(d)
             if 'dropdown' in d:
-                for dd in d['contents']: mark_active(dd)
+                for dd in d['contents']: mark_active(dd,d)
     return result
 
 def the_user (request):
