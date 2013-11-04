@@ -35,7 +35,6 @@ def topmenu_items (current,request=None):
             if d['label'][:curlen].lower() == current: 
                 d['is_active']=True
                 if up is not None: up['is_active']=True
-            print 'mark_active OUT','d=',d,'up',up
         for d in result:
             mark_active(d)
             if 'dropdown' in d:
