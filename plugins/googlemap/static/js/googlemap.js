@@ -35,7 +35,7 @@ googlemap_debug_detailed=false;
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
             // TODO in destructor
-            // $(window).unbind('Hazelnut');
+            // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
@@ -105,7 +105,7 @@ googlemap_debug_detailed=false;
 	    //return this.escape_id(key_value).replace(/\\/g, '');
 	    //  however this sequence removes backslashes from hrn's and as a result
 	    // resources_selected was getting all mixed up
-	    // hazelnut does publish hrn's with backslashes and that seems like the thing to do
+	    // querytable does publish hrn's with backslashes and that seems like the thing to do
 	    return key_value;
 	},	    
 

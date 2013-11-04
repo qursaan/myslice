@@ -17,7 +17,7 @@ from plugins.quickfilter                import QuickFilter
 from plugins.querycode                  import QueryCode
 from plugins.raw                        import Raw
 from plugins.messages                   import Messages
-from plugins.hazelnut                   import Hazelnut
+from plugins.querytable                 import QueryTable
 
 from ui.topmenu                         import topmenu_items, the_user
 from trash.trashutils                   import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
@@ -35,7 +35,7 @@ def test_plugin_view (request):
     
     slicename='ple.inria.heartbeat'
     main_query = Query.get('resource').filter_by('slice_hrn', '=', slicename).select(['network','type','hrn','hostname','sliver'])
-    # without an hazelnut, this would use use : run_it=False as nothing would listen to the results
+    # without an querytable, this would use use : run_it=False as nothing would listen to the results
     page.enqueue_query (main_query, # run_it=False
                         )
 
@@ -53,11 +53,11 @@ def test_plugin_view (request):
                     domid="messages-transient",
                     levels='ALL',
                     ),
-            Hazelnut (
+            QueryTable (
                     page=page,
                     title="Slice %s - checkboxes"%slicename,
                     query=main_query,
-                    domid="hazelnut",
+                    domid="querytable",
                     checkboxes=True,
                     togglable=True,
                     ),

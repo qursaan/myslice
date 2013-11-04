@@ -270,9 +270,9 @@ div.dataTables_info {
 
 
 
-/* HAZELNUT */
+/* QUERYTABLE */
 
-div.Hazelnut table.dataTable th {
+div.QueryTable table.dataTable th {
     font: bold 12px/22px Ubuntu, Arial, sans-serif;
     color: #333 !important;
     border-right: 0px solid #333 !important;
@@ -286,18 +286,18 @@ div.Hazelnut table.dataTable th {
     background: url('../img/tablesort-header.jpg') no-repeat !important; 
 }
 
-div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Hazelnut table.dataTable input [type="text"] {
+div.QueryTable table.dataTable td, div.QueryTable table.dataTable textarea, div.QueryTable table.dataTable input [type="text"] {
     font: normal 12px Ubuntu, Arial, Helvetica, sans-serif;
     border-right: 0px solid #fff !important;
     border-bottom: 1px solid #fff !important;
 }
 
-div.Hazelnut table.dataTable thead { 
+div.QueryTable table.dataTable thead { 
     background: url('../img/tablesort-header.png') repeat-x !important;
     background-color: #caebea;
 }
 
-div.Hazelnut table.dataTable tfoot { 
+div.QueryTable table.dataTable tfoot { 
     background: url('../img/tablesort-header.png') repeat-x !important;
     /* background-color: # !important; */
 }

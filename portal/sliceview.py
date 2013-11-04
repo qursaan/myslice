@@ -11,7 +11,7 @@ from ui.topmenu                      import topmenu_items, the_user
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
-from plugins.hazelnut                import Hazelnut 
+from plugins.querytable              import QueryTable 
 from plugins.resources_selected      import ResourcesSelected
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
@@ -160,7 +160,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             zoom       = 4,
         )
 
-        resources_as_list = Hazelnut( 
+        resources_as_list = QueryTable( 
             page       = page,
             domid      = 'resources-list',
             title      = 'List view',
@@ -175,7 +175,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-       # with the new 'Filter' stuff on top, no need for anything but the hazelnut
+       # with the new 'Filter' stuff on top, no need for anything but the querytable
         resources_as_list_area = resources_as_list 
 
         resources_area = Tabs ( page=page, 
@@ -202,7 +202,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 )
             main_stack.insert(tab_users)
     
-            tab_users.insert(Hazelnut( 
+            tab_users.insert(QueryTable( 
                 page        = page,
                 title       = 'Users List',
                 domid       = 'users-list',
@@ -287,7 +287,7 @@ class SliceView (LoginRequiredAutoLogoutView):
 #        )
 #        main_stack.insert(tab_measurements)
 #    
-#        tab_measurements.insert(Hazelnut( 
+#        tab_measurements.insert(QueryTable( 
 #            page        = page,
 #            title       = 'Measurements',
 #            domid       = 'measurements-list',

@@ -31,7 +31,7 @@
 
             var self = this;
             this.table = this.elmt('table').dataTable({
-// the original hazelnut layout was
+// the original querytable layout was
 //                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
 // however the bottom line with 'showing blabla...' and the navigation widget are not really helpful
                 sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t>",
@@ -178,7 +178,7 @@
                 button
             ];
             if (!row) {
-                // XXX second parameter refresh = false can improve performance. todo in hazelnut also
+                // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);
                 row = this.find_row(data.value);
             } else {

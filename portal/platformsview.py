@@ -4,7 +4,7 @@ from unfold.page                 import Page
 from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                  import topmenu_items, the_user
 
-from plugins.hazelnut            import Hazelnut
+from plugins.querytable          import QueryTable
 
 # View for platforms
 class PlatformsView(FreeAccessView):
@@ -19,7 +19,7 @@ class PlatformsView(FreeAccessView):
 
         page.expose_js_metadata()
         page.expose_queries()
-        platformlist = Hazelnut(
+        platformlist = QueryTable(
             page  = page,
             title = 'List',
             domid = 'checkboxes',

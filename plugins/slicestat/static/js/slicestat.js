@@ -51,7 +51,7 @@
         },
 
         /* PLUGIN EVENTS */
-        // on_show like in hazelnut
+        // on_show like in querytable
 
 
         /* GUI EVENTS */

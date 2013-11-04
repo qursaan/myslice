@@ -79,13 +79,13 @@
 
             return this.each(function() {
                 var $this = $(this);
-                var hazelnut = $this.data('Manifold');
+                var querytable = $this.data('Manifold');
 
                 // Unbind all events using namespacing
                 $(window).unbind('Manifold');
 
                 // Remove associated data
-                hazelnut.remove();
+                querytable.remove();
                 $this.removeData('Manifold');
             });
         }, // destroy

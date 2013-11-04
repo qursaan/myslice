@@ -9,7 +9,7 @@
     var debug=false;
 //    debug=true
 
-    var Hazelnut = Plugin.extend({
+    var QueryTable = Plugin.extend({
 
         init: function(options, element) 
         {
@@ -36,7 +36,7 @@
             this.elmt().on('show', this, this.on_show);
             // Unbind all events using namespacing
             // TODO in destructor
-            // $(window).unbind('Hazelnut');
+            // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.method = query.object;
@@ -64,9 +64,9 @@
             /* temp disabled... useful ? -- jordan
             $(this).each(function(i,elt) {
                 if (jQuery(elt).hasClass('dataTables')) {
-                    var myDiv=jQuery('#hazelnut-' + this.id).parent();
+                    var myDiv=jQuery('#querytable-' + this.id).parent();
                     if(myDiv.height()==0) {
-                        var oTable=$('#hazelnut-' + this.id).dataTable();            
+                        var oTable=$('#querytable-' + this.id).dataTable();            
                         oTable.fnDraw();
                     }
                 }
@@ -96,7 +96,7 @@
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */
-                fnDrawCallback: function() { self._hazelnut_draw_callback.call(self); }
+                fnDrawCallback: function() { self._querytable_draw_callback.call(self); }
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
@@ -131,7 +131,7 @@
                 /* No filtering if the table does not match */
                 if (oSettings.nTable.id != self.options.plugin_uuid + '__table')
                     return true;
-                return self._hazelnut_filter.call(self, oSettings, aData, iDataIndex);
+                return self._querytable_filter.call(self, oSettings, aData, iDataIndex);
             });
 
             /* Processing hidden_columns */
@@ -156,7 +156,7 @@
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
-            result += " class='hazelnut-checkbox'";
+            result += " class='querytable-checkbox'";
             result += " id='" + this.flat_id(this.id('checkbox', value)) + "'";
             result += " name='" + key + "'";
             result += " type='checkbox'";
@@ -305,7 +305,7 @@
 
         on_field_clear: function()
         {
-            alert('Hazelnut::clear_fields() not implemented');
+            alert('QueryTable::clear_fields() not implemented');
         },
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
@@ -341,7 +341,7 @@
 
         on_all_field_clear: function()
         {
-            alert('Hazelnut::clear_fields() not implemented');
+            alert('QueryTable::clear_fields() not implemented');
         },
 
 
@@ -452,9 +452,9 @@
         /************************** PRIVATE METHODS ***************************/
 
         /** 
-         * @brief Hazelnut filtering function
+         * @brief QueryTable filtering function
          */
-        _hazelnut_filter: function(oSettings, aData, iDataIndex)
+        _querytable_filter: function(oSettings, aData, iDataIndex)
         {
             var ret = true;
             $.each (this.filters, function(index, filter) { 
@@ -500,13 +500,13 @@
             return ret;
         },
 
-        _hazelnut_draw_callback: function()
+        _querytable_draw_callback: function()
         {
             /* 
              * Handle clicks on checkboxes: reassociate checkbox click every time
              * the table is redrawn 
              */
-            this.elts('hazelnut-checkbox').unbind('click').click(this, this._check_click);
+            this.elts('querytable-checkbox').unbind('click').click(this, this._check_click);
 
             if (!this.table)
                 return;
@@ -518,15 +518,15 @@
             var minRowsPerPage = this.table.fnSettings().aLengthMenu[0];
 
             if ( rowsToShow <= rowsPerPage || rowsPerPage == -1 ) {
-                $('.hazelnut_paginate', wrapper).css('visibility', 'hidden');
+                $('.querytable_paginate', wrapper).css('visibility', 'hidden');
             } else {
-                $('.hazelnut_paginate', wrapper).css('visibility', 'visible');
+                $('.querytable_paginate', wrapper).css('visibility', 'visible');
             }
 
             if ( rowsToShow <= minRowsPerPage ) {
-                $('.hazelnut_length', wrapper).css('visibility', 'hidden');
+                $('.querytable_length', wrapper).css('visibility', 'hidden');
             } else {
-                $('.hazelnut_length', wrapper).css('visibility', 'visible');
+                $('.querytable_length', wrapper).css('visibility', 'visible');
             }
         },
 
@@ -537,7 +537,7 @@
             var self = e.data;
 
             // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("hazelnut click handler checked=" + this.checked + " hrn=" + this.value);
+	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " hrn=" + this.value);
             manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
@@ -547,8 +547,8 @@
         {
             // requires jQuery id
             var uuid=this.id.split("-");
-            var oTable=$("#hazelnut-"+uuid[1]).dataTable();
-            // Function available in Hazelnut 1.9.x
+            var oTable=$("#querytable-"+uuid[1]).dataTable();
+            // Function available in QueryTable 1.9.x
             // Filter : displayed data only
             var filterData = oTable._('tr', {"filter":"applied"});   
             /* TODO: WARNING if too many nodes selected, use filters to reduce nuber of nodes */        
@@ -565,7 +565,7 @@
 
     });
 
-    $.plugin('Hazelnut', Hazelnut);
+    $.plugin('QueryTable', QueryTable);
 
   /* define the 'dom-checkbox' type for sorting in datatables 
      http://datatables.net/examples/plug-ins/dom_sort.html
