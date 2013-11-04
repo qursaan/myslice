@@ -33,8 +33,8 @@ class Page:
         # queue of queries with maybe a domid, see enqueue_query
         self._queue=[]
         # global prelude object
-        self.prelude=Prelude(css_files='css/plugin.css')
-        self.prelude=Prelude(css_files='css/onelab_marko.css')
+        self.prelude=Prelude(css_files=[
+                'css/plugin.css','css/onelab_marko.css',])
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):

@@ -167,22 +167,25 @@ body {
     padding-bottom: 0px;
 }
 
+/* Thierry : turning this off
 div.topmenu { 
 	padding-top: 0px;
 	font-family: Ubuntu, Arial, sans-serif;
 	font-weight: bold;
-	/* text-transform: ; */
 	background: #fff;
 	-webkit-box-shadow: 0px 10px 10px rgba(50, 50, 50, 0.44);
 	-moz-box-shadow:    0px 10px 10px rgba(50, 50, 50, 0.44);
 	box-shadow:         0px 10px 10px rgba(50, 50, 50, 0.44);
 }
+Thierry */
 
+/* Thierry : turning this off
 .navbar-nav li a,
 .navbar-nav li.other a {
 	padding-top: 25px;
 	padding-bottom: 20px;
 }
+Thierry */
 
 .navbar-nav li a:hover {
 	color: #572bc9 !important;
@@ -192,9 +195,11 @@ div.topmenu {
 	background: #eee !important;
 }
 
+/* Thierry : turning this off
 ul.logged-in { 
     padding-top: 25px; 
 }
+Thierry */
 button.logged-in { 
     font-size: 1em;
     font-weight: bold; 
