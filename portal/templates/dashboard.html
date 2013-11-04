@@ -17,7 +17,7 @@
 	<div class='ms-dashboard-content'>
 	  <ul>
 	    {% if person.last_name %} <li><span id='username'>{{person.first_name}} {{person.last_name}}</span></li> {% endif %}
-	    <li><b>Email: </b><a href='mailto:#'>{{person.email}}</a></li>
+	    <li><b>Email: </b><a href='mailto:{{person.email}}'>{{person.email}}</a></li>
 	  </ul>
 	  <button id="account" onclick="location.href='/portal/account/'" class="btn btn-default">Modify</button>
 	</div>
