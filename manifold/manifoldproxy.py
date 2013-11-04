@@ -25,7 +25,10 @@ debug_spin=0
 debug_empty=False
 #debug_empty=True
 
-# turn this on if you want the fastest possible (locally cached) feedback
+# Historically we had a feature for developing without an Internet connection
+# However this won't work anymore as the python layer itself does manifold calls
+# before javascript has a chance to do so.
+# Might still come in handy if you want the fastest possible (locally cached) feedback
 # beware that this is very rough though...
 work_offline=False
 #work_offline=True
