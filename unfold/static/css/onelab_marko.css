@@ -9,10 +9,8 @@
 /*    color: #fff; */
 }
 
-.container h1 {
+.container h1, .container h2 {
     color: #fff !important;
-    font-family: Ubuntu;
-    margin-top: 60px;
 }
 
 div.plugin-outline-complete, 
