@@ -45,7 +45,7 @@ class PlatformView(TemplateView):
         context = super(PlatformView, self).get_context_data(**kwargs)
 
         context['ALL_STATIC'] = "all_static"
-        context['unfold1_main'] = debug_platform.render(self.request)
+        context['unfold_main'] = debug_platform.render(self.request)
 
         # XXX This is repeated in all pages
         # more general variables expected in the template

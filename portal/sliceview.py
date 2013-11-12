@@ -324,8 +324,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
-        # define 'unfold1_main' to the template engine - the main contents
-        template_env [ 'unfold1_main' ] = main_stack.render(request)
+        # define 'unfold_main' to the template engine - the main contents
+        template_env [ 'unfold_main' ] = main_stack.render(request)
     
         # more general variables expected in the template
         template_env [ 'title' ] = '%(slicename)s'%locals()

@@ -1,12 +1,11 @@
-{% extends 'layout-unfold2.html' %}
+{# fine for either layout-unfold1.html (logged in) or layout-unfold2.html (needs a login prompt) #}
+{% extends layout_1_or_2 %}
 
-{% block unfold2_margin %}
-{% if not username %}
+{% block unfold_margin %}
 {% include 'widget-login.html' %}
-{% endif %}
-{% endblock unfold2_margin %}
+{% endblock unfold_margin %}
 
-{% block unfold2_main %}
+{% block unfold_main %}
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
 <!-- xxx ideally only onelab.css but ... xxx -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
@@ -28,4 +27,4 @@ federated testbeds.
 <p>This UI server is connected to the manifold backend running at <code>{{ MANIFOLD_URL }}</code>.</p>
 </div>
 
-{% endblock unfold2_main %}
+{% endblock unfold_main %}

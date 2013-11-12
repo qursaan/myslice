@@ -48,4 +48,6 @@ class PlatformsView(FreeAccessView):
 
         context.update(page.prelude_env())
 
+        context['layout_1_or_2']="layout-unfold2.html" if not context['username'] else "layout-unfold1.html"
+
         return context

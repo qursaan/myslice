@@ -84,8 +84,8 @@ function issue_debug() {console.log("issue_debug");messages.debug("issue_debug")
 $(function(){$("#bouton").click(issue_debug);});
 """)
 
-    # define 'unfold1_main' to the template engine
-    template_env [ 'unfold1_main' ] = main_plugin.render(request)
+    # define 'unfold_main' to the template engine
+    template_env [ 'unfold_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
     template_env [ 'title' ] = 'Single Plugin View' 

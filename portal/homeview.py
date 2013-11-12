@@ -33,6 +33,8 @@ class HomeView (FreeAccessView):
         # . a django User in case of success
         # . or None if the backend could be reached but the authentication failed
         auth_result = authenticate(token=token)
+        # use one or two columns for the layout - not logged in users will see the login prompt
+        env['layout_1_or_2']="layout-unfold2.html" if not username else "layout-unfold1.html"
         # high-level errors, like connection refused or the like
         if isinstance (auth_result, ManifoldResult):
             manifoldresult = auth_result
@@ -61,5 +63,7 @@ class HomeView (FreeAccessView):
         env['topmenu_items'] = topmenu_items(None, request)
         if state: env['state'] = state
         elif not env['username']: env['state'] = "Please sign in"
+        # use one or two columns for the layout - not logged in users will see the login prompt
+        env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
         return render_to_response('home-view.html',env, context_instance=RequestContext(request))
 
