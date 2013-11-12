@@ -12,7 +12,7 @@ from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
 from plugins.querytable              import QueryTable 
-from plugins.resources_selected      import ResourcesSelected
+from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
 from plugins.querycode               import QueryCode
@@ -102,9 +102,9 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
     
         # --------------------------------------------------------------------------
-        # ResourcesSelected (Pending Operations)
+        # QueryUpdater (Pending Operations)
 
-        main_stack.insert(ResourcesSelected(
+        main_stack.insert(QueryUpdater(
             page                = page,
             title               = 'Pending operations',
             query               = main_query,

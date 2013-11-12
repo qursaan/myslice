@@ -312,7 +312,7 @@ table.query-editor {
 }
 
 .query-editor-spacer,
-.plugin.ResourcesSelected,
+.plugin.QueryUpdater,
 .plugin.Tabs {
     margin-top: 60px !important;
 }

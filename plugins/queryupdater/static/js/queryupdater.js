@@ -1,5 +1,5 @@
 /**
- * MySlice ResourcesSelected plugin
+ * MySlice QueryUpdater plugin
  * Version: 0.1.0
  * URL: http://www.myslice.info
  * Description: display of selected resources
@@ -23,7 +23,7 @@
     // Record state through the query cycle
 
 
-    var ResourcesSelected = Plugin.extend({
+    var QueryUpdater = Plugin.extend({
 
         init: function(options, element)
         {
@@ -447,6 +447,6 @@
 
     });
 
-    $.plugin('ResourcesSelected', ResourcesSelected);
+    $.plugin('QueryUpdater', QueryUpdater);
 
 })(jQuery);

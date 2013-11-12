@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class ResourcesSelected(Plugin):
+class QueryUpdater(Plugin):
 
     def template_file (self):
         return "resources_selected.html"
