@@ -1,14 +1,13 @@
-from django.views.generic.base   import TemplateView
-
 from manifold.core.query         import Query
 from unfold.page                 import Page
 
+from unfold.loginrequired        import FreeAccessView
 from ui.topmenu                  import topmenu_items, the_user
 
 from plugins.hazelnut            import Hazelnut
 
 # View for 1 platform and its details
-class PlatformView(TemplateView):
+class PlatformView(FreeAccessView):
     template_name = "platform.html"
 
     def get_context_data(self, **kwargs):

@@ -18,10 +18,10 @@ class Config(object):
 
     # the OpenLab-wide backend as managed by UPMC
     # xxx production should probably use https of course
-    default_manifold_url = "http://test.myslice.info:7080/"
-    # the devel/unstable version runs on "http://dev.myslice.info:7080/"
+    default_manifold_url = "https://test.myslice.info:7080/"
+    # the devel/unstable version runs on "https://dev.myslice.info:7080/"
     # if you use a development backend running on this box, use "http://localhost:7080/"
-    # the INRIA setup is with "http://manifold.pl.sophia.inria.fr:7080/"
+    # the INRIA setup is with "https://manifold.pl.sophia.inria.fr:7080/"
 
     default_manifold_admin_user     = 'admin'
     default_manifold_admin_password = 'demo'

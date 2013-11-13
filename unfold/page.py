@@ -36,6 +36,7 @@ class Page:
         self.prelude=Prelude(css_files='css/plugin.css')
         print "Loading... CSS OneLab"
         self.prelude=Prelude(css_files='css/onelab_marko.css')
+#        self.prelude=Prelude(css_files=['css/plugin.css','css/onelab_marko.css',])
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):

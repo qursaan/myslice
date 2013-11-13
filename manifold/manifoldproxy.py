@@ -11,6 +11,7 @@ from manifold.core.result_value import ResultValue
 from manifold.manifoldapi       import ManifoldAPI
 from manifold.manifoldresult    import ManifoldException
 from manifold.util.log          import Log
+from myslice.config             import Config
 
 debug=False
 debug=True
@@ -24,7 +25,10 @@ debug_spin=0
 debug_empty=False
 #debug_empty=True
 
-# turn this on if you want the fastest possible (locally cached) feedback
+# Historically we had a feature for developing without an Internet connection
+# However this won't work anymore as the python layer itself does manifold calls
+# before javascript has a chance to do so.
+# Might still come in handy if you want the fastest possible (locally cached) feedback
 # beware that this is very rough though...
 work_offline=False
 #work_offline=True
@@ -59,9 +63,10 @@ with the query passed using POST"""
         # retrieve session for request
 
         # We allow some requests to use the ADMIN user account
-        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
-            print "W: Used hardcoded demo account for admin queries"
-            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': 'demo', 'AuthString': 'demo'}
+        if (manifold_query.get_from() == 'local:user' and manifold_query.get_action() == 'create') \
+                or (manifold_query.get_from() == 'local:platform' and manifold_query.get_action() == 'get'):
+            admin_user, admin_password = Config().manifold_admin_user_password()
+            manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
             manifold_api_session_auth = request.session['manifold']['auth']
 
@@ -92,7 +97,8 @@ with the query passed using POST"""
         result = manifold_api.forward(manifold_query.to_dict())
 
         # XXX TEMP HACK
-        if 'description' in result and result['description'] and isinstance(result['description'], (tuple, list, set, frozenset)):
+        if 'description' in result and result['description'] \
+                and isinstance(result['description'], (tuple, list, set, frozenset)):
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)

@@ -3,6 +3,7 @@ from django.template.loader     import render_to_string
 from django.views.generic       import View
 from django.core.mail           import send_mail
 
+from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items, the_user
 
 from portal.forms               import ContactForm
@@ -10,7 +11,7 @@ from portal.forms               import ContactForm
 # splitting the 2 functions done here
 # GET is for displaying the empty form
 # POST is to process it once filled - or show the form again if anything is missing
-class ContactView (View):
+class ContactView (FreeAccessView):
     def post (self, request):
         form = ContactForm(request.POST) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass

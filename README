@@ -32,6 +32,16 @@ $ make static (which is a shorthand for cleaning up and run manage collectstatic
   that creates templates/ 
 $ make templates [$ make redo (each time when you pull, do that and restart the server)]
 
+
+## Whenever doing a git pull the following operations are recommended:
+
+$ make static # will refresh static/ from all the pieces in the project
+$ make templates # same, for templates
+$ make redo-static # clears up (rm -rf) static/ first, then make static
+$ make redo-templates # ditto for templates
+$ make redo == make redo-static redo-templates
+
+
 * run a local server:
 $ manage.py runserver 0.0.0.0:8000
 -- or -- my advice:

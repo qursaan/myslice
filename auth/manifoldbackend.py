@@ -47,7 +47,7 @@ class ManifoldBackend:
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
         except ManifoldException, e:
-            print "Caught ManifoldException, returning corresponding ManifoldResult"
+            print "ManifoldBackend.authenticate caught ManifoldException, returning corresponding ManifoldResult"
             return e.manifold_result
         except Exception, e:
             print "E: manifoldbackend", e

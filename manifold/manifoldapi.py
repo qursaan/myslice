@@ -52,15 +52,28 @@ class ManifoldAPI:
     # a SESSION_EXPIRED code
     def __getattr__(self, methodName):
         def func(*args, **kwds):
+            # how to display a call
+            def repr ():
+                # most of the time, we run 'forward'
+                if methodName=='forward':
+                    try:    action="forward(%s)"%args[0]['action']
+                    except: action="forward(??)"
+                else: action=methodName
+                return action
             try:
                 if debug:
-                    print "====> ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
-                result=getattr(self.server, methodName)(self.auth, *args, **kwds)
+                    print "====> ManifoldAPI.%s"%repr(),"url",self.url
+                    print "=> auth",self.auth
+                    print "=> args",args,"kwds",kwds
+                annotations = {
+                    'authentication': self.auth
+                }
+                args += (annotations,)
+                result=getattr(self.server, methodName)(*args, **kwds)
                 if debug:
-                    print '<==== backend call %s(*%s,**%s) returned'%(methodName,args,kwds),
-                    print '.ctd. Authmethod=',self.auth['AuthMethod'], self.url,'->',
+                    print '<= result=',
                     self._print_result(result)
-                    print '===== ManifoldAPI call done'
+                    print '<==== backend call %s returned'%(repr()),
 
                 return ResultValue(**result)
 
@@ -70,11 +83,12 @@ class ManifoldAPI:
                     raise ManifoldException ( ManifoldResult (code=ManifoldCode.SERVER_UNREACHABLE,
                                                               output="%s answered %s"%(self.url,error)))
                 # otherwise
-                print "====> ERROR On ManifoldAPI.%s"%methodName,"auth",self.auth,"args",args,"kwds",kwds
-                import traceback
-                traceback.print_exc()
-                if debug: print "KO (unexpected exception)",error
-                raise ManifoldException ( ManifoldResult (code=ManifoldCode.UNKNOWN_ERROR, output="%s"%error) )
+                if debug: 
+                    print "===== xmlrpc catch-all exception:",error
+                    import traceback
+                    traceback.print_exc(limit=3)
+                print "<==== ERROR On ManifoldAPI.%s"%repr()
+                raise ManifoldException ( ManifoldResult (code=ManifoldCode.SERVER_UNREACHABLE, output="%s"%error) )
 
         return func
 

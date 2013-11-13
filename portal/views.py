@@ -24,10 +24,10 @@
 import json
 
 from django.http                import HttpResponseRedirect, HttpResponse
-from django.views.generic.base  import TemplateView
 from django.shortcuts           import render
 from django.template.loader     import render_to_string
 
+from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items, the_user
 
 from portal.event               import Event
@@ -49,7 +49,7 @@ from unfold.page                import Page
 # all the other ones have now migrated into separate classes/files for more convenience
 # I'm leaving these ones here for now as I could not exactly figure what the purpose was 
 # (i.e. what the correct name should be, as presviewview was a bit cryptic)
-class PresViewView(TemplateView):
+class PresViewView(FreeAccessView):
     template_name = "view-unfold1.html"
 
     def get_context_data(self, **kwargs):
@@ -222,7 +222,7 @@ def pres_view_static(request, constraints, id):
     json_answer = json.dumps(cmd)
     return HttpResponse (json_answer, mimetype="application/json")
 
-class ValidatePendingView(TemplateView):
+class ValidatePendingView(FreeAccessView):
     template_name = "validate_pending.html"
 
     def get_context_data(self, **kwargs):
@@ -272,7 +272,14 @@ class ValidatePendingView(TemplateView):
                 platform_ids.append(sfa_platform['platform_id'])
 
             print "W: Hardcoding platform myslice"
-            platform_ids.append(5);
+            # There has been a tweak on how new platforms are referencing a
+            # so-called 'myslice' platform for storing authentication tokens.
+            # XXX This has to be removed in final versions.
+            myslice_platforms_query = Query().get('local:platform').filter_by('platform', '==', 'myslice').select('platform_id')
+            myslice_platforms = execute_query(self.request, myslice_platforms_query)
+            if myslice_platforms:
+                myslice_platform, = myslice_platforms
+                platform_ids.append(myslice_platform['platform_id'])
 
             # We can check on which the user has authoritity credentials = PI rights
             credential_authorities = set()
@@ -313,7 +320,7 @@ class ValidatePendingView(TemplateView):
 
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
-            pi_authorities_query = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
+            pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
             pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
             pi_authorities = set()
             for pa in pi_authorities_tmp:

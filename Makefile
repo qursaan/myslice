@@ -28,6 +28,7 @@ install:
 	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
 	    --install-data=$(DESTDIR)/$(datadir)/unfold
 
+#################### third-party layout is managed as art of collectstatic
 static: force
 	./manage.py collectstatic --noinput
 
@@ -66,73 +67,6 @@ debian.clean:
 	find . -name '*.pyc' -delete
 
 
-### #################### third-party layout is kind of special 
-### # because we have differents versions, and also we 
-### # try to preserve the file structure from upstream
-### # so let's handle this manually
-### THIRD-PARTY-RESOURCES =
-### # ignore variants, use the main symlink	third-party/bootstrap
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/bootstrap/*/*)
-### # just the single js as identified with a symlink
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/js/dataTables.bootstrap.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/datatables/css/dataTables.bootstrap.css)
-### # likewise
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery/js/jquery.min.js)
-### # for storing the visible status of plugins
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-html5storage/jquery.html5storage.min.js)
-### # creating queries uuids on the fly
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/uuid/Math.uuid.js)
-### # spin comes in plain or min, + the jquery plugin, and our own settings
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/spin/*.js)
-### # used in QueryCode
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shCore.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shAutoloader.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushPython.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/scripts/shBrushRuby.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCore.css)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shCoreDefault.css)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/syntaxhighlighter/styles/shThemeDefault.css)
-### # wizard plugin
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.js)
-### #THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/js/jquery.smartWizard-2.0.min.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/smartwizard-1636c86/styles/smart_wizard.css)
-### # jquery.notify
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/jquery.notify.min.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/jquery-notify/ui.notify.css)
-### # CodeMirror
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.js) 
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/lib/codemirror.css) 
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/codemirror-3.15/mode/sql/sql.js)
-### # Mustache.js
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/mustache/mustache.js)
-### # markerclustererplus for the googlemap plugin
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer.js)
-### THIRD-PARTY-RESOURCES += $(shell ls third-party/markerclusterer/markerclusterer_packed.js)
-### 
-### thirdparty-js:
-### 	@find $(THIRD-PARTY-RESOURCES) -name '*.js'
-### thirdparty-css:
-### 	@find $(THIRD-PARTY-RESOURCES) -name '*.css'
-### thirdparty-img:
-### 	@find $(THIRD-PARTY-RESOURCES) -name '*.png' -o -name '*.ico'
-### 
-### # we might have any of these as templates - e.g. ./unfold/templates/plugin-init.js
-### # so if there's a /templates/ in the path ignore the file
-### local-js: force
-### 	@find . -type f -name '*.js' | egrep -v '/all-(static|templates)/|/third-party/|/templates/'
-### local-css: force
-### 	@find . -type f -name '*.css' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
-### local-img: force
-### 	@find . -type f -name '*.png' -o -name '*.ico' | egrep -v 'all-(static|templates)/|/third-party/|/templates/'
-### 
-### list-js: thirdparty-js local-js
-### list-css: thirdparty-css local-css
-### list-img: thirdparty-img local-img
-
 # having templates in a templates/ subdir is fine most of the time except for plugins
 plugins-templates: force
 	@find plugins -type f -name '*.html' 
@@ -167,14 +101,22 @@ tags: force
 ftags: force
 	find . -type f | fgrep -v '/.git/' | xargs etags
 
-#################### sync : push current code on a (devel) box running myslice
+########################################
+### devel-oriented
+########################################
+
+#################### sync : push current code on a box running myslice
+# this for now targets deployments based on the debian packaging
 SSHURL:=root@$(MYSLICEBOX):/
 SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 
 ### rsync options
 # the config file should probably not be overridden ??
 # --exclude settings.py 
-LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc' --exclude config.py --exclude static --exclude templates --exclude '*.sqlite3'  --exclude play/ 
+LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc'
+LOCAL_RSYNC_EXCLUDES	+= --exclude '*.sqlite3' --exclude myslice.ini
+LOCAL_RSYNC_EXCLUDES	+= --exclude static --exclude templates --exclude build
+LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party --exclude 'offline*'
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
@@ -182,27 +124,39 @@ RSYNC_COND_DRY_RUN	:= $(if $(findstring n,$(MAKEFLAGS)),--dry-run,)
 # putting it together
 RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 
-##### convenience for development only, push code on a specific test box
+#################### minimal convenience for pushing work-in-progress in an apache-based depl.
 # xxx until we come up with a packaging this is going to be a wild guess
 # on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
-#INSTALLED=/usr/share/myslice
-INSTALLED=/root/myslice
+INSTALLED_MAIN		=/usr/share/unfold
+# this is for a debian box
+INSTALLED_APACHE	=/etc/apache2/sites-available/
 
-sync:
+sync: sync-main sync-apache
+
+sync-main:
 ifeq (,$(MYSLICEBOX))
 	@echo "you need to set MYSLICEBOX, like in e.g."
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	+$(RSYNC) ./ $(SSHURL)/$(INSTALLED)/
+	+$(RSYNC) ./ $(SSHURL)/$(INSTALLED_MAIN)/
 endif
 
-# xxx likewise until we run this under apache it's probably hard to restart from here
+sync-apache:
+ifeq (,$(MYSLICEBOX))
+	@echo "you need to set MYSLICEBOX, like in e.g."
+	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
+	@exit 1
+else
+	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
+	+$(RSYNC) ./apache/init-ssl.sh ./apache/init-ssl.py $(SSHURL)/$(bindir)/
+endif
+
 restart:
 ifeq (,$(MYSLICEBOX))
 	@echo "you need to set MYSLICEBOX, like in e.g."
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	@echo "$@" target not yet implemented - for an apache based depl it would read ...; exit; @$(SSHCOMMAND) /etc/init.d/apache2 restart
+	+$(SSHCOMMAND) apachectl restart
 endif

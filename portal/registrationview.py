@@ -8,6 +8,7 @@ from django.template.loader     import render_to_string
 from django.shortcuts           import render
 
 from unfold.page                import Page
+from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items
 
 from manifold.manifoldapi       import execute_admin_query
@@ -16,17 +17,18 @@ from manifold.core.query        import Query
 from portal.models              import PendingUser
 from portal.actions             import authority_get_pi_emails 
 
-# This is a rough porting from views.py
-# the former function-based view is now made a class
-# we redefine dispatch as it is simple
-# and coincidentally works since we do not need LoginRequiredAutoLogoutView
-# a second stab should redefine post and get instead
-# also this was not thoroughly tested either, might miss some imports
-# to be continued...
+# since we inherit from FreeAccessView we cannot redefine 'dispatch'
+# so let's override 'get' and 'post' instead
+#
+class RegistrationView (FreeAccessView):
 
-class RegistrationView (View):
+    def post (self, request):
+        return self.get_or_post (request, 'POST')
 
-    def dispatch (self, request):
+    def get (self, request):
+        return self.get_or_post (request, 'GET')
+
+    def get_or_post  (self, request, method):
         errors = []
 
         #authorities_query = Query.get('authority').\
@@ -49,9 +51,9 @@ class RegistrationView (View):
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
 
-        print 'registration view, method',request.method
+        print 'registration view, method',method
 
-        if request.method == 'POST':
+        if method == 'POST':
             # We shall use a form here
 
             #get_email = PendingUser.objects.get(email)

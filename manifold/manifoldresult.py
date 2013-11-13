@@ -41,7 +41,7 @@ class ManifoldResult (dict):
 
     def __repr__ (self):
         code=self['code']
-        result="[[MFresult %s (code=%s)"%(_messages_.get(code,"???"),code)
+        result="[MFresult %s (code=%s)"%(_messages_.get(code,"???"),code)
         if code==0:
             value=self['value']
             if isinstance(value,list): result += " [value=list with %d elts]"%len(value)
@@ -49,7 +49,7 @@ class ManifoldResult (dict):
             else: result += " [value=%s: %s]"%(type(value).__name__,value)
         else:
             result += " [output=%s]"%self['output']
-        result += "]]"
+        result += "]"
         return result
 
 # probably simpler to use a single class and transport the whole result there
