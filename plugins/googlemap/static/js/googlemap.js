@@ -104,7 +104,7 @@ googlemap_debug_detailed=false;
 	    // XXX BACKSLASHES original code was reading like this
 	    //return this.escape_id(key_value).replace(/\\/g, '');
 	    //  however this sequence removes backslashes from hrn's and as a result
-	    // resources_selected was getting all mixed up
+	    // queryupdater was getting all mixed up
 	    // querytable does publish hrn's with backslashes and that seems like the thing to do
 	    return key_value;
 	},	    

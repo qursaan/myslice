@@ -80,12 +80,12 @@
 
         do_reset: function(e)
         {
-            throw 'resources_selected.do_reset Not implemented';
+            throw 'queryupdater.do_reset Not implemented';
         },
 
         do_clear_annotations: function(e)
         {
-            throw 'resources_selected.do_clear_annotations Not implemented';
+            throw 'queryupdater.do_clear_annotations Not implemented';
         },
         
         /************************** GUI MANIPULATION **************************/

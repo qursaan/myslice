@@ -3,12 +3,12 @@ from unfold.plugin import Plugin
 class QueryUpdater(Plugin):
 
     def template_file (self):
-        return "resources_selected.html"
+        return "queryupdater.html"
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/resources_selected.js" ] ,
-            'css_files': [ "css/resources_selected.css" ],
+            'js_files' : [ "js/queryupdater.js" ] ,
+            'css_files': [ "css/queryupdater.css" ],
             }
         return reqs
 
