@@ -347,17 +347,19 @@ var manifold = {
     // Executes all async. queries
     // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
     asynchroneous_exec : function (query_publish_dom_tuples) {
-        // start spinners
-
-        // in case the spin stuff was not loaded, let's make sure we proceed to the exit 
-        //try {
-        //    if (manifold.asynchroneous_debug) 
-        //   messages.debug("Turning on spin with " + jQuery(".need-spin").length + " matches for .need-spin");
-        //    jQuery('.need-spin').spin(manifold.spin_presets);
-        //} catch (err) { messages.debug("Cannot turn on spins " + err); }
+// start spinners - be robust if the spin stuff was not loaded for any reason
+// turned off because each plugin is responsible for doing that through on_query_in_progress
+//        try {
+//	    var subjects=$(".need-spin");
+//            if (manifold.asynchroneous_debug) {
+//		messages.debug("Turning on spin with " + subjects.length + " matches for .need-spin");
+//		$.map (subjects, function (subject) { messages.debug("need-spin: "+ subject.id);});
+//	    }
+//            subjects.spin(manifold.spin_presets);
+//        } catch (err) { messages.debug("Cannot turn on spins " + err); }
         
         // Loop through input array, and use publish_uuid to publish back results
-        jQuery.each(query_publish_dom_tuples, function(index, tuple) {
+        $.each(query_publish_dom_tuples, function(index, tuple) {
             var query=manifold.find_query(tuple.query_uuid);
             var query_json=JSON.stringify (query);
             var publish_uuid=tuple.publish_uuid;
@@ -373,8 +375,8 @@ var manifold = {
 
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
-            jQuery.post(manifold.proxy_url, {'json':query_json}, 
-			manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
+            $.post(manifold.proxy_url, {'json':query_json}, 
+		   manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
         })
     },
 
@@ -431,7 +433,7 @@ var manifold = {
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
         if (manifold.publish_result_debug) messages.debug(".. publish_result OLD API (3) " + channel);
-        jQuery.publish(channel, [result, query]);
+        $.publish(channel, [result, query]);
 
 	if (manifold.publish_result_debug) messages.debug(".. publish_result - END (4) q=" + query.__repr());
     },
@@ -451,7 +453,7 @@ var manifold = {
 	if (manifold.publish_result_debug) messages.debug (">>>>> publish_result_rec " + query.object);
         if (manifold.query_expects_unique_result(query)) {
             /* Also publish subqueries */
-            jQuery.each(query.subqueries, function(object, subquery) {
+            $.each(query.subqueries, function(object, subquery) {
                 manifold.publish_result_rec(subquery, result[0][object]);
                 /* TODO remove object from result */
             });
