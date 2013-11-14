@@ -61,6 +61,3 @@ class PlatformView(FreeAccessView):
         context.update(page.prelude_env())
 
         return context
-
-
-

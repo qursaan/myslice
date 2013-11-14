@@ -7,7 +7,7 @@
 (function($){
 
     var debug=false;
-    // debug=true
+    debug=true
 
     $.fn.SimpleList = function( method ) {
         /* Method calling logic */
@@ -53,14 +53,16 @@
         // e.data is what we passed in second argument to subscribe
         // so here it is the jquery object attached to the plugin <div>
         var $plugindiv = e.data;
+        var options = $plugindiv.data().SimpleList;
+	var classname=options.classname;
         // locate the <table> element; with datatables in the way,
         // this might not be a direct son of the div-plugin
-        var $table = $plugindiv.find("table.simplelist").first();
+        var $table = $plugindiv.find("table."+classname).first();
         // also we may or may not have a header
-        var $tbody = $table.find("tbody.simplelist").first();
+        var $tbody = $table.find("tbody."+classname).first();
         var use_datatables = $table.hasClass("with-datatables");
         if (debug) 
-            messages.debug($plugindiv.attr('id') + " udt= " + use_datatables);
+            messages.debug($plugindiv.attr('id') + " udt= " + use_datatables + " rows="+rows.length);
 	
 	// clear the spinning wheel: look up an ancestor that has the need-spin class
 	// do this before we might return
@@ -75,21 +77,20 @@
         }
 
         if (typeof rows[0].error != 'undefined') {
-	        var error="ERROR: " + rows[0].error;
-	        if (use_datatables) 
+	    var error="ERROR: " + rows[0].error;
+	    if (use_datatables) 
                 datatables_set_message ($table, $tbody, unfold.error(error));
-	        else
-        		regular_set_message ($table, $tbody, unfold.error(error));
+	    else
+        	regular_set_message ($table, $tbody, unfold.error(error));
             return;
         }
 
-        var options = $plugindiv.data().SimpleList;
-	    if (use_datatables)	
+	if (use_datatables)	
             datatables_update_table($table, $tbody, rows, options.key);
-	    else
-  			regular_update_table($table, $tbody, rows, options.key);
+	else
+  	    regular_update_table($table, $tbody, rows, options.key, classname);
 
-        }
+    }
 
     // hard-wire a separate presentation depending on the key being used....
     function cell(key, value) {
@@ -106,10 +107,10 @@
 	$tbody.html("<tr><td>"+message+"</td></tr>");
     }
 
-    function regular_update_table ($table, $tbody, rows, key) {
+    function regular_update_table ($table, $tbody, rows, key, classname) {
         if (debug)
-            messages.debug('regular_update_table ' + rows.length + " rows");
-	    var html=$.map(rows, function (row) {
+            messages.debug('regular_update_table ' + rows.length + " rows" + " key=" + key + " classname=" + classname);
+	var html=$.map(rows, function (row) {
             value = row;
             $.each(key.split('.'), function(i, k) {
                 if ($.isArray(value)) {
@@ -118,11 +119,13 @@
                     value = value[k];
                 }
             });
-            if ($.isArray(value)) {
-                x = $.map(value, function(val, i) { return html_row ( cell (key, val)); });
+		if ($.isArray(value)) {
+                x = $.map(value, function(val, i) { 
+		    messages.debug("loop.loop val="+val+" i="+i);
+		    return html_row ( cell (key, val), classname); });
                 return x;
             } else {
-                return html_row ( cell (key, value));
+                return html_row ( cell (key, value), classname);
             }
         }).join();
     	$tbody.html(html);
@@ -144,8 +147,8 @@
 	$table.dataTable().fnDraw();
     }	
     
-    function html_row (cell) { 
-        return "<tr><td class='simplelist'>"+cell+"</td></tr>"; 
+    function html_row (cell, classname) { 
+        return "<tr><td class='"+classname+"'>"+cell+"</td></tr>"; 
     }
     
 })( jQuery );
