@@ -1,3 +1,9 @@
+# NOTE
+# in real-life we use a debian packaging, so this fedora packaging is very rough
+# it turns out we need to have one specfile for the PL build..
+# in any case the contents here should be more carefully split
+# into several components pieces for generic and plugins and all that...
+
 %define name myslice
 %define version 0.2
 %define taglevel 4
