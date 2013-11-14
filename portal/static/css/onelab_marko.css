@@ -165,7 +165,10 @@ h2.well.well-lg {
 
 
 
-
+/* if window enlarged wider than background picture */
+body {
+    background: black !important;
+}
 
 /* TOPMENU.CSS */
 
