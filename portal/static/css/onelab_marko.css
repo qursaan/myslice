@@ -169,12 +169,14 @@ h2.well.well-lg {
 
 /* TOPMENU.CSS */
 
+/* Thierry : turning this off
 body {
-	/* background: #30196d !important; */
-	background: black !important;
+    *//* background: #30196d !important; *//*
+    background: black !important;
     padding-top: 60px;
     padding-bottom: 0px;
 }
+Thierry */
 
 /* Thierry : turning this off
 div.topmenu { 
@@ -328,7 +330,10 @@ table.query-editor {
 
 .query-editor-spacer,
 .plugin.QueryUpdater,
-.plugin.Tabs {
+/* Thierry : turning this off
+.plugin.Tabs 
+Thierry */
+{
     margin-top: 60px !important;
 }
 
