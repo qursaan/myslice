@@ -195,7 +195,8 @@ class Plugin:
             env ['settings_json' ] = self.settings_json()
             # compute plugin-specific initialization
             js_init = render_to_string ( 'plugin-init.js', env )
-            self.add_js_chunks (js_init)
+            # make sure this happens first in js
+            self.add_js_init_chunks (js_init)
         
         # interpret the result of requirements ()
         self.handle_requirements (request)
@@ -251,6 +252,8 @@ class Plugin:
     def add_js_files (self):pass
     @to_prelude
     def add_css_files (self):pass
+    @to_prelude
+    def add_js_init_chunks (self):pass
     @to_prelude
     def add_js_chunks (self):pass
     @to_prelude

@@ -115,11 +115,11 @@ class Page:
     def expose_js_metadata (self):
         # expose global MANIFOLD_METADATA as a js variable
         # xxx this is fetched synchroneously..
-        self.add_js_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
+        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
 
     def expose_js_manifold_config (self):
         config=Config()
-        self.add_js_chunks(config.manifold_js_export())
+        self.add_js_init_chunks(config.manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above
@@ -127,6 +127,8 @@ class Page:
     def add_js_files (self):pass
     @to_prelude
     def add_css_files (self):pass
+    @to_prelude
+    def add_js_init_chunks (self):pass
     @to_prelude
     def add_js_chunks (self):pass
     @to_prelude
