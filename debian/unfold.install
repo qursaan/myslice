@@ -8,7 +8,5 @@ usr/share/unfold/unfold
 usr/share/unfold/ui
 usr/share/unfold/myslice
 usr/share/unfold/sample
-usr/share/unfold/trash
-usr/share/unfold/debug_platform
 manage.py usr/share/unfold/
 apache/myslice.conf /etc/apache2/sites-available

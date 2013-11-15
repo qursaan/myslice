@@ -5,8 +5,8 @@
 /* GENERAL */
 
 .container {
-	padding: 0 !important;
-	color: #fff;
+    padding: 0 !important;
+    color: #fff;
     background: url(http://new.fit-equipex.fr/images/background.jpg) no-repeat;
     margin: 0;
     width: 100%;
@@ -165,16 +165,21 @@ h2.well.well-lg {
 
 
 
-
+/* if window enlarged wider than background picture */
+body {
+    background: black !important;
+}
 
 /* TOPMENU.CSS */
 
+/* Thierry : turning this off
 body {
-	/* background: #30196d !important; */
-	background: black !important;
+    *//* background: #30196d !important; *//*
+    background: black !important;
     padding-top: 60px;
     padding-bottom: 0px;
 }
+Thierry */
 
 /* Thierry : turning this off
 div.topmenu { 
@@ -328,7 +333,10 @@ table.query-editor {
 
 .query-editor-spacer,
 .plugin.QueryUpdater,
-.plugin.Tabs {
+/* Thierry : turning this off
+.plugin.Tabs 
+Thierry */
+{
     margin-top: 60px !important;
 }
 
@@ -414,8 +422,3 @@ table.query-editor td {
     padding-left: 0 !important;
 }   
 
-.simplelist {
-    font-size: 100%;
-    text-align: center !important;
-    margin: 0 auto;
-}

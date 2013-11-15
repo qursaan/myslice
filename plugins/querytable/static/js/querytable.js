@@ -350,14 +350,14 @@
         on_new_record: function(record)
         {
             if (this.received_all_query) {
-        		// if the 'all' query has been dealt with already we may turn on the checkbox
-        		if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
+        	// if the 'all' query has been dealt with already we may turn on the checkbox
+        	if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
                 this.set_checkbox(record, true);
-        	} else {
-        		// otherwise we need to remember that and do it later on
-        		if (debug) messages.debug("Remembering record to check " + record[this.key]);
+            } else {
+        	// otherwise we need to remember that and do it later on
+        	if (debug) messages.debug("Remembering record to check " + record[this.key]);
                 this.buffered_records_to_check.push(record);
-        	}
+            }
         },
 
         on_clear_records: function()
