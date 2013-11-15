@@ -1,13 +1,12 @@
 /* this is to get the content below the navbar */
 body {
     padding-top: 60px;
-    padding-bottom: 20px;
 }
 
 /* center the buttons vertically in the header */
 div.topmenu { padding-top: 7px; }
 ul.logged-in { 
-    padding-top: 12px; 
+    padding-top: 14px; 
 }
 button.logged-in { 
     font-size: small; 
