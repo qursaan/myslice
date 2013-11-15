@@ -27,24 +27,29 @@ class MetaData:
             except:
                 print "metadata.work_offline: failed to decode %s"%offline_filename
         manifold_api = ManifoldAPI(self.auth)
-        fields = ['table', 'column.name', 'column.qualifier', 'column.type', 'column.is_array', 'column.description', 'column.default', 'key', 'capability']
+        fields = ['table', 'column.name', 'column.qualifier', 'column.type', 
+                  'column.is_array', 'column.description', 'column.default', 'key', 'capability']
         #fields = ['table', 'column.column',
         #          'column.description','column.header', 'column.title',
         #          'column.unit', 'column.info_type',
         #          'column.resource_type', 'column.value_type',
         #          'column.allowed_values', 'column.platforms.platform',
         #          'column.platforms.platform_url']
-        result = manifold_api.forward({
-            'action': 'get',
-            'object': 'local:object', # proposed to replace metadata:table
-            'fields':     fields 
-        })
+        request={ 'action': 'get',
+                  'object': 'local:object', # proposed to replace metadata:table
+                  'fields':  fields ,
+                  }
+        result = manifold_api.forward(request)
 
+        # xxx need a way to export error messages to the UI
         if result['code'] == 1: # warning
-            messages.warning(request, result['description'])
+            # messages.warning(request, result['description'])
+            print ("METADATA WARNING -",request,result['description'])
         elif result['code'] == 2:
-            messages.error(request, result['description'])
+            # messages.error(request, result['description'])
+            print ("METADATA ERROR -",request,result['description'])
             # XXX FAIL HERE XXX
+            return
 
         rows = result.ok_value()
 # API errors will be handled by the outer logic
