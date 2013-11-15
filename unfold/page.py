@@ -80,7 +80,7 @@ class Page:
             result={'query_uuid':a}
             if b: result['domid']=b
             return result
-        env['query_publish_dom_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
+        env['query_exec_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
         javascript = render_to_string ("page-queries.js",env)
         self.add_js_chunks (javascript)
 #        self.reset_queue()

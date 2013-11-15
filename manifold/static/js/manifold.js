@@ -323,9 +323,9 @@ var manifold = {
      * \brief We use js function closure to be able to pass the query (array)
      * to the callback function used when data is received
      */
-    success_closure: function(query, publish_uuid, callback /*domid*/) {
+    success_closure: function(query, publish_uuid, callback) {
         return function(data, textStatus) {
-            manifold.asynchroneous_success(data, query, publish_uuid, callback /*domid*/);
+            manifold.asynchroneous_success(data, query, publish_uuid, callback);
         }
     },
 
@@ -341,12 +341,12 @@ var manifold = {
         //    manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
         //});
 
-        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback /*domid*/));
+        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback));
     },
 
-    // Executes all async. queries
-    // input queries are specified as a list of {'query_uuid': <query_uuid>, 'id': <possibly null>}
-    asynchroneous_exec : function (query_publish_dom_tuples) {
+    // Executes all async. queries - intended for the javascript header to initialize queries
+    // input queries are specified as a list of {'query_uuid': <query_uuid> }
+    asynchroneous_exec : function (query_exec_tuples) {
 // start spinners - be robust if the spin stuff was not loaded for any reason
 // turned off because each plugin is responsible for doing that through on_query_in_progress
 //        try {
@@ -359,7 +359,7 @@ var manifold = {
 //        } catch (err) { messages.debug("Cannot turn on spins " + err); }
         
         // Loop through input array, and use publish_uuid to publish back results
-        $.each(query_publish_dom_tuples, function(index, tuple) {
+        $.each(query_exec_tuples, function(index, tuple) {
             var query=manifold.find_query(tuple.query_uuid);
             var query_json=JSON.stringify (query);
             var publish_uuid=tuple.publish_uuid;
@@ -376,7 +376,7 @@ var manifold = {
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
             $.post(manifold.proxy_url, {'json':query_json}, 
-		   manifold.success_closure(query, publish_uuid, tuple.callback /*domid*/));
+		   manifold.success_closure(query, publish_uuid, tuple.callback));
         })
     },
 
@@ -384,13 +384,11 @@ var manifold = {
      * \brief Forward a query to the manifold backend
      * \param query (dict) the query to be executed asynchronously
      * \param callback (function) the function to be called when the query terminates
-     * Deprecated:
-     * \param domid (string) the domid to be notified about the results (null for using the pub/sub system
      */
-    forward: function(query, callback /*domid*/) {
+    forward: function(query, callback) {
         var query_json = JSON.stringify(query);
         $.post(manifold.proxy_url, {'json': query_json} , 
-	       manifold.success_closure(query, query.query_uuid, callback/*domid*/));
+	       manifold.success_closure(query, query.query_uuid, callback));
     },
 
     /*!
@@ -695,26 +693,16 @@ var manifold = {
         }
     },
 
-    // if set domid allows the result to be directed to just one plugin
+    // if set callback is provided it is called
     // most of the time publish_uuid will be query.query_uuid
     // however in some cases we wish to publish the result under a different uuid
     // e.g. an updater wants to publish its result as if from the original (get) query
-    asynchroneous_success : function (data, query, publish_uuid, callback /*domid*/) {
+    asynchroneous_success : function (data, query, publish_uuid, callback) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
 	
 	var start = new Date();
 	if (manifold.asynchroneous_debug)
 	    messages.debug(">>>>>>>>>> asynchroneous_success query.object=" + query.object);
-
-        /* If a callback has been specified, we redirect results to it */
-        if (!!callback) { 
-	    callback(data); 
-	    if (manifold.asynchroneous_debug) {
-		duration=new Date()-start;
-		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- callback ended " + duration + " ms");
-	    }
-	    return; 
-	}
 
         if (data.code == 2) { // ERROR
             // We need to make sense of error codes here
@@ -732,16 +720,18 @@ var manifold = {
             if (publish_uuid)
                 $.publish("/results/" + publish_uuid + "/failed", [data.code, data.description] );
 
-/* DEMO - Debug Messages desactivated
-            $("#notifications").notify("create", "sticky", {
-              title: 'Warning',
-              text: data.description
-            },{
-              expires: false,
-              speed: 1000
-            });
-*/
         }
+
+        // If a callback has been specified, we redirect results to it 
+        if (!!callback) { 
+	    callback(data); 
+	    if (manifold.asynchroneous_debug) {
+		duration=new Date()-start;
+		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- callback ended " + duration + " ms");
+	    }
+	    return; 
+	}
+
 	if (manifold.asynchroneous_debug) 
 	    messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
 
