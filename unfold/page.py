@@ -88,29 +88,6 @@ class Page:
         self.expose_js_manifold_config()
 
 
-# DEPRECATED #    # needs to be called explicitly and only when metadata is actually required
-# DEPRECATED #    # in particular user needs to be logged
-# DEPRECATED #    def get_metadata (self):
-# DEPRECATED #        # look in session's cache - we don't want to retrieve this for every request
-# DEPRECATED #        session=self.request.session
-# DEPRECATED #        if 'manifold' not in session:
-# DEPRECATED #            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
-# DEPRECATED #            return
-# DEPRECATED #        manifold=session['manifold']
-# DEPRECATED #        # if cached, use it
-# DEPRECATED #        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
-# DEPRECATED #            if debug: print "Page.get_metadata: return cached value"
-# DEPRECATED #            return manifold['metadata']
-# DEPRECATED #        # otherwise retrieve it
-# DEPRECATED #        manifold_api_session_auth = session['manifold']['auth']
-# DEPRECATED #        print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
-# DEPRECATED #        metadata=MetaData (manifold_api_session_auth)
-# DEPRECATED #        metadata.fetch()
-# DEPRECATED #        # store it for next time
-# DEPRECATED #        manifold['metadata']=metadata
-# DEPRECATED #        if debug: print "Page.get_metadata: return new value"
-# DEPRECATED #        return metadata
-
     # needs to be called explicitly and only when metadata is actually required
     # in particular user needs to be logged
     def get_metadata (self):
@@ -136,7 +113,8 @@ class Page:
         return metadata
             
     def expose_js_metadata (self):
-        # export in this js global...
+        # expose global MANIFOLD_METADATA as a js variable
+        # xxx this is fetched synchroneously..
         self.add_js_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
 
     def expose_js_manifold_config (self):
