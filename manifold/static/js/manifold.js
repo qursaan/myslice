@@ -346,17 +346,8 @@ var manifold = {
 
     // Executes all async. queries - intended for the javascript header to initialize queries
     // input queries are specified as a list of {'query_uuid': <query_uuid> }
+    // each plugin is responsible for managing its spinner through on_query_in_progress
     asynchroneous_exec : function (query_exec_tuples) {
-// start spinners - be robust if the spin stuff was not loaded for any reason
-// turned off because each plugin is responsible for doing that through on_query_in_progress
-//        try {
-//	    var subjects=$(".need-spin");
-//            if (manifold.asynchroneous_debug) {
-//		messages.debug("Turning on spin with " + subjects.length + " matches for .need-spin");
-//		$.map (subjects, function (subject) { messages.debug("need-spin: "+ subject.id);});
-//	    }
-//            subjects.spin(manifold.spin_presets);
-//        } catch (err) { messages.debug("Cannot turn on spins " + err); }
         
         // Loop through input array, and use publish_uuid to publish back results
         $.each(query_exec_tuples, function(index, tuple) {

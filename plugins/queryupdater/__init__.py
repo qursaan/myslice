@@ -15,5 +15,3 @@ class QueryUpdater(Plugin):
     def json_settings_list (self):
         return ['plugin_uuid', 'domid', 'query_uuid']
 
-    def export_json_settings (self):
-        return True

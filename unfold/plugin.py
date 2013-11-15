@@ -163,10 +163,6 @@ class Plugin:
     def export_json_settings (self):
         return 'query_uuid' in self.json_settings_list()
     
-    # by default we create a timer if there's a query attached, redefine to change this behaviour
-    def start_with_spin (self):
-        return self.export_json_settings()
-
     # returns the html code for that plugin
     # in essence, wraps the results of self.render_content ()
     def render (self, request):
@@ -175,8 +171,6 @@ class Plugin:
         # shove this into plugin.html
         env = {}
         env ['plugin_content']= plugin_content
-        # need_spin is used in plugin.html
-        self.need_spin=self.start_with_spin()
         env.update(self.__dict__)
         # translate high-level 'toggled' into 4 different booleans
         self.need_toggle = False
@@ -312,6 +306,3 @@ class Plugin:
     #
     # whether we export the json settings to js
     # def export_json_settings (self)
-    #
-    # whether we show an initial spinner
-    # def start_with_spin (self)
