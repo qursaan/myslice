@@ -161,6 +161,9 @@ def account_process(request):
 #                        private_key = k.as_pem()
 #                        private_key = ''.join(private_key.split())
 #                        public_key = "ssh-rsa " + public_key
+                        # now we overwrite the config field with keypair
+                        # once there will be user_hrn, we need to keep user_hrn and change only the keypair
+                        # see submit_name section for implementing this    
                         keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + '}'
 #                       keypair = re.sub("\r", "", keypair)
 #                       keypair = re.sub("\n", "\\n", keypair)
