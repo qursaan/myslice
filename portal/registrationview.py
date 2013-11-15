@@ -63,7 +63,11 @@ class RegistrationView (FreeAccessView):
             reg_auth   = request.POST.get('authority_hrn', '')
             reg_login  = request.POST.get('login', '')
             reg_email  = request.POST.get('email','').lower()
-      
+            #prepare user_hrn 
+            split_email = reg_email.split("@")[0] 
+            split_email = split_email.replace(".", "_")
+            user_hrn = reg_auth + '.' + split_email
+
             #POST value validation  
             if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
                 errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
@@ -89,7 +93,7 @@ class RegistrationView (FreeAccessView):
 #                private_key = ''.join(private_key.split())
 #                public_key = "ssh-rsa " + public_key
                 # Saving to DB
-                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + '}'
+                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":'+ user_hrn + '}'
                 #keypair = re.sub("\r", "", keypair)
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')
