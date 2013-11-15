@@ -25,6 +25,3 @@ class QueryCode (Plugin):
             }
 
     def json_settings_list (self): return ['plugin_uuid','query_uuid']
-        
-    # because we have a link to a query it looks like we need a spin, let's make this right
-    def start_with_spin (self): return False
