@@ -93,7 +93,7 @@ class RegistrationView (FreeAccessView):
 #                private_key = ''.join(private_key.split())
 #                public_key = "ssh-rsa " + public_key
                 # Saving to DB
-                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":'+ user_hrn + '}'
+                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
                 #keypair = re.sub("\r", "", keypair)
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')
@@ -105,7 +105,7 @@ class RegistrationView (FreeAccessView):
                 file_extension = os.path.splitext(file_name)[1]
                 allowed_extension =  ['.pub','.txt']
                 if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
-                    keypair = '{"user_public_key":"'+ file_content +'"}'
+                    keypair = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
                     keypair = re.sub("\r", "", keypair)
                     keypair = re.sub("\n", "\\n",keypair)
                     keypair = ''.join(keypair.split())
@@ -135,11 +135,11 @@ class RegistrationView (FreeAccessView):
                     'first_name'    : reg_fname, 
                     'last_name'     : reg_lname, 
                     'authority_hrn' : reg_auth,
-                    'email'         : reg_email, 
+                    'email'         : reg_email,
+                    'user_hrn'      : user_hrn,
                     'keypair'       : 'Public Key :' + public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
-
                 recipients = authority_get_pi_emails(request,reg_auth)
 
                 if ctx['cc_myself']:
