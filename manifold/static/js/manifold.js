@@ -769,7 +769,15 @@ var manifold = {
     raise_event_handler: function(type, query_uuid, event_type, value) {
         if ((type != 'query') && (type != 'record'))
             throw 'Incorrect type for manifold.raise_event()';
+	// xxx we observe quite a lot of incoming calls with an undefined query_uuid
+	// this should be fixed upstream
+	if (query_uuid === undefined) {
+	    messages.warning("undefined query in raise_event_handler");
+	    return;
+	}
 
+	// notify the change to objects that either listen to this channel specifically,
+	// or to the wildcard channel
         var channels = [ manifold.get_channel(type, query_uuid), manifold.get_channel(type, '*') ];
 
         $.each(channels, function(i, channel) {
