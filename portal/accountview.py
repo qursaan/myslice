@@ -171,7 +171,7 @@ def account_process(request):
                         # updating maniolf local:account table
                         account_config = json.loads(account_detail['config'])
                         # preserving user_hrn
-                        user_hrn = account_config['user_hrn']
+                        user_hrn = account_config.get('user_hrn','N/A')
                         keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
                         updated_config = json.dumps(account_config) 
 
@@ -196,7 +196,7 @@ def account_process(request):
                         if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
                             account_config = json.loads(account_detail['config'])
                             # preserving user_hrn
-                            user_hrn = account_config['user_hrn']
+                            user_hrn = account_config.get('user_hrn','N/A')
                             file_content = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
                             #file_content = re.sub("\r", "", file_content)
                             #file_content = re.sub("\n", "\\n",file_content)
