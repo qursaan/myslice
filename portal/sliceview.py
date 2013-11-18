@@ -160,6 +160,14 @@ class SliceView (LoginRequiredAutoLogoutView):
             zoom       = 4,
         )
 
+        resources_as_map = SensLabMap(
+            page       = page,
+            title      = '3D Map',
+            domid      = 'senslabmap',
+            query      = sq_resource,
+            query_all  = query_resource_all,
+        )
+
         resources_as_list = QueryTable( 
             page       = page,
             domid      = 'resources-list',
