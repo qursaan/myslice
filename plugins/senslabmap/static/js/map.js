@@ -1,15 +1,24 @@
 var Senslab = {
   normalize: function(node) {
-    if (node.component_name) { //"wsn430-11.devlille.iot-lab.info",
-      var s = node.component_name.split('.');
-      if (s[2] == 'iot-lab' && s[3] == 'info') {
-        node.arch = s[0].split('-')[0];
-        node.id = s[0].split('-')[1];
-        node.site = s[1];
-        return true;
-      }
+    var info;
+
+    if (node.component_name) { // wsn430-11.devlille.iot-lab.info
+      info = node.component_name.split(".");
+    } else if (node.hrn) { // iotlab.a8-11\.devgrenoble\.iot-lab\.info
+      var info = node.hrn.split("\\.");
+      info[0] = info[0].split(".")[1];
     }
-    return false;
+
+    if (info && info[2] == "iot-lab" && info[3] == "info") {
+      node.arch = info[0].split("-")[0];
+      node.id = info[0].split("-")[1];
+      node.site = info[1];
+      return true;
+    } else {
+      console.warn("could not normalize node :");
+      console.warn(node);
+      return false;
+    }
   }
 };
 
@@ -22,9 +31,9 @@ Senslab.Map = function() {
   };
   
   var archs = [
-  "wsn430",
-  "m3",
-  "a8"
+    "wsn430",
+    "m3",
+    "a8"
   ];
   
   function Map($container) {
