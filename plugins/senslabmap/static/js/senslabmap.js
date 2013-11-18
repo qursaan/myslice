@@ -10,41 +10,45 @@
       /* Setup query and record handlers */
       this.listen_query(options.query_uuid);
       this.listen_query(options.query_all_uuid, 'all');
-      
-      /* GUI setup and event binding */
-      this.initialize_map();
-    },
-    
-    initialize_map: function() {
-      this.nodes = [];
-      this.id = 0;
-      init();
+
+      this.sites = [];
+      this.nodes = {};
     },
     
     refresh: function() {
       console.log("refresh");
-      myrender();
     },
     
     on_show: function(e) {
       e.data.refresh();
     },
     
-    on_all_new_record: function(n) {
-      // format is : [name, x, y, z, uid, state]
-      // state = "Busy", "Alive" or "Suspected"
-      if (n.x == null || n.y == null || n.z == null) {
-        console.log("Warning: no coord for " + n.hrn);
-        return;
+    on_all_new_record: function(node) {
+      Senslab.normalize(node);
+      var site = node.site;
+      if (site) {
+        if ($.inArray(site, this.sites) == -1) {
+          this.sites.push(site);
+          this.nodes[site] = [];
+        }
+        this.nodes[site].push(node);
+      } else {
+        console.warn(node);
+        console.warn("-> has no site");
       }
-      this.id++;
-      node = [this.id, n.x, n.y, n.z, this.id, n.boot_state];
-      this.nodes.push(node);
     },
     
     on_all_query_done: function() {
-      drawNodes(this.nodes);
-      parseNodebox();
+      var
+        self = this,
+        maps = {},
+        $container = $('#maps-container');
+  
+      $.each(this.sites, function(i, site) {
+        var $div = $("<div />").appendTo($container);
+        maps[site] = new Senslab.Map($div);
+        maps[site].addNodes(self.nodes[site]);
+      });
     }
   });
   $.plugin('SensLabMap', SensLabMap);
