@@ -146,7 +146,11 @@ googlemap_debug_detailed=false;
 	// retrieve DOM checkbox and make sure it is checked/unchecked
         set_checkbox: function(record, checked) {
 	    var hrn=this.record_hrn (record);
-	    if (! hrn) { messages.warning ("googlemap.set_checkbox: record has no hrn"); return; }
+	    if (! hrn) { 
+		try {messages.warning ("googlemap.set_checkbox: record has no hrn -- hostname="+record.hostname); }
+		catch (err) {messages.warning ("googlemap.set_checkbox: record has no hrn"); }
+		return; 
+	    }
 	    var checkbox_s = this.by_hrn [ hrn ];
 	    if (! checkbox_s ) { messages.warning ("googlemap.set_checkbox: could not spot checkbox for hrn "+hrn); return; }
 	    checkbox_s.checkbox.prop('checked',checked);

@@ -15,5 +15,3 @@ class Tabs (Composite):
     def json_settings_list (self):
         return []
 
-    def export_json_settings(self):
-        return True

@@ -41,6 +41,3 @@ class Messages (Plugin):
     def json_settings_list (self):
         return [ 'plugin_uuid', 'levels' ]
 
-    # and we don't need a spin wheel 
-    def start_with_spin (self):
-        return False
