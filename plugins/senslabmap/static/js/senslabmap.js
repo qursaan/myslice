@@ -35,16 +35,15 @@
     },
     
     on_all_query_done: function() {
-      var
-        self = this,
-        maps = {},
-        $container = $('#maps-container');
-  
-      $.each(this.sites, function(i, site) {
-        var $div = $("<div />").appendTo($container);
-        maps[site] = new Senslab.Map($div);
-        maps[site].addNodes(self.nodes[site]);
-      });
+      var self = this;
+      
+      Senslab.createMaps($('#maps-container'), this.sites, this.nodes);
+      Senslab.notify = function(node) {
+        manifold.raise_event(self.options.query_uuid,
+                             node.boot_state == "Alive" ? SET_REMOVED : SET_ADD,
+                             node.component_id
+                            );
+      }
     }
   });
   $.plugin('SensLabMap', SensLabMap);

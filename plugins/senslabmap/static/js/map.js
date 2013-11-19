@@ -15,6 +15,17 @@ var Senslab = {
       node.site = info[1];
       node.normalized = true;
     }
+  },
+  notify: function(node) {
+    console.log("[Notify] node " + node.id + " is " + node.boot_state);
+  },
+  createMaps: function($container, sites, nodes) {
+    var maps = {};
+    $.each(sites, function(i, site) {
+      var $div = $("<div />").appendTo($container);
+      maps[site] = new Senslab.Map($div);
+      maps[site].addNodes(nodes[site]);
+    });
   }
 };
 
@@ -153,6 +164,7 @@ Senslab.Map = function() {
       particle.id = parseInt(nodes[i].id);
       particle.arch = nodes[i].arch;
       particle.boot_state = nodes[i].boot_state;
+      particle.component_id = nodes[i].component_id;
       particle.position.x = (nodes[i].x - center.x) * 10;
       particle.position.y = (nodes[i].y - center.y) * 10;
       particle.position.z = (nodes[i].z - center.z) * 10;
@@ -191,7 +203,7 @@ Senslab.Map = function() {
   function setState(node, state) {
     node.boot_state = state;
     setColor(node);
-    notify(node);
+    Senslab.notify(node);
   }
 
   function setColor(node) {
@@ -272,10 +284,6 @@ Senslab.Map = function() {
     context.arc(0, 0, 1, 0, Math.PI * 2, true);
     context.closePath();
     context.fill();
-  };
-
-  var notify = function(node) {
-    console.log("[Notify] node " + node.id + " is " + node.boot_state);
   };
   
   return Map;
