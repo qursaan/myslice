@@ -4,10 +4,10 @@ var Senslab = {
 
     if (node.component_name) { // wsn430-11.devlille.iot-lab.info
       info = node.component_name.split(".");
-    } else if (node.hrn) { // iotlab.a8-11\.devgrenoble\.iot-lab\.info
+    } /*else if (node.hrn) { // iotlab.a8-11\.devgrenoble\.iot-lab\.info
       var info = node.hrn.split("\\.");
       info[0] = info[0].split(".")[1];
-    }
+    }*/
 
     if (info && info[2] == "iot-lab" && info[3] == "info") {
       node.arch = info[0].split("-")[0];
@@ -29,6 +29,10 @@ Senslab.Map = function() {
     "Suspected": 0xFF3030,
     "Selected": 0x0099CC
   };
+
+  function setColor(node) {
+    node.material.color.setHex(colors[node.boot_state] || colors["Selected"]);
+  }
   
   var archs = [
     "wsn430",
@@ -36,7 +40,7 @@ Senslab.Map = function() {
     "a8"
   ];
   
-  function Map($container) {
+  function Map($container, options) {
     this.width  = 600;
     this.height = 400;
     
@@ -44,6 +48,10 @@ Senslab.Map = function() {
     this.phi = -100;
     this.theta = 0;
     this.onRot = false;
+
+    this._notify = function(node) {
+      console.log("[Notify] node " + node.id + " is " + node.boot_state);
+    };
     
     this.pointerDetectRay = new THREE.Raycaster();
     this.pointerDetectRay.ray.direction.set(0, -1, 0);
@@ -62,16 +70,13 @@ Senslab.Map = function() {
     
     var self = this;
     
-    this.nodes = {};
     this.$nodeInputs = {};
     
     $.each(archs, function(i, arch) {
-      self.nodes[arch] = [];
       self.$nodeInputs[arch] = $("<input type='text' placeholder='" + arch + "'>")
       .appendTo($container)
       .change(function() {
-        self.nodes[arch] = expand($(this).val());
-        self.updateColor(arch);
+        self.updateColor(arch, expand($(this).val()));
       });
     });
     
@@ -100,11 +105,16 @@ Senslab.Map = function() {
         case 1:
           self.pointerDetectRay = self.projector.pickingRay(self.mouse2D.clone(), self.camera);
           var intersects = self.pointerDetectRay.intersectObjects(self.scene.children);
-          if (intersects.length > 0 && self.select(intersects[0].object)) {
+          if (intersects.length > 0) {
             var node = intersects[0].object;
-            var $nodeInput = self.$nodeInputs[node.arch];
-            $nodeInput.val(factorize(self.nodes[node.arch]));
-            self.update();
+            if (node.boot_state != "Suspected") {
+              node.boot_state = node.boot_state == "Alive" ? "Selected" : "Alive";
+              setColor(node);
+              self._notify(node);
+              var $nodeInput = self.$nodeInputs[node.arch];
+              $nodeInput.val(factorize(self.getNodesId(node.arch)));
+              self.update();
+            }
           }
           break;
         case 3:
@@ -131,7 +141,70 @@ Senslab.Map = function() {
     
     $container.append($canvas);
   }
+
+  Map.prototype.getNodesId = function(arch) {
+    var allNodes = this.scene.children;
+    var nodes = [];
+    for (var i = 0; i < allNodes.length; ++i) {
+      if (allNodes[i].arch == arch && allNodes[i].boot_state == "Selected") {
+        nodes.push(parseInt(allNodes[i].id));
+      }
+    }
+    return nodes;
+  }
   
+  Map.prototype.addNodes = function(nodes) {
+    var center = getCenter(nodes);
+
+    nodes.sort(function(a, b) {
+      return a.id - b.id;
+    });
+    
+    for(var i = 0; i < nodes.length; ++i) {
+      var material = new THREE.ParticleCanvasMaterial({program: circle});
+      var particle = new THREE.Particle(material);
+      particle.id = nodes[i].id;
+      particle.arch = nodes[i].arch;
+      particle.boot_state = nodes[i].boot_state;
+      particle.position.x = (nodes[i].x - center.x) * 10;
+      particle.position.y = (nodes[i].y - center.y) * 10;
+      particle.position.z = (nodes[i].z - center.z) * 10;
+      particle.scale.x = particle.scale.y = 1;
+      setColor(particle)
+      this.scene.add(particle);
+    }
+    this.update();
+  };
+  
+  Map.prototype.updateColor = function(arch, selected) {
+    var nodes = this.scene.children;
+    for (var i = 0; i < nodes.length; ++i) {
+      if (nodes[i].arch == arch && nodes[i].boot_state != "Suspected") {
+        var node = nodes[i];
+        var id = parseInt(node.id);
+        var state = $.inArray(id, selected) == -1 ? "Alive" : "Selected";
+        if (node.boot_state != state) {
+          node.boot_state = state;
+          this._notify(node);
+        }
+        setColor(node);
+      }
+    }
+    this.update();
+  }
+  
+  Map.prototype.updatePosition = function() {
+    this.camera.position.x = this.distance * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+    this.camera.position.y = this.distance * Math.sin(this.phi * Math.PI / 360);
+    this.camera.position.z = this.distance * Math.cos(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+    this.camera.lookAt(this.scene.position);
+    this.camera.updateMatrix();
+  };
+  
+  Map.prototype.update = function() {
+    this.renderer.render(this.scene, this.camera);
+  };
+
   function getCenter(nodes) {
     var xmin = 0, ymin = 0, zmin = 0;
     var xmax = 0, ymax = 0, zmax = 0;
@@ -146,57 +219,7 @@ Senslab.Map = function() {
     }
     return {x: (xmax + xmin) / 2, y: (ymax + ymin) / 2, z: (zmax + zmin) / 2};
   }
-  
-  function setColor(node) {
-    node.material.color.setHex(colors[node.boot_state] || colors["Selected"]);
-  }
-  
-  Map.prototype.addNodes = function(nodes) {
-    var center = getCenter(nodes);
-    var program = function(context) {
-      context.beginPath();
-      context.arc(0, 0, 1, 0, Math.PI * 2, true);
-      context.closePath();
-      context.fill();
-    };
-    
-    for(var i = 0; i < nodes.length; ++i) {
-      var material = new THREE.ParticleCanvasMaterial({program: program});
-      var particle = new THREE.Particle(material);
-      
-      particle.id = nodes[i].id;
-      particle.arch = nodes[i].arch;
-      particle.boot_state = nodes[i].boot_state;
-      particle.position.x = (nodes[i].x - center.x) * 10;
-      particle.position.y = (nodes[i].y - center.y) * 10;
-      particle.position.z = (nodes[i].z - center.z) * 10;
-      particle.scale.x = particle.scale.y = 1;
-      setColor(particle)
-      this.scene.add(particle);
-    }
-    this.update();
-  };
-  
-  Map.prototype.select = function(node) {
-    if (node.boot_state == "Suspected") {
-      return false;
-    } else if (node.boot_state == "Alive") {
-      var array = this.nodes[node.arch];
-      array.push(parseInt(node.id));
-      array.sort(nodeSort);
-      node.boot_state = "Selected";
-      setColor(node);
-      return true;
-    } else {
-      var array = this.nodes[node.arch];
-      var index = $.inArray(parseInt(node.id), array);
-      index > -1 && array.splice(index, 1);
-      node.boot_state = "Alive";
-      setColor(node);
-      return true;
-    }
-  };
-  
+
   function factorize(nodes) {
     var factorized = [];
     var prev = 0;
@@ -238,7 +261,11 @@ Senslab.Map = function() {
         expanded.push(parseInt(factorized[i]));
       }
     }
-    expanded.sort(nodeSort);
+    
+    expanded.sort(function(a, b) {
+      return a - b;
+    });
+    
     for (var i = 1; i < expanded.length; i++) {
       if (expanded[i] == expanded[i - 1]) {
         expanded.splice(i--, 1);
@@ -246,34 +273,12 @@ Senslab.Map = function() {
     }
     return expanded;
   }
-  
-  function nodeSort(a, b) {
-    return a - b;
-  }
-  
-  Map.prototype.updateColor = function(arch) {
-    var nodes = this.scene.children;
-    for (var i = 0; i < nodes.length; ++i) {
-      if (nodes[i].arch == arch && nodes[i].boot_state != "Suspected") {
-        var id = parseInt(nodes[i].id);
-        var array = this.nodes[arch];
-        nodes[i].boot_state = $.inArray(id, array) == -1 ? "Alive" : "Selected";
-        setColor(nodes[i]);
-      }
-    }
-    this.update();
-  }
-  
-  Map.prototype.updatePosition = function() {
-    this.camera.position.x = this.distance * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
-    this.camera.position.y = this.distance * Math.sin(this.phi * Math.PI / 360);
-    this.camera.position.z = this.distance * Math.cos(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
-    this.camera.lookAt(this.scene.position);
-    this.camera.updateMatrix();
-  };
-  
-  Map.prototype.update = function() {
-    this.renderer.render(this.scene, this.camera);
+
+  function circle(context) {
+    context.beginPath();
+    context.arc(0, 0, 1, 0, Math.PI * 2, true);
+    context.closePath();
+    context.fill();
   };
   
   return Map;
