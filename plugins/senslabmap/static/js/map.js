@@ -13,11 +13,7 @@ var Senslab = {
       node.arch = info[0].split("-")[0];
       node.id = info[0].split("-")[1];
       node.site = info[1];
-      return true;
-    } else {
-      console.warn("could not normalize node :");
-      console.warn(node);
-      return false;
+      node.normalized = true;
     }
   }
 };
@@ -30,10 +26,6 @@ Senslab.Map = function() {
     "Selected": 0x0099CC
   };
 
-  function setColor(node) {
-    node.material.color.setHex(colors[node.boot_state] || colors["Selected"]);
-  }
-  
   var archs = [
     "wsn430",
     "m3",
@@ -48,10 +40,6 @@ Senslab.Map = function() {
     this.phi = -100;
     this.theta = 0;
     this.onRot = false;
-
-    this._notify = function(node) {
-      console.log("[Notify] node " + node.id + " is " + node.boot_state);
-    };
     
     this.pointerDetectRay = new THREE.Raycaster();
     this.pointerDetectRay.ray.direction.set(0, -1, 0);
@@ -76,7 +64,8 @@ Senslab.Map = function() {
       self.$nodeInputs[arch] = $("<input type='text' placeholder='" + arch + "'>")
       .appendTo($container)
       .change(function() {
-        self.updateColor(arch, expand($(this).val()));
+        self.updateSelected(arch, expand($(this).val()));
+        self.update();
       });
     });
     
@@ -108,9 +97,7 @@ Senslab.Map = function() {
           if (intersects.length > 0) {
             var node = intersects[0].object;
             if (node.boot_state != "Suspected") {
-              node.boot_state = node.boot_state == "Alive" ? "Selected" : "Alive";
-              setColor(node);
-              self._notify(node);
+              setState(node, node.boot_state == "Alive" ? "Selected" : "Alive");
               var $nodeInput = self.$nodeInputs[node.arch];
               $nodeInput.val(factorize(self.getNodesId(node.arch)));
               self.update();
@@ -141,13 +128,13 @@ Senslab.Map = function() {
     
     $container.append($canvas);
   }
-
+  
   Map.prototype.getNodesId = function(arch) {
     var allNodes = this.scene.children;
     var nodes = [];
     for (var i = 0; i < allNodes.length; ++i) {
       if (allNodes[i].arch == arch && allNodes[i].boot_state == "Selected") {
-        nodes.push(parseInt(allNodes[i].id));
+        nodes.push(allNodes[i].id);
       }
     }
     return nodes;
@@ -163,7 +150,7 @@ Senslab.Map = function() {
     for(var i = 0; i < nodes.length; ++i) {
       var material = new THREE.ParticleCanvasMaterial({program: circle});
       var particle = new THREE.Particle(material);
-      particle.id = nodes[i].id;
+      particle.id = parseInt(nodes[i].id);
       particle.arch = nodes[i].arch;
       particle.boot_state = nodes[i].boot_state;
       particle.position.x = (nodes[i].x - center.x) * 10;
@@ -176,21 +163,17 @@ Senslab.Map = function() {
     this.update();
   };
   
-  Map.prototype.updateColor = function(arch, selected) {
+  Map.prototype.updateSelected = function(arch, selected) {
     var nodes = this.scene.children;
     for (var i = 0; i < nodes.length; ++i) {
       if (nodes[i].arch == arch && nodes[i].boot_state != "Suspected") {
         var node = nodes[i];
-        var id = parseInt(node.id);
-        var state = $.inArray(id, selected) == -1 ? "Alive" : "Selected";
+        var state = $.inArray(node.id, selected) == -1 ? "Alive" : "Selected";
         if (node.boot_state != state) {
-          node.boot_state = state;
-          this._notify(node);
+          setState(node, state);
         }
-        setColor(node);
       }
     }
-    this.update();
   }
   
   Map.prototype.updatePosition = function() {
@@ -204,6 +187,16 @@ Senslab.Map = function() {
   Map.prototype.update = function() {
     this.renderer.render(this.scene, this.camera);
   };
+
+  function setState(node, state) {
+    node.boot_state = state;
+    setColor(node);
+    notify(node);
+  }
+
+  function setColor(node) {
+    node.material.color.setHex(colors[node.boot_state] || colors["Selected"]);
+  }
 
   function getCenter(nodes) {
     var xmin = 0, ymin = 0, zmin = 0;
@@ -279,6 +272,10 @@ Senslab.Map = function() {
     context.arc(0, 0, 1, 0, Math.PI * 2, true);
     context.closePath();
     context.fill();
+  };
+
+  var notify = function(node) {
+    console.log("[Notify] node " + node.id + " is " + node.boot_state);
   };
   
   return Map;

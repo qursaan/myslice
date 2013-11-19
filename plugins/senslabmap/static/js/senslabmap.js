@@ -15,26 +15,22 @@
       this.nodes = {};
     },
     
-    refresh: function() {
-      console.log("refresh");
-    },
-    
     on_show: function(e) {
       e.data.refresh();
     },
     
     on_all_new_record: function(node) {
       Senslab.normalize(node);
-      var site = node.site;
-      if (site) {
+      if (node.normalized) {
+        var site = node.site;
         if ($.inArray(site, this.sites) == -1) {
           this.sites.push(site);
           this.nodes[site] = [];
         }
         this.nodes[site].push(node);
       } else {
+        console.warn("node has no site:");
         console.warn(node);
-        console.warn("-> has no site");
       }
     },
     
