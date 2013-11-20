@@ -2,17 +2,29 @@ from types import StringTypes, ListType
 
 from django.template.loader import render_to_string
 
-debug=True
+debug=False
 
+# the need for js_init_chunks is because we need to have the plugins initialized
+# before the queries fly
+# and when writing a view it is not very easy to remember in which order
+# all the js initialization will end up, so we use these 2 categories 
+# as a simple way to enforce this dependency
+# far from perfect but good enough for now
 class Prelude:
 
-    """A class for collecting dependencies on js/css files or fragments"""
+    """A class for collecting dependencies on js/css stuff
+    files are expected from your 'static' area, typically 'css/foo.css' or 'js/foo.js'
+    fragments (chunks) is for raw code
+    you can specify a string or a list of strings
+    js_init_chunks get collated with js_chunks but come first
+    """
 
-    keys=[ 'js_files','css_files','js_chunks', 'css_chunks' ]
-    def __init__ (self, js_files=None, css_files=None, js_chunks=None, css_chunks=None):
+    keys=[ 'js_files', 'css_files', 'js_init_chunks', 'js_chunks', 'css_chunks' ]
+    def __init__ (self, js_files=None, css_files=None, js_init_chunks=None, js_chunks=None, css_chunks=None):
         # it's tempting to use sets but sets are not ordered..
         self.js_files  = Prelude._normalize(js_files)
         self.css_files = Prelude._normalize(css_files)
+        self.js_init_chunks = Prelude._normalize(js_init_chunks)
         self.js_chunks = Prelude._normalize(js_chunks)
         self.css_chunks= Prelude._normalize(css_chunks)
 
@@ -29,6 +41,8 @@ class Prelude:
     def add_css_files (self, x):
         for i in Prelude._normalize (x):
             if i not in self.css_files: self.css_files.append(i)
+    def add_js_init_chunks (self, x):
+        self.js_init_chunks += Prelude._normalize (x)
     def add_js_chunks (self, x):
         self.js_chunks += Prelude._normalize (x)
     def add_css_chunks (self, x):
@@ -36,7 +50,7 @@ class Prelude:
 
     def inspect_string (self,msg):
         result =  'Prelude.inspect %s (%s) with '%(msg,self)
-        result += ",".join( [ "%s->%s"%(k,len(getattr(self,k))) for k in ['js_files','js_chunks','css_files','css_chunks'] ] )
+        result += ",".join( [ "%s->%s"%(k,len(getattr(self,k))) for k in Prelude.keys ] )
         return result
     def inspect (self,msg):
         print self.inspect_string(msg)
@@ -69,11 +83,11 @@ class Prelude:
         env={}
         env['js_urls'] = [ Prelude.full_url (js_file) for js_file in self.js_files ]
         env['css_urls'] = [ Prelude.full_url (css_file) for css_file in self.css_files ]
-        env['js_chunks']= self.js_chunks
+        env['all_js_chunks']= self.js_init_chunks + self.js_chunks
         env['css_chunks']=self.css_chunks
         if debug:
-            print "prelude has %d js_files, %d css files, %d js chunks and %d css_chunks"%\
-                (len(self.js_files),len(self.css_files),len(self.js_chunks),len(self.css_chunks),)
+            print "prelude has %d js_files, %d css files, (%d+%d) js chunks and %d css_chunks"%\
+                (len(self.js_files),len(self.css_files),len(self.js_init_chunks),len(self.js_chunks),len(self.css_chunks),)
         # render this with prelude.html and put the result in header_prelude
         header_prelude = render_to_string ('prelude.html',env)
         return { 'header_prelude' : header_prelude }

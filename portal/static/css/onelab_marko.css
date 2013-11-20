@@ -5,8 +5,8 @@
 /* GENERAL */
 
 .container {
-	padding: 0 !important;
-	color: #fff;
+    padding: 0 !important;
+    color: #fff;
     background: url(http://new.fit-equipex.fr/images/background.jpg) no-repeat;
     margin: 0;
     width: 100%;
@@ -165,16 +165,21 @@ h2.well.well-lg {
 
 
 
-
+/* if window enlarged wider than background picture */
+body {
+    background: black !important;
+}
 
 /* TOPMENU.CSS */
 
+/* Thierry : turning this off
 body {
-	/* background: #30196d !important; */
-	background: black !important;
+    *//* background: #30196d !important; *//*
+    background: black !important;
     padding-top: 60px;
     padding-bottom: 0px;
 }
+Thierry */
 
 /* Thierry : turning this off
 div.topmenu { 
@@ -283,9 +288,9 @@ div.dataTables_info {
 
 
 
-/* HAZELNUT */
+/* QUERYTABLE */
 
-div.Hazelnut table.dataTable th {
+div.QueryTable table.dataTable th {
     font: bold 12px/22px Ubuntu, Arial, sans-serif;
     color: #333 !important;
     border-right: 0px solid #333 !important;
@@ -299,18 +304,18 @@ div.Hazelnut table.dataTable th {
     background: url('../img/tablesort-header.jpg') no-repeat !important; 
 }
 
-div.Hazelnut table.dataTable td, div.Hazelnut table.dataTable textarea, div.Hazelnut table.dataTable input [type="text"] {
+div.QueryTable table.dataTable td, div.QueryTable table.dataTable textarea, div.QueryTable table.dataTable input [type="text"] {
     font: normal 12px Ubuntu, Arial, Helvetica, sans-serif;
     border-right: 0px solid #fff !important;
     border-bottom: 1px solid #fff !important;
 }
 
-div.Hazelnut table.dataTable thead { 
+div.QueryTable table.dataTable thead { 
     background: url('../img/tablesort-header.png') repeat-x !important;
     background-color: #caebea;
 }
 
-div.Hazelnut table.dataTable tfoot { 
+div.QueryTable table.dataTable tfoot { 
     background: url('../img/tablesort-header.png') repeat-x !important;
     /* background-color: # !important; */
 }
@@ -327,8 +332,11 @@ table.query-editor {
 }
 
 .query-editor-spacer,
-.plugin.ResourcesSelected,
-.plugin.Tabs {
+.plugin.QueryUpdater,
+/* Thierry : turning this off
+.plugin.Tabs 
+Thierry */
+{
     margin-top: 60px !important;
 }
 
@@ -414,8 +422,3 @@ table.query-editor td {
     padding-left: 0 !important;
 }   
 
-.simplelist {
-    font-size: 100%;
-    text-align: center !important;
-    margin: 0 auto;
-}

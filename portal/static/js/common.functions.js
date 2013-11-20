@@ -1,6 +1,3 @@
-/*
- * This file is included in tophat_render.php
- */
 // Escape special characters in jQuery Selector
 function escape_id( myid ) {
     return "#" + myid.replace( /(:|\.|\[|\])/g, "\\$1" );

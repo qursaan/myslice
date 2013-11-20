@@ -35,7 +35,7 @@ googlemap_debug_detailed=false;
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
             // TODO in destructor
-            // $(window).unbind('Hazelnut');
+            // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
@@ -104,8 +104,8 @@ googlemap_debug_detailed=false;
 	    // XXX BACKSLASHES original code was reading like this
 	    //return this.escape_id(key_value).replace(/\\/g, '');
 	    //  however this sequence removes backslashes from hrn's and as a result
-	    // resources_selected was getting all mixed up
-	    // hazelnut does publish hrn's with backslashes and that seems like the thing to do
+	    // queryupdater was getting all mixed up
+	    // querytable does publish hrn's with backslashes and that seems like the thing to do
 	    return key_value;
 	},	    
 
@@ -146,7 +146,11 @@ googlemap_debug_detailed=false;
 	// retrieve DOM checkbox and make sure it is checked/unchecked
         set_checkbox: function(record, checked) {
 	    var hrn=this.record_hrn (record);
-	    if (! hrn) { messages.warning ("googlemap.set_checkbox: record has no hrn"); return; }
+	    if (! hrn) { 
+		try {messages.warning ("googlemap.set_checkbox: record has no hrn -- hostname="+record.hostname); }
+		catch (err) {messages.warning ("googlemap.set_checkbox: record has no hrn"); }
+		return; 
+	    }
 	    var checkbox_s = this.by_hrn [ hrn ];
 	    if (! checkbox_s ) { messages.warning ("googlemap.set_checkbox: could not spot checkbox for hrn "+hrn); return; }
 	    checkbox_s.checkbox.prop('checked',checked);

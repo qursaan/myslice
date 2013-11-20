@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class Hazelnut (Plugin):
+class QueryTable (Plugin):
 
     # set checkboxes if a final column with checkboxes is desired
     # pass columns as the initial set of columns
@@ -37,16 +37,16 @@ class Hazelnut (Plugin):
         if self.checkboxes:
             # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
             if 'aoColumns' in self.datatables_options:
-                print 'WARNING: hazelnut uses aoColumnDefs, your aoColumns spec. is discarded'
+                print 'WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded'
                 del self.datatables_options['aoColumns']
             # set aoColumnDefs in datatables_options - might already have stuff in there
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])
             # here 'checkbox' is the class that we give to the <th> dom elem
-            # dom-checkbox is a sorting type that we define in hazelnut.js
+            # dom-checkbox is a sorting type that we define in querytable.js
             aoColumnDefs.append ( {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
 
     def template_file (self):
-        return "hazelnut.html"
+        return "querytable.html"
 
     def template_env (self, request):
         env={}
@@ -60,15 +60,15 @@ class Hazelnut (Plugin):
                            "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                            "js/manifold.js", "js/manifold-query.js", 
                            "js/unfold-helper.js",
-                          # hazelnut.js needs to be loaded after dataTables.js as it extends 
+                          # querytable.js needs to be loaded after dataTables.js as it extends 
                           # dataTableExt.afnSortData
-                           "js/hazelnut.js", 
+                           "js/querytable.js", 
                            ] ,
             'css_files': [ "css/dataTables.bootstrap.css",
                            # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
                            # for now we use full_numbers, with our own ad hoc css 
                            "css/dataTables.full_numbers.css",
-                           "css/hazelnut.css" , 
+                           "css/querytable.css" , 
                            ],
             }
         return reqs

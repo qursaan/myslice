@@ -161,12 +161,20 @@ def account_process(request):
 #                        private_key = k.as_pem()
 #                        private_key = ''.join(private_key.split())
 #                        public_key = "ssh-rsa " + public_key
-                        keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + '}'
+                        # now we overwrite the config field with keypair
+                        # once there will be user_hrn, we need to keep user_hrn and change only the keypair
+                        # see submit_name section for implementing this    
 #                       keypair = re.sub("\r", "", keypair)
 #                       keypair = re.sub("\n", "\\n", keypair)
 #                       #keypair = keypair.rstrip('\r\n')
 #                       keypair = ''.join(keypair.split())
                         # updating maniolf local:account table
+                        account_config = json.loads(account_detail['config'])
+                        # preserving user_hrn
+                        user_hrn = account_config.get('user_hrn','N/A')
+                        keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
+                        updated_config = json.dumps(account_config) 
+
                         user_params = { 'config': keypair, 'auth_type':'managed'}
                         manifold_update_account(request,user_params)
                         messages.success(request, 'Sucess: New Keypair Generated!')
@@ -186,7 +194,10 @@ def account_process(request):
                         file_extension = os.path.splitext(file_name)[1] 
                         allowed_extension =  ['.pub','.txt']
                         if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
-                            file_content = '{"user_public_key":"'+ file_content +'"}'
+                            account_config = json.loads(account_detail['config'])
+                            # preserving user_hrn
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            file_content = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
                             #file_content = re.sub("\r", "", file_content)
                             #file_content = re.sub("\n", "\\n",file_content)
                             file_content = ''.join(file_content.split())

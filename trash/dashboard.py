@@ -65,8 +65,8 @@ def dashboard_view (request):
     # variables that will get passed to the view-unfold2.html template
     template_env = {}
     
-    # define 'unfold2_main' to the template engine
-    template_env [ 'unfold2_main' ] = main_plugin.render(request)
+    # define 'unfold_main' to the template engine
+    template_env [ 'unfold_main' ] = main_plugin.render(request)
 
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view for a full request cycle'
@@ -87,7 +87,7 @@ def dashboard_view (request):
         query=slices_query,
         )
     # likewise but on the side view
-    template_env [ 'unfold2_margin' ] = related_plugin.render (request)
+    template_env [ 'unfold_margin' ] = related_plugin.render (request)
     
     # add our own css in the mix
     #page.add_css_files ( 'css/dashboard.css')

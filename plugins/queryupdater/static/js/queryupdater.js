@@ -1,5 +1,5 @@
 /**
- * MySlice ResourcesSelected plugin
+ * MySlice QueryUpdater plugin
  * Version: 0.1.0
  * URL: http://www.myslice.info
  * Description: display of selected resources
@@ -23,7 +23,7 @@
     // Record state through the query cycle
 
 
-    var ResourcesSelected = Plugin.extend({
+    var QueryUpdater = Plugin.extend({
 
         init: function(options, element)
         {
@@ -31,7 +31,7 @@
 
             var self = this;
             this.table = this.elmt('table').dataTable({
-// the original hazelnut layout was
+// the original querytable layout was
 //                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
 // however the bottom line with 'showing blabla...' and the navigation widget are not really helpful
                 sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t>",
@@ -80,12 +80,12 @@
 
         do_reset: function(e)
         {
-            throw 'resources_selected.do_reset Not implemented';
+            throw 'queryupdater.do_reset Not implemented';
         },
 
         do_clear_annotations: function(e)
         {
-            throw 'resources_selected.do_clear_annotations Not implemented';
+            throw 'queryupdater.do_clear_annotations Not implemented';
         },
         
         /************************** GUI MANIPULATION **************************/
@@ -178,7 +178,7 @@
                 button
             ];
             if (!row) {
-                // XXX second parameter refresh = false can improve performance. todo in hazelnut also
+                // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);
                 row = this.find_row(data.value);
             } else {
@@ -447,6 +447,6 @@
 
     });
 
-    $.plugin('ResourcesSelected', ResourcesSelected);
+    $.plugin('QueryUpdater', QueryUpdater);
 
 })(jQuery);

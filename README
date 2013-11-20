@@ -18,6 +18,7 @@ $ apt-get install python-django-south
 
 * edit myslice/config.py and enter the details of your manifold backend
 
+$ apt-get install python-django-south
 * init django
 $ ./manage.py syncdb
 $ ./manage.py migrate
@@ -45,7 +46,7 @@ $ make redo == make redo-static redo-templates
 
 
 * run a local server:
-$ manage.py runserver 0.0.0.0:8000
+$ ./manage.py runserver 0.0.0.0:8000
 -- or -- my advice:
 $ devel/server-loop.sh
 when you just need to hit ^C yourself when your static files need to be refreshed - see below

@@ -15,14 +15,9 @@ thead.simplelist>tr>th {
 tbody.simplelist i {
     padding-right: 8px;
 }
-/* make previous next buttons a bit nicer */
-div.paging_two_button>a { padding: 0px 4px 0px 4px; }
 
-/* ---------- */
-/* xxx this probably should be separated in something related to datatables */
-select { 
-    width: auto;
-}
-div.dataTables_filter input[type=text] {
-    width: 60;
+.simplelist {
+    font-size: 100%;
+    text-align: center !important;
+    margin: 0 auto;
 }

@@ -62,7 +62,7 @@ class PresViewView(FreeAccessView):
         context = super(PresViewView, self).get_context_data(**kwargs)
 
         #context['ALL_STATIC'] = "all_static"
-        context['unfold1_main'] = pres_view.render(self.request)
+        context['unfold_main'] = pres_view.render(self.request)
 
         # XXX This is repeated in all pages
         # more general variables expected in the template

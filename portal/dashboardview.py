@@ -1,7 +1,8 @@
 from manifold.core.query         import Query
 from unfold.page                 import Page
 
-from plugins.lists.simplelist    import SimpleList
+from plugins.lists.testbedlist   import TestbedList
+from plugins.lists.slicelist     import SliceList
 
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
@@ -22,32 +23,29 @@ class DashboardView (LoginRequiredAutoLogoutView):
 
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
-        auth_query  = Query().get('network').select('network_hrn','platform')
+        testbed_query  = Query().get('network').select('network_hrn','platform')
         # DEMO GEC18 Query only PLE
         slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
         page.enqueue_query(slice_query)
-        page.enqueue_query(auth_query)
+        page.enqueue_query(testbed_query)
 
         page.expose_js_metadata()
         page.expose_queries()
 
-        slicelist = SimpleList(
-            title = None,
+        slicelist = SliceList(
             page  = page,
-            key   = 'slice.slice_hrn',
+            title = "slices",
             query = slice_query,
         )
-        # XXX TODO: plugins/lists/static/js/simplelist.js => hardcoded keys that give links : slice_hrn & platform
-        authlist = SimpleList(
-            title = None,
+        testbedlist = TestbedList(
             page  = page,
-            key   = 'platform',
-            query = auth_query,
+            title = "testbeds",
+            query = testbed_query,
         )
  
         context = super(DashboardView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
-        context['networks'] = authlist.render(self.request) 
+        context['testbeds'] = testbedlist.render(self.request) 
         context['slices']   = slicelist.render(self.request)
 
         # XXX This is repeated in all pages
