@@ -1,5 +1,5 @@
 # Manifold API Python interface
-import xmlrpclib
+import copy, xmlrpclib
 
 from myslice.config import Config
 
@@ -71,7 +71,7 @@ class ManifoldAPI:
                 if debug:
                     print "====> ManifoldAPI.%s"%repr(),"url",self.url
                     # No password in the logs
-                    logAuth = self.auth
+                    logAuth = copy.copy(self.auth)
                     if 'AuthString' in logAuth:
                         logAuth['AuthString']="XXX"
                     print "=> auth",logAuth
