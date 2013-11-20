@@ -1,7 +1,7 @@
 var Senslab = {
   normalize: function(node) {
     var info;
-
+    
     if (node.component_name) { // wsn430-11.devlille.iot-lab.info
       info = node.component_name.split(".");
     } /*else if (node.hrn) { // iotlab.a8-11\.devgrenoble\.iot-lab\.info
@@ -106,11 +106,11 @@ Senslab.Map = function() {
           self.pointerDetectRay = self.projector.pickingRay(self.mouse2D.clone(), self.camera);
           var intersects = self.pointerDetectRay.intersectObjects(self.scene.children);
           if (intersects.length > 0) {
-            var node = intersects[0].object;
-            if (node.boot_state != "Suspected") {
-              setState(node, node.boot_state == "Alive" ? "Selected" : "Alive");
-              var $nodeInput = self.$nodeInputs[node.arch];
-              $nodeInput.val(factorize(self.getNodesId(node.arch)));
+            var particle = intersects[0].object;
+            if (particle.data.boot_state != "Suspected") {
+              setState(particle, particle.data.boot_state == "Alive" ? "Selected" : "Alive");
+              var $nodeInput = self.$nodeInputs[particle.data.arch];
+              $nodeInput.val(factorize(self.getNodesId(particle.data.arch)));
               self.update();
             }
           }
@@ -141,11 +141,11 @@ Senslab.Map = function() {
   }
   
   Map.prototype.getNodesId = function(arch) {
-    var allNodes = this.scene.children;
+    var particles = this.scene.children;
     var nodes = [];
-    for (var i = 0; i < allNodes.length; ++i) {
-      if (allNodes[i].arch == arch && allNodes[i].boot_state == "Selected") {
-        nodes.push(allNodes[i].id);
+    for (var i = 0; i < particles.length; ++i) {
+      if (particles[i].data && particles[i].data.arch == arch && particles[i].data.boot_state == "Selected") {
+        nodes.push(particles[i].id);
       }
     }
     return nodes;
@@ -161,10 +161,8 @@ Senslab.Map = function() {
     for(var i = 0; i < nodes.length; ++i) {
       var material = new THREE.ParticleCanvasMaterial({program: circle});
       var particle = new THREE.Particle(material);
+      particle.data = nodes[i];
       particle.id = parseInt(nodes[i].id);
-      particle.arch = nodes[i].arch;
-      particle.boot_state = nodes[i].boot_state;
-      particle.component_id = nodes[i].component_id;
       particle.position.x = (nodes[i].x - center.x) * 10;
       particle.position.y = (nodes[i].y - center.y) * 10;
       particle.position.z = (nodes[i].z - center.z) * 10;
@@ -176,22 +174,26 @@ Senslab.Map = function() {
   };
   
   Map.prototype.updateSelected = function(arch, selected) {
-    var nodes = this.scene.children;
-    for (var i = 0; i < nodes.length; ++i) {
-      if (nodes[i].arch == arch && nodes[i].boot_state != "Suspected") {
-        var node = nodes[i];
-        var state = $.inArray(node.id, selected) == -1 ? "Alive" : "Selected";
-        if (node.boot_state != state) {
-          setState(node, state);
+    var particles = this.scene.children;
+    for (var i = 0; i < particles.length; ++i) {
+      if (particles[i].data && particles[i].data.arch == arch && particles[i].data.boot_state != "Suspected") {
+        var particle = particles[i];
+        var state = $.inArray(particle.id, selected) == -1 ? "Alive" : "Selected";
+        if (particle.data.boot_state != state) {
+          setState(particle, state);
         }
       }
     }
   }
   
   Map.prototype.updatePosition = function() {
-    this.camera.position.x = this.distance * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+    this.camera.position.x = this.distance
+      * Math.sin(this.theta * Math.PI / 360)
+      * Math.cos(this.phi * Math.PI / 360);
     this.camera.position.y = this.distance * Math.sin(this.phi * Math.PI / 360);
-    this.camera.position.z = this.distance * Math.cos(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+    this.camera.position.z = this.distance
+      * Math.cos(this.theta * Math.PI / 360)
+      * Math.cos(this.phi * Math.PI / 360);
     this.camera.lookAt(this.scene.position);
     this.camera.updateMatrix();
   };
@@ -200,14 +202,15 @@ Senslab.Map = function() {
     this.renderer.render(this.scene, this.camera);
   };
 
-  function setState(node, state) {
-    node.boot_state = state;
-    setColor(node);
-    Senslab.notify(node);
+  function setState(particle, state) {
+    particle.data.boot_state = state;
+    setColor(particle);
+    Senslab.notify(particle.data);
   }
 
-  function setColor(node) {
-    node.material.color.setHex(colors[node.boot_state] || colors["Selected"]);
+  function setColor(particle) {
+    var color = colors[particle.data.boot_state] || colors["Selected"];
+    particle.material.color.setHex(color);
   }
 
   function getCenter(nodes) {
