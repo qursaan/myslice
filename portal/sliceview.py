@@ -145,7 +145,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # RESOURCES
         # the resources part is made of a Tabs (Geographic, List), 
 
-        resources_as_map = GoogleMap(
+        resources_as_gmap = GoogleMap(
             page       = page,
             title      = 'Geographic view',
             domid      = 'resources-map',
@@ -160,7 +160,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             zoom       = 4,
         )
 
-        resources_as_map = SensLabMap(
+        resources_as_3dmap = SensLabMap(
             page       = page,
             title      = '3D Map',
             domid      = 'senslabmap',
@@ -191,7 +191,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_map, resources_as_list_area ],
+                                sons=[ resources_as_gmap, 
+                                       resources_as_3dmap,
+                                       resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 )
         main_stack.insert (resources_area)
