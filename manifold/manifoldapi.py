@@ -63,7 +63,11 @@ class ManifoldAPI:
             try:
                 if debug:
                     print "====> ManifoldAPI.%s"%repr(),"url",self.url
-                    print "=> auth",self.auth
+                    # No password in the logs
+                    logAuth = self.auth
+                    if 'AuthString' in logAuth:
+                        logAuth['AuthString']="XXX"
+                    print "=> auth",logAuth
                     print "=> args",args,"kwds",kwds
                 annotations = {
                     'authentication': self.auth

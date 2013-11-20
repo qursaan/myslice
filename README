@@ -9,6 +9,8 @@ See the devel/ subdir for more devel-oriented doc.
 *  REQUIREMENTS  is to have python + django (1.5.2) installed django
 ** should be straightforward
 ** see devel/django-install.txt in case of trouble
+$ apt-get install python-django
+$ apt-get install python-django-south
 
 * git clone git://git.onelab.eu/myslice.git
 -- or --
