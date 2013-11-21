@@ -75,6 +75,7 @@ googlemap_debug_detailed=false;
             var myOptions = {
                 zoom: this.options.zoom,
                 center: center,
+		scrollwheel: false,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
 	    
