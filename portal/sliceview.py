@@ -30,6 +30,9 @@ tmp_default_slice='ple.upmc.myslicedemo'
 #do_query_users=True
 do_query_users=False
 
+insert_messages=False
+#insert_messages=True
+
 class SliceView (LoginRequiredAutoLogoutView):
 
     def get (self,request, slicename=tmp_default_slice):
@@ -317,19 +320,20 @@ class SliceView (LoginRequiredAutoLogoutView):
 #    
 #        # --------------------------------------------------------------------------
 #        # MESSAGES (we use transient=False for now)
-#        main_stack.insert(Messages(
-#            page   = page,
-#            title  = "Runtime messages for slice %s"%slicename,
-#            domid  = "msgs-pre",
-#            levels = "ALL",
-#            # plain messages are probably less nice for production but more reliable for development for now
-#            transient = False,
-#            # these make sense only in non-transient mode..
-#            togglable = True,
-#            toggled = 'persistent',
-#            outline_complete = True,
-#        ))
-#    
+        if insert_messages:
+            main_stack.insert(Messages(
+                    page   = page,
+                    title  = "Runtime messages for slice %s"%slicename,
+                    domid  = "msgs-pre",
+                    levels = "ALL",
+                    # plain messages are probably less nice for production but more reliable for development for now
+                    transient = False,
+                    # these make sense only in non-transient mode..
+                    togglable = True,
+                    toggled = 'persistent',
+                    outline_complete = True,
+                    ))
+    
     
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
