@@ -301,7 +301,7 @@ div.QueryTable table.dataTable th {
     text-align: left;
     padding: 8px 12px 4px 20px;
     vertical-align:middle;
-    background: url('../img/tablesort-header.jpg') no-repeat !important; 
+    background: url('../img/tablesort-header.png') no-repeat !important; 
 }
 
 div.QueryTable table.dataTable td, div.QueryTable table.dataTable textarea, div.QueryTable table.dataTable input [type="text"] {
