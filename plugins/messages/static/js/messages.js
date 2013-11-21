@@ -6,99 +6,70 @@
 
 ( function($) {
 
-    /* Method calling logic */
-    $.fn.Messages = function( method ) {
-	if ( methods[method] ) {
-	    return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-	} else if ( typeof method === 'object' || ! method ) {
-	    return methods.init.apply( this, arguments );
-	} else {
-	    $.error( 'Method ' +  method + ' does not exist on $.Messages' );
-	}    
-    };
+    var Messages = Plugin.extend ({
 
-    var methods = {
-        init : function( options ) {
+	init: function (options, element) {
+	    this._super (options, element);
+	    // subscribe to the various messages channels
+	    var self=this;
+	    for (level in options.levels)
+		(function (l) {
+		    $.subscribe("/messages/"+l, function (e, msg){ self.display_message (msg,l)});
+		})(level);
+	    // kind of patchy, notify the convenience functions that somebody is listening...
+	    try {messages.ready=true;}
+	    catch (err) { console.log("Could not set messages.ready");}
+	    // this happens very early - even before the document is loaded
+	    // so it won't show right away; no big deal though
+            $.publish ("/messages/info", 'Subscribed to all 5 message channels');
 
-            return this.each (function() {
-                var $this = $(this);
-		instance=new Messages (options,$this);
-		$this.data('Messages',instance);
-		for (level in options.levels) {
-		    (function (instance,level) {
-			$.subscribe("/messages/"+level, function (e, msg){ instance.display_message (msg,level)});
-		    }) (instance,level);
+	    this.initialize();
+	},
+
+	initialize: function () {
+	    var self=this;
+	    this.elmt().find("div.messages-buttons>input").each(
+		function (i,input) {
+		    self.init_button (input, self.options.levels);
+		    self.arm_button (input, self.toggle_handler);
 		}
-		// kind of patchy, notify the convenience functions that somebody is listening...
-		try {messages.ready=true;}
-		catch (err) { console.log("Could not set messages.ready");}
-		// this happens very early - even before the document is loaded
-		// so it won't show right away; no big deal though
-                $.publish ("/messages/info", 'Subscribed to all 5 message channels');
-            });
-        },
-        destroy : function( ) {
+	    );
+	},
+	
+	init_button: function (input,levels) {
+	    /* set initial 'checked' state for that input from global 'levels' above */
+	    var level=input.name;
+	    if (levels[level]) $(input).attr('checked','checked');
+	},
 
-            return this.each(function(){
-                var $this = $(this), instance = $this.data('Messages');
-                $(window).unbind('Messages');
-                instance.remove();
-                $this.removeData('Messages');
-            });
-        },
-/*
-    reposition : function( ) { // ... },
-    show : function( ) { // ... },
-    hide : function( ) { // ... },
-*/
-        update : function( content ) { },
-    };
-
-    function Messages (options,plugindiv) {
-	this.options=options;
-	this.plugindiv=plugindiv;
-	/* cannot use 'this' directly of course */
-	(function (instance) { $( function () {instance.initialize();}) }) (this);
-
-	this.is_active = function (level) { 
-	    return this.plugindiv.find("div.messages-buttons>input[name="+level+"]").attr('checked');
-	}
-	this.display_message = function (incoming, level) {
-	    var domid=this.plugindiv.attr('id');
+	arm_button: function (input,handler) {
+	    $(input).click (handler);
+	},
+	
+	is_active: function (level) { 
+	    return this.elmt().find("div.messages-buttons>input[name="+level+"]").attr('checked');
+	},
+	    
+	display_message: function (incoming, level) {
+	    var domid=this.elmt().attr('id');
 	    var html="";
 	    html += "<li class='" + level +"'"; 
 	    if ( ! this.is_active(level) ) html += " style='display:none'";
 	    html += ">";
+	    html += "<span class='messages-fixed'>";
+	    html += "<span class='messages-level'>" + level + "</span>";
 	    html += "<span class='messages-date'>";
+	    html += "</html>";
 	    d=new Date();
 	    html += d.getHours() + ":" +d.getMinutes() + ":" + d.getSeconds() + "--" + d.getMilliseconds();
 	    html += "</span>";
-	    html += "<span class='messages-level'>" + level + "</span>";
 	    //	html += "[" + domid + "]";
 	    html += " " + incoming + "</li>";
 	    $("ul#"+domid+".messages").append(html);
 	},
 
-	this.initialize = function () {
-	    var init_button=this.init_button;
-	    var levels=this.options.levels;
-	    this.plugindiv.find("div.messages-buttons>input").each(
-		function (i,input) {init_button (input, levels)});
-	    var arm_button=this.arm_button;
-	    var toggle_handler=this.toggle_handler;
-	    this.plugindiv.find("div.messages-buttons>input").each(
-		function (i,input) {arm_button (input,toggle_handler); });
-	},
-	this.init_button = function (input,levels) {
-	    /* set initial 'checked' state for that input from global 'levels' above */
-	    var level=input.name;
-	    if (levels[level]) $(input).attr('checked','checked');
-	},
-	this.arm_button = function (input,handler) {
-	    $(input).click (handler);
-	},
 	/* as an event handler toggle_handler will see the DOM <input> as 'this' */
-	this.toggle_handler = function (e) {
+	toggle_handler : function (e) {
 	    var $this=$(this);
 	    // toggle the state of the checkbox
 	    if ($this.attr('checked')) $this.removeAttr('checked');
@@ -106,12 +77,14 @@
 	    // turn messages on or off
 	    var level=this.name;
 	    var display = $this.attr('checked') ? "list-item" : "none";
-	    var plugindiv=$this.closest("div.Messages");
-	    plugindiv.find("li."+level).css("display",display);
-	}
+	    var elmt=$this.closest("div.Messages");
+	    elmt.find("li."+level).css("display",display);
+	},
+	
+    });
 
-    };
-    
+    $.plugin('Messages', Messages);
+
 })(jQuery);
 
 /* turn this on for an auto-test on startup
