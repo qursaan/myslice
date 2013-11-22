@@ -4,6 +4,8 @@ import os.path
 from manifold.manifoldresult import ManifoldResult
 from manifold.manifoldapi import ManifoldAPI
 
+from django.contrib                     import messages
+
 debug=False
 debug=True
 
@@ -17,7 +19,7 @@ class MetaData:
         self.auth=auth
         self.hash_by_object={}
 
-    def fetch (self):
+    def fetch (self, request):
         offline_filename="%s/../offline-metadata.json"%os.path.dirname(__file__)
         if work_offline:
             try:

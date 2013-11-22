@@ -130,7 +130,7 @@ class Page:
         metadata_auth = {'AuthMethod':'anonymous'}
 
         metadata=MetaData (metadata_auth)
-        metadata.fetch()
+        metadata.fetch(self.request)
         # store it for next time
         manifold['metadata']=metadata
         if debug: print "Page.get_metadata: return new value"

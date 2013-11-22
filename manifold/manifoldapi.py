@@ -70,6 +70,8 @@ class ManifoldAPI:
                 }
                 args += (annotations,)
                 result=getattr(self.server, methodName)(*args, **kwds)
+                print "%s%r" %(methodName, args)
+                
                 if debug:
                     print '<= result=',
                     self._print_result(result)
