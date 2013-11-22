@@ -153,6 +153,7 @@
 
         checkbox_html : function (key, value)
         {
+//	    if (debug) messages.debug("checkbox_html, value="+value);
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
@@ -161,10 +162,14 @@
             result += " name='" + key + "'";
             result += " type='checkbox'";
             result += " autocomplete='off'";
-            result += " value='" + value + "'";
+	    if (value === undefined) {
+		messages.warning("querytable.checkbox_html - undefined value");
+	    } else {
+		result += " value='" + value + "'";
+	    }
             result += "></input>";
             return result;
-        }, // checkbox
+        }, 
 
 
         new_record: function(record)
@@ -261,12 +266,18 @@
             }
 
 
+	    if (key_value === undefined) {
+		messages.warning("querytable.set_checkbox has no value to figure which line to tick");
+		return;
+	    }
             var checkbox_id = this.flat_id(this.id('checkbox', key_value));
             // function escape_id(myid) is defined in portal/static/js/common.functions.js
             checkbox_id = escape_id(checkbox_id);
-	        // using dataTables's $ to search also in nodes that are not currently displayed
+            // using dataTables's $ to search also in nodes that are not currently displayed
             var element = this.table.$(checkbox_id);
-	        if (debug) messages.debug("set_checkbox checked=" + checked + " id=" + checkbox_id + " matches=" + element.length);
+            if (debug) 
+                messages.debug("set_checkbox checked=" + checked
+                               + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
         },
 
@@ -351,7 +362,6 @@
         {
             if (this.received_all_query) {
         	// if the 'all' query has been dealt with already we may turn on the checkbox
-        	if (debug) messages.debug("turning on checkbox for record "+record[this.key]);
                 this.set_checkbox(record, true);
             } else {
         	// otherwise we need to remember that and do it later on
