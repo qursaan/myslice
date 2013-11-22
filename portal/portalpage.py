@@ -15,8 +15,8 @@ class PortalPage(Page):
     def render(self):
         template_env = {}
         
-        # define 'unfold1_main' to the template engine - the main contents
-        template_env [ 'unfold1_main' ] = "\n".join(self._content)
+        # define 'unfold_main' to the template engine - the main contents
+        template_env [ 'unfold_main' ] = "\n".join(self._content)
 
         # more general variables expected in the template
         template_env [ 'title' ] = 'Test view that combines various plugins'

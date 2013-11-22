@@ -22,9 +22,9 @@ class SensLabMap (Plugin):
         reqs = {
             'js_files' : [ "js/senslabmap.js",
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js",
-                           "js/three.js", "js/grenoble.js", "js/viewer3D.js",
-                           ] ,
-            'css_files': [ "css/senslabmap.css" ,
+                           "js/three.min.js", "js/jquery-mousewheel.min.js", "js/map.js",
+                           ],
+            'css_files': [ "css/map.css",
                            ],
             }
         return reqs

@@ -1,18 +1,30 @@
-<div class="senslabmap">
-  <div class="row" id="maps">
-    <div class="span8 offset2">
-      <div id="selectionbox">
-        Selected Nodes <input type="text" placeholder="1-10,24,25" id="nodebox" />
-        <button class="btn" id="btnSave" value="Save">Save</button>
-      </div>
-      <div id="div3d" oncontextmenu="return false;"></div>
-      <div id="infobox"></div>
-      <div style="text-align:right">
-        <div id="node_alive"></div> Alive -
-        <div id="node_down"></div> Down -
-        <div id="node_selected"></div> Selected -
-        <div id="node_used"></div> Busy
-      </div>
-    </div>
-  </div>
-</div>
+<div id="maps-container" oncontextmenu="return false;"></div>
+<script>
+$(function() {
+  $.getJSON("nodes.json", function(all_nodes) {
+    var sites = [], maps = {}, nodes = {};
+
+    $.each(all_nodes, function(i, node) {
+      Senslab.normalize(node);
+      var site = node.site;
+      if (site) {
+        if ($.inArray(site, sites) == -1) {
+          sites.push(site);
+          nodes[site] = [];
+        }
+        nodes[site].push(node);
+      } else {
+        console.warn("Node " + node + " has no site");
+      }
+    });
+
+    $container = $('#maps-container');
+
+    $.each(sites, function(i, site) {
+      var $div = $("<div />").appendTo($container);
+      maps[site] = new Senslab.Map($div);
+      maps[site].addNodes(nodes[site]);
+    });
+  });
+});
+</script>

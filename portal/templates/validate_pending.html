@@ -45,10 +45,10 @@
 </script>
 {% endblock %}
 
-{% block unfold1_main %}
-
+{% block unfold_main %}
+<div class="onelab-title well-lg">
 <h1>Pending requests</h1>
-
+</div>
 <hr/>
 <h2>My authorities</h2>
 
@@ -56,7 +56,8 @@
 
 {% for authority, requests in my_authorities.items %}
 <h3>{{authority}}</h3>
-    <table width=100% border=1>
+<div class="container">
+    <table width=100% border=1 style="color:white;">
       <th>
         <td>type</td>
         <td>id</td>
@@ -161,5 +162,6 @@
 {% endif %}
 
 <input type='button' id='portal__validate' value='Validate' onclick='on_click_event();'/>
-
+</div>
+<!-- End of the container div -->
 {% endblock %}

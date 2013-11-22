@@ -5,7 +5,7 @@ from unfold.loginrequired        import FreeAccessView
 from ui.topmenu                  import topmenu_items, the_user
 
 from plugins.googlemap           import GoogleMap
-from plugins.hazelnut            import Hazelnut
+from plugins.querytable          import QueryTable
 from plugins.lists.simplelist    import SimpleList
 from plugins.slicestat           import SliceStat
 
@@ -31,7 +31,7 @@ class ResourceView(FreeAccessView):
         page.expose_js_metadata()
         page.expose_queries()
 
-        resourcelist = Hazelnut(
+        resourcelist = QueryTable(
             page  = page,
             title = 'List',
             domid = 'checkboxes',

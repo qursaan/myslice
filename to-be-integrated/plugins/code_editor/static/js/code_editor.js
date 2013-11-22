@@ -78,13 +78,13 @@
 
             return this.each(function() {
                 var $this = $(this);
-                var hazelnut = $this.data('Manifold');
+                var querytable = $this.data('Manifold');
 
                 // Unbind all events using namespacing
                 $(window).unbind('Manifold');
 
                 // Remove associated data
-                hazelnut.remove();
+                querytable.remove();
                 $this.removeData('Manifold');
             });
         }, // destroy
@@ -93,16 +93,16 @@
             var $this=$(this);
             // xxx wtf. why [1] ? would expect 0...
             if (debug)
-                messages.debug("Hitting suspicious line in hazelnut.show");
+                messages.debug("Hitting suspicious line in querytable.show");
             var oTable = $($('.dataTable', $this)[1]).dataTable();
             oTable.fnAdjustColumnSizing()
 
             /* Refresh dataTabeles if click on the menu to display it : fix dataTables 1.9.x Bug */
             $(this).each(function(i,elt) {
                 if (jQuery(elt).hasClass('dataTables')) {
-                    var myDiv=jQuery('#hazelnut-' + this.id).parent();
+                    var myDiv=jQuery('#querytable-' + this.id).parent();
                     if(myDiv.height()==0) {
-                        var oTable=$('#hazelnut-' + this.id).dataTable();
+                        var oTable=$('#querytable-' + this.id).dataTable();
                         oTable.fnDraw();
                     }
                 }

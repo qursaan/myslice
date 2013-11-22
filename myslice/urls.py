@@ -59,7 +59,7 @@ urlpatterns = patterns(
     # Portal
     url(r'^sample/', include('sample.urls')),
     # Debug
-    url(r'^debug/', include('debug_platform.urls')),
+#    url(r'^debug/', include('debug_platform.urls')),
     #
     # various trash views - bound to go away 
     #

@@ -1,5 +1,5 @@
 # Manifold API Python interface
-import xmlrpclib
+import copy, xmlrpclib
 
 from myslice.config import Config
 
@@ -32,6 +32,12 @@ class ManifoldAPI:
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
 
+    def _print_value (self, value):
+        print "+++",'value',
+        if isinstance (value,list):     print "[%d]"%len(value),
+        elif isinstance (value,dict):   print "{%d}"%len(value),
+        print mytruncate (value,80)
+    
     # a one-liner to give a hint of what the return value looks like
     def _print_result (self, result):
         if not result:                        print "[no/empty result]"
@@ -41,7 +47,8 @@ class ManifoldAPI:
             print "result is a dict with %d keys : %s"%(len(result),result.keys())
             for (k,v) in result.iteritems(): 
                 if v is None: continue
-                print '+++',k,':',mytruncate (v,60)
+                if k=='value':  self._print_value(v)
+                else:           print '+++',k,':',mytruncate (v,30)
         else:                                 print "[dont know how to display result] %s"%result
 
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
@@ -63,7 +70,11 @@ class ManifoldAPI:
             try:
                 if debug:
                     print "====> ManifoldAPI.%s"%repr(),"url",self.url
-                    print "=> auth",self.auth
+                    # No password in the logs
+                    logAuth = copy.copy(self.auth)
+                    if 'AuthString' in logAuth:
+                        logAuth['AuthString']="XXX"
+                    print "=> auth",logAuth
                     print "=> args",args,"kwds",kwds
                 annotations = {
                     'authentication': self.auth

@@ -11,8 +11,8 @@ from ui.topmenu                      import topmenu_items, the_user
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
-from plugins.hazelnut                import Hazelnut 
-from plugins.resources_selected      import ResourcesSelected
+from plugins.querytable              import QueryTable 
+from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
 from plugins.querycode               import QueryCode
@@ -29,6 +29,9 @@ tmp_default_slice='ple.upmc.myslicedemo'
 # temporary : turn off the users part to speed things up
 #do_query_users=True
 do_query_users=False
+
+insert_messages=False
+#insert_messages=True
 
 class SliceView (LoginRequiredAutoLogoutView):
 
@@ -102,9 +105,9 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
     
         # --------------------------------------------------------------------------
-        # ResourcesSelected (Pending Operations)
+        # QueryUpdater (Pending Operations)
 
-        main_stack.insert(ResourcesSelected(
+        main_stack.insert(QueryUpdater(
             page                = page,
             title               = 'Pending operations',
             query               = main_query,
@@ -145,7 +148,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # RESOURCES
         # the resources part is made of a Tabs (Geographic, List), 
 
-        resources_as_map = GoogleMap(
+        resources_as_gmap = GoogleMap(
             page       = page,
             title      = 'Geographic view',
             domid      = 'resources-map',
@@ -160,7 +163,15 @@ class SliceView (LoginRequiredAutoLogoutView):
             zoom       = 4,
         )
 
-        resources_as_list = Hazelnut( 
+        resources_as_3dmap = SensLabMap(
+            page       = page,
+            title      = '3D Map',
+            domid      = 'senslabmap',
+            query      = sq_resource,
+            query_all  = query_resource_all,
+        )
+
+        resources_as_list = QueryTable( 
             page       = page,
             domid      = 'resources-list',
             title      = 'List view',
@@ -175,7 +186,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-       # with the new 'Filter' stuff on top, no need for anything but the hazelnut
+       # with the new 'Filter' stuff on top, no need for anything but the querytable
         resources_as_list_area = resources_as_list 
 
         resources_area = Tabs ( page=page, 
@@ -183,7 +194,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_map, resources_as_list_area ],
+                                sons=[ resources_as_gmap, 
+                                       resources_as_3dmap,
+                                       resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 )
         main_stack.insert (resources_area)
@@ -202,7 +215,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 )
             main_stack.insert(tab_users)
     
-            tab_users.insert(Hazelnut( 
+            tab_users.insert(QueryTable( 
                 page        = page,
                 title       = 'Users List',
                 domid       = 'users-list',
@@ -287,7 +300,7 @@ class SliceView (LoginRequiredAutoLogoutView):
 #        )
 #        main_stack.insert(tab_measurements)
 #    
-#        tab_measurements.insert(Hazelnut( 
+#        tab_measurements.insert(QueryTable( 
 #            page        = page,
 #            title       = 'Measurements',
 #            domid       = 'measurements-list',
@@ -307,25 +320,26 @@ class SliceView (LoginRequiredAutoLogoutView):
 #    
 #        # --------------------------------------------------------------------------
 #        # MESSAGES (we use transient=False for now)
-#        main_stack.insert(Messages(
-#            page   = page,
-#            title  = "Runtime messages for slice %s"%slicename,
-#            domid  = "msgs-pre",
-#            levels = "ALL",
-#            # plain messages are probably less nice for production but more reliable for development for now
-#            transient = False,
-#            # these make sense only in non-transient mode..
-#            togglable = True,
-#            toggled = 'persistent',
-#            outline_complete = True,
-#        ))
-#    
+        if insert_messages:
+            main_stack.insert(Messages(
+                    page   = page,
+                    title  = "Runtime messages for slice %s"%slicename,
+                    domid  = "msgs-pre",
+                    levels = "ALL",
+                    # plain messages are probably less nice for production but more reliable for development for now
+                    transient = False,
+                    # these make sense only in non-transient mode..
+                    togglable = True,
+                    toggled = 'persistent',
+                    outline_complete = True,
+                    ))
+    
     
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
-        # define 'unfold1_main' to the template engine - the main contents
-        template_env [ 'unfold1_main' ] = main_stack.render(request)
+        # define 'unfold_main' to the template engine - the main contents
+        template_env [ 'unfold_main' ] = main_stack.render(request)
     
         # more general variables expected in the template
         template_env [ 'title' ] = '%(slicename)s'%locals()

@@ -33,8 +33,7 @@ class Page:
         # queue of queries with maybe a domid, see enqueue_query
         self._queue=[]
         # global prelude object
-#        self.prelude=Prelude(css_files=['css/plugin.css','css/onelab_marko.css',])
-        self.prelude=Prelude()
+        self.prelude=Prelude(css_files=['css/plugin.css','css/onelab_marko.css',])
 
     # record known plugins hashed on their domid
     def record_plugin (self, plugin):
@@ -81,36 +80,13 @@ class Page:
             result={'query_uuid':a}
             if b: result['domid']=b
             return result
-        env['query_publish_dom_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
+        env['query_exec_tuples'] = [ query_publish_dom_tuple (a,b) for (a,b) in self._queue ]
         javascript = render_to_string ("page-queries.js",env)
         self.add_js_chunks (javascript)
 #        self.reset_queue()
         # unconditionnally expose MANIFOLD_URL, this is small and manifold.js uses that for various messages
         self.expose_js_manifold_config()
 
-
-# DEPRECATED #    # needs to be called explicitly and only when metadata is actually required
-# DEPRECATED #    # in particular user needs to be logged
-# DEPRECATED #    def get_metadata (self):
-# DEPRECATED #        # look in session's cache - we don't want to retrieve this for every request
-# DEPRECATED #        session=self.request.session
-# DEPRECATED #        if 'manifold' not in session:
-# DEPRECATED #            print "Page.expose_js_metadata: no 'manifold' in session... - cannot retrieve metadata - skipping"
-# DEPRECATED #            return
-# DEPRECATED #        manifold=session['manifold']
-# DEPRECATED #        # if cached, use it
-# DEPRECATED #        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
-# DEPRECATED #            if debug: print "Page.get_metadata: return cached value"
-# DEPRECATED #            return manifold['metadata']
-# DEPRECATED #        # otherwise retrieve it
-# DEPRECATED #        manifold_api_session_auth = session['manifold']['auth']
-# DEPRECATED #        print "get_metadata(), manifold_api_session_auth =", session['manifold']['auth']
-# DEPRECATED #        metadata=MetaData (manifold_api_session_auth)
-# DEPRECATED #        metadata.fetch()
-# DEPRECATED #        # store it for next time
-# DEPRECATED #        manifold['metadata']=metadata
-# DEPRECATED #        if debug: print "Page.get_metadata: return new value"
-# DEPRECATED #        return metadata
 
     # needs to be called explicitly and only when metadata is actually required
     # in particular user needs to be logged
@@ -137,12 +113,13 @@ class Page:
         return metadata
             
     def expose_js_metadata (self):
-        # export in this js global...
-        self.add_js_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
+        # expose global MANIFOLD_METADATA as a js variable
+        # xxx this is fetched synchroneously..
+        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
 
     def expose_js_manifold_config (self):
         config=Config()
-        self.add_js_chunks(config.manifold_js_export())
+        self.add_js_init_chunks(config.manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above
@@ -150,6 +127,8 @@ class Page:
     def add_js_files (self):pass
     @to_prelude
     def add_css_files (self):pass
+    @to_prelude
+    def add_js_init_chunks (self):pass
     @to_prelude
     def add_js_chunks (self):pass
     @to_prelude
