@@ -6,7 +6,7 @@ class Scheduler(Plugin):
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
     # latitude,longitude, zoom : the starting point
-    def __init__ (self, query, query_all = None, **settings):
+    def __init__ (self, query, query_lease = None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
         self.query_lease = query_lease

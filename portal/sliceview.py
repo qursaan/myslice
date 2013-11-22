@@ -192,7 +192,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             title       = 'Scheduler',
             domid       = 'scheduler',
             query       = sq_resource,
-            query_lease = query_lease,
+            query_lease = sq_lease,
         )
 
        # with the new 'Filter' stuff on top, no need for anything but the querytable

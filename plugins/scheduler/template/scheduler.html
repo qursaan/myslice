@@ -1,8 +1,3 @@
-define('DEFAULT_LEASES_OFFSET', 0);
-define('DEFAULT_LEASES_SLOTS', 36);
-define('DEFAULT_LEASES_W', 180);
-define('DEFAULT_LEASES_GRANULARITY', 3600);
-
 <div id="{{domid}}--scheduler" class='plugin scrollx scrolly'>
 <!--
 <p>
@@ -31,7 +26,7 @@ define('DEFAULT_LEASES_GRANULARITY', 3600);
 </div>
 -->
 
-  <p>Date: <input type='text' id='datepicker' value='".date('Y-m-d')."' /></p>
+  <p>Date: <input type='text' id='datepicker' value='2013-01-01' /></p>
     
   <p>Search: <input type='text' id='search' name='search' /></p>
   <!-- <div id='date_refresh'>Submit</div> -->
@@ -41,7 +36,7 @@ define('DEFAULT_LEASES_GRANULARITY', 3600);
   <table id='leases_data' class='hidden'></table>
 
 <!-- The general layout for the scheduler -->
-  <div id='leases_area-$uuid'></div>
+  <div id='{{domid}}__leases_area'></div>
 <!--
 <div id='leases_area'></div>
 

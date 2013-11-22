@@ -48,8 +48,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             this._super(options, element);
 
             /* Member variables */
-            this.options = options;
-            this.canvas_id = 'leases_area-' + options.plugin_uuid;
+            this.canvas_id = this.id('leases_area');
 
             this.query_uuid = options.query_uuid;
             this.rows = null;
@@ -139,13 +138,13 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
              * Implement an action of filtering while typing
              * filter what correspond to the user choice
              * 
-             */
             $(function() {
                 var availableTags = ['omf','nitos','ple', s.nodelabel];
             $( "#search" ).autocomplete({
               source: availableTags
                 });
             });
+             */
 
             this.init_axisx('');
             this.draw();
@@ -198,20 +197,23 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             });
 
             this.draw(this.canvas_id);
-        }
+        },
 
-        this.set_leases = function(leases) {
+        set_leases: function(leases) 
+        {
             this.initial_leases=leases;
             this.draw(this.canvas_id);
-        }
+        },
 
-        this.update_resources = function(resources) {
+        update_resources: function(resources) 
+        {
             //
-        }
+        },
 
-        this.update_leases = function(leases) {
+        update_leases: function(leases)
+        {
             //
-        }
+        },
 
         /* RECORD HANDLERS */
 
@@ -315,7 +317,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                     paper.path(half_daymarker_path).attr({'translation':left+','+top}).attr(attr_daymarker);
                 }
                 left += this.options.leases_w;
-            },
+            }
 
             ////////// the row with the timeslot buttons (the one labeled 'All nodes')
             this.granularity= this.min_granularity; // XXX axisx[1][0]-axisx[0][0];
@@ -327,14 +329,14 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             var allnodes = paper.text (o.x_nodelabel-o.x_sep,top+o.y_node/2,"All nodes").attr(txt_allnodes)
                 .attr ({"font-size":o.y_node, "text-anchor":"end","baseline":"bottom"});
             allnodes.scheduler=this;
-            allnodes.click(allnodes_methods.click);
+            allnodes.click(this.allnodes_methods.click);
             
             // timeslot buttons [it's the triangles above the slots]
             for (var i=0, len=axisx.length; i < len; ++i) {
                 var timebutton=paper.path(this.timebutton_path).attr({'translation':left+','+top}).attr(attr_timebutton);
                 timebutton.from_time=axisx[i][0];
                 timebutton.scheduler=this;
-                timebutton.click(timebutton_methods.click);
+                timebutton.click(this.timebutton_methods.click);
                 left+=(this.options.leases_w);
             }
             
@@ -355,9 +357,9 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                 var nodelabel = paper.text(o.x_nodelabel-o.x_sep,top+o.y_node/3,nodename).attr(txt_nodelabel)
                 .attr ({"font-size":"12px", "text-anchor":"end","baseline":"bottom"});    
                 //console.log(nodelabel);
-                nodelabel_methods.selected(nodelabel,1);
+                this.nodelabel_methods.selected(nodelabel,1);
                 //nodelabel_methods.selected( this, ! this.selected );
-                nodelabel.click(nodelabel_methods.click); //click action works here
+                nodelabel.click(this.nodelabel_methods.click); //click action works here
                 //timebutton.click(timebutton_methods.click);
                 
                // lease_methods.init_free(nodelabel.click, lease_methods.click_mine);
@@ -473,7 +475,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                 /* if at least one is not selected : select all */
                 var new_state = (unselected >0) ? 1 : 0;
                 for (var i=0, len=scheduler.nodelabels.length; i<len; ++i) 
-                    nodelabel_methods.selected(scheduler.nodelabels[i],new_state);
+                    this.nodelabel_methods.selected(scheduler.nodelabels[i],new_state);
             }
         },
 
