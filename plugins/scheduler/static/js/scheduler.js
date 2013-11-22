@@ -47,7 +47,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
         {
             this._super(options, element);
 
-                /* Member variables */
+            /* Member variables */
             this.options = options;
             this.canvas_id = 'leases_area-' + options.plugin_uuid;
 
@@ -79,8 +79,8 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             /* XXX Keys */
 
             /* Listening to queries */
-            this.listen_query(options.resource_query_uuid);
-            this.listen_query(options.lease_query_uuid);
+            this.listen_query(options.query_uuid);
+            this.listen_query(options.query_lease_uuid);
 
             /* XXX GUI setup and event binding */
             jQuery("#datepicker").datetimepicker({

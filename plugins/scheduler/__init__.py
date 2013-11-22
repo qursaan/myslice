@@ -9,8 +9,8 @@ class Scheduler(Plugin):
     def __init__ (self, query, query_all = None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
-        self.query_all = query_all
-        self.query_all_uuid = query_all.query_uuid if query_all else None
+        self.query_lease = query_lease
+        self.query_lease_uuid = query_lease.query_uuid if query_lease else None
 
     def template_file (self):
         return "scheduler.html"
@@ -37,4 +37,4 @@ class Scheduler(Plugin):
 
     # the list of things passed to the js plugin
     def json_settings_list (self): 
-        return ['plugin_uuid','query_uuid', 'query_all_uuid', ]
+        return ['plugin_uuid','query_uuid', 'query_lease_uuid', ]

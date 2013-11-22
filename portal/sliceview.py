@@ -15,6 +15,7 @@ from plugins.querytable              import QueryTable
 from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
+from plugins.scheduler               import Scheduler
 from plugins.querycode               import QueryCode
 from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
@@ -186,6 +187,14 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
+        resources_as_scheduler = Scheduler(
+            page        = page,
+            title       = 'Scheduler',
+            domid       = 'scheduler',
+            query       = sq_resource,
+            query_lease = query_lease,
+        )
+
        # with the new 'Filter' stuff on top, no need for anything but the querytable
         resources_as_list_area = resources_as_list 
 
@@ -196,6 +205,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 outline_complete=True,
                                 sons=[ resources_as_gmap, 
                                        resources_as_3dmap,
+                                       resources_as_scheduler,
                                        resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 )
