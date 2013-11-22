@@ -1,0 +1,54 @@
+define('DEFAULT_LEASES_OFFSET', 0);
+define('DEFAULT_LEASES_SLOTS', 36);
+define('DEFAULT_LEASES_W', 180);
+define('DEFAULT_LEASES_GRANULARITY', 3600);
+
+<div id="{{domid}}--scheduler" class='plugin scrollx scrolly'>
+<!--
+<p>
+  You have attached one or more reservable nodes to your slice.  Reservable nodes
+  show up with the '' mark. Your slivers will be available only during timeslots
+  where you have obtained leases. You can manage your leases in the tab
+  below.
+</p>
+
+<p>
+  <font color='red'>
+    This is a dummy scheduler for demonstration purposes only, adapted from the
+    MyPLC one. Do not expect it to be working.
+  </font>
+</p>
+-->
+
+<!--
+<div class='center' id='leases_settings'>
+  <label id='leases_offset_label' class='leases_label'>start, in hours from now</label>
+  <input type='text' class='leases_input' id='leases_offset_input' value='$leases_offset' />
+  <label id='leases_slots_label' class='leases_label'># of timeslots</label>
+  <input type='text' class='leases_input' id='leases_slots_input' value='$leases_slots' />
+  <label id='leases_w_label' class='leases_label'>slot width, in pixels</label>
+  <input type='text' class='leases_input' id='leases_w_input' value='$leases_w' />
+</div>
+-->
+
+  <p>Date: <input type='text' id='datepicker' value='".date('Y-m-d')."' /></p>
+    
+  <p>Search: <input type='text' id='search' name='search' /></p>
+  <!-- <div id='date_refresh'>Submit</div> -->
+    
+  <!-- Leases_data is the name used by Scheduler.js to locate this place first
+       population will be triggered by init_scheduler from Scheduler.js -->
+  <table id='leases_data' class='hidden'></table>
+
+<!-- The general layout for the scheduler -->
+  <div id='leases_area-$uuid'></div>
+<!--
+<div id='leases_area'></div>
+
+<div id='leases_buttons'>
+    <button id='leases_refresh' type='submit'>Refresh (Pull)</button>
+    <button id='leases_submit' type='submit'>Submit (Push)</button>
+</div>
+-->
+
+</div>

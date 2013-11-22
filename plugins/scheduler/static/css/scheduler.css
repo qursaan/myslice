@@ -1,0 +1,141 @@
+/*
+ $Id: toggle.css 12435 2009-03-11 15:07:00Z thierry $
+ */
+
+/* this class is used to store data that needs to get passed to javascript code */
+/* these elements are not meant to be rendered */
+.hidden {
+    display: none;
+}
+.center {
+    text-align: center;
+}
+
+.scrollx {
+	overflow-x:scroll;
+        height: 340px;
+}
+.scrolly {
+overflow-y : scroll;
+}
+/* space around various messages */
+div.my-slice-renewal {
+    margin: 30px;
+}
+
+/* toggles for the nodes sections */
+div#toggle-container-my-slice-persons-current,
+div#toggle-container-my-slice-nodes-current {
+    background: #f0f0f0;
+}
+
+div#toggle-container-my-slice-persons-add,
+div#toggle-container-my-slice-nodes-add {
+    background: #f0e0e0;
+}
+
+/* the scheduler area */
+div#toggle-container-my-slice-nodes-reserve {
+    background: #def;
+}
+
+/* where the graphics go */
+div#leases_area {
+  /* padding: 10px 25px; */
+}
+
+/* don't display the scheduler data table - not quite sure this works */
+table#leases_data {
+    display: none;
+}
+
+/* the various controls for the scheduler */
+/* upper section, with selection mode */
+#leases_modes { padding: 10px; text-align: center; color: #333; }
+
+#leases_buttons { padding: 0px 10px 10px 10px; }
+#leases_refresh { position: relative; left: 30%;}
+#leases_submit { position: relative; left: 60%; }
+        
+
+/* column configuation style */
+
+div#toggle-container-my-slice-nodes-configuration {
+    background: #f8f8f8;
+}
+
+OPTION.out{background-color:white; color:black}
+OPTION.in{background-color:#CAE8EA; color:#4f6b72}
+
+div.out{background-color:white; color:black}
+div.in{background-color:#CAE8EA; color:#4f6b72}
+div.selected{background-color:gray; color:black}
+div.invisible{display:none}
+
+div.toggle-info {
+ 	padding: 10px 20px;
+ 	background-color: #cae8ea;
+	margin: 10px 10px;
+
+}
+
+div#scrolldiv {
+	border : solid 2px grey; 
+	padding:4px; 
+	width:300px; 
+	height:180px; 
+	overflow:auto;
+}
+
+th,td.top {
+	vertical-align: top;
+	text-align: left;
+	padding:10px;
+}
+
+td.smallright {
+	text-align: right;
+	width:20px;
+}
+
+table.center {
+	margin-left:auto; 
+	margin-right:auto;
+}
+
+table.columnlist {
+	width:280px;
+}
+
+td.header {
+	background-color: #CAE8EA;
+	text-align: center;
+	width:30px;
+}
+
+span.header {
+	font-weight: bold;
+	color: #3399CC;
+}
+
+a.source-url{
+        font-weight: bold;
+}
+
+span.gray{
+        color: #555555;
+}
+
+span.short {
+	height:10px;
+}
+
+span.column-title {
+        font-size: 12px;
+        font-weight: bold;
+}
+
+span.column-detail {
+        font-size: 11px; 
+        font-style: italic;
+}
