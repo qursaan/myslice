@@ -28,7 +28,7 @@ install:
 	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
 	    --install-data=$(DESTDIR)/$(datadir)/unfold
 
-#################### third-party layout is managed as art of collectstatic
+#################### third-party layout is managed as part of collectstatic
 static: force
 	./manage.py collectstatic --noinput
 
