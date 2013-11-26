@@ -15,10 +15,10 @@ packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/_
 setup(packages = packages,
       scripts = [ 'apache/unfold-init-ssl.sh' ],
       data_files = [ 
-        ( 'static/js', glob ('static/js/*')),
-        ( 'static/css', glob ('static/css/*')),
-        ( 'static/img', glob ('static/img/*')),
-        ( 'static/fonts', glob ('static/fonts/*')),
-        ( 'templates', glob ('templates/*')),
+        ( '/usr/share/unfold/static/js', glob ('static/js/*')),
+        ( '/usr/share/unfold/static/css', glob ('static/css/*')),
+        ( '/usr/share/unfold/static/img', glob ('static/img/*')),
+        ( '/usr/share/unfold/static/fonts', glob ('static/fonts/*')),
+        ( '/usr/share/unfold/templates', glob ('templates/*')),
         ( 'apache', [ 'apache/myslice.conf' ]),
         ])

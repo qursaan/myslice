@@ -59,7 +59,7 @@ debian.source: force
 	rsync -a $(RPMTARBALL) $(DEBTARBALL)
 
 debian.package:
-	debuild -uc -us -b 
+	debuild --set-envvar PREFIX=/usr -uc -us -b
 
 debian.clean:
 	$(MAKE) -f debian/rules clean
