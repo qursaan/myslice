@@ -164,16 +164,13 @@ class SliceView (LoginRequiredAutoLogoutView):
             zoom       = 4,
         )
 
-# because (senslab)map.css changes stuff for *all* canvas elements
-# it destroys the googlemap behaviour
-# turning this off for now until Anthony can fix that
-#        resources_as_3dmap = SensLabMap(
-#            page       = page,
-#            title      = '3D Map',
-#            domid      = 'senslabmap',
-#            query      = sq_resource,
-#            query_all  = query_resource_all,
-#        )
+        resources_as_3dmap = SensLabMap(
+            page       = page,
+            title      = '3D Map',
+            domid      = 'senslabmap',
+            query      = sq_resource,
+            query_all  = query_resource_all,
+        )
 
         resources_as_list = QueryTable( 
             page       = page,
@@ -199,8 +196,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 title="Resources",
                                 outline_complete=True,
                                 sons=[ resources_as_gmap, 
-# see above
-#                                       resources_as_3dmap,
+                                       resources_as_3dmap,
                                        resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 )

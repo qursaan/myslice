@@ -33,6 +33,10 @@ var Senslab = {
     
     $menu.find("li").eq(0).addClass("active");
     $maps.find("div").eq(0).addClass("active");
+
+    if (!sites.length) {
+      $container.text("No nodes to display.");
+    }
   }
 };
 
