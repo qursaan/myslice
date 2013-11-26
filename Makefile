@@ -127,7 +127,7 @@ RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 #################### minimal convenience for pushing work-in-progress in an apache-based depl.
 # xxx until we come up with a packaging this is going to be a wild guess
 # on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
-INSTALLED_MAIN		=/usr/share/unfold
+INSTALLED_MAIN		=/usr/share/pyshared
 # this is for a debian box
 INSTALLED_APACHE	=/etc/apache2/sites-available/
 
@@ -149,7 +149,7 @@ ifeq (,$(MYSLICEBOX))
 	@exit 1
 else
 	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
-	+$(RSYNC) ./apache/init-ssl.sh ./apache/init-ssl.py $(SSHURL)/$(bindir)/
+	+$(RSYNC) ./apache/unfold-init-ssl.py $(SSHURL)/$(bindir)/
 endif
 
 restart:
