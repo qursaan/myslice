@@ -15,7 +15,7 @@ from manifold.manifoldapi       import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser
-from portal.actions             import authority_get_pi_emails 
+from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account
 
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
@@ -117,6 +117,7 @@ class RegistrationView (FreeAccessView):
             #b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
             #                email=reg_email, password=request.POST['password'], keypair=keypair)
             #b.save()
+            #saving to django db 'portal_pendinguser' table
             if not errors:
                 b = PendingUser(
                     first_name    = reg_fname, 
@@ -129,7 +130,10 @@ class RegistrationView (FreeAccessView):
                     keypair       = keypair,
                 )
                 b.save()
-
+                #saving to manifold
+                config = '{"firstname":'+ reg_fname + ', "lastname":'+ reg_lname + ', "authority":"'+ reg_auth + '"}'
+                user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
+                manifold_add_user(request,user_params) 
                 # Send email
                 ctx = {
                     'first_name'    : reg_fname, 
