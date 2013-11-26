@@ -1,13 +1,15 @@
-from manifold.core.query         import Query
-from unfold.page                 import Page
+from manifold.core.query        import Query
+from unfold.page                import Page
 
-from unfold.loginrequired        import FreeAccessView
-from ui.topmenu                  import topmenu_items, the_user
+from unfold.loginrequired       import FreeAccessView
+from ui.topmenu                 import topmenu_items, the_user
 
-from plugins.googlemap           import GoogleMap
-from plugins.querytable          import QueryTable
-from plugins.lists.simplelist    import SimpleList
-from plugins.slicestat           import SliceStat
+from plugins.googlemap          import GoogleMap
+from plugins.querytable         import QueryTable
+from plugins.lists.simplelist   import SimpleList
+from plugins.slicestat          import SliceStat
+
+from myslice.config             import Config
 
 # View for 1 platform and its details
 class ResourceView(FreeAccessView):
@@ -52,6 +54,7 @@ class ResourceView(FreeAccessView):
             togglable  = True,
             query      = resource_query,
             query_all  = resource_query,
+            googlemap_api_key = Config().googlemap_api_key(),
             checkboxes = False,
             # center on Paris
             #latitude   = 49.,

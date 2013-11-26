@@ -156,6 +156,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             togglable  = False,
             query      = sq_resource,
             query_all  = query_resource_all,
+            googlemap_api_key = Config().googlemap_api_key(),
             checkboxes = True,
             # center on Paris
             latitude   = 49.,
