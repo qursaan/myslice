@@ -116,7 +116,7 @@ SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc'
 LOCAL_RSYNC_EXCLUDES	+= --exclude '*.sqlite3' --exclude myslice.ini
 LOCAL_RSYNC_EXCLUDES	+= --exclude static --exclude templates --exclude build
-LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party --exclude 'offline*'
+LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party 
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
@@ -149,7 +149,7 @@ ifeq (,$(MYSLICEBOX))
 	@exit 1
 else
 	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
-	+$(RSYNC) ./apache/unfold-init-ssl.py $(SSHURL)/$(bindir)/
+	+$(RSYNC) ./apache/unfold-init-ssl.sh $(SSHURL)/$(bindir)/
 endif
 
 restart:
