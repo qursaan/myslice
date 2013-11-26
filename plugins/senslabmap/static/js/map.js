@@ -11,7 +11,7 @@ var Senslab = {
 
     if (info && info[2] == "iot-lab" && info[3] == "info") {
       node.arch = info[0].split("-")[0];
-      node.id = info[0].split("-")[1];
+      node.id = parseInt(info[0].split("-")[1]);
       node.site = info[1];
       node.normalized = true;
     }
@@ -21,11 +21,22 @@ var Senslab = {
   },
   createMaps: function($container, sites, nodes) {
     var maps = {};
+    var $menu = $("<ul id='sites-tabs' class='nav nav-tabs' data-tabs='sites-tabs'/>").appendTo($container);
+    var $maps = $("<div id='maps' class='tab-content' />").appendTo($container);
+    
     $.each(sites, function(i, site) {
-      var $div = $("<div />").appendTo($container);
-      maps[site] = new Senslab.Map($div);
+      var entry = $("<li><a href='#" + site + "' data-toggle='tab'>" + site + "</a></li>").appendTo($menu);
+      var $tab = $("<div class='tab-pane' id='" + site + "' />").appendTo($maps);
+      maps[site] = new Senslab.Map($tab);
       maps[site].addNodes(nodes[site]);
     });
+    
+    $menu.find("li").eq(0).addClass("active");
+    $maps.find("div").eq(0).addClass("active");
+
+    if (!sites.length) {
+      $container.text("No nodes to display.");
+    }
   }
 };
 

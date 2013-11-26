@@ -63,6 +63,6 @@ urlpatterns = patterns(
     #
     # various trash views - bound to go away 
     #
-    url(r'^trash/', include('trash.urls')),
+#    url(r'^trash/', include('trash.urls')),
 
 )

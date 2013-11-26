@@ -22,7 +22,7 @@
     },
     
     on_all_new_record: function(node) {
-      Senslab.normalize(node, this.key);
+      Senslab.normalize(node);
       if (node.normalized) {
         var site = node.site;
         if ($.inArray(site, this.sites) == -1) {

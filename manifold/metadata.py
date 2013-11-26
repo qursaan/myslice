@@ -9,10 +9,6 @@ from django.contrib                     import messages
 debug=False
 debug=True
 
-# turn this on if you want to work offline
-work_offline=False
-#work_offline=True
-
 class MetaData:
 
     def __init__ (self, auth):
@@ -20,14 +16,6 @@ class MetaData:
         self.hash_by_object={}
 
     def fetch (self, request):
-        offline_filename="%s/../offline-metadata.json"%os.path.dirname(__file__)
-        if work_offline:
-            try:
-                with file(offline_metadata) as f:
-                    self.hash_by_object=json.loads(f.read())
-                return
-            except:
-                print "metadata.work_offline: failed to decode %s"%offline_filename
         manifold_api = ManifoldAPI(self.auth)
         fields = ['table', 'column.name', 'column.qualifier', 'column.type', 
                   'column.is_array', 'column.description', 'column.default', 'key', 'capability']
@@ -59,10 +47,6 @@ class MetaData:
 #            print "Failed to retrieve metadata",rows_result.error()
 #            rows=[]
         self.hash_by_object = dict ( [ (row['table'], row) for row in rows ] )
-        # save for next time we use offline mode
-        if debug and rows:
-            with file(offline_filename,'w') as f:
-                f.write(json.dumps(self.hash_by_object))
 
     def to_json(self):
         return json.dumps(self.hash_by_object)
