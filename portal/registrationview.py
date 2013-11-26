@@ -37,13 +37,13 @@ class RegistrationView (FreeAccessView):
         #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
         #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
         #if onelab_enabled:
-        if True:
-            print "ONELAB ENABLED"
-            authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
-        else:
-            print "FIREXP ENABLED"
+        #if True:
+        #    print "ONELAB ENABLED"
+        #    authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
+        #else:
+        #    print "FIREXP ENABLED"
 
-        authorities = execute_admin_query(request, authorities_query)
+        #authorities = execute_admin_query(request, authorities_query)
         # xxx tocheck - if authorities is empty, it's no use anyway
         # (users won't be able to validate the form anyway)
 
@@ -94,6 +94,7 @@ class RegistrationView (FreeAccessView):
 #                public_key = "ssh-rsa " + public_key
                 # Saving to DB
                 keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
+                auth_type = 'managed'
                 #keypair = re.sub("\r", "", keypair)
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')
@@ -109,6 +110,7 @@ class RegistrationView (FreeAccessView):
                     keypair = re.sub("\r", "", keypair)
                     keypair = re.sub("\n", "\\n",keypair)
                     keypair = ''.join(keypair.split())
+                    auth_type = 'user'
                     # for sending email
                     public_key = file_content
                 else:
@@ -152,7 +154,20 @@ class RegistrationView (FreeAccessView):
                 msg = render_to_string('user_request_email.txt', ctx)
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
 
-                return render(request, 'user_register_complete.html')
+                #return render(request, 'user_register_complete.html')
+            
+            #creating local:account in manifold
+            user_query  = Query().get('local:user').select('user_id','email')
+            user_details = execute_admin_query(self.request, user_query)
+            
+            for user_detail in user_details:
+                if user_detail['email']==reg_email:
+                    user_id = user_detail['user_id']
+                    #print "test"
+                    #print user_id
+            user_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': keypair}    
+            manifold_add_account(request,user_params)
+            return render(request, 'user_register_complete.html') 
 
         template_env = {
           'topmenu_items': topmenu_items('Register', request),
@@ -163,7 +178,7 @@ class RegistrationView (FreeAccessView):
           'authority_hrn': request.POST.get('authority_hrn', ''),
           'email': request.POST.get('email', ''),
           'password': request.POST.get('password', ''),           
-          'authorities': authorities,
+          #'authorities': authorities,
           }
         template_env.update(page.prelude_env ())
         return render(request, 'registration_view.html',template_env)

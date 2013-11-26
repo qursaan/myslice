@@ -1,6 +1,6 @@
 from django.http                 import HttpResponse
 from manifold.core.query         import Query
-from manifold.manifoldapi        import execute_query
+from manifold.manifoldapi        import execute_query,execute_admin_query
 from portal.models               import PendingUser, PendingSlice
 import json
 
@@ -54,7 +54,7 @@ def sfa_add_slice(request, slice_params):
 def manifold_add_user(request, user_params):
     # user_params: email, password e.g., user_params = {'email':'aa@aa.com','password':'demo'}
     query = Query.create('local:user').set(user_params).select('email')
-    results = execute_query(request, query)
+    results = execute_admin_query(request, query)
     if not results:
         raise Exception, "Failed creating manifold user: %s" % user_params['email']
     result, = results
@@ -73,11 +73,11 @@ def manifold_update_user(request, user_params):
 
 def manifold_add_account(request, account_params):
     query = Query.create('local:account').set(account_params).select(['user', 'platform'])
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     if not results:
         raise Exception, "Failed creating manifold account on platform %s for user: %s" % (account_params['platform'], account_params['user'])
     result, = results
-    return (result['user'], result['platform'])
+    return result['user_id']
 
 def manifold_update_account(request,account_params):
     # account_params: config
