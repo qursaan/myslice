@@ -33,6 +33,8 @@ class Config(object):
         parser.set ('manifold', 'url', Config.default_manifold_url)
         parser.set ('manifold', 'admin_user', Config.default_manifold_admin_user)
         parser.set ('manifold', 'admin_password', Config.default_manifold_admin_password)
+        parser.add_section('googlemap')
+        parser.set ('googlemap','api_key', None)
         parser.read (os.path.join(ROOT,'myslice/myslice.ini'))
         self.config_parser=parser
 
@@ -42,6 +44,9 @@ class Config(object):
     def manifold_admin_user_password(self):
         return (self.config_parser.get('manifold','admin_user'),
                 self.config_parser.get('manifold','admin_password'))
+
+    def googlemap_api_key (self):
+        return self.config_parser.get('googlemap','api_key')
 
     # exporting these details to js
     def manifold_js_export (self):

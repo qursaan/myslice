@@ -13,6 +13,7 @@ from distutils.core import setup
 packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/__init__.py")) ]
 
 setup(packages = packages,
+      # xxx somehow this does not seem to show up in debian packaging
       scripts = [ 'apache/unfold-init-ssl.sh' ],
       data_files = [ 
         ( '/usr/share/unfold/static/js', glob ('static/js/*')),

@@ -1,10 +1,6 @@
 import os
 import sys
 
-path = '/usr/share/unfold'
-if path not in sys.path:
-    sys.path.append(path)
-
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myslice.settings'
 
 import django.core.handlers.wsgi

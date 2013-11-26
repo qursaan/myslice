@@ -1,7 +1,5 @@
 # any local dbfile
 *.sqlite3
-# here is a mode to 'record' the backend answers and replay them offline
-offline-*
 # the usual useless crap
 TAGS
 *.pyc

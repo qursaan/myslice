@@ -72,8 +72,8 @@ class ManifoldAPI:
                     print "====> ManifoldAPI.%s"%repr(),"url",self.url
                     # No password in the logs
                     logAuth = copy.copy(self.auth)
-                    if 'AuthString' in logAuth:
-                        logAuth['AuthString']="XXX"
+                    for obfuscate in ['Authring','session']: 
+                        if obfuscate in logAuth:  logAuth[obfuscate]="XXX"
                     print "=> auth",logAuth
                     print "=> args",args,"kwds",kwds
                 annotations = {
