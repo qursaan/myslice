@@ -34,12 +34,12 @@ class HomeView (FreeAccessView):
         # . or None if the backend could be reached but the authentication failed
         auth_result = authenticate(token=token)
         # use one or two columns for the layout - not logged in users will see the login prompt
-        env['layout_1_or_2']="layout-unfold2.html" if not username else "layout-unfold1.html"
         # high-level errors, like connection refused or the like
         if isinstance (auth_result, ManifoldResult):
             manifoldresult = auth_result
             # let's use ManifoldResult.__repr__
             env['state']="%s"%manifoldresult
+            env['layout_1_or_2']="layout-unfold2.html"
             return render_to_response('home-view.html',env, context_instance=RequestContext(request))
         # user was authenticated at the backend
         elif auth_result is not None:
@@ -50,10 +50,12 @@ class HomeView (FreeAccessView):
                 return HttpResponseRedirect ('/login-ok')
             else:
                 env['state'] = "Your account is not active, please contact the site admin."
+                env['layout_1_or_2']="layout-unfold2.html"
                 return render_to_response('home-view.html',env, context_instance=RequestContext(request))
         # otherwise
         else:
             env['state'] = "Your username and/or password were incorrect."
+            env['layout_1_or_2']="layout-unfold2.html"
             return render_to_response('home-view.html',env, context_instance=RequestContext(request))
 
     # login-ok sets state="Welcome to MySlice" in urls.py

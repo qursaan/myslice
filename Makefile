@@ -28,7 +28,7 @@ install:
 	    --install-scripts=$(DESTDIR)/$(datadir)/unfold \
 	    --install-data=$(DESTDIR)/$(datadir)/unfold
 
-#################### third-party layout is managed as art of collectstatic
+#################### third-party layout is managed as part of collectstatic
 static: force
 	./manage.py collectstatic --noinput
 
@@ -59,7 +59,7 @@ debian.source: force
 	rsync -a $(RPMTARBALL) $(DEBTARBALL)
 
 debian.package:
-	debuild -uc -us -b 
+	debuild --set-envvar PREFIX=/usr -uc -us -b
 
 debian.clean:
 	$(MAKE) -f debian/rules clean
@@ -116,7 +116,7 @@ SSHCOMMAND:=ssh root@$(MYSLICEBOX)
 LOCAL_RSYNC_EXCLUDES	:= --exclude '*.pyc'
 LOCAL_RSYNC_EXCLUDES	+= --exclude '*.sqlite3' --exclude myslice.ini
 LOCAL_RSYNC_EXCLUDES	+= --exclude static --exclude templates --exclude build
-LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party --exclude 'offline*'
+LOCAL_RSYNC_EXCLUDES	+= --exclude to-be-integrated --exclude third-party 
 # usual excludes
 RSYNC_EXCLUDES		:= --exclude .git --exclude '*~' --exclude TAGS --exclude .DS_Store $(LOCAL_RSYNC_EXCLUDES) 
 # make -n will propagate as rsync -n 
@@ -127,7 +127,7 @@ RSYNC			:= rsync -a -v $(RSYNC_COND_DRY_RUN) $(RSYNC_EXCLUDES)
 #################### minimal convenience for pushing work-in-progress in an apache-based depl.
 # xxx until we come up with a packaging this is going to be a wild guess
 # on debian04 I have stuff in /usr/share/myslice and a symlink in /root/myslice
-INSTALLED_MAIN		=/usr/share/unfold
+INSTALLED_MAIN		=/usr/share/pyshared
 # this is for a debian box
 INSTALLED_APACHE	=/etc/apache2/sites-available/
 
@@ -149,7 +149,7 @@ ifeq (,$(MYSLICEBOX))
 	@exit 1
 else
 	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
-	+$(RSYNC) ./apache/init-ssl.sh ./apache/init-ssl.py $(SSHURL)/$(bindir)/
+	+$(RSYNC) ./apache/unfold-init-ssl.sh $(SSHURL)/$(bindir)/
 endif
 
 restart:

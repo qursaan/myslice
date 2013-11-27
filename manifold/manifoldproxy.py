@@ -25,14 +25,6 @@ debug_spin=0
 debug_empty=False
 #debug_empty=True
 
-# Historically we had a feature for developing without an Internet connection
-# However this won't work anymore as the python layer itself does manifold calls
-# before javascript has a chance to do so.
-# Might still come in handy if you want the fastest possible (locally cached) feedback
-# beware that this is very rough though...
-work_offline=False
-#work_offline=True
-
 # this view is what the javascript talks to when it sends a query
 # see also
 # myslice/urls.py
@@ -59,7 +51,6 @@ with the query passed using POST"""
         manifold_query = Query()
         #manifold_query = ManifoldQuery()
         manifold_query.fill_from_POST(request.POST)
-        offline_filename="%s/../offline-%s-%s.json"%(os.path.dirname(__file__),manifold_query.action,manifold_query.object)
         # retrieve session for request
 
         # We allow some requests to use the ADMIN user account
@@ -74,19 +65,6 @@ with the query passed using POST"""
             json_answer=json.dumps({'code':0,'value':[]})
             print "By-passing : debug_empty & 'get' request : returning a fake empty list"
             return HttpResponse (json_answer, mimetype="application/json")
-        ### patch : return the latest one..
-        if work_offline:
-            # if that won't work then we'll try to update anyways
-            try:
-                with (file(offline_filename,"r")) as f:
-                    json_answer=f.read()
-                print "By-passing : using contents from %s"%offline_filename
-                return HttpResponse (json_answer, mimetype="application/json")
-            except:
-                import traceback
-                traceback.print_exc()
-                print "Could not run in offline mode, PROCEEDING"
-                pass
                 
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
@@ -102,10 +80,6 @@ with the query passed using POST"""
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)
-        # if in debug mode we save this so we can use offline mode later
-        if debug:
-            with (file(offline_filename,"w")) as f:
-                f.write(json_answer)
 
         # this is an artificial delay added for debugging purposes only
         if debug_spin>0:

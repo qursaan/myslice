@@ -1,12 +1,12 @@
+usr/lib*/python*/dist-packages/auth
+usr/lib*/python*/dist-packages/insert_above
+usr/lib*/python*/dist-packages/manifold
+usr/lib*/python*/dist-packages/plugins
+usr/lib*/python*/dist-packages/unfold
+usr/lib*/python*/dist-packages/ui
+usr/lib*/python*/dist-packages/myslice
+usr/lib*/python*/dist-packages/sample
 usr/share/unfold/static
 usr/share/unfold/templates
-usr/share/unfold/auth
-usr/share/unfold/insert_above
-usr/share/unfold/manifold
-usr/share/unfold/plugins
-usr/share/unfold/unfold
-usr/share/unfold/ui
-usr/share/unfold/myslice
-usr/share/unfold/sample
 manage.py usr/share/unfold/
 apache/myslice.conf /etc/apache2/sites-available

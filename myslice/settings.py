@@ -14,13 +14,22 @@ try:
     # move one step up
     ROOT=os.path.realpath(ROOT+'/..')
 except:
+    # something is badly wrong here
     ROOT=None
-    if DEBUG:
-        import traceback
-        traceback.print_exc()
+    import traceback
+    traceback.print_exc()
 
-if not ROOT:
-    raise Exception,"Cannot find ROOT for myslice"
+# find out DATAROOT, which is different from ROOT 
+# when deployed from a package
+# this code is run by collectstatic too, so we cannot
+# assume we have ./static present already
+DATAROOT="/usr/share/unfold"
+# if not there, then we assume it's from a devel tree
+if not os.path.isdir (os.path.join(DATAROOT,"static")):
+    DATAROOT=ROOT
+
+if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for myslice"%ROOT
+if not os.path.isdir(DATAROOT): raise Exception,"Cannot find DATAROOT %s for myslice"%DATAROOT
 
 ####################
 ADMINS = (
@@ -40,7 +49,7 @@ EMAIL_USE_TLS = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(ROOT,'myslice.sqlite3'), # Or path to database file if using sqlite3.
+        'NAME': os.path.join(DATAROOT,'myslice.sqlite3'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -84,7 +93,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(ROOT,'static')
+STATIC_ROOT = os.path.join(DATAROOT,'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -154,7 +163,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT,"templates"),
+    os.path.join(DATAROOT,"templates"),
 )
 
 INSTALLED_APPS = (
@@ -183,7 +192,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'portal',
     # temporary - not packaged
-    'trash',
+    # 'trash',
     'sample',
 # DEPRECATED #    'django.contrib.formtools',
 # DEPRECATED ##    'crispy_forms',

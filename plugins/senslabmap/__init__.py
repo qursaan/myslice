@@ -24,7 +24,7 @@ class SensLabMap (Plugin):
                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js",
                            "js/three.min.js", "js/jquery-mousewheel.min.js", "js/map.js",
                            ],
-            'css_files': [ "css/map.css",
+            'css_files': [ "css/senslabmap.css",
                            ],
             }
         return reqs
