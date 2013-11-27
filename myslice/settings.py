@@ -14,20 +14,22 @@ try:
     # move one step up
     ROOT=os.path.realpath(ROOT+'/..')
 except:
+    # something is badly wrong here
     ROOT=None
-    if DEBUG:
-        import traceback
-        traceback.print_exc()
+    import traceback
+    traceback.print_exc()
 
-if os.path.isdir(os.path.join(ROOT,"static")):
+# find out DATAROOT, which is different from ROOT 
+# when deployed from a package
+# this code is run by collectstatic too, so we cannot
+# assume we have ./static present already
+DATAROOT="/usr/share/unfold"
+# if not there, then we assume it's from a devel tree
+if not os.path.isdir (os.path.join(DATAROOT,"static")):
     DATAROOT=ROOT
-else:
-    DATAROOT="/usr/share/unfold"
-    if not os.path.isdir(os.path.join(DATAROOT,"static")):
-        DATAROOT=None
 
-if not ROOT: raise Exception,"Cannot find ROOT for myslice"
-if not DATAROOT: raise Exception,"Cannot find DATAROOT for myslice"
+if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for myslice"%ROOT
+if not os.path.isdir(DATAROOT): raise Exception,"Cannot find DATAROOT %s for myslice"%DATAROOT
 
 ####################
 ADMINS = (
