@@ -48,7 +48,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             this._super(options, element);
 
             /* Member variables */
-            this.canvas_id = this.id('leases_area');
+            this._canvas_id = this.id('leases_area');
 
             this.query_uuid = options.query_uuid;
             this.rows = null;
@@ -56,13 +56,17 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             //this.current_resources = Array();
             //this.current_leases = Array();
 
+            /* Managing asynchronous reception of resources and leases */
+            this._tmp_resources = Array();
+            this.listLeases    = Array();
+            this._received_resources = false;
+            this._received_leases    = false;
+
             this.myLeases = Array();
             this.allLeases = Array();
 
-            this.listLeases = Array();
-
             this.axisx = Array();
-            this.axisy = Array();
+            this.resources = Array();
             this.data = Array();
             this.default_granularity = 1800; /* 30 min */
             this.initial_timestamp = null;
@@ -79,7 +83,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
             /* Listening to queries */
             this.listen_query(options.query_uuid);
-            this.listen_query(options.query_lease_uuid);
+            this.listen_query(options.query_lease_uuid, 'lease');
 
             /* XXX GUI setup and event binding */
             jQuery("#datepicker").datetimepicker({
@@ -179,43 +183,54 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
         /* TEMPLATES */
 
-        /* QUERY HANDLERS */
+        /*************************** RECORD HANDLER ***************************/
 
-        set_resources: function(resources) 
+        /* ------------------------------------------------------------------
+         * Resources
+         * ------------------------------------------------------------------ */
+
+        on_new_record: function(record)
         {
-            //console.log(resources);
-            var scheduler = this;
-            jQuery.each(resources, function(i, resource) {
-                // ... add reservable ones to the x axis
-                if ((typeof resource.exclusive != 'undefined') && (resource.exclusive)) {
-                    scheduler.axisy.push(Array(resource.urn, resource.resource_hrn, resource.type));
-                }
-                // ... if we do not have information about slivers (first update), update it
-                if (typeof resource.sliver != 'undefined') {
-                    // XXX
-                }
-            });
-
-            this.draw(this.canvas_id);
+            if ((typeof record.exclusive != 'undefined') && (record.exclusive)) {
+                this.resources.push(Array(record.urn, record.record_hrn, record.type));
+            }
+            // ... if we do not have information about slivers (first update), update it
+            if (typeof record.sliver != 'undefined') {
+                // XXX
+            }
         },
 
-        set_leases: function(leases) 
-        {
-            this.initial_leases=leases;
-            this.draw(this.canvas_id);
+        on_query_in_progress: function() {
+            this.spin();
         },
 
-        update_resources: function(resources) 
+        on_query_done: function() {
+            /* We have received all leases */
+            if (this._received_resources) {
+                this.draw(this._canvas_id);
+                this.unspin();
+            }
+            this._received_leases = true;
+        },
+        /* ------------------------------------------------------------------
+         * Leases
+         * ------------------------------------------------------------------ */
+        
+        on_lease_new_record: function(record)
         {
-            //
+            this.listLeases.push(record);
+            // this.initial_leases=leases;
         },
 
-        update_leases: function(leases)
+        on_lease_query_done: function(record)
         {
-            //
+            /* We have received all resources */
+            if (this._received_leases) {
+                this.draw(this._canvas_id);
+                this.unspin();
+            }
+            this._received_resources = true;
         },
-
-        /* RECORD HANDLERS */
 
         /* INTERNAL FUNCTIONS */
 
@@ -256,13 +271,13 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
          */
         draw: function() 
         { 
-            var canvas_id = this.canvas_id;
+            var canvas_id = this._canvas_id;
             var o = this.options;
             var total_width = o.x_nodelabel + this.nb_grains() * this.options.leases_w;
             var total_height = 2 * o.y_header /* the timelabels */
                              + 2 * o.y_sep    /* extra space */
-                             + o.y_node	  /* all-nodes & timebuttons row */ 
-                             + (this.axisy.length)*(o.y_node+o.y_sep);  /* the regular nodes and preceding space */
+                             + o.y_node          /* all-nodes & timebuttons row */ 
+                             + (this.resources.length)*(o.y_node+o.y_sep);  /* the regular nodes and preceding space */
 
             /* reuse for paper if exists with same size, or (re-)create otherwise */
             var paper;
@@ -272,7 +287,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                 paper=this.paper;
                 paper.clear();
             } else {
-                $$("#"+canvas_id)[0].innerHTML="";
+                $("#"+canvas_id)[0].innerHTML="";
                 paper = Raphael (canvas_id, total_width+o.x_sep, total_height);
             }
             this.paper=paper;
@@ -281,7 +296,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             this.timebutton_path = "M1,0L"+(this.options.leases_w-1)+",0L"+(this.options.leases_w/2)+","+o.y_header+"L1,0";
 
             var axisx = this.axisx;
-            var axisy = this.axisy;
+            var axisy = this.resources;
 
             /* maintain the list of nodelabels for the 'all nodes' button */
             this.nodelabels=[];
@@ -455,7 +470,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                 var lease=this.leases[i];
                 if (lease.current != lease.initial) {
                 if (lease.initial == 'free') lease_methods.init_free(lease,lease_methods.click_mine);
-                else			     lease_methods.init_mine(lease,lease_methods.click_free);
+                else                             lease_methods.init_mine(lease,lease_methods.click_free);
                 }
             }
         },

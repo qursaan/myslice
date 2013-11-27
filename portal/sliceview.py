@@ -60,7 +60,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'slice_hrn',
                 'resource.hrn', 'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
-                #'lease.urn',
+                'lease.urn',
                 'user.user_hrn',
                 #'application.measurement_point.counter'
         )
@@ -203,9 +203,10 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ resources_as_gmap, 
-                                       resources_as_3dmap,
+                                sons=[ 
                                        resources_as_scheduler,
+                                       #resources_as_gmap, 
+                                       #resources_as_3dmap,
                                        resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 )
