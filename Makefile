@@ -148,7 +148,7 @@ ifeq (,$(MYSLICEBOX))
 	@echo "  $(MAKE) MYSLICEBOX=debian04.pl.sophia.inria.fr "$@""
 	@exit 1
 else
-	+$(RSYNC) ./apache/myslice.conf $(SSHURL)/$(INSTALLED_APACHE)/
+	+$(RSYNC) ./apache/unfold.conf $(SSHURL)/$(INSTALLED_APACHE)/
 	+$(RSYNC) ./apache/unfold-init-ssl.sh $(SSHURL)/$(bindir)/
 endif
 

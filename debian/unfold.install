@@ -8,5 +8,7 @@ usr/lib*/python*/dist-packages/myslice
 usr/lib*/python*/dist-packages/sample
 usr/share/unfold/static
 usr/share/unfold/templates
+apache/unfold.wsgi /usr/share/unfold/apache/
+apache/unfold.conf /etc/apache2/sites-available
 manage.py usr/share/unfold/
-apache/myslice.conf /etc/apache2/sites-available
+usr/bin/unfold-init-ssl.sh

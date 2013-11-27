@@ -1,10 +1,11 @@
 #!/bin/bash
 # if this requires a service to be running, add something like this
 # update-rc.d unfold defaults
+[ -d /var/unfold ] || mkdir /var/unfold
+chown -R www-data.www-data /var/unfold
 /usr/share/unfold/manage.py syncdb
 /usr/share/unfold/manage.py migrate
-chmod 777 /usr/share/unfold/myslice.sqlite3
-chmod 777 /usr/share/unfold
+chmod 700 /var/unfold/unfold.sqlite3
 a2dissite default
-a2ensite myslice.conf
+a2ensite unfold.conf
 service apache2 restart
