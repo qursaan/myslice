@@ -250,27 +250,27 @@
             /* Default: checked = true */
             if (checked === undefined) checked = true;
 
-            var key_value;
+            var id;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
-                case TYPE_VALUE:
-                    key_value = record;
-                    break;
-                case TYPE_RECORD:
-                    /* XXX Test the key before ? */
-                    key_value = record[this.key];
-                    break;
-                default:
-                    throw "Not implemented";
-                    break;
+            case TYPE_VALUE:
+                id = record;
+                break;
+            case TYPE_RECORD:
+                /* XXX Test the key before ? */
+                id = record[this.key];
+                break;
+            default:
+                throw "Not implemented";
+                break;
             }
 
 
-	    if (key_value === undefined) {
-		messages.warning("querytable.set_checkbox has no value to figure which line to tick");
+	    if (id === undefined) {
+		messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
 		return;
 	    }
-            var checkbox_id = this.flat_id(this.id('checkbox', key_value));
+            var checkbox_id = this.flat_id(this.id('checkbox', id));
             // function escape_id(myid) is defined in portal/static/js/common.functions.js
             checkbox_id = escape_id(checkbox_id);
             // using dataTables's $ to search also in nodes that are not currently displayed
