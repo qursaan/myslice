@@ -44,6 +44,15 @@
             var keys = manifold.metadata.get_key(this.method);
             this.key = (keys && keys.length == 1) ? keys[0] : null;
 
+	    // xxx temporary hack
+	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
+	    // the code tries to access record[this.key] the records only have
+	    // keys=type,hrn,network_hrn,hostname
+	    // so for now we force using hrn instead
+	    // as soon as record have their primary key set this line can be removed
+	    // see also same hack in googlemap
+	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
+
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');

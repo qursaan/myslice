@@ -44,6 +44,15 @@ googlemap_debug_detailed=false;
 	    // 
             this.key = (keys && keys.length == 1) ? keys[0] : null;
 
+	    // xxx temporary hack
+	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
+	    // the code tries to access record[this.key] the records only have
+	    // keys=type,hrn,network_hrn,hostname
+	    // so for now we force using hrn instead
+	    // as soon as record have their primary key set this line can be removed
+	    // see also same hack in querytable
+	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
+
             //// Setup query and record handlers 
 	    // this query is the one about the slice itself 
 	    // event related to this query will trigger callbacks like on_new_record
