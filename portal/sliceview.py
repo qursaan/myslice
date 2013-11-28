@@ -193,6 +193,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             title       = 'Scheduler',
             domid       = 'scheduler',
             query       = sq_resource,
+            query_all_resources = query_resource_all,
             query_lease = sq_lease,
         )
 

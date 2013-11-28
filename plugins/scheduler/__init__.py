@@ -6,9 +6,11 @@ class Scheduler(Plugin):
     # pass columns as the initial set of columns
     #   if None then this is taken from the query's fields
     # latitude,longitude, zoom : the starting point
-    def __init__ (self, query, query_lease = None, **settings):
+    def __init__ (self, query, query_all_resources, query_lease = None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
+        self.query_all_resources = query_all_resources
+        self.query_all_resources_uuid = query_all_resources.query_uuid
         self.query_lease = query_lease
         self.query_lease_uuid = query_lease.query_uuid if query_lease else None
 
@@ -37,4 +39,4 @@ class Scheduler(Plugin):
 
     # the list of things passed to the js plugin
     def json_settings_list (self): 
-        return ['plugin_uuid','query_uuid', 'query_lease_uuid', ]
+        return ['plugin_uuid','query_uuid', 'query_lease_uuid', 'query_all_resources_uuid']
