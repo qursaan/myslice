@@ -243,16 +243,16 @@ googlemap_debug_detailed=false;
         on_field_state_changed: function(data) {
             if (googlemap_debug_detailed) messages.debug("on_field_state_changed");            
             switch(data.request) {
-            case FIELD_REQUEST_ADD:
-            case FIELD_REQUEST_ADD_RESET:
-                this.set_checkbox(data.value, true);
-                break;
-            case FIELD_REQUEST_REMOVE:
-            case FIELD_REQUEST_REMOVE_RESET:
-                this.set_checkbox(data.value, false);
-                break;
-            default:
-                break;
+                case FIELD_REQUEST_ADD:
+                case FIELD_REQUEST_ADD_RESET:
+                    this.set_checkbox(data.value, true);
+                    break;
+                case FIELD_REQUEST_REMOVE:
+                case FIELD_REQUEST_REMOVE_RESET:
+                    this.set_checkbox(data.value, false);
+                    break;
+                default:
+                    break;
             }
         },
 

@@ -799,11 +799,15 @@ var manifold = {
 
                 switch(value.request) {
                     case FIELD_REQUEST_CHANGE:
+                        if (update_query.params[value.key] === undefined)
+                            update_query.params[value.key] = Array();
                         update_query.params[value.key] = value.value;
                         break;
                     case FIELD_REQUEST_ADD:
                         if ($.inArray(value.value, update_query_orig.params[value.key]) != -1)
                             value.request = FIELD_REQUEST_ADD_RESET;
+                        if (update_query.params[value.key] === undefined)
+                            update_query.params[value.key] = Array();
                         update_query.params[value.key].push(value.value);
                         break;
                     case FIELD_REQUEST_REMOVE:
@@ -812,6 +816,8 @@ var manifold = {
 
                         var arr = update_query.params[value.key];
                         arr = $.grep(arr, function(x) { return x != value.value; });
+                        if (update_query.params[value.key] === undefined)
+                            update_query.params[value.key] = Array();
                         update_query.params[value.key] = arr;
 
                         break;

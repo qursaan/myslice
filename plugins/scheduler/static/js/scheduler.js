@@ -194,6 +194,29 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             // this.initial_leases=leases;
         },
 
+        on_lease_field_state_changed: function(data)
+        {
+            switch(data.request) {
+                case FIELD_REQUEST_ADD:
+                case FIELD_REQUEST_ADD_RESET:
+                    this._leases.push(data.value);
+                    /* XXX Not optimal, we could only redraw the right cell */
+                    /* We need a mapping between the lease and the cell */
+                    /* How is it done in d3 ? based on key */
+                    this._draw();
+                    break;
+                case FIELD_REQUEST_REMOVE:
+                case FIELD_REQUEST_REMOVE_RESET:
+                    // We remove data.value (aka keep those leases different from data.value
+                    this._leases = $.grep(this._leases, function(x) { return x != data.value; });
+                    this._draw();
+                    break;
+                default:
+                    break;
+
+            }
+        },
+
         on_lease_query_done: function(record)
         {
             /* We have received all resources */
@@ -393,6 +416,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                     lease.nodename  = nodename;
                     lease.urn       = urn;
                     lease.nodelabel = nodelabel;
+                    lease.id        = 0; /* XXX how to use CSS selector to find a given lease... */ 
 
                     if (slicename == "") {
                         lease.initial = "free";
@@ -583,39 +607,56 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
             /* Add a new lease : XXX should be replaced by a dictionary */
             // Do we have a lease with the same urn  just before or just after ?
-            var removeIdBefore = null;
-            var removeIdAfter  = null;
+            //var removeIdBefore = null;
+            //var removeIdAfter  = null;
+            var remove_lease_before = null;
+            var remove_lease_after  = null;
+            // It is important to group leases,  while this is technically
+            // equivalent, some testbeds such as IotLab limit the number of
+            // leases a user can have.
+            // XXX we might have several leases before or after if they have
+            // XXX not been grouped like this tool does
             $.each(scheduler._leases, function(i, lease) {
                 if (lease[0] == urn) {
                     if (lease[1] + lease[2] * 1800 == start_time) { // XXX HARDCODED LEASE GRAIN
                         // Merge with previous lease
-                        removeIdBefore = i;
-                        start_time = lease[1];
-                        duration += lease[2];
+                        // removeIdBefore = i;
+                        remove_lease_before = lease;
+                        start_time          = lease[1];
+                        duration           += lease[2];
                     }
                     if (lease[1] == end_time) {
                         // Merge with following lease
-                        removeIdAfter = i;
-                        duration += lease[2];
+                        // removeIdAfter = i;
+                        remove_lease_after  = lease;
+                        duration           += lease[2];
                     }
                 }
             });
-            if (removeIdBefore != null) {
-                scheduler._leases.splice(removeIdBefore , 1);
-                if (removeIdAfter != null)
-                    removeIdAfter -= 1;
-            }
-            if (removeIdAfter != null) {
-                scheduler._leases.splice(removeIdAfter , 1);
-            }
+            //if (removeIdBefore != null) {
+            //    scheduler._leases.splice(removeIdBefore , 1);
+            //    if (removeIdAfter != null)
+            //        removeIdAfter -= 1;
+            //}
+            //if (removeIdAfter != null) {
+            //    scheduler._leases.splice(removeIdAfter , 1);
+            //}
 
-            scheduler._leases.push([this.urn, start_time, duration]);
+            // We add the new lease, no need to push
+            var new_lease = [this.urn, start_time, duration];
+
+            // We send events, manifold will inform us about the change and we will react accordingly
+            if (remove_lease_before != null)
+                manifold.raise_event(scheduler.options.query_lease_uuid, SET_REMOVED, remove_lease_before);
+            if (remove_lease_after != null)
+                manifold.raise_event(scheduler.options.query_lease_uuid, SET_REMOVED, remove_lease_after);
+            manifold.raise_event(scheduler.options.query_lease_uuid, SET_ADD,     new_lease);
+            //scheduler._leases.push([this.urn, start_time, duration]);
 
             //console.log(scheduler._leases);
             //jQuery.publish('/update-set/' + scheduler.options.query_uuid, [scheduler._leases]);
 
             /* We need to inform manifold about the whole diff, in addition to maintaining our own structure */
-            jQuery.publish('/update-set/' + scheduler.options.lease_query_uuid, [scheduler._leases]);
         },
 
         _lease_init_mine: function (lease, unclick) 
