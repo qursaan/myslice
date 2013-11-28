@@ -1,0 +1,9 @@
+not quite sure where to store the wsgi application file in the codebase
+it used to be in unfold/wsgi.py but that looked a bit awkward
+one of the reasons for that is, the apache/ config (apache/unfold.conf)
+needs to reference the installed wsgi file, so we'd rather not have this
+installed in the python library where names are not known in advance
+--
+So at some point it was decided to have it moved with the apache/ config
+The symlink here is only for the django development server to find it at run time
+see settings.py and the definition of WSGI_APPLICATION
