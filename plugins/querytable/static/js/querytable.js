@@ -44,6 +44,15 @@
             var keys = manifold.metadata.get_key(this.method);
             this.key = (keys && keys.length == 1) ? keys[0] : null;
 
+	    // xxx temporary hack
+	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
+	    // the code tries to access record[this.key] the records only have
+	    // keys=type,hrn,network_hrn,hostname
+	    // so for now we force using hrn instead
+	    // as soon as record have their primary key set this line can be removed
+	    // see also same hack in googlemap
+	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
+
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');
@@ -250,27 +259,27 @@
             /* Default: checked = true */
             if (checked === undefined) checked = true;
 
-            var key_value;
+            var id;
             /* The function accepts both records and their key */
             switch (manifold.get_type(record)) {
-                case TYPE_VALUE:
-                    key_value = record;
-                    break;
-                case TYPE_RECORD:
-                    /* XXX Test the key before ? */
-                    key_value = record[this.key];
-                    break;
-                default:
-                    throw "Not implemented";
-                    break;
+            case TYPE_VALUE:
+                id = record;
+                break;
+            case TYPE_RECORD:
+                /* XXX Test the key before ? */
+                id = record[this.key];
+                break;
+            default:
+                throw "Not implemented";
+                break;
             }
 
 
-	    if (key_value === undefined) {
-		messages.warning("querytable.set_checkbox has no value to figure which line to tick");
+	    if (id === undefined) {
+		messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
 		return;
 	    }
-            var checkbox_id = this.flat_id(this.id('checkbox', key_value));
+            var checkbox_id = this.flat_id(this.id('checkbox', id));
             // function escape_id(myid) is defined in portal/static/js/common.functions.js
             checkbox_id = escape_id(checkbox_id);
             // using dataTables's $ to search also in nodes that are not currently displayed
