@@ -28,9 +28,9 @@ googlemap_debug_detailed=false;
 
             // we keep a couple of global hashes
 	    // lat_lon --> { marker, <ul> }
-	    // hrn --> { <li>, <input> }
+	    // id --> { <li>, <input> }
 	    this.by_lat_lon = {};
-	    this.by_hrn = {};
+	    this.by_id = {};
 
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
@@ -86,29 +86,25 @@ googlemap_debug_detailed=false;
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
 
-	// xxx probably not the right place
-        // The function accepts both records and their key 
-	record_hrn : function (record) {
-            var key_value;
-            switch (manifold.get_type(record)) {
+        // The function accepts both records and their id
+	// record.key points to the name of the primary key for this record
+	// typically this is 'urn'
+	record_id : function (input) {
+            var id;
+            switch (manifold.get_type(input)) {
             case TYPE_VALUE:
-		key_value = record;
+		id = input;
                 break;
             case TYPE_RECORD:
-		if ( ! this.key in record ) return;
-                key_value = record[this.key];
+		if ( ! this.key in input ) return;
+                id = input[this.key];
                 break;
             default:
-                throw "Not implemented";
+                throw "googlemap.record_id: not implemented";
                 break;
             }
-	    // XXX BACKSLASHES original code was reading like this
-	    //return this.escape_id(key_value).replace(/\\/g, '');
-	    //  however this sequence removes backslashes from hrn's and as a result
-	    // queryupdater was getting all mixed up
-	    // querytable does publish hrn's with backslashes and that seems like the thing to do
-	    return key_value;
-	},	    
+	    return id;
+	},
 
 	// return { marker: gmap_marker, ul : <ul DOM> }
 	create_marker_struct: function (object,lat,lon) {
@@ -126,35 +122,43 @@ googlemap_debug_detailed=false;
 	    return {marker:marker, ul:ul};
 	},
 
-	// add an entry in the marker <ul> tag for that record
-	// returns { checkbox : <input DOM> }
+	// given an input <ul> element, this method inserts a <li> with embedded checkbox 
+	// for displaying/selecting the resource corresponding to the input record
+	// returns the created <input> element for further checkbox manipulation
 	create_record_checkbox: function (record,ul,checked) {
 	    var checkbox = $("<input>", {type:'checkbox', checked:checked, class:'geo'});
-	    var hrn=this.record_hrn(record);
+	    var id=this.record_id(record);
+	    // use hrn as far as possible for displaying
+	    var label= ('hrn' in record) ? record.hrn : id;
 	    ul.append($("<li>").addClass("geo").append(checkbox).
-		      append($("<span>").addClass("geo").append(hrn)));
+		      append($("<span>").addClass("geo").append(label)));
 	    var googlemap=this;
 	    // the callback for when a user clicks
 	    // NOTE: this will *not* be called for changes done by program
 	    checkbox.change( function (e) {
-		if (googlemap_debug) messages.debug("googlemap click handler checked= " + this.checked + " hrn=" + hrn);
-		manifold.raise_event (googlemap.options.query_uuid, 
-				      this.checked ? SET_ADD : SET_REMOVED, hrn);
+		manifold.raise_event (googlemap.options.query_uuid, this.checked ? SET_ADD : SET_REMOVED, id);
 	    });
 	    return checkbox;
 	},
 	    
+	warning: function (record,message) {
+	    try {messages.warning (message+" -- hostname="+record.hostname); }
+	    catch (err) {messages.warning (message); }
+	},
+	    
 	// retrieve DOM checkbox and make sure it is checked/unchecked
         set_checkbox: function(record, checked) {
-	    var hrn=this.record_hrn (record);
-	    if (! hrn) { 
-		try {messages.warning ("googlemap.set_checkbox: record has no hrn -- hostname="+record.hostname); }
-		catch (err) {messages.warning ("googlemap.set_checkbox: record has no hrn"); }
+	    var id=this.record_id (record);
+	    if (! id) { 
+		this.warning (record, "googlemap.set_checkbox: record has no id");
 		return; 
 	    }
-	    var checkbox_s = this.by_hrn [ hrn ];
-	    if (! checkbox_s ) { messages.warning ("googlemap.set_checkbox: could not spot checkbox for hrn "+hrn); return; }
-	    checkbox_s.checkbox.prop('checked',checked);
+	    var checkbox = this.by_id [ id ];
+	    if (! checkbox ) { 
+		this.warning (record, "googlemap.set_checkbox: checkbox not found");
+		return; 
+	    }
+	    checkbox.prop('checked',checked);
         }, // set_checkbox
 
 	// this record is *in* the slice
@@ -172,31 +176,19 @@ googlemap_debug_detailed=false;
     	    // i.e. consider 2 places equal if not further away than 300m or so...
     	    var marker_s = this.by_lat_lon [lat_lon];
     	    if ( marker_s == null ) {
-        		marker_s = this.create_marker_struct (this.object, latitude, longitude);
-        		this.by_lat_lon [ lat_lon ] = marker_s;
-        		this.arm_marker(marker_s.marker, this.map);
-	        }
+        	marker_s = this.create_marker_struct (this.object, latitude, longitude);
+        	this.by_lat_lon [ lat_lon ] = marker_s;
+        	this.arm_marker(marker_s.marker, this.map);
+	    }
 	    
     	    // now add a line for this resource in the marker
     	    // xxx should compute checked here ?
     	    // this is where the checkbox will be appended
     	    var ul=marker_s.ul;
     	    var checkbox = this.create_record_checkbox (record, ul, false);
-    	    if ( ! this.key in record ) return;
-            var key_value = record[this.key];
-    	    // see XXX BACKSLASHES 
-    	    //var hrn = this.escape_id(key_value).replace(/\\/g, '');
-    	    var hrn = key_value;
-            this.by_hrn[hrn] = {
-    		    checkbox: checkbox,
-        		// xxx Thierry sept 2013
-        		// xxx actually we might have just used a domid-based scheme instead of the hash
-        		// since at this point we only need to retrieve the checkbox from an hrn
-        		// but I was not sure enough that extra needs would not show up so I kept this in place
-        		// xxx not sure these are actually useful :
-                value: key_value,
-                record: record,
-            }
+	    var id=this.record_id(record);
+	    // used to keep a dict here, but only checkbox is required
+            this.by_id[id] = checkbox;
         }, // new_record
 
         arm_marker: function(marker, map) {
