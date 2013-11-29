@@ -41,17 +41,18 @@
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.method = query.object;
 
-            var keys = manifold.metadata.get_key(this.method);
-            this.key = (keys && keys.length == 1) ? keys[0] : null;
+	    // xxx beware that this.key needs to contain a key that all records will have
+	    // in general query_all will return well populated records, but query
+	    // returns records with only the fields displayed on startup. 
+	    this.key = (this.options.id_key);
+	    if (! this.key) {
+		// if not specified by caller, decide from metadata
+		var keys = manifold.metadata.get_key(this.method);
+		this.key = (keys && keys.length == 1) ? keys[0] : null;
+	    }
+	    if (! this.key) messages.warning("querytable.init could not kind valid key");
 
-	    // xxx temporary hack
-	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
-	    // the code tries to access record[this.key] the records only have
-	    // keys=type,hrn,network_hrn,hostname
-	    // so for now we force using hrn instead
-	    // as soon as record have their primary key set this line can be removed
-	    // see also same hack in googlemap
-	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
+	    messages.debug("querytable: key="+this.key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);

@@ -64,6 +64,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'user.user_hrn',
                 #'application.measurement_point.counter'
         )
+        # for internal use in the querytable plugin;
+        # needs to be a unique column present for each returned record
+        main_query_key = 'hrn'
     
         query_resource_all = Query.get('resource').select(resource_fields)
         if do_query_users:
@@ -180,6 +183,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
+            # safer to use 'hrn' as the internal unique key for this plugin
+            id_key     = main_query_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,

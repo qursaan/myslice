@@ -2,13 +2,40 @@ from unfold.plugin import Plugin
 
 class QueryTable (Plugin):
 
-    # set checkboxes if a final column with checkboxes is desired
-    # pass columns as the initial set of columns
-    #   if None then this is taken from the query's fields
-    # also please refrain from passing an 'aoColumns' as datatables_options
-    # as we use 'aoColumnDefs' instead
+    """A plugin for displaying a query as a list
+
+More accurately, we consider a subject entity (say, a slice) 
+that can be linked to any number of related entities (say, resources, or users)
+The 'query' argument will correspond to the subject, while
+'query_all' will fetch the complete list of 
+possible candidates for the relationship.
+
+Current implementation makes the following assumptions
+* query will only retrieve for the related items a list of fields
+  that corresponds to the initial set of fields displayed in the table
+* query_all on the contrary is expected to return the complete set of 
+  available attributes that may be of interest, so that using a QueryEditor
+  one can easily extend this table without having to query the backend
+* checkboxes is a boolean flag, set to true if a rightmost column
+  with checkboxes is desired
+* optionally pass columns as the initial set of columns
+  if None then this is taken from the query's fields
+* id_key is the name of a column used internally in the plugin
+  for checkboxes management. Caller should specify a column that is present 
+  in the fields returned by 'query' and that has unique values.
+  If not specified, metadata will be used to find out a primary key.
+  However in the case of nodes & slice for example, the default key
+  as returned by the metadata would be 'urn', but it is not necessarily 
+  a good idea to show urn's initially - if at all.
+  This is why a slice view would use 'hrn' here instead.
+* datatables_options are passed to dataTables as-is; 
+  however please refrain from passing an 'aoColumns' 
+  as we use 'aoColumnDefs' instead.
+"""
+
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
+                  id_key=None,
                   datatables_options={}, **settings):
         Plugin.__init__ (self, **settings)
         self.query          = query
@@ -30,6 +57,7 @@ class QueryTable (Plugin):
         else:
             self.columns = []
             self.hidden_columns = []
+        self.id_key=id_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type
         # so that sorting can take place on a selected-first basis (or -last of course)
@@ -78,4 +106,4 @@ class QueryTable (Plugin):
         return ['plugin_uuid', 'domid', 
                 'query_uuid', 'query_all_uuid', 
                 'checkboxes', 'datatables_options', 
-                'hidden_columns']
+                'hidden_columns', 'id_key',]
