@@ -57,6 +57,8 @@ Current implementation makes the following assumptions
         else:
             self.columns = []
             self.hidden_columns = []
+        # needs to be json-serializable, and sets are not
+        self.columns=list(self.columns)
         self.id_key=id_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type
@@ -84,20 +86,31 @@ Current implementation makes the following assumptions
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
-                           "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
-                           "js/manifold.js", "js/manifold-query.js", 
-                           "js/unfold-helper.js",
-                          # querytable.js needs to be loaded after dataTables.js as it extends 
-                          # dataTableExt.afnSortData
-                           "js/querytable.js", 
-                           ] ,
-            'css_files': [ "css/dataTables.bootstrap.css",
-                           # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
-                           # for now we use full_numbers, with our own ad hoc css 
-                           "css/dataTables.full_numbers.css",
-                           "css/querytable.css" , 
-                           ],
+            'js_files' : [ 
+                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                "http://mleibman.github.io/SlickGrid/lib/jquery.event.drag-2.2.js",
+                "http://mleibman.github.io/SlickGrid/slick.core.js",
+                "http://mleibman.github.io/SlickGrid/plugins/slick.cellrangedecorator.js",
+                "http://mleibman.github.io/SlickGrid/plugins/slick.cellrangeselector.js",
+                "http://mleibman.github.io/SlickGrid/plugins/slick.cellselectionmodel.js",
+                "http://mleibman.github.io/SlickGrid/slick.grid.js",
+#                "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
+                "js/manifold.js", "js/manifold-query.js", 
+                "js/unfold-helper.js",
+                # querytable.js needs to be loaded after dataTables.js as it extends 
+                # dataTableExt.afnSortData
+                "js/querytable.js", 
+                ] ,
+            'css_files': [ 
+#                "css/dataTables.bootstrap.css",
+                # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
+                # for now we use full_numbers, with our own ad hoc css 
+#                "css/dataTables.full_numbers.css",
+                "css/querytable.css" , 
+                "http://mleibman.github.io/SlickGrid/slick.grid.css",
+#                "http://mleibman.github.io/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css",
+#                "http://mleibman.github.io/SlickGrid/examples/examples.css",
+                ],
             }
         return reqs
 
@@ -106,4 +119,5 @@ Current implementation makes the following assumptions
         return ['plugin_uuid', 'domid', 
                 'query_uuid', 'query_all_uuid', 
                 'checkboxes', 'datatables_options', 
-                'hidden_columns', 'id_key',]
+                'columns','hidden_columns', 
+                'id_key',]

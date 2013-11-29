@@ -1,20 +1,3 @@
-<div id='main-{{ domid }}' class='querytable-spacer'>
-  <table class='table table-striped table-bordered dataTable' id='{{domid}}__table'>
-    <thead>
-      <tr>
-        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
-        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
-        {% if checkboxes %} <th class="checkbox">+/-</th> {% endif %}
-      </tr>
-    </thead> 
-    <tbody>
-    </tbody>
-    <tfoot>
-      <tr>
-        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
-        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
-        {% if checkboxes %} <th>+/-</th> {% endif %}
-      </tr>
-    </tfoot> 
-  </table>
+<div id='spacer-{{ domid }}' class='querytable-spacer'>
+<div class="querytable" id="grid-{{ domid }}"></div>
 </div>
