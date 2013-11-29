@@ -1,12 +1,13 @@
 from unfold.plugin import Plugin
 
-# this is a simple base class for plugins that contain/arrange a set of other plugins
-# sons is expected to be a list of the contained plugins, and 
-# active_domid is the domid for the one son that should be displayed as active
-# some subclasses of Composite, like e.g. Tabs, will not behave as expected 
-# if a valid active_domid is not provided
-
 class Composite (Plugin):
+
+    """a simple base class for plugins that contain/arrange a set of other plugins
+sons is expected to be a list of the contained plugins, and 
+active_domid is the domid for the one son that should be displayed as active
+some subclasses of Composite, like e.g. Tabs, will not behave as expected 
+if a valid active_domid is not provided
+"""
 
     def __init__ (self, sons=None, active_domid=None, *args, **kwds):
         Plugin.__init__ (self, *args, **kwds)

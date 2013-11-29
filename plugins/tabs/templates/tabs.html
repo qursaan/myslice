@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs" id='tabs-{{ domid }}'>
+<ul class="nav nav-tabs{%if persistent_active%} persistent-active{%endif%}" id='tabs-{{ domid }}'>
 {% for son in sons %}
 <li{% if son.is_active %} class='active'{% endif %}> <a href="#tab-{{ son.domid }}" data-toggle="tab">{{ son.title }}</a> </li>
 {% endfor %}

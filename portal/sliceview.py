@@ -199,6 +199,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                                        resources_as_3dmap,
                                        resources_as_list_area, ],
                                 active_domid = 'resources-map',
+                                persistent_active=True,
                                 )
         main_stack.insert (resources_area)
 
