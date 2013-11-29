@@ -27,10 +27,10 @@ googlemap_debug_detailed=false;
             this.in_set_backlog = [];
 
             // we keep a couple of global hashes
-            // lat_lon --> { marker, <ul> }
-            // hrn --> { <li>, <input> }
-            this.by_lat_lon = {};
-            this.by_hrn = {};
+	    // lat_lon --> { marker, <ul> }
+	    // id --> { <li>, <input> }
+	    this.by_lat_lon = {};
+	    this.by_id = {};
 
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
@@ -41,7 +41,7 @@ googlemap_debug_detailed=false;
             this.object = query.object;
 
             var keys = manifold.metadata.get_key(this.object);
-            // 
+	    // 
             this.key = (keys && keys.length == 1) ? keys[0] : null;
 
 	    // xxx temporary hack
@@ -54,11 +54,11 @@ googlemap_debug_detailed=false;
 	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
 
             //// Setup query and record handlers 
-            // this query is the one about the slice itself 
-            // event related to this query will trigger callbacks like on_new_record
+	    // this query is the one about the slice itself 
+	    // event related to this query will trigger callbacks like on_new_record
             this.listen_query(options.query_uuid);
-            // this one is the complete list of resources
-            // and will be bound to callbacks like on_all_new_record
+	    // this one is the complete list of resources
+	    // and will be bound to callbacks like on_all_new_record
             this.listen_query(options.query_all_uuid, 'all');
 
             /* GUI setup and event binding */
@@ -68,7 +68,7 @@ googlemap_debug_detailed=false;
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-            if (googlemap_debug) messages.debug("googlemap.on_show");
+	    if (googlemap_debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
         }, // on_show
@@ -84,13 +84,13 @@ googlemap_debug_detailed=false;
             var myOptions = {
                 zoom: this.options.zoom,
                 center: center,
-                scrollwheel: false,
+		scrollwheel: false,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
-            
+	    
             var domid = this.options.plugin_uuid + '--' + 'googlemap';
-            var elmt = document.getElementById(domid);
-            if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
+	    var elmt = document.getElementById(domid);
+	    if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
             this.map = new google.maps.Map(elmt, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
@@ -125,7 +125,7 @@ googlemap_debug_detailed=false;
 	    var marker = new google.maps.Marker({
 		position: new google.maps.LatLng(lat, lon),
                 title: object,
-                // gmap can deal with a DOM element but not a jquery object
+		// gmap can deal with a DOM element but not a jquery object
                 content: dom.get(0),
             }); 
 	    return {marker:marker, ul:ul};
@@ -170,11 +170,11 @@ googlemap_debug_detailed=false;
 	    checkbox.prop('checked',checked);
         }, // set_checkbox
 
-        // this record is *in* the slice
+	// this record is *in* the slice
         new_record: function(record) {
-                if (googlemap_debug_detailed) messages.debug ("new_record");
+	        if (googlemap_debug_detailed) messages.debug ("new_record");
             if (!(record['latitude'])) return false;
-            
+	    
             // get the coordinates
             var latitude=unfold.get_value(record['latitude']);
             var longitude=unfold.get_value(record['longitude']);
@@ -201,7 +201,7 @@ googlemap_debug_detailed=false;
         }, // new_record
 
         arm_marker: function(marker, map) {
-            if (googlemap_debug_detailed) messages.debug ("arm_marker content="+marker.content);
+	    if (googlemap_debug_detailed) messages.debug ("arm_marker content="+marker.content);
             var googlemap = this;
             google.maps.event.addListener(marker, 'click', function () {
                 googlemap.infowindow.close();
@@ -214,7 +214,7 @@ googlemap_debug_detailed=false;
 
         /*************************** RECORD HANDLER ***************************/
         on_new_record: function(record) {
-            if (googlemap_debug_detailed) messages.debug("on_new_record");
+	    if (googlemap_debug_detailed) messages.debug("on_new_record");
             if (this.received_all)
                 // update checkbox for record
                 this.set_checkbox(record, true);
@@ -224,36 +224,36 @@ googlemap_debug_detailed=false;
         },
 
         on_clear_records: function(record) {
-            if (googlemap_debug_detailed) messages.debug("on_clear_records");
+	    if (googlemap_debug_detailed) messages.debug("on_clear_records");
         },
 
         // Could be the default in parent
         on_query_in_progress: function() {
-            if (googlemap_debug) messages.debug("on_query_in_progress (spinning)");
+	    if (googlemap_debug) messages.debug("on_query_in_progress (spinning)");
             this.spin();
         },
 
         on_query_done: function() {
-            if (googlemap_debug) messages.debug("on_query_done");            
+	    if (googlemap_debug) messages.debug("on_query_done");	    
             if (this.received_all) {
                 this.unspin();
-            }
+	    }
             this.received_set = true;
         },
 
         on_field_state_changed: function(data) {
-            if (googlemap_debug_detailed) messages.debug("on_field_state_changed");            
+	    if (googlemap_debug_detailed) messages.debug("on_field_state_changed");	    
             switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
-                    break;
-                default:
-                    break;
+            case FIELD_REQUEST_ADD:
+            case FIELD_REQUEST_ADD_RESET:
+                this.set_checkbox(data.value, true);
+                break;
+            case FIELD_REQUEST_REMOVE:
+            case FIELD_REQUEST_REMOVE_RESET:
+                this.set_checkbox(data.value, false);
+                break;
+            default:
+                break;
             }
         },
 
@@ -261,22 +261,22 @@ googlemap_debug_detailed=false;
         // all : this 
 
         on_all_new_record: function(record) {
-            if (googlemap_debug_detailed) messages.debug("on_all_new_record");
+	    if (googlemap_debug_detailed) messages.debug("on_all_new_record");
             this.new_record(record);
         },
 
         on_all_clear_records: function() {
-            if (googlemap_debug) messages.debug("on_all_clear_records");            
+	    if (googlemap_debug) messages.debug("on_all_clear_records");	    
         },
 
         on_all_query_in_progress: function() {
-            if (googlemap_debug) messages.debug("on_all_query_in_progress (spinning)");
+	    if (googlemap_debug) messages.debug("on_all_query_in_progress (spinning)");
             // XXX parent
             this.spin();
         },
 
         on_all_query_done: function() {
-            if (googlemap_debug) messages.debug("on_all_query_done");
+	    if (googlemap_debug) messages.debug("on_all_query_done");
 
             // MarkerClusterer
             var markers = [];
@@ -298,10 +298,10 @@ googlemap_debug_detailed=false;
                 $.each(this.in_set_backlog, function(i, record) {
                     googlemap.set_checkbox(record, true);
                 });
-                // reset 
-                googlemap.in_set_backlog = [];
+		// reset 
+		googlemap.in_set_backlog = [];
 
-                if (googlemap_debug) messages.debug("unspinning");
+		if (googlemap_debug) messages.debug("unspinning");
                 this.unspin();
             }
             this.received_all = true;
