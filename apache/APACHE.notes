@@ -1,0 +1,29 @@
+The apache config as it ships in unfold.conf defines a port
+(currently 443) where SSL client-auth is enforced
+
+The idea being to have the browser prompting our user for a
+certificate - instead of leaving that optional, which we believe is
+something nobody will ever use if it's optional.
+
+A few notes and caveats must be outlined though below; see also unfold-init-ssl.sh about that
+
+* as of this writing quite a lot of what is below would be taken care
+  of by the packaging stuff once/if it works; 
+  the notes below are intended to help in this respect.
+
+* all the local material for this deployment gets into /etc/unfold/
+
+* I could not find a way to have client-auth without server auth;
+  this is totally weird, and stupid, but just so
+  so there is a need to install a (probably self-signed) cert 
+  and related key in 
+/etc/unfold/myslice.cert
+/etc/unfold/myslice.key
+  see init-ssl.sh for how to create these
+
+* Now the trusted roots - that we do need in our case - are expected in 
+/etc/unfold/trusted_roots
+ this of course is a user choice, e.g.:
+/etc/unfold/trusted_roots/plc.gid
+/etc/unfold/trusted_roots/ple.gid
+

@@ -37,13 +37,13 @@ class RegistrationView (FreeAccessView):
         #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
         #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
         #if onelab_enabled:
-        #if True:
-        #    print "ONELAB ENABLED"
-        #    authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
-        #else:
-        #    print "FIREXP ENABLED"
+        if True:
+            print "ONELAB ENABLED"
+            authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
+        else:
+            print "FIREXP ENABLED"
 
-        #authorities = execute_admin_query(request, authorities_query)
+        authorities = execute_admin_query(request, authorities_query)
         # xxx tocheck - if authorities is empty, it's no use anyway
         # (users won't be able to validate the form anyway)
 
@@ -52,6 +52,9 @@ class RegistrationView (FreeAccessView):
         page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
 
         print 'registration view, method',method
+
+        user_query  = Query().get('local:user').select('user_id','email')
+        user_details = execute_admin_query(self.request, user_query)
 
         if method == 'POST':
             # We shall use a form here
@@ -75,7 +78,10 @@ class RegistrationView (FreeAccessView):
                 errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             # XXX validate authority hrn !!
             if PendingUser.objects.filter(email__iexact=reg_email):
-                errors.append('Email already registered.Please provide a new email address.')
+                errors.append('Email is pending for validation. Please provide a new email address.')
+            for user_detail in user_details:
+                if user_detail['email']==reg_email:
+                    errors.append('Email already exists in Manifold. Please provide a new email address.')
 
 # XXX TODO: Factorize with portal/accountview.py
             if 'generate' in request.POST['question']:
@@ -132,10 +138,15 @@ class RegistrationView (FreeAccessView):
                     keypair       = keypair,
                 )
                 b.save()
-                #saving to manifold
-                config = '{"firstname":'+ reg_fname + ', "lastname":'+ reg_lname + ', "authority":"'+ reg_auth + '"}'
+                #creating user to manifold local:user
+                config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
                 user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
-                manifold_add_user(request,user_params) 
+                manifold_add_user(request,user_params)
+                #creating local:account in manifold
+                user_id = user_detail['user_id']+1 # the user_id for the newly created user in local:user
+                user_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': keypair}
+                manifold_add_account(request,user_params)
+ 
                 # Send email
                 ctx = {
                     'first_name'    : reg_fname, 
@@ -153,21 +164,7 @@ class RegistrationView (FreeAccessView):
 
                 msg = render_to_string('user_request_email.txt', ctx)
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
-
-                #return render(request, 'user_register_complete.html')
-            
-            #creating local:account in manifold
-            user_query  = Query().get('local:user').select('user_id','email')
-            user_details = execute_admin_query(self.request, user_query)
-            
-            for user_detail in user_details:
-                if user_detail['email']==reg_email:
-                    user_id = user_detail['user_id']
-                    #print "test"
-                    #print user_id
-            user_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': keypair}    
-            manifold_add_account(request,user_params)
-            return render(request, 'user_register_complete.html') 
+                return render(request, 'user_register_complete.html') 
 
         template_env = {
           'topmenu_items': topmenu_items('Register', request),
@@ -178,7 +175,7 @@ class RegistrationView (FreeAccessView):
           'authority_hrn': request.POST.get('authority_hrn', ''),
           'email': request.POST.get('email', ''),
           'password': request.POST.get('password', ''),           
-          #'authorities': authorities,
+          'authorities': authorities,
           }
         template_env.update(page.prelude_env ())
         return render(request, 'registration_view.html',template_env)

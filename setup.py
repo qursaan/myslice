@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Setup script for myslice
+# Setup script for myslice+unfold
 #
 # Thierry Parmentelat <thierry.parmentelat@inria.fr>
 # INRIA (c) 2013
@@ -21,5 +21,5 @@ setup(packages = packages,
         ( '/usr/share/unfold/static/img', glob ('static/img/*')),
         ( '/usr/share/unfold/static/fonts', glob ('static/fonts/*')),
         ( '/usr/share/unfold/templates', glob ('templates/*')),
-        ( 'apache', [ 'apache/myslice.conf' ]),
+        ( 'apache', [ 'apache/unfold.conf', 'apache/unfold.wsgi' ]),
         ])

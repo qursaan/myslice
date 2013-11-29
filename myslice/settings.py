@@ -1,4 +1,4 @@
-# Django settings for myslice project.
+# Django settings for unfold project.
 
 import os.path
 
@@ -19,17 +19,20 @@ except:
     import traceback
     traceback.print_exc()
 
-# find out DATAROOT, which is different from ROOT 
+# find out HTTPROOT, which is different from ROOT 
 # when deployed from a package
 # this code is run by collectstatic too, so we cannot
 # assume we have ./static present already
-DATAROOT="/usr/share/unfold"
+HTTPROOT="/usr/share/unfold"
+# the place to store local data, like e.g. the sqlite db
+DATAROOT="/var/unfold"
 # if not there, then we assume it's from a devel tree
-if not os.path.isdir (os.path.join(DATAROOT,"static")):
+if not os.path.isdir (os.path.join(HTTPROOT,"static")):
+    HTTPROOT=ROOT
     DATAROOT=ROOT
 
-if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for myslice"%ROOT
-if not os.path.isdir(DATAROOT): raise Exception,"Cannot find DATAROOT %s for myslice"%DATAROOT
+if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
+if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
 
 ####################
 ADMINS = (
@@ -49,7 +52,7 @@ EMAIL_USE_TLS = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(DATAROOT,'myslice.sqlite3'), # Or path to database file if using sqlite3.
+        'NAME': os.path.join(DATAROOT,'unfold.sqlite3'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -93,7 +96,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(DATAROOT,'static')
+STATIC_ROOT = os.path.join(HTTPROOT,'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -157,13 +160,13 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'myslice.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'myslice.wsgi.application'
+WSGI_APPLICATION = 'unfold.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(DATAROOT,"templates"),
+    os.path.join(HTTPROOT,"templates"),
 )
 
 INSTALLED_APPS = (
