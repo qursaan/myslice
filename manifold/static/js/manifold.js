@@ -106,7 +106,7 @@ function QueryStore() {
 
     this.insert = function(query) {
         // We expect only main_queries are inserted
-	
+        
         /* If the query has not been analyzed, then we analyze it */
         if (query.analyzed_query == null) {
             query.analyze_subqueries();
@@ -367,7 +367,7 @@ var manifold = {
             // not quite sure what happens if we send a string directly, as POST data is named..
             // this gets reconstructed on the proxy side with ManifoldQuery.fill_from_POST
             $.post(manifold.proxy_url, {'json':query_json}, 
-		   manifold.success_closure(query, publish_uuid, tuple.callback));
+                   manifold.success_closure(query, publish_uuid, tuple.callback));
         })
     },
 
@@ -379,7 +379,7 @@ var manifold = {
     forward: function(query, callback) {
         var query_json = JSON.stringify(query);
         $.post(manifold.proxy_url, {'json': query_json} , 
-	       manifold.success_closure(query, query.query_uuid, callback));
+               manifold.success_closure(query, query.query_uuid, callback));
     },
 
     /*!
@@ -409,22 +409,27 @@ var manifold = {
 
         // NEW PLUGIN API
         manifold.raise_record_event(query.query_uuid, CLEAR_RECORDS);
-        if (manifold.publish_result_debug) messages.debug(".. publish_result (1) ");
-	var count=0;
+        if (manifold.publish_result_debug)
+            messages.debug(".. publish_result (1) ");
+        var count=0;
         $.each(result, function(i, record) {
             manifold.raise_record_event(query.query_uuid, NEW_RECORD, record);
-	    count += 1;
+            count += 1;
         });
-        if (manifold.publish_result_debug) messages.debug(".. publish_result NEW API (2) count=" + count);
+        if (manifold.publish_result_debug) 
+            messages.debug(".. publish_result NEW API (2) count=" + count);
         manifold.raise_record_event(query.query_uuid, DONE);
 
         // OLD PLUGIN API BELOW
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
-        if (manifold.publish_result_debug) messages.debug(".. publish_result OLD API (3) " + channel);
+        if (manifold.publish_result_debug) 
+            messages.debug(".. publish_result OLD API (3) " + channel);
+
         $.publish(channel, [result, query]);
 
-	if (manifold.publish_result_debug) messages.debug(".. publish_result - END (4) q=" + query.__repr());
+        if (manifold.publish_result_debug) 
+            messages.debug(".. publish_result - END (4) q=" + query.__repr());
     },
 
     /*!
@@ -433,13 +438,16 @@ var manifold = {
      * \memberof Manifold
      * \param ManifoldQuery query Query which has received result
      * \param array result result corresponding to query
+     *
+     * Note: this function works on the analyzed query
      */
     publish_result_rec: function(query, result) {
         /* If the result is not unique, only publish the top query;
          * otherwise, publish the main object as well as subqueries
          * XXX how much recursive are we ?
          */
-	if (manifold.publish_result_debug) messages.debug (">>>>> publish_result_rec " + query.object);
+        if (manifold.publish_result_debug)
+            messages.debug (">>>>> publish_result_rec " + query.object);
         if (manifold.query_expects_unique_result(query)) {
             /* Also publish subqueries */
             $.each(query.subqueries, function(object, subquery) {
@@ -447,9 +455,13 @@ var manifold = {
                 /* TODO remove object from result */
             });
         }
-	if (manifold.publish_result_debug) messages.debug ("===== publish_result_rec " + query.object);
+        if (manifold.publish_result_debug) 
+            messages.debug ("===== publish_result_rec " + query.object);
+
         manifold.publish_result(query, result);
-	if (manifold.publish_result_debug) messages.debug ("<<<<< publish_result_rec " + query.object);
+
+        if (manifold.publish_result_debug) 
+            messages.debug ("<<<<< publish_result_rec " + query.object);
     },
 
     setup_update_query: function(query, records) {
@@ -500,7 +512,7 @@ var manifold = {
         this.setup_update_query(query, records);
 
         /* Publish full results */
-        tmp_query = manifold.find_query(query.query_uuid);
+        var tmp_query = manifold.find_query(query.query_uuid);
         manifold.publish_result_rec(tmp_query.analyzed_query, records);
     },
 
@@ -690,19 +702,19 @@ var manifold = {
     // e.g. an updater wants to publish its result as if from the original (get) query
     asynchroneous_success : function (data, query, publish_uuid, callback) {
         // xxx should have a nicer declaration of that enum in sync with the python code somehow
-	
-	var start = new Date();
-	if (manifold.asynchroneous_debug)
-	    messages.debug(">>>>>>>>>> asynchroneous_success query.object=" + query.object);
+        
+        var start = new Date();
+        if (manifold.asynchroneous_debug)
+            messages.debug(">>>>>>>>>> asynchroneous_success query.object=" + query.object);
 
         if (data.code == 2) { // ERROR
             // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
             window.location="/logout/";
-	    if (manifold.asynchroneous_debug) {
-		duration=new Date()-start;
-		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- error returned - logging out " + duration + " ms");
-	    }
+            if (manifold.asynchroneous_debug) {
+                duration=new Date()-start;
+                messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- error returned - logging out " + duration + " ms");
+            }
             return;
         }
         if (data.code == 1) { // WARNING
@@ -715,16 +727,16 @@ var manifold = {
 
         // If a callback has been specified, we redirect results to it 
         if (!!callback) { 
-	    callback(data); 
-	    if (manifold.asynchroneous_debug) {
-		duration=new Date()-start;
-		messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- callback ended " + duration + " ms");
-	    }
-	    return; 
-	}
+            callback(data); 
+            if (manifold.asynchroneous_debug) {
+                duration=new Date()-start;
+                messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- callback ended " + duration + " ms");
+            }
+            return; 
+        }
 
-	if (manifold.asynchroneous_debug) 
-	    messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
+        if (manifold.asynchroneous_debug) 
+            messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
 
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
@@ -736,10 +748,10 @@ var manifold = {
             //tmp_query = manifold.find_query(query.query_uuid);
             //manifold.publish_result_rec(tmp_query.analyzed_query, result);
         }
-	if (manifold.asynchroneous_debug) {
-	    duration=new Date()-start;
-	    messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- done " + duration + " ms");
-	}
+        if (manifold.asynchroneous_debug) {
+            duration=new Date()-start;
+            messages.debug ("<<<<<<<<<< asynchroneous_success " + query.object + " -- done " + duration + " ms");
+        }
 
     },
 
@@ -750,23 +762,23 @@ var manifold = {
     raise_event_handler: function(type, query_uuid, event_type, value) {
         if ((type != 'query') && (type != 'record'))
             throw 'Incorrect type for manifold.raise_event()';
-	// xxx we observe quite a lot of incoming calls with an undefined query_uuid
-	// this should be fixed upstream
-	if (query_uuid === undefined) {
-	    messages.warning("undefined query in raise_event_handler");
-	    return;
-	}
+        // xxx we observe quite a lot of incoming calls with an undefined query_uuid
+        // this should be fixed upstream
+        if (query_uuid === undefined) {
+            messages.warning("undefined query in raise_event_handler");
+            return;
+        }
 
-	// notify the change to objects that either listen to this channel specifically,
-	// or to the wildcard channel
+        // notify the change to objects that either listen to this channel specifically,
+        // or to the wildcard channel
         var channels = [ manifold.get_channel(type, query_uuid), manifold.get_channel(type, '*') ];
 
         $.each(channels, function(i, channel) {
             if (value === undefined) {
                 $('.plugin').trigger(channel, [event_type]);
-	    } else {
+            } else {
                 $('.plugin').trigger(channel, [event_type, value]);
-	    }
+            }
         });
     },
 
@@ -890,7 +902,7 @@ var manifold = {
                 // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
 
                 // if everything is done right, update_query should not be null. 
-	        // It is updated when we received results from the get query
+                // It is updated when we received results from the get query
                 // object = the same as get
                 // filter = key : update a single object for now
                 // fields = the same as get

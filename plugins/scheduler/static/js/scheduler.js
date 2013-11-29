@@ -78,7 +78,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             this.min_granularity = this.default_granularity;
 
             // the data contains slice names, and lease_id, we need this to find our own leases (mine)
-            this.paper=null;
+            this._paper=null;
 
 
             /* XXX Events */
@@ -173,6 +173,10 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
          * All resources
          * ------------------------------------------------------------------ */
 
+        on_all_resources_query_in_progress: function() {
+            console.log("all resources query in progress");
+        },
+
         on_all_resources_new_record: function(record)
         {
             if ((typeof record.exclusive != 'undefined') && (record.exclusive)) {
@@ -196,20 +200,27 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
         on_lease_field_state_changed: function(data)
         {
+            var lease = data.value;
+            var urn = lease[0];
+            var start_time = lease[1];
+
+            var lease_element = this._lease_element_find(urn, start_time);
+            if (!lease_element) {
+                console.log("Alert: lease element not found");
+                return;
+            }
+
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
                     this._leases.push(data.value);
-                    /* XXX Not optimal, we could only redraw the right cell */
-                    /* We need a mapping between the lease and the cell */
-                    /* How is it done in d3 ? based on key */
-                    this._draw();
+                    this._lease_init_mine(lease_element);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
                     // We remove data.value (aka keep those leases different from data.value
                     this._leases = $.grep(this._leases, function(x) { return x != data.value; });
-                    this._draw();
+                    this._lease_init_free(lease_element);
                     break;
                 default:
                     break;
@@ -271,6 +282,19 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             return result;
         },
 
+        /* Iterative search through raphael.js objects, no forEach, no getById in the current version */
+        _lease_element_find: function(urn, start_time)
+        {
+            var date = new Date(start_time*1000);
+            var pos = this._paper.top; 
+            while (pos) { 
+                 if (pos.key == urn + "-" + date)
+                    return pos;
+                 pos = pos.prev; 
+            } 
+            return null;
+        },
+
         /**
          * @brief Draw
          */
@@ -287,17 +311,17 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
             /* reuse for paper if exists with same size, or (re-)create otherwise */
             var paper;
-            if (this.paper == null) {
+            if (this._paper == null) {
                 paper = Raphael (canvas_id, total_width + o.x_sep, total_height);
-            } else if (this.paper.width==total_width && this.paper.height==total_height) {
-                paper=this.paper;
+            } else if (this._paper.width==total_width && this._paper.height==total_height) {
+                paper=this._paper;
                 paper.clear();
             } else {
                 $("#"+canvas_id)[0].innerHTML="";
                 //this.elmt().html();
                 paper = Raphael (canvas_id, total_width + o.x_sep, total_height);
             }
-            this.paper = paper;
+            this._paper = paper;
 
             /* the path for the triangle-shaped buttons */
             var timebutton_path = "M1,0L"+(this.options.leases_w-1)+",0L"+(this.options.leases_w/2)+","+o.y_header+"L1,0";
@@ -416,7 +440,6 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                     lease.nodename  = nodename;
                     lease.urn       = urn;
                     lease.nodelabel = nodelabel;
-                    lease.id        = 0; /* XXX how to use CSS selector to find a given lease... */ 
 
                     if (slicename == "") {
                         lease.initial = "free";
@@ -428,9 +451,14 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
                         lease.initial = "other";
                         this._lease_init_other(lease, slicename);
                     }
+
                     lease.from_time = axisx[grain % this.nb_grains()][0];
                     grain += duration;
                     lease.until_time = axisx[grain % this.nb_grains()][0];
+
+                    /* We set a key to the lease element to find it later in the paper thanks to this._lease_element_find() */
+                    lease.key        = urn + '-' + lease.from_time;
+
                     // and vice versa
                     this._lease_elements.push(lease);
                     // move on with the loop
@@ -601,11 +629,12 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             //this.urn
             //this.until_time
             var urn        = this.urn
-            var start_time = new Date(this.from_time).getTime() / 1000;        
-            var end_time   = new Date(this.until_time).getTime() / 1000;
+            var start_time = this.from_time.getTime() / 1000;        
+            var end_time   = this.until_time.getTime() / 1000;
             var duration   = (end_time - start_time) / 1800; // XXX HARDCODED LEASE GRAIN
 
             /* Add a new lease : XXX should be replaced by a dictionary */
+            /*
             // Do we have a lease with the same urn  just before or just after ?
             //var removeIdBefore = null;
             //var removeIdAfter  = null;
@@ -646,10 +675,12 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             var new_lease = [this.urn, start_time, duration];
 
             // We send events, manifold will inform us about the change and we will react accordingly
+            /*
             if (remove_lease_before != null)
                 manifold.raise_event(scheduler.options.query_lease_uuid, SET_REMOVED, remove_lease_before);
             if (remove_lease_after != null)
                 manifold.raise_event(scheduler.options.query_lease_uuid, SET_REMOVED, remove_lease_after);
+            */
             manifold.raise_event(scheduler.options.query_lease_uuid, SET_ADD,     new_lease);
             //scheduler._leases.push([this.urn, start_time, duration]);
 
@@ -657,6 +688,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             //jQuery.publish('/update-set/' + scheduler.options.query_uuid, [scheduler._leases]);
 
             /* We need to inform manifold about the whole diff, in addition to maintaining our own structure */
+            event.preventDefault();
         },
 
         _lease_init_mine: function (lease, unclick) 
@@ -677,6 +709,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
             // we free just this lease
             //console.log('this is mine');
             scheduler._lease_init_free(this, scheduler._lease_click_mine);
+            event.preventDefault();
         },
 
 
