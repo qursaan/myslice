@@ -206,9 +206,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 title="Resources",
                                 outline_complete=True,
                                 sons=[ 
+                                       resources_as_gmap, 
+                                       resources_as_3dmap,
                                        resources_as_scheduler,
-                                       #resources_as_gmap, 
-                                       #resources_as_3dmap,
                                        resources_as_list_area, ],
                                 active_domid = 'resources-map',
                                 persistent_active=True,
