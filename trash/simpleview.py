@@ -66,7 +66,7 @@ class SimpleView (TemplateView):
         template_env [ 'unfold_main' ] = resources_as_list.render(request)
     
         # more general variables expected in the template
-        template_env [ 'title' ] = '%(slicename)s'%locals()
+        template_env [ 'title' ] = 'simple %(slicename)s'%locals()
         # the menu items on the top
         template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
         # so we can sho who is logged
