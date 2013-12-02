@@ -195,7 +195,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'portal',
     # temporary - not packaged
-    # 'trash',
+    'trash',
     'sample',
 # DEPRECATED #    'django.contrib.formtools',
 # DEPRECATED ##    'crispy_forms',
