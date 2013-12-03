@@ -5,3 +5,12 @@ div.querytable {
     width: 100%;
     height: 400px;
 }
+
+/* this is crucial for slickgrid and bootstrap3 to play together nicely
+   https://github.com/mleibman/SlickGrid/issues/742
+ */
+div.querytable div {
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
+}
