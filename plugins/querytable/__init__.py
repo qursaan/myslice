@@ -88,16 +88,21 @@ Current implementation makes the following assumptions
         reqs = {
             'js_files' : [ 
                 "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
-                "http://mleibman.github.io/SlickGrid/lib/jquery.event.drag-2.2.js",
+# this one was in the slickgrid demo 
+# http://mleibman.github.io/SlickGrid/examples/example-checkbox-row-select.html
+# but triggers js errors when included - probably/maybe because of the jquery version ?
+# it might be responsible for not being able to select a row by clicking anywhere in it ?
+#                "http://mleibman.github.io/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js",
+                "js/jquery.event.drag-2.2.js",   # from slickgrid/lib
                 "js/slick.core.js",
-                "js/slick.autotooltips.js",       # from plugins/
-                "js/slick.cellrangedecorator.js",       # from plugins/
-                "js/slick.cellrangeselector.js",       # from plugins/
-                "js/slick.cellcopymanager.js",       # from plugins/
-                "js/slick.cellselectionmodel.js",       # from plugins/
-                "js/slick.rowselectionmodel.js",       # from plugins/
-                "js/slick.checkboxselectcolumn.js",       # from plugins/
-                "js/slick.columnpicker.js",             # from controls/
+                "js/slick.autotooltips.js",       # from slickgrid/plugins/
+                "js/slick.cellrangedecorator.js",       # from slickgrid/plugins/
+                "js/slick.cellrangeselector.js",       # from slickgrid/plugins/
+                "js/slick.cellcopymanager.js",       # from slickgrid/plugins/
+                "js/slick.cellselectionmodel.js",       # from slickgrid/plugins/
+                "js/slick.rowselectionmodel.js",       # from slickgrid/plugins/
+                "js/slick.checkboxselectcolumn.js",       # from slickgrid/plugins/
+                "js/slick.columnpicker.js",             # from slickgrid/controls/
                 "js/slick.formatters.js",
                 "js/slick.editors.js",
                 "js/slick.grid.js",
