@@ -34,8 +34,6 @@ googlemap_debug_detailed=false;
 
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
-            // TODO in destructor
-            // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
