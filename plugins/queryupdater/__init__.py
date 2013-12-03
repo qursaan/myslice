@@ -7,8 +7,8 @@ class QueryUpdater(Plugin):
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/queryupdater.js" ] ,
-            'css_files': [ "css/queryupdater.css" ],
+            'js_files' : [ "js/dataTables.js", "js/queryupdater.js" ] ,
+            'css_files': [ "css/dataTables.bootstrap.css", "css/queryupdater.css" ],
             }
         return reqs
 
