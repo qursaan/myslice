@@ -89,11 +89,19 @@ Current implementation makes the following assumptions
             'js_files' : [ 
                 "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                 "http://mleibman.github.io/SlickGrid/lib/jquery.event.drag-2.2.js",
-                "http://mleibman.github.io/SlickGrid/slick.core.js",
-                "http://mleibman.github.io/SlickGrid/plugins/slick.cellrangedecorator.js",
-                "http://mleibman.github.io/SlickGrid/plugins/slick.cellrangeselector.js",
-                "http://mleibman.github.io/SlickGrid/plugins/slick.cellselectionmodel.js",
-                "http://mleibman.github.io/SlickGrid/slick.grid.js",
+                "js/slick.core.js",
+                "js/slick.autotooltips.js",       # from plugins/
+                "js/slick.cellrangedecorator.js",       # from plugins/
+                "js/slick.cellrangeselector.js",       # from plugins/
+                "js/slick.cellcopymanager.js",       # from plugins/
+                "js/slick.cellselectionmodel.js",       # from plugins/
+                "js/slick.rowselectionmodel.js",       # from plugins/
+                "js/slick.checkboxselectcolumn.js",       # from plugins/
+                "js/slick.columnpicker.js",             # from controls/
+                "js/slick.formatters.js",
+                "js/slick.editors.js",
+                "js/slick.grid.js",
+
 #                "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                 "js/manifold.js", "js/manifold-query.js", 
                 "js/unfold-helper.js",

@@ -97,7 +97,16 @@
 		    messages.debug("slick_column["+c+"]:"+msg);
 		}
 	    }
+	    // add a checkbox column
+	    var checkbox_selector = new Slick.CheckboxSelectColumn({
+		cssClass: "slick-cell-checkboxsel"
+	    });
+	    this.slick_columns.push(checkbox_selector.getColumnDefinition());
 	    this.slick_grid = new Slick.Grid(selector, this.slick_data, this.slick_columns, this.slick_options);
+	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
+	    this.slick_grid.registerPlugin (checkbox_selector);
+	    
+	    this.columnpicker = new Slick.Controls.ColumnPicker (this.slick_columns, this.slick_grid, this.slick_options)
 
         }, // initialize_table
 
