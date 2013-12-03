@@ -2,7 +2,7 @@ from unfold.plugin import Plugin
 
 class MyPlugin(Plugin):
     
-    def __init__ (self, query, **settings):
+    def __init__ (self, query=None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
 

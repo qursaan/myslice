@@ -197,6 +197,7 @@ INSTALLED_APPS = (
     # temporary - not packaged
     # 'trash',
     'sample',
+    'sandbox'
 # DEPRECATED #    'django.contrib.formtools',
 # DEPRECATED ##    'crispy_forms',
 # DEPRECATED #
