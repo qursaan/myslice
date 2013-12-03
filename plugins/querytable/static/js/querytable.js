@@ -7,7 +7,9 @@
 (function($) {
 
     var debug=false;
-//    debug=true
+    debug=true
+    var contents_debug=false;
+//    contents_debug=true;
 
     var QueryTable = Plugin.extend({
 
@@ -88,7 +90,7 @@
 	    this.slick_data=[];
 	    
 	    var selector="#grid-"+this.options.domid;
-	    if (debug) {
+	    if (contents_debug) {
 		messages.debug("slick grid selector is " + selector);
 		for (c in this.slick_columns) {
 		    var col=this.slick_columns[c];
@@ -333,10 +335,15 @@
 
         on_all_query_done: function() {
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.slick_data.length + " lines");
+	    var start=new Date();
 	    this.slick_grid.setData (this.slick_data, true);
-	    if (debug) 
-		for (k in this.slick_data[0]) messages.debug("slick_data[0]["+k+"]="+this.slick_data[0][k]);
 	    this.slick_grid.render();
+	    var duration=new Date()-start;
+	    if (debug) messages.debug("setData+render took " + duration + " ms");
+	    if (contents_debug) {
+		// show full contents of first row app
+		for (k in this.slick_data[0]) messages.debug("slick_data[0]["+k+"]="+this.slick_data[0][k]);
+	    }
 	    
             var self = this;
 	    // if we've already received the slice query, we have not been able to set 
