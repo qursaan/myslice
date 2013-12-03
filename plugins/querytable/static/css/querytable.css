@@ -15,3 +15,13 @@ div.querytable div {
      -moz-box-sizing: content-box;
           box-sizing: content-box;
 }
+
+div.querytable .slick-column-name {
+    font-weight: bold;
+    font-size: medium;
+    padding: 5px;
+ }
+
+div.querytable {
+    font-size: small;
+}
