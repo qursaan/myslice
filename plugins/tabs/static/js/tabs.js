@@ -33,7 +33,6 @@ var tabs_helper = {
 	if (tabs_helper.debug) messages.debug ("setting active for " + domid + " to active_domid=" + active_domid);
 	// build something like "#uldomid a[href='#active_domid']"
 	var selector="#"+domid+" a[href='#"+active_domid+"']";
-	console.log("selector="+selector);
 	$(selector).tab('show');
     },
     set_from_saved_active_domid : function (domid) {

@@ -91,7 +91,7 @@ redo-templates: clean-templates templates
 #################### compute emacs tags
 # list files under git but exclude third-party stuff like bootstrap and jquery
 myfiles: force
-	@git ls-files | egrep -v 'insert(_|-)above|third-party/|play/'
+	@git ls-files | egrep -v 'insert(_|-)above|third-party/|to-be-integrated/'
 
 # in general it's right to rely on the contents as reported by git
 tags: force
