@@ -31,6 +31,9 @@ tmp_default_slice='ple.upmc.myslicedemo'
 #do_query_users=True
 do_query_users=False
 
+#do_query_leases=True
+do_query_leases=False
+
 insert_messages=False
 #insert_messages=True
 
@@ -43,6 +46,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
         page.add_js_chunks ('$(function() { messages.debug("sliceview: jQuery version " + $.fn.jquery); });')
         page.add_js_chunks ('$(function() { messages.debug("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
+        page.add_js_chunks ('$(function() { messages.debug("sliceview: leases turned %s"); });'%("on" if do_query_leases else "off"))
         config=Config()
         page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
         page.expose_js_metadata()
@@ -64,6 +68,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'user.user_hrn',
                 #'application.measurement_point.counter'
         )
+        # for internal use in the querytable plugin;
+        # needs to be a unique column present for each returned record
+        main_query_key = 'hrn'
     
         query_resource_all = Query.get('resource').select(resource_fields)
         if do_query_users:
@@ -180,6 +187,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
+            # safer to use 'hrn' as the internal unique key for this plugin
+            id_key     = main_query_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,
@@ -188,28 +197,36 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
-        resources_as_scheduler = Scheduler(
-            page        = page,
-            title       = 'Scheduler',
-            domid       = 'scheduler',
-            query       = sq_resource,
-            query_all_resources = query_resource_all,
-            query_lease = sq_lease,
-        )
+        if do_query_leases:
+            resources_as_scheduler = Scheduler(
+                page        = page,
+                title       = 'Scheduler',
+                domid       = 'scheduler',
+                query       = sq_resource,
+                query_all_resources = query_resource_all,
+                query_lease = sq_lease,
+                )
 
        # with the new 'Filter' stuff on top, no need for anything but the querytable
         resources_as_list_area = resources_as_list 
+
+        resources_sons = [
+            resources_as_gmap, 
+            resources_as_3dmap,
+            resources_as_scheduler,
+            resources_as_list_area,
+            ] if do_query_leases else [
+            resources_as_gmap, 
+            resources_as_3dmap,
+            resources_as_list_area,
+            ]
 
         resources_area = Tabs ( page=page, 
                                 domid="resources",
                                 togglable=True,
                                 title="Resources",
                                 outline_complete=True,
-                                sons=[ 
-                                       resources_as_gmap, 
-                                       resources_as_3dmap,
-                                       resources_as_scheduler,
-                                       resources_as_list_area, ],
+                                sons= resources_sons,
                                 active_domid = 'resources-map',
                                 persistent_active=True,
                                 )

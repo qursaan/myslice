@@ -58,7 +58,6 @@ var tabs_helper = {
 	    // persistent-active
 	    var domid=$(e.target).closest(".persistent-active").attr('id');
 	    tabs_helper.store_active_domid(domid,active_domid);
-	    console.log("CLICKED domid="+domid+" active_domid="+active_domid);
 	});
     },
 
