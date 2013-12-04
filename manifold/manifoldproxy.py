@@ -14,7 +14,7 @@ from manifold.util.log          import Log
 from myslice.config             import Config
 
 debug=False
-debug=True
+#debug=True
 
 # add artificial delay in s
 debug_spin=0

@@ -9,16 +9,29 @@ from manifold.core.result_value import ResultValue
 
 debug=False
 debug=True
+debug_deep=False
+#debug_deep=True
 
+########## ugly stuff for hopefully nicer debug messages
 def mytruncate (obj, l):
     # we will add '..' 
     l1=l-2
     repr="%s"%obj
     return (repr[:l1]+'..') if len(repr)>l1 else repr
 
+from time import time, gmtime, strftime
+from math import trunc
+def mytime (start=None):
+    gm=gmtime()
+    t=time()
+    msg=strftime("%H:%M:%S-", gmtime())+"%03d"%((t-trunc(t))*1000)
+    if start is not None: msg += " (%03fs)"%(t-start)
+    return t,msg
+##########
+
 class ManifoldAPI:
 
-    def __init__(self, auth=None, cainfo=None):
+    def __init__ (self, auth=None, cainfo=None):
         
         self.auth = auth
         self.cainfo = cainfo
@@ -51,6 +64,16 @@ class ManifoldAPI:
                 else:           print '+++',k,':',mytruncate (v,30)
         else:                                 print "[dont know how to display result] %s"%result
 
+    # how to display a call
+    def _repr_query (self,methodName, query):
+        try:    action=query['action']
+        except: action="???"
+        try:    subject=query['object']
+        except: subject="???"
+        # most of the time, we run 'forward'
+        if methodName=='forward':       return "forward(%s(%s))"%(action,subject)
+        else:                           return "%s(%s)"%(action,subject)
+
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
     # as of march 2013 we work with an API that essentially either returns the value, or raises 
     # an xmlrpclib.Fault exception with always the same 8002 code
@@ -59,23 +82,18 @@ class ManifoldAPI:
     # a SESSION_EXPIRED code
     def __getattr__(self, methodName):
         def func(*args, **kwds):
-            # how to display a call
-            def repr ():
-                # most of the time, we run 'forward'
-                if methodName=='forward':
-                    try:    action="forward(%s)"%args[0]['action']
-                    except: action="forward(??)"
-                else: action=methodName
-                return action
+            # shorthand
+            def repr(): return self._repr_query (methodName, args[0])
             try:
                 if debug:
-                    print "====> ManifoldAPI.%s"%repr(),"url",self.url
+                    start,msg = mytime()
+                    print "====>",msg,"ManifoldAPI.%s"%repr(),"url",self.url
                     # No password in the logs
                     logAuth = copy.copy(self.auth)
                     for obfuscate in ['Authring','session']: 
                         if obfuscate in logAuth:  logAuth[obfuscate]="XXX"
-                    print "=> auth",logAuth
-                    print "=> args",args,"kwds",kwds
+                    if debug_deep: print "=> auth",logAuth
+                    if debug_deep: print "=> args",args,"kwds",kwds
                 annotations = {
                     'authentication': self.auth
                 }
@@ -86,7 +104,8 @@ class ManifoldAPI:
                 if debug:
                     print '<= result=',
                     self._print_result(result)
-                    print '<==== backend call %s returned'%(repr()),
+                    end,msg = mytime(start)
+                    print "<====",msg,"backend call %s returned"%(repr())
 
                 return ResultValue(**result)
 

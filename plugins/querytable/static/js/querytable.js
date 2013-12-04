@@ -8,8 +8,8 @@
 
     var debug=false;
     debug=true
-    var contents_debug=false;
-//    contents_debug=true;
+    var debug_deep=false;
+//    debug_deep=true;
 
     var QueryTable = Plugin.extend({
 
@@ -90,7 +90,7 @@
 	    this.slick_data=[];
 	    
 	    var selector="#grid-"+this.options.domid;
-	    if (contents_debug) {
+	    if (debug_deep) {
 		messages.debug("slick grid selector is " + selector);
 		for (c in this.slick_columns) {
 		    var col=this.slick_columns[c];
@@ -119,7 +119,7 @@
         }, // getColIndex
 
         checkbox_html : function (key, value) {
-//	    if (debug) messages.debug("checkbox_html, value="+value);
+	    if (debug_deep) messages.debug("checkbox_html, value="+value);
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
@@ -162,7 +162,7 @@
         },
 
         set_checkbox: function(record, checked) {
-	    console.log("set_checkbox not implemented");
+	    console.log("set_checkbox not yet implemented with slickgrid");
 	    return;
             /* Default: checked = true */
             if (checked === undefined) checked = true;
@@ -192,7 +192,7 @@
             checkbox_id = escape_id(checkbox_id);
             // using dataTables's $ to search also in nodes that are not currently displayed
             var element = this.table.$(checkbox_id);
-            if (debug) 
+            if (debug_deep) 
                 messages.debug("set_checkbox checked=" + checked
                                + " id=" + checkbox_id + " matches=" + element.length);
             element.attr('checked', checked);
@@ -340,7 +340,7 @@
 	    this.slick_grid.render();
 	    var duration=new Date()-start;
 	    if (debug) messages.debug("setData+render took " + duration + " ms");
-	    if (contents_debug) {
+	    if (debug_deep) {
 		// show full contents of first row app
 		for (k in this.slick_data[0]) messages.debug("slick_data[0]["+k+"]="+this.slick_data[0][k]);
 	    }

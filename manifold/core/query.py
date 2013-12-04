@@ -23,7 +23,7 @@ def uniqid ():
     return uuid.uuid4().hex
 
 debug=False
-debug=True
+#debug=True
 
 class ParameterError(StandardError): pass
 
