@@ -25,3 +25,8 @@ div.querytable .slick-column-name {
 div.querytable {
     font-size: small;
 }
+
+/* an example of the css classes used */
+.querytable-column-network_hrn {
+    background-color:red;
+}

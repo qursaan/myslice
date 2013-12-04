@@ -76,9 +76,13 @@
 	    // compute columns based on columns and hidden_columns
 	    this.slick_columns = [];
 	    var all_columns = this.options.columns; // .concat(this.options.hidden_columns)
+	    // xxx would be helpful to support a column_renamings options arg
+	    // for redefining some labels like 'network_hrn' that really are not meaningful
 	    for (c in all_columns) {
 		var column=all_columns[c];
-		this.slick_columns.push ( {id:column, name:column, field:column, width:100, minWidth:40, });
+		this.slick_columns.push ( {id:column, name:column, field:column, 
+					   cssClass: "querytable-column-"+column,
+					   width:100, minWidth:40, });
 	    }
 
 	    // xxx should be extensible from caller with this.options.slickgrid_options 
