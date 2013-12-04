@@ -56,7 +56,8 @@ urlpatterns = patterns(
     #
     # Portal
     url(r'^portal/', include('portal.urls')),
-    # Portal
+    # Sandbox
+    url(r'^sandbox/', include('sandbox.urls')),
     url(r'^sample/', include('sample.urls')),
     # Debug
 #    url(r'^debug/', include('debug_platform.urls')),
