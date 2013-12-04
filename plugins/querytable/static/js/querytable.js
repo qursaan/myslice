@@ -78,7 +78,7 @@
 	    var all_columns = this.options.columns; // .concat(this.options.hidden_columns)
 	    for (c in all_columns) {
 		var column=all_columns[c];
-		this.slick_columns.push ( {id:column, name:column, field:column });
+		this.slick_columns.push ( {id:column, name:column, field:column, width:100, minWidth:40, });
 	    }
 
 	    // xxx should be extensible from caller with this.options.slickgrid_options 
