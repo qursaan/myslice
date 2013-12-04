@@ -79,18 +79,19 @@ googlemap_debug_detailed=false;
 
         initialize_map: function() {
             this.markerCluster = null;
-
+            //create empty LatLngBounds object in order to automatically center the map on the displayed objects
+            this.bounds = new google.maps.LatLngBounds();
             var center = new google.maps.LatLng(this.options.latitude, this.options.longitude);
             var myOptions = {
                 zoom: this.options.zoom,
                 center: center,
-		scrollwheel: false,
+		        scrollwheel: false,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
             }
 	    
             var domid = this.options.plugin_uuid + '--' + 'googlemap';
-	    var elmt = document.getElementById(domid);
-	    if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
+	        var elmt = document.getElementById(domid);
+	        if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
             this.map = new google.maps.Map(elmt, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
@@ -127,7 +128,9 @@ googlemap_debug_detailed=false;
                 title: object,
 		// gmap can deal with a DOM element but not a jquery object
                 content: dom.get(0),
-            }); 
+        }); 
+        //extend the bounds to include each marker's position
+        this.bounds.extend(marker.position);
 	    return {marker:marker, ul:ul};
 	},
 
@@ -234,10 +237,10 @@ googlemap_debug_detailed=false;
         },
 
         on_query_done: function() {
-	    if (googlemap_debug) messages.debug("on_query_done");	    
+	        if (googlemap_debug) messages.debug("on_query_done");	    
             if (this.received_all) {
                 this.unspin();
-	    }
+	        }
             this.received_set = true;
         },
 
@@ -291,7 +294,12 @@ googlemap_debug_detailed=false;
                 //map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
                 this.map.fitBounds(bounds);
             });
-
+            //now fit the map to the bounds
+            this.map.fitBounds(this.bounds);
+            // Fix the zoom of fitBounds function, it's too close when there is only 1 marker
+            if(markers.length==1){
+                this.map.setZoom(this.map.getZoom()-4);
+            }
             var googlemap = this;
             if (this.received_set) {
                 /* ... and check the ones specified in the resource list */
