@@ -85,7 +85,6 @@
 	    this.slick_options = {
 		enableCellNavigation: false,
 		enableColumnReorder: true,
-		explicitInitialization: true,		
 	    };
 
 	    this.slick_data=[];
@@ -338,7 +337,7 @@
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.slick_data.length + " lines");
 	    var start=new Date();
 	    this.slick_grid.setData (this.slick_data, true);
-	    this.slick_grid.init();
+	    this.slick_grid.render();
 	    var duration=new Date()-start;
 	    if (debug) messages.debug("setData+render took " + duration + " ms");
 	    if (debug_deep) {
