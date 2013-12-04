@@ -107,6 +107,9 @@
 	    this.slick_grid = new Slick.Grid(selector, this.slick_data, this.slick_columns, this.slick_options);
 	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
 	    this.slick_grid.registerPlugin (checkbox_selector);
+	    // autotooltips: for showing the full column name when ellipsed
+	    var auto_tooltips = new Slick.AutoTooltips ({ enableForHeaderCells: true });
+	    this.slick_grid.registerPlugin (auto_tooltips);
 	    
 	    this.columnpicker = new Slick.Controls.ColumnPicker (this.slick_columns, this.slick_grid, this.slick_options)
 
