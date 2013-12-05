@@ -154,8 +154,6 @@
         }, 
 
         new_record: function(record) {
-	    // xxx having a field named 'id' is a requirement from dataview
-	    record['id']=record[this.key];
 	    this.slick_data.push(record);
         },
 
@@ -354,7 +352,8 @@
         on_all_query_done: function() {
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.slick_data.length + " lines");
 	    var start=new Date();
-	    this.slick_dataview.setItems (this.slick_data);
+	    // use this.key as the key for identifying rows
+	    this.slick_dataview.setItems (this.slick_data, this.key);
 	    var duration=new Date()-start;
 	    if (debug) messages.debug("setItems " + duration + " ms");
 	    if (debug_deep) {
