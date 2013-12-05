@@ -65,7 +65,7 @@
 
         on_show: function(e) {
             var self = e.data;
-            self.table.fnAdjustColumnSizing()
+            self.redraw_table();
         }, // on_show
 
         /* GUI EVENTS */
@@ -394,35 +394,6 @@
 
             });
             return ret;
-        },
-
-        _querytable_draw_callback: function() {
-            /* 
-             * Handle clicks on checkboxes: reassociate checkbox click every time
-             * the table is redrawn 
-             */
-            this.elts('querytable-checkbox').unbind('click').click(this, this._check_click);
-
-            if (!this.table)
-                return;
-
-            /* Remove pagination if we show only a few results */
-            var wrapper = this.table; //.parent().parent().parent();
-            var rowsPerPage = this.table.fnSettings()._iDisplayLength;
-            var rowsToShow = this.table.fnSettings().fnRecordsDisplay();
-            var minRowsPerPage = this.table.fnSettings().aLengthMenu[0];
-
-            if ( rowsToShow <= rowsPerPage || rowsPerPage == -1 ) {
-                $('.querytable_paginate', wrapper).css('visibility', 'hidden');
-            } else {
-                $('.querytable_paginate', wrapper).css('visibility', 'visible');
-            }
-
-            if ( rowsToShow <= minRowsPerPage ) {
-                $('.querytable_length', wrapper).css('visibility', 'hidden');
-            } else {
-                $('.querytable_length', wrapper).css('visibility', 'visible');
-            }
         },
 
         _check_click: function(e) {
