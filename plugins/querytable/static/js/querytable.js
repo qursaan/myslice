@@ -89,6 +89,8 @@
 	    this.slick_options = {
 		enableCellNavigation: false,
 		enableColumnReorder: true,
+		showHeaderRow: true,
+		syncColumnCellResize: true,
 	    };
 
 	    this.slick_data = [];
