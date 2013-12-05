@@ -60,12 +60,15 @@ class AccountView(LoginRequiredAutoLogoutView):
                     account_type_list.append(account_type)
                     usr_hrn_list.append(account_usr_hrn)
                     pub_key_list.append(account_pub_key)
+            
+                # to hide private key row if it doesn't exist    
+                if 'myslice' in platform_detail['platform']:
+                    account_config = json.loads(account_detail['config'])
+                    account_priv_key = account_config.get('user_private_key','N/A')
         
         # combining 4 lists into 1 [to render in the template] 
         lst = [{'platform_name': t[0], 'account_type': t[1], 'usr_hrn':t[2], 'usr_pubkey':t[3]} 
                for t in zip(platform_name_list, account_type_list, usr_hrn_list, pub_key_list)]
-        #print "test"
-        #print lst
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
@@ -74,7 +77,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         context ['lastname'] = config.get('lastname',"?")
         context ['fullname'] = context['firstname'] +' '+ context['lastname']
         context ['authority'] = config.get('authority',"Unknown Authority")
-        #context['users'] = userlist.render(self.request)
+        context['user_private_key'] = account_priv_key
         
         # XXX This is repeated in all pages
         # more general variables expected in the template

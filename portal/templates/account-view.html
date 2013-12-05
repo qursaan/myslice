@@ -110,12 +110,14 @@
 						<button id="upload_file" type="button" title="Upload a public key"> Upload </button>       
 	      			</td>
 	    		</tr>
-	    		<tr class="even" id="pkey_row" display="none">
-	      			<td class="key">Private Key </td>
+	    		<tr class="even" id="pkey_row">
+				 {%if 'N/A' not in user_private_key%}
+	      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
 	      			<td class="value">********<a href="#">
 	      				<button type="submit" name="dl_pkey" class="download" title="Download your privaye key" id="dl_pkey"> Download </button>
 	      				<button id="delete" name="delete" type="submit" title="Delete your private key">Delete </button>
 	    			</td>
+				 {%endif%}		
 	  			</tr>
 	  			<tr class="odd">
 	    			<td colspan="2">
