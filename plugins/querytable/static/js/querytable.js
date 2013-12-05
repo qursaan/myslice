@@ -126,60 +126,32 @@
 	    
 	    this.columnpicker = new Slick.Controls.ColumnPicker (this.slick_columns, this.slick_grid, this.slick_options)
 
+
         }, // initialize_table
-
-	// Determine index of key in the table columns 
-        getColIndex: function(key, cols) {
-            var tabIndex = $.map(cols, function(x, i) { if (x.sTitle == key) return i; });
-            return (tabIndex.length > 0) ? tabIndex[0] : -1;
-        }, // getColIndex
-
-        checkbox_html : function (key, value) {
-	    if (debug_deep) messages.debug("checkbox_html, value="+value);
-            var result="";
-            // Prefix id with plugin_uuid
-            result += "<input";
-            result += " class='querytable-checkbox'";
-            result += " id='" + this.flat_id(this.id('checkbox', value)) + "'";
-            result += " name='" + key + "'";
-            result += " type='checkbox'";
-            result += " autocomplete='off'";
-	    if (value === undefined) {
-		messages.warning("querytable.checkbox_html - undefined value");
-	    } else {
-		result += " value='" + value + "'";
-	    }
-            result += "></input>";
-            return result;
-        }, 
 
         new_record: function(record) {
 	    this.slick_data.push(record);
         },
 
         clear_table: function() {
-	    console.log("clear_table not implemented");
+	    this.slick_data=[];
+	    this.slick_dataview.setItems(this.slick_data,this.key);
         },
 
         redraw_table: function() {
-            this.table.fnDraw();
+	    this.slick_grid.autosizeColumns();
+            this.slick_grid.render();
         },
 
         show_column: function(field) {
-            var oSettings = this.table.fnSettings();
-            var cols = oSettings.aoColumns;
-            var index = this.getColIndex(field,cols);
-            if (index != -1)
-                this.table.fnSetColumnVis(index, true);
+	    console.log ("querytable.show_column not yet implemented with slickgrid - field="+field);
         },
 
         hide_column: function(field) {
-	    console.log("hide_column not implemented - field="+field);
+	    console.log("querytable.hide_column not implemented with slickgrid - field="+field);
         },
 
         set_checkbox: function(record, checked) {
-	    console.log("set_checkbox not yet implemented with slickgrid");
-	    return;
             /* Default: checked = true */
             if (checked === undefined) checked = true;
 
@@ -203,15 +175,13 @@
 		messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
 		return;
 	    }
-            var checkbox_id = this.flat_id(this.id('checkbox', id));
-            // function escape_id(myid) is defined in portal/static/js/common.functions.js
-            checkbox_id = escape_id(checkbox_id);
-            // using dataTables's $ to search also in nodes that are not currently displayed
-            var element = this.table.$(checkbox_id);
-            if (debug_deep) 
-                messages.debug("set_checkbox checked=" + checked
-                               + " id=" + checkbox_id + " matches=" + element.length);
-            element.attr('checked', checked);
+	    var index = this.slick_dataview.getIdxById(id);
+	    var selectedRows=this.slick_grid.getSelectedRows();
+	    if (checked) // add index in current list
+		selectedRows=selectedRows.concat(index);
+	    else
+		selectedRows=selectedRows.filter(function(idx) {return idx!=index;});
+	    this.slick_grid.setSelectedRows(selectedRows);
         },
 
         /*************************** QUERY HANDLER ****************************/
