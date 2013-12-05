@@ -91,7 +91,14 @@
 		enableColumnReorder: true,
 	    };
 
-	    this.slick_data=[];
+	    this.slick_data = [];
+	    this.slick_dataview = new Slick.Data.DataView();
+	    var self=this;
+	    this.slick_dataview.onRowCountChanged.subscribe ( function (e,args) {
+		self.slick_grid.updateRowCount();
+		self.slick_grid.autosizeColumns();
+		self.slick_grid.render();
+	    });
 	    
 	    var selector="#grid-"+this.options.domid;
 	    if (debug_deep) {
@@ -108,7 +115,7 @@
 		cssClass: "slick-cell-checkboxsel"
 	    });
 	    this.slick_columns.push(checkbox_selector.getColumnDefinition());
-	    this.slick_grid = new Slick.Grid(selector, this.slick_data, this.slick_columns, this.slick_options);
+	    this.slick_grid = new Slick.Grid(selector, this.slick_dataview, this.slick_columns, this.slick_options);
 	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
 	    this.slick_grid.registerPlugin (checkbox_selector);
 	    // autotooltips: for showing the full column name when ellipsed
@@ -145,6 +152,8 @@
         }, 
 
         new_record: function(record) {
+	    // xxx having a field named 'id' is a requirement from dataview
+	    record['id']=record[this.key];
 	    this.slick_data.push(record);
         },
 
@@ -343,11 +352,9 @@
         on_all_query_done: function() {
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.slick_data.length + " lines");
 	    var start=new Date();
-	    this.slick_grid.setData (this.slick_data, true);
-	    this.slick_grid.autosizeColumns();
-	    this.slick_grid.render();
+	    this.slick_dataview.setItems (this.slick_data);
 	    var duration=new Date()-start;
-	    if (debug) messages.debug("setData+render took " + duration + " ms");
+	    if (debug) messages.debug("setItems " + duration + " ms");
 	    if (debug_deep) {
 		// show full contents of first row app
 		for (k in this.slick_data[0]) messages.debug("slick_data[0]["+k+"]="+this.slick_data[0][k]);

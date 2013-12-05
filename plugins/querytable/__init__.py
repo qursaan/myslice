@@ -106,6 +106,7 @@ Current implementation makes the following assumptions
                 "js/slick.formatters.js",
                 "js/slick.editors.js",
                 "js/slick.grid.js",
+                "js/slick.dataview.js",
 
 #                "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                 "js/manifold.js", "js/manifold-query.js", 
