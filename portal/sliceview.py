@@ -17,7 +17,10 @@ from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
 from plugins.scheduler               import Scheduler
 from plugins.querycode               import QueryCode
-from plugins.query_editor            import QueryEditor
+# Thierry
+# stay away from query editor for now as it seems to make things go very slow
+# see https://lists.myslice.info/pipermail/devel-myslice/2013-December/000221.html 
+#from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
@@ -129,13 +132,14 @@ class SliceView (LoginRequiredAutoLogoutView):
         # --------------------------------------------------------------------------
         # Filter Resources
        
-        filter_query_editor = QueryEditor(
-            page  = page,
-            query = sq_resource, 
-            query_all = query_resource_all,
-            title = "Select Columns",
-            domid = 'select-columns',
-            )
+# turn off for now -- see above
+#        filter_query_editor = QueryEditor(
+#            page  = page,
+#            query = sq_resource, 
+#            query_all = query_resource_all,
+#            title = "Select Columns",
+#            domid = 'select-columns',
+#            )
         filter_active_filters = ActiveFilters(
             page  = page,
             query = sq_resource,
@@ -145,7 +149,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             page                = page,
             title               = 'Filter Resources',
             domid               = 'filters',
-            sons                = [filter_query_editor, filter_active_filters],
+            sons                = [# filter_query_editor, 
+                                   filter_active_filters],
             togglable           = True,
             toggled             = 'persistent',
             outline_complete    = True, 
