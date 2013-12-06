@@ -356,7 +356,7 @@ var manifold = {
             var publish_uuid=tuple.publish_uuid;
             // by default we publish using the same uuid of course
             if (publish_uuid==undefined) publish_uuid=query.query_uuid;
-            if (manifold.asynchroneous_debug) {
+            if (manifold.publish_result_debug) {
                 messages.debug("sending POST on " + manifold.proxy_url + query.__repr());
             }
 

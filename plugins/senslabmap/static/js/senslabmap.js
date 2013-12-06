@@ -31,8 +31,10 @@
         }
         this.nodes[site].push(node);
       } else {
-        console.warn("node has no site:");
-        console.warn(node);
+// xxx would need a smarter way to report these only on nodes that deserve it
+// these messages are all over the place in a PL setup and tend to hide helpful signal
+//        console.warn("node has no site:");
+//        console.warn(node);
       }
     },
     
