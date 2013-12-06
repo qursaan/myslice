@@ -30,3 +30,7 @@ div.querytable {
 .querytable-column-network_hrn {
     background-color:red;
 }
+
+.slick-checkbox {
+    background-color: blue;
+}

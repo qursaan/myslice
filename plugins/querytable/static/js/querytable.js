@@ -1,8 +1,23 @@
 /**
- * Description: display a query result in a datatables-powered <table>
+ * Description: display a query result in a slickgrid-powered <table>
  * Copyright (c) 2012-2013 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
+
+/* ongoing adaptation to slickgrid 
+   still missing are
+. checkboxes really running properly
+. ability to sort on columns (should be straightforward
+  IIRC this got broken when moving to dataview, see dataview doc
+. ability to sort on the checkboxes column 
+  (e.g. have resources 'in' the slice show up first)
+  not quite clear how to do this
+. searching
+. filtering
+. style improvement
+. rendering in the sliceview - does not use up all space, 
+  this is different from the behaviour with simpleview
+*/
 
 (function($) {
 
@@ -24,18 +39,14 @@
             this.received_all_query = false;
             this.received_query = false;
 
-//            // We need to remember the active filter for datatables filtering
+//            // We need to remember the active filter for filtering
 //            this.filters = Array(); 
 
             // an internal buffer for records that are 'in' and thus need to be checked 
             this.buffered_records_to_check = [];
 
-            /* XXX Events XXX */
-            // this.$element.on('show.Datatables', this.on_show);
+            /* Events */
             this.elmt().on('show', this, this.on_show);
-            // Unbind all events using namespacing
-            // TODO in destructor
-            // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.method = query.object;
@@ -84,6 +95,10 @@
 					   cssClass: "querytable-column-"+column,
 					   width:100, minWidth:40, });
 	    }
+	    var checkbox_selector = new Slick.CheckboxSelectColumn({
+		cssClass: "slick-checkbox"
+	    });
+	    this.slick_columns.push(checkbox_selector.getColumnDefinition());
 
 	    // xxx should be extensible from caller with this.options.slickgrid_options 
 	    this.slick_options = {
@@ -112,11 +127,7 @@
 		    messages.debug("slick_column["+c+"]:"+msg);
 		}
 	    }
-	    // add a checkbox column
-	    var checkbox_selector = new Slick.CheckboxSelectColumn({
-		cssClass: "slick-cell-checkboxsel"
-	    });
-	    this.slick_columns.push(checkbox_selector.getColumnDefinition());
+
 	    this.slick_grid = new Slick.Grid(selector, this.slick_dataview, this.slick_columns, this.slick_options);
 	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
 	    this.slick_grid.registerPlugin (checkbox_selector);
@@ -126,6 +137,7 @@
 	    
 	    this.columnpicker = new Slick.Controls.ColumnPicker (this.slick_columns, this.slick_grid, this.slick_options)
 
+	    g=this.slick_grid;
 
         }, // initialize_table
 
@@ -149,39 +161,6 @@
 
         hide_column: function(field) {
 	    console.log("querytable.hide_column not implemented with slickgrid - field="+field);
-        },
-
-        set_checkbox: function(record, checked) {
-            /* Default: checked = true */
-            if (checked === undefined) checked = true;
-
-            var id;
-            /* The function accepts both records and their key */
-            switch (manifold.get_type(record)) {
-            case TYPE_VALUE:
-                id = record;
-                break;
-            case TYPE_RECORD:
-                /* XXX Test the key before ? */
-                id = record[this.key];
-                break;
-            default:
-                throw "Not implemented";
-                break;
-            }
-
-
-	    if (id === undefined) {
-		messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
-		return;
-	    }
-	    var index = this.slick_dataview.getIdxById(id);
-	    var selectedRows=this.slick_grid.getSelectedRows();
-	    if (checked) // add index in current list
-		selectedRows=selectedRows.concat(index);
-	    else
-		selectedRows=selectedRows.filter(function(idx) {return idx!=index;});
-	    this.slick_grid.setSelectedRows(selectedRows);
         },
 
         /*************************** QUERY HANDLER ****************************/
@@ -251,7 +230,7 @@
         on_new_record: function(record) {
             if (this.received_all_query) {
         	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this.set_checkbox(record, true);
+                this._set_checkbox(record, true);
             } else {
         	// otherwise we need to remember that and do it later on
         	if (debug) messages.debug("Remembering record to check " + record[this.key]);
@@ -270,18 +249,21 @@
         on_query_done: function() {
             this.received_query = true;
     	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
+            if (this.received_all_query && this.received_query) {
+		this._init_checkboxes();
+		this.unspin();
+	    }
         },
         
         on_field_state_changed: function(data) {
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
+                    this._set_checkbox(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
+                    this._set_checkbox(data.value, false);
                     break;
                 default:
                     break;
@@ -294,11 +276,11 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
+                    this._set_checkbox(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
+                    this._set_checkbox(data.value, false);
                     break;
                 default:
                     break;
@@ -320,8 +302,8 @@
         }, // on_all_query_in_progress
 
         on_all_query_done: function() {
-	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.slick_data.length + " lines");
 	    var start=new Date();
+	    if (debug) messages.debug("1-shot initializing slickgrid content with " + this.slick_data.length + " lines");
 	    // use this.key as the key for identifying rows
 	    this.slick_dataview.setItems (this.slick_data, this.key);
 	    var duration=new Date()-start;
@@ -336,21 +318,100 @@
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
 		if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
-                self.set_checkbox(record, true);
+                self._set_checkbox(record, true);
             });
 	    this.buffered_records_to_check = [];
 
             this.received_all_query = true;
 	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
+            if (this.received_all_query && this.received_query) {
+		this._init_checkboxes();
+		this.unspin();
+	    }
 
         }, // on_all_query_done
 
         /************************** PRIVATE METHODS ***************************/
 
-        /** 
-         * @brief QueryTable filtering function
-         */
+        _set_checkbox: function(record, checked) {
+            /* Default: checked = true */
+            if (checked === undefined) checked = true;
+
+            var id;
+            /* The function accepts both records and their key */
+            switch (manifold.get_type(record)) {
+            case TYPE_VALUE:
+                id = record;
+                break;
+            case TYPE_RECORD:
+                /* XXX Test the key before ? */
+                id = record[this.key];
+                break;
+            default:
+                throw "Not implemented";
+                break;
+            }
+
+
+	    if (id === undefined) {
+		messages.warning("querytable._set_checkbox record has no id to figure which line to tick");
+		return;
+	    }
+	    var index = this.slick_dataview.getIdxById(id);
+	    var selectedRows=this.slick_grid.getSelectedRows();
+	    if (checked) // add index in current list
+		selectedRows=selectedRows.concat(index);
+	    else // remove index from current list
+		selectedRows=selectedRows.filter(function(idx) {return idx!=index;});
+	    this.slick_grid.setSelectedRows(selectedRows);
+        },
+
+// initializing checkboxes
+// have tried 2 approaches, but none seems to work as we need it
+// issue summarized in here 
+// http://stackoverflow.com/questions/20425193/slickgrid-selection-changed-callback-how-to-tell-between-manual-and-programmat
+	// arm the click callback on checkboxes
+	_init_checkboxes_manual : function () {
+	    // xxx looks like checkboxes can only be the last column??
+	    var checkbox_col = this.slick_grid.getColumns().length-1; // -1 +1 =0
+	    console.log ("checkbox_col="+checkbox_col);
+	    var self=this;
+	    console.log ("HERE 1 with "+this.slick_dataview.getLength()+" sons");
+	    for (var index=0; index < this.slick_dataview.getLength(); index++) {
+		// retrieve key (i.e. hrn) for this line
+		var key=this.slick_dataview.getItem(index)[this.key];
+		// locate cell <div> for the checkbox
+		var div=this.slick_grid.getCellNode(index,checkbox_col);
+		if (index <=30) console.log("HERE2 div",div," index="+index+" col="+checkbox_col);
+		// arm callback on single son of <div> that is the <input>
+		$(div).children("input").each(function () {
+		    if (index<=30) console.log("HERE 3, index="+index+" key="+key);
+		    $(this).click(function() {self._checkbox_clicked(self,this,key);});
+		});
+	    }
+	},
+
+	// onSelectedRowsChanged will fire even when 
+	_init_checkboxes : function () {
+	    console.log("_init_checkboxes");
+	    var grid=this.slick_grid;
+	    this.slick_grid.onSelectedRowsChanged.subscribe(function(){
+		row_ids = grid.getSelectedRows();
+		console.log(row_ids);
+	    });
+	},
+
+	// the callback for when user clicks 
+        _checkbox_clicked: function(querytable,input,key) {
+            // XXX this.value = key of object to be added... what about multiple keys ?
+	    if (debug) messages.debug("querytable click handler checked=" + input.checked + " key=" + key);
+            manifold.raise_event(querytable.options.query_uuid, input.checked?SET_ADD:SET_REMOVED, key);
+            //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
+            
+        },
+
+	// xxx from this and down, probably needs further tweaks for slickgrid
+
         _querytable_filter: function(oSettings, aData, iDataIndex) {
             var ret = true;
             $.each (this.filters, function(index, filter) { 
@@ -394,18 +455,6 @@
 
             });
             return ret;
-        },
-
-        _check_click: function(e) {
-            e.stopPropagation();
-
-            var self = e.data;
-
-            // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " hrn=" + this.value);
-            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
-            //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
-            
         },
 
         _selectAll: function() {
