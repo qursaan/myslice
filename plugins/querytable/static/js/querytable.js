@@ -39,19 +39,18 @@
             // $(window).unbind('QueryTable');
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
-            this.method = query.object;
+            this.object = query.object;
 
 	    // xxx beware that this.key needs to contain a key that all records will have
 	    // in general query_all will return well populated records, but query
 	    // returns records with only the fields displayed on startup. 
 	    this.key = (this.options.id_key);
-	    if (! this.key) {
-		// if not specified by caller, decide from metadata
-		var keys = manifold.metadata.get_key(this.method);
-		this.key = (keys && keys.length == 1) ? keys[0] : null;
+	    if (typeof(this.key)=='undefined' || (this.key).startsWith("unknown")) {
+		    // if not specified by caller, decide from metadata
+		    var keys = manifold.metadata.get_key(this.object);
+		    this.key = (keys && keys.length == 1) ? keys[0] : null;
 	    }
 	    if (! this.key) messages.warning("querytable.init could not kind valid key");
-
 	    messages.debug("querytable: key="+this.key);
 
             /* Setup query and record handlers */
@@ -276,15 +275,19 @@
             }
 
 
-	    if (id === undefined) {
-		messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
-		return;
-	    }
+	        if (id === undefined) {
+		        messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
+		        return;
+	        }
+            // PB TO CHECK THE RIGHT CHECKBOXES IS HERE... flat_id using \ in the key
+            // need to use escape_id when creating the id of the checkboxes
             var checkbox_id = this.flat_id(this.id('checkbox', id));
             // function escape_id(myid) is defined in portal/static/js/common.functions.js
             checkbox_id = escape_id(checkbox_id);
+            // As we are using [id="x"] syntax, we need to remove the # in the checkbox_id
+            checkbox_id = checkbox_id.replace("#","");
             // using dataTables's $ to search also in nodes that are not currently displayed
-            var element = this.table.$(checkbox_id);
+            var element = this.table.$('[id="' + checkbox_id + '"]');
             if (debug) 
                 messages.debug("set_checkbox checked=" + checked
                                + " id=" + checkbox_id + " matches=" + element.length);
@@ -557,7 +560,7 @@
             var self = e.data;
 
             // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " hrn=" + this.value);
+	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " "+this.key+"=" + this.value);
             manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             

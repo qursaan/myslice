@@ -12,12 +12,16 @@ from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
 from plugins.querytable              import QueryTable 
+from plugins.querygrid               import QueryGrid
 from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
 from plugins.scheduler               import Scheduler
 from plugins.querycode               import QueryCode
-from plugins.query_editor            import QueryEditor
+# Thierry
+# stay away from query editor for now as it seems to make things go very slow
+# see https://lists.myslice.info/pipermail/devel-myslice/2013-December/000221.html 
+#from plugins.query_editor            import QueryEditor
 from plugins.active_filters          import ActiveFilters
 from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
@@ -33,6 +37,9 @@ do_query_users=False
 
 #do_query_leases=True
 do_query_leases=False
+
+insert_grid=False
+#insert_grid=True
 
 insert_messages=False
 #insert_messages=True
@@ -62,7 +69,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                'resource.hrn', 'resource.hostname', 'resource.type', 
+                'resource.hrn', 'resource.urn', 'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
                 'lease.urn',
                 'user.user_hrn',
@@ -70,7 +77,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
         # for internal use in the querytable plugin;
         # needs to be a unique column present for each returned record
-        main_query_key = 'hrn'
+        #main_query_key = 'hrn'
     
         query_resource_all = Query.get('resource').select(resource_fields)
         if do_query_users:
@@ -129,13 +136,14 @@ class SliceView (LoginRequiredAutoLogoutView):
         # --------------------------------------------------------------------------
         # Filter Resources
        
-        filter_query_editor = QueryEditor(
-            page  = page,
-            query = sq_resource, 
-            query_all = query_resource_all,
-            title = "Select Columns",
-            domid = 'select-columns',
-            )
+# turn off for now -- see above
+#        filter_query_editor = QueryEditor(
+#            page  = page,
+#            query = sq_resource, 
+#            query_all = query_resource_all,
+#            title = "Select Columns",
+#            domid = 'select-columns',
+#            )
         filter_active_filters = ActiveFilters(
             page  = page,
             query = sq_resource,
@@ -145,7 +153,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             page                = page,
             title               = 'Filter Resources',
             domid               = 'filters',
-            sons                = [filter_query_editor, filter_active_filters],
+            sons                = [# filter_query_editor, 
+                                   filter_active_filters],
             togglable           = True,
             toggled             = 'persistent',
             outline_complete    = True, 
@@ -188,7 +197,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # safer to use 'hrn' as the internal unique key for this plugin
-            id_key     = main_query_key,
+            #id_key     = main_query_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,
@@ -196,6 +205,19 @@ class SliceView (LoginRequiredAutoLogoutView):
                 'bAutoWidth'    : True,
                 },
             )
+
+        if insert_grid:
+            resources_as_grid = QueryGrid( 
+                page       = page,
+                domid      = 'resources-grid',
+                title      = 'Grid view',
+                # this is the query at the core of the slice list
+                query      = sq_resource,
+                query_all  = query_resource_all,
+                # safer to use 'hrn' as the internal unique key for this plugin
+                id_key     = main_query_key,
+                checkboxes = True,
+                )
 
         if do_query_leases:
             resources_as_scheduler = Scheduler(
@@ -220,6 +242,10 @@ class SliceView (LoginRequiredAutoLogoutView):
             resources_as_3dmap,
             resources_as_list_area,
             ]
+        if insert_grid:
+            resources_sons.append(resources_as_grid)
+
+        print 40*'+-',"resources_sons has",len(resources_sons),"son"
 
         resources_area = Tabs ( page=page, 
                                 domid="resources",

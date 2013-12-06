@@ -7,7 +7,7 @@ from manifold.manifoldapi import ManifoldAPI
 from django.contrib                     import messages
 
 debug=False
-debug=True
+#debug=True
 
 class MetaData:
 
@@ -58,5 +58,5 @@ class MetaData:
         return self.hash_by_object[object]['column'].sort()
 
     def get_field_type(self, object, field):
-        print "Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon"
+        if debug: print "Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon"
         return field

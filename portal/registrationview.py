@@ -31,15 +31,16 @@ class RegistrationView (FreeAccessView):
     def get_or_post  (self, request, method):
         errors = []
 
-        #authorities_query = Query.get('authority').\
-        #    select('name', 'authority_hrn')
+        # Using cache manifold-tables to get the list of authorities faster
+        authorities_query = Query.get('authority').select('name', 'authority_hrn')
         
         #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
         #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
         #if onelab_enabled:
         if True:
             print "ONELAB ENABLED"
-            authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
+            #authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple', 'ple.nitos'])
+            # Now using Cache 
         else:
             print "FIREXP ENABLED"
 

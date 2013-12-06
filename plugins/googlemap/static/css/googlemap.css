@@ -1,3 +1,4 @@
+/* use same height as the querytable plugin for nicer effect */
 div.geo {
   height: 600px;
 /* these don't play out too well - somehow the bottom is off
