@@ -26,7 +26,7 @@
     var debug_deep=false;
 //    debug_deep=true;
 
-    var QueryTable = Plugin.extend({
+    var QueryGrid = Plugin.extend({
 
         init: function(options, element) {
             this._super(options, element);
@@ -60,9 +60,9 @@
 		var keys = manifold.metadata.get_key(this.method);
 		this.key = (keys && keys.length == 1) ? keys[0] : null;
 	    }
-	    if (! this.key) messages.warning("querytable.init could not kind valid key");
+	    if (! this.key) messages.warning("querygrid.init could not kind valid key");
 
-	    if (debug) messages.debug("querytable: key="+this.key);
+	    if (debug) messages.debug("querygrid: key="+this.key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
@@ -92,7 +92,7 @@
 	    for (c in all_columns) {
 		var column=all_columns[c];
 		this.slick_columns.push ( {id:column, name:column, field:column, 
-					   cssClass: "querytable-column-"+column,
+					   cssClass: "querygrid-column-"+column,
 					   width:100, minWidth:40, });
 	    }
 	    var checkbox_selector = new Slick.CheckboxSelectColumn({
@@ -156,11 +156,11 @@
         },
 
         show_column: function(field) {
-	    console.log ("querytable.show_column not yet implemented with slickgrid - field="+field);
+	    console.log ("querygrid.show_column not yet implemented with slickgrid - field="+field);
         },
 
         hide_column: function(field) {
-	    console.log("querytable.hide_column not implemented with slickgrid - field="+field);
+	    console.log("querygrid.hide_column not implemented with slickgrid - field="+field);
         },
 
         /*************************** QUERY HANDLER ****************************/
@@ -191,7 +191,7 @@
         },
 
         on_field_clear: function() {
-            alert('QueryTable::clear_fields() not implemented');
+            alert('QueryGrid::clear_fields() not implemented');
         },
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
@@ -221,7 +221,7 @@
         },
 
         on_all_field_clear: function() {
-            alert('QueryTable::clear_fields() not implemented');
+            alert('QueryGrid::clear_fields() not implemented');
         },
 
 
@@ -354,7 +354,7 @@
 
 
 	    if (id === undefined) {
-		messages.warning("querytable._set_checkbox record has no id to figure which line to tick");
+		messages.warning("querygrid._set_checkbox record has no id to figure which line to tick");
 		return;
 	    }
 	    var index = this.slick_dataview.getIdxById(id);
@@ -402,17 +402,17 @@
 	},
 
 	// the callback for when user clicks 
-        _checkbox_clicked: function(querytable,input,key) {
+        _checkbox_clicked: function(querygrid,input,key) {
             // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable click handler checked=" + input.checked + " key=" + key);
-            manifold.raise_event(querytable.options.query_uuid, input.checked?SET_ADD:SET_REMOVED, key);
+	    if (debug) messages.debug("querygrid click handler checked=" + input.checked + " key=" + key);
+            manifold.raise_event(querygrid.options.query_uuid, input.checked?SET_ADD:SET_REMOVED, key);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },
 
 	// xxx from this and down, probably needs further tweaks for slickgrid
 
-        _querytable_filter: function(oSettings, aData, iDataIndex) {
+        _querygrid_filter: function(oSettings, aData, iDataIndex) {
             var ret = true;
             $.each (this.filters, function(index, filter) { 
                 /* XXX How to manage checkbox ? */
@@ -460,8 +460,8 @@
         _selectAll: function() {
             // requires jQuery id
             var uuid=this.id.split("-");
-            var oTable=$("#querytable-"+uuid[1]).dataTable();
-            // Function available in QueryTable 1.9.x
+            var oTable=$("#querygrid-"+uuid[1]).dataTable();
+            // Function available in QueryGrid 1.9.x
             // Filter : displayed data only
             var filterData = oTable._('tr', {"filter":"applied"});   
             /* TODO: WARNING if too many nodes selected, use filters to reduce nuber of nodes */        
@@ -478,7 +478,7 @@
 
     });
 
-    $.plugin('QueryTable', QueryTable);
+    $.plugin('QueryGrid', QueryGrid);
 
 //  /* define the 'dom-checkbox' type for sorting in datatables 
 //     http://datatables.net/examples/plug-ins/dom_sort.html

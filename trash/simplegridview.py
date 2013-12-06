@@ -1,4 +1,4 @@
-# just one instance of QueryTable, nothing more, nothing less
+# just one instance of QueryGrid, nothing more, nothing less
 from django.views.generic.base import TemplateView
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -9,9 +9,9 @@ from unfold.page import Page
 
 from ui.topmenu import topmenu_items, the_user
 
-from plugins.querytable import QueryTable
+from plugins.querygrid import QueryGrid
 
-class SimpleView (TemplateView):
+class SimpleGridView (TemplateView):
 
     def get (self, request, slicename='ple.inria.f14'):
 
@@ -30,7 +30,7 @@ class SimpleView (TemplateView):
                 'user.user_hrn',
                 #'application.measurement_point.counter'
         )
-        # for internal use in the querytable plugin;
+        # for internal use in the querygrid plugin;
         # needs to be a unique column present for each returned record
         main_query_key = 'hrn'
     
@@ -42,7 +42,7 @@ class SimpleView (TemplateView):
 
         sq_resource    = aq.subquery('resource')
 
-        resources_as_list = QueryTable( 
+        resources_as_list = QueryGrid( 
             page       = page,
             domid      = 'resources-list',
             title      = 'List view',
