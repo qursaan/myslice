@@ -16,11 +16,12 @@ var Senslab = {
       node.x = parseFloat(node.x);
       node.y = parseFloat(node.y);
       node.z = parseFloat(node.z);
+      node.selected = false;
       node.normalized = true;
     }
   },
   notify: function(node) {
-    console.log("[Notify] node " + node.id + " is " + node.boot_state);
+    console.log("[Notify] node " + node.id + " is " + node.selected);
   },
   createMaps: function($container, sites, nodes) {
     var maps = {};
@@ -122,7 +123,7 @@ Senslab.Map = function() {
           if (intersects.length > 0) {
             var particle = intersects[0].object;
             if (particle.data.boot_state != "Suspected") {
-              setState(particle, particle.data.boot_state == "Alive" ? "Selected" : "Alive");
+              setSelected(particle, !particle.data.selected);
               var $nodeInput = self.$nodeInputs[particle.data.arch];
               $nodeInput.val(factorize(self.getNodesId(particle.data.arch)));
               self.update();
@@ -158,7 +159,7 @@ Senslab.Map = function() {
     var particles = this.scene.children;
     var nodes = [];
     for (var i = 0; i < particles.length; ++i) {
-      if (particles[i].data && particles[i].data.arch == arch && particles[i].data.boot_state == "Selected") {
+      if (particles[i].data && particles[i].data.arch == arch && particles[i].data.selected) {
         nodes.push(particles[i].id);
       }
     }
@@ -187,14 +188,14 @@ Senslab.Map = function() {
     this.update();
   };
   
-  Map.prototype.updateSelected = function(arch, selected) {
+  Map.prototype.updateSelected = function(arch, selectedNodes) {
     var particles = this.scene.children;
     for (var i = 0; i < particles.length; ++i) {
       if (particles[i].data && particles[i].data.arch == arch && particles[i].data.boot_state != "Suspected") {
         var particle = particles[i];
-        var state = $.inArray(particle.id, selected) == -1 ? "Alive" : "Selected";
-        if (particle.data.boot_state != state) {
-          setState(particle, state);
+        var selected = $.inArray(particle.id, selectedNodes) != -1;
+        if (particle.data.selected != selected) {
+          setSelected(particle, selected);
         }
       }
     }
@@ -216,14 +217,14 @@ Senslab.Map = function() {
     this.renderer.render(this.scene, this.camera);
   };
 
-  function setState(particle, state) {
-    particle.data.boot_state = state;
+  function setSelected(particle, selected) {
+    particle.data.selected = selected;
     setColor(particle);
     Senslab.notify(particle.data);
   }
 
   function setColor(particle) {
-    var color = colors[particle.data.boot_state] || colors["Selected"];
+    var color = particle.data.selected ? colors["Selected"] : colors[particle.data.boot_state];
     particle.material.color.setHex(color);
   }
 
