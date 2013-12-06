@@ -1,3 +1,6 @@
+from pprint import pprint
+from manifold.manifoldapi       import execute_query
+from manifold.core.query        import Query
 # a set of utilities to help make the global layout consistent across views
 
 # dropdowns are kind of ad hoc for now, and limited to one level
@@ -15,7 +18,16 @@ def topmenu_items (current,request=None):
     if has_user:
         result.append({'label':'Dashboard', 'href': '/portal/dashboard/'})
         result.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
-        result.append({'label':'Validation', 'href': '/portal/validate/'})
+        # ** Where am I a PI **
+        # For this we need to ask SFA (of all authorities) = PI function
+        pi_authorities_query = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
+        pi_authorities_tmp = execute_query(request, pi_authorities_query)
+        pi_authorities = set()
+        for pa in pi_authorities_tmp:
+            pi_authorities |= set(pa['pi_authorities'])
+        print "pi_authorities =", pi_authorities
+        if len(pi_authorities) > 0:
+            result.append({'label':'Validation', 'href': '/portal/validate/'})
         dropdown = []
         dropdown.append({'label':'Platforms', 'href': '/portal/platforms/'})
         dropdown.append({'label':'My Account', 'href': '/portal/account/'})
