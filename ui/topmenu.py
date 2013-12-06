@@ -21,7 +21,10 @@ def topmenu_items (current,request=None):
         # ** Where am I a PI **
         # For this we need to ask SFA (of all authorities) = PI function
         pi_authorities_query = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
-        pi_authorities_tmp = execute_query(request, pi_authorities_query)
+        try:
+            pi_authorities_tmp = execute_query(request, pi_authorities_query)
+        except:
+            pi_authorities_tmp = set()
         pi_authorities = set()
         for pa in pi_authorities_tmp:
             pi_authorities |= set(pa['pi_authorities'])

@@ -27,10 +27,10 @@ googlemap_debug_detailed=false;
             this.in_set_backlog = [];
 
             // we keep a couple of global hashes
-	    // lat_lon --> { marker, <ul> }
-	    // id --> { <li>, <input> }
-	    this.by_lat_lon = {};
-	    this.by_id = {};
+	        // lat_lon --> { marker, <ul> }
+	        // id --> { <li>, <input> }
+	        this.by_lat_lon = {};
+	        this.by_id = {};
 
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
@@ -40,9 +40,9 @@ googlemap_debug_detailed=false;
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
 
-            var keys = manifold.metadata.get_key(this.object);
+        //    var keys = manifold.metadata.get_key(this.object);
 	    // 
-            this.key = (keys && keys.length == 1) ? keys[0] : null;
+        //    this.key = (keys && keys.length == 1) ? keys[0] : null;
 
 	    // xxx temporary hack
 	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
@@ -51,7 +51,13 @@ googlemap_debug_detailed=false;
 	    // so for now we force using hrn instead
 	    // as soon as record have their primary key set this line can be removed
 	    // see also same hack in querytable
-	    this.key= (this.key == 'urn') ? 'hrn' : this.key;
+	    //this.key= (this.key == 'urn') ? 'hrn' : this.key;
+        this.key = (this.options.id_key);
+        if (typeof(this.key)=='undefined' || (this.key).startsWith("unknown")) {
+            // if not specified by caller, decide from metadata
+            var keys = manifold.metadata.get_key(this.object);
+            this.key = (keys && keys.length == 1) ? keys[0] : null;
+        }
 
             //// Setup query and record handlers 
 	    // this query is the one about the slice itself 
@@ -141,7 +147,8 @@ googlemap_debug_detailed=false;
 	    var checkbox = $("<input>", {type:'checkbox', checked:checked, class:'geo'});
 	    var id=this.record_id(record);
 	    // use hrn as far as possible for displaying
-	    var label= ('hrn' in record) ? record.hrn : id;
+	    // var label= ('hrn' in record) ? record.hrn : id;
+	    var label= (this.key in record) ? record[this.key] : id;
 	    ul.append($("<li>").addClass("geo").append(checkbox).
 		      append($("<span>").addClass("geo").append(label)));
 	    var googlemap=this;
@@ -154,12 +161,12 @@ googlemap_debug_detailed=false;
 	},
 	    
 	warning: function (record,message) {
-	    try {messages.warning (message+" -- hostname="+record.hostname); }
+	    try {messages.warning (message+" -- "+this.key+"="+record[this.key]); }
 	    catch (err) {messages.warning (message); }
 	},
 	    
 	// retrieve DOM checkbox and make sure it is checked/unchecked
-        set_checkbox: function(record, checked) {
+    set_checkbox: function(record, checked) {
 	    var id=this.record_id (record);
 	    if (! id) { 
 		this.warning (record, "googlemap.set_checkbox: record has no id");
@@ -171,7 +178,7 @@ googlemap_debug_detailed=false;
 		return; 
 	    }
 	    checkbox.prop('checked',checked);
-        }, // set_checkbox
+     }, // set_checkbox
 
 	// this record is *in* the slice
         new_record: function(record) {

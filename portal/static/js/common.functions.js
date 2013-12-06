@@ -15,6 +15,20 @@ function getKeySplitId(id,separator){
     return key;
 }
 
+// Adding startsWith & endsWith to the string prototype
+if ( typeof String.prototype.startsWith != 'function' ) {
+  String.prototype.startsWith = function( str ) {
+    return this.substring( 0, str.length ) === str;
+  }
+};
+
+if ( typeof String.prototype.endsWith != 'function' ) {
+  String.prototype.endsWith = function( str ) {
+    return this.substring( this.length - str.length, this.length ) === str;
+  }
+};
+// http://stackoverflow.com/questions/646628/javascript-startswith
+
 function arrays_equal(a,b) { return !(a<b || b<a); }
 
 function arrayInArray(elt,tab){
