@@ -12,6 +12,7 @@ from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
 from plugins.querytable              import QueryTable 
+from plugins.querygrid               import QueryGrid
 from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
@@ -36,6 +37,9 @@ do_query_users=False
 
 #do_query_leases=True
 do_query_leases=False
+
+insert_grid=False
+#insert_grid=True
 
 insert_messages=False
 #insert_messages=True
@@ -202,6 +206,19 @@ class SliceView (LoginRequiredAutoLogoutView):
                 },
             )
 
+        if insert_grid:
+            resources_as_grid = QueryGrid( 
+                page       = page,
+                domid      = 'resources-grid',
+                title      = 'Grid view',
+                # this is the query at the core of the slice list
+                query      = sq_resource,
+                query_all  = query_resource_all,
+                # safer to use 'hrn' as the internal unique key for this plugin
+                id_key     = main_query_key,
+                checkboxes = True,
+                )
+
         if do_query_leases:
             resources_as_scheduler = Scheduler(
                 page        = page,
@@ -225,6 +242,10 @@ class SliceView (LoginRequiredAutoLogoutView):
             resources_as_3dmap,
             resources_as_list_area,
             ]
+        if insert_grid:
+            resources_sons.append(resources_as_grid)
+
+        print 40*'+-',"resources_sons has",len(resources_sons),"son"
 
         resources_area = Tabs ( page=page, 
                                 domid="resources",
