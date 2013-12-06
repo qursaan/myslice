@@ -24,7 +24,9 @@ from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
 from sandbox.views import MyPluginView
+from sandbox.views import MadDashView
 
 urlpatterns = patterns('', 
-    url(r'^myplugin/?$', MyPluginView.as_view(), name='myplugin')
+    url(r'^myplugin/?$', MyPluginView.as_view(), name='myplugin'),
+    url(r'^maddash/?$', MadDashView.as_view(), name='maddash')
 )

@@ -26,13 +26,12 @@ import json
 from django.http                import HttpResponseRedirect, HttpResponse
 from django.shortcuts           import render
 from django.template.loader     import render_to_string
-
-from unfold.loginrequired       import FreeAccessView
-from ui.topmenu                 import topmenu_items, the_user
-
-from unfold.page                import Page
-
+from manifold.core.query        import Query
 from plugins.myplugin           import MyPlugin
+from plugins.maddash            import MadDash
+from ui.topmenu                 import topmenu_items, the_user
+from unfold.loginrequired       import FreeAccessView
+from unfold.page                import Page
 
 # NOTE
 # initially all the portal views were defined in this single file
@@ -46,18 +45,47 @@ class MyPluginView(FreeAccessView):
 
         page = Page(self.request)
 
-#        pres_view = PresView(page = page)
-        plugin = MyPlugin(page = page, html="<h1>PresView needs to be integrated</h1>")
-
+        plugin = MyPlugin(page = page)
         context = super(MyPluginView, self).get_context_data(**kwargs)
-
         context['unfold_main'] = plugin.render(self.request)
 
         # more general variables expected in the template
         context['title'] = 'Sandbox for MyPlugin plugin'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('PresView', self.request)
+        context['topmenu_items'] = topmenu_items('myplugin', self.request)
         # so we can sho who is logged
+        context['username'] = the_user(self.request)
+
+        prelude_env = page.prelude_env()
+        context.update(prelude_env)
+
+        return context
+
+
+class MadDashView(FreeAccessView):
+    template_name = "view-unfold1.html"
+
+    def get_context_data(self, **kwargs):
+        page = Page(self.request)
+
+        # This will simulate fake records in order to test the plugin
+        fake_query = Query.get('ping').select('hrn', 'src_hostname', 'dst_hostname', 'delay')
+        fake_query_all = Query.get('ping').select('hrn', 'src_hostname', 'dst_hostname', 'delay')
+
+        generators = {
+            'hrn': 'random_string',
+            'src_hostname': 'random_string',
+            'dst_hostname': 'random_string',
+            'delay': 'random_int'
+        }
+        page.generate_records(fake_query, generators, 5)
+        page.generate_records(fake_query_all, generators, 20)
+
+        plugin = MadDash(query = fake_query, query_all = fake_query_all, page = page)
+        context = super(MadDashView, self).get_context_data(**kwargs)
+        context['unfold_main'] = plugin.render(self.request)
+        context['title'] = 'Sandbox for MadDash plugin'
+        context['topmenu_items'] = topmenu_items('maddash', self.request)
         context['username'] = the_user(self.request)
 
         prelude_env = page.prelude_env()
