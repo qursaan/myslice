@@ -62,7 +62,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                'resource.hrn', 'resource.hostname', 'resource.type', 
+                'resource.hrn', 'resource.urn', 'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
                 'lease.urn',
                 'user.user_hrn',
@@ -70,7 +70,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
         # for internal use in the querytable plugin;
         # needs to be a unique column present for each returned record
-        main_query_key = 'hrn'
+        #main_query_key = 'hrn'
     
         query_resource_all = Query.get('resource').select(resource_fields)
         if do_query_users:
@@ -188,7 +188,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # safer to use 'hrn' as the internal unique key for this plugin
-            id_key     = main_query_key,
+            #id_key     = main_query_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,
