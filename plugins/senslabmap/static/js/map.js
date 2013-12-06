@@ -13,6 +13,9 @@ var Senslab = {
       node.arch = info[0].split("-")[0];
       node.id = parseInt(info[0].split("-")[1]);
       node.site = info[1];
+      node.x = parseFloat(node.x);
+      node.y = parseFloat(node.y);
+      node.z = parseFloat(node.z);
       node.normalized = true;
     }
   },
