@@ -1,5 +1,6 @@
-#maddash__maddash {
+.MadDash {
 	height: 600px;
+	background: white;
 }
 
 .grid-container{float:left;overflow:hidden;margin-right:10px;}
