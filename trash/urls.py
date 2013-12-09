@@ -1,5 +1,6 @@
 from django.conf.urls           import patterns, include, url
 
+import trash.simpletableview
 import trash.simplegridview
 
 urlpatterns = patterns(
@@ -8,5 +9,6 @@ urlpatterns = patterns(
     url(r'^scroll/?$',          'trash.sampleviews.scroll_view'),
     url(r'^plugin/?$',          'trash.pluginview.test_plugin_view'),
     url(r'^dashboard/?$',       'trash.dashboard.dashboard_view'),
+    url(r'^simpletable/(?P<slicename>[\w\.]+)/?$', trash.simpletableview.SimpleTableView.as_view()),
     url(r'^simplegrid/(?P<slicename>[\w\.]+)/?$', trash.simplegridview.SimpleGridView.as_view()),
 )
