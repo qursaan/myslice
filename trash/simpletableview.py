@@ -24,7 +24,7 @@ class SimpleTableView (TemplateView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                'resource.hrn', 'resource.hostname', 'resource.type', 
+                'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
                 'lease.urn',
                 'user.user_hrn',
@@ -32,7 +32,7 @@ class SimpleTableView (TemplateView):
         )
         # for internal use in the querytable plugin;
         # needs to be a unique column present for each returned record
-        main_query_key = 'hrn'
+        main_query_init_key = 'hostname'
     
         query_resource_all = Query.get('resource').select(resource_fields)
         
@@ -50,7 +50,7 @@ class SimpleTableView (TemplateView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # safer to use 'hrn' as the internal unique key for this plugin
-            common_key     = main_query_key,
+            init_key     = main_query_init_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,
