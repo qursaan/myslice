@@ -59,8 +59,6 @@ class SimpleTableView (TemplateView):
                 },
             )
 
-        print 40*'++-','JUST created, common_key=',resources_as_list.common_key
-
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
