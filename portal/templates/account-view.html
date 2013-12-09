@@ -138,7 +138,8 @@
 		<table class="mytable"> 
 			<tr class="odd"> 
     			<th>Platform</th> 
-        		<th>Account Type</th> 
+        		<th>Account Type</th>
+				<th>Account_delegation</th>	 
         		<th>user_hrn</th>
         		<th>Pub Key</th>
     		</tr>   
@@ -146,8 +147,9 @@
    			<tr class="border_bottom">
     			<td class="odd"> {{ row.platform_name }} </td>
         		<td class="even"> {{ row.account_type }} </td>
-       			<td class="odd"> {{ row.usr_hrn }}  </td>
-        		<td class="even"> {{ row.usr_pubkey }} </td>
+				<td class="odd"> {{ row.delegation_type }} </td>
+       			<td class="even"> {{ row.usr_hrn }}  </td>
+        		<td class="odd"> {{ row.usr_pubkey }} </td>
     		</tr> 
 			{%endfor%}               
 		</table>

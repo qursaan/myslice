@@ -44,13 +44,22 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_pub_key = ''
         platform_name_list = []
         account_type_list = []
+        delegation_type_list = []
         usr_hrn_list = []
         pub_key_list = []          
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
-                    account_type = account_detail['auth_type']
+                    if 'reference' in account_detail['auth_type']:
+                        account_type = 'Reference'
+                        delegation = 'N/A'
+                    elif 'managed' in account_detail['auth_type']:
+                        account_type = 'Principal'
+                        delegation = 'Automatic'
+                    else:
+                        account_type = 'Principal'
+                        delegation = 'Manual'
                     account_config = json.loads(account_detail['config'])
                     # a bit more pythonic
                     account_usr_hrn = account_config.get('user_hrn','N/A')
@@ -58,17 +67,21 @@ class AccountView(LoginRequiredAutoLogoutView):
                     
                     platform_name_list.append(platform_name)
                     account_type_list.append(account_type)
+                    delegation_type_list.append(delegation)
                     usr_hrn_list.append(account_usr_hrn)
                     pub_key_list.append(account_pub_key)
             
                 # to hide private key row if it doesn't exist    
-                if 'myslice' in platform_detail['platform']:
-                    account_config = json.loads(account_detail['config'])
-                    account_priv_key = account_config.get('user_private_key','N/A')
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        account_priv_key = account_config.get('user_private_key','N/A')
+                        print "testing"
+                        print account_priv_key
+                    #break
         
-        # combining 4 lists into 1 [to render in the template] 
-        lst = [{'platform_name': t[0], 'account_type': t[1], 'usr_hrn':t[2], 'usr_pubkey':t[3]} 
-               for t in zip(platform_name_list, account_type_list, usr_hrn_list, pub_key_list)]
+        # combining 5 lists into 1 [to render in the template] 
+        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
+               for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
