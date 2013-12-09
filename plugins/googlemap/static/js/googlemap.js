@@ -8,12 +8,15 @@
  * - infowindow is not properly reopened when the maps does not have the focus
  */
 
-// events that happen in the once-per-view range
-googlemap_debug=false;
-// more on a on-per-record basis
-googlemap_debug_detailed=false;
-
 (function($){
+
+    // events that happen in the once-per-view range
+    var debug=false;
+    debug=true;
+
+    // more on a on-per-record basis
+    var debug_deep=false;
+    // debug_deep=true;
 
     var GoogleMap = Plugin.extend({
 
@@ -74,7 +77,7 @@ googlemap_debug_detailed=false;
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (googlemap_debug) messages.debug("googlemap.on_show");
+	    if (debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
         }, // on_show
@@ -97,7 +100,7 @@ googlemap_debug_detailed=false;
 	    
             var domid = this.options.plugin_uuid + '--' + 'googlemap';
 	        var elmt = document.getElementById(domid);
-	        if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
+	        if (debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
             this.map = new google.maps.Map(elmt, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
@@ -182,7 +185,7 @@ googlemap_debug_detailed=false;
 
 	// this record is *in* the slice
         new_record: function(record) {
-	        if (googlemap_debug_detailed) messages.debug ("new_record");
+	    if (debug_deep) messages.debug ("googlemap.new_record");
             if (!(record['latitude'])) return false;
 	    
             // get the coordinates
@@ -211,7 +214,7 @@ googlemap_debug_detailed=false;
         }, // new_record
 
         arm_marker: function(marker, map) {
-	    if (googlemap_debug_detailed) messages.debug ("arm_marker content="+marker.content);
+	    if (debug_deep) messages.debug ("arm_marker content="+marker.content);
             var googlemap = this;
             google.maps.event.addListener(marker, 'click', function () {
                 googlemap.infowindow.close();
@@ -224,7 +227,7 @@ googlemap_debug_detailed=false;
 
         /*************************** RECORD HANDLER ***************************/
         on_new_record: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_new_record");
+	    if (debug_deep) messages.debug("on_new_record");
             if (this.received_all)
                 // update checkbox for record
                 this.set_checkbox(record, true);
@@ -234,17 +237,17 @@ googlemap_debug_detailed=false;
         },
 
         on_clear_records: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_clear_records");
+	    if (debug_deep) messages.debug("on_clear_records");
         },
 
         // Could be the default in parent
         on_query_in_progress: function() {
-	    if (googlemap_debug) messages.debug("on_query_in_progress (spinning)");
+	    if (debug) messages.debug("on_query_in_progress (spinning)");
             this.spin();
         },
 
         on_query_done: function() {
-	        if (googlemap_debug) messages.debug("on_query_done");	    
+	        if (debug) messages.debug("on_query_done");	    
             if (this.received_all) {
                 this.unspin();
 	        }
@@ -252,7 +255,7 @@ googlemap_debug_detailed=false;
         },
 
         on_field_state_changed: function(data) {
-	    if (googlemap_debug_detailed) messages.debug("on_field_state_changed");	    
+	    if (debug_deep) messages.debug("on_field_state_changed");	    
             switch(data.request) {
             case FIELD_REQUEST_ADD:
             case FIELD_REQUEST_ADD_RESET:
@@ -271,22 +274,22 @@ googlemap_debug_detailed=false;
         // all : this 
 
         on_all_new_record: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_all_new_record");
+	    if (debug_deep) messages.debug("on_all_new_record");
             this.new_record(record);
         },
 
         on_all_clear_records: function() {
-	    if (googlemap_debug) messages.debug("on_all_clear_records");	    
+	    if (debug) messages.debug("on_all_clear_records");	    
         },
 
         on_all_query_in_progress: function() {
-	    if (googlemap_debug) messages.debug("on_all_query_in_progress (spinning)");
+	    if (debug) messages.debug("on_all_query_in_progress (spinning)");
             // XXX parent
             this.spin();
         },
 
         on_all_query_done: function() {
-	    if (googlemap_debug) messages.debug("on_all_query_done");
+	    if (debug) messages.debug("on_all_query_done");
 
             // MarkerClusterer
             var markers = [];
@@ -316,7 +319,7 @@ googlemap_debug_detailed=false;
 		// reset 
 		googlemap.in_set_backlog = [];
 
-		if (googlemap_debug) messages.debug("unspinning");
+		if (debug) messages.debug("unspinning");
                 this.unspin();
             }
             this.received_all = true;
