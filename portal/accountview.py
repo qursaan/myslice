@@ -42,8 +42,12 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_type = ''
         account_usr_hrn = ''
         account_pub_key = ''
+        account_reference = ''
         platform_name_list = []
+        platform_name_secondary_list = []
         account_type_list = []
+        account_type_secondary_list = []
+        account_reference_list = []
         delegation_type_list = []
         usr_hrn_list = []
         pub_key_list = []          
@@ -51,40 +55,48 @@ class AccountView(LoginRequiredAutoLogoutView):
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
+                    account_config = json.loads(account_detail['config'])
+                    # a bit more pythonic
+                    account_usr_hrn = account_config.get('user_hrn','N/A')
+                    account_pub_key = account_config.get('user_public_key','N/A')
+                    account_reference = account_config.get ('reference_platform','N/A')
+
                     if 'reference' in account_detail['auth_type']:
                         account_type = 'Reference'
                         delegation = 'N/A'
+                        platform_name_secondary_list.append(platform_name)
+                        account_type_secondary_list.append(account_type)
+                        account_reference_list.append(account_reference)
+                        secondary_list = [{'platform_name': t[0], 'account_type': t[1], 'account_reference': t[2]} 
+                            for t in zip(platform_name_secondary_list, account_type_secondary_list, account_reference_list)]
+                       
                     elif 'managed' in account_detail['auth_type']:
                         account_type = 'Principal'
                         delegation = 'Automatic'
                     else:
                         account_type = 'Principal'
                         delegation = 'Manual'
-                    account_config = json.loads(account_detail['config'])
-                    # a bit more pythonic
-                    account_usr_hrn = account_config.get('user_hrn','N/A')
-                    account_pub_key = account_config.get('user_public_key','N/A')
-                    
-                    platform_name_list.append(platform_name)
-                    account_type_list.append(account_type)
-                    delegation_type_list.append(delegation)
-                    usr_hrn_list.append(account_usr_hrn)
-                    pub_key_list.append(account_pub_key)
-            
-                # to hide private key row if it doesn't exist    
+ 
+                    if 'reference' not in account_detail['auth_type']:
+                        platform_name_list.append(platform_name)
+                        account_type_list.append(account_type)
+                        delegation_type_list.append(delegation)
+                        usr_hrn_list.append(account_usr_hrn)
+                        pub_key_list.append(account_pub_key)
+                        # combining 5 lists into 1 [to render in the template] 
+                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
+                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
+                    # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         account_priv_key = account_config.get('user_private_key','N/A')
-                        print "testing"
-                        print account_priv_key
-                    #break
-        
-        # combining 5 lists into 1 [to render in the template] 
-        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
-               for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
+
+                    
+                        
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
+        context ['ref_acc'] = secondary_list
         context['person']   = self.request.user
         context ['firstname'] = config.get('firstname',"?")
         context ['lastname'] = config.get('lastname',"?")

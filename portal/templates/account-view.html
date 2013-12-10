@@ -10,7 +10,7 @@
 
 {% block unfold_main %}
 
-<h2>MySlice  Account</h2>
+<h2>User Details</h2>
 
 {% if messages %}
 <ul class="messages">
@@ -28,7 +28,7 @@
 	  		<table class="profile">          
 	    		<tr class="odd">
 	      			<td colspan="2">
-						<div id="info">Personal Details</div>
+						<div id="info">Platform: Myslice</div>
 	      			</td>
 	    		</tr>
 	    		<tr class="even">
@@ -132,7 +132,8 @@
 	</div>
 </div>
 
-<h2>Platform Access</h2>
+<h2>Account Information</h2>
+<h3>Principal Accounts</h3>
 <div id="middle" align="center">
 	<div class="well">
 		<table class="mytable"> 
@@ -155,6 +156,27 @@
 		</table>
 	</div>
 </div>
+
+<h3>Secondary Accounts</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable"> 
+            <tr class="odd"> 
+                <th>Platform</th> 
+                <th>Account Type</th>
+				<th>Reference to</th>
+            </tr>   
+            {% for row in ref_acc %}         
+            <tr class="border_bottom">
+                <td class="odd"> {{ row.platform_name }} </td>
+                <td class="even"> {{ row.account_type }} </td>
+				<td class="even"> {{ row.account_reference }} </td>
+            </tr> 
+            {%endfor%}               
+        </table>
+    </div>
+</div>
+
 
 
 
