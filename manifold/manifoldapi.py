@@ -132,8 +132,10 @@ def _execute_query(request, query, manifold_api_session_auth):
     print "-"*80
     result = manifold_api.forward(query.to_dict())
     if result['code'] == 2:
-        # XXX only if we know it is the issue
-        del request.session['manifold']
+        # this is gross; at the very least we need to logout() 
+        # but most importantly there is a need to refine that test, since 
+        # code==2 does not necessarily mean an expired session
+        # del request.session['manifold']
         raise Exception, 'Error running query: %r' % result
     
     if result['code'] == 1:
