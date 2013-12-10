@@ -177,6 +177,27 @@
     </div>
 </div>
 
+<h2>Other Platforms</h2>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable"> 
+            <tr class="odd"> 
+                <th>Platforms</th> 
+                <th>Request Access</th>
+            </tr>   
+            {% for platform in platform_list %}         
+            <tr class="border_bottom">
+                <td class="odd"> {{ platform.platform_no_access }} </td>
+                <td class="even">
+					<button id="request_access" name="request_access" type="submit" title="Request Access to this platform">Request</button>
+				</td>
+            </tr> 
+            {%endfor%}               
+        </table>
+    </div>
+</div>
+
+
 
 
 

@@ -10,7 +10,7 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 #
-import json, os, re
+import json, os, re, itertools
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
@@ -32,7 +32,7 @@ class AccountView(LoginRequiredAutoLogoutView):
             if user_detail['config']:
                 config = json.loads(user_detail['config'])
 
-        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         platform_details = execute_query(self.request, platform_query)
         account_details = execute_query(self.request, account_query)
@@ -45,14 +45,21 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_reference = ''
         platform_name_list = []
         platform_name_secondary_list = []
+        platform_access_list = []
+        platform_no_access_list = []
+        total_platform_list = []
         account_type_list = []
         account_type_secondary_list = []
         account_reference_list = []
         delegation_type_list = []
         usr_hrn_list = []
         pub_key_list = []          
-        for account_detail in account_details:
-            for platform_detail in platform_details:
+        for platform_detail in platform_details:
+            if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
+                total_platform = platform_detail['platform']
+                total_platform_list.append(total_platform)
+                
+            for account_detail in account_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
                     account_config = json.loads(account_detail['config'])
@@ -60,7 +67,7 @@ class AccountView(LoginRequiredAutoLogoutView):
                     account_usr_hrn = account_config.get('user_hrn','N/A')
                     account_pub_key = account_config.get('user_public_key','N/A')
                     account_reference = account_config.get ('reference_platform','N/A')
-
+                    
                     if 'reference' in account_detail['auth_type']:
                         account_type = 'Reference'
                         delegation = 'N/A'
@@ -90,18 +97,30 @@ class AccountView(LoginRequiredAutoLogoutView):
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         account_priv_key = account_config.get('user_private_key','N/A')
+                    if 'sfa' in platform_detail['gateway_type']:
+                        platform_access = platform_detail['platform']
+                        platform_access_list.append(platform_access)
+       
+        # Removing the platform which already has access
+        for platform in platform_access_list:
+            total_platform_list.remove(platform)
+        
+        platform_list = [{'platform_no_access': t[0]}
+            for t in itertools.izip_longest(total_platform_list)]
+
 
                     
                         
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
-        context ['ref_acc'] = secondary_list
+        context['ref_acc'] = secondary_list
+        context['platform_list'] = platform_list
         context['person']   = self.request.user
-        context ['firstname'] = config.get('firstname',"?")
-        context ['lastname'] = config.get('lastname',"?")
-        context ['fullname'] = context['firstname'] +' '+ context['lastname']
-        context ['authority'] = config.get('authority',"Unknown Authority")
+        context['firstname'] = config.get('firstname',"?")
+        context['lastname'] = config.get('lastname',"?")
+        context['fullname'] = context['firstname'] +' '+ context['lastname']
+        context['authority'] = config.get('authority',"Unknown Authority")
         context['user_private_key'] = account_priv_key
         
         # XXX This is repeated in all pages
