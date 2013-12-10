@@ -8,12 +8,15 @@
  * - infowindow is not properly reopened when the maps does not have the focus
  */
 
-// events that happen in the once-per-view range
-googlemap_debug=false;
-// more on a on-per-record basis
-googlemap_debug_detailed=false;
-
 (function($){
+
+    // events that happen in the once-per-view range
+    var debug=false;
+    debug=true;
+
+    // more on a on-per-record basis
+    var debug_deep=false;
+    // debug_deep=true;
 
     var GoogleMap = Plugin.extend({
 
@@ -27,10 +30,13 @@ googlemap_debug_detailed=false;
             this.in_set_backlog = [];
 
             // we keep a couple of global hashes
-	        // lat_lon --> { marker, <ul> }
-	        // id --> { <li>, <input> }
-	        this.by_lat_lon = {};
-	        this.by_id = {};
+	    // lat_lon --> { marker, <ul> }
+	    // id --> { <li>, <input> }
+	    this.by_lat_lon = {};
+	    // locating checkboxes by DOM selectors might be abstruse, as we cannot safely assume 
+	    // all the items will belong under the toplevel <div>
+	    this.by_id = {};
+	    this.by_init_id = {};
 
             /* XXX Events */
             this.elmt().on('show', this, this.on_show);
@@ -40,24 +46,17 @@ googlemap_debug_detailed=false;
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
 
-        //    var keys = manifold.metadata.get_key(this.object);
+	    // see querytable.js for an explanation
+	    var keys = manifold.metadata.get_key(this.object);
+	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
 	    // 
-        //    this.key = (keys && keys.length == 1) ? keys[0] : null;
-
-	    // xxx temporary hack
-	    // as of nov. 28 2013 we have here this.key='urn', but in any place where
-	    // the code tries to access record[this.key] the records only have
-	    // keys=type,hrn,network_hrn,hostname
-	    // so for now we force using hrn instead
-	    // as soon as record have their primary key set this line can be removed
-	    // see also same hack in querytable
-	    //this.key= (this.key == 'urn') ? 'hrn' : this.key;
-        this.key = (this.options.id_key);
-        if (typeof(this.key)=='undefined' || (this.key).startsWith("unknown")) {
-            // if not specified by caller, decide from metadata
-            var keys = manifold.metadata.get_key(this.object);
-            this.key = (keys && keys.length == 1) ? keys[0] : null;
-        }
+	    this.init_key = this.options.init_key;
+	    // have init_key default to canonical_key
+	    this.init_key = this.init_key || this.canonical_key;
+	    // sanity check
+	    if ( ! this.init_key ) messages.warning ("QueryTable : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("QueryTable : cannot find canonical_key");
+	    if (debug) messages.debug("googlemap: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             //// Setup query and record handlers 
 	    // this query is the one about the slice itself 
@@ -74,7 +73,7 @@ googlemap_debug_detailed=false;
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (googlemap_debug) messages.debug("googlemap.on_show");
+	    if (debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
         }, // on_show
@@ -97,30 +96,10 @@ googlemap_debug_detailed=false;
 	    
             var domid = this.options.plugin_uuid + '--' + 'googlemap';
 	        var elmt = document.getElementById(domid);
-	        if (googlemap_debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
+	        if (debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
             this.map = new google.maps.Map(elmt, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
-
-        // The function accepts both records and their id
-	// record.key points to the name of the primary key for this record
-	// typically this is 'urn'
-	record_id : function (input) {
-            var id;
-            switch (manifold.get_type(input)) {
-            case TYPE_VALUE:
-		id = input;
-                break;
-            case TYPE_RECORD:
-		if ( ! this.key in input ) return;
-                id = input[this.key];
-                break;
-            default:
-                throw "googlemap.record_id: not implemented";
-                break;
-            }
-	    return id;
-	},
 
 	// return { marker: gmap_marker, ul : <ul DOM> }
 	create_marker_struct: function (object,lat,lon) {
@@ -145,17 +124,21 @@ googlemap_debug_detailed=false;
 	// returns the created <input> element for further checkbox manipulation
 	create_record_checkbox: function (record,ul,checked) {
 	    var checkbox = $("<input>", {type:'checkbox', checked:checked, class:'geo'});
-	    var id=this.record_id(record);
-	    // use hrn as far as possible for displaying
-	    // var label= ('hrn' in record) ? record.hrn : id;
-	    var label= (this.key in record) ? record[this.key] : id;
+	    var id=record[this.canonical_key];
+	    var init_id=record[this.init_key];
+	    // xxx use init_key to find out label - or should we explicitly accept an incoming label_key ?
+	    var label=init_id;
 	    ul.append($("<li>").addClass("geo").append(checkbox).
 		      append($("<span>").addClass("geo").append(label)));
-	    var googlemap=this;
+	    // hash by id and by init_id 
+	    this.by_id[id]=checkbox;
+            this.by_init_id[init_id] = checkbox;
+	    //
 	    // the callback for when a user clicks
 	    // NOTE: this will *not* be called for changes done by program
+	    var self=this;
 	    checkbox.change( function (e) {
-		manifold.raise_event (googlemap.options.query_uuid, this.checked ? SET_ADD : SET_REMOVED, id);
+		manifold.raise_event (self.options.query_uuid, this.checked ? SET_ADD : SET_REMOVED, id);
 	    });
 	    return checkbox;
 	},
@@ -166,23 +149,21 @@ googlemap_debug_detailed=false;
 	},
 	    
 	// retrieve DOM checkbox and make sure it is checked/unchecked
-    set_checkbox: function(record, checked) {
-	    var id=this.record_id (record);
-	    if (! id) { 
-		this.warning (record, "googlemap.set_checkbox: record has no id");
-		return; 
-	    }
-	    var checkbox = this.by_id [ id ];
-	    if (! checkbox ) { 
-		this.warning (record, "googlemap.set_checkbox: checkbox not found");
-		return; 
-	    }
+	set_checkbox_from_record: function(record, checked) {
+	    var init_id=record[this.init_key];
+	    var checkbox = this.by_id [ init_id ];
 	    checkbox.prop('checked',checked);
-     }, // set_checkbox
+	}, 
+
+	set_checkbox_from_data: function(id, checked) {
+	    var id=record[this.canonical_key];
+	    var checkbox = this.by_id [ id ];
+	    checkbox.prop('checked',checked);
+	}, 
 
 	// this record is *in* the slice
         new_record: function(record) {
-	        if (googlemap_debug_detailed) messages.debug ("new_record");
+	    if (debug_deep) messages.debug ("googlemap.new_record");
             if (!(record['latitude'])) return false;
 	    
             // get the coordinates
@@ -205,13 +186,10 @@ googlemap_debug_detailed=false;
     	    // this is where the checkbox will be appended
     	    var ul=marker_s.ul;
     	    var checkbox = this.create_record_checkbox (record, ul, false);
-	    var id=this.record_id(record);
-	    // used to keep a dict here, but only checkbox is required
-            this.by_id[id] = checkbox;
         }, // new_record
 
         arm_marker: function(marker, map) {
-	    if (googlemap_debug_detailed) messages.debug ("arm_marker content="+marker.content);
+	    if (debug_deep) messages.debug ("arm_marker content="+marker.content);
             var googlemap = this;
             google.maps.event.addListener(marker, 'click', function () {
                 googlemap.infowindow.close();
@@ -224,27 +202,27 @@ googlemap_debug_detailed=false;
 
         /*************************** RECORD HANDLER ***************************/
         on_new_record: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_new_record");
+	    if (debug_deep) messages.debug("on_new_record");
             if (this.received_all)
                 // update checkbox for record
-                this.set_checkbox(record, true);
+                this.set_checkbox_from_record(record, true);
             else
                 // store for later update of checkboxes
                 this.in_set_backlog.push(record);
         },
 
         on_clear_records: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_clear_records");
+	    if (debug_deep) messages.debug("on_clear_records");
         },
 
         // Could be the default in parent
         on_query_in_progress: function() {
-	    if (googlemap_debug) messages.debug("on_query_in_progress (spinning)");
+	    if (debug) messages.debug("on_query_in_progress (spinning)");
             this.spin();
         },
 
         on_query_done: function() {
-	        if (googlemap_debug) messages.debug("on_query_done");	    
+	        if (debug) messages.debug("on_query_done");	    
             if (this.received_all) {
                 this.unspin();
 	        }
@@ -252,15 +230,15 @@ googlemap_debug_detailed=false;
         },
 
         on_field_state_changed: function(data) {
-	    if (googlemap_debug_detailed) messages.debug("on_field_state_changed");	    
+	    if (debug_deep) messages.debug("on_field_state_changed");	    
             switch(data.request) {
             case FIELD_REQUEST_ADD:
             case FIELD_REQUEST_ADD_RESET:
-                this.set_checkbox(data.value, true);
+                this.set_checkbox_from_data(data.value, true);
                 break;
             case FIELD_REQUEST_REMOVE:
             case FIELD_REQUEST_REMOVE_RESET:
-                this.set_checkbox(data.value, false);
+                this.set_checkbox_from_data(data.value, false);
                 break;
             default:
                 break;
@@ -271,22 +249,22 @@ googlemap_debug_detailed=false;
         // all : this 
 
         on_all_new_record: function(record) {
-	    if (googlemap_debug_detailed) messages.debug("on_all_new_record");
+	    if (debug_deep) messages.debug("on_all_new_record");
             this.new_record(record);
         },
 
         on_all_clear_records: function() {
-	    if (googlemap_debug) messages.debug("on_all_clear_records");	    
+	    if (debug) messages.debug("on_all_clear_records");	    
         },
 
         on_all_query_in_progress: function() {
-	    if (googlemap_debug) messages.debug("on_all_query_in_progress (spinning)");
+	    if (debug) messages.debug("on_all_query_in_progress (spinning)");
             // XXX parent
             this.spin();
         },
 
         on_all_query_done: function() {
-	    if (googlemap_debug) messages.debug("on_all_query_done");
+	    if (debug) messages.debug("on_all_query_done");
 
             // MarkerClusterer
             var markers = [];
@@ -311,12 +289,12 @@ googlemap_debug_detailed=false;
             if (this.received_set) {
                 /* ... and check the ones specified in the resource list */
                 $.each(this.in_set_backlog, function(i, record) {
-                    googlemap.set_checkbox(record, true);
+                    googlemap.set_checkbox_from_record(record, true);
                 });
 		// reset 
 		googlemap.in_set_backlog = [];
 
-		if (googlemap_debug) messages.debug("unspinning");
+		if (debug) messages.debug("unspinning");
                 this.unspin();
             }
             this.received_all = true;
