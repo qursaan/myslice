@@ -44,4 +44,8 @@ class GoogleMap (Plugin):
         return reqs
 
     # the list of things passed to the js plugin
-    def json_settings_list (self): return ['plugin_uuid','query_uuid', 'query_all_uuid', 'latitude', 'longitude', 'zoom', ]
+    def json_settings_list (self): 
+        return [ 'plugin_uuid', 'query_uuid', 'query_all_uuid',
+                 'init_key',
+                 'latitude', 'longitude', 'zoom', 
+                 ]
