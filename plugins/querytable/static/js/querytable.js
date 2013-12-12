@@ -168,7 +168,7 @@
 
 	// create a checkbox <input> tag
 	// computes 'id' attribute from canonical_key (using flat_id)
-	// computes 'common_id' from init_key for initialization phase
+	// computes 'init_id' from init_key for initialization phase
         checkbox_html : function (record) {
             var result="";
             // Prefix id with plugin_uuid
@@ -180,11 +180,11 @@
 	    id = this.flat_id(id)
 //	    if (debug) messages.debug("checkbox_html, id="+id);
             result += " id='" + id + "'";
-	 // compute common_id too
-	    var common_id=record[this.init_key];
-	    common_id=this.flat_id(common_id);
+	 // compute init_id too
+	    var init_id=record[this.init_key];
+	    init_id=this.flat_id(init_id);
 	 // wrap up
-	    result += "common_id='" + common_id + "'";
+	    result += "init_id='" + init_id + "'";
 	    // set value for posting events upon user's clicks
 	    result += " value='"+record[this.canonical_key]+"'";
             result += " type='checkbox'";
@@ -271,9 +271,9 @@
 	// (because the argument record, if it comes from query, might not have canonical_key set
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
-	    var common_id = this.flat_id(record[this.init_key]);
-	    if (debug) messages.debug("set_checkbox_from_record, common_id="+common_id);
-	    var element = this.table.$('[common_id="'+common_id+'"]');
+	    var init_id = this.flat_id(record[this.init_key]);
+	    if (debug) messages.debug("set_checkbox_from_record, init_id="+init_id);
+	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
 	},
 

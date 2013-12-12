@@ -201,8 +201,11 @@ var Plugin = Class.extend({
     // > "ple.aluiple.host147-82-static\.93-94-b\.business\.telecomitalia\.it"
     // flat_id(input)
     // "ple-aluiple-host147-82-static-93-94-b-business-telecomitalia-it"
+    // input="urn:publicid:IDN+ple:nicta+node+planetlab2-research-nicta-com-au"
+    // flat_id(input)
+    // urn-publicid-IDN-ple-nicta-node-planetlab2-research-nicta-com-au
     flat_id : function (id_in) {
-	return id_in.replace(/\\\./g,"-").replace(/\\/g,"-").replace(/\./g,"-");
+	return id_in.replace(/\\\./g,"-").replace(/\\/g,"-").replace(/\./g,"-").replace(/:/g,'-').replace(/\+/g,'-');
     },
 
     // escape (read: backslashes) some meta-chars in input
