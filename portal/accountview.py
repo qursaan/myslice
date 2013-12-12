@@ -54,8 +54,12 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_type_secondary_list = []
         account_reference_list = []
         delegation_type_list = []
+        exp_user_cred_list = []
+        slice_list = []
+        slice_cred_exp_list = []
         usr_hrn_list = []
-        pub_key_list = []          
+        pub_key_list = []
+          
         for platform_detail in platform_details:
             if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
                 total_platform = platform_detail['platform']
@@ -65,11 +69,29 @@ class AccountView(LoginRequiredAutoLogoutView):
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
                     account_config = json.loads(account_detail['config'])
-                    # a bit more pythonic
                     account_usr_hrn = account_config.get('user_hrn','N/A')
                     account_pub_key = account_config.get('user_public_key','N/A')
                     account_reference = account_config.get ('reference_platform','N/A')
-                    
+
+                    acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
+                    if 'N/A' not in acc_slice_cred:
+                        for key, value in acc_slice_cred.iteritems():
+                            slice_list.append(key)
+                            # get cred_exp date
+                            exp_date = re.search('<expires>(.*)</expires>', value)
+                            if exp_date:
+                                exp_date = exp_date.group(1)
+                                slice_cred_exp_list.append(exp_date)
+
+                        my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
+                            for t in zip(slice_list, slice_cred_exp_list)]
+
+                    account_user_credential = account_config.get('delegated_user_credential','N/A')
+                    # Expiration date 
+                    result = re.search('<expires>(.*)</expires>', account_user_credential)
+                    if result:
+                        exp_user_cred = result.group(1)
+                    # for reference accounts
                     if 'reference' in account_detail['auth_type']:
                         account_type = 'Reference'
                         delegation = 'N/A'
@@ -85,16 +107,17 @@ class AccountView(LoginRequiredAutoLogoutView):
                     else:
                         account_type = 'Principal'
                         delegation = 'Manual'
- 
+                    # for principal (auth_type=user/managed) accounts
                     if 'reference' not in account_detail['auth_type']:
                         platform_name_list.append(platform_name)
                         account_type_list.append(account_type)
                         delegation_type_list.append(delegation)
+                        exp_user_cred_list.append(exp_user_cred)
                         usr_hrn_list.append(account_usr_hrn)
                         pub_key_list.append(account_pub_key)
                         # combining 5 lists into 1 [to render in the template] 
-                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
-                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
+                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'credential_expiration':t[3], 'usr_hrn':t[4], 'usr_pubkey':t[5]} 
+                            for t in zip(platform_name_list, account_type_list, delegation_type_list, exp_user_cred_list, usr_hrn_list, pub_key_list)]
                     # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
@@ -106,18 +129,16 @@ class AccountView(LoginRequiredAutoLogoutView):
         # Removing the platform which already has access
         for platform in platform_access_list:
             total_platform_list.remove(platform)
-        
+        # we could use zip. this one is used if columns have unequal rows 
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
 
-
-                    
-                        
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
         context['ref_acc'] = secondary_list
         context['platform_list'] = platform_list
+        context['my_slices'] = my_slices
         context['person']   = self.request.user
         context['firstname'] = config.get('firstname',"?")
         context['lastname'] = config.get('lastname',"?")
