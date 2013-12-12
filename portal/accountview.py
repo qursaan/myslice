@@ -9,6 +9,8 @@ from ui.topmenu                         import topmenu_items, the_user
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
+from django.core.mail                   import send_mail
+
 #
 import json, os, re, itertools
 
@@ -317,8 +319,62 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
-           
-       
+        
+    elif 'fuseco' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"] 
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in fuseco Platform" % requester
+        send_mail("Onelab user %s requested an account in Fuseco"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on Fuseco platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'ple' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"] 
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in fuseco Platform" % requester
+        send_mail("Onelab user %s requested an account in PLE"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on PLE platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'omf' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in omf:nitos Platform" % requester
+        send_mail("Onelab user %s requested an account in OMF:NITOS"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on OMF:NITOS platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'wilab' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in Wilab Platform" % requester
+        send_mail("Onelab user %s requested an account in Wilab"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on Wilab platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'iotlab' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in IOTLab Platform" % requester
+        send_mail("Onelab user %s requested an account in IOTLab"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on IOTLab platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+  
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")

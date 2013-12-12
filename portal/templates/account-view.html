@@ -21,9 +21,9 @@
 {% endif %}
 
 
+<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
 <div id="middle" align="center">
 	<div class="well">
-		<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
 	  	{% csrf_token %}
 	  		<table class="profile">          
 	    		<tr class="odd">
@@ -128,7 +128,6 @@
 	    			</td>
 	  			</tr>
 			</table>
-		</form>
 	</div>
 </div>
 
@@ -189,7 +188,7 @@
             <tr class="border_bottom">
                 <td class="odd"> {{ platform.platform_no_access }} </td>
                 <td class="even">
-					<button id="request_access" name="request_access" type="submit" title="Request Access to this platform">Request</button>
+					<button id="request_access" name= {{platform.platform_no_access}} type="submit" title="Request Access to this platform">Request {{platform.platform_no_access}}</button>
 				</td>
             </tr> 
             {%endfor%}               
@@ -198,6 +197,7 @@
 </div>
 
 
+</form>
 
 
 
