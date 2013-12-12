@@ -151,14 +151,16 @@
 	// retrieve DOM checkbox and make sure it is checked/unchecked
 	set_checkbox_from_record: function(record, checked) {
 	    var init_id=record[this.init_key];
-	    var checkbox = this.by_id [ init_id ];
-	    checkbox.prop('checked',checked);
+	    var checkbox = this.by_init_id [ init_id ];
+	    if (checkbox) checkbox.prop('checked',checked);
+	    else this.warning(record, "googlemap.set_checkbox_from_record - not found "+init_id);
 	}, 
 
 	set_checkbox_from_data: function(id, checked) {
-	    var id=record[this.canonical_key];
+	    var id=record [this.canonical_key];
 	    var checkbox = this.by_id [ id ];
-	    checkbox.prop('checked',checked);
+	    if (checkbox) checkbox.prop('checked',checked);
+	    else this.warning(record, "googlemap.set_checkbox_from_data - not found "+init_id);
 	}, 
 
 	// this record is *in* the slice
