@@ -139,17 +139,19 @@
 			<tr class="odd"> 
     			<th>Platform</th> 
         		<th>Account Type</th>
-				<th>Account_delegation</th>	 
+				<th>Account_delegation</th>
+				<th>Credential Expiration</th> 	 
         		<th>user_hrn</th>
-        		<th>Pub Key</th>
+        		<!--<th>Pub Key</th> -->
     		</tr>   
 			{% for row in data %}         
    			<tr class="border_bottom">
     			<td class="odd"> {{ row.platform_name }} </td>
         		<td class="even"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.delegation_type }} </td>
-       			<td class="even"> {{ row.usr_hrn }}  </td>
-        		<td class="odd"> {{ row.usr_pubkey }} </td>
+				<td class="even"> {{ row.credential_expiration }} </td>
+       			<td class="odd"> {{ row.usr_hrn }}  </td>
+        	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
     		</tr> 
 			{%endfor%}               
 		</table>
@@ -195,6 +197,29 @@
         </table>
     </div>
 </div>
+
+
+
+
+<h3>Slice Information</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable"> 
+            <tr class="odd"> 
+                <th>Slice name</th> 
+                <th>Credential Expiration</th>
+            </tr>   
+            {% for row in my_slices %}         
+            <tr class="border_bottom">
+                <td class="odd"> {{ row.slice_name }} </td>
+                <td class="even"> {{ row.cred_exp }} </td>
+            </tr>
+            {%endfor%}
+        </table>
+    </div>
+</div>
+
+
 
 
 </form>
