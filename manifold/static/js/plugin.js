@@ -192,21 +192,21 @@ var Plugin = Class.extend({
         return key_field + manifold.separator + this.escape_id(value).replace(/\\/g, '');
     },
 
-    // we do not need to carry around all the nonsense about backslashing dots in hrns
-    // likewise, DOM ids do not like to have dots in them
-    // because "#foo.bar" matches an elem named foo with class bar - not an id that is foo.bar
-    // so this method gives you a valid DOMID but that cannot be 'reversed' back to retrieve an hrn or the like
-    // e.g. 
-    // input=input="ple.aluiple.host147-82-static\\.93-94-b\\.business\\.telecomitalia\\.it"
-    // > "ple.aluiple.host147-82-static\.93-94-b\.business\.telecomitalia\.it"
-    // flat_id(input)
-    // "ple-aluiple-host147-82-static-93-94-b-business-telecomitalia-it"
-    // input="urn:publicid:IDN+ple:nicta+node+planetlab2-research-nicta-com-au"
-    // flat_id(input)
-    // urn-publicid-IDN-ple-nicta-node-planetlab2-research-nicta-com-au
-    flat_id : function (id_in) {
-	return id_in.replace(/\\\./g,"-").replace(/\\/g,"-").replace(/\./g,"-").replace(/:/g,'-').replace(/\+/g,'-');
-    },
+    // NOTE
+    // at some point in time we used to have a helper function named 'flat_id' here
+    // the goals was to sort of normalize id's but it turned out we can get rid of that
+    // in a nutshell, we would have an id (can be urn, hrn, whatever) and 
+    // we want to be able to retrieve a DOM element based on that (e.g. a checkbox)
+    // so we did something like <tag id="some-id-that-comes-from-the-db">
+    // and then $("#some-id-that-comes-from-the-db")
+    // however the syntax for that selector prevents from using some characters in id
+    // and so for some of our ids this won't work
+    // instead of 'flattening' we now do this instead
+    // <tag some_id="then!we:can+use.what$we!want">
+    // and to retrieve it
+    // $("[some_id='then!we:can+use.what$we!want']")
+    // which thanks to the quotes, works; and you can use this with id as well in fact
+    // of course if now we have quotes in the id it's going to squeak, but well..
 
     // escape (read: backslashes) some meta-chars in input
     escape_id: function(id) {
