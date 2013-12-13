@@ -134,7 +134,9 @@ def _execute_query(request, query, manifold_api_session_auth):
     if result['code'] == 2:
         # XXX only if we know it is the issue
         del request.session['manifold']
-        raise Exception, 'Error running query: %r' % result
+        # Flush django session
+        request.session.flush()
+        #raise Exception, 'Error running query: %r' % result
     
     if result['code'] == 1:
         print "WARNING" 
@@ -147,6 +149,7 @@ def _execute_query(request, query, manifold_api_session_auth):
 
 def execute_query(request, query):
     if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
+        request.session.flush()
         raise Exception, "User not authenticated"
     manifold_api_session_auth = request.session['manifold']['auth']
     return _execute_query(request, query, manifold_api_session_auth)
