@@ -132,6 +132,9 @@ def _execute_query(request, query, manifold_api_session_auth):
     print "-"*80
     result = manifold_api.forward(query.to_dict())
     if result['code'] == 2:
+        # this is gross; at the very least we need to logout() 
+        # but most importantly there is a need to refine that test, since 
+        # code==2 does not necessarily mean an expired session
         # XXX only if we know it is the issue
         del request.session['manifold']
         # Flush django session

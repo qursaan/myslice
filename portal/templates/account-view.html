@@ -10,7 +10,7 @@
 
 {% block unfold_main %}
 
-<h2>MySlice  Account</h2>
+<h2>User Details</h2>
 
 {% if messages %}
 <ul class="messages">
@@ -21,14 +21,14 @@
 {% endif %}
 
 
+<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
 <div id="middle" align="center">
 	<div class="well">
-		<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
 	  	{% csrf_token %}
 	  		<table class="profile">          
 	    		<tr class="odd">
 	      			<td colspan="2">
-						<div id="info">Personal Details</div>
+						<div id="info">Platform: Myslice</div>
 	      			</td>
 	    		</tr>
 	    		<tr class="even">
@@ -128,26 +128,28 @@
 	    			</td>
 	  			</tr>
 			</table>
-		</form>
 	</div>
 </div>
 
-<h2>Platform Access</h2>
+<h2>Account Information</h2>
+<h3>Principal Account</h3>
 <div id="middle" align="center">
 	<div class="well">
 		<table class="mytable"> 
 			<tr class="odd"> 
     			<th>Platform</th> 
-        		<th>Account Type</th> 
+        		<th>Account Type</th>
+				<th>Account_delegation</th>
         		<th>user_hrn</th>
-        		<th>Pub Key</th>
+        		<!--<th>Pub Key</th> -->
     		</tr>   
 			{% for row in data %}         
    			<tr class="border_bottom">
     			<td class="odd"> {{ row.platform_name }} </td>
         		<td class="even"> {{ row.account_type }} </td>
+				<td class="odd"> {{ row.delegation_type }} </td>
        			<td class="odd"> {{ row.usr_hrn }}  </td>
-        		<td class="even"> {{ row.usr_pubkey }} </td>
+        	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
     		</tr> 
 			{%endfor%}               
 		</table>
@@ -155,5 +157,97 @@
 </div>
 
 
+<h3>Credentials</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable">
+			<caption><b>Delegated User Credential</b></caption> 
+            <tr class="odd"> 
+                <th>Expiration Date</th>
+            </tr>
+			{% for row in data %}         
+			<tr class="border_bottom">
+    			<td class="even"> {{ row.credential_expiration }} </td>
+			</tr>
+			{%endfor%}
+		 </table>
+		<p><button id="dl_user_cred" name= "dl_user_cred" type="submit" title="Download User Credential">Download</button></p>
+		 <table class="mytable">
+			<caption><b>Delegated Slice Credentials</b></caption>  
+     		<tr class="odd"> 
+				<th>Slice Name</th> 
+         		<th>Expiration Date</th>
+     		</tr>
+			{% for row in my_slices %}     
+     		<tr class="border_bottom">
+         		<td class="even"> {{ row.slice_name }} </td>
+				<td class="odd"> {{ row.cred_exp }} </td>
+     		</tr>
+     		{%endfor%}
+  		</table>
+		<p><button id="dl_slice_cred" name= "dl_slice_cred" type="submit" title="Download Slice Credentials">Download</button></p>
+		<table class="mytable">
+   			<caption><b>Delegated Authority Credentials</b></caption>
+   			<tr class="odd"> 
+       			<th>Authority Name</th> 
+       			<th>Expiration Date</th>
+   			</tr>
+   			{% for row in my_auths %}
+   			<tr class="border_bottom">
+       			<td class="even"> {{ row.auth_name }} </td>
+       			<td class="odd"> {{ row.cred_exp }} </td>
+   			</tr>
+   			{%endfor%}
+		</table>
+		<p><button id="dl_auth_cred" name= "dl_auth_cred" type="submit" title="Download Authority Credentials">Download</button></p>
+		<p></p>	
+		<p><button id="clear_cred" name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+    </div>
+</div>
+
+
+
+
+<h3>Testbed Accounts</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable"> 
+            <tr class="odd"> 
+                <th>Platform</th> 
+                <th>Account Type</th>
+				<th>Reference to</th>
+            </tr>   
+            {% for row in ref_acc %}         
+            <tr class="border_bottom">
+                <td class="odd"> {{ row.platform_name }} </td>
+                <td class="even"> {{ row.account_type }} </td>
+				<td class="odd"> {{ row.account_reference }} </td>
+            </tr> 
+            {%endfor%}               
+        </table>
+    </div>
+</div>
+
+<h3>Add Accounts</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable"> 
+            <tr class="odd"> 
+                <th>Platforms</th> 
+                <th>Request Access</th>
+            </tr>   
+            {% for platform in platform_list %}         
+            <tr class="border_bottom">
+                <td class="odd"> {{ platform.platform_no_access }} </td>
+                <td class="even">
+					<button id="request_access" name= {{platform.platform_no_access}} type="submit" title="Add account to this platform">Add {{platform.platform_no_access}}</button>
+				</td>
+            </tr> 
+            {%endfor%}               
+        </table>
+    </div>
+</div>
+
+</form>
 
 {% endblock %}

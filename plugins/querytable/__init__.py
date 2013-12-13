@@ -20,13 +20,13 @@ Current implementation makes the following assumptions
   with checkboxes is desired
 * optionally pass columns as the initial set of columns
   if None then this is taken from the query's fields
-* id_key is the name of a column used internally in the plugin
-  for checkboxes management. Caller should specify a column that is present 
-  in the fields returned by 'query' and that has unique values.
+* init_key is the name of a column that should appear in both queries
+  and used internally in the plugin for checkboxes initialization. 
   If not specified, metadata will be used to find out a primary key.
   However in the case of nodes & slice for example, the default key
-  as returned by the metadata would be 'urn', but it is not necessarily 
-  a good idea to show urn's initially - if at all.
+  as returned by the metadata would be 'urn', but 'urn' could only 
+  be used for this purpose if it gets displayed initially, which is
+  not necessarily a good idea.
   This is why a slice view would use 'hrn' here instead.
 * datatables_options are passed to dataTables as-is; 
   however please refrain from passing an 'aoColumns' 
@@ -35,7 +35,7 @@ Current implementation makes the following assumptions
 
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
-                  id_key=None,
+                  init_key=None,
                   datatables_options={}, **settings):
         Plugin.__init__ (self, **settings)
         self.query          = query
@@ -57,7 +57,7 @@ Current implementation makes the following assumptions
         else:
             self.columns = []
             self.hidden_columns = []
-        self.id_key=id_key
+        self.init_key=init_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type
         # so that sorting can take place on a selected-first basis (or -last of course)
@@ -106,4 +106,4 @@ Current implementation makes the following assumptions
         return ['plugin_uuid', 'domid', 
                 'query_uuid', 'query_all_uuid', 
                 'checkboxes', 'datatables_options', 
-                'hidden_columns', 'id_key',]
+                'hidden_columns', 'init_key',]

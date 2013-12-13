@@ -71,7 +71,8 @@ class SliceView (LoginRequiredAutoLogoutView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                'resource.hrn', 'resource.urn', 'resource.hostname', 'resource.type', 
+                #'resource.hrn', 'resource.urn', 
+                'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
                 'lease.urn',
                 'user.user_hrn',
@@ -79,7 +80,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
         # for internal use in the querytable plugin;
         # needs to be a unique column present for each returned record
-        #main_query_key = 'hrn'
+        main_query_init_key = 'hostname'
     
         query_resource_all = Query.get('resource').select(resource_fields)
 
@@ -198,7 +199,10 @@ class SliceView (LoginRequiredAutoLogoutView):
             togglable  = False,
             query      = sq_resource,
             query_all  = query_resource_all,
+            # this key is the one issued by google
             googlemap_api_key = Config().googlemap_api_key(),
+            # the key to use at init-time
+            init_key   = main_query_init_key,
             checkboxes = True,
             # center on Paris
             latitude   = 49.,
@@ -221,8 +225,8 @@ class SliceView (LoginRequiredAutoLogoutView):
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
-            # safer to use 'hrn' as the internal unique key for this plugin
-            #id_key     = main_query_key,
+            # use 'hrn' as the internal unique key for this plugin
+            init_key     = main_query_init_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,
@@ -239,8 +243,9 @@ class SliceView (LoginRequiredAutoLogoutView):
                 # this is the query at the core of the slice list
                 query      = sq_resource,
                 query_all  = query_resource_all,
-                # safer to use 'hrn' as the internal unique key for this plugin
-                id_key     = main_query_key,
+                # use 'hrn' as the internal unique key for this plugin
+                # xxx todo on querygrid as well
+                # init_key     = main_query_init_key,
                 checkboxes = True,
                 )
 
@@ -269,8 +274,6 @@ class SliceView (LoginRequiredAutoLogoutView):
             ]
         if insert_grid:
             resources_sons.append(resources_as_grid)
-
-        print 40*'+-',"resources_sons has",len(resources_sons),"son"
 
         resources_area = Tabs ( page=page, 
                                 domid="resources",

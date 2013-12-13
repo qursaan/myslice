@@ -4,6 +4,17 @@
  * License: GPLv3
  */
 
+/* 
+ * WARNINGS
+ *
+ * This is very rough for now and not deemed working
+ * 
+ * Also it still requires adaptation for the init_key / init_id / canonical_key / id business 
+ * if the basic logic was to become usable
+ * 
+ * WARNINGS
+ */
+
 /* ongoing adaptation to slickgrid 
    still missing are
 . checkboxes really running properly

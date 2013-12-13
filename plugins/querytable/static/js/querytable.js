@@ -7,7 +7,7 @@
 (function($){
 
     var debug=false;
-//    debug=true
+    debug=true
 
     var QueryTable = Plugin.extend({
 
@@ -41,17 +41,23 @@
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
 
-	    // xxx beware that this.key needs to contain a key that all records will have
-	    // in general query_all will return well populated records, but query
-	    // returns records with only the fields displayed on startup. 
-	    this.key = (this.options.id_key);
-	    if (typeof(this.key)=='undefined' || (this.key).startsWith("unknown")) {
-		    // if not specified by caller, decide from metadata
-		    var keys = manifold.metadata.get_key(this.object);
-		    this.key = (keys && keys.length == 1) ? keys[0] : null;
-	    }
-	    if (! this.key) messages.warning("querytable.init could not kind valid key");
-	    messages.debug("querytable: key="+this.key);
+	    //// we need 2 different keys
+	    // * canonical_key is the primary key as derived from metadata (typically: urn)
+	    //   and is used to communicate about a given record with the other plugins
+	    // * init_key is a key that both kinds of records 
+	    //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
+	    //   in general query_all will return well populated records, but query
+	    //   returns records with only the fields displayed on startup
+	    var keys = manifold.metadata.get_key(this.object);
+	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
+	    // 
+	    this.init_key = this.options.init_key;
+	    // have init_key default to canonical_key
+	    this.init_key = this.init_key || this.canonical_key;
+	    // sanity check
+	    if ( ! this.init_key ) messages.warning ("QueryTable : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("QueryTable : cannot find canonical_key");
+	    if (debug) messages.debug("querytable: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
@@ -160,22 +166,28 @@
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
-        checkbox_html : function (key, value)
-        {
-//	    if (debug) messages.debug("checkbox_html, value="+value);
+	// create a checkbox <input> tag
+	// computes 'id' attribute from canonical_key
+	// computes 'init_id' from init_key for initialization phase
+	// no need to used convoluted ids with plugin-uuid or others, since
+	// we search using table.$ which looks only in this table
+        checkbox_html : function (record) {
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='querytable-checkbox'";
-            result += " id='" + this.flat_id(this.id('checkbox', value)) + "'";
-            result += " name='" + key + "'";
+	 // compute id from canonical_key
+	    var id = record[this.canonical_key]
+//	    if (debug) messages.debug("checkbox_html, id="+id);
+	 // compute init_id form init_key
+	    var init_id=record[this.init_key];
+	 // set id - for retrieving from an id, or for posting events upon user's clicks
+	    result += " id='"+record[this.canonical_key]+"'";
+	 // set init_id
+	    result += "init_id='" + init_id + "'";
+	 // wrap up
             result += " type='checkbox'";
             result += " autocomplete='off'";
-	    if (value === undefined) {
-		messages.warning("querytable.checkbox_html - undefined value");
-	    } else {
-		result += " value='" + value + "'";
-	    }
             result += "></input>";
             return result;
         }, 
@@ -218,7 +230,7 @@
             // catch up with the last column if checkboxes were requested 
             if (this.options.checkboxes) {
                 // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox_html(this.key, record[this.key]));
+                line.push(this.checkbox_html(record));
 	        }
     
     	    // adding an array in one call is *much* more efficient
@@ -254,45 +266,25 @@
                 this.table.fnSetColumnVis(index, false);
         },
 
-        set_checkbox: function(record, checked)
-        {
-            /* Default: checked = true */
+	// this is used at init-time, at which point only init_key can make sense
+	// (because the argument record, if it comes from query, might not have canonical_key set
+	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
+	    var init_id = record[this.init_key];
+	    if (debug) messages.debug("set_checkbox_from_record, init_id="+init_id);
+	    // using table.$ to search inside elements that are not visible
+	    var element = this.table.$('[init_id="'+init_id+'"]');
+	    element.attr('checked',checked);
+	},
 
-            var id;
-            /* The function accepts both records and their key */
-            switch (manifold.get_type(record)) {
-            case TYPE_VALUE:
-                id = record;
-                break;
-            case TYPE_RECORD:
-                /* XXX Test the key before ? */
-                id = record[this.key];
-                break;
-            default:
-                throw "Not implemented";
-                break;
-            }
-
-
-	        if (id === undefined) {
-		        messages.warning("querytable.set_checkbox record has no id to figure which line to tick");
-		        return;
-	        }
-            // PB TO CHECK THE RIGHT CHECKBOXES IS HERE... flat_id using \ in the key
-            // need to use escape_id when creating the id of the checkboxes
-            var checkbox_id = this.flat_id(this.id('checkbox', id));
-            // function escape_id(myid) is defined in portal/static/js/common.functions.js
-            checkbox_id = escape_id(checkbox_id);
-            // As we are using [id="x"] syntax, we need to remove the # in the checkbox_id
-            checkbox_id = checkbox_id.replace("#","");
-            // using dataTables's $ to search also in nodes that are not currently displayed
-            var element = this.table.$('[id="' + checkbox_id + '"]');
-            if (debug) 
-                messages.debug("set_checkbox checked=" + checked
-                               + " id=" + checkbox_id + " matches=" + element.length);
-            element.attr('checked', checked);
-        },
+	// id relates to canonical_key
+	set_checkbox_from_data: function (id, checked) {
+            if (checked === undefined) checked = true;
+	    if (debug) messages.debug("set_checkbox_from_data, id="+id);
+	    // using table.$ to search inside elements that are not visible
+	    var element = this.table.$("[id='"+id+"']");
+	    element.attr('checked',checked);
+	},
 
         /*************************** QUERY HANDLER ****************************/
 
@@ -375,10 +367,10 @@
         {
             if (this.received_all_query) {
         	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this.set_checkbox(record, true);
+                this.set_checkbox_from_record(record, true);
             } else {
         	// otherwise we need to remember that and do it later on
-        	if (debug) messages.debug("Remembering record to check " + record[this.key]);
+        	if (debug) messages.debug("Remembering record to check " + record[this.init_key]);
                 this.buffered_records_to_check.push(record);
             }
         },
@@ -405,11 +397,11 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
+                    this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
+                    this.set_checkbox_from_data(data.value, false);
                     break;
                 default:
                     break;
@@ -423,11 +415,11 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox(data.value, true);
+                    this.set_checkboxfrom_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox(data.value, false);
+                    this.set_checkbox_from_data(data.value, false);
                     break;
                 default:
                     break;
@@ -462,7 +454,7 @@
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
 		if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
-                self.set_checkbox(record, true);
+                self.set_checkbox_from_record(record, true);
             });
 	    this.buffered_records_to_check = [];
 
@@ -558,10 +550,11 @@
             e.stopPropagation();
 
             var self = e.data;
+	    var id=this.id;
 
-            // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " "+this.key+"=" + this.value);
-            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
+            // this.id = key of object to be added... what about multiple keys ?
+	    if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
+            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, id);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },

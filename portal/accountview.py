@@ -9,8 +9,10 @@ from ui.topmenu                         import topmenu_items, the_user
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
+from django.core.mail                   import send_mail
+
 #
-import json, os, re
+import json, os, re, itertools
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
@@ -32,7 +34,7 @@ class AccountView(LoginRequiredAutoLogoutView):
             if user_detail['config']:
                 config = json.loads(user_detail['config'])
 
-        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         platform_details = execute_query(self.request, platform_query)
         account_details = execute_query(self.request, account_query)
@@ -42,41 +44,124 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_type = ''
         account_usr_hrn = ''
         account_pub_key = ''
+        account_reference = ''
         platform_name_list = []
+        platform_name_secondary_list = []
+        platform_access_list = []
+        platform_no_access_list = []
+        total_platform_list = []
         account_type_list = []
+        account_type_secondary_list = []
+        account_reference_list = []
+        delegation_type_list = []
+        exp_user_cred_list = []
+        slice_list = []
+        auth_list = []
+        slice_cred_exp_list = []
+        auth_cred_exp_list = []
         usr_hrn_list = []
-        pub_key_list = []          
-        for account_detail in account_details:
-            for platform_detail in platform_details:
+        pub_key_list = []
+          
+        for platform_detail in platform_details:
+            if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
+                total_platform = platform_detail['platform']
+                total_platform_list.append(total_platform)
+                
+            for account_detail in account_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
-                    account_type = account_detail['auth_type']
                     account_config = json.loads(account_detail['config'])
-                    # a bit more pythonic
                     account_usr_hrn = account_config.get('user_hrn','N/A')
                     account_pub_key = account_config.get('user_public_key','N/A')
-                    
-                    platform_name_list.append(platform_name)
-                    account_type_list.append(account_type)
-                    usr_hrn_list.append(account_usr_hrn)
-                    pub_key_list.append(account_pub_key)
-            
-                # to hide private key row if it doesn't exist    
-                if 'myslice' in platform_detail['platform']:
-                    account_config = json.loads(account_detail['config'])
-                    account_priv_key = account_config.get('user_private_key','N/A')
-        
-        # combining 4 lists into 1 [to render in the template] 
-        lst = [{'platform_name': t[0], 'account_type': t[1], 'usr_hrn':t[2], 'usr_pubkey':t[3]} 
-               for t in zip(platform_name_list, account_type_list, usr_hrn_list, pub_key_list)]
+                    account_reference = account_config.get ('reference_platform','N/A')
+                    # credentials
+                    acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
+                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+
+                    if 'N/A' not in acc_slice_cred:
+                        for key, value in acc_slice_cred.iteritems():
+                            slice_list.append(key)
+                            # get cred_exp date
+                            exp_date = re.search('<expires>(.*)</expires>', value)
+                            if exp_date:
+                                exp_date = exp_date.group(1)
+                                slice_cred_exp_list.append(exp_date)
+
+                        my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
+                            for t in zip(slice_list, slice_cred_exp_list)]
+
+                    if 'N/A' not in acc_auth_cred:
+                        for key, value in acc_auth_cred.iteritems():
+                            auth_list.append(key)
+                        #get cred_exp date
+                            exp_date = re.search('<expires>(.*)</expires>', value)
+                            if exp_date:
+                                exp_date = exp_date.group(1)
+                                auth_cred_exp_list.append(exp_date)
+
+                        my_auths = [{'auth_name': t[0], 'cred_exp': t[1]}
+                            for t in zip(auth_list, auth_cred_exp_list)]
+
+
+                    account_user_credential = account_config.get('delegated_user_credential','N/A')
+                    # Expiration date 
+                    result = re.search('<expires>(.*)</expires>', account_user_credential)
+                    if result:
+                        exp_user_cred = result.group(1)
+                    # for reference accounts
+                    if 'reference' in account_detail['auth_type']:
+                        account_type = 'Reference'
+                        delegation = 'N/A'
+                        platform_name_secondary_list.append(platform_name)
+                        account_type_secondary_list.append(account_type)
+                        account_reference_list.append(account_reference)
+                        secondary_list = [{'platform_name': t[0], 'account_type': t[1], 'account_reference': t[2]} 
+                            for t in zip(platform_name_secondary_list, account_type_secondary_list, account_reference_list)]
+                       
+                    elif 'managed' in account_detail['auth_type']:
+                        account_type = 'Principal'
+                        delegation = 'Automatic'
+                    else:
+                        account_type = 'Principal'
+                        delegation = 'Manual'
+                    # for principal (auth_type=user/managed) accounts
+                    if 'reference' not in account_detail['auth_type']:
+                        platform_name_list.append(platform_name)
+                        account_type_list.append(account_type)
+                        delegation_type_list.append(delegation)
+                        exp_user_cred_list.append(exp_user_cred)
+                        usr_hrn_list.append(account_usr_hrn)
+                        pub_key_list.append(account_pub_key)
+                        # combining 5 lists into 1 [to render in the template] 
+                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'credential_expiration':t[3], 'usr_hrn':t[4], 'usr_pubkey':t[5]} 
+                            for t in zip(platform_name_list, account_type_list, delegation_type_list, exp_user_cred_list, usr_hrn_list, pub_key_list)]
+                    # to hide private key row if it doesn't exist    
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        account_priv_key = account_config.get('user_private_key','N/A')
+                    if 'sfa' in platform_detail['gateway_type']:
+                        platform_access = platform_detail['platform']
+                        platform_access_list.append(platform_access)
+       
+        # Removing the platform which already has access
+        for platform in platform_access_list:
+            total_platform_list.remove(platform)
+        # we could use zip. this one is used if columns have unequal rows 
+        platform_list = [{'platform_no_access': t[0]}
+            for t in itertools.izip_longest(total_platform_list)]
+
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
+        context['ref_acc'] = secondary_list
+        context['platform_list'] = platform_list
+        context['my_slices'] = my_slices
+        context['my_auths'] = my_auths
         context['person']   = self.request.user
-        context ['firstname'] = config.get('firstname',"?")
-        context ['lastname'] = config.get('lastname',"?")
-        context ['fullname'] = context['firstname'] +' '+ context['lastname']
-        context ['authority'] = config.get('authority',"Unknown Authority")
+        context['firstname'] = config.get('firstname',"?")
+        context['lastname'] = config.get('lastname',"?")
+        context['fullname'] = context['firstname'] +' '+ context['lastname']
+        context['authority'] = config.get('authority',"Unknown Authority")
         context['user_private_key'] = account_priv_key
         
         # XXX This is repeated in all pages
@@ -273,8 +358,62 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
-           
-       
+        
+    elif 'fuseco' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"] 
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in fuseco Platform" % requester
+        send_mail("Onelab user %s requested an account in Fuseco"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on Fuseco platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'ple' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"] 
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in fuseco Platform" % requester
+        send_mail("Onelab user %s requested an account in PLE"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on PLE platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'omf' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in omf:nitos Platform" % requester
+        send_mail("Onelab user %s requested an account in OMF:NITOS"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on OMF:NITOS platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'wilab' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in Wilab Platform" % requester
+        send_mail("Onelab user %s requested an account in Wilab"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on Wilab platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'iotlab' in request.POST:
+        # The recipients are the PI of the authority
+        #recipients = authority_get_pi_emails(request, authority_hrn)
+        recipients = ["support@myslice.info"]
+        requester = request.user # current user
+        sender = 'yasin.upmc@gmail.com' # the server email
+        msg = "OneLab user %s requested account in IOTLab Platform" % requester
+        send_mail("Onelab user %s requested an account in IOTLab"%requester , msg, sender, recipients)
+        messages.info(request, 'Request to get access on IOTLab platform received. Please wait for PI\'s reply.')
+        return HttpResponseRedirect("/portal/account/")
+  
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")
