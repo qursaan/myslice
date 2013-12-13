@@ -167,8 +167,10 @@
         }, // getColIndex
 
 	// create a checkbox <input> tag
-	// computes 'id' attribute from canonical_key (using flat_id)
-	// computes 'common_id' from init_key for initialization phase
+	// computes 'id' attribute from canonical_key
+	// computes 'init_id' from init_key for initialization phase
+	// no need to used convoluted ids with plugin-uuid or others, since
+	// we search using table.$ which looks only in this table
         checkbox_html : function (record) {
             var result="";
             // Prefix id with plugin_uuid
@@ -176,17 +178,14 @@
             result += " class='querytable-checkbox'";
 	 // compute id from canonical_key
 	    var id = record[this.canonical_key]
-	    // normalize using flat_id - see plugin.js
-	    id = this.flat_id(id)
 //	    if (debug) messages.debug("checkbox_html, id="+id);
-            result += " id='" + id + "'";
-	 // compute common_id too
-	    var common_id=record[this.init_key];
-	    common_id=this.flat_id(common_id);
+	 // compute init_id form init_key
+	    var init_id=record[this.init_key];
+	 // set id - for retrieving from an id, or for posting events upon user's clicks
+	    result += " id='"+record[this.canonical_key]+"'";
+	 // set init_id
+	    result += "init_id='" + init_id + "'";
 	 // wrap up
-	    result += "common_id='" + common_id + "'";
-	    // set value for posting events upon user's clicks
-	    result += " value='"+record[this.canonical_key]+"'";
             result += " type='checkbox'";
             result += " autocomplete='off'";
             result += "></input>";
@@ -271,18 +270,19 @@
 	// (because the argument record, if it comes from query, might not have canonical_key set
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
-	    var common_id = this.flat_id(record[this.init_key]);
-	    if (debug) messages.debug("set_checkbox_from_record, common_id="+common_id);
-	    var element = this.table.$('[common_id="'+common_id+'"]');
+	    var init_id = record[this.init_key];
+	    if (debug) messages.debug("set_checkbox_from_record, init_id="+init_id);
+	    // using table.$ to search inside elements that are not visible
+	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
 	},
 
 	// id relates to canonical_key
 	set_checkbox_from_data: function (id, checked) {
             if (checked === undefined) checked = true;
-	    var id=this.flat_id(id);
 	    if (debug) messages.debug("set_checkbox_from_data, id="+id);
-	    var element = this.table.$('#'+id);
+	    // using table.$ to search inside elements that are not visible
+	    var element = this.table.$("[id='"+id+"']");
 	    element.attr('checked',checked);
 	},
 
@@ -550,10 +550,11 @@
             e.stopPropagation();
 
             var self = e.data;
+	    var id=this.id;
 
-            // XXX this.value = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable click handler checked=" + this.checked + " "+this.canonical_key+"=" + this.value);
-            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, this.value);
+            // this.id = key of object to be added... what about multiple keys ?
+	    if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
+            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, id);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },

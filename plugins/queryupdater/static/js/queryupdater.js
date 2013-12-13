@@ -127,7 +127,7 @@
             var row;
 	    
 	    // make sure the change is visible : toggle on the whole plugin
-	    // this might hae to be made an 'auto-toggle' option of this plugin..
+	    // this might have to be made an 'auto-toggle' option of this plugin..
 	    // also it might be needed to be a little finer-grained here
 	    this.toggle_on();
 	    

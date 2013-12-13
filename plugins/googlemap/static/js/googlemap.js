@@ -157,10 +157,9 @@
 	}, 
 
 	set_checkbox_from_data: function(id, checked) {
-	    var id=record [this.canonical_key];
 	    var checkbox = this.by_id [ id ];
 	    if (checkbox) checkbox.prop('checked',checked);
-	    else this.warning(record, "googlemap.set_checkbox_from_data - not found "+init_id);
+	    else messages.warning("googlemap.set_checkbox_from_data - id not found "+id);
 	}, 
 
 	// this record is *in* the slice
