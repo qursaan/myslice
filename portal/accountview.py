@@ -56,7 +56,9 @@ class AccountView(LoginRequiredAutoLogoutView):
         delegation_type_list = []
         exp_user_cred_list = []
         slice_list = []
+        auth_list = []
         slice_cred_exp_list = []
+        auth_cred_exp_list = []
         usr_hrn_list = []
         pub_key_list = []
           
@@ -72,8 +74,10 @@ class AccountView(LoginRequiredAutoLogoutView):
                     account_usr_hrn = account_config.get('user_hrn','N/A')
                     account_pub_key = account_config.get('user_public_key','N/A')
                     account_reference = account_config.get ('reference_platform','N/A')
-
+                    # credentials
                     acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
+                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+
                     if 'N/A' not in acc_slice_cred:
                         for key, value in acc_slice_cred.iteritems():
                             slice_list.append(key)
@@ -85,6 +89,19 @@ class AccountView(LoginRequiredAutoLogoutView):
 
                         my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
                             for t in zip(slice_list, slice_cred_exp_list)]
+
+                    if 'N/A' not in acc_auth_cred:
+                        for key, value in acc_auth_cred.iteritems():
+                            auth_list.append(key)
+                        #get cred_exp date
+                            exp_date = re.search('<expires>(.*)</expires>', value)
+                            if exp_date:
+                                exp_date = exp_date.group(1)
+                                auth_cred_exp_list.append(exp_date)
+
+                        my_auths = [{'auth_name': t[0], 'cred_exp': t[1]}
+                            for t in zip(auth_list, auth_cred_exp_list)]
+
 
                     account_user_credential = account_config.get('delegated_user_credential','N/A')
                     # Expiration date 
@@ -139,6 +156,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         context['ref_acc'] = secondary_list
         context['platform_list'] = platform_list
         context['my_slices'] = my_slices
+        context['my_auths'] = my_auths
         context['person']   = self.request.user
         context['firstname'] = config.get('firstname',"?")
         context['lastname'] = config.get('lastname',"?")

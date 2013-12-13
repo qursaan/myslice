@@ -132,7 +132,7 @@
 </div>
 
 <h2>Account Information</h2>
-<h3>Principal Accounts</h3>
+<h3>Principal Account</h3>
 <div id="middle" align="center">
 	<div class="well">
 		<table class="mytable"> 
@@ -140,7 +140,6 @@
     			<th>Platform</th> 
         		<th>Account Type</th>
 				<th>Account_delegation</th>
-				<th>Credential Expiration</th> 	 
         		<th>user_hrn</th>
         		<!--<th>Pub Key</th> -->
     		</tr>   
@@ -149,7 +148,6 @@
     			<td class="odd"> {{ row.platform_name }} </td>
         		<td class="even"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.delegation_type }} </td>
-				<td class="even"> {{ row.credential_expiration }} </td>
        			<td class="odd"> {{ row.usr_hrn }}  </td>
         	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
     		</tr> 
@@ -158,7 +156,59 @@
 	</div>
 </div>
 
-<h3>Secondary Accounts</h3>
+
+<h3>Credentials</h3>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable">
+			<caption><b>Delegated User Credential</b></caption> 
+            <tr class="odd"> 
+                <th>Expiration Date</th>
+            </tr>
+			{% for row in data %}         
+			<tr class="border_bottom">
+    			<td class="even"> {{ row.credential_expiration }} </td>
+			</tr>
+			{%endfor%}
+		 </table>
+		<p><button id="dl_user_cred" name= "dl_user_cred" type="submit" title="Download User Credential">Download</button></p>
+		 <table class="mytable">
+			<caption><b>Delegated Slice Credentials</b></caption>  
+     		<tr class="odd"> 
+				<th>Slice Name</th> 
+         		<th>Expiration Date</th>
+     		</tr>
+			{% for row in my_slices %}     
+     		<tr class="border_bottom">
+         		<td class="even"> {{ row.slice_name }} </td>
+				<td class="odd"> {{ row.cred_exp }} </td>
+     		</tr>
+     		{%endfor%}
+  		</table>
+		<p><button id="dl_slice_cred" name= "dl_slice_cred" type="submit" title="Download Slice Credentials">Download</button></p>
+		<table class="mytable">
+   			<caption><b>Delegated Authority Credentials</b></caption>
+   			<tr class="odd"> 
+       			<th>Authority Name</th> 
+       			<th>Expiration Date</th>
+   			</tr>
+   			{% for row in my_auths %}
+   			<tr class="border_bottom">
+       			<td class="even"> {{ row.auth_name }} </td>
+       			<td class="odd"> {{ row.cred_exp }} </td>
+   			</tr>
+   			{%endfor%}
+		</table>
+		<p><button id="dl_auth_cred" name= "dl_auth_cred" type="submit" title="Download Authority Credentials">Download</button></p>
+		<p></p>	
+		<p><button id="clear_cred" name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+    </div>
+</div>
+
+
+
+
+<h3>Testbed Accounts</h3>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable"> 
@@ -171,14 +221,14 @@
             <tr class="border_bottom">
                 <td class="odd"> {{ row.platform_name }} </td>
                 <td class="even"> {{ row.account_type }} </td>
-				<td class="even"> {{ row.account_reference }} </td>
+				<td class="odd"> {{ row.account_reference }} </td>
             </tr> 
             {%endfor%}               
         </table>
     </div>
 </div>
 
-<h2>Other Platforms</h2>
+<h3>Add Accounts</h3>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable"> 
@@ -190,7 +240,7 @@
             <tr class="border_bottom">
                 <td class="odd"> {{ platform.platform_no_access }} </td>
                 <td class="even">
-					<button id="request_access" name= {{platform.platform_no_access}} type="submit" title="Request Access to this platform">Request {{platform.platform_no_access}}</button>
+					<button id="request_access" name= {{platform.platform_no_access}} type="submit" title="Add account to this platform">Add {{platform.platform_no_access}}</button>
 				</td>
             </tr> 
             {%endfor%}               
@@ -198,32 +248,6 @@
     </div>
 </div>
 
-
-
-
-<h2>Slice Information</h2>
-<div id="middle" align="center">
-    <div class="well">
-        <table class="mytable"> 
-            <tr class="odd"> 
-                <th>Slice name</th> 
-                <th>Credential Expiration</th>
-            </tr>   
-            {% for row in my_slices %}         
-            <tr class="border_bottom">
-                <td class="odd"> {{ row.slice_name }} </td>
-                <td class="even"> {{ row.cred_exp }} </td>
-            </tr>
-            {%endfor%}
-        </table>
-    </div>
-</div>
-
-
-
-
 </form>
-
-
 
 {% endblock %}
