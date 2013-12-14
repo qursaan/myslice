@@ -34,6 +34,13 @@ if not os.path.isdir (os.path.join(HTTPROOT,"static")):
 if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
 if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
 
+# dec 2013 - we currently have 3 auxiliary subdirs with various utilities
+# that we do not wish to package 
+# hopefully the number should go down to 1
+# for each of these, if we find a directory of that name under ROOT, it then gets
+# inserted in INSTALLED_APPS and its urls get included (see urls.py)
+auxiliaries = [ 'sandbox', 'sample', 'trash', ]
+
 ####################
 ADMINS = (
     # ('your_name', 'your_email@test.com'),
@@ -169,7 +176,7 @@ TEMPLATE_DIRS = (
     os.path.join(HTTPROOT,"templates"),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -194,18 +201,11 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
-    # temporary - not packaged
-    'trash',
-    'sample',
-    'sandbox'
-# DEPRECATED #    'django.contrib.formtools',
-# DEPRECATED ##    'crispy_forms',
-# DEPRECATED #
-# DEPRECATED #    # User registration
-# DEPRECATED #    'django.contrib.auth',
-# DEPRECATED #    'django.contrib.sites',
-# DEPRECATED #    'registration',
-)
+]
+for aux in auxiliaries:
+    if os.path.isdir(os.path.join(ROOT,aux)): 
+        print "Using devel auxiliary",aux
+        INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 

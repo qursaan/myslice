@@ -9,6 +9,8 @@ from django.conf      import settings
 from django.template.loader import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
+from settings import auxiliaries, INSTALLED_APPS
+
 import portal.platformsview
 import portal.dashboardview
 import portal.homeview
@@ -28,7 +30,7 @@ the_after_login_view=dashboard_view
 # might need another one ?
 the_login_view=home_view
 
-urlpatterns = patterns(
+urls = [
     '',
     # Examples:
     # url(r'^$', 'myslice.views.home', name='home'),
@@ -39,31 +41,28 @@ urlpatterns = patterns(
     # url(r'^admin/', include(admin.site.urls)),
     #
     # default / view
-    #
     (r'^/?$', the_default_view),
     #
     # login / logout
-    #
     (r'^login-ok/?$', the_after_login_view, {'state': 'Welcome to MySlice'} ),
+    #
     # seems to be what login_required uses to redirect ...
     (r'^accounts/login/$', the_login_view),
     (r'^login/?$', the_login_view),
     (r'^logout/?$', 'auth.views.logout_user'),
     #
     # the manifold proxy
-    #
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifold.manifoldproxy.proxy'),
     #
     # Portal
     url(r'^portal/', include('portal.urls')),
-    # Sandbox
-    url(r'^sandbox/', include('sandbox.urls')),
-    url(r'^sample/', include('sample.urls')),
-    # Debug
-#    url(r'^debug/', include('debug_platform.urls')),
-    #
-    # various trash views - bound to go away 
-    #
-#    url(r'^trash/', include('trash.urls')),
+]
 
-)
+#this one would not match the convention
+# url(r'^debug/', include('debug_platform.urls')),
+# but it was commented out anyways
+for aux in auxiliaries:
+    if aux in INSTALLED_APPS:
+        urls.append ( url ( r'^%s/'%aux, include ('%s.urls'%aux )))
+
+urlpatterns = patterns(*urls)
