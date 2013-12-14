@@ -31,12 +31,11 @@
 	    // an internal buffer for keeping lines and display them in one call to fnAddData
 	    this.buffered_lines = [];
 
-            /* XXX Events XXX */
-            // this.$element.on('show.Datatables', this.on_show);
+            /* Events */
+	    // xx somehow non of these triggers at all for now
             this.elmt().on('show', this, this.on_show);
-            // Unbind all events using namespacing
-            // TODO in destructor
-            // $(window).unbind('QueryTable');
+            this.elmt().on('shown.bs.tab', this, this.on_show);
+            this.elmt().on('resize', this, this.on_resize);
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
@@ -69,25 +68,17 @@
 
         /* PLUGIN EVENTS */
 
-        on_show: function(e)
-        {
+        on_show: function(e) {
+	    if (debug) messages.debug("querytable.on_show");
             var self = e.data;
+            self.table.fnAdjustColumnSizing();
+	},        
 
-            self.table.fnAdjustColumnSizing()
-        
-            /* Refresh dataTabeles if click on the menu to display it : fix dataTables 1.9.x Bug */        
-            /* temp disabled... useful ? -- jordan
-            $(this).each(function(i,elt) {
-                if (jQuery(elt).hasClass('dataTables')) {
-                    var myDiv=jQuery('#querytable-' + this.id).parent();
-                    if(myDiv.height()==0) {
-                        var oTable=$('#querytable-' + this.id).dataTable();            
-                        oTable.fnDraw();
-                    }
-                }
-            });
-            */
-        }, // on_show
+        on_resize: function(e) {
+	    if (debug) messages.debug("querytable.on_resize");
+            var self = e.data;
+            self.table.fnAdjustColumnSizing();
+	},        
 
         /* GUI EVENTS */
 
@@ -178,7 +169,6 @@
             result += " class='querytable-checkbox'";
 	 // compute id from canonical_key
 	    var id = record[this.canonical_key]
-//	    if (debug) messages.debug("checkbox_html, id="+id);
 	 // compute init_id form init_key
 	    var init_id=record[this.init_key];
 	 // set id - for retrieving from an id, or for posting events upon user's clicks
@@ -271,7 +261,7 @@
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
 	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("set_checkbox_from_record, init_id="+init_id);
+	    if (debug) messages.debug("querytable.set_checkbox_from_record, init_id="+init_id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
@@ -280,7 +270,7 @@
 	// id relates to canonical_key
 	set_checkbox_from_data: function (id, checked) {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("set_checkbox_from_data, id="+id);
+	    if (debug) messages.debug("querytable.set_checkbox_from_data, id="+id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$("[id='"+id+"']");
 	    element.attr('checked',checked);
@@ -369,8 +359,6 @@
         	// if the 'all' query has been dealt with already we may turn on the checkbox
                 this.set_checkbox_from_record(record, true);
             } else {
-        	// otherwise we need to remember that and do it later on
-        	if (debug) messages.debug("Remembering record to check " + record[this.init_key]);
                 this.buffered_records_to_check.push(record);
             }
         },
@@ -453,7 +441,7 @@
 	    // if we've already received the slice query, we have not been able to set 
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
-		if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
+		if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
                 self.set_checkbox_from_record(record, true);
             });
 	    this.buffered_records_to_check = [];
