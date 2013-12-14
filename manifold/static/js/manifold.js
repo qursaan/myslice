@@ -186,19 +186,6 @@ var manifold = {
 
     separator: '__',
 
-    spin_presets: {},
-
-    spin: function(locator, active /*= true */) {
-        active = typeof active !== 'undefined' ? active : true;
-        try {
-            if (active) {
-                $(locator).spin(manifold.spin_presets);
-            } else {
-                $(locator).spin(false);
-            }
-        } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
-    },
-
     get_type: function(variable) {
         switch(Object.toType(variable)) {
             case 'number':
