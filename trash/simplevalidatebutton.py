@@ -16,8 +16,10 @@ class SimpleValidateButtonView (TemplateView):
     # mention a user name in the URL as .../trash/simplevalidatebutton/ple.inria.thierry_parmentelat
     def get (self, request, username='ple.inria.thierry_parmentelat'):
 
+        if username=='logged': username='$user_hrn'
+
         page=Page(request)
-        page.expose_js_metadata()
+
         query_pi_auths = Query.get('ple:user').filter_by('user_hrn', '==', username ).select('pi_authorities')
         page.enqueue_query(query_pi_auths)
 
@@ -28,16 +30,16 @@ class SimpleValidateButtonView (TemplateView):
                                          # see above
                                          domid='topmenu-validation',
                                          query=query_pi_auths,
-                                         # this one is the target for a $.show() when the query comes back
+                                         # this one is the target for enabling when the query comes back
                                          button_domid="topmenu-validation")
+        # there is a need to call render() for exposing the query and creating the js plugin
+        # even though this returns an empty string
+        validatebutton.render(request)
+
 
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
-        # there is a need to call render() for exposing the query and creating the js plugin
-        # even though this returns an empty string
-        rendered=validatebutton.render(request)
-
         # write something of our own instead
         template_env ['unfold_main'] = '<h1>Some title </h1>'
         
