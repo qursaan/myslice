@@ -16,10 +16,6 @@ from myslice.config             import Config
 debug=False
 #debug=True
 
-# add artificial delay in s
-debug_spin=0
-#debug_spin=1
-
 # pretend the server only returns - empty lists to 'get' requests - this is to mimick 
 # misconfigurations or expired credentials or similar corner case situations
 debug_empty=False
@@ -80,12 +76,6 @@ with the query passed using POST"""
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
 
         json_answer=json.dumps(result)
-
-        # this is an artificial delay added for debugging purposes only
-        if debug_spin>0:
-            print "Adding additional artificial delay",debug_spin
-            import time
-            time.sleep(debug_spin)
 
         return HttpResponse (json_answer, mimetype="application/json")
 
