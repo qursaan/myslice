@@ -780,10 +780,10 @@ var manifold = {
         $.each(channels, function(i, channel) {
             if (value === undefined) {
 		if (manifold.publish_result_debug) messages.debug("triggering [no value] on channel="+channel+" and event_type="+event_type);
-                $('.plugin').trigger(channel, [event_type]);
+                $('.pubsub').trigger(channel, [event_type]);
             } else {
 		if (manifold.publish_result_debug) messages.debug("triggering [value="+value+"] on channel="+channel+" and event_type="+event_type);
-                $('.plugin').trigger(channel, [event_type, value]);
+                $('.pubsub').trigger(channel, [event_type, value]);
             }
         });
     },

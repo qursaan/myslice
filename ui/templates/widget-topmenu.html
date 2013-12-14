@@ -28,7 +28,7 @@
 	  </ul>
         </li>
         {% else %} 
-	<li class='{% if d.is_active %}active{% else %}other{% endif %} plugin{% if d.disabled %} disabled{%endif%}'
+	<li class='{% if d.is_active %}active{% else %}other{% endif %}{% if d.disabled %} disabled{%endif%}'
 	{% if d.domid %} id='{{d.domid}}'{% endif %}>
 	<a href="{{ d.href }}"> {{ d.label }} </a> </li>
 	{% endif %}

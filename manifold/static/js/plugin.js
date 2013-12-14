@@ -30,6 +30,9 @@ var Plugin = Class.extend({
         // reference and a normal reference
         this.element  = element;
         this.$element = $(element);
+	// programmatically add specific class for publishing events
+	// used in manifold.js for triggering API events
+	if ( ! this.$element.hasClass('pubsub')) this.$element.addClass('pubsub');
 
         // return this so we can chain/use the bridge with less code.
         return this;
