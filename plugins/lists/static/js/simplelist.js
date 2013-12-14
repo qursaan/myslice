@@ -19,7 +19,7 @@
 
         on_query_in_progress: function() {
 	    messages.debug("on_query_in_progress");
-            this.spin();
+            this.spin(true);
         },
 
         on_query_done: function() {
