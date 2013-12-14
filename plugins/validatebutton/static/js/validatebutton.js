@@ -17,14 +17,18 @@
 
         // Could be the default in parent
         on_query_in_progress: function() {
-            this.spin();
+	    var presets = spin_presets();
+	    presets.radius=5;
+	    presets.length=4;
+	    presets.lines=7;
+	    presets.width=2;
+            this.spin(presets);
         },
 
 	// we have received at least one answer: we'll do something
 	on_new_record: function (record) {
 	    // we only need to act on the first record
 	    if (this.triggered) return;
-	    if (debug) messages.debug("validatebutton.on_query_done - turning on "+this.options.button_domid);
 	    $('#'+this.options.button_domid).removeClass('disabled');
 	    this.unspin();
 	    this.triggered=true;
