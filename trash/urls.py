@@ -2,6 +2,7 @@ from django.conf.urls           import patterns, include, url
 
 import trash.simpletableview
 import trash.simplegridview
+import trash.simplevalidatebutton
 
 urlpatterns = patterns(
     '',
@@ -11,4 +12,5 @@ urlpatterns = patterns(
     url(r'^dashboard/?$',       'trash.dashboard.dashboard_view'),
     url(r'^simpletable/(?P<slicename>[\w\.]+)/?$', trash.simpletableview.SimpleTableView.as_view()),
     url(r'^simplegrid/(?P<slicename>[\w\.]+)/?$', trash.simplegridview.SimpleGridView.as_view()),
+    url(r'^simplevalidatebutton/(?P<username>[\w\._]+)/?$', trash.simplevalidatebutton.SimpleValidateButtonView.as_view()),
 )
