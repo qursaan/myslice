@@ -33,7 +33,7 @@ class CreateForm (Plugin):
     
     def requirements (self):
         # Some should be included by default by manifold
-        return { 'js_files'     : ['js/manifold.js', 'js/spin.presets.js', 'js/spin.min.js', 'js/jquery.spin.js',
+        return { 'js_files'     : ['js/manifold.js', 'js/spin-presets.js', 'js/spin.min.js', 'js/jquery.spin.js',
                                    'js/form.js', 'js/jquery.validate.js', ],
                  'css_files'    : ['css/form.css'] 
                  }

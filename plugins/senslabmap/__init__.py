@@ -21,7 +21,7 @@ class SensLabMap (Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [ "js/senslabmap.js",
-                           "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js",
+                           "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
                            "js/three.min.js", "js/jquery-mousewheel.min.js", "js/map.js",
                            ],
             'css_files': [ "css/senslabmap.css",

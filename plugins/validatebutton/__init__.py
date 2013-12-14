@@ -28,7 +28,7 @@ Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_author
     
     def requirements (self):
         return { 'js_files': [ 'js/validatebutton.js', 'js/manifold-query.js', 
-                               "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                               "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                                ], }
 
     def json_settings_list (self):
