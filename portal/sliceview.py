@@ -10,7 +10,7 @@ from manifold.manifoldapi            import execute_query
 
 from ui.topmenu                      import topmenu_items, the_user
 
-from plugins.topmenuvalidation          import TopmenuValidation
+from plugins.topmenuvalidation       import TopmenuValidation
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
