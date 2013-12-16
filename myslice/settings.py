@@ -34,12 +34,13 @@ if not os.path.isdir (os.path.join(HTTPROOT,"static")):
 if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
 if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
 
-# dec 2013 - we currently have 3 auxiliary subdirs with various utilities
+# dec 2013 - we currently have 2 auxiliary subdirs with various utilities
 # that we do not wish to package 
-# hopefully the number should go down to 1
+# * sandbox is for plugin developers
+# * sample is for various test views
 # for each of these, if we find a directory of that name under ROOT, it then gets
 # inserted in INSTALLED_APPS and its urls get included (see urls.py)
-auxiliaries = [ 'sandbox', 'sample', 'trash', ]
+auxiliaries = [ 'sandbox', 'sample', ]
 
 ####################
 ADMINS = (

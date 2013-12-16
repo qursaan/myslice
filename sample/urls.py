@@ -23,7 +23,19 @@
 from django.conf.urls import patterns, url
 from sample.views     import WebSocketsView, WebSockets2View
 
-urlpatterns = patterns('',
+import sample.querytableview
+import sample.querygridview
+import sample.validatebuttonview
+
+urlpatterns = patterns(
+    '',
     url(r'^websockets/?$', WebSocketsView.as_view(), name='websockets'),
     url(r'^websockets2/?$', WebSockets2View.as_view(), name='websockets2'),
+    url(r'^tab/?$',                                             'sample.tabview.tab_view'),
+    url(r'^scroll/?$',                                          'sample.scrollview.scroll_view'),
+    url(r'^plugin/?$',                                          'sample.pluginview.test_plugin_view'),
+    url(r'^dashboard/?$',                                       'sample.dashboardview.dashboard_view'),
+    url(r'^querytable/(?P<slicename>[\w\.]+)/?$',               sample.querytableview.QueryTableView.as_view()),
+    url(r'^querygrid/(?P<slicename>[\w\.]+)/?$',                sample.querygridview.QueryGridView.as_view()),
+    url(r'^validatebutton/(?P<username>[\w\._]+)/?$',           sample.validatebuttonview.ValidateButtonView.as_view()),
 )
