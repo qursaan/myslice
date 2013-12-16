@@ -39,12 +39,16 @@ class AccountView(LoginRequiredAutoLogoutView):
         platform_details = execute_query(self.request, platform_query)
         account_details = execute_query(self.request, account_query)
        
-        # initial assignment needed for users having no account  
+        # initial assignment needed for users having account.config = {} 
         platform_name = ''
         account_type = ''
         account_usr_hrn = ''
         account_pub_key = ''
         account_reference = ''
+        my_users = ''
+        my_slices = ''
+        my_auths = ''
+        secondary_list = ''
         platform_name_list = []
         platform_name_secondary_list = []
         platform_access_list = []
@@ -54,7 +58,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_type_secondary_list = []
         account_reference_list = []
         delegation_type_list = []
-        exp_user_cred_list = []
+        user_cred_exp_list = []
         slice_list = []
         auth_list = []
         slice_cred_exp_list = []
@@ -63,7 +67,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         pub_key_list = []
           
         for platform_detail in platform_details:
-            if 'sfa' in platform_detail['gateway_type']:
+            if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
                 total_platform = platform_detail['platform']
                 total_platform_list.append(total_platform)
                 
@@ -75,8 +79,19 @@ class AccountView(LoginRequiredAutoLogoutView):
                     account_pub_key = account_config.get('user_public_key','N/A')
                     account_reference = account_config.get ('reference_platform','N/A')
                     # credentials
+                    acc_user_cred = account_config.get('delegated_user_credential','N/A')
                     acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
                     acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+
+                    if 'N/A' not in acc_user_cred:
+                        exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
+                        if exp_date:
+                            user_exp_date = exp_date.group(1)
+                            user_cred_exp_list.append(user_exp_date)
+
+                        my_users = [{'cred_exp': t[0]}
+                            for t in zip(user_cred_exp_list)]
+                       
 
                     if 'N/A' not in acc_slice_cred:
                         for key, value in acc_slice_cred.iteritems():
@@ -103,11 +118,6 @@ class AccountView(LoginRequiredAutoLogoutView):
                             for t in zip(auth_list, auth_cred_exp_list)]
 
 
-                    account_user_credential = account_config.get('delegated_user_credential','N/A')
-                    # Expiration date 
-                    result = re.search('<expires>(.*)</expires>', account_user_credential)
-                    if result:
-                        exp_user_cred = result.group(1)
                     # for reference accounts
                     if 'reference' in account_detail['auth_type']:
                         account_type = 'Reference'
@@ -129,12 +139,11 @@ class AccountView(LoginRequiredAutoLogoutView):
                         platform_name_list.append(platform_name)
                         account_type_list.append(account_type)
                         delegation_type_list.append(delegation)
-                        exp_user_cred_list.append(exp_user_cred)
                         usr_hrn_list.append(account_usr_hrn)
                         pub_key_list.append(account_pub_key)
                         # combining 5 lists into 1 [to render in the template] 
-                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'credential_expiration':t[3], 'usr_hrn':t[4], 'usr_pubkey':t[5]} 
-                            for t in zip(platform_name_list, account_type_list, delegation_type_list, exp_user_cred_list, usr_hrn_list, pub_key_list)]
+                        lst = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
+                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
                     # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
@@ -144,20 +153,17 @@ class AccountView(LoginRequiredAutoLogoutView):
                         platform_access_list.append(platform_access)
        
         # Removing the platform which already has access
-        print platform_access_list
-        print total_platform_list
         for platform in platform_access_list:
-            print platform
             total_platform_list.remove(platform)
         # we could use zip. this one is used if columns have unequal rows 
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
 
-
         context = super(AccountView, self).get_context_data(**kwargs)
         context['data'] = lst
         context['ref_acc'] = secondary_list
         context['platform_list'] = platform_list
+        context['my_users'] = my_users
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
         context['person']   = self.request.user
@@ -361,8 +367,9 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
-        
-    elif 'fuseco' in request.POST:
+
+    # add reference platforms       
+    elif 'add_fuseco' in request.POST:
         # The recipients are the PI of the authority
         #recipients = authority_get_pi_emails(request, authority_hrn)
         recipients = ["support@myslice.info"] 
@@ -373,7 +380,7 @@ def account_process(request):
         messages.info(request, 'Request to get access on Fuseco platform received. Please wait for PI\'s reply.')
         return HttpResponseRedirect("/portal/account/")
 
-    elif 'ple' in request.POST:
+    elif 'add_ple' in request.POST:
         # The recipients are the PI of the authority
         #recipients = authority_get_pi_emails(request, authority_hrn)
         recipients = ["support@myslice.info"] 
@@ -384,7 +391,7 @@ def account_process(request):
         messages.info(request, 'Request to get access on PLE platform received. Please wait for PI\'s reply.')
         return HttpResponseRedirect("/portal/account/")
 
-    elif 'omf' in request.POST:
+    elif 'add_omf' in request.POST:
         # The recipients are the PI of the authority
         #recipients = authority_get_pi_emails(request, authority_hrn)
         recipients = ["support@myslice.info"]
@@ -395,7 +402,7 @@ def account_process(request):
         messages.info(request, 'Request to get access on OMF:NITOS platform received. Please wait for PI\'s reply.')
         return HttpResponseRedirect("/portal/account/")
 
-    elif 'wilab' in request.POST:
+    elif 'add_wilab' in request.POST:
         # The recipients are the PI of the authority
         #recipients = authority_get_pi_emails(request, authority_hrn)
         recipients = ["support@myslice.info"]
@@ -416,6 +423,8 @@ def account_process(request):
         send_mail("Onelab user %s requested an account in IOTLab"%requester , msg, sender, recipients)
         messages.info(request, 'Request to get access on IOTLab platform received. Please wait for PI\'s reply.')
         return HttpResponseRedirect("/portal/account/")
+
+    #delete reference platoforms
   
     else:
         messages.info(request, 'Under Construction. Please try again later!')
