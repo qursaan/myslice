@@ -31,7 +31,6 @@ class ResourceView(FreeAccessView):
         page.enqueue_query(resource_query)
 
         page.expose_js_metadata()
-        page.expose_queries()
 
         resourcelist = QueryTable(
             page  = page,

@@ -18,7 +18,6 @@ class PlatformsView(FreeAccessView):
         page.enqueue_query(platform_query)
 
         page.expose_js_metadata()
-        page.expose_queries()
         platformlist = QueryTable(
             page  = page,
             title = 'List',

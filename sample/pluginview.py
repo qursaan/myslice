@@ -92,9 +92,6 @@ $(function(){$("#bouton").click(issue_debug);});
     template_env [ 'topmenu_items' ] = topmenu_items('plugin', request) 
     template_env [ 'username' ] = the_user (request) 
 
-    # run queries when we have any
-    page.expose_queries ()
-
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()

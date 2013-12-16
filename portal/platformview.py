@@ -24,7 +24,6 @@ class PlatformView(FreeAccessView):
         page.enqueue_query(network_query)
 
         page.expose_js_metadata()
-        page.expose_queries()
         networklist = QueryTable(
             page  = page,
             title = 'List',

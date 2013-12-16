@@ -49,7 +49,7 @@ class Page:
 #        self._queue = []
 
     # this method adds a query to the page
-    # the query will be exposed to js when calling expose_queries
+    # the query will be exposed to js when calling __expose_queries, which is done by prelude_env() 
     # additionally if run_it is set to True, this query will be asynchroneously triggered on page load
     # in this case (exec=True) the js async callback (see manifold.asynchroneous_success)
     # offers the option to deliver the result to a specific DOM elt (in this case, set domid)
@@ -73,11 +73,11 @@ class Page:
         self.add_js_files('js/record_generator.js');
         js_chunk = '$(document).ready(function() { new RecordGenerator(%s,%s,%s).run(); });'%(query.to_json(),json.dumps(generators),number);
         self.add_js_chunks(js_chunk)
-
+    
     # return the javascript code for exposing queries
     # all queries are inserted in the global manifold object
     # in addition, the ones enqueued with 'run_it=True' are triggered 
-    def expose_queries (self):
+    def __expose_queries (self):
         # compute variables to expose to the template
         env = {}
         # expose the json definition of all queries
@@ -139,5 +139,9 @@ class Page:
     def add_js_chunks (self):pass
     @to_prelude
     def add_css_chunks (self):pass
-    @to_prelude
-    def prelude_env (self):pass
+
+    # prelude_env also does expose_queries
+    def prelude_env (self):
+        self.__expose_queries()
+        from_prelude=self.prelude.prelude_env()
+        return from_prelude

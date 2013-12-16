@@ -92,12 +92,6 @@ def dashboard_view (request):
     # add our own css in the mix
     #page.add_css_files ( 'css/dashboard.css')
     
-    # don't forget to run the requests
-    page.expose_queries ()
-
-    # xxx create another plugin with the same query and a different layout (with_datatables)
-    # show that it worls as expected, one single api call to backend and 2 refreshed views
-
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}
     prelude_env = page.prelude_env()
