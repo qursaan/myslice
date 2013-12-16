@@ -9,7 +9,7 @@ from django.shortcuts           import render
 
 from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
-from ui.topmenu                 import topmenu_items
+from ui.topmenu                 import topmenu_items_live
 
 from manifold.manifoldapi       import execute_admin_query
 from manifold.core.query        import Query
@@ -168,7 +168,7 @@ class RegistrationView (FreeAccessView):
                 return render(request, 'user_register_complete.html') 
 
         template_env = {
-          'topmenu_items': topmenu_items('Register', request),
+          'topmenu_items': topmenu_items_live('Register', page),
           'errors': errors,
           'firstname': request.POST.get('firstname', ''),
           'lastname': request.POST.get('lastname', ''),

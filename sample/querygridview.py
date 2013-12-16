@@ -7,7 +7,7 @@ from manifold.core.query import Query, AnalyzedQuery
 
 from unfold.page import Page
 
-from ui.topmenu import topmenu_items, the_user
+from ui.topmenu import topmenu_items_live, the_user
 
 from plugins.querygrid import QueryGrid
 
@@ -69,7 +69,7 @@ class QueryGridView (TemplateView):
         # more general variables expected in the template
         template_env [ 'title' ] = 'simple %(slicename)s'%locals()
         # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
+        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can sho who is logged
         template_env [ 'username' ] = the_user (request) 
     

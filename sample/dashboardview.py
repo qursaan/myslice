@@ -19,7 +19,7 @@ from plugins.quickfilter import QuickFilter
 from trash.trashutils import quickfilter_criterias
 
 # 
-from ui.topmenu import topmenu_items, the_user
+from ui.topmenu import topmenu_items_live, the_user
 
 @login_required
 def dashboard_view (request):
@@ -71,7 +71,7 @@ def dashboard_view (request):
     # more general variables expected in the template
     template_env [ 'title' ] = 'Test view for a full request cycle'
     # the menu items on the top 
-    template_env [ 'topmenu_items' ] = topmenu_items('dashboard', request) 
+    template_env [ 'topmenu_items' ] = topmenu_items_live('dashboard', page) 
     # so we can sho who is logged
     template_env [ 'username' ] = the_user (request) 
 

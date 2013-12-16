@@ -29,7 +29,7 @@ from django.template.loader     import render_to_string
 from manifold.core.query        import Query
 from plugins.myplugin           import MyPlugin
 from plugins.maddash            import MadDash
-from ui.topmenu                 import topmenu_items, the_user
+from ui.topmenu                 import topmenu_items_live, the_user
 from unfold.loginrequired       import FreeAccessView
 from unfold.page                import Page
 
@@ -52,7 +52,7 @@ class MyPluginView(FreeAccessView):
         # more general variables expected in the template
         context['title'] = 'Sandbox for MyPlugin plugin'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('myplugin', self.request)
+        context['topmenu_items'] = topmenu_items_live('myplugin', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 
@@ -85,7 +85,7 @@ class MadDashView(FreeAccessView):
         context = super(MadDashView, self).get_context_data(**kwargs)
         context['unfold_main'] = plugin.render(self.request)
         context['title'] = 'Sandbox for MadDash plugin'
-        context['topmenu_items'] = topmenu_items('maddash', self.request)
+        context['topmenu_items'] = topmenu_items_live ('maddash', page)
         context['username'] = the_user(self.request)
 
         prelude_env = page.prelude_env()
