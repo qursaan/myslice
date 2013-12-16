@@ -9,11 +9,11 @@ from unfold.page import Page
 
 from ui.topmenu import topmenu_items, the_user
 
-from plugins.validatebutton import ValidateButton
+from plugins.topmenuvalidation import TopmenuValidation
 
-class ValidateButtonView (TemplateView):
+class TopmenuValidationView (TemplateView):
 
-    # mention a user name in the URL as .../trash/simplevalidatebutton/ple.inria.thierry_parmentelat
+    # mention a user name in the URL as .../trash/simpletopmenuvalidation/ple.inria.thierry_parmentelat
     def get (self, request, username='ple.inria.thierry_parmentelat'):
 
         if username=='logged': username='$user_hrn'
@@ -26,15 +26,16 @@ class ValidateButtonView (TemplateView):
         # even though this plugin does not have any html materialization, the corresponding domid
         # must exist because it is searched at init-time to create the JS plugin
         # so we simply piggy-back the target button here
-        validatebutton = ValidateButton (page=page, 
-                                         # see above
-                                         domid='topmenu-validation',
-                                         query=query_pi_auths,
-                                         # this one is the target for enabling when the query comes back
-                                         button_domid="topmenu-validation")
+        topmenuvalidation = TopmenuValidation (
+            page=page, 
+            # see above
+            domid='topmenu-validation',
+            query=query_pi_auths,
+            # this one is the target for enabling when the query comes back
+            button_domid="topmenu-validation")
         # there is a need to call render() for exposing the query and creating the js plugin
         # even though this returns an empty string
-        validatebutton.render(request)
+        topmenuvalidation.render(request)
 
 
         # variables that will get passed to the view-unfold1.html template
@@ -44,7 +45,7 @@ class ValidateButtonView (TemplateView):
         template_env ['unfold_main'] = '<h1>Some title </h1>'
         
         # more general variables expected in the template
-        template_env [ 'title' ] = 'simple validatebutton %(username)s'%locals()
+        template_env [ 'title' ] = 'simple topmenuvalidation %(username)s'%locals()
         # the menu items on the top
         template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
         # so we can see who is logged

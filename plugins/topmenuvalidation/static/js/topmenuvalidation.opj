@@ -7,7 +7,7 @@
     var debug=false;
 //    debug=true
 
-    var ValidateButton = Plugin.extend({
+    var TopmenuValidation = Plugin.extend({
 
         init: function(options, element) {
             this._super(options, element);
@@ -39,6 +39,6 @@
 	},
     });
 
-    $.plugin('ValidateButton', ValidateButton);
+    $.plugin('TopmenuValidation', TopmenuValidation);
 
 })(jQuery);

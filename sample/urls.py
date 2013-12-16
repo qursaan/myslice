@@ -25,7 +25,7 @@ from sample.views     import WebSocketsView, WebSockets2View
 
 import sample.querytableview
 import sample.querygridview
-import sample.validatebuttonview
+import sample.topmenuvalidationview
 
 urlpatterns = patterns(
     '',
@@ -37,5 +37,5 @@ urlpatterns = patterns(
     url(r'^dashboard/?$',                                       'sample.dashboardview.dashboard_view'),
     url(r'^querytable/(?P<slicename>[\w\.]+)/?$',               sample.querytableview.QueryTableView.as_view()),
     url(r'^querygrid/(?P<slicename>[\w\.]+)/?$',                sample.querygridview.QueryGridView.as_view()),
-    url(r'^validatebutton/(?P<username>[\w\._]+)/?$',           sample.validatebuttonview.ValidateButtonView.as_view()),
+    url(r'^topmenuvalidation/(?P<username>[\w\._]+)/?$',        sample.topmenuvalidationview.TopmenuValidationView.as_view()),
 )

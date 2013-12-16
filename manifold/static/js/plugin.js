@@ -266,7 +266,7 @@ var Plugin = Class.extend({
     /* SPIN */
     // use spin() to get our default spin settings (called presets)
     // use spin(true) to get spin's builtin defaults
-    // you can also call spin_presets() yourself and tweak what you need to, like validatebutton does
+    // you can also call spin_presets() yourself and tweak what you need to, like topmenuvalidation does
     spin: function (presets) {
 	var presets = ( presets === undefined ) ? spin_presets() : presets;
 	try { this.$element.spin(presets); }

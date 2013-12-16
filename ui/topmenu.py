@@ -13,7 +13,7 @@ from manifold.core.query        import Query
 # , ..]
 
 # see also templates/widget-topmenu.html for how these items are put together
-# and plugins/validatebutton for how this hident button is turned on when necessary
+# and plugins/topmenuvalidation for how this hident button is turned on when necessary
 
 # current: the beginning of the label in the menu that you want to outline
 def topmenu_items (current,request=None):
@@ -59,7 +59,7 @@ def topmenu_items (current,request=None):
 ####            result.append({'label':'Validation', 'href': '/portal/validate/'})
 ###        result.append({'label':'Validation', 'href': '/portal/validate/'})
         # always create a disabled button for validation, and let the 
-        # validatebutton plugin handle that asynchroneously, based on this domid
+        # topmenuvalidation plugin handle that asynchroneously, based on this domid
         result.append({'label':'Validation', 'href': '/portal/validate/', 'domid':'topmenu-validation', 'disabled':True})
         dropdown = []
         dropdown.append({'label':'Platforms', 'href': '/portal/platforms/'})

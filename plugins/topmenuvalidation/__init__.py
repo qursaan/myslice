@@ -1,11 +1,11 @@
 from unfold.plugin import Plugin
 
-class ValidateButton (Plugin):
+class TopmenuValidation (Plugin):
 
     """This plugin is designed to work together with topmenu.
     
 It will check to see if user has PI rights at least on one authority, 
-and if so will enable corresponding button in topmenu.
+and if so will enable corresponding validation button in topmenu.
 
 A realistic example would have incoming query as
 
@@ -27,7 +27,7 @@ Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_author
         return ""
     
     def requirements (self):
-        return { 'js_files': [ 'js/validatebutton.js', 'js/manifold-query.js', 
+        return { 'js_files': [ 'js/topmenuvalidation.js', 'js/manifold-query.js', 
                                "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                                ], }
 
