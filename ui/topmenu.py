@@ -81,7 +81,7 @@ def topmenu_items_live (current, page):
         query=query_pi_auths,
         # this one is the target for a $.show() when the query comes back
         button_domid="topmenu-validation")
-        # although the result does not matter, rendering is required for the JS init code to make it in the page
+    # although the result does not matter, rendering is required for the JS init code to make it in the page
     topmenuvalidation.render(request)
 
     return topmenu_items_static (current, request)
