@@ -48,6 +48,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         my_users = ''
         my_slices = ''
         my_auths = ''
+        secondary_list = ''
         platform_name_list = []
         platform_name_secondary_list = []
         platform_access_list = []
