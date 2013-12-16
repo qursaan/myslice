@@ -66,7 +66,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         pub_key_list = []
           
         for platform_detail in platform_details:
-            if 'sfa' in platform_detail['gateway_type']:
+            if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
                 total_platform = platform_detail['platform']
                 total_platform_list.append(total_platform)
                 
@@ -152,10 +152,7 @@ class AccountView(LoginRequiredAutoLogoutView):
                         platform_access_list.append(platform_access)
        
         # Removing the platform which already has access
-        print platform_access_list
-        print total_platform_list
         for platform in platform_access_list:
-            print platform
             total_platform_list.remove(platform)
         # we could use zip. this one is used if columns have unequal rows 
         platform_list = [{'platform_no_access': t[0]}
