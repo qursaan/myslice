@@ -11,7 +11,7 @@ from ui.topmenu import topmenu_items, the_user
 
 from plugins.validatebutton import ValidateButton
 
-class SimpleValidateButtonView (TemplateView):
+class ValidateButtonView (TemplateView):
 
     # mention a user name in the URL as .../trash/simplevalidatebutton/ple.inria.thierry_parmentelat
     def get (self, request, username='ple.inria.thierry_parmentelat'):
