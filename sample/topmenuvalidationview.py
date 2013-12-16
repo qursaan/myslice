@@ -7,9 +7,7 @@ from manifold.core.query import Query, AnalyzedQuery
 
 from unfold.page import Page
 
-from ui.topmenu import topmenu_items, the_user
-
-from plugins.topmenuvalidation import TopmenuValidation
+from ui.topmenu import topmenu_items_live, the_user
 
 class TopmenuValidationView (TemplateView):
 
@@ -20,24 +18,6 @@ class TopmenuValidationView (TemplateView):
 
         page=Page(request)
 
-        query_pi_auths = Query.get('ple:user').filter_by('user_hrn', '==', username ).select('pi_authorities')
-        page.enqueue_query(query_pi_auths)
-
-        # even though this plugin does not have any html materialization, the corresponding domid
-        # must exist because it is searched at init-time to create the JS plugin
-        # so we simply piggy-back the target button here
-        topmenuvalidation = TopmenuValidation (
-            page=page, 
-            # see above
-            domid='topmenu-validation',
-            query=query_pi_auths,
-            # this one is the target for enabling when the query comes back
-            button_domid="topmenu-validation")
-        # there is a need to call render() for exposing the query and creating the js plugin
-        # even though this returns an empty string
-        topmenuvalidation.render(request)
-
-
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
@@ -47,7 +27,7 @@ class TopmenuValidationView (TemplateView):
         # more general variables expected in the template
         template_env [ 'title' ] = 'simple topmenuvalidation %(username)s'%locals()
         # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
+        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can see who is logged
         template_env [ 'username' ] = the_user (request) 
     

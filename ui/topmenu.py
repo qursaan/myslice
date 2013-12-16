@@ -19,7 +19,7 @@ def the_user (request):
 # and plugins/topmenuvalidation for how this hident button is turned on when necessary
 
 # current: the beginning of the label in the menu that you want to outline
-def topmenu_items (current,request=None):
+def topmenu_items_static (current, request):
     has_user=request.user.is_authenticated()
     result=[]
     print request.user
@@ -40,8 +40,8 @@ def topmenu_items (current,request=None):
         result.append({'label':'Platforms', 'href': '/portal/platforms/'})
         result.append({'label':'Register', 'href': '/portal/register/'})
         result.append({'label':'Contact Support', 'href': '/portal/contact/'})
+
     # mark active if the provided 'current', even if shorter, matches the beginning of d['label']
-    
     if current is not None:
         current=current.lower()
         curlen=len(current)
@@ -54,4 +54,35 @@ def topmenu_items (current,request=None):
             if 'dropdown' in d:
                 for dd in d['contents']: mark_active(dd,d)
     return result
+
+# tmp - transition phase
+def topmenu_items (current, request):
+    print "WARNING -- please now use topmenu_items_live (label, page) toplevel_items is deprecated -- WARNING"
+    return topmenu_items_static (current, request)
+
+# integrated helper function for an animated menu
+from unfold.page import Page
+from manifold.core.query import Query
+from plugins.topmenuvalidation import TopmenuValidation
+
+### this is now the 'live' version, that has plugins 
+# for asynchronous management of topmenu
+def topmenu_items_live (current, page):
+    request=page.request
+    query_pi_auths = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn' ).select('pi_authorities')
+    page.enqueue_query(query_pi_auths)
+#        # even though this plugin does not have any html materialization, the corresponding domid
+#        # must exist because it is searched at init-time to create the JS plugin
+#        # so we simply piggy-back the target button created in the topmenu
+    topmenuvalidation = TopmenuValidation (
+        page=page, 
+        # see above
+        domid='topmenu-validation',
+        query=query_pi_auths,
+        # this one is the target for a $.show() when the query comes back
+        button_domid="topmenu-validation")
+        # although the result does not matter, rendering is required for the JS init code to make it in the page
+    topmenuvalidation.render(request)
+
+    return topmenu_items_static (current, request)
 

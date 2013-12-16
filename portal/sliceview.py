@@ -8,9 +8,8 @@ from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 from manifold.manifoldapi            import execute_query
 
-from ui.topmenu                      import topmenu_items, the_user
+from ui.topmenu                      import topmenu_items_live, the_user
 
-from plugins.topmenuvalidation       import TopmenuValidation
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
@@ -421,24 +420,6 @@ class SliceView (LoginRequiredAutoLogoutView):
                     outline_complete = True,
                     ))
     
-# topmenu animation
-# xxx all this should go into a plugin if its own with the topmenu and all...
-        query_pi_auths = Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn' ).select('pi_authorities')
-        page.enqueue_query(query_pi_auths)
-        # even though this plugin does not have any html materialization, the corresponding domid
-        # must exist because it is searched at init-time to create the JS plugin
-        # so we simply piggy-back the target button here
-        topmenuvalidation = TopmenuValidation (
-            page=page, 
-            # see above
-            domid='topmenu-validation',
-            query=query_pi_auths,
-            # this one is the target for a $.show() when the query comes back
-            button_domid="topmenu-validation")
-        # although the result does not matter, rendering is required for the JS init code to make it in the page
-        topmenuvalidation.render(request)
-# end topmenu addition
-
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
@@ -448,7 +429,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # more general variables expected in the template
         template_env [ 'title' ] = '%(slicename)s'%locals()
         # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
+        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can sho who is logged
         template_env [ 'username' ] = the_user (request) 
     
