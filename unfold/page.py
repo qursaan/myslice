@@ -69,9 +69,10 @@ class Page:
         # we only do this if run_it is set
         if run_it: self._queue.append ( (query.query_uuid,domid) )
 
-    def generate_records(self, query, generators, number):
+    def generate_records(self, query, generators, number=10):
         self.add_js_files('js/record_generator.js');
-        self.add_js_chunks('$(document).ready(function() { new RecordGenerator(' + query.to_json() + ', ' + json.dumps(generators) + ', 10).run(); });')
+        js_chunk = '$(document).ready(function() { new RecordGenerator(%s,%s,%s).run(); });'%(query.to_json(),json.dumps(generators),number);
+        self.add_js_chunks(js_chunk)
 
     # return the javascript code for exposing queries
     # all queries are inserted in the global manifold object
