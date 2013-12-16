@@ -14,7 +14,7 @@ class QueryCode (Plugin):
             'js_files' : [ 
                 "js/querycode.js", 
                 "js/manifold.js", "js/manifold-query.js",
-                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                 "js/shAutoloader.js","js/shCore.js","js/shBrushPython.js","js/shBrushRuby.js",
                 ] ,
 # thierry: see this file for details of why we turn this off for now            

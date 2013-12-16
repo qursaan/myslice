@@ -27,7 +27,7 @@ class Scheduler(Plugin):
                            #"//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js",
                             "js/raphael.js",
                             "js/manifold.js", "js/manifold-query.js", 
-                            "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                            "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                             "js/unfold-helper.js",
                             "js/jquery-ui-timepicker-addon.js", "js/jquery-ui-sliderAccess.js",
                            ],

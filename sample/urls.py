@@ -5,6 +5,7 @@
 #
 # Authors:
 #   Jordan Augé <jordan.auge@lip6.fr>
+#   thierry.parmentelat@inria.fr
 # Copyright 2013, UPMC Sorbonne Universités / LIP6
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -23,7 +24,19 @@
 from django.conf.urls import patterns, url
 from sample.views     import WebSocketsView, WebSockets2View
 
-urlpatterns = patterns('',
-    url(r'^websockets/?$', WebSocketsView.as_view(), name='websockets'),
-    url(r'^websockets2/?$', WebSockets2View.as_view(), name='websockets2'),
+import sample.querytableview
+import sample.querygridview
+import sample.topmenuvalidationview
+
+urlpatterns = patterns(
+    '',
+    url(r'^websockets/?$',                                      WebSocketsView.as_view(), name='websockets'),
+    url(r'^websockets2/?$',                                     WebSockets2View.as_view(), name='websockets2'),
+    url(r'^tab/?$',                                             'sample.tabview.tab_view'),
+    url(r'^scroll/?$',                                          'sample.scrollview.scroll_view'),
+    url(r'^plugin/?$',                                          'sample.pluginview.test_plugin_view'),
+    url(r'^dashboard/?$',                                       'sample.dashboardview.dashboard_view'),
+    url(r'^querytable/(?P<slicename>[\w\.]+)/?$',               sample.querytableview.QueryTableView.as_view()),
+    url(r'^querygrid/(?P<slicename>[\w\.]+)/?$',                sample.querygridview.QueryGridView.as_view()),
+    url(r'^topmenuvalidation/(?P<username>[\w\._]+)/?$',        sample.topmenuvalidationview.TopmenuValidationView.as_view()),
 )

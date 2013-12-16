@@ -26,7 +26,7 @@ class MadDash (Plugin):
                 'js/jquery.tipsy.js',
                 'js/buffer.js', 'js/maddash.js',
                 'js/manifold.js', 'js/manifold-query.js',
-                'js/spin.presets.js', 'js/spin.min.js', 'js/jquery.spin.js', 
+                'js/spin-presets.js', 'js/spin.min.js', 'js/jquery.spin.js', 
                 'js/unfold-helper.js',
             ],
             'css_files' : [ 

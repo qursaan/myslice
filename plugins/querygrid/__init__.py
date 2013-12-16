@@ -87,7 +87,7 @@ Current implementation makes the following assumptions
     def requirements (self):
         reqs = {
             'js_files' : [ 
-                "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+                "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
 # this one was in the slickgrid demo 
 # http://mleibman.github.io/SlickGrid/examples/example-checkbox-row-select.html
 # but triggers js errors when included - probably/maybe because of the jquery version ?

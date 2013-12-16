@@ -1,3 +1,4 @@
+import json
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 
@@ -5,8 +6,9 @@ from unfold.loginrequired            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
+from manifold.manifoldapi            import execute_query
 
-from ui.topmenu                      import topmenu_items, the_user
+from ui.topmenu                      import topmenu_items_live, the_user
 
 from plugins.raw                     import Raw
 from plugins.stack                   import Stack
@@ -56,8 +58,9 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.add_js_chunks ('$(function() { messages.debug("sliceview: leases turned %s"); });'%("on" if do_query_leases else "off"))
         config=Config()
         page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
+
         page.expose_js_metadata()
-    
+
         metadata = page.get_metadata()
         resource_md = metadata.details_by_object('resource')
         resource_fields = [column['name'] for column in resource_md['column']]
@@ -81,14 +84,37 @@ class SliceView (LoginRequiredAutoLogoutView):
         main_query_init_key = 'hostname'
     
         query_resource_all = Query.get('resource').select(resource_fields)
-        if do_query_users:
-            query_user_all = Query.get('user').select(user_fields)
-    
+
         aq = AnalyzedQuery(main_query, metadata=metadata)
         page.enqueue_query(main_query, analyzed_query=aq)
         page.enqueue_query(query_resource_all)
         if do_query_users:
-            page.enqueue_query(query_user_all)
+            # Required: the user must have an authority in its user.config
+            # XXX Temporary solution
+            user_query  = Query().get('local:user').select('config','email')
+            user_details = execute_query(self.request, user_query)
+            
+            # not always found in user_details...
+            config={}
+#            for user_detail in user_details:
+#                #email = user_detail['email']
+#                if user_detail['config']:
+#                    config = json.loads(user_detail['config'])
+#            user_detail['authority'] = config.get('authority',"Unknown Authority")
+#
+#            if user_detail['authority'] is not None:
+#                sub_authority = user_detail['authority'].split('.')
+#                root_authority = sub_authority[0]
+#                query_user_all = Query.get(root_authority+':user').select(user_fields)
+#
+#                # XXX TODO this filter doesn't work - to be improved in Manifold
+#                #.filter_by('authority.authority_hrn', '=', user_detail['authority'])
+#
+#                page.enqueue_query(query_user_all)
+#            else:
+#                print "authority of the user is not in local:user db"
+            query_user_all = Query.get('user').select(user_fields)
+            #    query_user_all = None
     
         # ... and for the relations
         # XXX Let's hardcode resources for now
@@ -264,7 +290,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # --------------------------------------------------------------------------
         # USERS
     
-        if do_query_users:
+        if do_query_users and query_user_all is not None:
             tab_users = Tabs(
                 page                = page,
                 domid               = 'users',
@@ -394,7 +420,6 @@ class SliceView (LoginRequiredAutoLogoutView):
                     outline_complete = True,
                     ))
     
-    
         # variables that will get passed to the view-unfold1.html template
         template_env = {}
         
@@ -404,7 +429,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         # more general variables expected in the template
         template_env [ 'title' ] = '%(slicename)s'%locals()
         # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
+        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can sho who is logged
         template_env [ 'username' ] = the_user (request) 
     

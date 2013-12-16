@@ -1,4 +1,4 @@
-# just one instance of QueryGrid, nothing more, nothing less
+# just one instance of QueryTable, nothing more, nothing less
 from django.views.generic.base import TemplateView
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -9,9 +9,9 @@ from unfold.page import Page
 
 from ui.topmenu import topmenu_items, the_user
 
-from plugins.querygrid import QueryGrid
+from plugins.querytable import QueryTable
 
-class SimpleGridView (TemplateView):
+class QueryTableView (TemplateView):
 
     def get (self, request, slicename='ple.inria.f14'):
 
@@ -24,14 +24,13 @@ class SimpleGridView (TemplateView):
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
-                #'resource.hrn', 
                 'resource.hostname', 'resource.type', 
                 'resource.network_hrn',
                 'lease.urn',
                 'user.user_hrn',
                 #'application.measurement_point.counter'
         )
-        # for internal use in the querygrid plugin;
+        # for internal use in the querytable plugin;
         # needs to be a unique column present for each returned record
         main_query_init_key = 'hostname'
     
@@ -43,7 +42,7 @@ class SimpleGridView (TemplateView):
 
         sq_resource    = aq.subquery('resource')
 
-        resources_as_list = QueryGrid( 
+        resources_as_list = QueryTable( 
             page       = page,
             domid      = 'resources-list',
             title      = 'List view',
@@ -51,7 +50,7 @@ class SimpleGridView (TemplateView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # safer to use 'hrn' as the internal unique key for this plugin
-            id_key     = main_query_init_key,
+            init_key     = main_query_init_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,

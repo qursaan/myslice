@@ -30,6 +30,9 @@ var Plugin = Class.extend({
         // reference and a normal reference
         this.element  = element;
         this.$element = $(element);
+	// programmatically add specific class for publishing events
+	// used in manifold.js for triggering API events
+	if ( ! this.$element.hasClass('pubsub')) this.$element.addClass('pubsub');
 
         // return this so we can chain/use the bridge with less code.
         return this;
@@ -261,13 +264,18 @@ var Plugin = Class.extend({
     },
 
     /* SPIN */
-
-    spin: function() {
-        manifold.spin(this.element);
+    // use spin() to get our default spin settings (called presets)
+    // use spin(true) to get spin's builtin defaults
+    // you can also call spin_presets() yourself and tweak what you need to, like topmenuvalidation does
+    spin: function (presets) {
+	var presets = ( presets === undefined ) ? spin_presets() : presets;
+	try { this.$element.spin(presets); }
+	catch (err) { messages.debug("Cannot turn on spin " + err); }
     },
 
     unspin: function() {
-        manifold.spin(this.element, false);
+	try { this.$element.spin(false); }
+	catch (err) { messages.debug("Cannot turn off spin " + err); }
     },
 
     /* TEMPLATE */

@@ -1,4 +1,7 @@
+import json
 from manifold.core.query         import Query
+from manifold.manifoldapi        import execute_query
+
 from unfold.page                 import Page
 
 from plugins.lists.testbedlist   import TestbedList
@@ -21,10 +24,28 @@ class DashboardView (LoginRequiredAutoLogoutView):
         #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 
+        print "Dashboard page"
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
         testbed_query  = Query().get('network').select('network_hrn','platform')
         # DEMO GEC18 Query only PLE
+        user_query  = Query().get('local:user').select('config','email')
+        user_details = execute_query(self.request, user_query)
+
+        # not always found in user_details...
+        config={}
+  #      for user_detail in user_details:
+  #          #email = user_detail['email']
+  #          if user_detail['config']:
+  #              config = json.loads(user_detail['config'])
+  #      user_detail['authority'] = config.get('authority',"Unknown Authority")
+#
+#        print user_detail
+#        if user_detail['authority'] is not None:
+#            sub_authority = user_detail['authority'].split('.')
+#            root_authority = sub_authority[0]
+#            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
+#        else:
         slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)

@@ -19,7 +19,7 @@
 
         on_query_in_progress: function() {
 	    messages.debug("on_query_in_progress");
-            this.spin();
+            this.spin(true);
         },
 
         on_query_done: function() {
@@ -110,7 +110,8 @@
 	    if (debug) messages.debug('datatables_update_table ' + rows.length + " rows");
 	    $table.dataTable().fnClearTable();
 	    // the lambda here returns a [[]] because $.map is kind of broken; as per the doc:
-	    // The function can return any value to add to the array. A returned array will be flattened into the resulting array.
+	    // The function can return any value to add to the array. 
+	    // A returned array will be flattened into the resulting array.
 	    // this is wrong indeed so let's work around that
 	    var self=this;
 	    $table.dataTable().fnAddData( $.map(rows, function (row) { return [[ self._cell (key,row[key]) ]] }) );

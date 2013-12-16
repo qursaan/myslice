@@ -120,7 +120,7 @@ class Page:
     def expose_js_metadata (self):
         # expose global MANIFOLD_METADATA as a js variable
         # xxx this is fetched synchroneously..
-        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";")
+        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";\n")
 
     def expose_js_manifold_config (self):
         config=Config()

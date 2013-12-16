@@ -84,7 +84,7 @@ Current implementation makes the following assumptions
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/spin.presets.js", "js/spin.min.js", "js/jquery.spin.js", 
+            'js_files' : [ "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js", 
                            "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                            "js/manifold.js", "js/manifold-query.js", 
                            "js/unfold-helper.js",

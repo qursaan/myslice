@@ -186,19 +186,6 @@ var manifold = {
 
     separator: '__',
 
-    spin_presets: {},
-
-    spin: function(locator, active /*= true */) {
-        active = typeof active !== 'undefined' ? active : true;
-        try {
-            if (active) {
-                $(locator).spin(manifold.spin_presets);
-            } else {
-                $(locator).spin(false);
-            }
-        } catch (err) { messages.debug("Cannot turn spins on/off " + err); }
-    },
-
     get_type: function(variable) {
         switch(Object.toType(variable)) {
             case 'number':
@@ -317,7 +304,7 @@ var manifold = {
     // reasonably low-noise, shows manifold requests coming in and out
     asynchroneous_debug : true,
     // print our more details on result publication and related callbacks
-    publish_result_debug : false,
+    pubsub_debug : false,
 
     /**
      * \brief We use js function closure to be able to pass the query (array)
@@ -356,7 +343,7 @@ var manifold = {
             var publish_uuid=tuple.publish_uuid;
             // by default we publish using the same uuid of course
             if (publish_uuid==undefined) publish_uuid=query.query_uuid;
-            if (manifold.publish_result_debug) {
+            if (manifold.pubsub_debug) {
                 messages.debug("sending POST on " + manifold.proxy_url + query.__repr());
             }
 
@@ -409,27 +396,29 @@ var manifold = {
 
         // NEW PLUGIN API
         manifold.raise_record_event(query.query_uuid, CLEAR_RECORDS);
-        if (manifold.publish_result_debug)
+        if (manifold.pubsub_debug)
             messages.debug(".. publish_result (1) ");
         var count=0;
         $.each(result, function(i, record) {
             manifold.raise_record_event(query.query_uuid, NEW_RECORD, record);
             count += 1;
         });
-        if (manifold.publish_result_debug) 
-            messages.debug(".. publish_result NEW API (2) count=" + count);
+        if (manifold.pubsub_debug) 
+            messages.debug(".. publish_result (2) has used NEW API on " + count + " records");
         manifold.raise_record_event(query.query_uuid, DONE);
+        if (manifold.pubsub_debug) 
+            messages.debug(".. publish_result (3) has used NEW API to say DONE");
 
         // OLD PLUGIN API BELOW
         /* Publish an update announce */
         var channel="/results/" + query.query_uuid + "/changed";
-        if (manifold.publish_result_debug) 
-            messages.debug(".. publish_result OLD API (3) " + channel);
+        if (manifold.pubsub_debug) 
+            messages.debug(".. publish_result (4) OLD API on channel" + channel);
 
         $.publish(channel, [result, query]);
 
-        if (manifold.publish_result_debug) 
-            messages.debug(".. publish_result - END (4) q=" + query.__repr());
+        if (manifold.pubsub_debug) 
+            messages.debug(".. publish_result (5) END q=" + query.__repr());
     },
 
     /*!
@@ -446,7 +435,7 @@ var manifold = {
          * otherwise, publish the main object as well as subqueries
          * XXX how much recursive are we ?
          */
-        if (manifold.publish_result_debug)
+        if (manifold.pubsub_debug)
             messages.debug (">>>>> publish_result_rec " + query.object);
         if (manifold.query_expects_unique_result(query)) {
             /* Also publish subqueries */
@@ -455,12 +444,12 @@ var manifold = {
                 /* TODO remove object from result */
             });
         }
-        if (manifold.publish_result_debug) 
+        if (manifold.pubsub_debug) 
             messages.debug ("===== publish_result_rec " + query.object);
 
         manifold.publish_result(query, result);
 
-        if (manifold.publish_result_debug) 
+        if (manifold.pubsub_debug) 
             messages.debug ("<<<<< publish_result_rec " + query.object);
     },
 
@@ -736,7 +725,7 @@ var manifold = {
         }
 
         if (manifold.asynchroneous_debug) 
-            messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records");
+            messages.debug ("========== asynchroneous_success " + query.object + " -- before process_query_records [" + query.query_uuid +"]");
 
         // once everything is checked we can use the 'value' part of the manifoldresult
         var result=data.value;
@@ -760,10 +749,12 @@ var manifold = {
      **************************************************************************/ 
 
     raise_event_handler: function(type, query_uuid, event_type, value) {
+	if (manifold.pubsub_debug)
+	    messages.debug("raise_event_handler, quuid="+query_uuid+" type="+type+" event_type="+event_type);
         if ((type != 'query') && (type != 'record'))
             throw 'Incorrect type for manifold.raise_event()';
         // xxx we observe quite a lot of incoming calls with an undefined query_uuid
-        // this should be fixed upstream
+        // this should be fixed upstream in manifold I expect
         if (query_uuid === undefined) {
             messages.warning("undefined query in raise_event_handler");
             return;
@@ -775,9 +766,11 @@ var manifold = {
 
         $.each(channels, function(i, channel) {
             if (value === undefined) {
-                $('.plugin').trigger(channel, [event_type]);
+		if (manifold.pubsub_debug) messages.debug("triggering [no value] on channel="+channel+" and event_type="+event_type);
+                $('.pubsub').trigger(channel, [event_type]);
             } else {
-                $('.plugin').trigger(channel, [event_type, value]);
+		if (manifold.pubsub_debug) messages.debug("triggering [value="+value+"] on channel="+channel+" and event_type="+event_type);
+                $('.pubsub').trigger(channel, [event_type, value]);
             }
         });
     },

@@ -15,3 +15,7 @@ build/
 plugins/*/*.css
 plugins/*/*.js
 plugins/*/*.html
+# myslice.ini* is not intended to be under git as it may contain keys and other specifics
+myslice.ini*
+# other junk
+foo.*

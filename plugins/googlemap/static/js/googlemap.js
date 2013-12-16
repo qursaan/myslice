@@ -38,10 +38,11 @@
 	    this.by_id = {};
 	    this.by_init_id = {};
 
-            /* XXX Events */
+            /* Events */
+	    // xx somehow non of these triggers at all for now
             this.elmt().on('show', this, this.on_show);
-            // TODO in destructor
-            // $(window).unbind('QueryTable');
+            this.elmt().on('shown.bs.tab', this, this.on_show);
+            this.elmt().on('resize', this, this.on_resize);
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
             this.object = query.object;
@@ -76,7 +77,11 @@
 	    if (debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
-        }, // on_show
+        }, 
+	// dummy to see if this triggers at all
+        on_resize: function(e) {
+	    if (debug) messages.debug("googlemap.on_resize ...");
+        }, 
 
         /* GUI EVENTS */
 
@@ -95,8 +100,7 @@
             }
 	    
             var domid = this.options.plugin_uuid + '--' + 'googlemap';
-	        var elmt = document.getElementById(domid);
-	        if (debug) messages.debug("gmap.initialize_map based on  domid=" + domid + " elmt=" + elmt);
+	    var elmt = document.getElementById(domid);
             this.map = new google.maps.Map(elmt, myOptions);
             this.infowindow = new google.maps.InfoWindow();
         }, // initialize_map
@@ -203,7 +207,7 @@
 
         /*************************** RECORD HANDLER ***************************/
         on_new_record: function(record) {
-	    if (debug_deep) messages.debug("on_new_record");
+	    if (debug_deep) messages.debug("googlemap.on_new_record");
             if (this.received_all)
                 // update checkbox for record
                 this.set_checkbox_from_record(record, true);
@@ -213,17 +217,17 @@
         },
 
         on_clear_records: function(record) {
-	    if (debug_deep) messages.debug("on_clear_records");
+	    if (debug_deep) messages.debug("googlemap.on_clear_records");
         },
 
         // Could be the default in parent
         on_query_in_progress: function() {
-	    if (debug) messages.debug("on_query_in_progress (spinning)");
+	    if (debug) messages.debug("googlemap.on_query_in_progress (spinning)");
             this.spin();
         },
 
         on_query_done: function() {
-	        if (debug) messages.debug("on_query_done");	    
+	        if (debug) messages.debug("googlemap.on_query_done");	    
             if (this.received_all) {
                 this.unspin();
 	        }
@@ -231,7 +235,7 @@
         },
 
         on_field_state_changed: function(data) {
-	    if (debug_deep) messages.debug("on_field_state_changed");	    
+	    if (debug_deep) messages.debug("googlemap.on_field_state_changed");	    
             switch(data.request) {
             case FIELD_REQUEST_ADD:
             case FIELD_REQUEST_ADD_RESET:
@@ -250,22 +254,22 @@
         // all : this 
 
         on_all_new_record: function(record) {
-	    if (debug_deep) messages.debug("on_all_new_record");
+	    if (debug_deep) messages.debug("googlemap.on_all_new_record");
             this.new_record(record);
         },
 
         on_all_clear_records: function() {
-	    if (debug) messages.debug("on_all_clear_records");	    
+	    if (debug) messages.debug("googlemap.on_all_clear_records");	    
         },
 
         on_all_query_in_progress: function() {
-	    if (debug) messages.debug("on_all_query_in_progress (spinning)");
+	    if (debug) messages.debug("googlemap.on_all_query_in_progress (spinning)");
             // XXX parent
             this.spin();
         },
 
         on_all_query_done: function() {
-	    if (debug) messages.debug("on_all_query_done");
+	    if (debug) messages.debug("googlemap.on_all_query_done");
 
             // MarkerClusterer
             var markers = [];
@@ -294,8 +298,6 @@
                 });
 		// reset 
 		googlemap.in_set_backlog = [];
-
-		if (debug) messages.debug("unspinning");
                 this.unspin();
             }
             this.received_all = true;

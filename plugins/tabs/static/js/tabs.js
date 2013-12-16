@@ -1,6 +1,6 @@
 // storing tabs active component in localStorage
 //
-// based on plugin_helper.js, extended to store the domid of an active tab
+// based on plugin-helper.js, extended to store the domid of an active tab
 //
 
 var tabs_helper = {
