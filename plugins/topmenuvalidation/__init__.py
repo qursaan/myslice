@@ -35,6 +35,10 @@ Query.get('ple:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_author
         return [ 'query_uuid', 'button_domid', ]
 
 #################### here is an extract previously in topmenu.py
+#import json
+#from pprint import pprint
+#from manifold.manifoldapi       import execute_query
+#from manifold.core.query        import Query
 ###        # ** Where am I a PI **
 ###        # For this we need to ask SFA (of all authorities) = PI function
 ###        user_query  = Query().get('local:user').select('config','email')

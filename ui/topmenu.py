@@ -1,8 +1,11 @@
-import json
-from pprint import pprint
-from manifold.manifoldapi       import execute_query
-from manifold.core.query        import Query
 # a set of utilities to help make the global layout consistent across views
+
+def the_user (request):
+    "retrieves logged in user's email, or empty string"
+    if not request.user.is_authenticated (): 
+        return ''
+    else: 
+        return request.user.email
 
 # dropdowns are kind of ad hoc for now, and limited to one level
 # [ 
@@ -52,9 +55,3 @@ def topmenu_items (current,request=None):
                 for dd in d['contents']: mark_active(dd,d)
     return result
 
-def the_user (request):
-    "retrieves logged in user's email, or empty string"
-    if not request.user.is_authenticated (): 
-        return ''
-    else: 
-        return request.user.email
