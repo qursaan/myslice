@@ -35,8 +35,8 @@
 	      			<td class="key">Email</td>
 	      			<td class="value">
 						<span id="emailval" class="value" >{{ person.email }}</span>
-						<img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="emailAlert()"  title="To change your email please contact the administrator" 
-							 style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; margin-top: -9px;">
+						<img class="img-thumbnail" src="{{STATIC_URL}}/img/ques_icon.png" onclick="emailAlert()"  title="To change your email please contact the administrator" 
+							 style="height: 24px;  position: absolute; left: 625px; left: 900px; margin-top: -3px;">
 					</td>
 	      		</tr>
 	      		<tr class="odd">
@@ -82,8 +82,8 @@
 					<td class="key">Authority</td>
 					<td class="value">
 		  				<span id="affval" class="value">{{ authority }}</span>
-		  				<img class="logo" src="{{STATIC_URL}}/img/ques_icon.png" onclick="affAlert()"  title="To change your affiliation please contact the administrator" 
-							 style="height: 20px; width: 20px; position: absolute; left: 625px; left: 900px; ">
+		  				<img class="img-thumbnail" src="{{STATIC_URL}}/img/ques_icon.png" onclick="affAlert()"  title="To change your affiliation please contact the administrator" 
+							 style="height: 24px; position: absolute; left: 625px; left: 900px; margin-top:-3px; ">
 		  			</td>
 				</tr>
 				<tr class="even">
@@ -135,7 +135,7 @@
 <h3>Principal Account</h3>
 <div id="middle" align="center">
 	<div class="well">
-		<table class="mytable"> 
+		<table class="table table-bordered table-hover  mytable"> 
 			<tr class="odd"> 
     			<th>Platform</th> 
         		<th>Account Type</th>
@@ -146,7 +146,7 @@
 			{% for row in data %}         
    			<tr class="border_bottom">
     			<td class="odd"> {{ row.platform_name }} </td>
-        		<td class="even"> {{ row.account_type }} </td>
+        		<td class="odd"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.delegation_type }} </td>
        			<td class="odd"> {{ row.usr_hrn }}  </td>
         	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
@@ -160,7 +160,7 @@
 <h3>Credentials</h3>
 <div id="middle" align="center">
     <div class="well">
-        <table class="mytable">
+        <table class="mytable table table-bordered table-hover">
 			<caption><b>Delegated User Credential</b></caption> 
             <tr class="odd"> 
                 <th>Expiration Date</th>
@@ -168,13 +168,13 @@
             </tr>
 			{% for row in my_users %}         
 			<tr class="border_bottom">
-    			<td class="even"> {{ row.cred_exp }} </td>
+    			<td class="odd"> {{ row.cred_exp }} </td>
 				<td class="odd"><button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">Download</button></td>
 			</tr>
 			{%endfor%}
 		 </table>
 		<p></p>
-		<table class="mytable">
+		<table class="mytable table table-bordered table-hover">
 			<caption><b>Delegated Slice Credentials</b></caption>  
      		<tr class="odd"> 
 				<th>Slice Name</th> 
@@ -183,14 +183,14 @@
      		</tr>
 			{% for row in my_slices %}     
      		<tr class="border_bottom">
-         		<td class="even"> {{ row.slice_name }} </td>
+         		<td class="odd"> {{ row.slice_name }} </td>
 				<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="even"> <button class="btn btn-default btn-xs" name= "dl_slice_cred" type="submit" title="Download Slice Credentials">Download</button> </td>
+				<td class="odd"> <button class="btn btn-default btn-xs" name= "dl_slice_cred" type="submit" title="Download Slice Credentials">Download</button> </td>
      		</tr>
      		{%endfor%}
   		</table>
 		<p></p>
-		<table class="mytable">
+		<table class="mytable table table-bordered table-hover">
    			<caption><b>Delegated Authority Credentials</b></caption>
    			<tr class="odd"> 
        			<th>Authority Name</th> 
@@ -199,14 +199,14 @@
    			</tr>
    			{% for row in my_auths %}
    			<tr class="border_bottom">
-       			<td class="even"> {{ row.auth_name }} </td>
+       			<td class="odd"> {{ row.auth_name }} </td>
        			<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="even"><button class="btn btn-default btn-xs" name= "dl_auth_cred" type="submit" title="Download Authority Credentials">Download</button></td>
+				<td class="odd"><button class="btn btn-default btn-xs" name= "dl_auth_cred" type="submit" title="Download Authority Credentials">Download</button></td>
    			</tr>
    			{%endfor%}
 		</table>
 		<p></p>	
-		<p><button class="btn btn-danger" name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+		<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
     </div>
 </div>
 
@@ -216,7 +216,7 @@
 <h3>Testbed Accounts</h3>
 <div id="middle" align="center">
     <div class="well">
-        <table class="mytable"> 
+        <table class="mytable table table-bordered table-hover"> 
             <tr class="odd"> 
                 <th>Platform</th> 
                 <th>Account Type</th>
@@ -226,9 +226,9 @@
             {% for row in ref_acc %}         
             <tr class="border_bottom">
                 <td class="odd"> {{ row.platform_name }} </td>
-                <td class="even"> {{ row.account_type }} </td>
+                <td class="odd"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.account_reference }} </td>
-				<td class="even">
+				<td class="odd">
     				<button class="btn btn-default btn-xs" name="delete_{{platform.platform_no_access}}" type="submit" title="Delete account from this platform">Delete {{row.platform_name}}</button>
 				</td>
             </tr> 
@@ -240,7 +240,7 @@
 <h3>Add Accounts</h3>
 <div id="middle" align="center">
     <div class="well">
-        <table class="mytable"> 
+        <table class="mytable table table-bordered table-hover"> 
             <tr class="odd"> 
                 <th>Platforms</th> 
                 <th>Request Access</th>
@@ -248,7 +248,7 @@
             {% for platform in platform_list %}         
             <tr class="border_bottom">
                 <td class="odd"> {{ platform.platform_no_access }} </td>
-                <td class="even">
+                <td class="odd">
 					<button class="btn btn-default btn-xs" name= "add_{{platform.platform_no_access}}" type="submit" title="Add account to this platform">Add {{platform.platform_no_access}}</button>
 				</td>
             </tr> 
