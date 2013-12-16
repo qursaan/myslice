@@ -59,8 +59,6 @@ class SliceView (LoginRequiredAutoLogoutView):
         config=Config()
         page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
 
-        page.expose_js_metadata()
-
         metadata = page.get_metadata()
         resource_md = metadata.details_by_object('resource')
         resource_fields = [column['name'] for column in resource_md['column']]
@@ -434,15 +432,11 @@ class SliceView (LoginRequiredAutoLogoutView):
         template_env [ 'username' ] = the_user (request) 
     
         # don't forget to run the requests
+        page.expose_js_metadata()
         page.expose_queries ()
-    
-        # xxx create another plugin with the same query and a different layout (with_datatables)
-        # show that it worls as expected, one single api call to backend and 2 refreshed views
-    
         # the prelude object in page contains a summary of the requirements() for all plugins
         # define {js,css}_{files,chunks}
-        prelude_env = page.prelude_env()
-        template_env.update(prelude_env)
-        result=render_to_response ('view-unfold1.html',template_env,
+        template_env.update(page.prelude_env())
+
+        return render_to_response ('view-unfold1.html',template_env,
                                    context_instance=RequestContext(request))
-        return result

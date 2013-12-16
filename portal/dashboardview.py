@@ -9,7 +9,7 @@ from plugins.lists.slicelist     import SliceList
 
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
-from ui.topmenu                  import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items_live, the_user
 
 #This view requires login 
 class DashboardView (LoginRequiredAutoLogoutView):
@@ -29,11 +29,11 @@ class DashboardView (LoginRequiredAutoLogoutView):
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
         testbed_query  = Query().get('network').select('network_hrn','platform')
         # DEMO GEC18 Query only PLE
-        user_query  = Query().get('local:user').select('config','email')
-        user_details = execute_query(self.request, user_query)
+#        user_query  = Query().get('local:user').select('config','email')
+#        user_details = execute_query(self.request, user_query)
 
         # not always found in user_details...
-        config={}
+#        config={}
   #      for user_detail in user_details:
   #          #email = user_detail['email']
   #          if user_detail['config']:
@@ -49,9 +49,6 @@ class DashboardView (LoginRequiredAutoLogoutView):
         slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)
-
-        page.expose_js_metadata()
-        page.expose_queries()
 
         slicelist = SliceList(
             page  = page,
@@ -73,10 +70,14 @@ class DashboardView (LoginRequiredAutoLogoutView):
         # more general variables expected in the template
         context['title'] = 'Dashboard'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Dashboard', self.request) 
+        context['topmenu_items'] = topmenu_items_live('Dashboard', page) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 
+        page.expose_js_metadata()
+        page.expose_queries()
+
+        # the page header and other stuff
         context.update(page.prelude_env())
 
         return context
