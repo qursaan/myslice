@@ -34,19 +34,19 @@ class DashboardView (LoginRequiredAutoLogoutView):
 
         # not always found in user_details...
         config={}
-        for user_detail in user_details:
-            #email = user_detail['email']
-            if user_detail['config']:
-                config = json.loads(user_detail['config'])
-        user_detail['authority'] = config.get('authority',"Unknown Authority")
-
-        print user_detail
-        if user_detail['authority'] is not None:
-            sub_authority = user_detail['authority'].split('.')
-            root_authority = sub_authority[0]
-            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
-        else:
-            slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
+  #      for user_detail in user_details:
+  #          #email = user_detail['email']
+  #          if user_detail['config']:
+  #              config = json.loads(user_detail['config'])
+  #      user_detail['authority'] = config.get('authority',"Unknown Authority")
+#
+#        print user_detail
+#        if user_detail['authority'] is not None:
+#            sub_authority = user_detail['authority'].split('.')
+#            root_authority = sub_authority[0]
+#            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
+#        else:
+        slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)
 

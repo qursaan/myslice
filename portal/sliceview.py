@@ -35,8 +35,8 @@ from myslice.config                  import Config
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-do_query_users=True
-#do_query_users=False
+#do_query_users=True
+do_query_users=False
 
 #do_query_leases=True
 do_query_leases=False
@@ -97,24 +97,24 @@ class SliceView (LoginRequiredAutoLogoutView):
             
             # not always found in user_details...
             config={}
-            for user_detail in user_details:
-                #email = user_detail['email']
-                if user_detail['config']:
-                    config = json.loads(user_detail['config'])
-            user_detail['authority'] = config.get('authority',"Unknown Authority")
-
-            if user_detail['authority'] is not None:
-                sub_authority = user_detail['authority'].split('.')
-                root_authority = sub_authority[0]
-                query_user_all = Query.get(root_authority+':user').select(user_fields)
-
-                # XXX TODO this filter doesn't work - to be improved in Manifold
-                #.filter_by('authority.authority_hrn', '=', user_detail['authority'])
-
-                page.enqueue_query(query_user_all)
-            else:
-                print "authority of the user is not in local:user db"
-                query_user_all = Query.get('user').select(user_fields)
+#            for user_detail in user_details:
+#                #email = user_detail['email']
+#                if user_detail['config']:
+#                    config = json.loads(user_detail['config'])
+#            user_detail['authority'] = config.get('authority',"Unknown Authority")
+#
+#            if user_detail['authority'] is not None:
+#                sub_authority = user_detail['authority'].split('.')
+#                root_authority = sub_authority[0]
+#                query_user_all = Query.get(root_authority+':user').select(user_fields)
+#
+#                # XXX TODO this filter doesn't work - to be improved in Manifold
+#                #.filter_by('authority.authority_hrn', '=', user_detail['authority'])
+#
+#                page.enqueue_query(query_user_all)
+#            else:
+#                print "authority of the user is not in local:user db"
+            query_user_all = Query.get('user').select(user_fields)
             #    query_user_all = None
     
         # ... and for the relations
