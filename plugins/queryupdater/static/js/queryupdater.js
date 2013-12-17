@@ -316,7 +316,7 @@
 
         on_field_state_changed: function(result)
         {
-            console.log(result)
+            messages.debug(result)
             /* this.set_state(result.request, result.key, result.value, result.status); */
             this.set_state(result);
         },
@@ -350,7 +350,7 @@
 
         update_resources: function(resources, change)
         {
-            console.log("update_resources");
+            messages.debug("update_resources");
             var my_oTable = this.table.dataTable();
             var prev_resources = this.current_resources; 
 

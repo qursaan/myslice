@@ -491,16 +491,5 @@ window.dv=this.slick_dataview;
 
     $.plugin('QueryGrid', QueryGrid);
 
-//  /* define the 'dom-checkbox' type for sorting in datatables 
-//     http://datatables.net/examples/plug-ins/dom_sort.html
-//     using trial and error I found that the actual column number
-//     was in fact given as a third argument, and not second 
-//     as the various online resources had it - go figure */
-//    $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
-//	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
-//	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
-//	} );
-//    }
-
 })(jQuery);
 

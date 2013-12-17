@@ -20,7 +20,7 @@ var Buffer = Class.extend({
             this._timerid = setInterval(
                 (function(self) {         //Self-executing func which takes 'this' as self
                     return function() {   //Return a function in the context of 'self'
-                        console.log("running callback");
+                        messages.debug("running callback");
                         clearInterval(self._timerid);
                         self._callback.apply(self._callback_this);
                     }
