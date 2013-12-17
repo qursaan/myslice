@@ -2,7 +2,7 @@ from manifold.core.query        import Query
 from unfold.page                import Page
 
 from unfold.loginrequired       import FreeAccessView
-from ui.topmenu                 import topmenu_items, the_user
+from ui.topmenu                 import topmenu_items_live, the_user
 
 from plugins.googlemap          import GoogleMap
 from plugins.querytable         import QueryTable
@@ -31,7 +31,6 @@ class ResourceView(FreeAccessView):
         page.enqueue_query(resource_query)
 
         page.expose_js_metadata()
-        page.expose_queries()
 
         resourcelist = QueryTable(
             page  = page,
@@ -86,7 +85,7 @@ class ResourceView(FreeAccessView):
         # more general variables expected in the template
         context['title'] = 'Information about a resource'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items(None, self.request)
+        context['topmenu_items'] = topmenu_items_live(None, page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 

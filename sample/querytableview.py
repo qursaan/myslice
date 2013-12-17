@@ -7,7 +7,7 @@ from manifold.core.query import Query, AnalyzedQuery
 
 from unfold.page import Page
 
-from ui.topmenu import topmenu_items, the_user
+from ui.topmenu import topmenu_items_live, the_user
 
 from plugins.querytable import QueryTable
 
@@ -68,13 +68,10 @@ class QueryTableView (TemplateView):
         # more general variables expected in the template
         template_env [ 'title' ] = 'simple %(slicename)s'%locals()
         # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items('Slice', request) 
+        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can sho who is logged
         template_env [ 'username' ] = the_user (request) 
     
-        # don't forget to run the requests
-        page.expose_queries ()
-
         # the prelude object in page contains a summary of the requirements() for all plugins
         # define {js,css}_{files,chunks}
         prelude_env = page.prelude_env()

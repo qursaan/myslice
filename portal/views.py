@@ -28,7 +28,7 @@ from django.shortcuts           import render
 from django.template.loader     import render_to_string
 
 from unfold.loginrequired       import FreeAccessView
-from ui.topmenu                 import topmenu_items, the_user
+from ui.topmenu                 import topmenu_items_live, the_user
 
 from portal.event               import Event
 # presview is put in observation for now
@@ -68,7 +68,7 @@ class PresViewView(FreeAccessView):
         # more general variables expected in the template
         context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('PresView', self.request)
+        context['topmenu_items'] = topmenu_items_live('PresView', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 

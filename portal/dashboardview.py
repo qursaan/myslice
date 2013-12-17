@@ -75,7 +75,6 @@ class DashboardView (LoginRequiredAutoLogoutView):
         context['username'] = the_user(self.request) 
 
         page.expose_js_metadata()
-        page.expose_queries()
 
         # the page header and other stuff
         context.update(page.prelude_env())

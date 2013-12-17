@@ -433,7 +433,6 @@ class SliceView (LoginRequiredAutoLogoutView):
     
         # don't forget to run the requests
         page.expose_js_metadata()
-        page.expose_queries ()
         # the prelude object in page contains a summary of the requirements() for all plugins
         # define {js,css}_{files,chunks}
         template_env.update(page.prelude_env())

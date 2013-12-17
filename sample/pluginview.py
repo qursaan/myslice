@@ -19,7 +19,7 @@ from plugins.raw                        import Raw
 from plugins.messages                   import Messages
 from plugins.querytable                 import QueryTable
 
-from ui.topmenu                         import topmenu_items, the_user
+from ui.topmenu                         import topmenu_items_live, the_user
 from trash.trashutils                   import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 #might be useful or not depending on the context
@@ -89,11 +89,8 @@ $(function(){$("#bouton").click(issue_debug);});
 
     # more general variables expected in the template
     template_env [ 'title' ] = 'Single Plugin View' 
-    template_env [ 'topmenu_items' ] = topmenu_items('plugin', request) 
+    template_env [ 'topmenu_items' ] = topmenu_items_live('plugin', page) 
     template_env [ 'username' ] = the_user (request) 
-
-    # run queries when we have any
-    page.expose_queries ()
 
     # the prelude object in page contains a summary of the requirements() for all plugins
     # define {js,css}_{files,chunks}

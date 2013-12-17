@@ -31,9 +31,6 @@ class TopmenuValidationView (TemplateView):
         # so we can see who is logged
         template_env [ 'username' ] = the_user (request) 
     
-        # don't forget to run the requests
-        page.expose_queries ()
-
         # the prelude object in page contains a summary of the requirements() for all plugins
         # define {js,css}_{files,chunks}
         prelude_env = page.prelude_env()

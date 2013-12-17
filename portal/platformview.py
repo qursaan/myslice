@@ -2,7 +2,7 @@ from manifold.core.query         import Query
 from unfold.page                 import Page
 
 from unfold.loginrequired        import FreeAccessView
-from ui.topmenu                  import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items_live, the_user
 
 from plugins.querytable          import QueryTable
 
@@ -24,7 +24,6 @@ class PlatformView(FreeAccessView):
         page.enqueue_query(network_query)
 
         page.expose_js_metadata()
-        page.expose_queries()
         networklist = QueryTable(
             page  = page,
             title = 'List',
@@ -54,7 +53,7 @@ class PlatformView(FreeAccessView):
         # more general variables expected in the template
         context['title'] = 'Platforms connected to MySlice'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Platforms', self.request)
+        context['topmenu_items'] = topmenu_items_live('Platforms', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 

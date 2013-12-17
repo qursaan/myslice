@@ -29,6 +29,8 @@ class PortalPage(Page):
         # Jordan: it seems we need this to init plugins js
         # Issue a "manifold is not defined" error
         #self.expose_queries ()
+        # Thierry: this is deprecated anyway, and will happen as part of prelude_env
+        # "manifold not defined" would be due to a missing dependency to manifold.js or something...
 
         template_env.update(self.prelude_env())
         result=render_to_response ('view-unfold1.html',template_env,
