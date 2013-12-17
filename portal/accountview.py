@@ -2,7 +2,7 @@ from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
-from portal.actions                     import manifold_update_user, manifold_update_account
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account
 #
 from ui.topmenu                         import topmenu_items, the_user
 #
@@ -188,7 +188,7 @@ class AccountView(LoginRequiredAutoLogoutView):
 @login_required
 #my_acc form value processing
 def account_process(request):
-    user_query  = Query().get('local:user').select('password','config')
+    user_query  = Query().get('local:user').select('user_id','email','password','config')
     user_details = execute_query(request, user_query)
     
     account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
@@ -196,10 +196,12 @@ def account_process(request):
 
     platform_query  = Query().get('local:platform').select('platform_id','platform')
     platform_details = execute_query(request, platform_query)
-
-   # for account_detail in account_details:
-    #    if account_detail['platform_id'] == 5: 
-     #       account_config = json.loads(account_detail['config'])
+    
+    # getting the user_id from the session
+    for user_detail in user_details:
+            user_id = user_detail['user_id']
+            print "test"
+            print user_id
 
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
@@ -368,64 +370,55 @@ def account_process(request):
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
 
-    # add reference platforms       
+    
+    # add reference platforms  
     elif 'add_fuseco' in request.POST:
-        # The recipients are the PI of the authority
-        #recipients = authority_get_pi_emails(request, authority_hrn)
-        recipients = ["support@myslice.info"] 
-        requester = request.user # current user
-        sender = 'yasin.upmc@gmail.com' # the server email
-        msg = "OneLab user %s requested account in fuseco Platform" % requester
-        send_mail("Onelab user %s requested an account in Fuseco"%requester , msg, sender, recipients)
-        messages.info(request, 'Request to get access on Fuseco platform received. Please wait for PI\'s reply.')
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "fuseco":
+                platform_id = platform_detail['platform_id']
+
+        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+        manifold_add_account(request,user_params)
+
+        messages.info(request, 'Reference Account added on Fuseco platform. You have now access to Fuseco resources.')
         return HttpResponseRedirect("/portal/account/")
 
     elif 'add_ple' in request.POST:
-        # The recipients are the PI of the authority
-        #recipients = authority_get_pi_emails(request, authority_hrn)
-        recipients = ["support@myslice.info"] 
-        requester = request.user # current user
-        sender = 'yasin.upmc@gmail.com' # the server email
-        msg = "OneLab user %s requested account in fuseco Platform" % requester
-        send_mail("Onelab user %s requested an account in PLE"%requester , msg, sender, recipients)
-        messages.info(request, 'Request to get access on PLE platform received. Please wait for PI\'s reply.')
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "ple":
+                platform_id = platform_detail['platform_id']
+        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+        manifold_add_account(request,user_params)
+        messages.info(request, 'Reference Account added on PLE platform. You have now access to PLE resources.')
         return HttpResponseRedirect("/portal/account/")
 
     elif 'add_omf' in request.POST:
-        # The recipients are the PI of the authority
-        #recipients = authority_get_pi_emails(request, authority_hrn)
-        recipients = ["support@myslice.info"]
-        requester = request.user # current user
-        sender = 'yasin.upmc@gmail.com' # the server email
-        msg = "OneLab user %s requested account in omf:nitos Platform" % requester
-        send_mail("Onelab user %s requested an account in OMF:NITOS"%requester , msg, sender, recipients)
-        messages.info(request, 'Request to get access on OMF:NITOS platform received. Please wait for PI\'s reply.')
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "omf":
+                platform_id = platform_detail['platform_id']
+        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+        manifold_add_account(request,user_params)
+        messages.info(request, 'Reference Account added on OMF:Nitos platform. You have now access to OMF:Nitos resources.')
         return HttpResponseRedirect("/portal/account/")
 
     elif 'add_wilab' in request.POST:
-        # The recipients are the PI of the authority
-        #recipients = authority_get_pi_emails(request, authority_hrn)
-        recipients = ["support@myslice.info"]
-        requester = request.user # current user
-        sender = 'yasin.upmc@gmail.com' # the server email
-        msg = "OneLab user %s requested account in Wilab Platform" % requester
-        send_mail("Onelab user %s requested an account in Wilab"%requester , msg, sender, recipients)
-        messages.info(request, 'Request to get access on Wilab platform received. Please wait for PI\'s reply.')
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "wilab":
+                platform_id = platform_detail['platform_id']
+        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+        manifold_add_account(request,user_params)
+        messages.info(request, 'Reference Account added on Wilab platform. You have now access to Wilab resources.')
         return HttpResponseRedirect("/portal/account/")
 
     elif 'iotlab' in request.POST:
-        # The recipients are the PI of the authority
-        #recipients = authority_get_pi_emails(request, authority_hrn)
-        recipients = ["support@myslice.info"]
-        requester = request.user # current user
-        sender = 'yasin.upmc@gmail.com' # the server email
-        msg = "OneLab user %s requested account in IOTLab Platform" % requester
-        send_mail("Onelab user %s requested an account in IOTLab"%requester , msg, sender, recipients)
-        messages.info(request, 'Request to get access on IOTLab platform received. Please wait for PI\'s reply.')
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "iotlab":
+                platform_id = platform_detail['platform_id']
+        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+        manifold_add_account(request,user_params)
+        messages.info(request, 'Reference Account added on IOTLab platform. You have now access to IOTLab resources.')
         return HttpResponseRedirect("/portal/account/")
 
-    #delete reference platoforms
-  
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")
