@@ -1,5 +1,6 @@
+// -*- js-indent-tab:2 -*-
 /**
- * Description: display a query result in a slickgrid-powered <table>
+ * Description: display a query result in a slickgrid-powered table
  * Copyright (c) 2012-2013 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
  */
@@ -8,9 +9,6 @@
  * WARNINGS
  *
  * This is very rough for now and not deemed working
- * 
- * Also it still requires adaptation for the init_key / init_id / canonical_key / id business 
- * if the basic logic was to become usable
  * 
  * WARNINGS
  */
@@ -60,20 +58,25 @@
             this.elmt().on('show', this, this.on_show);
 
             var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
-            this.method = query.object;
+            this.object = query.object;
 
-	    // xxx beware that this.key needs to contain a key that all records will have
-	    // in general query_all will return well populated records, but query
-	    // returns records with only the fields displayed on startup. 
-	    this.key = (this.options.id_key);
-	    if (! this.key) {
-		// if not specified by caller, decide from metadata
-		var keys = manifold.metadata.get_key(this.method);
-		this.key = (keys && keys.length == 1) ? keys[0] : null;
-	    }
-	    if (! this.key) messages.warning("querygrid.init could not kind valid key");
-
-	    if (debug) messages.debug("querygrid: key="+this.key);
+	    //// we need 2 different keys
+	    // * canonical_key is the primary key as derived from metadata (typically: urn)
+	    //   and is used to communicate about a given record with the other plugins
+	    // * init_key is a key that both kinds of records 
+	    //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
+	    //   in general query_all will return well populated records, but query
+	    //   returns records with only the fields displayed on startup
+	    var keys = manifold.metadata.get_key(this.object);
+	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
+	    // 
+	    this.init_key = this.options.init_key;
+	    // have init_key default to canonical_key
+	    this.init_key = this.init_key || this.canonical_key;
+	    // sanity check
+	    if ( ! this.init_key ) messages.warning ("QueryGrid : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("QueryGrid : cannot find canonical_key");
+	    if (debug) messages.debug("querygrid: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
@@ -120,13 +123,16 @@
 	    };
 
 	    this.slick_data = [];
-	    this.slick_dataview = new Slick.Data.DataView();
+	    this.slick_dataview = new Slick.Data.UnfoldDataView();
+// capturing for debug
+window.dv=this.slick_dataview;
 	    var self=this;
 	    this.slick_dataview.onRowCountChanged.subscribe ( function (e,args) {
 		self.slick_grid.updateRowCount();
 		self.slick_grid.autosizeColumns();
 		self.slick_grid.render();
 	    });
+	  
 	    
 	    var selector="#grid-"+this.options.domid;
 	    if (debug_deep) {
@@ -140,15 +146,14 @@
 	    }
 
 	    this.slick_grid = new Slick.Grid(selector, this.slick_dataview, this.slick_columns, this.slick_options);
-	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
+//	    this.slick_grid.setSelectionModel (new Slick.RowSelectionModel ({selectActiveRow: false}));
+	    this.slick_grid.setSelectionModel (new Slick.UnfoldSelectionModel({selectActiveRow: false}));
 	    this.slick_grid.registerPlugin (checkbox_selector);
 	    // autotooltips: for showing the full column name when ellipsed
 	    var auto_tooltips = new Slick.AutoTooltips ({ enableForHeaderCells: true });
 	    this.slick_grid.registerPlugin (auto_tooltips);
 	    
 	    this.columnpicker = new Slick.Controls.ColumnPicker (this.slick_columns, this.slick_grid, this.slick_options)
-
-	    g=this.slick_grid;
 
         }, // initialize_table
 
@@ -158,7 +163,7 @@
 
         clear_table: function() {
 	    this.slick_data=[];
-	    this.slick_dataview.setItems(this.slick_data,this.key);
+	  this.slick_dataview.setItems(this.slick_data,this.init_key,this.canonical_key);
         },
 
         redraw_table: function() {
@@ -241,10 +246,10 @@
         on_new_record: function(record) {
             if (this.received_all_query) {
         	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this._set_checkbox(record, true);
+                this._set_checkbox_from_record(record, true);
             } else {
         	// otherwise we need to remember that and do it later on
-        	if (debug) messages.debug("Remembering record to check " + record[this.key]);
+        	if (debug) messages.debug("Remembering record to check, "+this.init_key+'='+ record[this.init_key]);
                 this.buffered_records_to_check.push(record);
             }
         },
@@ -270,11 +275,11 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this._set_checkbox(data.value, true);
+                    this._set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this._set_checkbox(data.value, false);
+                    this._set_checkbox_from_data(data.value, false);
                     break;
                 default:
                     break;
@@ -287,11 +292,11 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this._set_checkbox(data.value, true);
+                    this._set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                    this._set_checkbox(data.value, false);
+                    this._set_checkbox_from_data(data.value, false);
                     break;
                 default:
                     break;
@@ -315,8 +320,8 @@
         on_all_query_done: function() {
 	    var start=new Date();
 	    if (debug) messages.debug("1-shot initializing slickgrid content with " + this.slick_data.length + " lines");
-	    // use this.key as the key for identifying rows
-	    this.slick_dataview.setItems (this.slick_data, this.key);
+	    // use this.init_key as the key for identifying rows
+	  this.slick_dataview.setItems (this.slick_data, this.init_key,this.canonical_key);
 	    var duration=new Date()-start;
 	    if (debug) messages.debug("setItems " + duration + " ms");
 	    if (debug_deep) {
@@ -329,7 +334,7 @@
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
 		if (debug) messages.debug ("delayed turning on checkbox " + i + " record= " + record);
-                self._set_checkbox(record, true);
+                self._set_checkbox_from_record(record, true);
             });
 	    this.buffered_records_to_check = [];
 
@@ -344,38 +349,33 @@
 
         /************************** PRIVATE METHODS ***************************/
 
-        _set_checkbox: function(record, checked) {
-            /* Default: checked = true */
+        _set_checkbox_from_record : function(record, checked) {
+	    var init_id = record[this.init_key];
+	    if (debug) messages.debug("querygrid.set_checkbox_from_record, init_id="+init_id);
+	    var index = this.slick_dataview.getIdxById(init_id);
+            this._set_checkbox_from_index (index,checked);
+	},
+
+        _set_checkbox_from_data : function (id, checked) {
+	    if (debug) messages.debug("querygrid.set_checkbox_from_data, id="+id);
+	    // this is a local addition to mainstream dataview
+	    // it's kind if slow in this first implementation (no hashing)
+	    // but we should not notice that much
+	    var index = this.slick_dataview.getIdxByIdKey(id,this.canonical_key);
+            this._set_checkbox_from_index (index,checked);
+        },
+
+        _set_checkbox_from_index : function (index, checked) {
+	  if (index === undefined) { messages.warn("querygrid.set_checkbox - cannot find index"); return;}
             if (checked === undefined) checked = true;
-
-            var id;
-            /* The function accepts both records and their key */
-            switch (manifold.get_type(record)) {
-            case TYPE_VALUE:
-                id = record;
-                break;
-            case TYPE_RECORD:
-                /* XXX Test the key before ? */
-                id = record[this.key];
-                break;
-            default:
-                throw "Not implemented";
-                break;
-            }
-
-
-	    if (id === undefined) {
-		messages.warning("querygrid._set_checkbox record has no id to figure which line to tick");
-		return;
-	    }
-	    var index = this.slick_dataview.getIdxById(id);
 	    var selectedRows=this.slick_grid.getSelectedRows();
 	    if (checked) // add index in current list
 		selectedRows=selectedRows.concat(index);
 	    else // remove index from current list
 		selectedRows=selectedRows.filter(function(idx) {return idx!=index;});
+	    // set new selection
 	    this.slick_grid.setSelectedRows(selectedRows);
-        },
+	},
 
 // initializing checkboxes
 // have tried 2 approaches, but none seems to work as we need it

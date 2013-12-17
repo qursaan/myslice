@@ -224,7 +224,6 @@ class SliceView (LoginRequiredAutoLogoutView):
             # this is the query at the core of the slice list
             query      = sq_resource,
             query_all  = query_resource_all,
-            # use 'hrn' as the internal unique key for this plugin
             init_key     = main_query_init_key,
             checkboxes = True,
             datatables_options = { 
@@ -242,9 +241,7 @@ class SliceView (LoginRequiredAutoLogoutView):
                 # this is the query at the core of the slice list
                 query      = sq_resource,
                 query_all  = query_resource_all,
-                # use 'hrn' as the internal unique key for this plugin
-                # xxx todo on querygrid as well
-                # init_key     = main_query_init_key,
+                init_key     = main_query_init_key,
                 checkboxes = True,
                 )
 

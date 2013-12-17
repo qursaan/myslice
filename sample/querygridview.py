@@ -51,7 +51,7 @@ class QueryGridView (TemplateView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # safer to use 'hrn' as the internal unique key for this plugin
-            id_key     = main_query_init_key,
+            init_key   = main_query_init_key,
             checkboxes = True,
             datatables_options = { 
                 'iDisplayLength': 25,

@@ -7,7 +7,7 @@
 (function($){
 
     var debug=false;
-    debug=true
+//    debug=true
 
     var QueryTable = Plugin.extend({
 
