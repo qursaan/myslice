@@ -44,11 +44,13 @@ class AccountView(LoginRequiredAutoLogoutView):
         account_type = ''
         account_usr_hrn = ''
         account_pub_key = ''
+        account_priv_key = ''
         account_reference = ''
         my_users = ''
         my_slices = ''
         my_auths = ''
         secondary_list = ''
+        lst = ''
         platform_name_list = []
         platform_name_secondary_list = []
         platform_access_list = []
@@ -417,6 +419,58 @@ def account_process(request):
         user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
         manifold_add_account(request,user_params)
         messages.info(request, 'Reference Account added on IOTLab platform. You have now access to IOTLab resources.')
+        return HttpResponseRedirect("/portal/account/")
+        
+    # delete reference platforms  
+    elif 'delete_fuseco' in request.POST:
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "fuseco":
+                platform_id = platform_detail['platform_id']
+        # generic function is not possible. [filter is not constant]
+        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
+        results = execute_query(request,query)
+
+        messages.info(request, 'Reference Account is removed from Fuseco platform. You have no access to Fuseco resources anymore.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'delete_ple' in request.POST:
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "ple":
+                platform_id = platform_detail['platform_id']
+        # generic function is not possible. [filter is not constant]
+        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
+        results = execute_query(request,query)
+        messages.info(request, 'Reference Account is removed from PLE platform. You have no access to PLE resources anymore.')
+        return HttpResponseRedirect("/portal/account/")
+    
+    elif 'delete_omf' in request.POST:
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "omf":
+                platform_id = platform_detail['platform_id']
+        # generic function is not possible. [filter is not constant]
+        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
+        results = execute_query(request,query)
+        messages.info(request, 'Reference Account is removed from OMF:Nitos platform. You have no access to OMF:Nitos resources anymore.')
+        return HttpResponseRedirect("/portal/account/")
+    
+    elif 'delete_wilab' in request.POST:
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "wilab":
+                platform_id = platform_detail['platform_id']
+        # generic function is not possible. [filter is not constant]
+        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
+        results = execute_query(request,query)
+        messages.info(request, 'Reference Account is removed from Wilab platform. You have no access to Wilab resources anymore.')
+        return HttpResponseRedirect("/portal/account/")
+
+    elif 'delete_iotlab' in request.POST:
+        for platform_detail in platform_details:
+            if platform_detail['platform'] == "iotlab":
+                platform_id = platform_detail['platform_id']
+        # generic function is not possible. [filter is not constant]
+        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
+        results = execute_query(request,query)
+        messages.info(request, 'Reference Account is removed from IOTLab platform. You have no access to IOTLab resources anymore.')
         return HttpResponseRedirect("/portal/account/")
 
     else:

@@ -91,6 +91,15 @@ def manifold_update_account(request,account_params):
     return results
 
 
+def manifold_add_platform(request, platform_params):
+    query = Query.create('local:platform').set(account_params).select(['user', 'platform'])
+    results = execute_admin_query(request,query)
+    if not results:
+        raise Exception, "Failed creating manifold  platform %s for user: %s" % (platform_params['platform'], platform_params['user'])
+    result, = results
+    return result['platform_id']
+
+
 def make_request_user(user):
     request = {}
     request['type']          = 'user'
