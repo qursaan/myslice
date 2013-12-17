@@ -93,20 +93,21 @@ Current implementation makes the following assumptions
 # but triggers js errors when included - probably/maybe because of the jquery version ?
 # it might be responsible for not being able to select a row by clicking anywhere in it ?
 #                "http://mleibman.github.io/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js",
-                "js/jquery.event.drag-2.2.js",   # from slickgrid/lib
+                "js/jquery.event.drag-2.2.js",          # from slickgrid/lib
                 "js/slick.core.js",
-                "js/slick.autotooltips.js",       # from slickgrid/plugins/
+                "js/slick.autotooltips.js",             # from slickgrid/plugins/
                 "js/slick.cellrangedecorator.js",       # from slickgrid/plugins/
-                "js/slick.cellrangeselector.js",       # from slickgrid/plugins/
-                "js/slick.cellcopymanager.js",       # from slickgrid/plugins/
-                "js/slick.cellselectionmodel.js",       # from slickgrid/plugins/
-                "js/slick.rowselectionmodel.js",       # from slickgrid/plugins/
-                "js/slick.checkboxselectcolumn.js",       # from slickgrid/plugins/
+                "js/slick.cellrangeselector.js",        # from slickgrid/plugins/
+                "js/slick.cellcopymanager.js",          # from slickgrid/plugins/
+#                "js/slick.cellselectionmodel.js",       # from slickgrid/plugins/
+                "js/slick.rowselectionmodel.js",        # from slickgrid/plugins/
+                "js/slick.checkboxselectcolumn.js",     # from slickgrid/plugins/
                 "js/slick.columnpicker.js",             # from slickgrid/controls/
                 "js/slick.formatters.js",
                 "js/slick.editors.js",
                 "js/slick.grid.js",
-                "js/slick.dataview.js",
+                "js/slick.unfoldselection.js",          # from plugins/querygrid
+                "js/slick.unfolddataview.js",           # from plugins/querygrid
 
 #                "js/dataTables.js", "js/dataTables.bootstrap.js", "js/with-datatables.js",
                 "js/manifold.js", "js/manifold-query.js", 
@@ -134,4 +135,4 @@ Current implementation makes the following assumptions
                 'query_uuid', 'query_all_uuid', 
                 'checkboxes', 'datatables_options', 
                 'columns','hidden_columns', 
-                'id_key',]
+                'init_key',]
