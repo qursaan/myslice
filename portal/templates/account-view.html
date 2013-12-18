@@ -185,7 +185,7 @@
      		<tr class="border_bottom">
          		<td class="odd"> {{ row.slice_name }} </td>
 				<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="odd"> <button class="btn btn-default btn-xs" name= "dl_slice_cred" type="submit" title="Download Slice Credentials">Download</button> </td>
+				<td class="odd"> <button class="btn btn-default btn-xs" name= "dl_{{row.slice_name}}" type="submit" title="Download Slice Credentials">Download</button> </td>
      		</tr>
      		{%endfor%}
   		</table>
@@ -201,7 +201,7 @@
    			<tr class="border_bottom">
        			<td class="odd"> {{ row.auth_name }} </td>
        			<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="odd"><button class="btn btn-default btn-xs" name= "dl_auth_cred" type="submit" title="Download Authority Credentials">Download</button></td>
+				<td class="odd"><button class="btn btn-default btn-xs" name= "dl_{{row.auth_name}}" type="submit" title="Download Authority Credentials">Download</button></td>
    			</tr>
    			{%endfor%}
 		</table>

@@ -202,16 +202,54 @@ def account_process(request):
     # getting the user_id from the session
     for user_detail in user_details:
             user_id = user_detail['user_id']
-            print "test"
-            print user_id
 
+    for account_detail in account_details:
+        for platform_detail in platform_details:
+            if platform_detail['platform_id'] == account_detail['platform_id']:
+                if 'myslice' in platform_detail['platform']:
+                    account_config = json.loads(account_detail['config'])
+                    acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
+                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                    
+    
+    # adding the slices and corresponding credentials to list
+    if 'N/A' not in acc_slice_cred:
+        slice_list = []
+        slice_cred = [] 
+        for key, value in acc_slice_cred.iteritems():
+            slice_list.append(key)       
+            slice_cred.append(value)
+        # special case: download each slice credentials separately -- too complicated
+        for i in range(0, len(slice_list)):
+            if 'dl_'+slice_list[i] in request.POST:
+                slice_detail = "Slice name: " + slice_list[i] +"\nSlice Credentials: \n"+ slice_cred[i]
+                response = HttpResponse(slice_detail, content_type='text/plain')
+                response['Content-Disposition'] = 'attachment; filename="slice_credential.txt"'
+                return response
+
+    # adding the authority and corresponding credentials to list
+    if 'N/A' not in acc_auth_cred:
+        auth_list = []
+        auth_cred = [] 
+        for key, value in acc_auth_cred.iteritems():
+            auth_list.append(key)       
+            auth_cred.append(value)
+        # special case: download each slice credentials separately -- too complicated
+        for i in range(0, len(auth_list)):
+            if 'dl_'+auth_list[i] in request.POST:
+                auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
+                response = HttpResponse(auth_detail, content_type='text/plain')
+                response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
+                return response
+
+
+             
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
         
         config={}
         for user_config in user_details:
-        #email = user_detail['email']
             if user_config['config']:
                 config = json.loads(user_config['config'])
                 config['firstname'] = edited_first_name
@@ -223,10 +261,8 @@ def account_process(request):
                 user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
                 user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
-        #user_params = { 'config': updated_config}
         manifold_update_user(request,user_params)
         # this will be depricated, we will show the success msg in same page
-#        return HttpResponse('Sucess: First Name and Last Name Updated!')
         # Redirect to same page with success message
         messages.success(request, 'Sucess: First Name and Last Name Updated.')
         return HttpResponseRedirect("/portal/account/")       
@@ -255,20 +291,6 @@ def account_process(request):
                         private_key = json.dumps(private.exportKey())
                         public  = private.publickey()
                         public_key = json.dumps(public.exportKey(format='OpenSSH'))
-                        # Generate public and private keys using SFA Library
-#                        from sfa.trust.certificate  import Keypair
-#                        k = Keypair(create=True)
-#                        public_key = k.get_pubkey_string()
-#                        private_key = k.as_pem()
-#                        private_key = ''.join(private_key.split())
-#                        public_key = "ssh-rsa " + public_key
-                        # now we overwrite the config field with keypair
-                        # once there will be user_hrn, we need to keep user_hrn and change only the keypair
-                        # see submit_name section for implementing this    
-#                       keypair = re.sub("\r", "", keypair)
-#                       keypair = re.sub("\n", "\\n", keypair)
-#                       #keypair = keypair.rstrip('\r\n')
-#                       keypair = ''.join(keypair.split())
                         # updating maniolf local:account table
                         account_config = json.loads(account_detail['config'])
                         # preserving user_hrn
@@ -356,7 +378,7 @@ def account_process(request):
                         account_config = json.loads(account_detail['config'])
                         if 'user_private_key' in account_config:
                             for key in account_config.keys():
-                                if key== 'user_private_key':    
+                                if key == 'user_private_key':    
                                     del account_config[key]
                                 
                             updated_config = json.dumps(account_config)
@@ -372,7 +394,43 @@ def account_process(request):
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
 
-    
+    #clear all creds
+    elif 'clear_cred' in request.POST:
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_cred = account_config.get('delegated_user_credential','N/A')
+                        if 'N/A' not in user_cred:
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            user_pub_key = account_config.get('user_public_key','N/A')         
+                            user_priv_key = account_config.get('user_private_key','N/A')
+                            updated_config = '{"user_public_key":"'+ user_pub_key + '", "user_private_key":"'+ user_priv_key + '", "user_hrn":"'+ user_hrn + '"}'
+                            updated_config = ''.join(updated_config.split()) 
+                            user_params = { 'config': updated_config}
+                            manifold_update_account(request,user_params)
+                            messages.success(request, 'All Credentials cleared')
+                            return HttpResponseRedirect("/portal/account/")
+                        else:
+                            messages.error(request, 'Delete error: Credentials are not stored in the server')
+                            return HttpResponseRedirect("/portal/account/")
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            return HttpResponseRedirect("/portal/account/")
+
+
+    # Download delegated_user_cred
+    elif 'dl_user_cred' in request.POST:
+        if 'delegated_user_credential' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            response = HttpResponse(user_cred, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_cred.txt"'
+            return response
+        else:
+            messages.error(request, 'Download error: User credential  is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+        
     # add reference platforms  
     elif 'add_fuseco' in request.POST:
         for platform_detail in platform_details:
