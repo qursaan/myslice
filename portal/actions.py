@@ -90,9 +90,16 @@ def manifold_update_account(request,account_params):
     #result, = results
     return results
 
+#explicitly mention the platform_id
+def manifold_delete_account(request, platform_id, account_params):
+    query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).set(account_params).select('user_id')
+    results = execute_query(request,query)
+    return results
 
+
+#not tested
 def manifold_add_platform(request, platform_params):
-    query = Query.create('local:platform').set(account_params).select(['user', 'platform'])
+    query = Query.create('local:platform').set(platform_params).select(['user', 'platform'])
     results = execute_admin_query(request,query)
     if not results:
         raise Exception, "Failed creating manifold  platform %s for user: %s" % (platform_params['platform'], platform_params['user'])

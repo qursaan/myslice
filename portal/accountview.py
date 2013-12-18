@@ -2,7 +2,7 @@ from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
 #
 from ui.topmenu                         import topmenu_items, the_user
 #
@@ -426,10 +426,8 @@ def account_process(request):
         for platform_detail in platform_details:
             if platform_detail['platform'] == "fuseco":
                 platform_id = platform_detail['platform_id']
-        # generic function is not possible. [filter is not constant]
-        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
-        results = execute_query(request,query)
-
+        user_params = {'user_id':user_id}
+        manifold_delete_account(request,platform_id,user_params)
         messages.info(request, 'Reference Account is removed from Fuseco platform. You have no access to Fuseco resources anymore.')
         return HttpResponseRedirect("/portal/account/")
 
@@ -437,9 +435,8 @@ def account_process(request):
         for platform_detail in platform_details:
             if platform_detail['platform'] == "ple":
                 platform_id = platform_detail['platform_id']
-        # generic function is not possible. [filter is not constant]
-        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
-        results = execute_query(request,query)
+        user_params = {'user_id':user_id}
+        manifold_delete_account(request,platform_id,user_params)
         messages.info(request, 'Reference Account is removed from PLE platform. You have no access to PLE resources anymore.')
         return HttpResponseRedirect("/portal/account/")
     
@@ -447,9 +444,8 @@ def account_process(request):
         for platform_detail in platform_details:
             if platform_detail['platform'] == "omf":
                 platform_id = platform_detail['platform_id']
-        # generic function is not possible. [filter is not constant]
-        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
-        results = execute_query(request,query)
+        user_params = {'user_id':user_id}
+        manifold_delete_account(request,platform_id,user_params)
         messages.info(request, 'Reference Account is removed from OMF:Nitos platform. You have no access to OMF:Nitos resources anymore.')
         return HttpResponseRedirect("/portal/account/")
     
@@ -457,7 +453,8 @@ def account_process(request):
         for platform_detail in platform_details:
             if platform_detail['platform'] == "wilab":
                 platform_id = platform_detail['platform_id']
-        # generic function is not possible. [filter is not constant]
+        user_params = {'user_id':user_id}
+        manifold_delete_account(request,platform_id,user_params)
         query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
         results = execute_query(request,query)
         messages.info(request, 'Reference Account is removed from Wilab platform. You have no access to Wilab resources anymore.')
@@ -467,9 +464,8 @@ def account_process(request):
         for platform_detail in platform_details:
             if platform_detail['platform'] == "iotlab":
                 platform_id = platform_detail['platform_id']
-        # generic function is not possible. [filter is not constant]
-        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
-        results = execute_query(request,query)
+        user_params = {'user_id':user_id}
+        manifold_delete_account(request,platform_id,user_params)
         messages.info(request, 'Reference Account is removed from IOTLab platform. You have no access to IOTLab resources anymore.')
         return HttpResponseRedirect("/portal/account/")
 
