@@ -4,7 +4,8 @@ from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
 #
-from ui.topmenu                         import topmenu_items, the_user
+from unfold.page                        import Page    
+from ui.topmenu                         import topmenu_items_live, the_user
 #
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
@@ -17,12 +18,16 @@ import json, os, re, itertools
 # requires login
 class AccountView(LoginRequiredAutoLogoutView):
     template_name = "account-view.html"
-    
     def dispatch(self, *args, **kwargs):
         return super(AccountView, self).dispatch(*args, **kwargs)
 
 
     def get_context_data(self, **kwargs):
+
+        page = Page(self.request)
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/account_view.css" ] )
+
 
         user_query  = Query().get('local:user').select('config','email')
         user_details = execute_query(self.request, user_query)
@@ -179,11 +184,12 @@ class AccountView(LoginRequiredAutoLogoutView):
         # more general variables expected in the template
         context['title'] = 'Platforms connected to MySlice'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('My Account', self.request)
+        context['topmenu_items'] = topmenu_items_live('My Account', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 #        context ['firstname'] = config['firstname']
-        #context.update(page.prelude_env())
+        prelude_env = page.prelude_env()
+        context.update(prelude_env)
         return context
 
 
