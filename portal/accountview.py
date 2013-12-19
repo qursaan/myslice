@@ -26,7 +26,7 @@ class AccountView(LoginRequiredAutoLogoutView):
 
         page = Page(self.request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/account_view.css" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
 
         user_query  = Query().get('local:user').select('config','email')

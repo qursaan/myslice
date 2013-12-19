@@ -122,6 +122,7 @@
 	</div>
 </div>
 
+
 <h2>Account Information</h2>
 <h3>Principal Account <small>Account used for delegating credentials</small></h3>
 <div id="middle" align="center">
@@ -148,7 +149,17 @@
 </div>
 
 
-<h3>Credentials</h3>
+
+
+<h3 id="show-pending" class="plugin-show" style="display: block;">
+<span class="glyphicon glyphicon-chevron-right"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Credentials</h3>
+
+<div id="hide-pending" class="plugin-hide" style="display: none;">
+<span class="glyphicon glyphicon-chevron-down"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">Credentials</a>
+
+<h5>Delegated Credentials to Principal Account</h5>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover">
@@ -200,11 +211,18 @@
 		<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
     </div>
 </div>
+</div>
 
 
+<h3 id="show-filters" class="plugin-show" style="display: block;">
+<span class="glyphicon glyphicon-chevron-right"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>TestBed Accounts</h3>
 
+<div id="hide-filters" class="plugin-hide" style="display: none;">
+<span class="glyphicon glyphicon-chevron-down"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">TestBed Accounts</a>
 
-<h3>Testbed Accounts <small>Reference accounts in the following testbeds</small></h3>
+<h5>Reference Accounts in the following testbeds</h5>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover"> 
@@ -227,8 +245,19 @@
         </table>
     </div>
 </div>
+</div>
 
-<h3>Add Accounts <small>Add ref. account to the following testbeds</small></h3>
+
+<h3 id="show-resources" class="plugin-show" style="display: block;">
+<span class="glyphicon glyphicon-chevron-right"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Add Accounts</h3>
+
+<div id="hide-resources" class="plugin-hide" style="display: none;">
+<span class="glyphicon glyphicon-chevron-down"></span>
+<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">Add Accounts</a>
+
+
+<h5>Add reference account to the following testbeds</h5>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover"> 
@@ -246,6 +275,7 @@
             {%endfor%}               
         </table>
     </div>
+</div>
 </div>
 
 </form>
