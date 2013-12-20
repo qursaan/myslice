@@ -1,7 +1,7 @@
 {% extends "layout-unfold1.html" %}
 {% block unfold_main %}
 
-<h2>User Profile <small>User info. in Myslice platform</small></h2>
+<h2>User Profile</h2>
 
 {% if messages %}
 <ul class="messages">
@@ -233,8 +233,12 @@
    			</tr>
    			{%endfor%}
 		</table>
-		<p></p>	
+		<p></p>
+		 {%if '' not in my_users%}	
 		<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+		{%else%}
+		<p><button class="btn btn-danger btn-lg btn-block disabled"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+		{%endif%}
     </div>
 </div>
 </div>
@@ -297,7 +301,7 @@
             <tr class="border_bottom">
                 <td class="odd"> {{ platform.platform_no_access }} </td>
                 <td class="odd">
-					<button class="btn btn-success btn-xs" name= "add_{{platform.platform_no_access}}" type="submit" title="Add account to this platform">
+					<button class="btn btn-success btn-sm" name= "add_{{platform.platform_no_access}}" type="submit" title="Add account to this platform">
 						<span class="glyphicon glyphicon-plus"></span>
 					</button>
 				</td>
