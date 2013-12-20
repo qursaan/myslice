@@ -45,6 +45,7 @@ var txt_otherslice = {"font": '"Trebuchet MS", Verdana, Arial, Helvetica, sans-s
 
         init: function(options, element) 
         {
+	    this.classname="scheduler";
             this._super(options, element);
 
             /* Member variables */

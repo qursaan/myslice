@@ -9,6 +9,7 @@
     var Messages = Plugin.extend ({
 
 	init: function (options, element) {
+	    classname="messages";
 	    this._super (options, element);
 	    // subscribe to the various messages channels
 	    var self=this;

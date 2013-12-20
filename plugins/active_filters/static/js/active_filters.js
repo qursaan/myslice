@@ -11,6 +11,7 @@
     var ActiveFilters = Plugin.extend({
 
         init: function(options, element) {
+	    this.classname="active_filters";
             this._super(options, element);
 
             this.elts('closeButton').click(function() {

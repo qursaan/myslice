@@ -23,6 +23,7 @@
          *     applied, which allows to maintain chainability of calls
          */
         init: function(options, element) {
+	    this.classname="slicestat";
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);			 
 			

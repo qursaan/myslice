@@ -11,6 +11,9 @@
 
 (function( $ ){
 
+    var debug=false;
+    debug=true;
+
     // XXX record selected (multiple selection ?)
     // XXX record disabled ?
     // XXX out of sync plugin ?
@@ -25,8 +28,8 @@
 
     var QueryUpdater = Plugin.extend({
 
-        init: function(options, element)
-        {
+        init: function(options, element) {
+	    this.classname="queryupdater";
             this._super(options, element);
 
             var self = this;
@@ -65,8 +68,7 @@
 
         /***************************** GUI EVENTS *****************************/
 
-        do_update: function(e) 
-        {
+        do_update: function(e) {
             var self = e.data;
             // XXX check that the query is not disabled
             manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
@@ -268,6 +270,7 @@
 
         on_query_in_progress: function()
         {
+	    messages.debug("queryupdater.on_query_in_progress");
             this.spin();
         },
 
