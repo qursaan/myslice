@@ -37,6 +37,7 @@ var colorscale = d3.scale.category10().range(["green", "yellow", "red", "orange"
          */
         init: function(options, element) {
             // Call the parent constructor, see FAQ when forgotten
+	    this.classname="maddash";
             this._super(options, element);
 
 

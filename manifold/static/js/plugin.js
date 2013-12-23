@@ -20,6 +20,13 @@ $.plugin = function(name, object) {
     };
 };
 
+// set to either
+// * false or undefined or none : no debug
+// * true : trace all event calls
+// * [ 'in_progress', 'query_done' ] : would only trace to these events
+var plugin_debug=false;
+plugin_debug = [ 'in_progress', 'query_done' ];
+
 var Plugin = Class.extend({
 
     init: function(options, element) {
@@ -42,35 +49,52 @@ var Plugin = Class.extend({
         return (typeof this.on_filter_added === 'function');
     },
 
+    // do we need to log API calls ?
+    _is_in : function (obj, arr) {
+	for(var i=0; i<arr.length; i++) {
+            if (arr[i] == obj) return true;
+	}
+    },
+    _deserves_logging: function (event) {
+	if ( ! plugin_debug )				return false;
+	else if ( plugin_debug === true)		return true;
+	else if (this._is_in (event, plugin_debug))	return true;
+	return false;
+    },
+
     _query_handler: function(prefix, event_type, data) {
         // We suppose this.query_handler_prefix has been defined if this
         // callback is triggered    
-        var fn;
+        var event, fn;
         switch(event_type) {
         case FILTER_ADDED:
-            fn = 'filter_added';
+            event = 'filter_added';
             break;
         case FILTER_REMOVED:
-            fn = 'filter_removed';
+            event = 'filter_removed';
             break;
         case CLEAR_FILTERS:
-            fn = 'filter_clear';
+            event = 'filter_clear';
             break;
         case FIELD_ADDED:
-            fn = 'field_added';
+            event = 'field_added';
             break;
         case FIELD_REMOVED:
-            fn = 'field_removed';
+            event = 'field_removed';
             break;
         case CLEAR_FIELDS:
-            fn = 'field_clear';
+            event = 'field_clear';
             break;
         default:
             return;
         } // switch
         
-        fn = 'on_' + prefix + fn;
+        fn = 'on_' + prefix + event;
         if (typeof this[fn] === 'function') {
+	    if (this._deserves_logging (event)) {
+		var classname=this.classname;
+		messages.debug("Plugin._query_handler: calling "+fn+" on "+classname);
+	    }
             // call with data as parameter
             // XXX implement anti loop
             this[fn](data);
@@ -80,29 +104,33 @@ var Plugin = Class.extend({
     _record_handler: function(prefix, event_type, record) {
         // We suppose this.query_handler_prefix has been defined if this
         // callback is triggered    
-        var fn;
+        var event, fn;
         switch(event_type) {
         case NEW_RECORD:
-            fn = 'new_record';
+            event = 'new_record';
             break;
         case CLEAR_RECORDS:
-            fn = 'clear_records';
+            event = 'clear_records';
             break;
         case IN_PROGRESS:
-            fn = 'query_in_progress';
+            event = 'query_in_progress';
             break;
         case DONE:
-            fn = 'query_done';
+            event = 'query_done';
             break;
         case FIELD_STATE_CHANGED:
-            fn = 'field_state_changed';
+            event = 'field_state_changed';
             break;
         default:
             return;
         } // switch
         
-        fn = 'on_' + prefix + fn;
+        fn = 'on_' + prefix + event;
         if (typeof this[fn] === 'function') {
+	    if (this._deserves_logging (event)) {
+		var classname=this.classname;
+		messages.debug("Plugin._record_handler: calling "+fn+" on "+classname);
+	    }
             // call with data as parameter
             // XXX implement anti loop
             this[fn](record);

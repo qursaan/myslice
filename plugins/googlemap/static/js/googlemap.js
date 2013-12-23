@@ -14,6 +14,7 @@
     var debug=false;
     debug=true;
 
+    // this now should be obsolete, rather use plugin_debug in plugin.js
     // more on a on-per-record basis
     var debug_deep=false;
     // debug_deep=true;
@@ -21,6 +22,7 @@
     var GoogleMap = Plugin.extend({
 
         init: function(options, element) {
+	    this.classname="googlemap";
             this._super(options, element);
 
             /* Member variables */

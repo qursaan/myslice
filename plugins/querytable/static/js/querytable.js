@@ -11,8 +11,8 @@
 
     var QueryTable = Plugin.extend({
 
-        init: function(options, element) 
-        {
+        init: function(options, element) {
+	    this.classname="querytable";
             this._super(options, element);
 
             /* Member variables */

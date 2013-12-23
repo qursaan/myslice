@@ -12,6 +12,7 @@
     var SimpleList = Plugin.extend ({
 
 	init: function (options, element) {
+	    this.classname=options.classname;
 	    this._super (options, element);
 	    this.buffered_records=[];
             this.listen_query(options.query_uuid);
@@ -37,12 +38,11 @@
 	    var self=this;
             var $plugindiv = this.elmt();
             var options = this.options;
-	    var classname=options.classname;
             // locate the <table> element; with datatables in the way,
             // this might not be a direct son of the div-plugin
-            var $table = $plugindiv.find("table."+classname).first();
+            var $table = $plugindiv.find("table."+this.classname).first();
             // also we may or may not have a header
-            var $tbody = $table.find("tbody."+classname).first();
+            var $tbody = $table.find("tbody."+this.classname).first();
             var use_datatables = $table.hasClass("with-datatables");
 	    var rows=self.buffered_records;
 	    self.buffered_records=[];
@@ -69,7 +69,7 @@
 	    if (use_datatables)	
 		this._datatables_update_table($table, $tbody, rows, options.key);
 	    else
-  		this._regular_update_table($table, $tbody, rows, options.key, classname);
+  		this._regular_update_table($table, $tbody, rows, options.key, this.classname);
 	},
 
 	_regular_set_message: function ($table, $tbody, message) {
@@ -78,7 +78,8 @@
 
 	_regular_update_table: function ($table, $tbody, rows, key, classname) {
             if (debug)
-		messages.debug('regular_update_table ' + rows.length + " rows" + " key=" + key + " classname=" + classname);
+		messages.debug('regular_update_table ' + rows.length + " rows" + 
+			       " key=" + key + " classname=" + this.classname);
 	    var self=this;
 	    var html=$.map(rows, function (row) {
 		var value = row;
@@ -91,10 +92,10 @@
 		});
 		if ($.isArray(value)) {
                     return $.map(value, function(val, i) { 
-			return self._html_row ( self._cell (key, val), classname); 
+			return self._html_row ( self._cell (key, val), this.classname); 
 		    });
 		} else {
-                    return self._html_row ( self._cell (key, value), classname);
+                    return self._html_row ( self._cell (key, value), this.classname);
 		}
             }).join();
     	    $tbody.html(html);

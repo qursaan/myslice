@@ -10,6 +10,7 @@
     var TopmenuValidation = Plugin.extend({
 
         init: function(options, element) {
+	    this.classname="topmenuvalidation";
             this._super(options, element);
             this.listen_query(options.query_uuid);
 	    this.triggered=false;

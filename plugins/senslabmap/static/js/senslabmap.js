@@ -1,6 +1,7 @@
 (function($){
   var SensLabMap = Plugin.extend({
     init: function(options, element) {
+	this.classname="senslabmap";
       this._super(options, element);
       
       this.elmt().on('show', this, this.on_show);

@@ -38,6 +38,7 @@
     var QueryGrid = Plugin.extend({
 
         init: function(options, element) {
+	    this.classname="querygrid";
             this._super(options, element);
 
             /* Member variables */
