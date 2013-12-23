@@ -211,11 +211,29 @@ def account_process(request):
 
     for account_detail in account_details:
         for platform_detail in platform_details:
+            # Add reference account to the platforms
+            if 'add_'+platform_detail['platform'] in request.POST:
+                platform_id = platform_detail['platform_id']
+                user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+                manifold_add_account(request,user_params)
+                messages.info(request, 'Reference Account is added to the selected platform successfully!')
+                return HttpResponseRedirect("/portal/account/")
+
+            # Delete reference account from the platforms
+            if 'delete_'+platform_detail['platform'] in request.POST:
+                platform_id = platform_detail['platform_id']
+                user_params = {'user_id':user_id}
+                manifold_delete_account(request,platform_id,user_params)
+                messages.info(request, 'Reference Account is removed from the selected platform')
+                return HttpResponseRedirect("/portal/account/")
+
             if platform_detail['platform_id'] == account_detail['platform_id']:
                 if 'myslice' in platform_detail['platform']:
                     account_config = json.loads(account_detail['config'])
                     acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
                     acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                
+
                     
     
     # adding the slices and corresponding credentials to list
@@ -225,7 +243,7 @@ def account_process(request):
         for key, value in acc_slice_cred.iteritems():
             slice_list.append(key)       
             slice_cred.append(value)
-        # special case: download each slice credentials separately -- too complicated
+        # special case: download each slice credentials separately 
         for i in range(0, len(slice_list)):
             if 'dl_'+slice_list[i] in request.POST:
                 slice_detail = "Slice name: " + slice_list[i] +"\nSlice Credentials: \n"+ slice_cred[i]
@@ -240,7 +258,7 @@ def account_process(request):
         for key, value in acc_auth_cred.iteritems():
             auth_list.append(key)       
             auth_cred.append(value)
-        # special case: download each slice credentials separately -- too complicated
+        # special case: download each slice credentials separately
         for i in range(0, len(auth_list)):
             if 'dl_'+auth_list[i] in request.POST:
                 auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
@@ -437,102 +455,6 @@ def account_process(request):
             messages.error(request, 'Download error: User credential  is not stored in the server')
             return HttpResponseRedirect("/portal/account/")
         
-    # add reference platforms  
-    elif 'add_fuseco' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "fuseco":
-                platform_id = platform_detail['platform_id']
-
-        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
-        manifold_add_account(request,user_params)
-
-        messages.info(request, 'Reference Account added on Fuseco platform. You have now access to Fuseco resources.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'add_ple' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "ple":
-                platform_id = platform_detail['platform_id']
-        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
-        manifold_add_account(request,user_params)
-        messages.info(request, 'Reference Account added on PLE platform. You have now access to PLE resources.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'add_omf' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "omf":
-                platform_id = platform_detail['platform_id']
-        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
-        manifold_add_account(request,user_params)
-        messages.info(request, 'Reference Account added on OMF:Nitos platform. You have now access to OMF:Nitos resources.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'add_wilab' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "wilab":
-                platform_id = platform_detail['platform_id']
-        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
-        manifold_add_account(request,user_params)
-        messages.info(request, 'Reference Account added on Wilab platform. You have now access to Wilab resources.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'iotlab' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "iotlab":
-                platform_id = platform_detail['platform_id']
-        user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
-        manifold_add_account(request,user_params)
-        messages.info(request, 'Reference Account added on IOTLab platform. You have now access to IOTLab resources.')
-        return HttpResponseRedirect("/portal/account/")
-        
-    # delete reference platforms  
-    elif 'delete_fuseco' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "fuseco":
-                platform_id = platform_detail['platform_id']
-        user_params = {'user_id':user_id}
-        manifold_delete_account(request,platform_id,user_params)
-        messages.info(request, 'Reference Account is removed from Fuseco platform. You have no access to Fuseco resources anymore.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'delete_ple' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "ple":
-                platform_id = platform_detail['platform_id']
-        user_params = {'user_id':user_id}
-        manifold_delete_account(request,platform_id,user_params)
-        messages.info(request, 'Reference Account is removed from PLE platform. You have no access to PLE resources anymore.')
-        return HttpResponseRedirect("/portal/account/")
-    
-    elif 'delete_omf' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "omf":
-                platform_id = platform_detail['platform_id']
-        user_params = {'user_id':user_id}
-        manifold_delete_account(request,platform_id,user_params)
-        messages.info(request, 'Reference Account is removed from OMF:Nitos platform. You have no access to OMF:Nitos resources anymore.')
-        return HttpResponseRedirect("/portal/account/")
-    
-    elif 'delete_wilab' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "wilab":
-                platform_id = platform_detail['platform_id']
-        user_params = {'user_id':user_id}
-        manifold_delete_account(request,platform_id,user_params)
-        query = Query.delete('local:account').filter_by('platform_id','==',platform_id)
-        results = execute_query(request,query)
-        messages.info(request, 'Reference Account is removed from Wilab platform. You have no access to Wilab resources anymore.')
-        return HttpResponseRedirect("/portal/account/")
-
-    elif 'delete_iotlab' in request.POST:
-        for platform_detail in platform_details:
-            if platform_detail['platform'] == "iotlab":
-                platform_id = platform_detail['platform_id']
-        user_params = {'user_id':user_id}
-        manifold_delete_account(request,platform_id,user_params)
-        messages.info(request, 'Reference Account is removed from IOTLab platform. You have no access to IOTLab resources anymore.')
-        return HttpResponseRedirect("/portal/account/")
-
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")
