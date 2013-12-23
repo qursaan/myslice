@@ -122,6 +122,14 @@
 						</button>
 	      				<button class="btn btn-danger btn-xs" id="delete" name="delete" type="submit" title="Delete your private key">Delete </button>
 	    			</td>
+				  {%else%}
+					<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
+ 					<td class="value">********<a href="#">
+     					<button type="submit" name="dl_pkey" class="btn btn-default btn-xs disabled" title="Download your privaye key" id="dl_pkey">
+        					<span class="glyphicon glyphicon-download"></span> Download 
+     					</button>
+     				<button class="btn btn-danger btn-xs disabled" id="delete" name="delete" type="submit" title="Delete your private key">Delete </button>
+					</td>
 				 {%endif%}		
 	  			</tr>
 	  			<tr class="odd">
