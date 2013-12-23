@@ -53,6 +53,9 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
     cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
+class PassResetForm(forms.Form):
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
+
 class SliceRequestForm(forms.Form):
 #    slice_name = forms.CharField()
 #    authority_hrn = forms.ChoiceField(choices=[(1, 'un')])

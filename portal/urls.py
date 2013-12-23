@@ -32,6 +32,7 @@ from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
 from portal.sliceview           import SliceView
+from portal.passresetview       import PassResetView
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
@@ -65,6 +66,7 @@ urlpatterns = patterns('',
     url(r'^account/account_process/?$', account_process),
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
+    url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
     # Validate pending requests
