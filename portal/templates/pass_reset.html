@@ -14,7 +14,7 @@
 <!-- no hint for this form, moreover we need more space to write stuff down
      so we use a 3-6-3 layout -->
 <div class='well'>
-  <form class="cmxform form-horizontal" id="commentForm" action="#" method="post" role="form">{% csrf_token %}
+  <form class="cmxform form-horizontal" id="commentForm" action="" method="post" role="form">{% csrf_token %}
   <fieldset>
     {% for field in form %}
     <div class="form-group">
@@ -22,7 +22,7 @@
       <div class="col-xs-6"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
     </div>
     {% endfor %}
-    <button class="submit btn btn-default col-xs-12" type="submit">Reset Password</button>
+    <button class="submit btn btn-default col-xs-12" type="submit">Reset My Password</button>
   </fieldset>
   </form>
 </div>
