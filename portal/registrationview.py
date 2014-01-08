@@ -106,6 +106,8 @@ class RegistrationView (FreeAccessView):
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')
                 #keypair = ''.join(keypair.split())
+                #for sending email: removing existing double qoute 
+                public_key = public_key.replace('"', '');
             else: 
                 up_file = request.FILES['user_public_key']
                 file_content =  up_file.read()
@@ -120,6 +122,7 @@ class RegistrationView (FreeAccessView):
                     auth_type = 'user'
                     # for sending email
                     public_key = file_content
+                    public_key = ''.join(public_key.split()) 
                 else:
                     errors.append('Please upload a valid RSA public key [.txt or .pub].')
 
@@ -155,7 +158,7 @@ class RegistrationView (FreeAccessView):
                     'authority_hrn' : reg_auth,
                     'email'         : reg_email,
                     'user_hrn'      : user_hrn,
-                    'keypair'       : 'Public Key :' + public_key,
+                    'keypair'       : 'Public Key: ' + public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
                 recipients = authority_get_pi_emails(request,reg_auth)
