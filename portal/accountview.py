@@ -74,7 +74,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         pub_key_list = []
           
         for platform_detail in platform_details:
-            if 'sfa' in platform_detail['gateway_type'] and platform_detail['disabled']==0:
+            if 'sfa' in platform_detail['gateway_type']:
                 total_platform = platform_detail['platform']
                 total_platform_list.append(total_platform)
                 
@@ -285,7 +285,7 @@ def account_process(request):
                 user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
                 user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
-        manifold_update_user(request,user_params)
+        manifold_update_user(request, request.user.email,user_params)
         # this will be depricated, we will show the success msg in same page
         # Redirect to same page with success message
         messages.success(request, 'Sucess: First Name and Last Name Updated.')
@@ -298,7 +298,7 @@ def account_process(request):
             user_pass['password'] = edited_password
         #updating password in local:user
         user_params = { 'password': user_pass['password']}
-        manifold_update_user(request,user_params)
+        manifold_update_user(request,request.user.email,user_params)
 #        return HttpResponse('Success: Password Changed!!')
         messages.success(request, 'Sucess: Password Updated.')
         return HttpResponseRedirect("/portal/account/")
