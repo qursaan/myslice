@@ -57,6 +57,18 @@ EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 
+# use the email for debugging purpose
+# turn on debugging: 
+# python -m smtpd -n -c DebuggingServer localhost:1025
+
+if DEBUG:
+    EMAIL_HOST = 'localhost'
+    EMAIL_PORT = 1025
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_USE_TLS = False
+    DEFAULT_FROM_EMAIL = 'testing@example.com'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -198,7 +210,7 @@ INSTALLED_APPS = [
     # managing database migrations
     'south', 
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
@@ -239,7 +251,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend', )
+AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend','django.contrib.auth.backends.ModelBackend' )
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
