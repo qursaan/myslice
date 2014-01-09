@@ -37,7 +37,7 @@ from portal.passresetview       import PassResetView
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
 from portal.views               import ValidatePendingView
-
+from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -66,7 +66,7 @@ urlpatterns = patterns('',
     url(r'^account/account_process/?$', account_process),
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
-    url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
+    #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
     # Validate pending requests
@@ -82,6 +82,18 @@ urlpatterns = patterns('',
     #url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
     # Slice confirmation
     #url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),
+    url(r'^pass_reset/$', 
+        'portal.django_passresetview.password_reset', 
+        {'post_reset_redirect' : '/portal/password/reset/done/'}),
+    (r'^password/reset/done/$',
+        'portal.django_passresetview.password_reset_done'),
+    (r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 
+        'portal.django_passresetview.password_reset_confirm', 
+        {'post_reset_redirect' : '/portal/password/done/'}),
+    (r'^password/done/$', 
+        'portal.django_passresetview.password_reset_complete'),
+    # ...
+
 )
 # (r'^accounts/', include('registration.backends.default.urls')),
 
@@ -89,4 +101,4 @@ urlpatterns = patterns('',
 # DEPRECATED #    url(r'^$', views.index, name='index'),
 # DEPRECATED #    url(r"^registerwizard/(?P<step>[-\w]+)/$", register_wizard,
 # DEPRECATED #        name="register_wizard_step"),
-# DEPRECATED #    url(r"^registerwizard/$", register_wizard, name="register_wizard")
+# DEPRECATED #    url(r"^registerwizard/$", regster_wizard, name="register_wizard")
