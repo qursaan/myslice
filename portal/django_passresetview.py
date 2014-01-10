@@ -1,3 +1,47 @@
+# -*- coding: utf-8 -*-
+#
+# portal/views.py: views for the portal application
+# This file is part of the Manifold project.
+#
+# Author:
+#   Mohammed Yasin Rahman <mohammed-yasin.rahman@lip6.fr>
+# Copyright 2014, UPMC Sorbonne Universités / LIP6
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 3, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#   
+# You should have received a copy of the GNU General Public License along with
+# this program; see the file COPYING.  If not, write to the Free Software
+# Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+
+
+
+"""
+View Description:
+
+Allows a user to reset their password by generating a one-time use link that can be used to reset the password, and sending that link to the user's 
+registered email address.
+
+If the email address provided does not exist in the system, this view won't send an email, but the user won't receive any error message either. 
+This prevents information leaking to potential attackers. If you want to provide an error message in this case, you can subclass PasswordResetForm 
+and use the password_reset_form argument.
+
+Users flagged with an unusable password (see set_unusable_password() aren't allowed to request a password reset to prevent misuse when using an external 
+authentication source like LDAP. Note that they won't receive any error message since this would expose their account's existence but no mail will be sent either.
+
+More Detail: https://docs.djangoproject.com/en/dev/topics/auth/default/#topics-auth-creating-users
+"""
+
+
+
 try:
     from urllib.parse import urlparse, urlunparse
 except ImportError:     # Python 2
