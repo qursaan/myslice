@@ -20,6 +20,8 @@ $ apt-get install python-django-south
 
 $ apt-get install python-django-south
 * init django
+** when django prompts for creating an admin account, create it and 
+** keep the username and password safe
 $ ./manage.py syncdb
 $ ./manage.py migrate
 

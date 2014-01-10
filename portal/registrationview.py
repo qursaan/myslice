@@ -2,7 +2,7 @@ import os.path, re
 import json
 
 from django.core.mail           import send_mail
-
+from django.contrib.auth.models import User
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
@@ -108,6 +108,8 @@ class RegistrationView (FreeAccessView):
                 #keypair = re.sub("\n", "\\n", keypair)
                 #keypair = keypair.rstrip('\r\n')
                 #keypair = ''.join(keypair.split())
+                #for sending email: removing existing double qoute 
+                public_key = public_key.replace('"', '');
             else: 
                 up_file = request.FILES['user_public_key']
                 file_content =  up_file.read()
@@ -122,6 +124,7 @@ class RegistrationView (FreeAccessView):
                     auth_type = 'user'
                     # for sending email
                     public_key = file_content
+                    public_key = ''.join(public_key.split()) 
                 else:
                     errors.append('Please upload a valid RSA public key [.txt or .pub].')
 
@@ -141,6 +144,8 @@ class RegistrationView (FreeAccessView):
                     keypair       = keypair,
                 )
                 b.save()
+                # saves the user to django auth_user table [needed for password reset]
+                user = User.objects.create_user(reg_fname, reg_email, request.POST['password'])
                 #creating user to manifold local:user
                 config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
                 user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
@@ -157,7 +162,7 @@ class RegistrationView (FreeAccessView):
                     'authority_hrn' : reg_auth,
                     'email'         : reg_email,
                     'user_hrn'      : user_hrn,
-                    'keypair'       : 'Public Key :' + public_key,
+                    'keypair'       : 'Public Key: ' + public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
                 recipients = authority_get_pi_emails(request,reg_auth)

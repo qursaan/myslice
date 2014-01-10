@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.conf      import settings
+from django.contrib import admin
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -29,7 +30,7 @@ the_after_login_view=dashboard_view
 # where to redirect when login is required
 # might need another one ?
 the_login_view=home_view
-
+admin.autodiscover()
 urls = [
     '',
     # Examples:
@@ -38,7 +39,7 @@ urls = [
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+     url(r'^admin/', include(admin.site.urls)),
     #
     # default / view
     (r'^/?$', the_default_view),

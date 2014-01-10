@@ -60,10 +60,10 @@ def manifold_add_user(request, user_params):
     result, = results
     return result['email']
 
-def manifold_update_user(request, user_params):
+def manifold_update_user(request, email, user_params):
     # user_params: password, config e.g., 
-    query = Query.update('local:user').filter_by('email', '==', request.user.email).set(user_params).select('email')
-    results = execute_query(request,query)
+    query = Query.update('local:user').filter_by('email', '==', email).set(user_params).select('email')
+    results = execute_admin_query(request,query)
     # NOTE: results remains empty and goes to Exception. However, it updates the manifold DB.
     # That's why I commented the exception part. -- Yasin 
     #if not results:
