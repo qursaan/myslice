@@ -2,7 +2,7 @@ import os.path, re
 import json
 
 from django.core.mail           import send_mail
-
+from django.contrib.auth.models import User
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
@@ -142,6 +142,8 @@ class RegistrationView (FreeAccessView):
                     keypair       = keypair,
                 )
                 b.save()
+                # saves the user to django auth_user table [needed for password reset]
+                user = User.objects.create_user(reg_fname, reg_email, request.POST['password'])
                 #creating user to manifold local:user
                 config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
                 user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
