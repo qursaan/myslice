@@ -45,12 +45,14 @@ class RegistrationView (FreeAccessView):
             print "FIREXP ENABLED"
 
         authorities = execute_admin_query(request, authorities_query)
+        authorities = sorted(authorities)
         # xxx tocheck - if authorities is empty, it's no use anyway
         # (users won't be able to validate the form anyway)
 
         page = Page(request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
+        page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         print 'registration view, method',method
 

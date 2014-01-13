@@ -26,8 +26,7 @@ jQuery(document).ready(function(){
             jQuery("#upload_key").hide();
         }
     });
-
-});
+ });
 
 jQuery(function() {
     var availableTags = [
