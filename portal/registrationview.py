@@ -143,7 +143,7 @@ class RegistrationView (FreeAccessView):
                 )
                 b.save()
                 # saves the user to django auth_user table [needed for password reset]
-                user = User.objects.create_user(reg_fname, reg_email, request.POST['password'])
+                user = User.objects.create_user(reg_email, reg_email, request.POST['password'])
                 #creating user to manifold local:user
                 config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
                 user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
