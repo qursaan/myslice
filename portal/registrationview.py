@@ -67,7 +67,7 @@ class RegistrationView (FreeAccessView):
             reg_lname  = request.POST.get('lastname', '')
             #reg_aff   = request.POST.get('affiliation','')
             reg_auth   = request.POST.get('authority_hrn', '')
-            reg_login  = request.POST.get('login', '')
+            #reg_login  = request.POST.get('login', '')
             reg_email  = request.POST.get('email','').lower()
             #prepare user_hrn 
             split_email = reg_email.split("@")[0] 
@@ -138,7 +138,7 @@ class RegistrationView (FreeAccessView):
                     last_name     = reg_lname, 
                     #affiliation  = reg_aff,
                     authority_hrn = reg_auth,
-                    login         = reg_login,
+                    #login         = reg_login,
                     email         = reg_email, 
                     password      = request.POST['password'],
                     keypair       = keypair,

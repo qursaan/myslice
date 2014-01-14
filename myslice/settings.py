@@ -61,13 +61,13 @@ EMAIL_USE_TLS = False
 # turn on debugging: 
 # python -m smtpd -n -c DebuggingServer localhost:1025
 
-if DEBUG:
-    EMAIL_HOST = 'localhost'
-    EMAIL_PORT = 1025
-    EMAIL_HOST_USER = ''
-    EMAIL_HOST_PASSWORD = ''
-    EMAIL_USE_TLS = False
-    DEFAULT_FROM_EMAIL = 'testing@example.com'
+#if DEBUG:
+#    EMAIL_HOST = 'localhost'
+#    EMAIL_PORT = 1025
+#    EMAIL_HOST_USER = ''
+#    EMAIL_HOST_PASSWORD = ''
+#    EMAIL_USE_TLS = False
+#    DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 DATABASES = {
     'default': {
