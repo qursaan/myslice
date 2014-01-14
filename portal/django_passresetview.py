@@ -99,8 +99,8 @@ from portal.actions             import manifold_update_user
 
 @csrf_protect
 def password_reset(request, is_admin_site=False,
-                   template_name='registration/password_reset_form.html',
-                   email_template_name='registration/password_reset_email.html',
+                   template_name='password_reset_form.html',
+                   email_template_name='password_reset_email.html',
                    subject_template_name='registration/password_reset_subject.txt',
                    password_reset_form=PasswordResetForm,
                    token_generator=default_token_generator,
@@ -126,7 +126,7 @@ def password_reset(request, is_admin_site=False,
                     
             if flag == 0:
                 messages.error(request, 'Sorry, this email is not registered.')
-                return render(request, 'registration/password_reset_form.html', {
+                return render(request, 'password_reset_form.html', {
                     'form': form,
                     })
             ### end of email check in manifold  ### 
@@ -155,7 +155,7 @@ def password_reset(request, is_admin_site=False,
 
 
 def password_reset_done(request,
-                        template_name='registration/password_reset_done.html',
+                        template_name='password_reset_done.html',
                         current_app=None, extra_context=None):
     context = {}
     if extra_context is not None:
@@ -168,7 +168,7 @@ def password_reset_done(request,
 @sensitive_post_parameters()
 @never_cache
 def password_reset_confirm(request, uidb36=None, token=None,
-                           template_name='registration/password_reset_confirm.html',
+                           template_name='password_reset_confirm.html',
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
                            post_reset_redirect=None,
@@ -225,7 +225,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
 
 
 def password_reset_complete(request,
-                            template_name='registration/password_reset_complete.html',
+                            template_name='password_reset_complete.html',
                             current_app=None, extra_context=None):
     context = {
         'login_url': resolve_url(settings.LOGIN_URL)
