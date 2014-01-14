@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
+from django.contrib.auth        import get_user_model
 
 from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
@@ -73,18 +74,22 @@ class RegistrationView (FreeAccessView):
             split_email = reg_email.split("@")[0] 
             split_email = split_email.replace(".", "_")
             user_hrn = reg_auth + '.' + split_email
+            
+            UserModel = get_user_model()
 
             #POST value validation  
             if (re.search(r'^[\w+\s.@+-]+$', reg_fname)==None):
                 errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
                 errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            # XXX validate authority hrn !!
+            # checking in django_db !!
             if PendingUser.objects.filter(email__iexact=reg_email):
                 errors.append('Email is pending for validation. Please provide a new email address.')
+            if UserModel._default_manager.filter(email__iexact=reg_email): 
+                errors.append('This email is not usable. Please contact the administrator or try with another email.')
             for user_detail in user_details:
                 if user_detail['email']==reg_email:
-                    errors.append('Email already exists in Manifold. Please provide a new email address.')
+                    errors.append('Email already registered in Manifold. Please provide a new email address.')
 
 # XXX TODO: Factorize with portal/accountview.py
             if 'generate' in request.POST['question']:
@@ -162,7 +167,7 @@ class RegistrationView (FreeAccessView):
                     'authority_hrn' : reg_auth,
                     'email'         : reg_email,
                     'user_hrn'      : user_hrn,
-                    'keypair'       : 'Public Key: ' + public_key,
+                    'public_key'    : public_key,
                     'cc_myself'     : True # form.cleaned_data['cc_myself']
                     }
                 recipients = authority_get_pi_emails(request,reg_auth)
@@ -171,7 +176,7 @@ class RegistrationView (FreeAccessView):
                     recipients.append(ctx['email'])
 
                 msg = render_to_string('user_request_email.txt', ctx)
-                send_mail("Onelab New User request for %s submitted"%reg_email, msg, reg_email, recipients)
+                send_mail("Onelab New User request for %s submitted"%reg_email, msg, 'support@myslice.info', recipients)
                 return render(request, 'user_register_complete.html') 
 
         template_env = {
