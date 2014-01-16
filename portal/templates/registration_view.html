@@ -114,9 +114,18 @@ jQuery(document).ready(function(){
         {value:"",label:"No authority found !!!"}
     {% endif %}
     ];
-    $( "#authority_hrn" ).autocomplete({
+    jQuery( "#authority_hrn" ).autocomplete({
       source: availableTags,
-      select: function( event, ui ) {console.log(jQuery(this))}
+      minLength: 0,
+      change: function (event, ui) {
+          if(!ui.item){
+              //http://api.jqueryui.com/autocomplete/#event-change -
+              // The item selected from the menu, if any. Otherwise the property is null
+              //so clear the item for force selection
+              jQuery("#authority_hrn").val("");
+          }
+      }
+      //select: function( event, ui ) {console.log(jQuery(this))}
     });
 });
 </script>
