@@ -1,9 +1,8 @@
 NEW USER REQUEST
 
-first_name   : {{first_name}}
-last_name    : {{last_name}} 
-authority_hrn: {{authority_hrn}}
-keypair      : {{keypair}}
+First Name   : {{first_name}}
+Last Name    : {{last_name}} 
+Authority hrn: {{authority_hrn}}
+Public key   : {{public_key}}
 email        : {{email}}
-cc myself    : {{cc_myself}}
 

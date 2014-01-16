@@ -1,0 +1,99 @@
+{% extends "layout-unfold1.html" %}
+{% load i18n %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block unfold_main %}
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+<!-- xxx ideally only onelab.css but ... xxx -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
+
+<div class="onelab-title well-lg">
+  <h2>Request a Slice</h2>
+</div>
+
+{% if errors %}
+<ul>
+  {% for error in errors %}
+  <li>{{ error }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<div class='well'>
+  <form id="commentForm" class="form-horizontal" action="" method="post" role="form">{% csrf_token %}
+  <fieldset>
+
+   <div class="form-group">
+     <label for="email" class="col-xs-2 control-label">Experimenter</label>
+     <div class="col-xs-4">
+        <label class="col-xs-2 control-label" style="height:34px;">{{ email }}</label>
+     </div>
+     <div class="col-xs-6"> <p class="form-hint">Experimenter requesting a Slice</p> </div>
+   </div>
+
+   <div class="form-group">
+     <label for="slice_name" class="col-xs-2 control-label">Slice Name</label>
+     <div class="col-xs-4">
+        <input type="text" name="slice_name" class="form-control" minlength="2" value="{{ slice_name }}" placeholder="Slice Name" required />
+     </div>
+     <div class="col-xs-6"> <p class="form-hint">The name of the slice you wish to create</p> </div>
+   </div>
+
+   <div class="form-group">
+     <label for="authority_hrn" class="col-xs-2 control-label">Authority</label>
+     <div class="col-xs-4">
+       <div class="ui-widget">
+           <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" placeholder="Authority" required />
+       </div>
+    </div>
+     <div class="col-xs-6"><p class="form-hint">An authority responsible for vetting your slice</p></div>
+   </div>
+
+   <div class="form-group">
+     <label for="number_of_nodes" class="col-xs-2 control-label">Number of nodes</label>
+     <div class="col-xs-4">
+       <div class="ui-widget">
+           <input id="number_of_nodes" name="number_of_nodes" class="form-control" value="{{ number_of_nodes }}" />
+       </div>
+    </div>
+     <div class="col-xs-6"><p class="form-hint">Number of nodes you expect to request (informative)</p></div>
+   </div>
+
+   <div class="form-group">
+     <label for="purpose" class="col-xs-2 control-label">Experiment purpose</label>
+     <div class="col-xs-4">
+       <div class="ui-widget">
+           <textarea id="purpose" name="purpose" class="form-control" style="height:110px;" placeholder="Purpose" required>{{ purpose }}</textarea>
+       </div>
+    </div>
+     <div class="col-xs-6"><p class="form-hint">Purpose of your experiment (informative)</p></div>
+   </div>
+
+   <button class="submit btn btn-default col-xs-12" type="submit">Request Slice</button>
+  </fieldset>
+  </form>
+</div>
+
+<script>
+jQuery(document).ready(function(){
+    var availableTags = [
+    {% if authorities %}
+        {% for authority in authorities %}
+        {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
+        {% endfor %}    
+    {% else %}
+        {value:"",label:"No authority found !!!"}
+    {% endif %}
+    ];
+    $( "#authority_hrn" ).autocomplete({
+      source: availableTags,
+      select: function( event, ui ) {console.log(jQuery(this))}
+    });
+});
+</script>
+{% endblock %}
+
