@@ -2,6 +2,8 @@ from django.template.loader      import render_to_string
 from django.shortcuts            import render
 from django.core.mail            import send_mail
 
+from unfold.page                import Page
+
 from manifold.core.query         import Query
 from manifold.manifoldapi        import execute_admin_query, execute_query
 
@@ -9,77 +11,92 @@ from portal.models               import PendingSlice
 from portal.actions              import authority_get_pi_emails
 from portal.forms                import SliceRequestForm
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
-from ui.topmenu                  import topmenu_items, the_user
+from ui.topmenu                  import topmenu_items_live, the_user
 
 class SliceRequestView (LoginRequiredAutoLogoutView):
-
-    def authority_hrn_initial (self, request):
-        # Using cache manifold-tables to get the list of authorities
-        authorities_query = Query.get('authority').\
-            select('name', 'authority_hrn')
-        
-        #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple-onelab').filter_by('disabled', '==', 'False')
-        #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
-        #if onelab_enabled:
-        #authorities_query = Query.get('ple:authority').select('name', 'authority_hrn').filter_by('authority_hrn', 'included', ['ple.inria', 'ple.upmc', 'ple.ibbtple','ple.nitos'])
-        # Now using Cache
-
-        authorities = execute_admin_query(request, authorities_query)
-        authorities = sorted(authorities)
-        
-        authority_hrn_tuples = [ (authority['authority_hrn'], authority['name'] if authority['name'] else authority['authority_hrn'],) for authority in authorities ]
-        print "authority_hrn_tuples=", authority_hrn_tuples
-        return {'authority_hrn': authority_hrn_tuples}
+    def __init__ (self):
+        self.user_email = ''
+        self.errors = []
 
     # because we inherit LoginRequiredAutoLogoutView that is implemented by redefining 'dispatch'
     # we cannot redefine dispatch here, or we'd lose LoginRequired and AutoLogout behaviours
     def post (self, request):
-        
-        # The form has been submitted
-        form = SliceRequestForm(request.POST, initial=self.authority_hrn_initial(request)) 
-
-        if form.is_valid():
-            slice_name      = form.cleaned_data['slice_name']
-            authority_hrn   = form.cleaned_data['authority_hrn']
-            number_of_nodes = form.cleaned_data['number_of_nodes']
-            type_of_nodes   = form.cleaned_data['type_of_nodes']
-            purpose         = form.cleaned_data['purpose']
-            
-            s = PendingSlice(
-                slice_name      = slice_name,
-                authority_hrn   = authority_hrn,
-                number_of_nodes = number_of_nodes,
-                type_of_nodes   = type_of_nodes,
-                purpose         = purpose
-            )
-            s.save()
-
-            # All validation rules pass; process data in form.cleaned_data
-            # slice_name, number_of_nodes, type_of_nodes, purpose
-            email = form.cleaned_data['email'] # email of the sender
-            cc_myself = form.cleaned_data['cc_myself']
-
-            # The recipients are the PI of the authority
-            recipients = authority_get_pi_emails(request, authority_hrn)
-
-            if cc_myself:
-                recipients.append(email)
-            msg = render_to_string('slice-request-email.txt', form.cleaned_data)
-            print "email, msg, email, recipients", email , msg, email, recipients 
-            send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
-
-            return render(request,'slice-request-ack-view.html') # Redirect after POST
-        else:
-            return self._display (request, form)
+        return self.get_or_post (request, 'POST')
 
     def get (self, request):
-        return self._display (request, SliceRequestForm(initial=self.authority_hrn_initial(request)))
+        return self.get_or_post (request, 'GET')
 
-    def _display (self, request, form):
-        return render(request, 'slice-request-view.html', {
-                'form': form,
-                'topmenu_items': topmenu_items('Request a slice', request),
-                'username': the_user (request) 
-                })
+    def get_or_post  (self, request, method):
+        # Using cache manifold-tables to get the list of authorities faster
+        authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        authorities = execute_admin_query(request, authorities_query)
+        authorities = sorted(authorities)
 
+        user_query  = Query().get('local:user').select('email')
+        user_email = execute_query(self.request, user_query)
+        self.user_email = user_email[0].get('email')
+
+        page = Page(request)
+        page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+
+        if method == 'POST':
+            self.errors = []
+    
+            # The form has been submitted
+            slice_name = request.POST.get('slice_name', '')
+            authority_hrn = request.POST.get('authority_hrn', '')
+            number_of_nodes = request.POST.get('number_of_nodes', '')
+            purpose = request.POST.get('purpose', '')
+            email = self.user_email
+            cc_myself = True
+            
+            if (authority_hrn is None or authority_hrn == ''):
+                self.errors.append('Please, select an authority')
+            # What kind of slice name is valid?
+            if (slice_name is None or slice_name == ''):
+                self.errors.append('Slice Name is mandatory')
+    
+            if (purpose is None or purpose == ''):
+                self.errors.append('Purpose is mandatory')
+    
+            if not self.errors:
+                ctx = {
+                    'email': email,
+                    'slice_name': slice_name,
+                    'authority_hrn': authority_hrn,
+                    'number_of_nodes': number_of_nodes,
+                    'purpose': purpose,
+                }            
+                s = PendingSlice(
+                    slice_name      = slice_name,
+                    authority_hrn   = authority_hrn,
+                    number_of_nodes = number_of_nodes,
+                    purpose         = purpose
+                )
+                s.save()
+    
+                # The recipients are the PI of the authority
+                recipients = authority_get_pi_emails(request, authority_hrn)
+    
+                if cc_myself:
+                    recipients.append(email)
+                msg = render_to_string('slice-request-email.txt', ctx)
+                #print "email, msg, email, recipients", email , msg, email, recipients 
+                send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
+    
+                return render(request,'slice-request-ack-view.html') # Redirect after POST
+     
+        template_env = {
+          'topmenu_items': topmenu_items_live('Request a slice', page),
+          'errors': self.errors,
+          'slice_name': request.POST.get('slice_name', ''),
+          'authority_hrn': request.POST.get('authority_hrn', ''),
+          'number_of_nodes': request.POST.get('number_of_nodes', ''),
+          'purpose': request.POST.get('purpose', ''),
+          'email': self.user_email,
+          'cc_myself': True,
+          'authorities': authorities,
+        }
+        template_env.update(page.prelude_env ())
+        return render(request, 'slicerequest_view.html',template_env)
 

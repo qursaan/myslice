@@ -393,7 +393,7 @@ class ValidatePendingView(FreeAccessView):
         # more general variables expected in the template
         context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items('Validation', self.request) 
+        context['topmenu_items'] = topmenu_items_live('Validation', page) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 

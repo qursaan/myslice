@@ -102,7 +102,7 @@ class RegistrationView (FreeAccessView):
 #                private_key = ''.join(private_key.split())
 #                public_key = "ssh-rsa " + public_key
                 # Saving to DB
-                keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
+                account_config = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
                 auth_type = 'managed'
                 #keypair = re.sub("\r", "", keypair)
                 #keypair = re.sub("\n", "\\n", keypair)
@@ -117,10 +117,10 @@ class RegistrationView (FreeAccessView):
                 file_extension = os.path.splitext(file_name)[1]
                 allowed_extension =  ['.pub','.txt']
                 if file_extension in allowed_extension and re.search(r'ssh-rsa',file_content):
-                    keypair = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
-                    keypair = re.sub("\r", "", keypair)
-                    keypair = re.sub("\n", "\\n",keypair)
-                    keypair = ''.join(keypair.split())
+                    account_config = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
+                    account_config = re.sub("\r", "", account_config)
+                    account_config = re.sub("\n", "\\n",account_config)
+                    account_config = ''.join(account_config.split())
                     auth_type = 'user'
                     # for sending email
                     public_key = file_content
@@ -141,19 +141,19 @@ class RegistrationView (FreeAccessView):
                     #login         = reg_login,
                     email         = reg_email, 
                     password      = request.POST['password'],
-                    keypair       = keypair,
+                    keypair       = account_config,
                 )
                 b.save()
                 # saves the user to django auth_user table [needed for password reset]
                 user = User.objects.create_user(reg_email, reg_email, request.POST['password'])
                 #creating user to manifold local:user
-                config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
-                user_params = {'email': reg_email, 'password': request.POST['password'], 'config': config}
+                user_config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
+                user_params = {'email': reg_email, 'password': request.POST['password'], 'config': user_config}
                 manifold_add_user(request,user_params)
                 #creating local:account in manifold
                 user_id = user_detail['user_id']+1 # the user_id for the newly created user in local:user
-                user_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': keypair}
-                manifold_add_account(request,user_params)
+                account_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': account_config}
+                manifold_add_account(request,account_params)
  
                 # Send email
                 ctx = {
