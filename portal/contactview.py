@@ -18,7 +18,7 @@ class ContactView (FreeAccessView):
             # Process the data in form.cleaned_data
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            affiliation = form.cleaned_data['affiliation']
+            authority = form.cleaned_data['authority']
             subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
             email = form.cleaned_data['email'] # email of the sender
@@ -29,7 +29,7 @@ class ContactView (FreeAccessView):
             if cc_myself:
                 recipients.append(email)
 
-            msg = render_to_string('slice-request-email.txt', form.cleaned_data)
+            msg = render_to_string('contact-support-email.txt', form.cleaned_data)
             send_mail("Onelab user %s submitted a query "%email, msg, email, recipients)
             return render(request,'contact_sent.html') # Redirect after POST
         else:
