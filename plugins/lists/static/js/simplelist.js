@@ -24,8 +24,11 @@
         },
 
         on_query_done: function() {
-	    this._display_table();
+	        this._display_table();
             this.unspin();
+            console.log("query simple list done");
+            console.log(this);
+            console.log(this.buffered_records);
         },
         
         on_new_record: function(record) {
@@ -36,40 +39,45 @@
 
 	_display_table: function() {
 	    var self=this;
-            var $plugindiv = this.elmt();
-            var options = this.options;
-            // locate the <table> element; with datatables in the way,
-            // this might not be a direct son of the div-plugin
-            var $table = $plugindiv.find("table."+this.classname).first();
-            // also we may or may not have a header
-            var $tbody = $table.find("tbody."+this.classname).first();
-            var use_datatables = $table.hasClass("with-datatables");
+        var $plugindiv = this.elmt();
+        var options = this.options;
+        // locate the <table> element; with datatables in the way,
+        // this might not be a direct son of the div-plugin
+        var $table = $plugindiv.find("table."+this.classname).first();
+        // also we may or may not have a header
+        var $tbody = $table.find("tbody."+this.classname).first();
+        var use_datatables = $table.hasClass("with-datatables");
 	    var rows=self.buffered_records;
 	    self.buffered_records=[];
-            if (debug) 
-		messages.debug($plugindiv.attr('id') + " udt= " + use_datatables + " rows="+rows.length);
-	
-            if (rows.length == 0) {
-		if (use_datatables)
-                    this._datatables_set_message ($table, $tbody, unfold.warning("No result"));
-		else
+        if (debug){
+		    messages.debug($plugindiv.attr('id') + " udt= " + use_datatables + " rows="+rows.length);
+	    }
+        // check if rows contains results related to the object key
+        object_key = this.options.key.split('.');
+        if (rows.length == 0 || rows[0][object_key[0]].length == 0) {
+    		if (use_datatables){
+                this._datatables_set_message ($table, $tbody, unfold.warning("No result"));
+	    	}else{
         	    this._regular_set_message ($table, $tbody, unfold.warning("No result"));
-		return;
             }
+		    return;
+        }
 
-            if (typeof rows[0].error != 'undefined') {
-		var error="ERROR: " + rows[0].error;
-		if (use_datatables) 
-                    this._datatables_set_message ($table, $tbody, unfold.error(error));
-		else
+        if (typeof rows[0].error != 'undefined') {
+		    var error="ERROR: " + rows[0].error;
+		    if (use_datatables){
+                this._datatables_set_message ($table, $tbody, unfold.error(error));
+		    }else{
         	    this._regular_set_message ($table, $tbody, unfold.error(error));
-		return;
             }
+		    return;
+        }
 
-	    if (use_datatables)	
-		this._datatables_update_table($table, $tbody, rows, options.key);
-	    else
-  		this._regular_update_table($table, $tbody, rows, options.key, this.classname);
+	    if (use_datatables){
+		    this._datatables_update_table($table, $tbody, rows, options.key);
+	    }else{
+  		    this._regular_update_table($table, $tbody, rows, options.key, this.classname);
+        }
 	},
 
 	_regular_set_message: function ($table, $tbody, message) {
