@@ -53,6 +53,7 @@ class DashboardView (LoginRequiredAutoLogoutView):
         slicelist = SliceList(
             page  = page,
             title = "slices",
+            warning_msg = "<a href='../slice_request'>Request Slice</a>",
             query = slice_query,
         )
         testbedlist = TestbedList(

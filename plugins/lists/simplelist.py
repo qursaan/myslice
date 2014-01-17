@@ -37,5 +37,5 @@ class SimpleList (Plugin) :
             reqs['js_files'].append ("js/with-datatables.js")
         return reqs
     
-    def json_settings_list (self): return ['plugin_uuid','query_uuid','key','classname']
+    def json_settings_list (self): return ['plugin_uuid','query_uuid','key','classname','warning_msg']
 

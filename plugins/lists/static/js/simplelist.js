@@ -12,10 +12,16 @@
     var SimpleList = Plugin.extend ({
 
 	init: function (options, element) {
-	    this.classname=options.classname;
+	    this.classname = options.classname;
 	    this._super (options, element);
-	    this.buffered_records=[];
-            this.listen_query(options.query_uuid);
+	    this.buffered_records = [];
+        this.listen_query(options.query_uuid);
+        /* Optional parameter warning_msg */
+        if(options.warning_msg != "unknown-setting-warning_msg"){
+            this.warning_msg = options.warning_msg;
+        }else{
+            this.warning_msg = "No Result";
+        }
 	}, 
 
         on_query_in_progress: function() {
@@ -56,9 +62,9 @@
         object_key = this.options.key.split('.');
         if (rows.length == 0 || rows[0][object_key[0]].length == 0) {
     		if (use_datatables){
-                this._datatables_set_message ($table, $tbody, unfold.warning("No result"));
+                this._datatables_set_message ($table, $tbody, unfold.warning(self.warning_msg));
 	    	}else{
-        	    this._regular_set_message ($table, $tbody, unfold.warning("No result"));
+        	    this._regular_set_message ($table, $tbody, unfold.warning(self.warning_msg));
             }
 		    return;
         }
