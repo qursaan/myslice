@@ -59,7 +59,7 @@ class ContactForm(forms.Form):
     authority = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
     subject = forms.CharField(max_length=100,widget=forms.TextInput(attrs={'class':'form-control'}))
-    message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    description = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
     cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class PassResetForm(forms.Form):

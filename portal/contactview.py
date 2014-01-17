@@ -20,7 +20,7 @@ class ContactView (FreeAccessView):
             last_name = form.cleaned_data['last_name']
             authority = form.cleaned_data['authority']
             subject = form.cleaned_data['subject']
-            message = form.cleaned_data['message']
+            description = form.cleaned_data['description']
             email = form.cleaned_data['email'] # email of the sender
             cc_myself = form.cleaned_data['cc_myself']
 
