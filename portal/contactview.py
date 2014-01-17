@@ -25,7 +25,7 @@ class ContactView (FreeAccessView):
             cc_myself = form.cleaned_data['cc_myself']
 
             #recipients = authority_get_pi_emails(authority_hrn)
-            recipients = ['yasin.upmc@gmail.com', 'thierry.parmentelat@inria.fr', ]
+            recipients = ['support@myslice.info' ]
             if cc_myself:
                 recipients.append(email)
 
