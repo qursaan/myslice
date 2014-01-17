@@ -30,7 +30,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
         # Using cache manifold-tables to get the list of authorities faster
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
-        authorities = sorted(authorities)
+        if authorities is not None:
+            authorities = sorted(authorities)
 
         user_query  = Query().get('local:user').select('email')
         user_email = execute_query(self.request, user_query)

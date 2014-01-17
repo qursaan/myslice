@@ -46,7 +46,8 @@ class RegistrationView (FreeAccessView):
             print "FIREXP ENABLED"
 
         authorities = execute_admin_query(request, authorities_query)
-        authorities = sorted(authorities)
+        if authorities is not None:
+            authorities = sorted(authorities)
         # xxx tocheck - if authorities is empty, it's no use anyway
         # (users won't be able to validate the form anyway)
 
