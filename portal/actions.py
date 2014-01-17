@@ -189,7 +189,9 @@ def portal_validate_request(wsgi_request, request_ids):
         if request['type'] == 'user':
 
             try:
-                hrn = "%s.%s" % (request['authority_hrn'], request['login'])
+                # XXX tmp user_hrn inside the keypair column of pendiguser table
+                hrn = json.loads(request['keypair'])['user_hrn']
+                #hrn = "%s.%s" % (request['authority_hrn'], request['login'])
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
