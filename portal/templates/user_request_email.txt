@@ -4,5 +4,5 @@ First Name   : {{first_name}}
 Last Name    : {{last_name}} 
 Authority hrn: {{authority_hrn}}
 Public key   : {{public_key}}
-email        : {{email}}
-
+Email        : {{email}}
+User Hrn     : {{user_hrn}}
