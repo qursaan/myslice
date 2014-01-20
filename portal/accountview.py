@@ -2,7 +2,7 @@ from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifold.manifoldapi               import execute_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -321,9 +321,13 @@ def account_process(request):
                         user_hrn = account_config.get('user_hrn','N/A')
                         keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
                         updated_config = json.dumps(account_config) 
-
+                        # updating manifold
                         user_params = { 'config': keypair, 'auth_type':'managed'}
                         manifold_update_account(request,user_params)
+                        # updating sfa
+                        public_key = public_key.replace('"', '');
+                        user_pub_key = {'keys': public_key}
+                        sfa_update_user(request, user_hrn, user_pub_key)
                         messages.success(request, 'Sucess: New Keypair Generated!')
                         return HttpResponseRedirect("/portal/account/")
         else:

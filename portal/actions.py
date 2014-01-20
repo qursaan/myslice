@@ -42,6 +42,13 @@ def sfa_add_user(request, user_params):
         raise Exception, "Could not create %s. Already exists ?" % user_params['hrn']
     return results
 
+def sfa_update_user(request, user_hrn, user_params):
+    # user_params: keys [public_key] 
+    query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
+    results = execute_query(request,query)
+    return results
+
+
 def sfa_add_slice(request, slice_params):
     query = Query.create('slice').set(slice_params).select('slice_hrn')
     results = execute_query(request, query)
