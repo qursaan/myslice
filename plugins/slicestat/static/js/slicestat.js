@@ -75,6 +75,7 @@
 		
 		on_show: function(ev) 
 		{
+            console.log('slicestat show triggered');
 			$('iframe#' + ev.target.id + '-iframe').attr('src','http://plestats.planet-lab.eu/nodes.php?slice='+ev.data.slicename+'&order='+ev.data.o);
 		},
         /* TEMPLATES */
