@@ -162,16 +162,19 @@ jQuery(document).ready(function(){
                       });
                   });
 
+
+function editAlert()
+{
+alert("You can't edit email/authority. Please contact support and specify your requirements.");
+window.location.href = "/portal/contact/";
+}
+
+
+/*
 // alert box for the "Generate new Key Pair button"
 function myFunction()
 {
 alert("You have requested to generate new key pairs. Please download and save the new keypairs after receiving the success message.");
-}
-
-function emailAlert()
-{
-alert("To edit email please contact the administratior. You will be redirected to the support page now");
-window.location.href = "/portal/contact/";
 }
 
 function affAlert()
@@ -179,7 +182,7 @@ function affAlert()
 alert("To edit affiliation please contact the administratior. You will be redirected to the support page now");
 window.location.href = "/portal/contact/";
 }
-/*
+
  // alert having ok or cancel option
 function show_confirm()
 {

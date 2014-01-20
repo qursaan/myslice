@@ -328,7 +328,7 @@ def account_process(request):
                         public_key = public_key.replace('"', '');
                         user_pub_key = {'keys': public_key}
                         sfa_update_user(request, user_hrn, user_pub_key)
-                        messages.success(request, 'Sucess: New Keypair Generated!')
+                        messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
                         return HttpResponseRedirect("/portal/account/")
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
@@ -413,6 +413,7 @@ def account_process(request):
                             user_params = { 'config': updated_config, 'auth_type':'user'}
                             manifold_update_account(request,user_params)
                             messages.success(request, 'Private Key deleted. You need to delegate credentials manually once it expires.')
+                            messages.success(request, 'Once your credentials expire, Please delegate manually using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
                             return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'Delete error: Private key is not stored in the server')

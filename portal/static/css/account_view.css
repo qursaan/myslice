@@ -262,6 +262,24 @@ table.profile button {
   margin-right: 15px;
 }
 
+#delete {
+  width: 80px;
+  vertical-align: middle;
+  float: right;
+  margin-right: 15px;
+
+}
+
+#upload_key {
+  width: 80px;
+  vertical-align: middle;
+  float: right; 
+  margin-right: 15px;
+
+}
+
+
+
 table.profile span.hide_this{ 
 	display: inline;
 	display: none;
