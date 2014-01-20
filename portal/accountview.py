@@ -436,7 +436,7 @@ def account_process(request):
                             user_pub_key = account_config.get('user_public_key','N/A')         
                             user_priv_key = account_config.get('user_private_key','N/A')
                             updated_config = '{"user_public_key":"'+ user_pub_key + '", "user_private_key":"'+ user_priv_key + '", "user_hrn":"'+ user_hrn + '"}'
-                            updated_config = ''.join(updated_config.split()) 
+                            #updated_config = ''.join(updated_config.split()) 
                             user_params = { 'config': updated_config}
                             manifold_update_account(request,user_params)
                             messages.success(request, 'All Credentials cleared')
