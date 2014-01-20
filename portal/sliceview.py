@@ -361,13 +361,14 @@ class SliceView (LoginRequiredAutoLogoutView):
         )
 
         tab_measurements = Tabs ( page=page,
-                                domid="measurements",
-                                togglable=True,
-                                toggled  = False,
-                                title="Measurements",
+                                domid = "measurements",
+                                togglable = True,
+                                toggled = 'persistent',
+                                title = "Measurements",
                                 outline_complete=True,
-                                sons=[ measurements_stats_cpu, measurements_stats_mem, measurements_stats_asb, measurements_stats_arb ],
-                                active_domid = 'measurements_stats_cpu',
+                                sons = [ measurements_stats_cpu, measurements_stats_mem, measurements_stats_asb, measurements_stats_arb ],
+                                active_domid = 'resources-stats-cpu',
+                                persistent_active = True,
                                 )
         main_stack.insert (tab_measurements)
         
