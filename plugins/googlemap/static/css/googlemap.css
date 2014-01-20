@@ -13,6 +13,9 @@ div.geo {
 p.geo {
     text-align: center;
     font-weight: bold;
+    max-height: 200px;
+    width: 200px;
+    overflow: auto;
 }
 
 ul.geo {
