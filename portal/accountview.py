@@ -86,43 +86,44 @@ class AccountView(LoginRequiredAutoLogoutView):
                     account_pub_key = account_config.get('user_public_key','N/A')
                     account_reference = account_config.get ('reference_platform','N/A')
                     # credentials
-                    acc_user_cred = account_config.get('delegated_user_credential','N/A')
-                    acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
-                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                    if 'myslice' in platform_detail['platform']:
+                        acc_user_cred = account_config.get('delegated_user_credential','N/A')
+                        acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
+                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
 
-                    if 'N/A' not in acc_user_cred:
-                        exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
-                        if exp_date:
-                            user_exp_date = exp_date.group(1)
-                            user_cred_exp_list.append(user_exp_date)
+                        if 'N/A' not in acc_user_cred:
+                            exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
+                            if exp_date:
+                                user_exp_date = exp_date.group(1)
+                                user_cred_exp_list.append(user_exp_date)
 
-                        my_users = [{'cred_exp': t[0]}
-                            for t in zip(user_cred_exp_list)]
+                            my_users = [{'cred_exp': t[0]}
+                                for t in zip(user_cred_exp_list)]
                        
 
-                    if 'N/A' not in acc_slice_cred:
-                        for key, value in acc_slice_cred.iteritems():
-                            slice_list.append(key)
-                            # get cred_exp date
-                            exp_date = re.search('<expires>(.*)</expires>', value)
-                            if exp_date:
-                                exp_date = exp_date.group(1)
-                                slice_cred_exp_list.append(exp_date)
+                        if 'N/A' not in acc_slice_cred:
+                            for key, value in acc_slice_cred.iteritems():
+                                slice_list.append(key)
+                                # get cred_exp date
+                                exp_date = re.search('<expires>(.*)</expires>', value)
+                                if exp_date:
+                                    exp_date = exp_date.group(1)
+                                    slice_cred_exp_list.append(exp_date)
 
-                        my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
-                            for t in zip(slice_list, slice_cred_exp_list)]
+                            my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
+                                for t in zip(slice_list, slice_cred_exp_list)]
 
-                    if 'N/A' not in acc_auth_cred:
-                        for key, value in acc_auth_cred.iteritems():
-                            auth_list.append(key)
-                        #get cred_exp date
-                            exp_date = re.search('<expires>(.*)</expires>', value)
-                            if exp_date:
-                                exp_date = exp_date.group(1)
-                                auth_cred_exp_list.append(exp_date)
+                        if 'N/A' not in acc_auth_cred:
+                            for key, value in acc_auth_cred.iteritems():
+                                auth_list.append(key)
+                                #get cred_exp date
+                                exp_date = re.search('<expires>(.*)</expires>', value)
+                                if exp_date:
+                                    exp_date = exp_date.group(1)
+                                    auth_cred_exp_list.append(exp_date)
 
-                        my_auths = [{'auth_name': t[0], 'cred_exp': t[1]}
-                            for t in zip(auth_list, auth_cred_exp_list)]
+                            my_auths = [{'auth_name': t[0], 'cred_exp': t[1]}
+                                for t in zip(auth_list, auth_cred_exp_list)]
 
 
                     # for reference accounts
