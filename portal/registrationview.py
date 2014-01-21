@@ -1,5 +1,6 @@
 import os.path, re
 import json
+from random import randint
 
 from django.core.mail           import send_mail
 from django.contrib.auth.models import User
@@ -74,7 +75,7 @@ class RegistrationView (FreeAccessView):
             #prepare user_hrn 
             split_email = reg_email.split("@")[0] 
             split_email = split_email.replace(".", "_")
-            user_hrn = reg_auth + '.' + split_email
+            user_hrn = reg_auth + '.' + split_email+ str(randint(1,1000000))
             
             UserModel = get_user_model()
 
