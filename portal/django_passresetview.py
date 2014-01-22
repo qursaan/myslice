@@ -115,7 +115,7 @@ def password_reset(request, is_admin_site=False,
         if form.is_valid():
 
             ### email check in manifold DB ###
-            email = form.cleaned_data['email'] # email inserted on the form
+            email = form.cleaned_data['email'].lower() # email inserted on the form
             user_query  = Query().get('local:user').select('user_id','email')
             user_details = execute_admin_query(request, user_query)
             flag = 0
@@ -196,13 +196,13 @@ def password_reset_confirm(request, uidb36=None, token=None,
                 ### manifold pass update ###
                 #password = form.cleaned_data('password1')
                 password=request.POST['new_password1']
-                user_query  = Query().get('local:user').select('user_id','email','password')
-                user_details = execute_admin_query(request, user_query)
-                for user_detail in user_details:
-                    if user_detail['email'] == user.email:
-                        user_detail['password'] = password
+                #user_query  = Query().get('local:user').select('user_id','email','password')
+                #user_details = execute_admin_query(request, user_query)
+                #for user_detail in user_details:
+                #    if user_detail['email'] == user.email:
+                #        user_detail['password'] = password
                 #updating password in local:user
-                user_params = { 'password': user_detail['password']}
+                user_params = { 'password': password}
                 manifold_update_user(request,user.email,user_params)    
                 ### end of manifold pass update ###            
     
