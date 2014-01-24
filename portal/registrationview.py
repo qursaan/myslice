@@ -133,7 +133,7 @@ class RegistrationView (FreeAccessView):
                     public_key = file_content
                     public_key = ''.join(public_key.split()) 
                 else:
-                    errors.append('Please upload a valid RSA public key [.txt or .pub].')
+                    errors.append('Please upload a valid RSA public key.')
 
             #b = PendingUser(first_name=reg_fname, last_name=reg_lname, affiliation=reg_aff, 
             #                email=reg_email, password=request.POST['password'], keypair=keypair)
