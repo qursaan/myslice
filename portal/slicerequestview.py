@@ -70,6 +70,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
                 }            
                 s = PendingSlice(
                     slice_name      = slice_name,
+                    user_email      = email
                     authority_hrn   = authority_hrn,
                     number_of_nodes = number_of_nodes,
                     purpose         = purpose

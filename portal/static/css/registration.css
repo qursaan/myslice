@@ -5,7 +5,7 @@ I've started to move over such stuff in onelab.css
 feel free to add to this collection
 */
    
-label.error { 
+.error { 
     float: none;
     color: red;
     padding-left: .5em;

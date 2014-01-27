@@ -66,8 +66,25 @@ class PendingUser(models.Model):
     created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 
+class PendingAuthority(models.Model):
+    site_name             = models.TextField()
+    site_authority        = models.TextField() 
+    site_abbreviated_name = models.TextField()
+    site_url              = models.TextField()
+    site_latitude         = models.TextField()
+    site_longitude        = models.TextField()
+    address_line1         = models.TextField()
+    address_line2         = models.TextField()
+    address_line3         = models.TextField()
+    address_city          = models.TextField()
+    address_postalcode    = models.TextField()
+    address_state         = models.TextField()
+    address_country       = models.TextField()
+    created               = models.DateTimeField(auto_now_add = True)
+ 
 class PendingSlice(models.Model):
     slice_name      = models.TextField()
+    user_email      = models.TextField()
     authority_hrn   = models.TextField(null=True)
     number_of_nodes = models.TextField(default=0)
     type_of_nodes   = models.TextField(default='NA')

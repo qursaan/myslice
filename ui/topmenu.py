@@ -39,6 +39,7 @@ def topmenu_items_static (current, request):
         # looks like this is accessible to non-logged users
         result.append({'label':'Platforms', 'href': '/portal/platforms/'})
         result.append({'label':'Register', 'href': '/portal/register/'})
+        result.append({'label':'Join us', 'href': '/portal/join/'})
         result.append({'label':'Contact Support', 'href': '/portal/contact/'})
 
     # mark active if the provided 'current', even if shorter, matches the beginning of d['label']

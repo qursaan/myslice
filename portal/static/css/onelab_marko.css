@@ -15,6 +15,10 @@
     height: 100%;
 }
 
+table {
+   color:white;
+}
+
 .container h1, .container h2 {
     color: #fff !important;
 }
