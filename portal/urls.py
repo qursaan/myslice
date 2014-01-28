@@ -31,11 +31,12 @@ from portal.accountview         import AccountView, account_process
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
+from portal.joinview            import JoinView
 from portal.sliceview           import SliceView
+from portal.validationview      import ValidatePendingView
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
-from portal.views               import ValidatePendingView
 from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
 # DEPRECATED #named_register_forms = (
@@ -64,6 +65,7 @@ urlpatterns = patterns('',
     url(r'^slice/(?P<slicename>[\w\.]+)/?$', SliceView.as_view(),name='slice'),
     url(r'^account/account_process/?$', account_process),
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
+    url(r'^join/?$', JoinView.as_view(), name='join'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request

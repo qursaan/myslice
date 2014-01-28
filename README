@@ -228,6 +228,12 @@ $python manage.py loaddata temp_data.json
 
 If your changes break your old schema this won't work - in which case tools like south or django evolution are great.
 
+
+Add a new model to the DB
+
+$python manage.py schemamigration <your_app> --auto
+$python manage.py migrate
+
 ======== update django database to reflect changes in existing models with migration system (e.g., south) =========
 
 As south is already installed , you just have to do:

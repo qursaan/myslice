@@ -48,9 +48,15 @@ def sfa_update_user(request, user_hrn, user_params):
     results = execute_query(request,query)
     return results
 
-
 def sfa_add_slice(request, slice_params):
     query = Query.create('slice').set(slice_params).select('slice_hrn')
+    results = execute_query(request, query)
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
+    return results
+
+def sfa_add_user_to_slice(request, user_hrn, slice_params):
+    query = Query.update('slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
     results = execute_query(request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
@@ -131,6 +137,7 @@ def make_request_slice(slice):
     request = {}
     request['type'] = 'slice'
     request['id'] = slice.id
+    request['user_email'] = slice.user_email
     request['timestamp'] = slice.created
     request['authority_hrn'] = slice.authority_hrn
     request['slice_name'] = slice.slice_name
@@ -260,6 +267,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
                 sfa_add_slice(wsgi_request, sfa_slice_params)
+                #sfa_add_user_to_slice(wsgi_request, user_hrn, sfa_slice_params)
 
                 # XXX Remove from database
 
