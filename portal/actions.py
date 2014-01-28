@@ -267,7 +267,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
                 sfa_add_slice(wsgi_request, sfa_slice_params)
-                #sfa_add_slice(wsgi_request, user_hrn, sfa_slice_params)
+                #sfa_add_user_to_slice(wsgi_request, user_hrn, sfa_slice_params)
 
                 # XXX Remove from database
 

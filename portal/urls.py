@@ -33,10 +33,10 @@ from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
 from portal.joinview            import JoinView
 from portal.sliceview           import SliceView
+from portal.validationview      import ValidatePendingView
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
-from portal.views               import ValidatePendingView
 from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
 # DEPRECATED #named_register_forms = (
