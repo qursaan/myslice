@@ -27,7 +27,7 @@ class DashboardView (LoginRequiredAutoLogoutView):
         print "Dashboard page"
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
-        testbed_query  = Query().get('network').select('network_hrn','platform')
+        testbed_query  = Query().get('network').select('network_hrn','platform','version')
         # DEMO GEC18 Query only PLE
 #        user_query  = Query().get('local:user').select('config','email')
 #        user_details = execute_query(self.request, user_query)

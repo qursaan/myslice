@@ -173,6 +173,7 @@ def get_request_by_id(ids):
     return make_requests(pending_users, pending_slices)
 
 def get_request_by_authority(authority_hrns):
+    print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
         pending_users  = PendingUser.objects.all()
         pending_slices = PendingSlice.objects.all()
