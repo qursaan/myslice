@@ -29,12 +29,21 @@ class AccountView(LoginRequiredAutoLogoutView):
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
 
-        user_query  = Query().get('local:user').select('config','email')
+        user_query  = Query().get('local:user').select('config','email','status')
         user_details = execute_query(self.request, user_query)
         
         # not always found in user_details...
         config={}
         for user_detail in user_details:
+            # different significations of user_status
+            if user_detail['status'] == 0: 
+                user_status = 'Disabled'
+            elif user_detail['status'] == 1:
+                user_status = 'Validation Pending'
+            elif user_detail['status'] == 2:
+                user_status = 'Enabled'
+            else:
+                user_status = 'N/A'
             #email = user_detail['email']
             if user_detail['config']:
                 config = json.loads(user_detail['config'])
@@ -56,6 +65,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         my_auths = ''
         ref_acc_list = ''
         principal_acc_list = ''
+        user_status_list = []
         platform_name_list = []
         platform_name_secondary_list = []
         platform_access_list = []
@@ -149,9 +159,10 @@ class AccountView(LoginRequiredAutoLogoutView):
                         delegation_type_list.append(delegation)
                         usr_hrn_list.append(account_usr_hrn)
                         pub_key_list.append(account_pub_key)
+                        user_status_list.append(user_status)
                         # combining 5 lists into 1 [to render in the template] 
-                        principal_acc_list = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4]} 
-                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list)]
+                        principal_acc_list = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4], 'user_status':t[5],} 
+                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list, user_status_list)]
                     # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
