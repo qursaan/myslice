@@ -155,7 +155,7 @@ class RegistrationView (FreeAccessView):
                 user = User.objects.create_user(reg_email, reg_email, request.POST['password'])
                 #creating user to manifold local:user
                 user_config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
-                user_params = {'email': reg_email, 'password': request.POST['password'], 'config': user_config}
+                user_params = {'email': reg_email, 'password': request.POST['password'], 'config': user_config, 'status': 1}
                 manifold_add_user(request,user_params)
                 #creating local:account in manifold
                 user_id = user_detail['user_id']+1 # the user_id for the newly created user in local:user
