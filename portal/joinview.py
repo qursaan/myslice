@@ -132,6 +132,7 @@ class JoinView (FreeAccessView):
                     address_postalcode    = reg_address_postalcode,
                     address_state         = reg_address_state,
                     address_country       = reg_address_country,
+                    authority_hrn         = reg_root_authority_hrn,
                 )
                 a.save()
  
@@ -199,6 +200,7 @@ class JoinView (FreeAccessView):
           'address_postalcode': request.POST.get('address_postalcode', ''),
           'address_state': request.POST.get('address_state', ''),
           'address_country': request.POST.get('address_country', ''),
+          'root_authority_hrn': request.POST.get('root_authority_hrn', '').lower(),
           'root_authorities': root_authorities,
           'authorities': authorities,
           }

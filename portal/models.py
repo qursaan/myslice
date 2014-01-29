@@ -80,6 +80,8 @@ class PendingAuthority(models.Model):
     address_postalcode    = models.TextField()
     address_state         = models.TextField()
     address_country       = models.TextField()
+    # parent authority of the requested authority
+    authority_hrn         = models.TextField()
     created               = models.DateTimeField(auto_now_add = True)
  
 class PendingSlice(models.Model):
