@@ -185,6 +185,7 @@ class AccountView(LoginRequiredAutoLogoutView):
         context['my_users'] = my_users
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
+        context['user_status'] = user_status
         context['person']   = self.request.user
         context['firstname'] = config.get('firstname',"?")
         context['lastname'] = config.get('lastname',"?")
@@ -337,9 +338,9 @@ def account_process(request):
                         user_params = { 'config': keypair, 'auth_type':'managed'}
                         manifold_update_account(request,user_params)
                         # updating sfa
-                        public_key = public_key.replace('"', '');
-                        user_pub_key = {'keys': public_key}
-                        sfa_update_user(request, user_hrn, user_pub_key)
+                        #public_key = public_key.replace('"', '');
+                        #user_pub_key = {'keys': public_key}
+                        #sfa_update_user(request, user_hrn, user_pub_key)
                         messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
                         return HttpResponseRedirect("/portal/account/")
         else:

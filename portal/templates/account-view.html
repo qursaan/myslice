@@ -156,6 +156,7 @@
         		<th>Account Type</th>
 				<th>Account Delegation</th>
         		<th>User hrn</th>
+				<th>User Status</th>
         		<!--<th>Pub Key</th> -->
     		</tr>   
 			{% for row in principal_acc %}         
@@ -164,6 +165,7 @@
         		<td class="odd"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.delegation_type }} </td>
        			<td class="odd"> {{ row.usr_hrn }}  </td>
+				<td class="odd"> {{ row.user_status }}  </td>
         	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
     		</tr> 
 			{%endfor%}               
@@ -173,7 +175,7 @@
 
 
 
-
+{%if 'Enabled'  in user_status %}
 <h3 id="show-pending" class="plugin-show" style="display: block;">
 <span class="glyphicon glyphicon-chevron-right"></span>
 <a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Credentials</h3>
@@ -320,6 +322,7 @@
     </div>
 </div>
 </div>
+{%endif%} 
 
 </form>
 

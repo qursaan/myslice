@@ -274,6 +274,9 @@ def portal_validate_request(wsgi_request, request_ids):
 
             except Exception, e:
                 request_status['SFA user'] = {'status': False, 'description': str(e)}
+            
+            user_params = {'status':2}
+            manifold_update_user(request, request['email'],user_params)
 
             # MANIFOLD user should be added beforehand, during registration
             #try:
