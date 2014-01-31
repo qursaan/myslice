@@ -175,7 +175,7 @@
 
 
 
-
+{%if 'Enabled'  in user_status %}
 <h3 id="show-pending" class="plugin-show" style="display: block;">
 <span class="glyphicon glyphicon-chevron-right"></span>
 <a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Credentials</h3>
@@ -322,6 +322,7 @@
     </div>
 </div>
 </div>
+{%endif%} 
 
 </form>
 
