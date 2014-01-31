@@ -1,7 +1,7 @@
 from django.http                 import HttpResponse
 from manifold.core.query         import Query
 from manifold.manifoldapi        import execute_query,execute_admin_query
-from portal.models               import PendingUser, PendingSlice
+from portal.models               import PendingUser, PendingSlice, PendingAuthority
 import json
 
 # Thierry: moving this right into the code so 
@@ -146,19 +146,39 @@ def make_request_slice(slice):
     request['purpose'] = slice.purpose
     return request
 
-def make_requests(pending_users, pending_slices):
-    print "pending users =", pending_users
-    print "pending slices =", pending_slices
+def make_request_authority(authority):
+    request = {}
+    request['type']                  = 'authority'
+    request['id']                    = authority.id
+    request['site_name']             = authority.site_name
+    request['site_latitude']         = authority.site_latitude
+    request['site_longitude']        = authority.site_longitude
+    request['site_url']              = authority.site_url
+    request['site_authority']        = authority.site_authority
+    request['site_abbreviated_name'] = authority.site_abbreviated_name
+    request['address_line1']         = authority.address_line1
+    request['address_line2']         = authority.address_line2
+    request['address_line3']         = authority.address_line3
+    request['address_city']          = authority.address_city
+    request['address_postalcode']    = authority.address_postalcode
+    request['address_state']         = authority.address_state
+    request['address_country']       = authority.address_country
+    request['authority_hrn']         = authority.authority_hrn
+    request['timestamp']             = authority.created
+    return request
 
+def make_requests(pending_users, pending_slices, pending_authorities):
     requests = []
     for user in pending_users:
         requests.append(make_request_user(user))
     for slice in pending_slices:
         requests.append(make_request_slice(slice))
+    for authority in pending_authorities:
+        requests.append(make_request_authority(authority))
     return requests   
 
 def get_request_by_id(ids):
-    sorted_ids = { 'user': [], 'slice': [] }
+    sorted_ids = { 'user': [], 'slice': [], 'authority': [] }
     for type__id in ids:
         type, id = type__id.split('__')
         sorted_ids[type].append(id)
@@ -166,22 +186,26 @@ def get_request_by_id(ids):
     if not ids:
         pending_users  = PendingUser.objects.all()
         pending_slices = PendingSlice.objects.all()
+        pending_authorities = PendingAuthority.objects.all()
     else:
         pending_users  = PendingUser.objects.filter(id__in=sorted_ids['user']).all()
         pending_slices = PendingSlice.objects.filter(id__in=sorted_ids['slice']).all()
+        pending_authorities = PendingAuthority.objects.filter(id__in=sorted_ids['authority']).all()
 
-    return make_requests(pending_users, pending_slices)
+    return make_requests(pending_users, pending_slices, pending_authorities)
 
 def get_request_by_authority(authority_hrns):
     print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
         pending_users  = PendingUser.objects.all()
         pending_slices = PendingSlice.objects.all()
+        pending_authorities = PendingAuthority.objects.all()
     else:
         pending_users  = PendingUser.objects.filter(authority_hrn__in=authority_hrns).all()
         pending_slices = PendingSlice.objects.filter(authority_hrn__in=authority_hrns).all()
+        pending_authorities = PendingAuthority.objects.filter(authority_hrn__in=authority_hrns).all()
 
-    return make_requests(pending_users, pending_slices)
+    return make_requests(pending_users, pending_slices, pending_authorities)
     
 # XXX Is it in sync with the form fields ?
 

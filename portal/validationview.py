@@ -179,9 +179,9 @@ class ValidatePendingView(FreeAccessView):
             print "queried_pending_authorities = ", queried_pending_authorities
 
             requests = get_request_by_authority(queried_pending_authorities)
-            print "requests = ", requests
             for request in requests:
                 auth_hrn = request['authority_hrn']
+                print "authority for this request", auth_hrn
 
                 if auth_hrn in pi_my_authorities:
                     dest = ctx_my_authorities
