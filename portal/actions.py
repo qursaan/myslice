@@ -55,6 +55,14 @@ def sfa_add_slice(request, slice_params):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     return results
 
+def sfa_add_authority(request, authority_params):
+    query = Query.create('authority').set(authority_params).select('authority_hrn')
+    results = execute_query(request, query)
+    print "sfa_add_auth results=",results
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % authority_params['hrn']
+    return results
+
 def sfa_add_user_to_slice(request, user_hrn, slice_params):
     query = Query.update('slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
     results = execute_query(request, query)
@@ -250,10 +258,17 @@ def portal_validate_request(wsgi_request, request_ids):
                 }
                 # ignored in request: id, timestamp, password
 
+                # UPDATE user status = 2 = validated
+                user_query  = Query().get('local:user').select('config','email','status').filter_by('email', '==', request['email'])
+                user_details = execute_admin_query(request, user_query)
+                print user_details[0]
+                manifold_user_params = {
+                    'status': 2
+                }
+                manifold_update_user(request, request['email'], manifold_user_params) 
+ 
                 sfa_add_user(wsgi_request, sfa_user_params)
-
-                # XXX Remove from database
-
+               # XXX Remove from database
 
                 request_status['SFA user'] = {'status': True }
 
@@ -293,14 +308,34 @@ def portal_validate_request(wsgi_request, request_ids):
 
                 sfa_add_slice(wsgi_request, sfa_slice_params)
                 #sfa_add_user_to_slice(wsgi_request, user_hrn, sfa_slice_params)
-
-                # XXX Remove from database
-
-            
                 request_status['SFA slice'] = {'status': True }
 
             except Exception, e:
                 request_status['SFA slice'] = {'status': False, 'description': str(e)}
+
+        elif request['type'] == 'authority':
+            try:
+                #hrn = "%s.%s" % (request['authority_hrn'], request['site_authority'])
+                hrn = request['site_authority']
+                # XXX tmp sfa dependency
+                from sfa.util.xrn import Xrn 
+                urn = Xrn(hrn, request['type']).get_urn()
+
+                sfa_authority_params = {
+                    'hrn'        : hrn,
+                    'urn'        : urn,
+                    'type'       : request['type'],
+                    #'pi'        : None,
+                    'enabled'    : True
+                }
+                print "ADD Authority"
+                sfa_add_authority(wsgi_request, sfa_authority_params)
+                request_status['SFA authority'] = {'status': True }
+
+            except Exception, e:
+                request_status['SFA authority'] = {'status': False, 'description': str(e)}
+
+        # XXX Remove from Pendings in database
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
 
