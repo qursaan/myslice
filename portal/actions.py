@@ -24,7 +24,7 @@ def authority_get_pis(request, authority_hrn):
     return results
 
 def authority_get_pi_emails(request, authority_hrn):
-    return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
+    #return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
 
     pi_users = authority_get_pis(request,authority_hrn)
     pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
