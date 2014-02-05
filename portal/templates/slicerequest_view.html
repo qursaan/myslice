@@ -81,13 +81,17 @@
 <script>
 jQuery(document).ready(function(){
     var availableTags = [
-    {% if authorities %}
-        {% for authority in authorities %}
-        {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
-        {% endfor %}    
-    {% else %}
-        {value:"",label:"No authority found !!!"}
-    {% endif %}
+     {% if authorities %}
+         {% for authority in authorities %}
+             {% if authority.name %}
+                 {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
+             {% else %}
+                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+             {% endif %}
+         {% endfor %}    
+     {% else %}
+         {value:"",label:"No authority found !!!"}
+     {% endif %}
     ];
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
