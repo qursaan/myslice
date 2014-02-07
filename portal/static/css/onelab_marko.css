@@ -18,6 +18,10 @@
 table {
    color:white;
 }
+table.dataTable {
+   color:black;
+}
+
 
 .container h1, .container h2 {
     color: #fff !important;

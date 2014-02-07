@@ -55,6 +55,7 @@ with the query passed using POST"""
             admin_user, admin_password = Config().manifold_admin_user_password()
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
+            print request.session['manifold']
             manifold_api_session_auth = request.session['manifold']['auth']
 
         if debug_empty and manifold_query.action.lower()=='get':

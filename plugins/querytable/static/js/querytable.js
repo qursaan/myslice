@@ -207,8 +207,20 @@
                     else
                         line.push(record['hostname']);
 
-                } else if (colnames[j] == 'hrn' && typeof(record) != 'undefined') {
-                    line.push('<a href="../resource/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record['hrn']);
+                } else if (colnames[j] == this.init_key && typeof(record) != 'undefined') {
+                    obj = this.object
+                    o = obj.split(':');
+                    if(o.length>1){
+                        obj = o[1];
+                    }else{
+                        obj = o[0];
+                    }
+                    /* XXX TODO: Remove this and have something consistant */
+                    if(obj=='resource'){
+                        line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                    }else{
+                        line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                    }
                 } else {
                     if (record[colnames[j]])
                         line.push(record[colnames[j]]);
