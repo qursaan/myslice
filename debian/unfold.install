@@ -12,3 +12,5 @@ apache/unfold.wsgi /usr/share/unfold/apache/
 apache/unfold.conf /etc/apache2/sites-available
 manage.py usr/share/unfold/
 usr/bin/unfold-init-ssl.sh
+etc/unfold/trusted_roots
+var/unfold
