@@ -7,6 +7,8 @@ chmod -R 700 /var/unfold
 # upgrading end
 /usr/share/unfold/manage.py syncdb
 /usr/share/unfold/manage.py migrate
+# enable required stuff
+a2enmod ssl
 a2dissite default
 a2ensite unfold.conf
 service apache2 restart
