@@ -29,7 +29,7 @@ from plugins.quickfilter             import QuickFilter
 from plugins.messages                import Messages
 from plugins.slicestat               import SliceStat
 
-from myslice.config                  import Config
+from myslice.configengine            import ConfigEngine
 
 tmp_default_slice='ple.upmc.myslicedemo'
 
@@ -56,8 +56,7 @@ class SliceView (LoginRequiredAutoLogoutView):
         page.add_js_chunks ('$(function() { messages.debug("sliceview: jQuery version " + $.fn.jquery); });')
         page.add_js_chunks ('$(function() { messages.debug("sliceview: users turned %s"); });'%("on" if do_query_users else "off"))
         page.add_js_chunks ('$(function() { messages.debug("sliceview: leases turned %s"); });'%("on" if do_query_leases else "off"))
-        config=Config()
-        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(config.manifold_url()))
+        page.add_js_chunks ('$(function() { messages.debug("manifold URL %s"); });'%(ConfigEngine().manifold_url()))
 
         metadata = page.get_metadata()
         resource_md = metadata.details_by_object('resource')
@@ -199,7 +198,7 @@ class SliceView (LoginRequiredAutoLogoutView):
             query      = sq_resource,
             query_all  = query_resource_all,
             # this key is the one issued by google
-            googlemap_api_key = Config().googlemap_api_key(),
+            googlemap_api_key = ConfigEngine().googlemap_api_key(),
             # the key to use at init-time
             init_key   = main_query_init_key,
             checkboxes = True,

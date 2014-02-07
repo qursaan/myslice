@@ -9,15 +9,14 @@ from unfold.loginrequired import FreeAccessView
 
 from manifold.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
-from myslice.config import Config
+from myslice.configengine import ConfigEngine
 
 class HomeView (FreeAccessView):
 
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
-        config=Config()
         return { 
-                 'MANIFOLD_URL':config.manifold_url(),
+                 'MANIFOLD_URL':ConfigEngine().manifold_url(),
                  }
 
     def post (self,request):
