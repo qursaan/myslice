@@ -14,7 +14,7 @@ from ui.topmenu                  import topmenu_items_live, the_user
 
 from plugins.querytable          import QueryTable
 
-from myslice.config              import Config
+from myslice.configengine        import ConfigEngine
 
 # View for 1 platform and its details
 class PlatformView(FreeAccessView):

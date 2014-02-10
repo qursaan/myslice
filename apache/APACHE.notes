@@ -14,7 +14,7 @@ A few notes and caveats must be outlined though below; see also unfold-init-ssl.
 * all the local material for this deployment gets into /etc/unfold/
 
 * I could not find a way to have client-auth without server auth;
-  this is totally weird, and stupid, but just so
+  this is totally weird, and stupid, but that's how it is
   so there is a need to install a (probably self-signed) cert 
   and related key in 
 /etc/unfold/myslice.cert

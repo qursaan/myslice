@@ -1,15 +1,28 @@
 #!/bin/bash
+# tmp - (or?)
+set -x
 # if this requires a service to be running, add something like this
 # update-rc.d unfold defaults
 [ -d /var/unfold ] || mkdir /var/unfold
 chown -R www-data.www-data /var/unfold
 chmod -R 700 /var/unfold
-# upgrading from older packages -- temporary 
-[ -f /usr/share/unfold/myslice.sqlite3 ] && mv -f /usr/share/unfold/myslice.sqlite3 /var/unfold
-rm -f /etc/apache2/sites*/myslice.conf
 # upgrading end
 /usr/share/unfold/manage.py syncdb
 /usr/share/unfold/manage.py migrate
-a2dissite default
+# be ready, enable ssl
+a2enmod ssl
+# disable defaults; jessie seems to come with 000-default instead of just default
+# not quite sure about ssl, disable every possible combination
+for site in default default-ssl; do 
+    for prefix in "" "000-"; do
+	s=${prefix}${site}
+	a2dissite $s || :
+    done
+done
 a2ensite unfold.conf
+# create a server-side cert/key and passes on gids to rehash them
+# because we do not enable ssl by default it is maybe not quite right to call this
+# at install-time anymore, although it should not hurt either
+unfold-init-ssl.sh
+# restart in any case
 service apache2 restart

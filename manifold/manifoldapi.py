@@ -1,7 +1,7 @@
 # Manifold API Python interface
 import copy, xmlrpclib
 
-from myslice.config import Config
+from myslice.configengine import ConfigEngine
 
 from django.contrib import messages
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException
@@ -39,8 +39,7 @@ class ManifoldAPI:
         self.trace = []
         self.calls = {}
         self.multicall = False
-        config = Config()
-        self.url = config.manifold_url()
+        self.url = ConfigEngine().manifold_url()
         self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
@@ -158,7 +157,6 @@ def execute_query(request, query):
     return _execute_query(request, query, manifold_api_session_auth)
 
 def execute_admin_query(request, query):
-    config = Config()
-    admin_user, admin_password = config.manifold_admin_user_password()
+    admin_user, admin_password = ConfigEngine().manifold_admin_user_password()
     admin_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
     return _execute_query(request, query, admin_auth)

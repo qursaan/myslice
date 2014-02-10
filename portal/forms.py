@@ -28,14 +28,25 @@ from portal.models import PendingUser, PendingSlice
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, get_user_model
-# TODO: Remove these automated forms and use html templates and views like any other page !
-# ERROR ImportError: cannot import name UNUSABLE_PASSWORD
-# XXX This is not compatible with Django 1.6.1
-# Ref: https://github.com/dot2code/varnish-bans-manager/issues/8
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
 from django.contrib.sites.models import get_current_site
 from django.utils.http import int_to_base36
 from django.template import loader
+
+# TODO: Remove these automated forms and use html templates and views like any other page !
+from django.contrib.auth.hashers import identify_hasher
+# adapted from https://sourcegraph.com/github.com/fusionbox/django-authtools/symbols/python/authtools/forms
+
+def is_password_unusable(pw):
+    # like Django's is_password_usable, but only checks for unusable
+    # passwords, not invalidly encoded passwords too.
+    try:
+        # 1.5
+        from django.contrib.auth.hashers import UNUSABLE_PASSWORD
+        return pw == UNUSABLE_PASSWORD
+    except ImportError:
+        # 1.6
+        from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+        return pw.startswith(UNUSABLE_PASSWORD_PREFIX)
 
 
 
@@ -146,8 +157,7 @@ class PasswordResetForm(forms.Form):
         if not any(user.is_active for user in self.users_cache):
             # none of the filtered users are active
             raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password == UNUSABLE_PASSWORD)
-               for user in self.users_cache):
+        if any(is_password_unusable(user.password) for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
 

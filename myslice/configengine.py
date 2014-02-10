@@ -2,18 +2,26 @@ import os.path
 from ConfigParser import RawConfigParser
 from myslice.settings import ROOT
 
-# as this code suggests, you have the option to override these defaults
+#
+# DO NOT EDIT !!!
+#
+# This file does not contain any user-modifiable data
+#
+# te defaults here are, well, only default values, 
+# and, you have the option to override them
 # by writing a file myslice/myslice.ini
 # that looks like this
 #[manifold]
 #url = http://manifold.pl.sophia.inria.fr:7080/
 #admin_user = admin
 #admin_password = admin
+#[googlemap]
+#api_key=theapikeyasprovidedbygoogle
 
 # use a singleton instead of staticmethods
 from manifold.util.singleton    import Singleton
 
-class Config(object):
+class ConfigEngine(object):
     __metaclass__ = Singleton
 
     # the OpenLab-wide backend as managed by UPMC
@@ -30,9 +38,9 @@ class Config(object):
     def __init__ (self):
         parser = RawConfigParser ()
         parser.add_section('manifold')
-        parser.set ('manifold', 'url', Config.default_manifold_url)
-        parser.set ('manifold', 'admin_user', Config.default_manifold_admin_user)
-        parser.set ('manifold', 'admin_password', Config.default_manifold_admin_password)
+        parser.set ('manifold', 'url', ConfigEngine.default_manifold_url)
+        parser.set ('manifold', 'admin_user', ConfigEngine.default_manifold_admin_user)
+        parser.set ('manifold', 'admin_password', ConfigEngine.default_manifold_admin_password)
         parser.add_section('googlemap')
         parser.set ('googlemap','api_key', None)
         parser.read (os.path.join(ROOT,'myslice/myslice.ini'))

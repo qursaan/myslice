@@ -10,7 +10,7 @@ from manifold.metadata import MetaData
 
 from unfold.prelude import Prelude
 
-from myslice.config import Config
+from myslice.configengine import ConfigEngine
 
 # decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
@@ -124,8 +124,7 @@ class Page:
         self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";\n")
 
     def expose_js_manifold_config (self):
-        config=Config()
-        self.add_js_init_chunks(config.manifold_js_export())
+        self.add_js_init_chunks(ConfigEngine().manifold_js_export())
 
     #################### requirements/prelude management
     # just forward to self.prelude - see decorator above

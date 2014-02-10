@@ -16,7 +16,7 @@ $ apt-get install python-django-south
 -- or --
 * git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
 
-* edit myslice/config.py and enter the details of your manifold backend
+* edit/create myslice/myslice.ini and enter the details of your manifold backend
 
 $ apt-get install python-django-south
 * init django

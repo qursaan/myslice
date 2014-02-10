@@ -10,6 +10,8 @@ trusted_roots=/etc/unfold/trusted_roots
 key=/etc/unfold/myslice.key
 cert=/etc/unfold/myslice.cert
 
+# provide a hostname as the first arg to this command 
+# (otherwise we use hostname)
 if [[ -n "$@" ]] ; then hostname=$1; shift; else hostname=$(hostname); fi
 
 function init_trusted_roots () {

@@ -9,7 +9,7 @@ from plugins.querytable         import QueryTable
 from plugins.lists.simplelist   import SimpleList
 from plugins.slicestat          import SliceStat
 
-from myslice.config             import Config
+from myslice.configengine       import ConfigEngine
 
 # View for 1 platform and its details
 class ResourceView(FreeAccessView):
@@ -53,7 +53,7 @@ class ResourceView(FreeAccessView):
             togglable  = True,
             query      = resource_query,
             query_all  = resource_query,
-            googlemap_api_key = Config().googlemap_api_key(),
+            googlemap_api_key = ConfigEngine().googlemap_api_key(),
             checkboxes = False,
             # center on Paris
             #latitude   = 49.,
