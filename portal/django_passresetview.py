@@ -34,7 +34,7 @@ If the email address provided does not exist in the system, this view won't send
 This prevents information leaking to potential attackers. If you want to provide an error message in this case, you can subclass PasswordResetForm 
 and use the password_reset_form argument.
 
-Users flagged with an unusable password (see set_unusable_password() aren't allowed to request a password reset to prevent misuse when using an external 
+Users flagged with an unusable password - see set_unusable_password() - aren't allowed to request a password reset to prevent misuse when using an external 
 authentication source like LDAP. Note that they won't receive any error message since this would expose their account's existence but no mail will be sent either.
 
 More Detail: https://docs.djangoproject.com/en/dev/topics/auth/default/#topics-auth-creating-users
@@ -64,7 +64,7 @@ from django.contrib.auth.decorators import login_required
 from portal.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, identify_hasher
+from django.contrib.auth.hashers import identify_hasher
 
 ##
 import os.path, re
