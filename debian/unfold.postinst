@@ -9,11 +9,20 @@ chmod -R 700 /var/unfold
 # upgrading end
 /usr/share/unfold/manage.py syncdb
 /usr/share/unfold/manage.py migrate
-# enable required stuff
+# be ready, enable ssl
 a2enmod ssl
-# name seems to depend on the debian distro
-a2dissite default || a2dissite 000-default || :
+# disable defaults; jessie seems to come with 000-default instead of just default
+# not quite sure about ssl, disable every possible combination
+for site in default default-ssl; do 
+    for prefix in "" "000-"; do
+	s=${prefix}${site}
+	a2dissite $s || :
+    done
+done
 a2ensite unfold.conf
 # create a server-side cert/key and passes on gids to rehash them
+# because we do not enable ssl by default it is maybe not quite right to call this
+# at install-time anymore, although it should not hurt either
 unfold-init-ssl.sh
+# restart in any case
 service apache2 restart
