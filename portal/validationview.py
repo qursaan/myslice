@@ -58,6 +58,7 @@ class ValidatePendingView(FreeAccessView):
 
         ctx_my_authorities = {}
         ctx_delegation_authorities = {}
+        ctx_sub_authorities = {}
 
 
         # The user need to be logged in
@@ -153,17 +154,20 @@ class ValidatePendingView(FreeAccessView):
             for pa in pi_authorities_tmp:
                 pi_authorities |= set(pa['pi_authorities'])
 
-# include all sub-authorities of the PI
-# if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
-#            a = set()
-#            for authority in authorities:
-#                for my_authority in my_authorities:
-#                    if authority.startswith(my_authority) and authority not in a:
-#                        a.add(authority)
-            
+            #print "all_auths = "
+            #print all_authorities
 
+            # include all sub-authorities of the PI
+            # if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
+            pi_subauthorities = set()
+            for authority in all_authorities:
+                authority_hrn = authority['authority_hrn']
+                for my_authority in pi_authorities:
+                    if authority_hrn.startswith(my_authority) and authority_hrn not in pi_subauthorities:
+                        pi_subauthorities.add(authority_hrn)
 
-            print "pi_authorities =", pi_authorities
+            #print "pi_authorities =", pi_authorities
+            #print "pi_subauthorities =", pi_subauthorities
             
             # My authorities + I have a credential
             pi_credential_authorities = pi_authorities & credential_authorities
@@ -173,29 +177,30 @@ class ValidatePendingView(FreeAccessView):
             pi_delegation_credential_authorities = credential_authorities - pi_authorities
             pi_delegation_expired_authorities = credential_authorities_expired - pi_authorities
 
-            print "pi_credential_authorities =", pi_credential_authorities
-            print "pi_no_credential_authorities =", pi_no_credential_authorities
-            print "pi_expired_credential_authorities =", pi_expired_credential_authorities
-            print "pi_delegation_credential_authorities = ", pi_delegation_credential_authorities
-            print "pi_delegation_expired_authorities = ", pi_delegation_expired_authorities
+            #print "pi_credential_authorities =", pi_credential_authorities
+            #print "pi_no_credential_authorities =", pi_no_credential_authorities
+            #print "pi_expired_credential_authorities =", pi_expired_credential_authorities
+            #print "pi_delegation_credential_authorities = ", pi_delegation_credential_authorities
+            #print "pi_delegation_expired_authorities = ", pi_delegation_expired_authorities
 
             # Summary intermediary
             pi_my_authorities = pi_credential_authorities | pi_no_credential_authorities | pi_expired_credential_authorities
             pi_delegation_authorities = pi_delegation_credential_authorities | pi_delegation_expired_authorities
 
-            print "--"
-            print "pi_my_authorities = ", pi_my_authorities
-            print "pi_delegation_authorities = ", pi_delegation_authorities
+            #print "--"
+            #print "pi_my_authorities = ", pi_my_authorities
+            #print "pi_delegation_authorities = ", pi_delegation_authorities
+            #print "pi_subauthorities = ", pi_subauthorities
 
             # Summary all
-            queried_pending_authorities = pi_my_authorities | pi_delegation_authorities
-            print "----"
-            print "queried_pending_authorities = ", queried_pending_authorities
+            queried_pending_authorities = pi_my_authorities | pi_delegation_authorities | pi_subauthorities
+            #print "----"
+            #print "queried_pending_authorities = ", queried_pending_authorities
 
             requests = get_request_by_authority(queried_pending_authorities)
             for request in requests:
                 auth_hrn = request['authority_hrn']
-                print "authority for this request", auth_hrn
+                #print "authority for this request", auth_hrn
 
                 if auth_hrn in pi_my_authorities:
                     dest = ctx_my_authorities
@@ -216,6 +221,14 @@ class ValidatePendingView(FreeAccessView):
                     else: # pi_delegation_expired_authorities
                         request['allowed'] = 'expired'
 
+                elif auth_hrn in pi_subauthorities:
+                    dest = ctx_sub_authorities
+
+                    if auth_hrn in pi_subauthorities:
+                        request['allowed'] = 'allowed'
+                    else: # pi_delegation_expired_authorities
+                        request['allowed'] = 'denied'
+
                 else:
                     continue
 
@@ -225,6 +238,7 @@ class ValidatePendingView(FreeAccessView):
         
         context = super(ValidatePendingView, self).get_context_data(**kwargs)
         context['my_authorities']   = ctx_my_authorities
+        context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities
 
         # XXX This is repeated in all pages
