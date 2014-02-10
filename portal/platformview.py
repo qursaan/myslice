@@ -82,7 +82,7 @@ class PlatformView(FreeAccessView):
             query      = query_resource_default_fields,
             query_all  = query_resource_all,
             # this key is the one issued by google
-            googlemap_api_key = Config().googlemap_api_key(),
+            googlemap_api_key = ConfigEngine().googlemap_api_key(),
             # the key to use at init-time
             init_key   = main_query_init_key,
             checkboxes = False,
