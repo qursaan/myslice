@@ -141,6 +141,10 @@ class ValidatePendingView(FreeAccessView):
             print 'credential_authorities =', credential_authorities
             print 'credential_authorities_expired =', credential_authorities_expired
 
+            # Using cache manifold-tables to get the list of authorities faster
+            all_authorities_query = Query.get('authority').select('name', 'authority_hrn')
+            all_authorities = execute_query(self.request, all_authorities_query)
+
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
             pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
@@ -148,6 +152,16 @@ class ValidatePendingView(FreeAccessView):
             pi_authorities = set()
             for pa in pi_authorities_tmp:
                 pi_authorities |= set(pa['pi_authorities'])
+
+# include all sub-authorities of the PI
+# if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
+#            a = set()
+#            for authority in authorities:
+#                for my_authority in my_authorities:
+#                    if authority.startswith(my_authority) and authority not in a:
+#                        a.add(authority)
+            
+
 
             print "pi_authorities =", pi_authorities
             

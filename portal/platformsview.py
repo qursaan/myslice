@@ -26,6 +26,7 @@ class PlatformsView(FreeAccessView):
             query = platform_query,
             query_all = platform_query,
             checkboxes = False,
+            init_key   = 'platform',
             datatables_options = { 
                 'iDisplayLength': 10,
                 'bLengthChange' : True,
