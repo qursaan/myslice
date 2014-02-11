@@ -6,25 +6,35 @@
 {% endblock unfold_margin %}
 
 {% block unfold_main %}
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
 <!-- xxx ideally only onelab.css but ... xxx -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-<div class='well-lg onelab-title'>
-  <h2 style="font-weight: bold;">Welcome to the OneLab portal !</h2>
-  <h4>New to OneLab? Please <a href="/portal/register">register</a> or learn more about <a href="http://www.onelab.eu/" target="_blank">the project</a>.</h3>
-</div>
-<div class='well'>
-<p>
-Experimentally-driven research is key to success in exploring the possible
-futures of the Internet. The OneLab initiative provides an open,
-general-purpose, shared experimental facility, both large-scale and
-sustainable, which allows European industry and academia to innovate and assess
-the performance of their solutions. Based on the results of several different
-European and national projects, OneLab offers access to a range of  tools and
-testbeds including PlanetLab Europe, the NITOS wireless testbed, and other
-federated testbeds.
-</p>
-<p>This UI server is connected to the manifold backend running at <code>{{ MANIFOLD_URL }}</code>.</p>
+	<div id="home-dashboard">
+	<ul class="nav nav-tabs">
+	  <li class="active"><a href="#">USER</a></li>
+	  <li><a href="#">MANAGER</a></li>
+	</ul>
+	<div id="user">
+		<table>
+			<tr>
+				<td>PROFILE</td>
+				<td>SLICES</td>
+				<td>SUPPORT</td>
+			</tr>
+			<tr>
+				<td><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></td>
+				<td><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></td>
+				<td><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></td>
+			</tr>
+			<tr>
+				<td>
+					<a href="/portal/register">Register</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="manager">
+		
+	</div>
 </div>
 
 {% endblock unfold_main %}

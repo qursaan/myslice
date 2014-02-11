@@ -2,45 +2,44 @@
 {% insert_str prelude "css/bootstrap.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-myslice-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="/">
-      <img src="{{ STATIC_URL }}img/onelab-logo.png" height="30" alt="OneLab logo" />
-    </a>
-  </div>
-  <div class="collapse navbar-collapse navbar-myslice-collapse topmenu">
-    <ul class="nav navbar-nav">
-	{% for d in topmenu_items %} 
-	{% if d.dropdown %}
-	{% if d.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
-	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}">{{ d.label }}<b class="caret"></b></a>
-	  <ul class="dropdown-menu">
-	    {% for dd in d.contents %}
-	    <li class='{% if dd.is_active %}active{% else %}other{% endif %}{% if dd.disabled %} disabled{%endif%}'
-	    {% if dd.domid %} id='{{dd.domid}}'{% endif %}>
-	    <a href="{{ dd.href }}"> {{ dd.label }} </a> </li>
-	    {% endfor %}
-	  </ul>
-        </li>
-        {% else %} 
-	<li class='{% if d.is_active %}active{% else %}other{% endif %}{% if d.disabled %} disabled{%endif%}'
-	{% if d.domid %} id='{{d.domid}}'{% endif %}>
-	<a href="{{ d.href }}"> {{ d.label }} </a> </li>
+
+
+
+<div id="header">
+	<div class="wrapper">
+		<div class="logo">
+			<a href="/"><img src="{{ STATIC_URL }}img/onelab-portal.png" alt="OneLab - Future Internet Testbeds" /></a>
+		</div>
+		
+		<div id="secondary">
+			<ul>
+				<li>News</li>
+				<li>About</li>
+				<li><a target="_blank" href="http://www.onelab.eu">Public Website</a></li>
+				<li>Intranet</li>
+			</ul>
+		</div>
+	</div>
+	
+	{% if username %}
+	<div id="navigation">
+		<div class="wrapper">
+		<ul>
+			<li>SLICES</li>
+			<li>REQUESTS</li>
+			<li>INSTITUTION</li>
+			<li><a href="/portal/contact/">SUPPORT</a></li>
+			<li>|</li>
+			<li>{{ username }}</li>
+			<li><a id="logout" data-username="{{ username }}">LOGOUT</a></li>
+		</ul>
+		</div>
+	</div>
+	{% else %}
+	<div id="navigation">
+		<div class="wrapper"></div>
+	</div>
 	{% endif %}
-	{% endfor %}
-    </ul> {# logout.js will attach a click function on that button, which then retrieves the 'username' attribute #}
-    <ul class="nav navbar-nav pull-right logged-in">
-      <li class='username'> {% if username %}
-      Logged in as {{ username }}
-      <button id='logout' class='btn btn-xs btn-danger logged-in' username='{{ username }}'>Logout</button> {% else %}
-      Not logged in{% endif %}
-      </li>
-    </ul>
-  </div>
-</nav>
+</div>
+
+

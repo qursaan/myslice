@@ -19,3 +19,5 @@ plugins/*/*.html
 myslice.ini*
 # other junk
 foo.*
+.project
+.pydevproject

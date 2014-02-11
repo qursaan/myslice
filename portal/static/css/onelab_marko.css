@@ -5,26 +5,14 @@
 /* GENERAL */
 
 .container {
-    padding: 0 !important;
-    color: #fff;
-    background: url(http://new.fit-equipex.fr/images/background.jpg) no-repeat;
+    padding: 0 ;
+    background-color:white;
+    color: black;
     margin: 0;
     width: 100%;
     max-width: 100%;
-    min-height: 100%;
+    min-height: 600px;
     height: 100%;
-}
-
-table {
-   color:white;
-}
-table.dataTable {
-   color:black;
-}
-
-
-.container h1, .container h2 {
-    color: #fff !important;
 }
 
 div.plugin-outline-complete, 
@@ -64,13 +52,13 @@ a.plugin-tooltip:hover {
 
 /* LIST VIEW */
 div.well-lg {
-    background-color: rgba(168, 32, 202, 0.5) !important;
+    background-color: rgba(168, 32, 202, 0.5) ;
 }
 div.onelab-title {
-    background-color: rgba(168, 32, 202, 0.5) !important;
+    background-color: rgba(168, 32, 202, 0.5) ;
 }
 div.well {
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-color: rgba(0, 0, 0, 0.5) ;
 }
 h2.well.well-lg {
     border-radius:0;
@@ -90,8 +78,8 @@ h2.well.well-lg {
 }
 
 #complete-resources {
-/*    background-color: #92f79e !important; */
-    background-color: #B8B2FF !important;
+/*    background-color: #92f79e ; */
+    background-color: #B8B2FF ;
 }
 
 #complete-filters {
@@ -100,17 +88,17 @@ h2.well.well-lg {
 }
 
 #complete-users {
-/*    background-color: #ff7394 !important; */
-    background-color: #add7ff !important;
+/*    background-color: #ff7394 ; */
+    background-color: #add7ff ;
 }
 /*
 #complete-measurements {
-    background-color: !important;
+    background-color: ;
 }
 */
 #complete-pending {
-/*    background-color: #add7ff !important; */
-    background-color: #B8B2FF !important;
+/*    background-color: #add7ff ; */
+    background-color: #B8B2FF ;
 
 }
 
@@ -144,77 +132,15 @@ h2.well.well-lg {
     opacity: 1;
 }
 
-.nav.nav-tabs {
-    font-family: Ubuntu, Arial, sans-serif;
-    border: 0 !important;
-    border-bottom: 3px solid #fff !important;
-    margin-bottom: 40px;
-}
-
-.nav.nav-tabs li.active a {
-    color: #572bc9;
-    border-left: 0px solid #572bc9;
-    border-top: 0px solid #572bc9;
-    border-right: 0px solid #572bc9;
-}
-
-.nav.nav-tabs li a {
-    color: #333;
-    border: 0 !important;
-    margin-right: 5px;
-}
-
-.nav.nav-tabs li a:hover {
-    color: #333;
-    background: #572bc9;
-    color: #fff;
-    border: 0 !important;
-}
 
 
-
-/* if window enlarged wider than background picture */
-body {
-    background: black !important;
-}
-
-/* TOPMENU.CSS */
-
-/* Thierry : turning this off
-body {
-    *//* background: #30196d !important; *//*
-    background: black !important;
-    padding-top: 60px;
-    padding-bottom: 0px;
-}
-Thierry */
-
-/* Thierry : turning this off
-div.topmenu { 
-    padding-top: 0px;
-    font-family: Ubuntu, Arial, sans-serif;
-    font-weight: bold;
-    background: #fff;
-    -webkit-box-shadow: 0px 10px 10px rgba(50, 50, 50, 0.44);
-    -moz-box-shadow:    0px 10px 10px rgba(50, 50, 50, 0.44);
-    box-shadow:         0px 10px 10px rgba(50, 50, 50, 0.44);
-}
-Thierry */
-
-/* Thierry : turning this off
-.navbar-nav li a,
-.navbar-nav li.other a {
-    padding-top: 25px;
-    padding-bottom: 20px;
-}
-Thierry */
 
 .navbar-nav li a:hover {
-    color: #572bc9 !important;
+    color: #572bc9 ;
 }
 
 .navbar-nav li.active a {
-    background: #eee !important;
+    background: #eee ;
 }
 
 /* Thierry : turning this off
@@ -290,7 +216,7 @@ input {
 div.dataTables_length label, 
 div.dataTables_filter label,
 div.dataTables_info {
-    font-family: Ubuntu, Arial, sans-serif !important;
+    font-family: Ubuntu, Arial, sans-serif ;
 }
 
 
@@ -300,42 +226,42 @@ div.dataTables_info {
 
 div.QueryTable table.dataTable th {
     font: bold 12px/22px Ubuntu, Arial, sans-serif;
-    color: #333 !important;
-    border-right: 0px solid #333 !important;
-    border-bottom: 0px solid #C1DAD7 !important;
-    border-top: 0px solid #C1DAD7 !important;
+    color: #333 ;
+    border-right: 0px solid #333 ;
+    border-bottom: 0px solid #C1DAD7 ;
+    border-top: 0px solid #C1DAD7 ;
     letter-spacing: 1px;
     text-transform: uppercase;
     text-align: left;
     padding: 8px 12px 4px 20px;
     vertical-align:middle;
-    background: url('../img/tablesort-header.png') no-repeat !important; 
+    background: url('../img/tablesort-header.png') no-repeat ; 
 }
 
 div.QueryTable table.dataTable td, div.QueryTable table.dataTable textarea, div.QueryTable table.dataTable input [type="text"] {
     font: normal 12px Ubuntu, Arial, Helvetica, sans-serif;
-    border-right: 0px solid #fff !important;
-    border-bottom: 1px solid #fff !important;
+    border-right: 0px solid #fff ;
+    border-bottom: 1px solid #fff ;
 }
 
 div.QueryTable table.dataTable thead { 
-    background: url('../img/tablesort-header.png') repeat-x !important;
+    background: url('../img/tablesort-header.png') repeat-x ;
     background-color: #caebea;
 }
 
 div.QueryTable table.dataTable tfoot { 
-    background: url('../img/tablesort-header.png') repeat-x !important;
-    /* background-color: # !important; */
+    background: url('../img/tablesort-header.png') repeat-x ;
+    /* background-color: # ; */
 }
 
 
 /* QUERY EDITOR */
 
 table.query-editor {
-    margin: 40px auto !important;
+    margin: 40px auto ;
     clear: both;
     /* width: 80%;*/
-    width: 100% !important;
+    width: 100% ;
     font-family: Ubuntu;
 }
 
@@ -345,12 +271,12 @@ table.query-editor {
 .plugin.Tabs 
 Thierry */
 {
-    margin-top: 60px !important;
+    margin-top: 60px ;
 }
 
 table.query-editor td {
-    padding: 5px 5px !important;
-    font: normal 12px Ubuntu, Arial, sans-serif !important;
+    padding: 5px 5px ;
+    font: normal 12px Ubuntu, Arial, sans-serif ;
 }
 
 
@@ -392,41 +318,143 @@ table.query-editor td {
 }
 
 .ms-dashboard-content ul {
-    list-style-type: none !important;
+    list-style-type: none ;
     padding-left: 0;
-    text-align: center !important;
+    text-align: center ;
 }
 
 .ms-dashboard-content {
-    padding: 0 !important;
+    padding: 0 ;
 }
 
-.ms-dashboard-content a {
-    color: #ff7394 !important;
-/* color: #ff0099 !important; */
-}
-
-.ms-dashboard-content a:hover {
-    color: white !important;
-}
-.ms-dashboard-caption h2 {
-    font-family: Ubuntu, Arial, sans-serif;
-    border-bottom: 0 !important;
-    text-transform: uppercase;
-}
 
 #ms-dashboard-profile>div.ms-dashboard-caption {
-    background: no-repeat url(#) !important;
-    padding-left: 0 !important;
+    background: no-repeat url(#) ;
+    padding-left: 0 ;
 }   
 
 #ms-dashboard-testbeds>div.ms-dashboard-caption {
-    background: no-repeat url(#) !important;
-    padding-left: 0 !important;
+    background: no-repeat url(#) ;
+    padding-left: 0 ;
 }   
 
 #ms-dashboard-slices>div.ms-dashboard-caption {
-    background: no-repeat url(#) !important;
-    padding-left: 0 !important;
+    background: no-repeat url(#) ;
+    padding-left: 0 ;
 }   
 
+
+
+
+
+
+
+
+
+/*** NEW CSS STYLES FOR ONLEAB ***/
+
+body {
+    background-color:white;
+    color:black;
+}
+div.wrapper {
+    width:980px;
+    margin:0 auto;
+    position:relative;
+}
+/* HEADER */
+div#header {
+    height:100px;
+    background-color:white;
+}
+
+div#secondary {
+    
+}
+
+div#secondary ul {
+    position:absolute;
+    top:20px;
+    right:0;
+}
+
+div#secondary li {
+    font-size:10pt;
+    float:left;
+    list-style:none;
+    margin-right:30px;
+}
+div#secondary li:last-child {
+    margin-right:0;
+}
+
+div#navigation {
+    background-color:black;
+    width:100%;
+    height:40px;
+}
+div#navigation div.wrapper {
+    text-align:center;
+}
+div#navigation ul {
+    margin:0;
+    padding:0;
+    display: inline-block;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+div#navigation li {
+    color:white;
+    font-family:helvetica, sans-serif;
+    font-size:10pt ;
+    font-weight:normal;
+    line-height:0.8em;
+    letter-spacing:0.6pt;
+    list-style:none;
+    float:left;
+    padding:0;
+    margin:15px 50px 0 0;
+}
+div#navigation li a {
+    color:white;
+}
+div#navigation li a:hover {
+    text-decoration:none;
+    color:#B8B2FF;
+}
+div#navigation li:last-child {
+    margin-right:0;
+}
+
+/* HOME DASHBOARD */
+div#home-dashboard {
+    color:black;
+    margin:25px 0;
+}
+div#home-dashboard table {
+    margin:25px;
+    width:100%;
+}
+div#home-dashboard table td {
+    text-align:center;
+    padding:15px 0;
+}
+/**/
+
+/* NAV TABS */
+
+.nav.nav-tabs {
+}
+
+.nav.nav-tabs li.active a {
+   
+}
+
+.nav.nav-tabs li a {
+}
+
+.nav.nav-tabs li a:hover {
+}
+
+/**/
