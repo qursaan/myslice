@@ -144,6 +144,7 @@ class JoinView (FreeAccessView):
                     email         = reg_email, 
                     password      = reg_password,
                     keypair       = account_config,
+                    pi            = reg_auth,
                 )
                 b.save()
 

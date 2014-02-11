@@ -149,6 +149,7 @@ class RegistrationView (FreeAccessView):
                     email         = reg_email, 
                     password      = request.POST['password'],
                     keypair       = account_config,
+                    pi            = '',
                 )
                 b.save()
                 # saves the user to django auth_user table [needed for password reset]

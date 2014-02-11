@@ -37,6 +37,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
         user_email = execute_query(self.request, user_query)
         self.user_email = user_email[0].get('email')
 
+        user_query  = Query().get('user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
+        user_hrn = execute_query(self.request, user_query)
+        self.user_hrn = user_hrn[0].get('user_hrn')
+
         page = Page(request)
         page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
@@ -49,6 +53,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             number_of_nodes = request.POST.get('number_of_nodes', '')
             purpose = request.POST.get('purpose', '')
             email = self.user_email
+            user_hrn = self.user_hrn
             cc_myself = True
             
             if (authority_hrn is None or authority_hrn == ''):
@@ -70,7 +75,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
                 }            
                 s = PendingSlice(
                     slice_name      = slice_name,
-                    user_email      = email,
+                    user_hrn        = user_hrn,
                     authority_hrn   = authority_hrn,
                     number_of_nodes = number_of_nodes,
                     purpose         = purpose
@@ -96,6 +101,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
           'number_of_nodes': request.POST.get('number_of_nodes', ''),
           'purpose': request.POST.get('purpose', ''),
           'email': self.user_email,
+          'user_hrn': self.user_hrn,
           'cc_myself': True,
           'authorities': authorities,
         }

@@ -328,7 +328,7 @@ def account_process(request):
                         private_key = json.dumps(private.exportKey())
                         public  = private.publickey()
                         public_key = json.dumps(public.exportKey(format='OpenSSH'))
-                        # updating maniolf local:account table
+                        # updating manifold local:account table
                         account_config = json.loads(account_detail['config'])
                         # preserving user_hrn
                         user_hrn = account_config.get('user_hrn','N/A')
@@ -338,9 +338,9 @@ def account_process(request):
                         user_params = { 'config': keypair, 'auth_type':'managed'}
                         manifold_update_account(request,user_params)
                         # updating sfa
-                        #public_key = public_key.replace('"', '');
-                        #user_pub_key = {'keys': public_key}
-                        #sfa_update_user(request, user_hrn, user_pub_key)
+                        public_key = public_key.replace('"', '');
+                        user_pub_key = {'keys': public_key}
+                        sfa_update_user(request, user_hrn, user_pub_key)
                         messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
                         return HttpResponseRedirect("/portal/account/")
         else:
@@ -368,6 +368,9 @@ def account_process(request):
                             #update manifold local:account table
                             user_params = { 'config': file_content, 'auth_type':'user'}
                             manifold_update_account(request,user_params)
+                            # updating sfa
+                            user_pub_key = {'keys': file_content}
+                            sfa_update_user(request, user_hrn, user_pub_key)
                             messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
                             return HttpResponseRedirect("/portal/account/")
                         else:

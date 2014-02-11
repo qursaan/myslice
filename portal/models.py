@@ -63,6 +63,7 @@ class PendingUser(models.Model):
     keypair       = models.TextField()
     authority_hrn = models.TextField()
     login         = models.TextField()
+    pi            = models.TextField()
     created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 
@@ -86,7 +87,7 @@ class PendingAuthority(models.Model):
  
 class PendingSlice(models.Model):
     slice_name      = models.TextField()
-    user_email      = models.TextField()
+    user_hrn        = models.TextField()
     authority_hrn   = models.TextField(null=True)
     number_of_nodes = models.TextField(default=0)
     type_of_nodes   = models.TextField(default='NA')

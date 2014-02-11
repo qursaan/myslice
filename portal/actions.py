@@ -36,6 +36,8 @@ def authority_get_pi_emails(request, authority_hrn):
 # SFA add record (user, slice)
 
 def sfa_add_user(request, user_params):
+    if 'email' in user_params:
+        params['user_email'] = params['email']
     query = Query.create('user').set(user_params).select('user_hrn')
     results = execute_query(request, query)
     if not results:
@@ -44,6 +46,8 @@ def sfa_add_user(request, user_params):
 
 def sfa_update_user(request, user_hrn, user_params):
     # user_params: keys [public_key] 
+    if 'email' in user_params:
+        params['user_email'] = params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
     results = execute_query(request,query)
     return results
@@ -64,8 +68,14 @@ def sfa_add_authority(request, authority_params):
     return results
 
 def sfa_add_user_to_slice(request, user_hrn, slice_params):
+# UPDATE myslice:slice SET researcher=['ple.upmc.jordan_auge','ple.inria.thierry_parmentelat','ple.upmc.loic_baron','ple.upmc.ciro_scognamiglio','ple.upmc.mohammed-yasin_rahman','ple.upmc.azerty'] where slice_hrn=='ple.upmc.myslicedemo'
+    query_current_users = Query.get('slice').select('user').filter_by('slice_hrn','==',slice_params['hrn'])
+    results_current_users = execute_query(request, query_current_users)
+    slice_params['researcher'] = slice_params['researcher'] | results_current_users
     query = Query.update('slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
     results = execute_query(request, query)
+# Also possible but not supported yet
+# UPDATE myslice:user SET slice=['ple.upmc.agent','ple.upmc.myslicedemo','ple.upmc.tophat'] where user_hrn=='ple.upmc.azerty'
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     return results
@@ -145,7 +155,7 @@ def make_request_slice(slice):
     request = {}
     request['type'] = 'slice'
     request['id'] = slice.id
-    request['user_email'] = slice.user_email
+    request['user_hrn'] = slice.user_hrn
     request['timestamp'] = slice.created
     request['authority_hrn'] = slice.authority_hrn
     request['slice_name'] = slice.slice_name
@@ -253,7 +263,7 @@ def portal_validate_request(wsgi_request, request_ids):
                     'email'      : request['email'],
                     #'slices'    : None,
                     #'researcher': None,
-                    #'pi'        : None,
+                    'pi'         : request['pi'],
                     'enabled'    : True
                 }
                 # ignored in request: id, timestamp, password
@@ -276,7 +286,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 request_status['SFA user'] = {'status': False, 'description': str(e)}
             
             user_params = {'status':2}
-            manifold_update_user(request, request['email'],user_params)
+            manifold_update_user(request, request['email'], user_params)
 
             # MANIFOLD user should be added beforehand, during registration
             #try:
@@ -297,13 +307,20 @@ def portal_validate_request(wsgi_request, request_ids):
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
-
+                
+                # Add User to Slice if we have the user_hrn in pendingslice table
+                if 'user_hrn' in request:
+                    user_hrn = request['user_hrn']
+                    print "Slice %s will be created for %s" % (hrn,request['user_hrn'])
+                else:
+                    user_hrn=''
+                    print "Slice %s will be created without users %s" % (hrn)
                 sfa_slice_params = {
                     'hrn'        : hrn, 
                     'urn'        : urn,
                     'type'       : request['type'],
                     #'slices'    : None,
-                    #'researcher': None,
+                    'researcher' : [user_hrn],
                     #'pi'        : None,
                     'enabled'    : True
                 }
