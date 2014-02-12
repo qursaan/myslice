@@ -24,7 +24,7 @@ def authority_get_pis(request, authority_hrn):
     return results
 
 def authority_get_pi_emails(request, authority_hrn):
-    #return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
+    return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
 
     pi_users = authority_get_pis(request,authority_hrn)
     pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
@@ -37,7 +37,7 @@ def authority_get_pi_emails(request, authority_hrn):
 
 def sfa_add_user(request, user_params):
     if 'email' in user_params:
-        params['user_email'] = params['email']
+        user_params['user_email'] = user_params['email']
     query = Query.create('user').set(user_params).select('user_hrn')
     results = execute_query(request, query)
     if not results:
@@ -47,7 +47,7 @@ def sfa_add_user(request, user_params):
 def sfa_update_user(request, user_hrn, user_params):
     # user_params: keys [public_key] 
     if 'email' in user_params:
-        params['user_email'] = params['email']
+        user_params['user_email'] = user_params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
     results = execute_query(request,query)
     return results
@@ -212,7 +212,7 @@ def get_request_by_id(ids):
 
     return make_requests(pending_users, pending_slices, pending_authorities)
 
-def get_request_by_authority(authority_hrns):
+def get_requests(authority_hrns=None):
     print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
         pending_users  = PendingUser.objects.all()
@@ -224,7 +224,7 @@ def get_request_by_authority(authority_hrns):
         pending_authorities = PendingAuthority.objects.filter(authority_hrn__in=authority_hrns).all()
 
     return make_requests(pending_users, pending_slices, pending_authorities)
-    
+
 # XXX Is it in sync with the form fields ?
 
 def portal_validate_request(wsgi_request, request_ids):
@@ -252,7 +252,10 @@ def portal_validate_request(wsgi_request, request_ids):
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
-
+                if 'pi' in request:
+                    auth_pi = request['pi']
+                else:
+                    auth_pi = ''
                 sfa_user_params = {
                     'hrn'        : hrn, 
                     'urn'        : urn,
@@ -263,30 +266,58 @@ def portal_validate_request(wsgi_request, request_ids):
                     'email'      : request['email'],
                     #'slices'    : None,
                     #'researcher': None,
-                    'pi'         : request['pi'],
+                    'pi'         : [auth_pi],
                     'enabled'    : True
                 }
                 # ignored in request: id, timestamp, password
+                
+                # ADD USER TO SFA Registry
+                sfa_add_user(wsgi_request, sfa_user_params)
 
-                # UPDATE user status = 2 = validated
-                user_query  = Query().get('local:user').select('config','email','status').filter_by('email', '==', request['email'])
+                # USER INFO
+                user_query  = Query().get('local:user').select('user_id','config','email','status').filter_by('email', '==', request['email'])
                 user_details = execute_admin_query(request, user_query)
-                print user_details[0]
+                #print user_details[0]
+
+                # UPDATE USER STATUS = 2
                 manifold_user_params = {
                     'status': 2
                 }
                 manifold_update_user(request, request['email'], manifold_user_params) 
- 
-                sfa_add_user(wsgi_request, sfa_user_params)
-               # XXX Remove from database
 
+                # USER MAIN ACCOUNT != reference
+                #print 'USER MAIN ACCOUNT != reference'
+                list_accounts_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')\
+                    .filter_by('user_id','==',user_details[0]['user_id'])\
+                    .filter_by('auth_type','!=','reference')    
+                list_accounts = execute_admin_query(request, list_accounts_query)
+                #print "List accounts = ",list_accounts
+                for account in list_accounts:
+                    main_platform_query  = Query().get('local:platform').select('platform_id','platform').filter_by('platform_id','==',account['platform_id'])
+                    main_platform = execute_admin_query(request, main_platform_query)
+
+                # ADD REFERENCE ACCOUNTS ON SFA ENABLED PLATFORMS                        
+                #print 'ADD REFERENCE ACCOUNTS ON SFA ENABLED PLATFORMS'
+                platforms_query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type','==','sfa').select('platform_id','gateway_type')
+                platforms = execute_admin_query(request, platforms_query)
+                #print "platforms SFA ENABLED = ",platforms
+                for platform in platforms:
+                    #print "add reference to platform ",platform
+                    manifold_account_params = {
+                        'user_id': user_details[0]['user_id'],
+                        'platform_id': platform['platform_id'],
+                        'auth_type': 'reference',
+                        'config': '{"reference_platform": "' + main_platform[0]['platform'] + '"}',
+                    }
+                    manifold_add_account(request, manifold_account_params)
+        
                 request_status['SFA user'] = {'status': True }
 
             except Exception, e:
-                request_status['SFA user'] = {'status': False, 'description': str(e)}
-            
-            user_params = {'status':2}
-            manifold_update_user(request, request['email'], user_params)
+                 request_status['SFA user'] = {'status': False, 'description': str(e)}
+                       
+#            user_params = {'status':2}
+#            manifold_update_user(request, request['email'], user_params)
 
             # MANIFOLD user should be added beforehand, during registration
             #try:
