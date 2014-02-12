@@ -1,14 +1,8 @@
-{# fine for either layout-unfold1.html (logged in) or layout-unfold2.html (needs a login prompt) #}
-{% extends layout_1_or_2 %}
-
-{% block unfold_margin %}
-{% include 'widget-login.html' %}
-{% endblock unfold_margin %}
+{% extends "layout-unfold1.html" %}
 
 {% block unfold_main %}
-<!-- xxx ideally only onelab.css but ... xxx -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-	<div id="home-dashboard">
+<div id="home-dashboard">
 	<ul class="nav nav-tabs">
 	  <li class="active"><a href="#">USER</a></li>
 	  <li><a href="#">MANAGER</a></li>
@@ -27,7 +21,15 @@
 			</tr>
 			<tr>
 				<td>
-					<a href="/portal/register">Register</a>
+					{% block unfold_margin %}
+					{% include 'widget-login.html' %}
+					{% endblock unfold_margin %}
+
+				</td>
+				<td></td>
+				<td class="support">
+					<div><a href="/portal/contact">Contact</a></div>
+					<div><a href="">Documentation</a></div>
 				</td>
 			</tr>
 		</table>
@@ -36,5 +38,4 @@
 		
 	</div>
 </div>
-
 {% endblock unfold_main %}

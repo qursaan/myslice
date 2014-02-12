@@ -57,9 +57,7 @@ div.well-lg {
 div.onelab-title {
     background-color: rgba(168, 32, 202, 0.5) ;
 }
-div.well {
-    background-color: rgba(0, 0, 0, 0.5) ;
-}
+
 h2.well.well-lg {
     border-radius:0;
     border: 0;
@@ -189,28 +187,6 @@ ul.pagination li.active a {
     border: 1px solid #572bc9;
 }
 
-.btn.btn-default {
-    background: #572bc9;
-    color: #ccc;
-    font-family: Ubuntu, Arial, sans-serif;
-    font-weight: bold;
-    border: 0px;
-}
-
-.btn.btn-default:hover {
-    /* background: #4af25d; */
-    background: #ff7394;
-    color: #333;
-    font-family: Ubuntu, Arial, sans-serif;
-    font-weight: bold;
-    border: 0px;
-}
-
-input {
-    border-radius: 3px;
-    border: none;
-    border: 1px solid #ccc;
-}
 
 
 div.dataTables_length label, 
@@ -384,6 +360,13 @@ div#secondary li {
     list-style:none;
     margin-right:30px;
 }
+div#secondary li a {
+    color:black;
+}
+div#secondary li a:hover {
+    color:#270A5A;
+    text-decoration:none;
+}
 div#secondary li:last-child {
     margin-right:0;
 }
@@ -439,6 +422,45 @@ div#home-dashboard table {
 div#home-dashboard table td {
     text-align:center;
     padding:15px 0;
+    width:33%;
+}
+div#home-dashboard table tr:first-child td {
+    font-size:12pt;
+    font-weight:bold;
+    color:#270A5A;
+}
+div#home-dashboard table tr:last-child td {
+    text-align:left;
+}
+div#home-dashboard table td.support {
+    font-size:14pt;
+    vertical-align:top;
+    padding-left:11%;
+}
+div#home-dashboard table td.support a {
+}
+div#home-dashboard table td.support a:hover {
+    text-decoration:none;
+}
+
+
+.login-submit {
+    vertical-align:middle;
+    padding:0;
+}
+.lost-password {
+    font-size:10pt;
+    color:#CCCCCC;
+    text-align:right;
+    padding:0px;
+}
+.lost-password a {
+}
+.login-signup {
+    border-top:1px solid #CCCCCC;
+    text-align:center;
+    margin-top:15px;
+    padding:5px 0 0 0;
 }
 /**/
 
@@ -458,3 +480,15 @@ div#home-dashboard table td {
 }
 
 /**/
+/* WELL */
+div.well {
+}
+/**/
+/* BUTTON */
+.btn.btn-default {
+    font-weight: bold;
+}
+
+.btn.btn-default:hover {
+    font-weight: bold;
+}

@@ -63,7 +63,7 @@ class HomeView (FreeAccessView):
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
         if state: env['state'] = state
-        elif not env['username']: env['state'] = "Please sign in"
+        elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
         env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
         return render_to_response('home-view.html',env, context_instance=RequestContext(request))

@@ -1,17 +1,26 @@
-{% insert_str prelude 'css/login.css' %}
-<p class='login-status'> {{ state }} </p>
-<div class='well'>
-<form action="/login/" method="post">
-  {% csrf_token %}
-  {% if next %}
-  <input type="hidden" name="next" value="{{ next }}" />
-  {% endif %}
-  <p class='login'>Username</p>
-  <input class='login' type="text" name="username" value="{{ username}}" /><br />
-  <p class='login'>Password</p>
-  <input class='login' type="password" name="password" value="" /><br />
-  <input class='login' type="submit" value="Log In" />
-  <p></p>	
-  <a href="/portal/pass_reset/">Can't access your account?</a>	
-</form>
+<div class="well">
+	{% if state %}
+	<span class="help-block">{{ state }}</span>
+	{% endif %}
+	<form action="/login/" method="post" role="form">
+	  {% csrf_token %}
+	  {% if next %}
+	  <input type="hidden" name="next" value="{{ next }}" />
+	  {% endif %}
+	<div class="form-group">
+    	<label for="username">Email address / Username</label>
+    	<input type="email" class="form-control" name="username" placeholder="Enter Email / username">
+  	</div>
+  	<div class="form-group">
+    	<label for="password">Password</label>
+    	<input type="password" class="form-control" name="password" placeholder="Password">
+	</div>
+	<div class="login-submit">
+		<input class="btn btn-default" type="submit" value="Sign In" />
+		<span class="lost-password">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/portal/pass_reset/">Can't access your account?</a></span>
+	</div>
+	<div class="login-signup">
+		<a href="/portal/register">Try</a> or <a href="/portal/register">Sign Up</a>
+	</div>
+	</form>
 </div>
