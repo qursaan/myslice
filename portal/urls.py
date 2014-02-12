@@ -23,6 +23,7 @@
 from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
+from portal.adminview           import AdminView
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.resourceview        import ResourceView
@@ -58,6 +59,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', AccountView.as_view(), name='account'),
+    url(r'^admin/?$', AdminView.as_view(), name='admin'),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.\-]+)/?$', PlatformView.as_view(), name='platform'),
     url(r'^resource/(?P<urn>[\w\.\-\+\:]+)/?$', ResourceView.as_view(), name='resource'),

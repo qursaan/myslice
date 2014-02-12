@@ -1,0 +1,34 @@
+{# fine for either layout-unfold1.html (logged in) or layout-unfold2.html (needs a login prompt) #}
+{% extends layout_1_or_2 %}
+
+{% block unfold_margin %}
+{% include 'widget-login.html' %}
+{% endblock unfold_margin %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/dashboard.css" />
+{% endblock %}
+
+{% block unfold_main %}
+
+<h1>Users</h1>
+<div id="middle" align="center">
+    <div class="well">
+        <table class="mytable table table-bordered table-hover">
+            <tr class="odd">
+                <th>Email</th>
+                <th>Status</th>
+            </tr>
+            {% for user in user_list %}
+            <tr class="border_bottom">
+                <td class="odd"> {{ user.email }} </td>
+				<td class="even"> {{ user.status }} </td>
+
+            </tr>
+            {%endfor%}
+        </table>
+    </div>
+</div>
+</div>
+
+{% endblock %}
