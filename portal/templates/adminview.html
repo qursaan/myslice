@@ -11,17 +11,19 @@
 
 {% block unfold_main %}
 
-<h1>Users</h1>
+<h1>MySlice Users</h1>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover">
             <tr class="odd">
                 <th>Email</th>
+				<th>Authority</th>
                 <th>Status</th>
             </tr>
             {% for user in user_list %}
             <tr class="border_bottom">
                 <td class="odd"> {{ user.email }} </td>
+				<td class="odd"> {{ user.authority }} </td>
 				<td class="even"> {{ user.status }} </td>
 
             </tr>

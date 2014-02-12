@@ -7,6 +7,7 @@ from manifold.manifoldapi       import execute_admin_query
 from plugins.querytable         import QueryTable
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 
+import json
 
 # View for platforms
 class AdminView(LoginRequiredAutoLogoutView):
@@ -19,14 +20,34 @@ class AdminView(LoginRequiredAutoLogoutView):
         #platform_query  = Query().get('local:platform').select('platform','platform_longname','gateway_type')
         email_list = []
         status_list = []
-        user_query  = Query().get('local:user').select('email','status')
-        user_details = execute_admin_query(self.request, user_query)
-        for user in user_details:
-            email_list.append(user['email'])
-            status_list.append(user['status'])
+        authority_list = []
+        config={}
 
-        user_list = [{'email': t[0], 'status': t[1]}
-            for t in zip(email_list, status_list)]
+        user_query  = Query().get('local:user').select('email','status','config')
+        user_details = execute_admin_query(self.request, user_query)
+
+        for user in user_details:
+            # get email
+            email_list.append(user['email'])
+            # get status
+            if user['status'] == 0:
+                user_status = 'Disabled'
+            elif user['status'] == 1:
+                user_status = 'Validation Pending'
+            elif user['status'] == 2:
+                user_status = 'Enabled'
+            else:
+                user_status = 'N/A'
+
+            status_list.append(user_status)
+            #get authority
+            #if user['config']:
+            user_config = json.loads(user['config'])
+            user_authority = user_config.get('authority','N/A')
+            authority_list.append(user_authority)
+    
+        user_list = [{'email': t[0], 'status': t[1], 'authority':t[2]}
+            for t in zip(email_list, status_list, authority_list)]
 
             
         #page.enqueue_query(user_query)
