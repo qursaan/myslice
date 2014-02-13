@@ -29,6 +29,7 @@ from portal.platformview        import PlatformView
 from portal.resourceview        import ResourceView
 from portal.dashboardview       import DashboardView
 from portal.accountview         import AccountView, account_process
+from portal.manageuserview      import UserView, user_process    
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
@@ -61,6 +62,7 @@ urlpatterns = patterns('',
     url(r'^account/?$', AccountView.as_view(), name='account'),
     url(r'^admin/?$', AdminView.as_view(), name='user_list'),
     url(r'^user/(?P<email>[\w\s.@\-]+)/?$', AccountView.as_view(), name='account'),
+    url(r'^user/user_process/?$', user_process),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.\-]+)/?$', PlatformView.as_view(), name='platform'),
     url(r'^resource/(?P<urn>[\w\.\-\+\:]+)/?$', ResourceView.as_view(), name='resource'),
