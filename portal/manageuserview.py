@@ -19,7 +19,7 @@ import json, os, re, itertools
 class UserView(LoginRequiredAutoLogoutView):
     template_name = "manageuserview.html"
     def dispatch(self, *args, **kwargs):
-        return super(AccountView, self).dispatch(*args, **kwargs)
+        return super(UserView, self).dispatch(*args, **kwargs)
 
 
     def get_context_data(self, **kwargs):
@@ -182,7 +182,7 @@ class UserView(LoginRequiredAutoLogoutView):
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
 
-        context = super(AccountView, self).get_context_data(**kwargs)
+        context = super(UserView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
         context['ref_acc'] = ref_acc_list
         context['platform_list'] = platform_list
