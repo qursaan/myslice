@@ -40,7 +40,7 @@ from plugins.raw                import Raw
 #from portal.util                import RegistrationView, ActivationView
 
 from portal.models              import PendingUser, PendingSlice
-from portal.actions             import get_request_by_authority
+from portal.actions             import get_requests
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page

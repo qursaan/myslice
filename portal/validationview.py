@@ -40,7 +40,7 @@ from plugins.raw                import Raw
 #from portal.util                import RegistrationView, ActivationView
 
 from portal.models              import PendingUser, PendingSlice
-from portal.actions             import get_request_by_authority
+from portal.actions             import get_requests
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
@@ -142,9 +142,9 @@ class ValidatePendingView(FreeAccessView):
             print 'credential_authorities =', credential_authorities
             print 'credential_authorities_expired =', credential_authorities_expired
 
-            # Using cache manifold-tables to get the list of authorities faster
-            all_authorities_query = Query.get('authority').select('name', 'authority_hrn')
-            all_authorities = execute_query(self.request, all_authorities_query)
+#            # Using cache manifold-tables to get the list of authorities faster
+#            all_authorities_query = Query.get('authority').select('name', 'authority_hrn')
+#            all_authorities = execute_query(self.request, all_authorities_query)
 
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
@@ -154,17 +154,14 @@ class ValidatePendingView(FreeAccessView):
             for pa in pi_authorities_tmp:
                 pi_authorities |= set(pa['pi_authorities'])
 
-            #print "all_auths = "
-            #print all_authorities
-
-            # include all sub-authorities of the PI
-            # if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
-            pi_subauthorities = set()
-            for authority in all_authorities:
-                authority_hrn = authority['authority_hrn']
-                for my_authority in pi_authorities:
-                    if authority_hrn.startswith(my_authority) and authority_hrn not in pi_subauthorities:
-                        pi_subauthorities.add(authority_hrn)
+#            # include all sub-authorities of the PI
+#            # if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
+#            pi_subauthorities = set()
+#            for authority in all_authorities:
+#                authority_hrn = authority['authority_hrn']
+#                for my_authority in pi_authorities:
+#                    if authority_hrn.startswith(my_authority) and authority_hrn not in pi_subauthorities:
+#                        pi_subauthorities.add(authority_hrn)
 
             #print "pi_authorities =", pi_authorities
             #print "pi_subauthorities =", pi_subauthorities
@@ -193,44 +190,58 @@ class ValidatePendingView(FreeAccessView):
             #print "pi_subauthorities = ", pi_subauthorities
 
             # Summary all
-            queried_pending_authorities = pi_my_authorities | pi_delegation_authorities | pi_subauthorities
+            queried_pending_authorities = pi_my_authorities | pi_delegation_authorities #| pi_subauthorities
             #print "----"
             #print "queried_pending_authorities = ", queried_pending_authorities
 
-            requests = get_request_by_authority(queried_pending_authorities)
+# iterate on the requests and check if the authority matches a prefix startswith an authority on which the user is PI
+            requests = get_requests()
+#            requests = get_requests(queried_pending_authorities)
             for request in requests:
                 auth_hrn = request['authority_hrn']
-                #print "authority for this request", auth_hrn
-
-                if auth_hrn in pi_my_authorities:
-                    dest = ctx_my_authorities
-
-                    # define the css class
-                    if auth_hrn in pi_credential_authorities:
+                for my_auth in pi_my_authorities: 
+                    if auth_hrn.startswith(my_auth):
+                        dest = ctx_my_authorities
                         request['allowed'] = 'allowed'
-                    elif auth_hrn in pi_expired_credential_authorities:
-                        request['allowed'] = 'expired'
-                    else: # pi_no_credential_authorities
-                        request['allowed'] = 'denied'
-
-                elif auth_hrn in pi_delegation_authorities:
-                    dest = ctx_delegation_authorities
-
-                    if auth_hrn in pi_delegation_credential_authorities:
+                for my_auth in pi_delegation_authorities:
+                    if auth_hrn.startswith(my_auth):
+                        dest = ctx_delegation_authorities
                         request['allowed'] = 'allowed'
-                    else: # pi_delegation_expired_authorities
-                        request['allowed'] = 'expired'
+                if auth_hrn in pi_expired_credential_authorities:
+                    request['allowed'] = 'expired'
+                if 'allowed' not in request:
+                    request['allowed'] = 'denied'
+               #print "authority for this request", auth_hrn
 
-                elif auth_hrn in pi_subauthorities:
-                    dest = ctx_sub_authorities
-
-                    if auth_hrn in pi_subauthorities:
-                        request['allowed'] = 'allowed'
-                    else: # pi_delegation_expired_authorities
-                        request['allowed'] = 'denied'
-
-                else:
-                    continue
+#                if auth_hrn in pi_my_authorities:
+#                    dest = ctx_my_authorities
+#
+#                    # define the css class
+#                    if auth_hrn in pi_credential_authorities:
+#                        request['allowed'] = 'allowed'
+#                    elif auth_hrn in pi_expired_credential_authorities:
+#                        request['allowed'] = 'expired'
+#                    else: # pi_no_credential_authorities
+#                        request['allowed'] = 'denied'
+#
+#                elif auth_hrn in pi_delegation_authorities:
+#                    dest = ctx_delegation_authorities
+#
+#                    if auth_hrn in pi_delegation_credential_authorities:
+#                        request['allowed'] = 'allowed'
+#                    else: # pi_delegation_expired_authorities
+#                        request['allowed'] = 'expired'
+#
+#                elif auth_hrn in pi_subauthorities:
+#                    dest = ctx_sub_authorities
+#
+#                    if auth_hrn in pi_subauthorities:
+#                        request['allowed'] = 'allowed'
+#                    else: # pi_delegation_expired_authorities
+#                        request['allowed'] = 'denied'
+#
+#                else:
+#                    continue
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
