@@ -34,6 +34,7 @@ from portal.registrationview    import RegistrationView
 from portal.joinview            import JoinView
 from portal.sliceview           import SliceView
 from portal.validationview      import ValidatePendingView
+from portal.univbrisview	import UnivbrisView
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
@@ -93,6 +94,9 @@ urlpatterns = patterns('',
         {'post_reset_redirect' : '/portal/password/done/'}),
     (r'^password/done/$', 
         'portal.django_passresetview.password_reset_complete'),
+
+    url(r'^univbris/?$', UnivbrisView.as_view(), name='univbris'),
+    #url(r'^univbris/univbrisfv_form2?$', 'django.views.generic.simple.direct_to_template', {'template': 'path/to/about_us.html'}),
     # ...
 
 )

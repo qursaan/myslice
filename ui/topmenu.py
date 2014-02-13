@@ -33,6 +33,7 @@ def topmenu_items_static (current, request):
         dropdown.append({'label':'Platforms', 'href': '/portal/platforms/'})
         dropdown.append({'label':'My Account', 'href': '/portal/account/'})
         dropdown.append({'label':'Contact Support', 'href': '/portal/contact/'})
+	dropdown.append({'label':'UNIVBRIS info', 'href': '/portal/univbris/'})
         result.append({'label': 'More', 'href':"#", 'dropdown':True, 'contents':dropdown})
     else:
         result.append({'label':'Home', 'href': '/login'})
