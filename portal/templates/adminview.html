@@ -22,10 +22,12 @@
             </tr>
             {% for user in user_list %}
             <tr class="border_bottom">
-                <td class="odd"> {{ user.email }} </td>
+                <td class="odd">
+					<a href="/portal/user/{{user.email}}"><span class="glyphicon glyphicon-search"></span></a>	
+					{{ user.email }} 
+				</td>
 				<td class="odd"> {{ user.authority }} </td>
 				<td class="even"> {{ user.status }} </td>
-
             </tr>
             {%endfor%}
         </table>
