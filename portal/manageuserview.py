@@ -1,7 +1,7 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
-from manifold.manifoldapi               import execute_query
+from manifold.manifoldapi               import execute_query, execute_admin_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user
 #
 from unfold.page                        import Page    
@@ -29,16 +29,20 @@ class UserView(LoginRequiredAutoLogoutView):
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
         for key, value in kwargs.iteritems():
-            print "%s = %s" % (key, value)
-            #if key == "platformname":
-            #    platformname=value
+            #print "%s = %s" % (key, value)
+            if key == "email":
+                selected_email=value
     
-        user_query  = Query().get('local:user').select('config','email','status')
-        user_details = execute_query(self.request, user_query)
+        user_query  = Query().get('local:user').filter_by('email', '==', selected_email).select('user_id','config','email','status')
+        user_details = execute_admin_query(self.request, user_query)
         
         # not always found in user_details...
         config={}
         for user_detail in user_details:
+            user_id = user_detail['user_id']
+            user_email = user_detail['email'] 
+            print "hello_world"
+            print user_id          
             # different significations of user_status
             if user_detail['status'] == 0: 
                 user_status = 'Disabled'
@@ -53,9 +57,9 @@ class UserView(LoginRequiredAutoLogoutView):
                 config = json.loads(user_detail['config'])
 
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+        account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
         platform_details = execute_query(self.request, platform_query)
-        account_details = execute_query(self.request, account_query)
+        account_details = execute_admin_query(self.request, account_query)
        
         # initial assignment needed for users having account.config = {} 
         platform_name = ''
@@ -190,7 +194,7 @@ class UserView(LoginRequiredAutoLogoutView):
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
         context['user_status'] = user_status
-        context['person']   = self.request.user
+        context['user_email']   = user_email
         context['firstname'] = config.get('firstname',"?")
         context['lastname'] = config.get('lastname',"?")
         context['fullname'] = context['firstname'] +' '+ context['lastname']

@@ -25,37 +25,10 @@
 	    		<tr class="even">
 	      			<td class="key">Email</td>
 	      			<td class="value">
-						<span id="emailval" class="value" >{{ person.email }}</span>
-						<button class="btn btn-default btn-xs" type="button" id="edit_email" onclick="editAlert()"  title="To change your affiliation please contact the administrator">
-    						<span class="glyphicon glyphicon-question-sign"></span> Edit
+						<span id="emailval" class="value" >{{ user_email }}</span>
+						<button class="btn btn-default btn-xs" type="button" id="edit_email"  title="To change your affiliation please contact the administrator">
+    						<span class="glyphicon glyphicon-edit"></span> Edit
 						</button>
-					</td>
-	      		</tr>
-	      		<tr class="odd">
-					<td class="key">Password</td>
-					<td class="value"> 
-		  				<button class="btn btn-default btn-xs" type="button" title="Password" name="edit_pass" id="edit_pass">
-							<span class="glyphicon glyphicon-edit"></span> Edit
-						</button>
-		  				<span id="passval"class="value">******** </span>
-		  				<span class="hide_this" id="span_pass">
-		    				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_pass_change"> Cancel </button>
-		    				<div style='display:none;' id="pass_form">
-		    				<input type='hidden'  value='' /></div>
-		    				<table id="edit_password">
-		      					<tr>
-									<td>Enter password: </td>
-									<td class="field"> <input type="password" name="password" id="password" /> </td>
-		      						</tr>
-		      						<tr>
-									<td>Confirm password: </td>
-									<td class="field"> 
-			  							<input type="password" name="confirmpassword" id="confirmpassword" /> 
-			  							<input type="submit" class="btn btn-default btn-xs" name="submit_pass" value="Save"/> 
-									</td>
-		      					</tr>
-		    				</table>
-		  				</span>	
 					</td>
 	      		</tr>
 	      		<tr class="even">
@@ -78,8 +51,8 @@
 					<td class="key">Authority</td>
 					<td class="value">
 		  				<span id="affval" class="value">{{ authority }}</span>
-						 <button class="btn btn-default btn-xs" type="button" id="edit_auth" onclick="editAlert()"  title="To change your authority please contact the administrator">
-     						<span class="glyphicon glyphicon-question-sign"></span> Edit
+						 <button class="btn btn-default btn-xs" type="button" id="edit_auth"   title="To change your authority please contact the administrator">
+     						<span class="glyphicon glyphicon-edit"></span> Edit
 						 </button>
 		  			</td>
 				</tr>
@@ -132,14 +105,6 @@
 								value="Delete"	/>
 					</td>
 				 {%endif%}		
-	  			</tr>
-	  			<tr class="odd">
-	    			<td colspan="2">
-	      				<p class="message" id="pkey_del_msg"><b> Tradeoff:</b> Ease-of-use vs Security.<br>
-							<b>Ease-of-use:</b> Automatic account delegation. Don't delete private key.<br>
-							<b>Security:</b> Manual account delegation. Download & Delete private key.
-						</p>
-	    			</td>
 	  			</tr>
 			</table>
 	</div>
