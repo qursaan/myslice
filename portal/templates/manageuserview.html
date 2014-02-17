@@ -86,27 +86,6 @@
 						</button>       
 	      			</td>
 	    		</tr>
-	    		<tr class="odd" id="pkey_row">
-				 {%if 'N/A' not in user_private_key%}
-	      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
-	      			<td class="value">********<a href="#">
-	      				<button type="submit" name="dl_pkey" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_pkey">
-							<span class="glyphicon glyphicon-download"></span> Download	
-						</button>
-	      				<input class="btn btn-danger btn-xs" id="delete" name="delete" type="submit"  value="Delete" title="Delete your private key"
-								onclick="return confirm('Are you sure? If you do so, you have to delegate your credentials manually.');"/> 
-	    			</td>
-				  {%else%}
-					<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
- 					<td class="value">********<a href="#">
-     					<button type="submit" name="dl_pkey" class="btn btn-default btn-xs disabled" title="Download your privaye key" id="dl_pkey">
-        					<span class="glyphicon glyphicon-download"></span> Download 
-     					</button>
-     					<input class="btn btn-danger btn-xs disabled" id="delete" name="delete" type="submit" title="Delete your private key"
-								value="Delete"	/>
-					</td>
-				 {%endif%}		
-	  			</tr>
 			</table>
 	</div>
 </div>
