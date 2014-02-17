@@ -394,10 +394,10 @@ def user_process(request, **kwargs):
                             user_params = { 'config': file_content, 'auth_type':'user'}
                             manifold_update_account(request,user_params)
                             # updating sfa
-                            user_pub_key = {'keys': file_content}
-                            sfa_update_user(request, user_hrn, user_pub_key)
+                            #user_pub_key = {'keys': file_content}
+                            #sfa_update_user(request, user_hrn, user_pub_key)
                             messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
                         else:
                             messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
                             return HttpResponseRedirect(redirect_url)
