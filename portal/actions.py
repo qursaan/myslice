@@ -113,7 +113,7 @@ def manifold_add_account(request, account_params):
 def manifold_update_account(request,account_params):
     # account_params: config
     query = Query.update('local:account').filter_by('platform', '==', 'myslice').set(account_params).select('user_id')
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     # NOTE: results remains empty and goes to Exception. However, it updates the manifold DB.
     # That's why I commented the exception part. -- Yasin 
     #if not results:
@@ -124,7 +124,7 @@ def manifold_update_account(request,account_params):
 #explicitly mention the platform_id
 def manifold_delete_account(request, platform_id, account_params):
     query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).set(account_params).select('user_id')
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     return results
 
 

@@ -41,8 +41,6 @@ class UserView(LoginRequiredAutoLogoutView):
         for user_detail in user_details:
             user_id = user_detail['user_id']
             user_email = user_detail['email'] 
-            print "hello_world"
-            print user_id          
             # different significations of user_status
             if user_detail['status'] == 0: 
                 user_status = 'Disabled'
@@ -231,7 +229,7 @@ def user_process(request, **kwargs):
     for user_detail in user_details:
         user_id = user_detail['user_id']
         user_email = user_detail['email']
-    
+
     account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
     account_details = execute_admin_query(request, account_query)
 
@@ -365,9 +363,9 @@ def user_process(request, **kwargs):
                         user_params = { 'config': keypair, 'auth_type':'managed'}
                         manifold_update_account(request,user_params)
                         # updating sfa
-                        public_key = public_key.replace('"', '');
-                        user_pub_key = {'keys': public_key}
-                        sfa_update_user(request, user_hrn, user_pub_key)
+                        #public_key = public_key.replace('"', '');
+                        #user_pub_key = {'keys': public_key}
+                        #sfa_update_user(request, user_hrn, user_pub_key)
                         messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
                         return HttpResponseRedirect(redirect_url)
         else:
