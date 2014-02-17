@@ -236,7 +236,7 @@ def account_process(request):
             if 'delete_'+platform_detail['platform'] in request.POST:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
-                manifold_delete_account(request,platform_id,user_params)
+                manifold_delete_account(request,platform_id, user_id, user_params)
                 messages.info(request, 'Reference Account is removed from the selected platform')
                 return HttpResponseRedirect("/portal/account/")
 
