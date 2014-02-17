@@ -221,8 +221,8 @@ def user_process(request, **kwargs):
     for key, value in kwargs.iteritems():
         if key == "email":
             selected_email=value
-    print "yasin"
-    print selected_email
+
+    redirect_url = "/portal/user/"+selected_email
     
     user_query  = Query().get('local:user').filter_by('email', '==', selected_email).select('user_id','email','password','config')
     user_details = execute_admin_query(request, user_query)
@@ -230,6 +230,7 @@ def user_process(request, **kwargs):
     # getting the user_id from the session
     for user_detail in user_details:
         user_id = user_detail['user_id']
+        user_email = user_detail['email']
     
     account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
     account_details = execute_admin_query(request, account_query)
@@ -237,12 +238,6 @@ def user_process(request, **kwargs):
     platform_query  = Query().get('local:platform').select('platform_id','platform')
     platform_details = execute_admin_query(request, platform_query)
     
-    # getting the user_id from the session
-    for user_detail in user_details:
-            user_id = user_detail['user_id']
-            user_email = user_detail['email']
-    
-    redirect_url = "/portal/user/"+selected_email
 
     for account_detail in account_details:
         for platform_detail in platform_details:

@@ -10,8 +10,8 @@ from unfold.loginrequired       import LoginRequiredAutoLogoutView
 import json
 
 # View for platforms
-class AdminView(LoginRequiredAutoLogoutView):
-    template_name = "adminview.html"
+class UsersView(LoginRequiredAutoLogoutView):
+    template_name = "usersview.html"
 
     def get_context_data(self, **kwargs):
         page = Page(self.request)
@@ -69,7 +69,7 @@ class AdminView(LoginRequiredAutoLogoutView):
         #        },
         #)
 
-        context = super(AdminView, self).get_context_data(**kwargs)
+        context = super(UsersView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
         context['user_list'] = user_list
 
@@ -77,7 +77,7 @@ class AdminView(LoginRequiredAutoLogoutView):
         # more general variables expected in the template
         context['title'] = 'Users in MySlice'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items_live('Admin', page)
+        context['topmenu_items'] = topmenu_items_live('Users', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
 
