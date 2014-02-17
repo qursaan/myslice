@@ -321,17 +321,27 @@ def user_process(request, **kwargs):
         messages.success(request, 'Sucess: First Name and Last Name Updated.')
         return HttpResponseRedirect(redirect_url)       
     
-    #elif 'submit_pass' in request.POST:
-    #    edited_password = request.POST['password']
-    #    
-    #    for user_pass in user_details:
-    #        user_pass['password'] = edited_password
-    #    #updating password in local:user
-    #    user_params = { 'password': user_pass['password']}
-    #    manifold_update_user(request,request.user.email,user_params)
-#   #     return HttpResponse('Success: Password Changed!!')
-    #    messages.success(request, 'Sucess: Password Updated.')
-    #    return HttpResponseRedirect("/portal/account/")
+    elif 'submit_auth' in request.POST:
+        edited_auth = request.POST['authority']
+        
+        config={}
+        for user_config in user_details:
+            if user_config['config']:
+                config = json.loads(user_config['config'])
+                config['firstname'] = config.get('firstname', 'N/A')
+                config['lastname'] = config.get('lastname','N/A')
+                config['authority'] = edited_auth
+                updated_config = json.dumps(config)
+                user_params = {'config': updated_config}
+            else: # it's needed if the config is empty 
+                user_config['config']= '{"firstname": "N/A", "lastname":"N/A", "authority":"' + edited_auth + '"}'
+                user_params = {'config': user_config['config']}
+        # updating config local:user in manifold       
+        manifold_update_user(request, user_email, user_params)
+        # this will be depricated, we will show the success msg in same page
+        # Redirect to same page with success message
+        messages.success(request, 'Sucess: Authority Updated.')
+        return HttpResponseRedirect(redirect_url)
 
 # XXX TODO: Factorize with portal/registrationview.py
 

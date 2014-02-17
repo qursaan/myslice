@@ -22,22 +22,11 @@
 						<div id="info">Platform: Myslice</div>
 	      			</td>
 	    		</tr>
-				<tr class="odd">
+				<tr class="even">
     				<td class="key">Email</td>
-    				<td class="value">
-        				<span id="emailval" class="value" >{{ user_email }} </span>
-        				<span class="hide_this" id="span_email">
-            				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_email_change"> Cancel </button>
-            				<div style='display:none;'><input type='hidden'  name='emailform'  /></div>
-            				<input id="email" type="text" name="email" class="required"  maxlength="200" value="{{user_email}}" />
-            				<input type="submit" class="btn btn-default btn-xs" name="submit_email" value="Save"/>
-        				</span>
-        				<button class="btn btn-default btn-xs" type="button"title="email" id="edit_email">
-            				<span class="glyphicon glyphicon-edit"></span> Edit
-        				</button>
-    				</td>
-				</tr>       
-	      		<tr class="even">
+    				<td class="value"> <span id="emailval" class="value" >{{ user_email }}</span> </td>
+				</tr>
+	      		<tr class="odd">
 					<td class="key">Full Name</td>
 					<td class="value">
 		  				<span id="nameval" class="value" >{{ fullname }} </span>
@@ -53,7 +42,7 @@
 						</button>
 					</td>
 	      		</tr>
-				<tr class="odd">
+				<tr class="even">
      				<td class="key">Authority</td>
      				<td class="value">
          				<span id="authval" class="value" >{{ authority }} </span>
@@ -68,7 +57,7 @@
         	 			</button>
      				</td>
  				</tr>     
-				<tr class="even">
+				<tr class="odd">
 		  			<td class="key">Generate Keys</td>
 		  			<td>
 						<input type="submit" name="generate" class="btn btn-danger btn-xs" value="Generate a new Key Pair" id="generate_keypair" 
@@ -76,7 +65,7 @@
 							   title="It will generate a new key Pair and your current credentials will be overwritten."/>
 	      			</td> 
 	    		</tr>
-	    		<tr class="odd">
+	    		<tr class="even">
 	      			<td class="key">Public Key</td>
 	      			<td class="value">
 						<span id="keyval" class="value">******** </span>
@@ -97,7 +86,7 @@
 						</button>       
 	      			</td>
 	    		</tr>
-	    		<tr class="even" id="pkey_row">
+	    		<tr class="odd" id="pkey_row">
 				 {%if 'N/A' not in user_private_key%}
 	      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
 	      			<td class="value">********<a href="#">
