@@ -216,19 +216,33 @@ class UserView(LoginRequiredAutoLogoutView):
 
 @login_required
 #my_acc form value processing
-def user_process(request):
-    user_query  = Query().get('local:user').select('user_id','email','password','config')
-    user_details = execute_query(request, user_query)
+def user_process(request, **kwargs):
+        
+    for key, value in kwargs.iteritems():
+        if key == "email":
+            selected_email=value
+    print "yasin"
+    print selected_email
     
-    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-    account_details = execute_query(request, account_query)
+    user_query  = Query().get('local:user').filter_by('email', '==', selected_email).select('user_id','email','password','config')
+    user_details = execute_admin_query(request, user_query)
+
+    # getting the user_id from the session
+    for user_detail in user_details:
+        user_id = user_detail['user_id']
+    
+    account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
+    account_details = execute_admin_query(request, account_query)
 
     platform_query  = Query().get('local:platform').select('platform_id','platform')
-    platform_details = execute_query(request, platform_query)
+    platform_details = execute_admin_query(request, platform_query)
     
     # getting the user_id from the session
     for user_detail in user_details:
             user_id = user_detail['user_id']
+            user_email = user_detail['email']
+    
+    redirect_url = "/portal/user/"+selected_email
 
     for account_detail in account_details:
         for platform_detail in platform_details:
@@ -238,15 +252,15 @@ def user_process(request):
                 user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
                 manifold_add_account(request,user_params)
                 messages.info(request, 'Reference Account is added to the selected platform successfully!')
-                return HttpResponseRedirect("/portal/account/")
+                return HttpResponseRedirect(redirect_url)
 
             # Delete reference account from the platforms
             if 'delete_'+platform_detail['platform'] in request.POST:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
                 manifold_delete_account(request,platform_id,user_params)
-                messages.info(request, 'Reference Account is removed from the selected platform')
-                return HttpResponseRedirect("/portal/account/")
+                messages.info(request, 'Refeence Account is removed from the selected platform')
+                return HttpResponseRedirect(redirect_url)
 
             if platform_detail['platform_id'] == account_detail['platform_id']:
                 if 'myslice' in platform_detail['platform']:
@@ -306,23 +320,23 @@ def user_process(request):
                 user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
                 user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
-        manifold_update_user(request, request.user.email,user_params)
+        manifold_update_user(request, user_email, user_params)
         # this will be depricated, we will show the success msg in same page
         # Redirect to same page with success message
         messages.success(request, 'Sucess: First Name and Last Name Updated.')
-        return HttpResponseRedirect("/portal/account/")       
+        return HttpResponseRedirect(redirect_url)       
     
-    elif 'submit_pass' in request.POST:
-        edited_password = request.POST['password']
-        
-        for user_pass in user_details:
-            user_pass['password'] = edited_password
-        #updating password in local:user
-        user_params = { 'password': user_pass['password']}
-        manifold_update_user(request,request.user.email,user_params)
-#        return HttpResponse('Success: Password Changed!!')
-        messages.success(request, 'Sucess: Password Updated.')
-        return HttpResponseRedirect("/portal/account/")
+    #elif 'submit_pass' in request.POST:
+    #    edited_password = request.POST['password']
+    #    
+    #    for user_pass in user_details:
+    #        user_pass['password'] = edited_password
+    #    #updating password in local:user
+    #    user_params = { 'password': user_pass['password']}
+    #    manifold_update_user(request,request.user.email,user_params)
+#   #     return HttpResponse('Success: Password Changed!!')
+    #    messages.success(request, 'Sucess: Password Updated.')
+    #    return HttpResponseRedirect("/portal/account/")
 
 # XXX TODO: Factorize with portal/registrationview.py
 
@@ -350,10 +364,10 @@ def user_process(request):
                         user_pub_key = {'keys': public_key}
                         sfa_update_user(request, user_hrn, user_pub_key)
                         messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
-                        return HttpResponseRedirect("/portal/account/")
+                        return HttpResponseRedirect(redirect_url)
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
                        
     elif 'upload_key' in request.POST:
         for account_detail in account_details:
@@ -383,7 +397,7 @@ def user_process(request):
                             return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
@@ -401,7 +415,7 @@ def user_process(request):
                         break
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
                
     elif 'dl_pkey' in request.POST:
         for account_detail in account_details:
@@ -416,7 +430,7 @@ def user_process(request):
                             return response
                         else:
                             messages.error(request, 'Download error: Private key is not stored in the server')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
 
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
@@ -441,11 +455,11 @@ def user_process(request):
                             return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'Delete error: Private key is not stored in the server')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
                            
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
 
     #clear all creds
     elif 'clear_cred' in request.POST:
@@ -466,10 +480,10 @@ def user_process(request):
                             return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'Delete error: Credentials are not stored in the server')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
 
 
     # Download delegated_user_cred
@@ -481,10 +495,10 @@ def user_process(request):
             return response
         else:
             messages.error(request, 'Download error: User credential  is not stored in the server')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
         
     else:
         messages.info(request, 'Under Construction. Please try again later!')
-        return HttpResponseRedirect("/portal/account/")
+        return HttpResponseRedirect(redirect_url)
 
 

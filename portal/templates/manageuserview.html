@@ -12,7 +12,7 @@
 {% endif %}
 
 
-<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
+<form id="editForm"  method="POST" action="{{user_email}}/user_process" enctype="multipart/form-data">
 <div id="middle" align="center">
 	<div class="well">
 	  	{% csrf_token %}
@@ -22,15 +22,21 @@
 						<div id="info">Platform: Myslice</div>
 	      			</td>
 	    		</tr>
-	    		<tr class="even">
-	      			<td class="key">Email</td>
-	      			<td class="value">
-						<span id="emailval" class="value" >{{ user_email }}</span>
-						<button class="btn btn-default btn-xs" type="button" id="edit_email"  title="To change your affiliation please contact the administrator">
-    						<span class="glyphicon glyphicon-edit"></span> Edit
-						</button>
-					</td>
-	      		</tr>
+				<tr class="odd">
+    				<td class="key">Email</td>
+    				<td class="value">
+        				<span id="emailval" class="value" >{{ user_email }} </span>
+        				<span class="hide_this" id="span_email">
+            				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_email_change"> Cancel </button>
+            				<div style='display:none;'><input type='hidden'  name='emailform'  /></div>
+            				<input id="email" type="text" name="email" class="required"  maxlength="200" value="{{user_email}}" />
+            				<input type="submit" class="btn btn-default btn-xs" name="submit_email" value="Save"/>
+        				</span>
+        				<button class="btn btn-default btn-xs" type="button"title="email" id="edit_email">
+            				<span class="glyphicon glyphicon-edit"></span> Edit
+        				</button>
+    				</td>
+				</tr>       
 	      		<tr class="even">
 					<td class="key">Full Name</td>
 					<td class="value">
@@ -47,15 +53,21 @@
 						</button>
 					</td>
 	      		</tr>
-	      		<tr class="odd">
-					<td class="key">Authority</td>
-					<td class="value">
-		  				<span id="affval" class="value">{{ authority }}</span>
-						 <button class="btn btn-default btn-xs" type="button" id="edit_auth"   title="To change your authority please contact the administrator">
-     						<span class="glyphicon glyphicon-edit"></span> Edit
-						 </button>
-		  			</td>
-				</tr>
+				<tr class="odd">
+     				<td class="key">Authority</td>
+     				<td class="value">
+         				<span id="authval" class="value" >{{ authority }} </span>
+         				<span class="hide_this" id="span_auth">
+             				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_auth_change"> Cancel </button>
+             				<div style='display:none;'><input type='hidden'  name='authform'  /></div>
+             				<input id="authority" type="text" name="authority" class="required"  maxlength="200" value="{{authority}}" />
+             				<input type="submit" class="btn btn-default btn-xs" name="submit_auth" value="Save"/>
+         				</span>
+         				<button class="btn btn-default btn-xs" type="button"title="auth" id="edit_auth">
+             				<span class="glyphicon glyphicon-edit"></span> Edit
+        	 			</button>
+     				</td>
+ 				</tr>     
 				<tr class="even">
 		  			<td class="key">Generate Keys</td>
 		  			<td>
