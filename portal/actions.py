@@ -117,8 +117,8 @@ def manifold_update_account(request,user_id,account_params):
     return results
 
 #explicitly mention the platform_id
-def manifold_delete_account(request, platform_id, account_params):
-    query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).set(account_params).select('user_id')
+def manifold_delete_account(request, platform_id, user_id, account_params):
+    query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).filter_by('user_id', '==', user_id).set(account_params).select('user_id')
     results = execute_admin_query(request,query)
     return results
 
