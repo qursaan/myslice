@@ -13,6 +13,8 @@ from portal.forms                import SliceRequestForm
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 from ui.topmenu                  import topmenu_items_live, the_user
 
+import json
+
 class SliceRequestView (LoginRequiredAutoLogoutView):
     def __init__ (self):
         self.user_email = ''
@@ -37,10 +39,29 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
         user_email = execute_query(self.request, user_query)
         self.user_email = user_email[0].get('email')
 
-        user_query  = Query().get('user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
-        user_hrn = execute_query(self.request, user_query)
-        self.user_hrn = user_hrn[0].get('user_hrn')
 
+        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+        account_details = execute_query(self.request, account_query)
+
+        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
+        platform_details = execute_query(self.request, platform_query)
+
+        # getting user_hrn from local:account
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    # taking user_hrn only from myslice account
+                    # NOTE: we should later handle accounts filter_by auth_type= managed OR user
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_hrn = account_config.get('user_hrn','N/A')
+
+
+        #user_query  = Query().get('user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
+        #user_hrn = execute_query(self.request, user_query)
+        #self.user_hrn = user_hrn[0].get('user_hrn')
+        
+        
         page = Page(request)
         page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
@@ -53,7 +74,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             number_of_nodes = request.POST.get('number_of_nodes', '')
             purpose = request.POST.get('purpose', '')
             email = self.user_email
-            user_hrn = self.user_hrn
+            user_hrn = user_hrn
             cc_myself = True
             
             if (authority_hrn is None or authority_hrn == ''):
@@ -101,10 +122,9 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
           'number_of_nodes': request.POST.get('number_of_nodes', ''),
           'purpose': request.POST.get('purpose', ''),
           'email': self.user_email,
-          'user_hrn': self.user_hrn,
+          'user_hrn': user_hrn,
           'cc_myself': True,
           'authorities': authorities,
         }
         template_env.update(page.prelude_env ())
         return render(request, 'slicerequest_view.html',template_env)
-
