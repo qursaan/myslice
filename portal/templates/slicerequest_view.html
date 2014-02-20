@@ -7,13 +7,8 @@
 
 {% block unfold_main %}
 
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
-<!-- xxx ideally only onelab.css but ... xxx -->
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-
-<div class="onelab-title well-lg">
-  <h2>Request a Slice</h2>
-</div>
+<div class="wrapper" id="slice-request">
+<h1><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="Request a Slice" /> Request a new Slice</h1>
 
 {% if errors %}
 <ul>
@@ -23,16 +18,19 @@
 </ul>
 {% endif %}
 
-<div class='well'>
-  <form id="commentForm" class="form-horizontal" action="" method="post" role="form">{% csrf_token %}
+<div>
+  <form id="commentForm" class="form-horizontal" method="post">
+  {% csrf_token %}
   <fieldset>
 
    <div class="form-group">
      <label for="email" class="col-xs-2 control-label">Experimenter</label>
      <div class="col-xs-4">
-        <label class="col-xs-2 control-label" style="height:34px;">{{ email }}</label>
+        <label class="col-xs-2 control-label">{{ email }}</label>
      </div>
-     <div class="col-xs-6"> <p class="form-hint">Experimenter requesting a Slice</p> </div>
+     <div class="col-xs-6">
+     	<p class="form-hint">Experimenter requesting a Slice</p>
+     </div>
    </div>
 
    <div class="form-group">
@@ -67,17 +65,23 @@
      <label for="purpose" class="col-xs-2 control-label">Experiment purpose</label>
      <div class="col-xs-4">
        <div class="ui-widget">
-           <textarea id="purpose" name="purpose" class="form-control" style="height:110px;" placeholder="Purpose" required>{{ purpose }}</textarea>
+           <textarea id="purpose" name="purpose" class="form-control" style="height:110px;" placeholder="Experiment Purpose" required>{{ purpose }}</textarea>
        </div>
     </div>
-     <div class="col-xs-6"><p class="form-hint">Purpose of your experiment (informative)</p></div>
+     <div class="col-xs-6">
+     	<p class="form-hint">Purpose of your experiment (informative)</p>
+     </div>
    </div>
 
-   <button class="submit btn btn-default col-xs-12" type="submit">Request Slice</button>
+	<div class="col-xs-2">
+	</div>
+	<div class="col-xs-4">
+		<button class="submit btn btn-default" type="submit">Request Slice</button>
+	</div>
   </fieldset>
   </form>
 </div>
-
+</div>
 <script>
 jQuery(document).ready(function(){
     var availableTags = [

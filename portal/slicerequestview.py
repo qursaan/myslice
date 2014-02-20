@@ -13,6 +13,8 @@ from portal.forms                import SliceRequestForm
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 from ui.topmenu                  import topmenu_items_live, the_user
 
+from theme import ThemeView
+
 import json
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
@@ -45,7 +47,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         platform_details = execute_query(self.request, platform_query)
-
+        user_hrn = None
         # getting user_hrn from local:account
         for account_detail in account_details:
             for platform_detail in platform_details:
@@ -74,7 +76,6 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             number_of_nodes = request.POST.get('number_of_nodes', '')
             purpose = request.POST.get('purpose', '')
             email = self.user_email
-            user_hrn = user_hrn
             cc_myself = True
             
             if (authority_hrn is None or authority_hrn == ''):
@@ -113,8 +114,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
     
                 return render(request,'slice-request-ack-view.html') # Redirect after POST
-     
         template_env = {
+            'username': request.user.email,
           'topmenu_items': topmenu_items_live('Request a slice', page),
           'errors': self.errors,
           'slice_name': request.POST.get('slice_name', ''),
