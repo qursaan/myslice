@@ -20,9 +20,9 @@ jQuery(document).ready(function(){
                               jQuery("#span_pass").hide();
                               jQuery("#edit_pass").show();
                               jQuery("#passval").show();
-                              jQuery("#span_aff").hide();
-                              jQuery("#edit_aff").show();
-                              jQuery("#affval").show();
+                              jQuery("#span_auth").hide();
+                              jQuery("#edit_auth").show();
+                              jQuery("#authval").show();
                               jQuery("#span_email").hide();
                               jQuery("#edit_email").show();
                               jQuery("#emailval").show();
@@ -49,9 +49,9 @@ jQuery(document).ready(function(){
                               jQuery("#span_name").hide();
                               jQuery("#edit_name").show();
                               jQuery("#nameval").show();
-                              jQuery("#span_aff").hide();
-                              jQuery("#edit_aff").show();
-                              jQuery("#affval").show();
+                              jQuery("#span_auth").hide();
+                              jQuery("#edit_aauth").show();
+                              jQuery("#authval").show();
                               jQuery("#span_email").hide();
                               jQuery("#edit_email").show();
                               jQuery("#emailval").show();
@@ -77,12 +77,12 @@ jQuery(document).ready(function(){
                                 }
                             }
                       });
-                      //edit affiliation
-                      jQuery("#edit_aff").click(function(){
+                      //edit authority
+                      jQuery("#edit_auth").click(function(){
 
-                              jQuery("#span_aff").show();
-                              jQuery("#affval").hide();
-                              jQuery("#edit_aff").hide();
+                              jQuery("#span_auth").show();
+                              jQuery("#authval").hide();
+                              jQuery("#edit_auth").hide();
                               // enforcing when one edit is clicked the rest will not work at same time
                               jQuery("#span_pass").hide();
                               jQuery("#edit_pass").show();
@@ -98,14 +98,14 @@ jQuery(document).ready(function(){
                               jQuery("#dl_file").show();
                               jQuery("#upload_file").show();
                       });
-                      jQuery("#cancel_aff_change").click(function(){
+                      jQuery("#cancel_auth_change").click(function(){
 
-                              jQuery("#span_aff").hide();
-                              jQuery("#affval").show();
-                              jQuery("#edit_aff").show();
+                              jQuery("#span_auth").hide();
+                              jQuery("#authval").show();
+                              jQuery("#edit_auth").show();
                       });
                       //edit email
-                      /* edit email will be done by PI if needed
+                      //edit email will be done by PI if needed
                       jQuery("#edit_email").click(function(){
 
                               jQuery("#span_email").show();
@@ -115,9 +115,9 @@ jQuery(document).ready(function(){
                               jQuery("#span_pass").hide();
                               jQuery("#edit_pass").show();
                               jQuery("#passval").show();
-                              jQuery("#span_aff").hide();
-                              jQuery("#edit_aff").show();
-                              jQuery("#affval").show();
+                              jQuery("#span_auth").hide();
+                              jQuery("#edit_auth").show();
+                              jQuery("#authval").show();
                               jQuery("#span_name").hide();
                               jQuery("#edit_name").show();
                               jQuery("#nameval").show();
@@ -131,7 +131,7 @@ jQuery(document).ready(function(){
                               jQuery("#span_email").hide();
                               jQuery("#emailval").show();
                               jQuery("#edit_email").show();
-                      }); */
+                      }); 
                       //upload pub keys
                       jQuery("#upload_file").click(function(){
 
@@ -146,9 +146,9 @@ jQuery(document).ready(function(){
                               jQuery("#span_pass").hide();
                               jQuery("#edit_pass").show();
                               jQuery("#passval").show();
-                              jQuery("#span_aff").hide();
-                              jQuery("#edit_aff").show();
-                              jQuery("#affval").show();
+                              jQuery("#span_auth").hide();
+                              jQuery("#edit_auth").show();
+                              jQuery("#authval").show();
                               jQuery("#span_email").hide();
                               jQuery("#edit_email").show();
                               jQuery("#emailval").show();

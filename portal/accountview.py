@@ -239,7 +239,7 @@ def account_process(request):
             if 'delete_'+platform_detail['platform'] in request.POST:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
-                manifold_delete_account(request,platform_id,user_params)
+                manifold_delete_account(request,platform_id, user_id, user_params)
                 messages.info(request, 'Reference Account is removed from the selected platform')
                 return HttpResponseRedirect("/portal/account/")
 
@@ -339,7 +339,7 @@ def account_process(request):
                         updated_config = json.dumps(account_config) 
                         # updating manifold
                         user_params = { 'config': keypair, 'auth_type':'managed'}
-                        manifold_update_account(request,user_params)
+                        manifold_update_account(request, user_id, user_params)
                         # updating sfa
                         public_key = public_key.replace('"', '');
                         user_pub_key = {'keys': public_key}
@@ -370,7 +370,7 @@ def account_process(request):
                             file_content = ''.join(file_content.split())
                             #update manifold local:account table
                             user_params = { 'config': file_content, 'auth_type':'user'}
-                            manifold_update_account(request,user_params)
+                            manifold_update_account(request, user_id, user_params)
                             # updating sfa
                             user_pub_key = {'keys': file_content}
                             sfa_update_user(request, user_hrn, user_pub_key)
@@ -430,7 +430,7 @@ def account_process(request):
                                 
                             updated_config = json.dumps(account_config)
                             user_params = { 'config': updated_config, 'auth_type':'user'}
-                            manifold_update_account(request,user_params)
+                            manifold_update_account(request, user_id, user_params)
                             messages.success(request, 'Private Key deleted. You need to delegate credentials manually once it expires.')
                             messages.success(request, 'Once your credentials expire, Please delegate manually using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
                             return HttpResponseRedirect("/portal/account/")
@@ -456,7 +456,7 @@ def account_process(request):
                             user_priv_key = json.dumps(account_config.get('user_private_key','N/A'))
                             updated_config = '{"user_public_key":'+ user_pub_key + ', "user_private_key":'+ user_priv_key + ', "user_hrn":"'+ user_hrn + '"}'
                             user_params = { 'config': updated_config}
-                            manifold_update_account(request,user_params)
+                            manifold_update_account(request,user_id, user_params)
                             messages.success(request, 'All Credentials cleared')
                             return HttpResponseRedirect("/portal/account/")
                         else:

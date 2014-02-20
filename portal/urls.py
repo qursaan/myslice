@@ -23,13 +23,13 @@
 from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
-from portal.adminview           import AdminView
+from portal.usersview           import UsersView
+from portal.manageuserview      import UserView, user_process    
 from portal.platformsview       import PlatformsView
 from portal.platformview        import PlatformView
 from portal.resourceview        import ResourceView
 from portal.dashboardview       import DashboardView
 from portal.accountview         import AccountView, account_process
-from portal.manageuserview      import UserView, user_process    
 from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
@@ -60,9 +60,9 @@ urlpatterns = patterns('',
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', AccountView.as_view(), name='account'),
-    url(r'^admin/?$', AdminView.as_view(), name='user_list'),
-    url(r'^user/(?P<email>[\w\s.@\-]+)/?$', UserView.as_view(), name='account'),
-    url(r'^user/user_process/?$', user_process),
+    url(r'^users/?$', UsersView.as_view(), name='user_list'),
+    url(r'^user/(?P<email>[\w\s.@\-]+)/?$', UserView.as_view(), name='user'),
+    url(r'^user/(?P<email>[\w\s.@\-]+)/user_process/?$', user_process),
     url(r'^platforms/?$', PlatformsView.as_view(), name='platforms'),
     url(r'^platform/(?P<platformname>[\w\.\-]+)/?$', PlatformView.as_view(), name='platform'),
     url(r'^resource/(?P<urn>[\w\.\-\+\:]+)/?$', ResourceView.as_view(), name='resource'),

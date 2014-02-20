@@ -12,7 +12,7 @@
 {% endif %}
 
 
-<form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
+<form id="editForm"  method="POST" action="{{user_email}}/user_process" enctype="multipart/form-data">
 <div id="middle" align="center">
 	<div class="well">
 	  	{% csrf_token %}
@@ -22,16 +22,11 @@
 						<div id="info">Platform: Myslice</div>
 	      			</td>
 	    		</tr>
-	    		<tr class="even">
-	      			<td class="key">Email</td>
-	      			<td class="value">
-						<span id="emailval" class="value" >{{ user_email }}</span>
-						<button class="btn btn-default btn-xs" type="button" id="edit_email"  title="To change your affiliation please contact the administrator">
-    						<span class="glyphicon glyphicon-edit"></span> Edit
-						</button>
-					</td>
-	      		</tr>
-	      		<tr class="even">
+				<tr class="even">
+    				<td class="key">Email</td>
+    				<td class="value"> <span id="emailval" class="value" >{{ user_email }}</span> </td>
+				</tr>
+	      		<tr class="odd">
 					<td class="key">Full Name</td>
 					<td class="value">
 		  				<span id="nameval" class="value" >{{ fullname }} </span>
@@ -47,16 +42,22 @@
 						</button>
 					</td>
 	      		</tr>
-	      		<tr class="odd">
-					<td class="key">Authority</td>
-					<td class="value">
-		  				<span id="affval" class="value">{{ authority }}</span>
-						 <button class="btn btn-default btn-xs" type="button" id="edit_auth"   title="To change your authority please contact the administrator">
-     						<span class="glyphicon glyphicon-edit"></span> Edit
-						 </button>
-		  			</td>
-				</tr>
 				<tr class="even">
+     				<td class="key">Authority</td>
+     				<td class="value">
+         				<span id="authval" class="value" >{{ authority }} </span>
+         				<span class="hide_this" id="span_auth">
+             				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_auth_change"> Cancel </button>
+             				<div style='display:none;'><input type='hidden'  name='authform'  /></div>
+             				<input id="authority" type="text" name="authority" class="required"  maxlength="200" value="{{authority}}" />
+             				<input type="submit" class="btn btn-default btn-xs" name="submit_auth" value="Save"/>
+         				</span>
+         				<button class="btn btn-default btn-xs" type="button"title="auth" id="edit_auth">
+             				<span class="glyphicon glyphicon-edit"></span> Edit
+        	 			</button>
+     				</td>
+ 				</tr>     
+				<tr class="odd">
 		  			<td class="key">Generate Keys</td>
 		  			<td>
 						<input type="submit" name="generate" class="btn btn-danger btn-xs" value="Generate a new Key Pair" id="generate_keypair" 
@@ -64,7 +65,7 @@
 							   title="It will generate a new key Pair and your current credentials will be overwritten."/>
 	      			</td> 
 	    		</tr>
-	    		<tr class="odd">
+	    		<tr class="even">
 	      			<td class="key">Public Key</td>
 	      			<td class="value">
 						<span id="keyval" class="value">******** </span>
@@ -85,27 +86,6 @@
 						</button>       
 	      			</td>
 	    		</tr>
-	    		<tr class="even" id="pkey_row">
-				 {%if 'N/A' not in user_private_key%}
-	      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
-	      			<td class="value">********<a href="#">
-	      				<button type="submit" name="dl_pkey" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_pkey">
-							<span class="glyphicon glyphicon-download"></span> Download	
-						</button>
-	      				<input class="btn btn-danger btn-xs" id="delete" name="delete" type="submit"  value="Delete" title="Delete your private key"
-								onclick="return confirm('Are you sure? If you do so, you have to delegate your credentials manually.');"/> 
-	    			</td>
-				  {%else%}
-					<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
- 					<td class="value">********<a href="#">
-     					<button type="submit" name="dl_pkey" class="btn btn-default btn-xs disabled" title="Download your privaye key" id="dl_pkey">
-        					<span class="glyphicon glyphicon-download"></span> Download 
-     					</button>
-     					<input class="btn btn-danger btn-xs disabled" id="delete" name="delete" type="submit" title="Delete your private key"
-								value="Delete"	/>
-					</td>
-				 {%endif%}		
-	  			</tr>
 			</table>
 	</div>
 </div>
