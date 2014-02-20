@@ -12,8 +12,8 @@ from portal.actions              import authority_get_pi_emails
 from portal.forms                import SliceRequestForm
 from unfold.loginrequired        import LoginRequiredAutoLogoutView
 from ui.topmenu                  import topmenu_items_live, the_user
-
-class SliceRequestView (LoginRequiredAutoLogoutView):
+from theme import ThemeView
+class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     def __init__ (self):
         self.user_email = ''
         self.errors = []
@@ -104,6 +104,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
           'user_hrn': self.user_hrn,
           'cc_myself': True,
           'authorities': authorities,
+          'theme': self.theme
         }
         template_env.update(page.prelude_env ())
         return render(request, 'slicerequest_view.html',template_env)
