@@ -1,18 +1,67 @@
 /* @override unfold/static/css/plugin.css */
-
-/*-------------------------------- MARKO'S STYLES -----*/
-
 /* GENERAL */
+body {
+    padding-top: 60px;
+    padding-bottom: 20px;
+}
+*/
+/* center the buttons vertically in the header */
+div.topmenu { padding-top: 40px; }
+ul.logged-in { 
+    padding-top: 12px; 
+}
+button.logged-in { 
+    font-size: small; 
+    margin-left: 5px;
+}
+li.username {
+    margin-bottom: 10px;
+    font-size: x-small; 
+}
 
+.logoTxt{
+    font-size: 35px;
+    position: absolute;
+    margin-left: 20px;
+    font-family: verdana,arial,sans-serif;
+    font-weight: bold;       
+}
+a{
+    color: #777777;
+    text-decoration: none;
+}
+a:hover{
+    color: red;
+    text-decoration: none;
+}
 .container {
-    padding: 0 ;
-    background-color:white;
+	padding: 0 !important;
     color: black;
+    background-color: white;
     margin: 0;
     width: 100%;
     max-width: 100%;
-    min-height: 600px;
-    height: 100%;
+    min-height: 100% !important;
+    height: 100% !important;
+    font-family: Ubuntu, Arial, sans-serif !important;
+}
+div.f4f-title{
+    margin-top:20px;
+    margin-bottom:20px;
+    text-align: center;
+    border: 1px solid #61210B;
+    background-color: orange;
+}
+.container h1 {
+    color: #777777;
+    margin-top: 5px;
+}
+table {
+   color:black;
+}
+
+.container h1, .container h2 {
+    color: #fff !important;
 }
 
 div.plugin-outline-complete, 
@@ -51,12 +100,6 @@ a.plugin-tooltip:hover {
 
 
 /* LIST VIEW */
-div.well-lg {
-    background-color: rgba(168, 32, 202, 0.5) ;
-}
-div.onelab-title {
-    background-color: rgba(168, 32, 202, 0.5) ;
-}
 
 h2.well.well-lg {
     border-radius:0;
@@ -130,10 +173,60 @@ h2.well.well-lg {
     opacity: 1;
 }
 
+.nav.nav-tabs {
+    font-family: Ubuntu, Arial, sans-serif;
+    border: 0 !important;
+    border-bottom: 3px solid #fff !important;
+    margin-bottom: 40px;
+}
 
+.nav.nav-tabs li.active a {
+    color: red;
+    border-left: 0px solid #572bc9;
+    border-top: 0px solid #572bc9;
+    border-right: 0px solid #572bc9;
+    background-color: orange;
+}
 
+.nav.nav-tabs li a {
+    color: #333;
+    border: 0 !important;
+    margin-right: 5px;
+}
+
+.nav.nav-tabs li a:hover {
+    color: #333;
+    background: red;
+    color: #fff;
+    border: 0 !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    background-color: orange;
+}
+
+/* TOPMENU.CSS */
+
+body {
+	/* background: #30196d !important; */
+	/* background: black !important; */
+	background: white !important;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.navbar-fixed-top {
+    position: relative !important;
+}
 
 .navbar-nav li a:hover {
+    color: red !important;
+}
+
+.navbar-nav li.active a {
+    background: #eee !important;
+    background-color: orange;
     color: #572bc9 ;
 }
 
@@ -151,18 +244,19 @@ button.logged-in {
     font-weight: bold; 
     margin-left: 5px;
     margin-top: -5px;
-    background: #572bc9;
-    border: 2px solid #572bc9;
-    color: #eee;
+    /* background: #572bc9; */
+    background: #FFD69B;
+    border: 1px solid orange;
+    color: #777777;
     padding: 5px 15px;
     border-radius:5px;
 }
 
 button.logged-in:hover { 
     /* background: #4af25d; */
-    background: #ff7394;
-    border: 2px solid #ff7394;
-    color: #333;
+    background: orange;
+    border: 1px solid #777777;
+    color: #777777;
 }
 li.username {
     margin-bottom: 10px;
@@ -183,11 +277,35 @@ ul.pagination li a {
 }
 
 ul.pagination li.active a {
-    background: #572bc9;
-    border: 1px solid #572bc9;
+    /* background: #572bc9; */
+    background: orange;
+    border: 1px solid red;
 }
 
+.btn.btn-default {
+    /* background: #572bc9; */
+    background: #FFD69B;
+    color: #777777;
+    font-family: Ubuntu, Arial, sans-serif;
+    font-weight: bold;
+    border-color: #eea236;
+}
 
+.btn.btn-default:hover {
+    /* background: #4af25d; */
+    /* background: #ff7394; */
+    background: orange;
+    color: #333;
+    font-family: Ubuntu, Arial, sans-serif;
+    font-weight: bold;
+    border-color: #927143;
+}
+
+input {
+    border-radius: 3px;
+    border: none;
+    border: 1px solid #ccc;
+}
 
 div.dataTables_length label, 
 div.dataTables_filter label,
@@ -243,11 +361,14 @@ table.query-editor {
 
 .query-editor-spacer,
 .plugin.QueryUpdater,
+.plugin.Tabs {
+    margin-top: 60px !important;
 /* Thierry : turning this off
 .plugin.Tabs 
 Thierry */
 {
     margin-top: 60px ;
+>>>>>>> 804932e8a431ddbf0d7c56457625457967b48d4c:portal/static/css/onelab_marko.css
 }
 
 table.query-editor td {
@@ -269,7 +390,7 @@ table.query-editor td {
     padding-top: 140px;
     padding-bottom: 60px;
     margin-top: 60px;
-    color: #fff;
+    color: #777777;
     font-family: Ubuntu, Arial, sans-serif;
     text-align: center;
 	
@@ -300,9 +421,24 @@ table.query-editor td {
 }
 
 .ms-dashboard-content {
-    padding: 0 ;
+    padding: 0 !important;
 }
 
+.ms-dashboard-content a {
+/*    color: #ff7394 !important; */
+    color: orange !important;
+/* color: #ff0099 !important; */
+}
+
+.ms-dashboard-content a:hover {
+    color: red !important;
+}
+.ms-dashboard-caption h2 {
+    font-family: Ubuntu, Arial, sans-serif;
+    border-bottom: 0 !important;
+    text-transform: uppercase;
+    color: #777777 !important;
+}
 
 #ms-dashboard-profile>div.ms-dashboard-caption {
     background: no-repeat url(#) ;
@@ -319,46 +455,22 @@ table.query-editor td {
     padding-left: 0 ;
 }   
 
-
-
-
-
-
-
-
+.simplelist {
+    font-size: 100%;
+    text-align: center !important;
+    margin: 0 auto;
+}
 
 /*** NEW CSS STYLES FOR ONLEAB ***/
 
 body {
     background-color:white;
     color:black;
-    margin:0;
-    padding:0;
 }
-a, a:active, a:focus {
-    outline: 0;
-}
-
 div.wrapper {
     width:980px;
     margin:0 auto;
     position:relative;
-}
-
-span.label {
-    font-size:11pt;
-    color:gray;
-    font-weight:normal;
-    padding:0;
-}
-/***** Notifications *****/
-.warning {
-    border: 1px solid red;
-    margin: 20px 60px;
-    padding: 10px 20px;
-    color: red;
-    background-color: #f2dbdb;
-    text-align: center;
 }
 /* HEADER */
 div#header {
@@ -435,7 +547,7 @@ div#navigation li:last-child {
 /* HOME DASHBOARD */
 div#home-dashboard {
     color:black;
-    margin:25px auto;
+    margin:25px 0;
 }
 div#home-dashboard table {
     margin:25px;
@@ -452,21 +564,12 @@ div#home-dashboard table tr:first-child td {
     color:#270A5A;
 }
 div#home-dashboard table tr:last-child td {
-    font-size:12pt;
-    vertical-align:top;
-    border-right:1px solid #DDDDDD;
-    padding:25px;
-}
-div#home-dashboard table tr:last-child td:first-child {
-}
-div#home-dashboard table tr:last-child td:last-child {
-    border-right:0;
-}
-div#home-dashboard table tr:last-child td div {
     text-align:left;
-    padding:25px 0;
 }
 div#home-dashboard table td.support {
+    font-size:14pt;
+    vertical-align:top;
+    padding-left:11%;
 }
 div#home-dashboard table td.support a {
 }
@@ -474,9 +577,6 @@ div#home-dashboard table td.support a:hover {
     text-decoration:none;
 }
 
-div#home-dashboard div#manager {
-    display:none;
-}
 
 .login-submit {
     vertical-align:middle;

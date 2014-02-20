@@ -11,8 +11,10 @@ from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
 from ui.topmenu                  import topmenu_items_live, the_user
 
+from theme import ThemeView
+
 #This view requires login 
-class DashboardView (LoginRequiredAutoLogoutView):
+class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 
     template_name = "dashboard.html"
     
@@ -75,6 +77,8 @@ class DashboardView (LoginRequiredAutoLogoutView):
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
 
+        context['theme'] = self.theme
+        
         page.expose_js_metadata()
 
         # the page header and other stuff

@@ -44,8 +44,9 @@ from portal.actions             import get_requests
 from manifold.manifoldapi       import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
+from theme import ThemeView
 
-class ValidatePendingView(FreeAccessView):
+class ValidatePendingView(FreeAccessView, ThemeView):
     template_name = "validate_pending.html"
 
     def get_context_data(self, **kwargs):
@@ -259,7 +260,9 @@ class ValidatePendingView(FreeAccessView):
         context['topmenu_items'] = topmenu_items_live('Validation', page) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
-
+        
+        context['theme'] = self.theme
+        
         # XXX We need to prepare the page for queries
         #context.update(page.prelude_env())
 

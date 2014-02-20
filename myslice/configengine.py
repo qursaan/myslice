@@ -46,6 +46,10 @@ class ConfigEngine(object):
         parser.read (os.path.join(ROOT,'myslice/myslice.ini'))
         self.config_parser=parser
 
+    def __getattr__(self, section):
+        if self.config_parser.has_section(section):
+            return ConfigSection(self.config_parser, section)
+        
     def manifold_url (self):
         return self.config_parser.get('manifold','url')
 
@@ -59,3 +63,13 @@ class ConfigEngine(object):
     # exporting these details to js
     def manifold_js_export (self):
         return "var MANIFOLD_URL = '%s';\n"%self.manifold_url();
+
+class ConfigSection(object) :
+    
+    def __init__(self, parser, section):
+        self._parser = parser
+        self._section = section
+    
+    def __getattr__(self, key):
+        if self._parser.has_option(self._section, key):
+            return self._parser.get(self._section, key)

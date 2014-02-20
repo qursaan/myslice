@@ -8,10 +8,12 @@ from ui.topmenu                 import topmenu_items, the_user
 
 from portal.forms               import ContactForm
 
+from theme import ThemeView
+
 # splitting the 2 functions done here
 # GET is for displaying the empty form
 # POST is to process it once filled - or show the form again if anything is missing
-class ContactView (FreeAccessView):
+class ContactView (FreeAccessView, ThemeView):
     def post (self, request):
         form = ContactForm(request.POST) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
@@ -31,7 +33,7 @@ class ContactView (FreeAccessView):
 
             msg = render_to_string('contact-support-email.txt', form.cleaned_data)
             send_mail("Onelab user %s submitted a query "%email, msg, email, recipients)
-            return render(request,'contact_sent.html') # Redirect after POST
+            return render(request,'contact_sent.html', { 'theme' : self.theme}) # Redirect after POST
         else:
             return self._display (request, form)
 
@@ -42,5 +44,6 @@ class ContactView (FreeAccessView):
         return render(request, 'contact.html', {
                 'form': form,
                 'topmenu_items': topmenu_items('Contact', request),
-                'username': the_user (request)
+                'username': the_user (request),
+                'theme' : self.theme
                 })

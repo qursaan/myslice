@@ -10,7 +10,7 @@
 	<div id="user">
 		<table>
 			<tr>
-				<td>PROFILE</td>
+				<td>ACCOUNT</td>
 				<td>SLICES</td>
 				<td>SUPPORT</td>
 			</tr>
@@ -21,12 +21,11 @@
 			</tr>
 			<tr>
 				<td>
-					{% block unfold_margin %}
-					{% include 'widget-login.html' %}
-					{% endblock unfold_margin %}
-
+					{% include 'onelab/_widget-login-user.html' %}
 				</td>
-				<td></td>
+				<td>
+					
+				</td>
 				<td class="support">
 					<div><a href="/portal/contact">Contact</a></div>
 					<div><a href="">Documentation</a></div>
@@ -35,7 +34,30 @@
 		</table>
 	</div>
 	<div id="manager">
-		
+		<table>
+			<tr>
+				<td>INSTITUTION</td>
+				<td>SLICES</td>
+				<td>SUPPORT</td>
+			</tr>
+			<tr>
+				<td><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></td>
+				<td><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></td>
+				<td><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></td>
+			</tr>
+			<tr>
+				<td>
+					{% include 'onelab/_widget-login-manager.html' %}
+				</td>
+				<td>
+					
+				</td>
+				<td class="support">
+					<div><a href="/portal/contact">Contact</a></div>
+					<div><a href="">Documentation</a></div>
+				</td>
+			</tr>
+		</table>
 	</div>
 </div>
 {% endblock unfold_main %}

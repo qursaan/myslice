@@ -7,4 +7,4 @@ function logout () {
     if (confirm(msg)) window.location="/logout/";
 }
 /* attach this function to the logout button */
-$(document).ready(function() { $('#logout').click(logout); })
+$(document).ready(function() { $('#logout').click(logout); $('#logoutbtn').click(logout); });

@@ -6,11 +6,11 @@ from manifold.manifoldapi       import execute_admin_query
 
 from plugins.querytable         import QueryTable
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
-
+from theme import ThemeView
 import json
 
 # View for platforms
-class AdminView(LoginRequiredAutoLogoutView):
+class AdminView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "adminview.html"
 
     def get_context_data(self, **kwargs):
@@ -80,7 +80,7 @@ class AdminView(LoginRequiredAutoLogoutView):
         context['topmenu_items'] = topmenu_items_live('Admin', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-
+        context['theme'] = self.theme
         context.update(page.prelude_env())
 
         context['layout_1_or_2']="layout-unfold2.html" if not context['username'] else "layout-unfold1.html"

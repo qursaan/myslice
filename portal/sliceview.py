@@ -31,6 +31,8 @@ from plugins.slicestat               import SliceStat
 
 from myslice.configengine            import ConfigEngine
 
+from theme import ThemeView
+
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
@@ -46,7 +48,7 @@ insert_grid=False
 insert_messages=False
 #insert_messages=True
 
-class SliceView (LoginRequiredAutoLogoutView):
+class SliceView (LoginRequiredAutoLogoutView, ThemeView):
 
     def get (self,request, slicename=tmp_default_slice):
     
@@ -427,7 +429,9 @@ class SliceView (LoginRequiredAutoLogoutView):
         template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
         # so we can sho who is logged
         template_env [ 'username' ] = the_user (request) 
-    
+        
+        template_env ['theme'] = self.theme
+        
         # don't forget to run the requests
         page.expose_js_metadata()
         # the prelude object in page contains a summary of the requirements() for all plugins

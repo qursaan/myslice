@@ -19,10 +19,12 @@ from manifold.core.query        import Query
 from portal.models              import PendingUser
 from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account
 
+from theme import ThemeView
+
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
 #
-class RegistrationView (FreeAccessView):
+class RegistrationView (FreeAccessView, ThemeView):
 
     def post (self, request):
         return self.get_or_post (request, 'POST')
@@ -193,6 +195,7 @@ class RegistrationView (FreeAccessView):
           'email': request.POST.get('email', ''),
           'password': request.POST.get('password', ''),           
           'authorities': authorities,
+          'theme': self.theme
           }
         template_env.update(page.prelude_env ())
         return render(request, 'registration_view.html',template_env)
