@@ -33,7 +33,11 @@ class ContactView (FreeAccessView, ThemeView):
 
             msg = render_to_string('contact-support-email.txt', form.cleaned_data)
             send_mail("Onelab user %s submitted a query "%email, msg, email, recipients)
-            return render(request,'contact_sent.html', { 'theme' : self.theme}) # Redirect after POST
+            if request.user.is_authenticated() :
+                username = request.user.email
+            else :
+                username = None
+            return render(request,'contact_sent.html', { 'theme' : self.theme,  'username': username}) # Redirect after POST
         else:
             return self._display (request, form)
 
@@ -41,9 +45,13 @@ class ContactView (FreeAccessView, ThemeView):
         return self._display (request, ContactForm()) # A fresh unbound form
         
     def _display (self, request, form):
+        if request.user.is_authenticated() :
+            username = request.user.email
+        else :
+            username = None
         return render(request, 'contact.html', {
                 'form': form,
                 'topmenu_items': topmenu_items('Contact', request),
-                'username': the_user (request),
-                'theme' : self.theme
+                'theme' : self.theme,
+                'username': username,
                 })

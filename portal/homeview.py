@@ -44,6 +44,7 @@ class HomeView (FreeAccessView, ThemeView):
             # let's use ManifoldResult.__repr__
             env['state']="%s"%manifoldresult
             env['layout_1_or_2']="layout-unfold2.html"
+            
             return render_to_response(self.template,env, context_instance=RequestContext(request))
         # user was authenticated at the backend
         elif auth_result is not None:
@@ -51,18 +52,24 @@ class HomeView (FreeAccessView, ThemeView):
             if user.is_active:
                 print "LOGGING IN"
                 login(request, user)
-                return HttpResponseRedirect ('/login-ok')
+                
+                if request.user.is_authenticated(): 
+                    env['person'] = self.request.user
+                else: 
+                    env['person'] = None
+                return render_to_response(self.template,env, context_instance=RequestContext(request))
             else:
                 env['state'] = "Your account is not active, please contact the site admin."
                 env['layout_1_or_2']="layout-unfold2.html"
+                
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
         # otherwise
         else:
             env['state'] = "Your username and/or password were incorrect."
             env['layout_1_or_2']="layout-unfold2.html"
+            
             return render_to_response(self.template, env, context_instance=RequestContext(request))
 
-    # login-ok sets state="Welcome to MySlice" in urls.py
     def get (self, request, state=None):
         env = self.default_env()
 
