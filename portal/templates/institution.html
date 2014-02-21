@@ -1,31 +1,134 @@
 {% extends "layout-unfold1.html" %}
 
 {% block unfold_main %}
-<div class="wrapper" id="ticket-request">
-    <h1>Affiliation to an Institution</h1>
-    <br>
-    <div style="float:left; width:30%;">
-        <img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /><br>
+<div class="wrapper" id="home-dashboard">
+    <ul class="nav nav-tabs">
+      <li class="active"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
+      <li><a class="home-tab" data-panel="users" href="#">MANAGERS & USERS</a></li>
+      <li><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
+    </ul>
+    <div class="home-panel" id="institution">
         <br>
-        <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
-        <b>Membership:</b> Governor
+        <h1>Affiliation to an Institution</h1>
+        <br>
+        <div style="float:left; width:30%;">
+            <img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /><br>
+            <br>
+            <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
+            <b>Membership:</b> Governor
+        </div>
+        <div style="float:right; width:70%;">
+            <img src="http://www.upmc.fr/skins/UPMC/templates/index/resources/img/upmc-logotype.gif" alt="" /><br>
+            <br>
+            <b>authority:</b> onelab.upmc<br>
+            <br>
+            <b>Université Pierre et Marie Curie</b><br>
+            <br>
+            <b>Address:</b> 4 Place Jussieu, 75005 Paris<br>
+            <br>
+            <b>Country:</b> France<br>
+            <br>
+            <br>
+            <h2>Contacts</h2>
+            <b>Legal:</b> Président Jean Chambaz<br>
+            <br>
+            <b>Scientific:</b> Dr Timur Friedman
+        </div>
     </div>
-    <div style="float:right; width:70%;">
-        <img src="http://www.upmc.fr/skins/UPMC/templates/index/resources/img/upmc-logotype.gif" alt="" /><br>
+    <div class="home-panel" id="users" style="display:none;">
         <br>
-        <b>authority:</b> onelab.upmc<br>
+        <h1>Managers: onelab.upmc</h1>
+        <table>
+            <tr>
+                <th>email</th>
+                <th>user_hrn</th>
+                <th>number of slices</th>
+                <th>status</th>
+            </tr>
+            <tr>
+                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
+                <td>onelab.upmc.loic_baron</td>
+                <td>3</td>
+                <td>enabled</td>
+            </tr>
+            <tr>
+                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
+                <td>onelab.upmc.loic_baron</td>
+                <td>3</td>
+                <td>enabled</td>
+            </tr>
+        </table>
         <br>
-        <b>Université Pierre et Marie Curie</b><br>
+        <h1>Users: onelab.upmc</h1>
+        <table>
+            <tr>
+                <th>email</th>
+                <th>user_hrn</th>
+                <th>number of slices</th>
+                <th>status</th>
+            </tr>
+            <tr>
+                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
+                <td>onelab.upmc.loic_baron</td>
+                <td>3</td>
+                <td>enabled</td>
+             </tr>
+  
+             <tr>
+                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
+                <td>onelab.upmc.loic_baron</td>
+                <td>3</td>
+                <td>enabled</td>
+              </tr>
+        </table>
+    </div>
+    <div class="home-panel" id="slices" style="display:none;">
         <br>
-        <b>Address:</b> 4 Place Jussieu, 75005 Paris<br>
-        <br>
-        <b>Country:</b> France<br>
-        <br>
-        <br>
-        <h2>Contacts</h2>
-        <b>Legal:</b> Président Jean Chambaz<br>
-        <br>
-        <b>Scientific:</b> Dr Timur Friedman
+        <h1>Slices: onelab.upmc <button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button></h1>
+        <table>
+            <tr>
+                <th>+/-</th>
+                <th>slice_hrn</th>
+                <th>number of users</th>
+                <th>expiration date</th>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td><a href="/portal/slice/ple.upmc.myslicedemo">onelab.upmc.myslicedemo</a></td>
+                <td>3</td>
+                <td>2014-02-11 17:20:37</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td><a href="/portal/slice/ple.upmc.zzzz">onelab.upmc.zzzz</a></td>
+                <td>3</td>
+                <td>2014-02-11 17:20:37</td>
+            </tr>
+        </table>
+        <div>
+            <button id="renewslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
+            <button id="deleteslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
+        </div>
     </div>
 </div>
-{% endblock %}
+<script>
+    $(document).ready(function() {
+        $('a.home-tab').click(function() {
+            $('ul.nav-tabs li').removeClass('active');
+            $(this).parent().addClass('active');
+            $('div.home-panel').hide();
+            $('div#'+$(this).data('panel')).show();
+        });
+        $('button#ticketbtn').click(function() {
+            /*
+            window.location="/portal/contact/";
+            */
+        })
+        ;$('button#slicerequestbtn').click(function() {
+            /*
+            window.location="/portal/slice_request/";
+            */
+        });
+    });
+</script>
+{% endblock unfold_main %}
