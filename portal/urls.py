@@ -36,6 +36,7 @@ from portal.registrationview    import RegistrationView
 from portal.joinview            import JoinView
 from portal.sliceview           import SliceView
 from portal.validationview      import ValidatePendingView
+from portal.experimentview      import experiment_view
 
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
@@ -72,6 +73,7 @@ urlpatterns = patterns('',
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
     url(r'^join/?$', JoinView.as_view(), name='join'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
+    url(r'^experiment?$', experiment_view),
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
