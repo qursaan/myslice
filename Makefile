@@ -71,14 +71,20 @@ debian.clean:
 plugins-templates: force
 	@find plugins -type f -name '*.html' 
 local-templates: force
-	@$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),ls -1 $(tmpl)/*;)
+	#@$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),ls -1 $(tmpl)/*;)
+	$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),find $(tmpl) -maxdepth 1 -type f -name *.html;)
+
 
 list-templates: plugins-templates local-templates
 
 #################### manage templates for the plugin area
 templates: force
-	mkdir -p templates
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./templates
+	@mkdir -p templates
+	@echo "----"
+	@echo $(shell $(MAKE-SILENT) list-templates)
+	@echo "----"
+	@echo $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x))
+	#ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./templates
 
 clean-templates templates-clean: force
 	rm -rf ./templates
