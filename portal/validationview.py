@@ -60,6 +60,7 @@ class ValidatePendingView(FreeAccessView, ThemeView):
         ctx_my_authorities = {}
         ctx_delegation_authorities = {}
         ctx_sub_authorities = {}
+        dest = {}
 
 
         # The user need to be logged in

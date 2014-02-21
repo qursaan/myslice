@@ -33,6 +33,7 @@ class ConfigEngine(object):
 
     default_manifold_admin_user     = 'admin'
     default_manifold_admin_password = 'demo'
+    default_myslice_theme           = 'onelab'
 
 
     def __init__ (self):
@@ -41,6 +42,10 @@ class ConfigEngine(object):
         parser.set ('manifold', 'url', ConfigEngine.default_manifold_url)
         parser.set ('manifold', 'admin_user', ConfigEngine.default_manifold_admin_user)
         parser.set ('manifold', 'admin_password', ConfigEngine.default_manifold_admin_password)
+
+        parser.add_section('myslice')
+        parser.set ('myslice', 'theme', ConfigEngine.default_myslice_theme)
+
         parser.add_section('googlemap')
         parser.set ('googlemap','api_key', None)
         parser.read (os.path.join(ROOT,'myslice/myslice.ini'))
