@@ -24,6 +24,7 @@ from django.views.generic.base   import TemplateView
 from django.conf.urls           import patterns, include, url
 
 from portal.about               import AboutView
+from portal.institution         import InstitutionView
 from portal.usersview           import UsersView
 from portal.manageuserview      import UserView, user_process    
 from portal.platformsview       import PlatformsView
@@ -62,6 +63,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/?$', DashboardView.as_view(), name='dashboard'),
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', AccountView.as_view(), name='account'),
+    url(r'^institution/?$', InstitutionView.as_view(), name='institution'),
     url(r'^about/?$', AboutView.as_view(), name='about'),
     url(r'^users/?$', UsersView.as_view(), name='user_list'),
     url(r'^user/(?P<email>[\w\s.@\-]+)/?$', UserView.as_view(), name='user'),
