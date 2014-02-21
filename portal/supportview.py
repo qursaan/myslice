@@ -14,8 +14,8 @@ from myslice.configengine import ConfigEngine
 
 from theme import ThemeView
 
-class ExperimentView (FreeAccessView, ThemeView):
-    template_name = 'experimentview.html'
+class SupportView (FreeAccessView, ThemeView):
+    template_name = 'supportview.html'
         
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):

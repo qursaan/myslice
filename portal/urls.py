@@ -40,6 +40,8 @@ from portal.sliceview           import SliceView
 from portal.validationview      import ValidatePendingView
 from portal.experimentview      import ExperimentView
 from portal.documentationview   import DocumentationView
+from portal.supportview         import SupportView
+
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
 from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
@@ -78,6 +80,7 @@ urlpatterns = patterns('',
     url(r'^join/?$', JoinView.as_view(), name='join'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
     url(r'^experiment?$', ExperimentView.as_view(), name='experiment'),
+    url(r'^support/?$', SupportView.as_view(), name='support'),
     url(r'^support/documentation?$', DocumentationView.as_view(), name='FAQ'),
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
