@@ -6,16 +6,16 @@
 
 {% block unfold_main %}
 
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
-<div class="onelab-title well-lg">
-  <h2>Onelab Support</h2>
-  <h4>If you have any diffculties using the portal, please contact us by filling this form below.</h4>
-  <h4>You can also <a href="mailto:support@myslice.info">e-mail</a> us directly or consult to our <a href="http://trac.myslice.info/" >documentation</a></h4>
-</div>
 
-<!-- no hint for this form, moreover we need more space to write stuff down
-     so we use a 3-6-3 layout -->
-<div class='well'>
+<div class="wrapper" id="ticket-request">
+<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> Onelab Support</h1>
+
+<p>
+	If you have any diffculties using the portal, please contact us by filling this form below.<br />
+	You can also <a href="mailto:support@myslice.info">e-mail</a> us directly or consult to our <a href="http://trac.myslice.info/" >documentation</a>
+</p>
+
+<div>
   <form class="cmxform form-horizontal" id="commentForm" action="#" method="post" role="form">{% csrf_token %}
   <fieldset>
     {% for field in form %}
@@ -24,7 +24,9 @@
       <div class="col-xs-6"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
     </div>
     {% endfor %}
-    <button class="submit btn btn-default col-xs-12" type="submit">Submit to OneLab Support</button>
+    <div class="col-xs-5">
+    </div>
+    <button class="submit btn btn-default col-xs-2" type="submit">Create Ticket</button>
   </fieldset>
   </form>
 </div>

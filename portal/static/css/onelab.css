@@ -16,19 +16,14 @@ body {
 a, a:active, a:focus {
     outline: 0;
 }
-input {
-    margin:0;
-}
+
 h1 {
-    color:#0B0042;
     border-bottom:1px solid #DDDDDD;
     padding:0 0 15px 0;
     margin:0 0 15px 0;
 }
 h1 img {
     vertical-align:top;
-    margin:0;
-    padding:0;
 }
 div.wrapper {
     width:980px;
@@ -143,9 +138,15 @@ div#home-dashboard table tr:first-child td {
     color:#270A5A;
 }
 div#home-dashboard table tr:last-child td {
-    font-size:12pt;
     vertical-align:top;
+    padding:25px 0;
+}
+div#home-dashboard table tr:last-child td.logged-in {
     border-right:1px solid #DDDDDD;
+    padding:25px;
+}
+div#home-dashboard table tr:last-child td.support {
+    border-left:1px solid #DDDDDD;
     padding:25px;
 }
 div#home-dashboard table tr:last-child td:first-child {
@@ -153,9 +154,16 @@ div#home-dashboard table tr:last-child td:first-child {
 div#home-dashboard table tr:last-child td:last-child {
     border-right:0;
 }
-div#home-dashboard table tr:last-child td div {
+div#home-dashboard table tr:last-child td.logged-in div {
     text-align:left;
     padding:25px 0;
+}
+div#home-dashboard table tr:last-child td.support div {
+    text-align:left;
+    padding:25px 0;
+}
+div#home-dashboard div.login-widget {
+    padding:20px;
 }
 div#home-dashboard table td.support {
 }
@@ -224,11 +232,24 @@ div#slice-request {
     color:black;
     margin:25px auto;
 }
-div#slice-request div {
+.form-hint {
+    font-size:11pt;
+    font-style:italic;
+    color:gray;
+}
 
+
+
+/* TICKET REQUEST */
+div#ticket-request {
+    color:black;
+    margin:25px auto;
 }
 .form-hint {
     font-size:11pt;
     font-style:italic;
     color:gray;
+}
+div#ticket-request p {
+    margin:20px 0;
 }
