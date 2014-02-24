@@ -55,6 +55,17 @@ urls = [
     # the manifold proxy
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifold.manifoldproxy.proxy'),
     #
+    #
+    # RESTful interface
+    (r'^rest/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
+    (r'^datatable/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
+    #
+    #
+    #(r'^view/?', include('view.urls')),
+    #(r'^list/slices', 'view.list.slices'),
+    #(r'^list/(?P<object_type>[^/]+)', 'view.list.default'),
+    #
+    #
     # Portal
     url(r'^portal/', include('portal.urls')),
 ]

@@ -36,6 +36,7 @@
 				<td>
 				{% if person %}
 					<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request a Slice</button>
+					<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 				{% else %}
 				{% endif %}
 				</td>
@@ -93,10 +94,22 @@
 		});
 		$('button#ticketbtn').click(function() {
 			window.location="/portal/contact/";
-		})
-		;$('button#slicerequestbtn').click(function() {
+		});
+		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
+		
+		{% if person %}
+		$.getJSON("rest/user", function( data ) {
+		  var items = [];
+		  $.each( data[0].slices, function( key, val ) {
+		    items.push( "<li><a href=\"portal/slice/"+val+"\">" + val + "</a></li>" );
+		  });
+		  
+		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+		  
+		});
+		{% endif %}
 	});
 </script>
 {% endblock unfold_main %}

@@ -177,6 +177,20 @@ div#home-dashboard div#manager {
     display:none;
 }
 
+div#home-dashboard div#home-slice-list {
+    margin:25px 0;
+    padding:0 25px;
+    text-align:left;
+}
+div#home-dashboard div#home-slice-list ul {
+    list-style: none;
+    padding:0;
+    margin:0;
+}
+div#home-dashboard div#home-slice-list li {
+    
+}
+
 .login-submit {
     vertical-align:middle;
     padding:0;
@@ -226,6 +240,17 @@ div.well {
     font-weight: bold;
 }
 
+
+/* INSTITUTION */
+div#institution {
+    color:black;
+    margin:25px auto;
+}
+.form-hint {
+    font-size:11pt;
+    font-style:italic;
+    color:gray;
+}
 
 /* SLICE REQUEST */
 div#slice-request {
