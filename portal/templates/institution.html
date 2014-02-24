@@ -4,7 +4,7 @@
 <div class="wrapper" id="institution">
     <ul class="nav nav-tabs">
       <li class="active"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
-      <li><a class="home-tab" data-panel="users" href="#">MANAGERS & USERS</a></li>
+      <li><a class="home-tab" data-panel="users" href="#">USERS</a></li>
       <li><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
     </ul>
     <div class="home-panel" id="institution">
@@ -30,55 +30,41 @@
             <h2>Contacts</h2>
             <b>Legal:</b> Président Jean Chambaz<br>
             <br>
-            <b>Scientific:</b> Dr Timur Friedman
+            <b>Scientific:</b> Dr Timur Friedman, Prof Serge Fdida
         </div>
     </div>
     <div class="home-panel" id="users" style="display:none;">
         <br>
-        <h1>Managers: onelab.upmc</h1>
-        <table>
-            <tr>
-                <th>email</th>
-                <th>user_hrn</th>
-                <th>number of slices</th>
-                <th>status</th>
-            </tr>
-            <tr>
-                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
-                <td>onelab.upmc.loic_baron</td>
-                <td>3</td>
-                <td>enabled</td>
-            </tr>
-            <tr>
-                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
-                <td>onelab.upmc.loic_baron</td>
-                <td>3</td>
-                <td>enabled</td>
-            </tr>
-        </table>
-        <br>
         <h1>Users: onelab.upmc</h1>
         <table>
             <tr>
+                <th>+/-</th>
                 <th>email</th>
                 <th>user_hrn</th>
                 <th>number of slices</th>
+                <th>role</th>
                 <th>status</th>
             </tr>
             <tr>
+                <td><input type="checkbox"></td>
                 <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
                 <td>onelab.upmc.loic_baron</td>
                 <td>3</td>
+                <td>user</td>
                 <td>enabled</td>
-             </tr>
-  
-             <tr>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
                 <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
                 <td>onelab.upmc.loic_baron</td>
                 <td>3</td>
+                <td>pi</td>
                 <td>enabled</td>
-              </tr>
+            </tr>
         </table>
+        <div>
+            <button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
+        </div>
     </div>
     <div class="home-panel" id="slices" style="display:none;">
         <br>
