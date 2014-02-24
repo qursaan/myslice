@@ -55,8 +55,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         user_hrn = account_config.get('user_hrn','N/A')
-
-
+    
         #user_query  = Query().get('user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
         #user_hrn = execute_query(self.request, user_query)
         #self.user_hrn = user_hrn[0].get('user_hrn')
@@ -74,7 +73,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
             number_of_nodes = request.POST.get('number_of_nodes', '')
             purpose = request.POST.get('purpose', '')
             email = self.user_email
-            user_hrn = user_hrn
+            #user_hrn = user_hrn
             cc_myself = True
             
             if (authority_hrn is None or authority_hrn == ''):
@@ -106,8 +105,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView):
                 # The recipients are the PI of the authority
                 recipients = authority_get_pi_emails(request, authority_hrn)
     
-                if cc_myself:
-                    recipients.append(email)
+                #if cc_myself:
+                recipients.append('support@myslice.info')
                 msg = render_to_string('slice-request-email.txt', ctx)
                 #print "email, msg, email, recipients", email , msg, email, recipients 
                 send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
