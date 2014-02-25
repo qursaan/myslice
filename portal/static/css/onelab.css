@@ -282,7 +282,7 @@ div#ticket-request p {
 /* SLICE VIEW */
 div#slice-view {
     width:100%;
-    margin-top:15px;
+    margin:25px auto;
 }
 div#slice-view div.list-group-item {
     border:0;
@@ -302,5 +302,10 @@ div#slice-view a.list-group-item.active, div#slice-view a.list-group-item:hover 
 div#slice-view a.list-group-item p.list-group-item-text {
     font-size:9pt;
     font-style:italic;
+}
+
+/* TESTBED LIST */
+div#testbed-list {
+    margin:25px auto;
 }
 

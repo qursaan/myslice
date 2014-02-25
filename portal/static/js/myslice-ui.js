@@ -29,19 +29,8 @@ $(document).ready(function() {
 	
 	/* Testbeds list */
 	$('div#testbed-list').ready(function() {
-		$('table#testbedList').load("/table/testbed", function(data) {
-			$(this).dataTable( {
-				"bScrollInfinite": true,
-		        "bScrollCollapse": true,
-		        "sScrollY": "500px",
-		        "bStateSave": true,
-		        "bPaginate": false,
-		        "bLengthChange": false,
-		        "bFilter": true,
-		        "bSort": true,
-		        "bInfo": false,
-		        "bAutoWidth": false
-			} );
+		$('table#testbedList').load("/table/testbed", function() {
+			
 		});
 	});
 	
