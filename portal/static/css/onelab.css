@@ -278,3 +278,29 @@ div#ticket-request {
 div#ticket-request p {
     margin:20px 0;
 }
+
+/* SLICE VIEW */
+div#slice-view {
+    width:100%;
+    margin-top:15px;
+}
+div#slice-view div.list-group-item {
+    border:0;
+    background-color:white;
+    font-weight:bold;
+    padding-left:0;
+}
+div#slice-view a.list-group-item {
+    border:0;
+    background-color:white;
+    padding:3px 0 3px 10px;
+    border-left:2pt white solid;
+}
+div#slice-view a.list-group-item.active, div#slice-view a.list-group-item:hover {
+    border-left:2pt blue solid;
+}
+div#slice-view a.list-group-item p.list-group-item-text {
+    font-size:9pt;
+    font-style:italic;
+}
+
