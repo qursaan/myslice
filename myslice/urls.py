@@ -20,6 +20,10 @@ home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
 platforms_view=portal.platformsview.PlatformsView.as_view()
 
+import portal.testbedlist
+import portal.sliceview
+
+
 #### high level choices
 # main entry point (set to the / URL)
 # beware that if this view is broken you end up in an endless cycle...
@@ -58,15 +62,17 @@ urls = [
     #
     # RESTful interface
     (r'^rest/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
+    (r'^table/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
     (r'^datatable/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
     #
     #
     #(r'^view/?', include('view.urls')),
-    #(r'^list/slices', 'view.list.slices'),
-    (r'^list/(?P<object_type>[^/]+)', 'rest.list'),
+    #(r'^list/slices', 'view.list.slices')
     #
     #
     # Portal
+    (r'^testbed/?$', portal.testbedlist.TestbedList.as_view()),
+    (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]
 
