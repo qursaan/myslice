@@ -6,7 +6,7 @@ from unfold.loginrequired            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
-from manifold.manifoldapi            import execute_query
+from manifoldapi.manifoldapi         import execute_query
 
 from ui.topmenu                      import topmenu_items_live, the_user
 
