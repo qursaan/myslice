@@ -175,12 +175,9 @@ class RegistrationView (FreeAccessView, ThemeView):
                     'user_hrn'      : user_hrn,
                     'public_key'    : public_key,
                     }
+                
                 recipients = authority_get_pi_emails(request,reg_auth)
                 
-                # We don't need to send this email to user.
-                # it's for the PI only
-                #if ctx['cc_myself']:
-                #    recipients.append(ctx['email'])
 
                 msg = render_to_string('user_request_email.txt', ctx)
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, 'support@myslice.info', recipients)

@@ -259,7 +259,7 @@ AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend','django.contr
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
 # if you need to see the error message then use this setting
-CSRF_FAILURE_VIEW = 'manifold.manifoldproxy.csrf_failure'
+CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 #################### for insert_above
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"

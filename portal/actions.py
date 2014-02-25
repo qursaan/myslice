@@ -14,7 +14,7 @@ import json
 
 def authority_get_pis(request, authority_hrn):
     query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
-    results = execute_query(request, query)
+    results = execute_admin_query(request, query)
     # NOTE: temporarily commented. Because results is giving empty list. 
     # Needs more debugging
     #if not results:
@@ -25,13 +25,22 @@ def authority_get_pis(request, authority_hrn):
 
 def authority_get_pi_emails(request, authority_hrn):
     #return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
-
     pi_users = authority_get_pis(request,authority_hrn)
-    pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
-    query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
-    results = execute_query(request, query)
-    print "mails",  [result['email'] for result in results]
-    return [result['email'] for result in results]
+    if any(d['pi_users'] == None for d in pi_users):
+        return ['support@myslice.info']
+    else:
+        pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
+        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
+        results = execute_admin_query(request, query)
+        print "mails",  [result['email'] for result in results]
+        return [result['email'] for result in results]
+
+# SFA get record
+
+def sfa_get_user(request, user_hrn, pub):
+    query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
+    result_sfa_user = execute_query(request, query_sfa_user)
+    return result_sfa_user                        
 
 # SFA add record (user, slice)
 

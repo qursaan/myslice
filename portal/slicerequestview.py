@@ -108,11 +108,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     
                 # The recipients are the PI of the authority
                 recipients = authority_get_pi_emails(request, authority_hrn)
-    
-                if cc_myself:
-                    recipients.append(email)
                 msg = render_to_string('slice-request-email.txt', ctx)
-                #print "email, msg, email, recipients", email , msg, email, recipients 
                 send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
                 
                 self.template_name = 'slice-request-ack-view.html'
