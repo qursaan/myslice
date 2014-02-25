@@ -35,6 +35,13 @@ def authority_get_pi_emails(request, authority_hrn):
         print "mails",  [result['email'] for result in results]
         return [result['email'] for result in results]
 
+# SFA get record
+
+def sfa_get_user(request, user_hrn, pub):
+    query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
+    result_sfa_user = execute_query(request, query_sfa_user)
+    return result_sfa_user                        
+
 # SFA add record (user, slice)
 
 def sfa_add_user(request, user_params):

@@ -2,7 +2,7 @@ from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, sfa_get_user
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -336,15 +336,25 @@ def account_process(request):
                         # preserving user_hrn
                         user_hrn = account_config.get('user_hrn','N/A')
                         keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
-                        updated_config = json.dumps(account_config) 
+                        #updated_config = json.dumps(account_config) 
                         # updating manifold
-                        user_params = { 'config': keypair, 'auth_type':'managed'}
-                        manifold_update_account(request, user_id, user_params)
+                        #user_params = { 'config': keypair, 'auth_type':'managed'}
+                        #manifold_update_account(request, user_id, user_params)
                         # updating sfa
                         public_key = public_key.replace('"', '');
                         user_pub_key = {'keys': public_key}
+                        #sfa_update_user(request, user_hrn, user_pub_key)
                         sfa_update_user(request, user_hrn, user_pub_key)
-                        messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
+                        result_sfa_user = sfa_get_user(request, user_hrn, public_key)
+                        result_sfa_user = result_sfa_user[0]
+                        if 'keys' in result_sfa_user and result_sfa_user['keys'][0] == public_key:
+                            # updating manifold
+                            updated_config = json.dumps(account_config) 
+                            user_params = { 'config': keypair, 'auth_type':'managed'}
+                            manifold_update_account(request, user_id, user_params)
+                            messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
+                        else:
+                            messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
                         return HttpResponseRedirect("/portal/account/")
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
