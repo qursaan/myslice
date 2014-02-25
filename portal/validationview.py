@@ -41,7 +41,7 @@ from plugins.raw                import Raw
 
 from portal.models              import PendingUser, PendingSlice
 from portal.actions             import get_requests
-from manifold.manifoldapi       import execute_query
+from manifoldapi.manifoldapi    import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
 from theme import ThemeView

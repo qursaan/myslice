@@ -6,7 +6,7 @@ from unfold.loginrequired           import LoginRequiredView
 from django.http                    import HttpResponse
 
 from manifold.core.query            import Query, AnalyzedQuery
-from manifold.manifoldapi           import execute_query
+from manifoldapi.manifoldapi        import execute_query
 
 import json
 

@@ -2,10 +2,10 @@ from django.template.loader      import render_to_string
 from django.shortcuts            import render
 from django.core.mail            import send_mail
 
-from unfold.page                import Page
+from unfold.page                 import Page
 
 from manifold.core.query         import Query
-from manifold.manifoldapi        import execute_admin_query, execute_query
+from manifoldapi.manifoldapi     import execute_admin_query, execute_query
 
 from portal.models               import PendingSlice
 from portal.actions              import authority_get_pi_emails

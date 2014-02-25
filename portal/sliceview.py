@@ -6,7 +6,7 @@ from unfold.loginrequired            import LoginRequiredAutoLogoutView
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
-from manifold.manifoldapi            import execute_query
+from manifoldapi.manifoldapi         import execute_query
 
 from ui.topmenu                      import topmenu_items_live, the_user
 
@@ -36,8 +36,8 @@ from theme import ThemeView
 tmp_default_slice='ple.upmc.myslicedemo'
 
 # temporary : turn off the users part to speed things up
-#do_query_users=True
-do_query_users=False
+do_query_users=True
+#do_query_users=False
 
 #do_query_leases=True
 do_query_leases=False
@@ -112,7 +112,8 @@ class SliceView (LoginRequiredAutoLogoutView, ThemeView):
 #                page.enqueue_query(query_user_all)
 #            else:
 #                print "authority of the user is not in local:user db"
-            query_user_all = Query.get('user').select(user_fields)
+            query_user_all = Query.get('user').select(user_fields).filter_by('parent_authority','==','ple.upmc')
+            page.enqueue_query(query_user_all)
             #    query_user_all = None
     
         # ... and for the relations
@@ -298,15 +299,16 @@ class SliceView (LoginRequiredAutoLogoutView, ThemeView):
             main_stack.insert(tab_users)
     
             tab_users.insert(QueryTable( 
-                page        = page,
-                title       = 'Users List',
-                domid       = 'users-list',
+                page       = page,
+                title      = 'Users List',
+                domid      = 'users-list',
                 # tab's sons preferably turn this off
-                togglable   = False,
+                togglable  = False,
                 # this is the query at the core of the slice list
-                query       = sq_user,
+                query      = sq_user,
                 query_all  = query_user_all,
-                checkboxes  = True,
+                init_key   = 'user_hrn',
+                checkboxes = True,
                 datatables_options = { 
                     'iDisplayLength' : 25,
                     'bLengthChange'  : True,

@@ -1,6 +1,6 @@
 from django.http                 import HttpResponse
 from manifold.core.query         import Query
-from manifold.manifoldapi        import execute_query,execute_admin_query
+from manifoldapi.manifoldapi        import execute_query,execute_admin_query
 from portal.models               import PendingUser, PendingSlice, PendingAuthority
 import json
 

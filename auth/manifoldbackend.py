@@ -2,7 +2,7 @@ import time
 
 from django.contrib.auth.models import User
 
-from manifold.manifoldapi import ManifoldAPI, ManifoldException, ManifoldResult
+from manifoldapi.manifoldapi    import ManifoldAPI, ManifoldException, ManifoldResult
 from manifold.core.query        import Query
 
 # Name my backend 'ManifoldBackend'

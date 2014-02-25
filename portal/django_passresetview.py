@@ -81,9 +81,9 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items_live
 
-from manifold.manifoldapi       import execute_admin_query
+from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
-from portal.actions                     import manifold_update_user
+from portal.actions             import manifold_update_user
 
 from portal.forms               import PassResetForm
 from portal.actions             import manifold_update_user
