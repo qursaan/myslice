@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
-from manifold.manifoldapi            import execute_query
+from manifoldapi.manifoldapi         import execute_query
 
 from theme import ThemeView
 
