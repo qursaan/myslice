@@ -1,0 +1,35 @@
+{% extends "layout-unfold1.html" %}
+
+{% block unfold_main %}
+<div id="slice-view">	
+	<div class="col-md-2">
+  		<div id="select-platform" class="list-group"></div>
+
+  		<div class="list-group">
+  			
+		  <a href="#" class="list-group-item active">
+		  	<span class="badge">14</span>
+		    Reserved
+		  </a>
+		  <a href="#" class="list-group-item">Available</a>
+		</div>
+			
+		<ul class="list-group">
+		  <li class="list-group-item">Filter: CPU</li>
+		  <li class="list-group-item">Filter: Interface</li>
+		  <li class="list-group-item">...</li>
+		  <li class="list-group-item">...</li>
+		  <li class="list-group-item">...</li>
+		</ul>
+
+  	</div>
+	<div class="col-md-10">
+		<ul class="nav nav-tabs">
+		  <li class="active"><a href="#">Resources</a></li>
+		  <li><a href="#"></a></li>
+		  <li><a href="#"></a></li>
+		</ul>
+		<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered" id="objectList"></table>
+	</div>
+</div>
+{% endblock unfold_main %}
