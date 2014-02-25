@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 
 from unfold.page import Page
 from manifold.core.query import Query
-#from manifold.manifoldquery import ManifoldQuery
 
 from plugins.stack import Stack
 from plugins.lists.slicelist import SliceList

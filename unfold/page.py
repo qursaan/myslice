@@ -6,7 +6,7 @@ import json
 
 from django.template.loader import render_to_string
 
-from manifold.metadata import MetaData
+from manifoldapi.metadata import MetaData
 
 from unfold.prelude import Prelude
 

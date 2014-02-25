@@ -13,7 +13,7 @@ from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items_live
 
-from manifold.manifoldapi       import execute_admin_query
+from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser,PendingAuthority

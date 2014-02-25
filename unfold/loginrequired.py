@@ -4,7 +4,7 @@ from django.http                        import HttpResponseRedirect
 # for 'as_view' that we need to call in urls.py and the like
 from django.views.generic.base          import TemplateView
 
-from manifold.manifoldresult            import ManifoldException
+from manifoldapi.manifoldresult            import ManifoldException
 
 ###
 # IMPORTANT NOTE

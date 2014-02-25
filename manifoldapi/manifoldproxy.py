@@ -5,11 +5,11 @@ import os.path
 #from django.core import serializers
 from django.http                import HttpResponse, HttpResponseForbidden
 
-#from manifold.manifoldquery import ManifoldQuery
+#from manifoldapi.manifoldquery import ManifoldQuery
 from manifold.core.query        import Query
 from manifold.core.result_value import ResultValue
-from manifold.manifoldapi       import ManifoldAPI
-from manifold.manifoldresult    import ManifoldException
+from manifoldapi                import ManifoldAPI
+from manifoldresult             import ManifoldException
 from manifold.util.log          import Log
 from myslice.configengine       import ConfigEngine
 

@@ -1,6 +1,6 @@
 import json
 from manifold.core.query         import Query
-from manifold.manifoldapi        import execute_query
+from manifoldapi.manifoldapi     import execute_query
 
 from unfold.page                 import Page
 
@@ -22,7 +22,7 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
         # We might have slices on different registries with different user accounts 
         # We note that this portal could be specific to a given registry, to which we register users, but i'm not sure that simplifies things
         # Different registries mean different identities, unless we identify via SFA HRN or have associated the user email to a single hrn
-
+	print self.request
         #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 

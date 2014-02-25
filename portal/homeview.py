@@ -8,7 +8,7 @@ from django.shortcuts import render
 
 from unfold.loginrequired import FreeAccessView
 
-from manifold.manifoldresult import ManifoldResult
+from manifoldapi.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
