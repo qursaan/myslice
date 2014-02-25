@@ -1,7 +1,6 @@
 {% extends "layout-unfold1.html" %}
 {% block unfold_main %}
 
-<h2>User Profile</h2>
 
 {% if messages %}
 <ul class="messages">
@@ -11,7 +10,13 @@
 </ul>
 {% endif %}
 
-
+<div class="wrapper" id="institution">
+    <ul class="nav nav-tabs">
+      <li class="active"><a class="home-tab" data-panel="user_profile" href="#">User Profile</a></li>
+      <li><a class="home-tab" data-panel="principal_acc" href="#">User Account</a></li>
+      <li><a class="home-tab" data-panel="ref_acc" href="#">Testbed Access</a></li>
+    </ul>
+<div class="home-panel" id="user_profile">
 <form id="editForm"  method="POST" action="account_process" enctype="multipart/form-data">
 <div id="middle" align="center">
 	<div class="well">
@@ -144,9 +149,10 @@
 			</table>
 	</div>
 </div>
+</div>
 
+<div class="home-panel" id="principal_acc" style="display:none;">
 
-<h2>Account Information</h2>
 <h3>Principal Account <small>Account used for delegating credentials</small></h3>
 <div id="middle" align="center">
 	<div class="well">
@@ -176,15 +182,7 @@
 
 
 {%if 'Enabled'  in user_status %}
-<h3 id="show-pending" class="plugin-show" style="display: block;">
-<span class="glyphicon glyphicon-chevron-right"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Credentials</h3>
-
-<div id="hide-pending" class="plugin-hide" style="display: none;">
-<span class="glyphicon glyphicon-chevron-down"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">Credentials</a>
-
-<h5>Delegated Credentials to Principal Account</h5>
+<h3>Credentials <small>Delegated to Principal Account</small></h3>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover">
@@ -255,15 +253,8 @@
 </div>
 
 
-<h3 id="show-filters" class="plugin-show" style="display: block;">
-<span class="glyphicon glyphicon-chevron-right"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>TestBed Accounts</h3>
-
-<div id="hide-filters" class="plugin-hide" style="display: none;">
-<span class="glyphicon glyphicon-chevron-down"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">TestBed Accounts</a>
-
-<h5>Reference Accounts in the following testbeds</h5>
+<div class="home-panel" id="ref_acc" style="display:none;">
+<h3>Testbed Access <small>Reference Accounts in the following testbeds</small></h3>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover"> 
@@ -288,19 +279,10 @@
         </table>
     </div>
 </div>
-</div>
 
 
-<h3 id="show-resources" class="plugin-show" style="display: block;">
-<span class="glyphicon glyphicon-chevron-right"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Show plugin &quot;Pending operations&quot; (QueryUpdater)"></a>Add Accounts</h3>
 
-<div id="hide-resources" class="plugin-hide" style="display: none;">
-<span class="glyphicon glyphicon-chevron-down"></span>
-<a href="#" class="plugin-tooltip" data-toggle="tooltip" data-original-title="Hide plugin &quot;Pending operations&quot; (QueryUpdater)">Add Accounts</a>
-
-
-<h5>Add reference account to the following testbeds</h5>
+<h3>Add reference account to the following testbeds</h3>
 <div id="middle" align="center">
     <div class="well">
         <table class="mytable table table-bordered table-hover"> 
@@ -323,7 +305,27 @@
 </div>
 </div>
 {%endif%} 
-
+</div>
 </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('a.home-tab').click(function() {
+            $('ul.nav-tabs li').removeClass('active');
+            $(this).parent().addClass('active');
+            $('div.home-panel').hide();
+            $('div#'+$(this).data('panel')).show();
+        });
+        $('button#createslice').click(function() {
+            window.location="/portal/slice_request/";
+        })
+        ;$('button#slicerequestbtn').click(function() {
+            /*
+            window.location="/portal/slice_request/";
+            */
+        });
+    });
+</script>
 
 {% endblock %}
