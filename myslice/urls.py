@@ -63,7 +63,7 @@ urls = [
     #
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices'),
-    #(r'^list/(?P<object_type>[^/]+)', 'view.list.default'),
+    (r'^list/(?P<object_type>[^/]+)', 'rest.list'),
     #
     #
     # Portal
