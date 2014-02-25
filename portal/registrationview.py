@@ -25,7 +25,8 @@ from theme import ThemeView
 # so let's override 'get' and 'post' instead
 #
 class RegistrationView (FreeAccessView, ThemeView):
-
+    template_name = 'registration_view.html'
+    
     def post (self, request):
         return self.get_or_post (request, 'POST')
 
@@ -183,7 +184,8 @@ class RegistrationView (FreeAccessView, ThemeView):
 
                 msg = render_to_string('user_request_email.txt', ctx)
                 send_mail("Onelab New User request for %s submitted"%reg_email, msg, 'support@myslice.info', recipients)
-                return render(request, 'user_register_complete.html') 
+                self.template_name = 'user_register_complete.html'
+                return render(request, self.template, {'theme': self.theme}) 
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),
@@ -198,4 +200,4 @@ class RegistrationView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(page.prelude_env ())
-        return render(request, 'registration_view.html',template_env)
+        return render(request, self.template,template_env)

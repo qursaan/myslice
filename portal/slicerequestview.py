@@ -18,6 +18,8 @@ from theme import ThemeView
 import json
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
+    template_name = 'slicerequest_view.html'
+    
     def __init__ (self):
         self.user_email = ''
         self.errors = []
@@ -112,8 +114,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 msg = render_to_string('slice-request-email.txt', ctx)
                 #print "email, msg, email, recipients", email , msg, email, recipients 
                 send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
-    
-                return render(request,'slice-request-ack-view.html') # Redirect after POST
+                
+                self.template_name = 'slice-request-ack-view.html'
+                
+                return render(request, self.template, {'theme': self.theme}) # Redirect after POST
         template_env = {
             'username': request.user.email,
           'topmenu_items': topmenu_items_live('Request a slice', page),
@@ -129,4 +133,4 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
           'theme': self.theme
         }
         template_env.update(page.prelude_env ())
-        return render(request, 'slicerequest_view.html',template_env)
+        return render(request, self.template, template_env)
