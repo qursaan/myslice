@@ -1,0 +1,32 @@
+{% load rest_filters %}
+<thead>
+<tr>
+	{% for p in properties %}
+	<th>
+		{{ p }}
+	</th>
+	{% endfor %}
+</tr>
+</thead>
+<tbody>
+{% for d in data %}
+<tr>
+	{% for p in properties %}
+	<td>
+		<div class="line1">{{ d|key:p }}</div>
+	</td>
+	{% endfor %}
+</tr>
+{% endfor %}
+</tbody>
+<!-- 
+"component_name",
+ "tags", 
+ "component_id", 
+ "interfaces", 
+ "component_manager_id",
+  "longitude", "country",
+   "exclusive", "hrn", "hardware_types",
+    "slice", "network_hrn",
+     "hostname", "urn", "x", "y", "z", 
+     "initscripts", "location", "latitude", "boot_state", "type" -->
