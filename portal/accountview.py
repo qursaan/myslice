@@ -1,7 +1,7 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 from manifold.core.query                import Query
-from manifold.manifoldapi               import execute_query
+from manifoldapi.manifoldapi            import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user
 #
 from unfold.page                        import Page    

@@ -14,9 +14,9 @@
 				<td>SUPPORT</td>
 			</tr>
 			<tr>
-				<td><a href="./portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a></td>
+				<td><a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a></td>
 				<td><a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
-				<td><a href="./portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a></td>
+				<td><a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a></td>
 			</tr>
 			<tr>
 				{% if person %}
@@ -58,7 +58,7 @@
 				<td>REQUESTS</td>
 			</tr>
 			<tr>
-				<td><a href="./portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a></td>
+				<td><a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a></td>
 				<td><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></td>
 				<td><a href="/portal/validate"><img src="{{ STATIC_URL }}img/icon_testbed_color.png" alt="" /></a></td>
 			</tr>
@@ -102,8 +102,8 @@
 		{% if person %}
 		$.getJSON("rest/user", function( data ) {
 		  var items = [];
-		  $.each( data[0].slices, function( key, val ) {
-		    items.push( "<li><a href=\"portal/slice/"+val+"\">" + val + "</a></li>" );
+		  $.each( data[0].slice, function( key, val ) {
+		  	items.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
 		  });
 		  
 		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));

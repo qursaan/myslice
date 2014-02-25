@@ -53,7 +53,7 @@ urls = [
     (r'^logout/?$', 'auth.views.logout_user'),
     #
     # the manifold proxy
-    (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifold.manifoldproxy.proxy'),
+    (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifoldapi.manifoldproxy.proxy'),
     #
     #
     # RESTful interface
@@ -63,7 +63,7 @@ urls = [
     #
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices'),
-    #(r'^list/(?P<object_type>[^/]+)', 'view.list.default'),
+    (r'^list/(?P<object_type>[^/]+)', 'rest.list'),
     #
     #
     # Portal

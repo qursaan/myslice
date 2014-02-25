@@ -1,10 +1,10 @@
 import json 
 import os.path
 
-from manifold.manifoldresult import ManifoldResult
-from manifold.manifoldapi import ManifoldAPI
+from manifoldresult     import ManifoldResult
+from manifoldapi        import ManifoldAPI
 
-from django.contrib                     import messages
+from django.contrib     import messages
 
 debug=False
 #debug=True

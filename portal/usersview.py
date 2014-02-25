@@ -2,7 +2,7 @@ from manifold.core.query        import Query
 from unfold.page                import Page
 
 from ui.topmenu                 import topmenu_items_live, the_user
-from manifold.manifoldapi       import execute_admin_query
+from manifoldapi.manifoldapi    import execute_admin_query
 
 from plugins.querytable         import QueryTable
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
