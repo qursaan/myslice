@@ -102,8 +102,8 @@
 		{% if person %}
 		$.getJSON("rest/user", function( data ) {
 		  var items = [];
-		  $.each( data[0].slices, function( key, val ) {
-		    items.push( "<li><a href=\"portal/slice/"+val+"\">" + val + "</a></li>" );
+		  $.each( data[0].slice, function( key, val ) {
+		  	items.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
 		  });
 		  
 		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
