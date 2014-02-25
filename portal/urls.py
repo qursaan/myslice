@@ -36,7 +36,7 @@ from portal.contactview         import ContactView
 from portal.slicerequestview    import SliceRequestView
 from portal.registrationview    import RegistrationView
 from portal.joinview            import JoinView
-from portal.sliceview           import SliceView
+from portal.sliceviewold           import SliceView
 from portal.validationview      import ValidatePendingView
 from portal.experimentview      import ExperimentView
 from portal.documentationview   import DocumentationView
