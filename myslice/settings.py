@@ -216,6 +216,7 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    'rest',
 ]
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
