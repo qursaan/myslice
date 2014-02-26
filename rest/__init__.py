@@ -11,7 +11,7 @@ from manifoldapi.manifoldapi        import execute_query
 
 from string import join
 import json
-
+import datetime
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
