@@ -47,8 +47,10 @@ def platform(request, object_name, object_properties):
     query  = Query().get('local:platform').filter_by('disabled', '==', '0').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
+# Add different filters possibilities [['user.user_hrn','==','$user_hrn'],['parent_authority','==','ple.upmc']]
 def slice(request, object_name, object_properties):
-    query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn').select(object_properties)
+    #query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn').select(object_properties)
+    query = Query().get('slice').filter_by('parent_authority', '==', 'ple.upmc').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 def resource(request, object_name, object_properties):
