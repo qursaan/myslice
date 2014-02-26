@@ -73,6 +73,7 @@ def platform(request, object_name, object_properties, object_filters = None):
     query.select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
+# Add different filters possibilities [['user.user_hrn','==','$user_hrn'],['parent_authority','==','ple.upmc']]
 def slice(request, object_name, object_properties, object_filters = None):
     query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn')
     if object_filters :
@@ -122,22 +123,3 @@ def send(request, response, object_properties):
 
 def error(request, object_name, object_properties):
     return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
-
-def getDictArray(post, name):
-    dic = {}
-    for k in post.keys():
-        if k.startswith(name):
-            rest = k[len(name):]
-
-            # split the string into different components
-            parts = [p[:-1] for p in rest.split('[')][1:]
-            print parts
-            id = int(parts[0])
-
-            # add a new dictionary if it doesn't exist yet
-            if id not in dic:
-                dic[id] = {}
-
-            # add the information to the dictionary
-            dic[id][parts[1]] = post.get(k)
-    return dic

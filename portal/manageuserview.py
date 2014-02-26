@@ -97,10 +97,11 @@ class UserView(LoginRequiredAutoLogoutView, ThemeView):
             for account_detail in account_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
-                    account_config = json.loads(account_detail['config'])
-                    account_usr_hrn = account_config.get('user_hrn','N/A')
-                    account_pub_key = account_config.get('user_public_key','N/A')
-                    account_reference = account_config.get ('reference_platform','N/A')
+                    if 'config' in account_detail and account_detail['config'] is not '':
+                        account_config = json.loads(account_detail['config'])
+                        account_usr_hrn = account_config.get('user_hrn','N/A')
+                        account_pub_key = account_config.get('user_public_key','N/A')
+                        account_reference = account_config.get ('reference_platform','N/A')
                     # credentials of myslice platform
                     if 'myslice' in platform_detail['platform']:
                         acc_user_cred = account_config.get('delegated_user_credential','N/A')
