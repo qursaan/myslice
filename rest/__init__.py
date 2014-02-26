@@ -13,7 +13,7 @@ from string import join
 import decimal
 import datetime
 import json
-import datetime
+from json import encoder
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
