@@ -37,7 +37,7 @@ def dispatch(request, object_type, object_name):
          'platform' : platform,
          'slice' : slice,
          'resource' : resource,
-         'user' : user
+         'user' : user,
     }
     
     if request.method == 'POST':
@@ -96,7 +96,9 @@ def resource(request, object_name, object_properties, object_filters = None):
     return send(request, execute_query(request, query), object_properties)
 
 def user(request, object_name, object_properties, object_filters = None):
-    query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn')
+#    query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select(object_properties)
+    query = Query().get('user').filter_by('parent_authority', '==', 'ple.upmc').select(object_properties)
+    #query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn')
     if object_filters :
         for k, f in object_filters.iteritems() :
             query.filter_by(k, '==', f)

@@ -34,38 +34,25 @@
         </div>
     </div>
     <div class="home-panel" id="users" style="display:none;">
-        <br>
-        <h1>Users: onelab.upmc</h1>
-        <table>
-            <tr>
-                <th>+/-</th>
-                <th>email</th>
-                <th>user_hrn</th>
-                <th>number of slices</th>
-                <th>role</th>
-                <th>status</th>
-            </tr>
-            <tr>
-                <td><input type="checkbox"></td>
-                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
-                <td>onelab.upmc.loic_baron</td>
-                <td>3</td>
-                <td>user</td>
-                <td>enabled</td>
-            </tr>
-            <tr>
-                <td><input type="checkbox"></td>
-                <td><a href="/portal/user/loic.baron@lip6.fr">loic.baron@lip6.fr</a></td>
-                <td>onelab.upmc.loic_baron</td>
-                <td>3</td>
-                <td>pi</td>
-                <td>enabled</td>
-            </tr>
-        </table>
+		<br>
+        <h1>Users: onelab.upmc</button></h1>
+        <div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+        <div id="user-tab-loaded" style="display:none;">
+            <table id="user-tab">
+                <tr>
+                    <th>+/-</th>
+                    <th>Email</th>
+                    <th>user_hrn</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Enabled</th>
+                </tr>
+            </table>
+        </div>
         <div>
             <button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
         </div>
-    </div>
+  	</div>
     <div class="home-panel" id="slices" style="display:none;">
         <br>
         <h1>Slices: onelab.upmc <button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button></h1>
@@ -144,6 +131,50 @@
             $("table#slice-tab tr:last").after(table_slices.join( "" ));
             $("div#slice-tab-loaded").css("display","block");
             $("div#slice-tab-loading").css("display","none");
+         });
+         {% endif %}
+		{% if person %}
+        $.getJSON("/rest/user/", function( data ) {
+            var list_users = [];
+            var table_users = [];
+			/*
+			"enabled", "keys", "parent_authority", "user_first_name", "user_last_name", "user_phone", "user_hrn", "slice", "user_email"
+			*/
+            $.each( data, function( key, val ) {
+                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                /*if(val.nodes=="undefined" || val.nodes==null){
+                    nodes_length=0;
+                }else{
+                    nodes_length=val.nodes.length;
+                }
+
+                if(val.user=="undefined" || val.user==null){
+                    user_length=0;
+                }else{
+                    user_length=val.user.length;
+                }
+
+                if(val.slice_url=="undefined" || val.slice_url==null){
+                    slice_url="";
+                }else{
+                    slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
+                }*/
+                
+                user_row = "<tr>";
+                user_row += "<td><input type='checkbox'></td>";
+                user_row += "<td>"+val.user_email+"</td>";
+                user_row += "<td>"+val.user_hrn+"</td>";
+                user_row += "<td>"+val.user_first_name+"</td>";
+                user_row += "<td>"+val.user_last_name+"</td>";
+				user_row += "<td>"+val.enabled+"</td>";
+                table_users.push(user_row);
+                
+            });
+           
+            /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */
+            $("table#user-tab tr:last").after(table_users.join( "" ));
+            $("div#user-tab-loaded").css("display","block");
+            $("div#user-tab-loading").css("display","none");
          });
          {% endif %}
     });
