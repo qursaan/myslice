@@ -13,7 +13,7 @@ from string import join
 import decimal
 import datetime
 import json
-
+from json import encoder
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
@@ -29,47 +29,64 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self)._iterencode(o, markers)
 
 def dispatch(request, object_type, object_name):
-
+    
+    object_properties = None
+    object_filters = None
+    
     switch = {
          'platform' : platform,
          'slice' : slice,
          'resource' : resource,
          'user' : user
     }
-
+    
+    if request.method == 'POST':
+        if 'filters' in request.POST :
+            object_filters = request.POST.getlist('filters[]')
+            print '########################'
+            print object_filters
+        print "$$$$$$$$$$$$$$$$$$$$$$"
+        print request.POST
+        
+        if 'columns[]' in request.POST :
+            object_properties = request.POST.getlist('columns[]')
+    
     # platform is local
     if ((object_type == 'platform') or (object_type == 'testbed')) :
         object_type = 'local:platform'
-        object_properties = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
-        return switch.get('platform', error)(request, object_name, object_properties)
+        if object_properties == None :
+            object_properties = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
+        return switch.get('platform', error)(request, object_name, object_properties, object_filters)
     else :
-        query = Query.get('local:object').filter_by('table', '==', object_type).select('column.name')
-        results = execute_query(request, query)
-        if results :
-            object_properties = []
-            for r in results[0]['column'] :
-                object_properties.append(r['name'])
-        else :
-            return error(request, object_name, {})
-        return switch.get(object_type, error)(request, object_name, object_properties)
+        if object_properties == None :
+            query = Query.get('local:object').filter_by('table', '==', object_type).select('column.name')
+            results = execute_query(request, query)
+            if results :
+                object_properties = []
+                for r in results[0]['column'] :
+                    object_properties.append(r['name'])
+            else :
+                return error(request, object_name, {})
+        return switch.get(object_type, error)(request, object_name, object_properties, object_filters)
 
 #     if request.method == 'GET':
 #         return switch.get(request, object_type, object_name, object_properties)
 #     elif request.method == 'POST':
 #         return post(request, object_type, object_name)
 
-def platform(request, object_name, object_properties):
+def platform(request, object_name, object_properties, object_filters = None):
     query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type', '==', 'sfa').filter_by('platform', '!=', 'myslice').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
-def slice(request, object_name, object_properties):
+def slice(request, object_name, object_properties, object_filters = None):
     query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
-def resource(request, object_name, object_properties):
-    pass
+def resource(request, object_name, object_properties, object_filters = None):
+    query = Query().get('resource').select(object_properties)
+    return send(request, execute_query(request, query), object_properties)
 
-def user(request, object_name, object_properties):
+def user(request, object_name, object_properties, object_filters = None):
     query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
