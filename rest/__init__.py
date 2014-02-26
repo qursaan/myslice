@@ -10,11 +10,16 @@ from manifold.core.query            import Query, AnalyzedQuery
 from manifoldapi.manifoldapi        import execute_query
 
 from string import join
+import decimal
+import datetime
 import json
 import datetime
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
+
+# support converting decimal in json
+encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
 # handles decimal numbers serialization in json
 class DecimalEncoder(json.JSONEncoder):
@@ -54,7 +59,7 @@ def dispatch(request, object_type, object_name):
 #         return post(request, object_type, object_name)
 
 def platform(request, object_name, object_properties):
-    query  = Query().get('local:platform').filter_by('disabled', '==', '0').select(object_properties)
+    query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type', '==', 'sfa').filter_by('platform', '!=', 'myslice').select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 # Add different filters possibilities [['user.user_hrn','==','$user_hrn'],['parent_authority','==','ple.upmc']]
@@ -73,7 +78,7 @@ def user(request, object_name, object_properties):
 def send(request, response, object_properties):
     if request.path.split('/')[1] == 'rest' :
         response_data = response
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
     elif request.path.split('/')[1] == 'table' :
         return render_to_response('table-default.html', {'data' : response, 'properties' : object_properties})
     elif request.path.split('/')[1] == 'datatable' :
