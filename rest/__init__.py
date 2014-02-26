@@ -75,7 +75,7 @@ def platform(request, object_name, object_properties, object_filters = None):
 
 # Add different filters possibilities [['user.user_hrn','==','$user_hrn'],['parent_authority','==','ple.upmc']]
 def slice(request, object_name, object_properties, object_filters = None):
-    query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn')
+    query = Query().get('slice')#.filter_by('user.user_hrn', '==', '$user_hrn')
     if object_filters :
         for k, f in object_filters.iteritems() :
             query.filter_by(k, '==', f)
@@ -91,7 +91,7 @@ def resource(request, object_name, object_properties, object_filters = None):
     return send(request, execute_query(request, query), object_properties)
 
 def user(request, object_name, object_properties, object_filters = None):
-    query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn')
+    query = Query().get('user')#.filter_by('user_hrn', '==', '$user_hrn')
     if object_filters :
         for k, f in object_filters.iteritems() :
             query.filter_by(k, '==', f)
