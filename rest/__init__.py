@@ -13,13 +13,13 @@ from string import join
 import decimal
 import datetime
 import json
-from json import encoder
+import urlparse
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
 
 # support converting decimal in json
-encoder.FLOAT_REPR = lambda o: format(o, '.2f')
+json.encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
 # handles decimal numbers serialization in json
 class DecimalEncoder(json.JSONEncoder):
@@ -30,8 +30,8 @@ class DecimalEncoder(json.JSONEncoder):
 
 def dispatch(request, object_type, object_name):
     
-    object_properties = None
-    object_filters = None
+    object_properties = []
+    object_filters = {}
     
     switch = {
          'platform' : platform,
@@ -41,15 +41,11 @@ def dispatch(request, object_type, object_name):
     }
     
     if request.method == 'POST':
-        if 'filters' in request.POST :
-            object_filters = request.POST.getlist('filters[]')
-            print '########################'
-            print object_filters
-        print "$$$$$$$$$$$$$$$$$$$$$$"
-        print request.POST
-        
-        if 'columns[]' in request.POST :
-            object_properties = request.POST.getlist('columns[]')
+        for el in request.POST.items():
+            if el[0].startswith('filters'):
+                object_filters[el[0][8:-1]] = el[1]
+            elif el[0].startswith('columns'):
+                object_properties = request.POST.getlist('columns[]')
     
     # platform is local
     if ((object_type == 'platform') or (object_type == 'testbed')) :
@@ -69,28 +65,39 @@ def dispatch(request, object_type, object_name):
                 return error(request, object_name, {})
         return switch.get(object_type, error)(request, object_name, object_properties, object_filters)
 
-#     if request.method == 'GET':
-#         return switch.get(request, object_type, object_name, object_properties)
-#     elif request.method == 'POST':
-#         return post(request, object_type, object_name)
-
 def platform(request, object_name, object_properties, object_filters = None):
-    query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type', '==', 'sfa').filter_by('platform', '!=', 'myslice').select(object_properties)
+    query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type', '==', 'sfa').filter_by('platform', '!=', 'myslice')
+    if object_filters :
+        for k, f in object_filters.iteritems() :
+            query.filter_by(k, '==', f)
+    query.select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 # Add different filters possibilities [['user.user_hrn','==','$user_hrn'],['parent_authority','==','ple.upmc']]
-def slice(request, object_name, object_properties):
-    #query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn').select(object_properties)
-    query = Query().get('slice').filter_by('parent_authority', '==', 'ple.upmc').select(object_properties)
+def slice(request, object_name, object_properties, object_filters = None):
+    query = Query().get('slice').filter_by('user.user_hrn', '==', '$user_hrn')
+    if object_filters :
+        for k, f in object_filters.iteritems() :
+            query.filter_by(k, '==', f)
+    query.select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 def resource(request, object_name, object_properties, object_filters = None):
-    query = Query().get('resource').select(object_properties)
+    query = Query().get('resource')
+    if object_filters :
+        for k, f in object_filters.iteritems() :
+            query.filter_by(k, '==', f)
+    query.select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 def user(request, object_name, object_properties, object_filters = None):
 #    query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select(object_properties)
     query = Query().get('user').filter_by('parent_authority', '==', 'ple.upmc').select(object_properties)
+    #query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn')
+    if object_filters :
+        for k, f in object_filters.iteritems() :
+            query.filter_by(k, '==', f)
+    query.select(object_properties)
     return send(request, execute_query(request, query), object_properties)
 
 def send(request, response, object_properties):
