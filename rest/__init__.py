@@ -29,7 +29,7 @@ class DecimalEncoder(json.JSONEncoder):
 
 def dispatch(request, object_type, object_name):
     
-    object_properties = []
+    object_properties = None
     object_filters = {}
     
     switch = {
@@ -49,8 +49,7 @@ def dispatch(request, object_type, object_name):
             object_filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('columns'):
             object_properties = request.POST.getlist('columns[]')
-        
-    
+
     # platform is local
     if ((object_type == 'platform') or (object_type == 'testbed')) :
         object_type = 'local:platform'
