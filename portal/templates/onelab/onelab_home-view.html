@@ -100,7 +100,7 @@
 		});
 		
 		{% if person %}
-		$.getJSON("/rest/user/", function( data ) {
+        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
 		  var items = [];
 		  $.each( data[0].slice, function( key, val ) {
 		  	items.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );

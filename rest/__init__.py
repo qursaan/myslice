@@ -13,7 +13,6 @@ from string import join
 import decimal
 import datetime
 import json
-import urlparse
 
 # handles serialization of datetime in json
 DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
@@ -37,15 +36,20 @@ def dispatch(request, object_type, object_name):
          'platform' : platform,
          'slice' : slice,
          'resource' : resource,
-         'user' : user
+         'user' : user,
     }
     
     if request.method == 'POST':
-        for el in request.POST.items():
-            if el[0].startswith('filters'):
-                object_filters[el[0][8:-1]] = el[1]
-            elif el[0].startswith('columns'):
-                object_properties = request.POST.getlist('columns[]')
+        req_items = request.POST.items()
+    elif request.method == 'GET':
+        req_items = request.GET.items()
+        
+    for el in req_items:
+        if el[0].startswith('filters'):
+            object_filters[el[0][8:-1]] = el[1]
+        elif el[0].startswith('columns'):
+            object_properties = request.POST.getlist('columns[]')
+        
     
     # platform is local
     if ((object_type == 'platform') or (object_type == 'testbed')) :
@@ -108,7 +112,6 @@ def send(request, response, object_properties):
         response_data = {}
         response_data['columns'] = object_properties
         response_data['labels'] = object_properties
-        #response_data['labels'] = [ 'Platform', 'Name', 'Url', 'Description','Gateway Type' ]
         response_data['data'] = []
         response_data['total'] = len(response)
         for r in response :
