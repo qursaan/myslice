@@ -13,6 +13,16 @@ from string import join
 import json
 
 
+# handles serialization of datetime in json
+DateEncoder = lambda obj: obj.strftime("%B %d, %Y %H:%M:%S") if isinstance(obj, datetime.datetime) else None
+
+# handles decimal numbers serialization in json
+class DecimalEncoder(json.JSONEncoder):
+    def _iterencode(self, o, markers=None):
+        if isinstance(o, decimal.Decimal):
+            return (str(o) for o in [o])
+        return super(DecimalEncoder, self)._iterencode(o, markers)
+
 def dispatch(request, object_type, object_name):
 
     switch = {
@@ -81,7 +91,7 @@ def send(request, response, object_properties):
             
             response_data['data'].append(d)
          
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
 
 def error(request, object_name, object_properties):
     return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
