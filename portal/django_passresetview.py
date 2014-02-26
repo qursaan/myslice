@@ -248,7 +248,7 @@ def password_reset_complete(request,
     }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, themeview.theme, context,
+    return TemplateResponse(request, themeview.template, context,
                             current_app=current_app)
 
 
