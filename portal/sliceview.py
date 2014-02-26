@@ -20,4 +20,4 @@ class SliceView (LoginRequiredView, ThemeView):
     template_name = "slice-view.html"
     
     def get(self, request, slicename):
-        return render_to_response(self.template, {"slice": slicename, "theme": self.theme, "username": request.user}, context_instance=RequestContext(request))
+        return render_to_response(self.template, {"slice": slicename, "theme": self.theme, "username": request.user, "section":"resources"}, context_instance=RequestContext(request))

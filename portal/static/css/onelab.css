@@ -48,7 +48,7 @@ span.label {
 }
 /* HEADER */
 div#header {
-    height:100px;
+    height:85px;
     background-color:white;
 }
 
@@ -239,8 +239,23 @@ div.well {
 .btn.btn-default:hover {
     font-weight: bold;
 }
-
-
+/**/
+/* TABLE */
+table.table {
+    margin:0;
+}
+table.table thead {
+    padding:0;
+}
+table.table tbody {
+    padding:0;
+}
+table.table tr {
+    padding:0;
+}
+table.table td {
+    padding:0;
+}
 /* INSTITUTION */
 div#institution {
     color:black;
@@ -303,6 +318,75 @@ div#slice-view a.list-group-item p.list-group-item-text {
     font-size:9pt;
     font-style:italic;
 }
+
+/* SLICE VIEW sections */
+.slice-sections, .slice-pending {
+    margin:0;
+    padding:0;
+}
+.slice-sections ul, .slice-pending ul {
+    margin:0;
+    padding:0;
+}
+.slice-pending ul {
+    width:400px;
+    margin:0 auto 15px auto;
+}
+.slice-sections li {
+    text-align:left;
+    margin:0;
+    padding:0;
+}
+.slice-pending li {
+    padding-right:15px;
+}
+.slice-sections li a, .slice-pending li a {
+    font-size:14px;
+    color:black;
+    padding:0;
+    margin-top:10px;
+}
+.slice-sections li.active a, .slice-pending li.active a  {
+    color:#201E62;
+    background-color:#EFEFEF;
+    text-decoration:underline;
+    padding:0;
+}
+.slice-sections ul.nav-pills li a:hover, .slice-pending ul.nav-pills li a:hover {
+    text-decoration:underline;
+    background-color:#EFEFEF;
+    color:black;
+}
+.slice-sections ul.nav-pills li.active, .slice-pending ul.nav-pills li.active {
+
+}
+.slice-sections li:first-child, .slice-sections li:first-child a {
+    color:#201E62;
+    font-weight:bold;
+}
+.slice-experiment {
+    text-align:right;
+    padding:0;
+}
+.slice-experiment button {
+    margin:3px 0 0 0;
+    background-color:#CC4125;
+    color:white;
+}
+
+.slice-pending {
+}
+.slice-pending button {
+    font-size:9pt;
+    margin:8px 0 0 0;
+    padding:3px 5px;
+}
+.slice-pending button.apply {
+}
+.slice-pending button.clear {
+}
+
+/* */
 
 /* TESTBED LIST */
 div#testbed-list {

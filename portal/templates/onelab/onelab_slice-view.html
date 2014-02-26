@@ -3,16 +3,8 @@
 {% block unfold_main %}
 <div id="slice-view">	
 	<div class="col-md-2">
-  		<div id="select-platform" class="list-group"></div>
-
-  		<div class="list-group">
-  			
-		  <a href="#" class="list-group-item active">
-		  	<span class="badge">14</span>
-		    Reserved
-		  </a>
-		  <a href="#" class="list-group-item">Available</a>
-		</div>
+  		<div id="select-platform" class="list-group">
+  		</div>
 			
 		<ul class="list-group">
 		  <li class="list-group-item">Filter: CPU</li>
@@ -24,12 +16,28 @@
 
   	</div>
 	<div class="col-md-10">
-		<ul class="nav nav-tabs">
-		  <li class="active"><a href="#">Resources</a></li>
-		  <li><a href="#"></a></li>
-		  <li><a href="#"></a></li>
-		</ul>
-		<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered" id="objectList"></table>
+		<div class="row">
+		  	{% include theme|add:"_widget-slice-sections.html" %}
+		</div>
+		<div class="row slice-pending">
+			<ul class="nav nav-pills">
+				<li><a href="">Unreserved<span class="badge">42</span></a></li>
+				<li><a href="">Reserved</a></li>
+				<li><a href="">Pending</a></li>
+				<li>
+					<button type="button" class="btn btn-primary apply">Apply</button>
+					<button type="button" class="btn btn-default clear">Clear</button>
+				</li>
+			</ul>
+		</div>
+		<div class="row">
+			<ul class="nav nav-tabs">
+			  <li class="active"><a href="#">Resources</a></li>
+			  <li><a href="#"></a></li>
+			  <li><a href="#"></a></li>
+			</ul>
+		</div>
+		<table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table>
 	</div>
 </div>
 {% endblock unfold_main %}
