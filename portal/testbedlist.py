@@ -8,5 +8,5 @@ from theme import ThemeView
 class TestbedList (LoginRequiredView, ThemeView):
     template_name = "testbed-list.html"
     
-    def get(self, request):
-        return render_to_response(self.template, {"theme": self.theme, "username": request.user}, context_instance=RequestContext(request))
+    def get(self, request, slicename):
+        return render_to_response(self.template, {"theme": self.theme, "username": request.user, "slice" : slicename, "section":"testbeds"}, context_instance=RequestContext(request))

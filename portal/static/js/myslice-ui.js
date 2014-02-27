@@ -35,18 +35,19 @@ $(document).ready(function() {
 	});
 	
 	
-	oTable.load("/list/resource", {}, function(data) {
+	oTable.load("/table/resource/", {'columns' : ['hostname','country','type'], 'filters' : { 'country' : 'France' } }, function(data) {
 		$(this).dataTable( {
-			"bScrollInfinite": true,
+			"sScrollY": window.innerHeight - 275,
+			"sDom": "frtiS",
 	        "bScrollCollapse": true,
-	        "sScrollY": "500px",
 	        "bStateSave": true,
 	        "bPaginate": false,
 	        "bLengthChange": false,
-	        "bFilter": true,
+	        "bFilter": false,
 	        "bSort": true,
 	        "bInfo": false,
-	        "bAutoWidth": false
+	        "bAutoWidth": true,
+	        "bAutoHeight": false
 		} );
 	});
 } );

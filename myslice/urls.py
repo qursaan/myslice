@@ -71,7 +71,8 @@ urls = [
     #
     #
     # Portal
-    (r'^testbeds/?$', portal.testbedlist.TestbedList.as_view()),
+    (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.testbedlist.TestbedList.as_view()),
+    (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]
