@@ -1,6 +1,6 @@
 {# This is required by insert_above #}{% insert_handler %}<!DOCTYPE html>
 <html lang="en"><head>
-<title>MySlice - {{ title }}</title>
+<title>MySlice - {{ section }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="/static/img/myslice-icon.png">
 {# This is where insert_str will end up #}{% media_container prelude %}
@@ -21,19 +21,18 @@
 {% insert_str prelude "js/mustache.js" %}
 {% insert_str prelude "js/plugin.js" %}
 {% insert_str prelude "js/manifold.js" %}
-{% insert_str prelude "js/topmenu.js" %}
-{% insert_str prelude "css/layout-unfold.css" %}
 {% insert_str prelude "css/manifold.css" %}
 {% insert_str prelude "css/plugin.css" %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/{{ theme }}.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
 </head>
 <body>
 {% block container %}
   	{% block topmenu %}
   	{% include theme|add:"__widget-topmenu.html" %}
   	{% endblock topmenu %}
-{% include 'messages-transient.html' %}
-	{% block base_content%}{% endblock %}
+	{% include 'messages-transient.html' %}
+	{% block base_content %}
+	{% endblock %}
 {% endblock container %}
 </body>
 </html>

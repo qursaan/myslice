@@ -1,7 +1,7 @@
-{% extends "layout-unfold1.html" %}
+{% extends "base.html" %}
 
-{% block unfold_main %}
-<div class="wrapper" id="home-dashboard">
+{% block content %}
+<div class="row" id="home-dashboard">
 	<ul class="nav nav-tabs">
 	  <li class="active"><a class="home-tab" data-panel="user" href="#">USER</a></li>
 	  <li><a class="home-tab" data-panel="manager" href="#">MANAGER</a></li>
@@ -112,4 +112,4 @@
 		{% endif %}
 	});
 </script>
-{% endblock unfold_main %}
+{% endblock %}
