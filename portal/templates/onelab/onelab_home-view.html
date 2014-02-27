@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
 <div class="row" id="home-dashboard">
@@ -72,10 +72,14 @@
 				{% endif %}
 				</td>
 				<td>
+					{% if person %}
 				    <button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button>
+					{% endif %}
 				</td>
 				<td class="support">
+					{% if person %}
 				    <button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
+					{% endif %}
 				</td>
 			</tr>
 		</table>

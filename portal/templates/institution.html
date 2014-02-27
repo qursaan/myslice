@@ -1,15 +1,16 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}
-<div class="wrapper" id="institution">
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Affiliation to an Institution</h1>
+</div>
+<div class="row" id="institution">
     <ul class="nav nav-tabs">
       <li class="active"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
       <li><a class="home-tab" data-panel="users" href="#">USERS</a></li>
       <li><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
     </ul>
     <div class="home-panel" id="institution">
-        <h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Affiliation to an Institution</h1>
-        <br>
         <div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
         <div id="authority-tab-loaded" style="display:none;">
             <div id="onelab_membership" style="float:left; width:30%;">
@@ -204,4 +205,4 @@
          {% endif %}
     });
 </script>
-{% endblock unfold_main %}
+{% endblock %}
