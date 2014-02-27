@@ -134,7 +134,7 @@
          });
          {% endif %}
 		{% if person %}
-        $.getJSON("/rest/user/", function( data ) {
+        $.getJSON("/rest/user/",{'filters':{'parent_authority':'ple.upmc'}}, function( data ) {
             var list_users = [];
             var table_users = [];
 			/*
@@ -142,25 +142,8 @@
 			*/
             $.each( data, function( key, val ) {
                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                /*if(val.nodes=="undefined" || val.nodes==null){
-                    nodes_length=0;
-                }else{
-                    nodes_length=val.nodes.length;
-                }
-
-                if(val.user=="undefined" || val.user==null){
-                    user_length=0;
-                }else{
-                    user_length=val.user.length;
-                }
-
-                if(val.slice_url=="undefined" || val.slice_url==null){
-                    slice_url="";
-                }else{
-                    slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
-                }*/
                 
-                user_row = "<tr>";
+				user_row = "<tr>";
                 user_row += "<td><input type='checkbox'></td>";
                 user_row += "<td>"+val.user_email+"</td>";
                 user_row += "<td>"+val.user_hrn+"</td>";
