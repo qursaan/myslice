@@ -1,18 +1,19 @@
-# this somehow is not used anymore - should it not be ?
 from django.core.context_processors import csrf
-from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.shortcuts import render
+from django.http                    import HttpResponseRedirect
+from django.contrib.auth            import authenticate, login, logout
+from django.template                import RequestContext
+from django.shortcuts               import render_to_response
+from django.shortcuts               import render
 
-from unfold.loginrequired import FreeAccessView
+from unfold.loginrequired           import FreeAccessView
 
-from manifoldapi.manifoldresult import ManifoldResult
-from ui.topmenu import topmenu_items, the_user
-from myslice.configengine import ConfigEngine
+from manifold.core.query            import Query
+from manifoldapi.manifoldapi        import execute_query
+from manifoldapi.manifoldresult     import ManifoldResult
+from ui.topmenu                     import topmenu_items, the_user
+from myslice.configengine           import ConfigEngine
 
-from theme import ThemeView
+from theme                          import ThemeView
 
 class InstitutionView (FreeAccessView, ThemeView):
     template_name = 'institution.html'
@@ -33,12 +34,14 @@ class InstitutionView (FreeAccessView, ThemeView):
 
         if request.user.is_authenticated(): 
             env['person'] = self.request.user
+            user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
+            user_details = execute_query(self.request, user_query)
+            env['user_details'] = user_details[0]
         else: 
             env['person'] = None
     
         env['theme'] = self.theme
     
-
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
         if state: env['state'] = state
