@@ -37,6 +37,7 @@ def dispatch(request, object_type, object_name):
          'slice' : slice,
          'resource' : resource,
          'user' : user,
+         'authority' : authority,
     }
     
     if request.method == 'POST':
@@ -95,6 +96,14 @@ def resource(request, object_name, object_properties, object_filters = None):
 
 def user(request, object_name, object_properties, object_filters = None):
     query = Query().get('user')#.filter_by('user_hrn', '==', '$user_hrn')
+    if object_filters :
+        for k, f in object_filters.iteritems() :
+            query.filter_by(k, '==', f)
+    query.select(object_properties)
+    return send(request, execute_query(request, query), object_properties)
+
+def authority(request, object_name, object_properties, object_filters = None):
+    query = Query().get('authority')#.filter_by('user_hrn', '==', '$user_hrn')
     if object_filters :
         for k, f in object_filters.iteritems() :
             query.filter_by(k, '==', f)
