@@ -263,7 +263,6 @@ class ValidatePendingView(FreeAccessView, ThemeView):
         context['username'] = the_user(self.request) 
         
         context['theme'] = self.theme
-        
         # XXX We need to prepare the page for queries
         #context.update(page.prelude_env())
 
