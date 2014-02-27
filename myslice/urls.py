@@ -22,6 +22,7 @@ platforms_view=portal.platformsview.PlatformsView.as_view()
 
 import portal.testbedlist
 import portal.sliceview
+import portal.sliceresourceview
 
 
 #### high level choices
@@ -72,7 +73,7 @@ urls = [
     #
     # Portal
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.testbedlist.TestbedList.as_view()),
-    (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
+    (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]

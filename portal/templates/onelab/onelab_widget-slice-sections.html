@@ -1,6 +1,6 @@
 <div class="col-md-8 slice-sections">
 	<ul class="nav nav-pills nav-justified">
-		<li><a href="/resources/{{ slice }}/">{{ slice }}</a></li>
+		<li {% if section == 'slice' %}class="active"{% endif %}><a href="/slice/{{ slice }}/">{{ slice }}</a></li>
 		<li {% if section == 'testbeds' %}class="active"{% endif %}><a href="/testbeds/{{ slice }}/">Testbeds</a></li>
 		<li {% if section == 'resources' %}class="active"{% endif %}><a href="/resources/{{ slice }}/">Resources</a></li>
 		<li {% if section == 'users' %}class="active">{% endif %}><a href="/users/{{ slice }}/">Users</a></li>

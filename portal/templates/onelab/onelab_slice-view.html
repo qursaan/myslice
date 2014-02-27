@@ -2,42 +2,48 @@
 
 {% block unfold_main %}
 <div id="slice-view">	
-	<div class="col-md-2">
-  		<div id="select-platform" class="list-group">
-  		</div>
-			
-		<ul class="list-group">
-		  <li class="list-group-item">Filter: CPU</li>
-		  <li class="list-group-item">Filter: Interface</li>
-		  <li class="list-group-item">...</li>
-		  <li class="list-group-item">...</li>
-		  <li class="list-group-item">...</li>
-		</ul>
-
-  	</div>
+	<div class="col-md-2"></div>
 	<div class="col-md-10">
 		<div class="row">
 		  	{% include theme|add:"_widget-slice-sections.html" %}
 		</div>
-		<div class="row slice-pending">
-			<ul class="nav nav-pills">
-				<li><a href="">Unreserved<span class="badge">42</span></a></li>
-				<li><a href="">Reserved</a></li>
-				<li><a href="">Pending</a></li>
-				<li>
-					<button type="button" class="btn btn-primary apply">Apply</button>
-					<button type="button" class="btn btn-default clear">Clear</button>
-				</li>
-			</ul>
-		</div>
-		<div class="row">
-			<ul class="nav nav-tabs">
-			  <li class="active"><a href="#">Resources</a></li>
-			  <li><a href="#"></a></li>
-			  <li><a href="#"></a></li>
-			</ul>
-		</div>
-		<table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table>
-	</div>
+    </div>
+    
+	<div class="col-md-2"></div>
+	<div class="col-md-10">
+        <br>
+        <br>
+        <table>
+            <tr>
+                <td><b>Description:</b></td>
+                <td>this slice is dedicated to debug the myslice software...</td>
+            </tr>
+            <tr>
+                <td><b>url:</b></td>
+                <td><a href="http://myslice.info" target="_blank">http://myslice.info</a></td>
+            </tr>
+            <tr>
+                <td><b>users:</b></td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td><b>resources:</b></td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td><b>created:</b></td>
+                <td>2012-06-21 10:00</td>
+            </tr>
+            <tr>
+                <td><b>last update:</b></td>
+                <td>2014-02-25 14:00</td>
+            </tr>
+            <tr>
+                <td><b>expires:</b></td>
+                <td>2014-04-01 12:00</td>
+            </tr>
+        </table>
+  	</div>
+    
 </div>
 {% endblock unfold_main %}
