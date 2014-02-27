@@ -37,7 +37,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         errors = []
 
         # Using cache manifold-tables to get the list of authorities faster
-        authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        authorities_query = Query.get('authority').select('authority_hrn')
         
         #onelab_enabled_query = Query.get('local:platform').filter_by('platform', '==', 'ple').filter_by('disabled', '==', 'False')
         #onelab_enabled = not not execute_admin_query(request, onelab_enabled_query)
