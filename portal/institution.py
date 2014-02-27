@@ -36,7 +36,6 @@ class InstitutionView (FreeAccessView, ThemeView):
             env['person'] = self.request.user
             user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
             user_details = execute_query(self.request, user_query)
-            print "user_details----------------------------->",user_details
             env['user_details'] = user_details[0]
         else: 
             env['person'] = None
