@@ -1,12 +1,3 @@
-/* @override unfold/static/css/plugin.css */
-
-/*-------------------------------- MARKO'S STYLES -----*/
-
-
-
-
-/*** NEW CSS STYLES FOR ONLEAB ***/
-
 body {
     background-color:white;
     color:black;
@@ -19,16 +10,34 @@ a, a:active, a:focus {
 
 h1 {
     border-bottom:1px solid #DDDDDD;
-    padding:0 0 15px 0;
+    padding:0 0 5px 0;
     margin:0 0 15px 0;
+    font-size:18pt;
 }
 h1 img {
-    vertical-align:top;
+    vertical-align:middle;
+    margin-bottom:4px;
+}
+h2 {
+    font-size:14pt;
+    color:#333333;
+}
+h3 {
+    font-size:13pt;
+    color:#201E62;
 }
 div.wrapper {
     width:980px;
     margin:0 auto;
     position:relative;
+}
+div.container {
+    width:980px;
+    margin:25px auto;
+}
+div.wide {
+    margin:25px auto;
+    padding:0 25px;
 }
 
 span.label {
@@ -48,7 +57,7 @@ span.label {
 }
 /* HEADER */
 div#header {
-    height:85px;
+    height:100px;
     background-color:white;
 }
 
@@ -121,7 +130,7 @@ div#navigation li:last-child {
 /* HOME DASHBOARD */
 div#home-dashboard {
     color:black;
-    margin:25px auto;
+    margin:0 auto 25px auto;
 }
 div#home-dashboard table {
     margin:25px;
@@ -214,6 +223,7 @@ div#home-dashboard div#home-slice-list li {
 /* NAV TABS */
 
 .nav.nav-tabs {
+    margin-bottom:25px;
 }
 
 .nav.nav-tabs li.active a {
@@ -259,7 +269,6 @@ table.table td {
 /* INSTITUTION */
 div#institution {
     color:black;
-    margin:25px auto;
 }
 .form-hint {
     font-size:11pt;
@@ -267,11 +276,7 @@ div#institution {
     color:gray;
 }
 
-/* SLICE REQUEST */
-div#slice-request {
-    color:black;
-    margin:25px auto;
-}
+
 .form-hint {
     font-size:11pt;
     font-style:italic;
@@ -283,7 +288,6 @@ div#slice-request {
 /* TICKET REQUEST */
 div#ticket-request {
     color:black;
-    margin:25px auto;
 }
 .form-hint {
     font-size:11pt;
@@ -296,25 +300,24 @@ div#ticket-request p {
 
 /* SLICE VIEW */
 div#slice-view {
-    width:100%;
-    margin:25px auto;
+    margin:0;
 }
-div#slice-view div.list-group-item {
+div.list-group-item {
     border:0;
     background-color:white;
     font-weight:bold;
     padding-left:0;
 }
-div#slice-view a.list-group-item {
+a.list-group-item {
     border:0;
     background-color:white;
     padding:3px 0 3px 10px;
     border-left:2pt white solid;
 }
-div#slice-view a.list-group-item.active, div#slice-view a.list-group-item:hover {
+a.list-group-item.active, a.list-group-item:hover {
     border-left:2pt blue solid;
 }
-div#slice-view a.list-group-item p.list-group-item-text {
+a.list-group-item p.list-group-item-text {
     font-size:9pt;
     font-style:italic;
 }
@@ -344,7 +347,6 @@ div#slice-view a.list-group-item p.list-group-item-text {
     font-size:14px;
     color:black;
     padding:0;
-    margin-top:10px;
 }
 .slice-sections li.active a, .slice-pending li.active a  {
     color:#201E62;
@@ -378,18 +380,10 @@ div#slice-view a.list-group-item p.list-group-item-text {
 }
 .slice-pending button {
     font-size:9pt;
-    margin:8px 0 0 0;
+    margin:-2px 0 0 0;
     padding:3px 5px;
 }
 .slice-pending button.apply {
 }
 .slice-pending button.clear {
 }
-
-/* */
-
-/* TESTBED LIST */
-div#testbed-list {
-    margin:25px auto;
-}
-

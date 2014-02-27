@@ -1,21 +1,21 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
 {% block head %}
 {{ wizard.form.media }}
 {% endblock %}
 
-{% block unfold_main %}
-
-
-<div class="wrapper" id="ticket-request">
-<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> OneLab Support</h1>
-
-<p>
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> OneLab Support</h1>
+</div>
+<div class="row">
+	<p>
 	If you have any diffculties using the portal, please contact us by filling this form below.<br />
-	You can also <a href="mailto:support@myslice.info">e-mail</a> us directly or consult to our <a href="http://trac.myslice.info/" >documentation</a>
-</p>
+	You can also <a href="mailto:support@myslice.info">e-mail</a> us directly or consult to our <a target="_blank" href="http://trac.myslice.info/" >documentation</a>
+	</p>
+</div>
 
-<div>
+<div class="row">
   <form class="cmxform form-horizontal" id="commentForm" action="#" method="post" role="form">{% csrf_token %}
   <fieldset>
     {% for field in form %}

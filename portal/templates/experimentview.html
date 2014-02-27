@@ -1,13 +1,11 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block head %}
-{{ wizard.form.media }}
-{% endblock %}
+{% block content %}
 
-{% block unfold_main %}
-
-
-<h1> Experiment Tools </h1>
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="Experiment Tools" /> Experiment Tools</h1>
+</div>
+<div class="row">
 
 <h2>Secure Shell (SSH)</h2>
 <p>
@@ -31,5 +29,5 @@ OMF was originally developed for the ORBIT wireless testbed at Winlab, Rutgers U
 
 <p>More Info: <a href="http://mytestbed.net/projects/omf" target="_blank">http://mytestbed.net/projects/omf</a></p>
 
-
+</div>
 {% endblock %}

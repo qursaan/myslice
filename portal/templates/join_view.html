@@ -1,22 +1,24 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}    
+{% block content %}    
 
-<div class="onelab-title well-lg">
- <h2>Join the OneLab Federation</h2>
+
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_testbed_small.png" alt="Join Federation" /> Join the OneLab Federation</h1>
 </div>
-
-<div class="well">
-OneLab welcomes companies, universities, and research laboratories to join the OneLab Federation of Testbeds. <br>
-We are supported by the European Commision through its 7th Framework Programs and FIRE initiative (Future Internet Research and Experimentation), as well as by other national and international funding initiatives.
-<br>
-<br>
-If you wish to become a new member of OneLab Federation, you should first consult the Membership Agreement.
-<br>
+<div class="row">
+	
+	<p>
+	OneLab welcomes companies, universities, and research laboratories to join the OneLab Federation of Testbeds. <br>
+	We are supported by the European Commision through its 7th Framework Programs and FIRE initiative (Future Internet Research and Experimentation), as well as by other national and international funding initiatives.
+	</p>
+	<p>
+	If you wish to become a new member of OneLab Federation, you should first consult the Membership Agreement.
+	</p>
 </div>
 
 {% if errors %}
-<div class="well">
+<div class="row">
     <ul class="error">
      {% for error in errors %}
      <li>{{ error }}</li>
@@ -25,7 +27,7 @@ If you wish to become a new member of OneLab Federation, you should first consul
 </div>
 {% endif %}
   
-<div class="well">
+<div class="row">
   <form action="" id="joinForm" method="post">
   {% csrf_token %}
     <fieldset>
@@ -137,12 +139,12 @@ If you wish to become a new member of OneLab Federation, you should first consul
   </form>
 </div>
 
-<div class="well">
+<div class="row">
+	<p>
 A membership agreement document will be sent to your email address as a PDF file.
-<br>
+</p><p>
 Please print and sign a copy of the agreement and send it to:
-<br>
-<br>
+</p><p>
 Ciro Scognamiglio<br>
 UPMC - LIP6<br>
 Campus Jussieu<br>
@@ -150,10 +152,11 @@ Couloir 26-00, bureau 102<br>
 Boite courrier 169<br>
 4 place Jussieu<br>
 F-75252 PARIS cedex 05 - FRANCE<br>
-<br>
+</p><p>
 Once your membership has been processed we will contact you to welcome you as a member.
-<br>
+</p><p>
 If you have any questions about membership, contact the <a href="/portal/contact" >OneLab Support team</a>.
+</p>
 </div>
 <script>
 /*

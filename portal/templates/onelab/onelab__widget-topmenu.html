@@ -38,3 +38,18 @@
 	</div>
 	{% endif %}
 </div>
+<script>
+	$(document).ready(function() {
+		var slices = localStorage.getItem('slices');
+		if (slices.length == 0) {
+			$.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+		  	var items = [];
+		  		localStorage.setItem('slices', data[0].slice);
+			});
+		}
+		$.each(slices, function( key, val ) {
+		  	items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+		});
+		$("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+	});
+</script>

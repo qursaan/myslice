@@ -1,11 +1,13 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}        
+{% block content %}        
 
-<div class="onelab-title well-lg">
-  <h2>OneLab Experimenter Registration</h2>
-  <h4>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> OneLab Experimenter Registration</h1>
 </div>
+<div class="row">
+
+  <h4>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
 
 {% if errors %}
 <ul>
@@ -15,7 +17,6 @@
 </ul>
 {% endif %}
    
-<div class="well">
  <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
     <fieldset>
     {% csrf_token %}
@@ -98,7 +99,6 @@
     </div>
     <div class="form-group" id="register">
       <button class="submit btn btn-default col-xs-12" type="submit">Register</button>
-    </div>
     </div>
   </fieldset>
   </form>  

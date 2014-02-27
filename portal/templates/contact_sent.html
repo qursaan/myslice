@@ -1,9 +1,14 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}
-
-  <h1>Query Received !</h1>
-
-We will study your problem and get back to you as soon as possible.
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> OneLab Support</h1>
+</div>
+<div class="row">
+  	<h2>Query Received !</h2>
+	<p>
+	We will study your problem and get back to you as soon as possible.
+	</p>
+</div>
 {% endblock %}
 
