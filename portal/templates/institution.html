@@ -3,9 +3,9 @@
 {% block unfold_main %}
 <div class="wrapper" id="institution">
     <ul class="nav nav-tabs">
-      <li class="active"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
-      <li><a class="home-tab" data-panel="users" href="#">USERS</a></li>
-      <li><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
+      <li class="active" id="authority-tab"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
+      <li id="users-tab"><a class="home-tab" data-panel="users" href="#">USERS</a></li>
+      <li id="slices-tab"><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
     </ul>
     <div class="home-panel" id="institution">
         <h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Affiliation to an Institution</h1>
@@ -70,6 +70,18 @@
             $('div.home-panel').hide();
             $('div#'+$(this).data('panel')).show();
         });
+        var url = window.location;
+        if(url.hash) {
+            // Fragment exists 
+            tab = url.href.split("#")[1];
+            tab_exists = $('div#'+tab).length;
+            if (tab_exists) {
+               $('ul.nav-tabs li').removeClass('active');
+               $('li#'+tab+'-tab').addClass('active');
+               $('div.home-panel').hide();            
+               $('div#'+tab).show();
+            }
+        }
         $('button#createslice').click(function() {
             window.location="/portal/slice_request/";
         })
@@ -161,7 +173,7 @@
                 
                 slice_row = "<tr>";
                 slice_row += "<td><input type='checkbox'></td>";
-                slice_row += "<td><a href=\"/portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
+                slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
                 slice_row += "<td>"+user_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
                 slice_row += "<td>"+nodes_length+"</td>";
