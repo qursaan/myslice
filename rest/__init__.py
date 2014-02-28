@@ -99,9 +99,7 @@ def dispatch(request, object_type, object_name):
         req_items = request.POST
     elif request.method == 'GET':
         req_items = request.GET
-    
-    print req_items
-    
+
     for el in req_items.items():
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
