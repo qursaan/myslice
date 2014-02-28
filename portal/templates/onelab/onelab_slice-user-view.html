@@ -37,7 +37,6 @@
 			  <li><a href="#"></a></li>
 			</ul>
 		</div>
-    	<div class="home-panel" id="users" style="display:none;">
         	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
         	<div id="user-tab-loaded" style="display:none;">
             	<table id="user-tab">
@@ -51,7 +50,6 @@
                 	</tr>
             	</table>
         	</div>
-  		</div>
 <script>
     $(document).ready(function() {
         $.post("/rest/user/",{'filters':{'parent_authority':'ple.upmc'}}, function( data ) {
