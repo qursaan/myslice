@@ -2,28 +2,25 @@
 
 {% block content %}
 <div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Affiliation to an Institution</h1>
+	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Institution: {{user_details.parent_authority}}</h1>
 </div>
 <div class="row" id="institution">
     <ul class="nav nav-tabs">
-      <li class="active" id="authority-tab"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
+      <li class="active" id="authority-tab"><a class="home-tab" data-panel="institution" href="#">INFO</a></li>
       <li id="users-tab"><a class="home-tab" data-panel="users" href="#">USERS</a></li>
       <li id="slices-tab"><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
     </ul>
     <div class="home-panel" id="institution">
         <div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
         <div id="authority-tab-loaded" style="display:none;">
-            <div id="onelab_membership" style="float:left; width:30%;">
+            <div id="authority-data" style="float:left; width:50%;"></div>
+            <div id="onelab_membership" style="float:right; width:50%;">
                 <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
                 <div id="onelab-data"></div>
-            </div>
-            <div id="authority-data" style="float:right; width:70%;">
             </div>
         </div>
     </div>
     <div class="home-panel" id="users" style="display:none;">
-		<br>
-        <h1>Users: {{user_details.parent_authority}}</button></h1>
         <div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
         <div id="user-tab-loaded" style="display:none;">
             <table id="user-tab">
@@ -41,8 +38,6 @@
         </div>
   	</div>
     <div class="home-panel" id="slices" style="display:none;">
-        <br>
-        <h1>Slices: {{user_details.parent_authority}} <button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button></h1>
         <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
         <div id="slice-tab-loaded" style="display:none;">
             <table id="slice-tab">
@@ -138,7 +133,7 @@
                 */
                     authority_row += val.scientific+"<br>";
                 //}
-                onelab_membership = "<b>Membership:</b> "+val.onelab_membership;
+                onelab_membership = "<b>Status: </b>"+val.onelab_membership;
                 onelab_data.push(onelab_membership);
                 authority_data.push(authority_row);
             });
