@@ -1,8 +1,5 @@
 {% extends "layout_wide.html" %}
 
-{% block head %}
-<script src="{{ STATIC_URL }}js/onelab_slice-user-view.js"></script>
-{% endblock %}
 
 {% block content %}
 	<div class="col-md-2">
@@ -40,19 +37,47 @@
 			  <li><a href="#"></a></li>
 			</ul>
 		</div>
-		<table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList">
+    	<div class="home-panel" id="users" style="display:none;">
+        	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
+        	<div id="user-tab-loaded" style="display:none;">
+            	<table id="user-tab">
+                	<tr>
+                    	<th>+/-</th>
+                    	<th>Email</th>
+                    	<th>user_hrn</th>
+                    	<th>First name</th>
+                    	<th>Last name</th>
+                    	<th>Enabled</th>
+                	</tr>
+            	</table>
+        	</div>
+  		</div>
+<script>
+    $(document).ready(function() {
+        $.post("/rest/user/",{'filters':{'parent_authority':'ple.upmc'}}, function( data ) {
+            var list_users = [];
+            var table_users = [];
+			/*
+			"enabled", "keys", "parent_authority", "user_first_name", "user_last_name", "user_phone", "user_hrn", "slice", "user_email"
+			*/
+            $.each( data, function( key, val ) {
+                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                user_row = "<tr>";
+                user_row += "<td><input type='checkbox'></td>";
+                user_row += "<td>"+val.user_email+"</td>";
+                user_row += "<td>"+val.user_hrn+"</td>";
+                user_row += "<td>"+val.user_first_name+"</td>";
+                user_row += "<td>"+val.user_last_name+"</td>";
+				user_row += "<td>"+val.enabled+"</td>";
+                user_row += "</tr>";
+                table_users.push(user_row);
+                
+            });
+			$("table#user-tab tr:last").after(table_users.join( "" ));
+            $("div#user-tab-loaded").css("display","block");
+            $("div#user-tab-loading").css("display","none");
+         });
+    });
+</script>
 
-        <div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-        <div id="user-tab-loaded" style="display:none;">
-                <tr>
-                    <th>+/-</th>
-                    <th>Email</th>
-                    <th>user_hrn</th>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th>Enabled</th>
-                </tr>
-        </div>
-		</table>
-	</div>
 {% endblock %}
