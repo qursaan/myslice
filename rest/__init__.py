@@ -32,6 +32,8 @@ def dispatch(request, object_type, object_name):
     object_properties = None
     object_filters = {}
     
+    # XXX TODO: What about the local: objects? 
+    # Example: local:user (Manifold) is different from user (SFA GW)   
     switch = {
          'platform' : platform,
          'slice' : slice,
