@@ -39,6 +39,9 @@ class objectRequest(object):
         
         self.request = request
 
+    # XXX TODO: What about the local: objects? 
+    # Example: local:user (Manifold) is different from user (SFA GW)   
+
         if ((self.type == 'platform') or (self.type == 'testbed')) :
             self.type = 'local:platform'
             self.id = 'platform'
