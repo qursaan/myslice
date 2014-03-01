@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-
+{% block head %} 
+<script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
+{% endblock head %}
 {% block content %}
 <div class="row">
 	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Institution: {{user_details.parent_authority}}</h1>
@@ -60,32 +62,6 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('a.home-tab').click(function() {
-            $('ul.nav-tabs li').removeClass('active');
-            $(this).parent().addClass('active');
-            $('div.home-panel').hide();
-            $('div#'+$(this).data('panel')).show();
-        });
-        var url = window.location;
-        if(url.hash) {
-            // Fragment exists 
-            tab = url.href.split("#")[1];
-            tab_exists = $('div#'+tab).length;
-            if (tab_exists) {
-               $('ul.nav-tabs li').removeClass('active');
-               $('li#'+tab+'-tab').addClass('active');
-               $('div.home-panel').hide();            
-               $('div#'+tab).show();
-            }
-        }
-        $('button#createslice').click(function() {
-            window.location="/portal/slice_request/";
-        })
-        ;$('button#slicerequestbtn').click(function() {
-            /*
-            window.location="/portal/slice_request/";
-            */
-        });
         {% if person %}
         {% if user_details.parent_authority %}
         $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
@@ -167,8 +143,8 @@
                     slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
                 }
                 
-                slice_row = "<tr>";
-                slice_row += "<td><input type='checkbox'></td>";
+                slice_row = "<tr id='"+val.slice_hrn+"'>";
+                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
                 slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
                 slice_row += "<td>"+user_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
@@ -193,8 +169,9 @@
 			*/
             $.each( data, function( key, val ) {
                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                user_row = "<tr>";
-                user_row += "<td><input type='checkbox'></td>";
+
+                user_row = "<tr id='"+val.user_hrn+"'>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
                 user_row += "<td>"+val.user_email+"</td>";
                 user_row += "<td>"+val.user_hrn+"</td>";
                 user_row += "<td>"+val.user_first_name+"</td>";
