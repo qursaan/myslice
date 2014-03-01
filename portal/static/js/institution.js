@@ -39,7 +39,7 @@ $(document).ready(function() {
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
-                $.post("/delete/slice/",{'filters':{'user_hrn':this.id}}, function(data) {
+                $.post("/delete/slice/",{'filters':{'slice_hrn':this.id}}, function(data) {
                     if(data.success){
                         $('tr[id="'+record_id+'"]').fadeOut("slow");
                         $('tr[id="'+record_id+'"]').remove();
