@@ -6,10 +6,11 @@ from django.shortcuts               import render_to_response
 from unfold.loginrequired           import LoginRequiredView
 from django.http                    import HttpResponse
 
-from manifold.core.query            import Query, AnalyzedQuery
+from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
 
-from string import join
+from string                         import join
+
 import decimal
 import datetime
 import json
@@ -98,9 +99,7 @@ def dispatch(request, object_type, object_name):
         req_items = request.POST
     elif request.method == 'GET':
         req_items = request.GET
-    
-    print req_items
-    
+
     for el in req_items.items():
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
@@ -113,12 +112,8 @@ def dispatch(request, object_type, object_name):
     
     if request.path.split('/')[1] == 'rest' :
         response_data = response
-        print response
         return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
     elif request.path.split('/')[1] == 'table' :
-        print o.properties
-        print o.options
-        print response
         return render_to_response('table-default.html', {'data' : response, 'properties' : o.properties, 'id' : o.id, 'options' : o.options})
     elif request.path.split('/')[1] == 'datatable' :
         response_data = {}
@@ -130,8 +125,6 @@ def dispatch(request, object_type, object_name):
             d = []
             for p in o.properties :
                 d.append(r[p])
-            #print d
-            
             response_data['data'].append(d)
          
         return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
