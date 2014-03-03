@@ -387,3 +387,6 @@ a.list-group-item p.list-group-item-text {
 }
 .slice-pending button.clear {
 }
+tr.active, tr.active td {
+    background-color:#FFFFCC !important;
+}

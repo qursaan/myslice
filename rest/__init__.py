@@ -134,7 +134,7 @@ class ObjectRequest(object):
             for p in self.fields :
                 d.append(r[p])
             response_data['data'].append(d)
-         
+        
         return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
 
 def error(msg):
