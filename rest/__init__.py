@@ -71,10 +71,6 @@ class ObjectRequest(object):
                 selected_fields.append(p)
         self.fields = selected_fields
         
-        # 
-        if self.id in self.fields :
-            self.fields.remove(self.id)
-            [self.id].extend(self.fields)
     
     def applyFilters(self, query, force_filters = False):
         if (force_filters and not self.filters) :
@@ -96,7 +92,12 @@ class ObjectRequest(object):
         return query
     
     def get(self):
-        query = Query.get(self.type).select(self.fields)
+        query = Query.get(self.type)
+        if (self.id not in self.fields) :
+            query.select(self.fields + [self.id])
+        else :
+            query.select(self.fields)
+        
         query = self.applyFilters(query)
         return execute_query(self.request, query)
     
