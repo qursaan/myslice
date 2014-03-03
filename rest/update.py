@@ -27,41 +27,95 @@ class DecimalEncoder(json.JSONEncoder):
             return (str(o) for o in [o])
         return super(DecimalEncoder, self)._iterencode(o, markers)
 
+class objectRequest(object):
+
+    def __init__(self, request, object_type, object_name):
+        self.type = object_type
+        self.name = object_name
+        # params required in update
+        self.params = []   
+        self.properties = []
+        self.filters = {}
+        self.options = None
+
+        self.request = request
+
+        # What about key formed of multiple fields???
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
+        results = execute_query(self.request, query)
+        print "key of object = %s" % results
+        if results :
+            for r in results[0]['key'] :
+                self.id = r
+        else :
+            return error('Manifold db error')
+
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('column.name')
+        results = execute_query(self.request, query)
+        if results :
+            for r in results[0]['column'] :
+                self.properties.append(r['name'])
+        else :
+            return error('Manifold db error')
+
+    def execute(self):
+        query = Query.update(self.type)
+        if self.filters :
+            for k, f in self.filters.iteritems() :
+                if (f[:1] == "!") :
+                    query.filter_by(k, '!=', f[1:])
+                elif (f[:2] == ">=") :
+                    query.filter_by(k, '>=', f[2:])
+                elif (f[:1] == ">") :
+                    query.filter_by(k, '>', f[1:])
+                elif (f[:2] == "<=") :
+                    query.filter_by(k, '<=', f[2:])
+                elif (f[:1] == "<") :
+                    query.filter_by(k, '<', f[1:])
+                else :
+                    query.filter_by(k, '==', f)
+        else:
+            raise Exception, "Filters are required for update"
+        if self.params :
+            query.set(self.params)
+        else:
+            raise Exception, "Params are required for update"
+        
+
+        return execute_query(self.request, query)
+
 def dispatch(request, object_type, object_name):
+    
+    o = objectRequest(request, object_type, object_name)    
     
     object_filters = {}
     object_params = {}
     result = {}
     
     if request.method == 'POST':
-        req_items = request.POST.items()
+        req_items = request.POST
     elif request.method == 'GET':
-        return HttpResponse(json.dumps({'error' : 'only post request is supported'}), content_type="application/json")
+        #return HttpResponse(json.dumps({'error' : 'only post request is supported'}), content_type="application/json")
+        req_items = request.GET
 
-    query = Query.update(object_type)
-    
-    if object_filters :
-        for k, f in object_filters.iteritems() :
-            query.filter_by(k, '==', f)
-    
-    # DEBUG        
-    print object_filters
-    
-    if object_params :
-        query.set(object_params.iteritems())
-    else :
-        return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
-    
-    # DEBUG
-    print object_params
-    
-    #result = execute_query(request, query)
-    
-    # DEBUG
-    print result
-    
-    if result :
-        return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
-    else :
-        return HttpResponse(json.dumps({'success' : 'record updated'}), content_type="application/json")
-    
+    for el in req_items.items():
+        if el[0].startswith('filters'):
+            o.filters[el[0][8:-1]] = el[1]
+        elif el[0].startswith('params'):
+            o.addParams(req_items.getlist('params[]'))
+        elif el[0].startswith('columns'):
+            o.addFilters(req_items.getlist('columns[]'))
+        elif el[0].startswith('options'):
+            o.options = req_items.getlist('options[]')
+
+    try:
+        response = o.execute()
+
+        if response :
+            return HttpResponse(json.dumps({'success' : 'record updated'}), content_type="application/json")
+        else :
+            return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
+ 
+    except Exception, e:
+        return HttpResponse(json.dumps({'error' : str(e)}), content_type="application/json")
+
