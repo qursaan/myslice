@@ -35,7 +35,7 @@ $(document).ready(function() {
 	});
 	
 	//{'columns' : ['hostname','country','type'], 'filters' : { 'country' : 'France' } }
-	oTable.load("/table/resource/", {'columns' : ['hostname','country','type'] }, function(data) {
+	oTable.load("/table/resource/", {'fields' : ['hostname','hrn','country','type'], 'options': ['checkbox'] }, function(data) {
 		$(this).dataTable( {
 			"sScrollY": window.innerHeight - 275,
 			"sDom": "frtiS",

@@ -1,5 +1,9 @@
 {% extends "layout_wide.html" %}
 
+{% block head %}
+<script src="{{ STATIC_URL }}js/onelab_slice-resource-view.js"></script>
+{% endblock %}
+
 {% block content %}
 	<div class="col-md-2">
 		<div id="select-platform" class="list-group">

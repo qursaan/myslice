@@ -1,63 +1,31 @@
-from manifold.core.query            import Query, AnalyzedQuery
-
-from django.views.generic.base      import TemplateView
+from django.shortcuts               import render_to_response
 
 from unfold.loginrequired           import LoginRequiredView
-from django.http                    import HttpResponse
 
-from manifold.core.query            import Query, AnalyzedQuery
-from manifoldapi.manifoldapi        import execute_query
+from rest import ObjectRequest, error
 
-import json
+from string import join
 
-def platform(request, platform_name):
+def dispatch(request, object_type, object_name):
     
-    platform_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type')
-    response = execute_query(request,platform_query)
+    o = ObjectRequest(request, object_type, object_name)
     
-    response_data = {}
-    response_data['columns'] = [ 'platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type' ]
-    response_data['labels'] = [ 'Platform', 'Name', 'Url', 'Description','Gateway Type' ]
-    response_data['data'] = []
-    for r in response :
-        response_data['data'].append([ r['platform'], r['platform_longname'], r['platform_url'], r['platform_description'], r['gateway_type'] ])
-        
-    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    if request.method == 'POST':
+        req_items = request.POST
+    elif request.method == 'GET':
+        req_items = request.GET
 
-def slice(request, slice_name):
-    
-    platform_query  = Query().get('local:platform').filter_by('disabled', '==', '0').select('platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type')
-    response = execute_query(request,platform_query)
-    
+    for el in req_items.items():
+        if el[0].startswith('filters'):
+            o.filters[el[0][8:-1]] = el[1]
+        elif el[0].startswith('fields'):
+            o.setFields(req_items.getlist('fields[]'))
+        elif el[0].startswith('options'):
+            o.options = req_items.getlist('options[]')
 
-    
-    response_data = {}
-    response_data['columns'] = [ 'platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type' ]
-    response_data['labels'] = [ 'Platform', 'Name', 'Url', 'Description','Gateway Type' ]
-    response_data['data'] = []
-    for r in response :
-        response_data['data'].append([ r['platform'], r['platform_longname'], r['platform_url'], r['platform_description'], r['gateway_type'] ])
-        
-    return HttpResponse(json.dumps(response_data), content_type="application/json")
-
-#         slicename = 'ple.upmc.myslicedemo'
-#         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
-#         main_query.select(
-#                 'slice_hrn',
-#                 'resource.hrn', 'resource.urn', 
-#                 'resource.hostname', 'resource.type', 
-#                 'resource.network_hrn',
-#                 'lease.urn',
-#                 'user.user_hrn',
-#                 #'application.measurement_point.counter'
-#         )
-#          
-#         res = execute_query(self.request,main_query)
-#        
-#         print res
-#         
-#         return render(request, self.template_name, {"resources": res[0]['resource']})
-    
-
-#     def get (self, request, name='default'):
-#         return HttpResponse()
+    if request.path.split('/')[1] == 'rest' :
+        return o.json()
+    elif request.path.split('/')[1] == 'table' :
+        return render_to_response('table-default.html', {'data' : o.get(), 'fields' : o.fields, 'id' : o.id, 'options' : o.options})
+    elif request.path.split('/')[1] == 'datatable' :
+        return o.datatable()

@@ -4,6 +4,10 @@ from manifoldapi.manifoldapi        import execute_query,execute_admin_query
 from portal.models               import PendingUser, PendingSlice, PendingAuthority
 import json
 
+from django.contrib.auth.models import User
+from django.template.loader      import render_to_string
+from django.core.mail            import send_mail
+
 # Thierry: moving this right into the code so 
 # most people can use myslice without having to install sfa
 # XXX tmp sfa dependency, should be moved to SFA gateway
@@ -24,17 +28,28 @@ def authority_get_pis(request, authority_hrn):
     return results
 
 def authority_get_pi_emails(request, authority_hrn):
-    #return ['jordan.auge@lip6.fr', 'loic.baron@lip6.fr']
     pi_users = authority_get_pis(request,authority_hrn)
     if any(d['pi_users'] == None for d in pi_users):
         return ['support@myslice.info']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
-        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
+        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
         results = execute_admin_query(request, query)
-        print "mails",  [result['email'] for result in results]
-        return [result['email'] for result in results]
+        return [result['user_email'] for result in results]
 
+def is_pi(wsgi_request, user_hrn, authority_hrn):
+    # XXX could be done in a single query !
+
+    # select pi_authorities from user where user_hrn == "ple.upmc.jordan_auge"
+    query = Query.get('user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
+    results = execute_admin_query(wsgi_request, query)
+    if not results:
+        # XXX Warning ?
+        return False
+    result = results[0]
+    user_authority_hrns = result.get('pi_authorities', [])
+    return authority_hrn in user_authority_hrns
+    
 # SFA get record
 
 def sfa_get_user(request, user_hrn, pub):
@@ -42,30 +57,12 @@ def sfa_get_user(request, user_hrn, pub):
     result_sfa_user = execute_query(request, query_sfa_user)
     return result_sfa_user                        
 
-# SFA add record (user, slice)
-
-def sfa_add_user(request, user_params):
-    if 'email' in user_params:
-        user_params['user_email'] = user_params['email']
-    query = Query.create('user').set(user_params).select('user_hrn')
-    results = execute_query(request, query)
-    if not results:
-        raise Exception, "Could not create %s. Already exists ?" % user_params['hrn']
-    return results
-
 def sfa_update_user(request, user_hrn, user_params):
     # user_params: keys [public_key] 
     if 'email' in user_params:
         user_params['user_email'] = user_params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
     results = execute_query(request,query)
-    return results
-
-def sfa_add_slice(request, slice_params):
-    query = Query.create('slice').set(slice_params).select('slice_hrn')
-    results = execute_query(request, query)
-    if not results:
-        raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     return results
 
 def sfa_add_authority(request, authority_params):
@@ -91,13 +88,35 @@ def sfa_add_user_to_slice(request, user_hrn, slice_params):
 
 # Propose hrn
 
-def manifold_add_user(request, user_params):
-    # user_params: email, password e.g., user_params = {'email':'aa@aa.com','password':'demo'}
+def manifold_add_user(wsgi_request, request):
+    """Add a Manifold user corresponding to a user request.
+
+    Args:
+        wsgi_request: a WSGIRequest instance
+        request (dict): a dictionary containing the user request built from the
+            form.
+
+    Returns:
+        The user_id of the inserted user.
+
+    Raises:
+        ?
+    
+    """
+    USER_CONFIG = '{"firstname": "%(first_name)s", "lastname": "%(last_name)s", "authority": "%(authority_hrn)s"}'
+
+    user_params = {
+        'email'     : request['email'],
+        'password'  : request['password'],
+        'config'    : USER_CONFIG % request,
+        'status'    : 1,
+    }
+
     query = Query.create('local:user').set(user_params).select('email')
     results = execute_admin_query(request, query)
     if not results:
         raise Exception, "Failed creating manifold user: %s" % user_params['email']
-    result, = results
+    result = results[0]
     return result['email']
 
 def manifold_update_user(request, email, user_params):
@@ -152,7 +171,9 @@ def make_request_user(user):
     request['last_name']     = user.last_name
     request['email']         = user.email
     request['login']         = user.login
-    request['keypair']       = user.keypair
+    request['user_hrn']      = user.user_hrn
+    request['public_key']    = user.public_key
+    request['private_key']   = user.private_key
     return request
 
 def make_request_slice(slice):
@@ -246,75 +267,10 @@ def portal_validate_request(wsgi_request, request_ids):
         
         request_status = {}
 
-        print "REQUEST", request
         if request['type'] == 'user':
 
             try:
-                # XXX tmp user_hrn inside the keypair column of pendiguser table
-                hrn = json.loads(request['keypair'])['user_hrn']
-                #hrn = "%s.%s" % (request['authority_hrn'], request['login'])
-                # XXX tmp sfa dependency
-                from sfa.util.xrn import Xrn 
-                urn = Xrn(hrn, request['type']).get_urn()
-                if 'pi' in request:
-                    auth_pi = request['pi']
-                else:
-                    auth_pi = ''
-                sfa_user_params = {
-                    'hrn'        : hrn, 
-                    'urn'        : urn,
-                    'type'       : request['type'],
-                    'keys'       : [json.loads(request['keypair'])['user_public_key']],
-                    'first_name' : request['first_name'],
-                    'last_name'  : request['last_name'],
-                    'email'      : request['email'],
-                    #'slices'    : None,
-                    #'researcher': None,
-                    'pi'         : [auth_pi],
-                    'enabled'    : True
-                }
-                # ignored in request: id, timestamp, password
-                
-                # ADD USER TO SFA Registry
-                sfa_add_user(wsgi_request, sfa_user_params)
-
-                # USER INFO
-                user_query  = Query().get('local:user').select('user_id','config','email','status').filter_by('email', '==', request['email'])
-                user_details = execute_admin_query(request, user_query)
-                #print user_details[0]
-
-                # UPDATE USER STATUS = 2
-                manifold_user_params = {
-                    'status': 2
-                }
-                manifold_update_user(request, request['email'], manifold_user_params) 
-
-                # USER MAIN ACCOUNT != reference
-                #print 'USER MAIN ACCOUNT != reference'
-                list_accounts_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')\
-                    .filter_by('user_id','==',user_details[0]['user_id'])\
-                    .filter_by('auth_type','!=','reference')    
-                list_accounts = execute_admin_query(request, list_accounts_query)
-                #print "List accounts = ",list_accounts
-                for account in list_accounts:
-                    main_platform_query  = Query().get('local:platform').select('platform_id','platform').filter_by('platform_id','==',account['platform_id'])
-                    main_platform = execute_admin_query(request, main_platform_query)
-
-                # ADD REFERENCE ACCOUNTS ON SFA ENABLED PLATFORMS                        
-                #print 'ADD REFERENCE ACCOUNTS ON SFA ENABLED PLATFORMS'
-                platforms_query  = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type','==','sfa').select('platform_id','gateway_type')
-                platforms = execute_admin_query(request, platforms_query)
-                #print "platforms SFA ENABLED = ",platforms
-                for platform in platforms:
-                    #print "add reference to platform ",platform
-                    manifold_account_params = {
-                        'user_id': user_details[0]['user_id'],
-                        'platform_id': platform['platform_id'],
-                        'auth_type': 'reference',
-                        'config': '{"reference_platform": "' + main_platform[0]['platform'] + '"}',
-                    }
-                    manifold_add_account(request, manifold_account_params)
-        
+                create_user(wsgi_request, request)
                 request_status['SFA user'] = {'status': True }
 
             except Exception, e:
@@ -338,31 +294,7 @@ def portal_validate_request(wsgi_request, request_ids):
 
         elif request['type'] == 'slice':
             try:
-                hrn = "%s.%s" % (request['authority_hrn'], request['slice_name'])
-                # XXX tmp sfa dependency
-                from sfa.util.xrn import Xrn 
-                urn = Xrn(hrn, request['type']).get_urn()
-                
-                # Add User to Slice if we have the user_hrn in pendingslice table
-                if 'user_hrn' in request:
-                    user_hrn = request['user_hrn']
-                    print "Slice %s will be created for %s" % (hrn,request['user_hrn'])
-                else:
-                    user_hrn=''
-                    print "Slice %s will be created without users %s" % (hrn)
-                sfa_slice_params = {
-                    'hrn'        : hrn, 
-                    'urn'        : urn,
-                    'type'       : request['type'],
-                    #'slices'    : None,
-                    'researcher' : [user_hrn],
-                    #'pi'        : None,
-                    'enabled'    : True
-                }
-                # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
-
-                sfa_add_slice(wsgi_request, sfa_slice_params)
-                #sfa_add_user_to_slice(wsgi_request, user_hrn, sfa_slice_params)
+                create_slice(wsgi_request, request)
                 request_status['SFA slice'] = {'status': True }
 
             except Exception, e:
@@ -405,3 +337,207 @@ def validate_action(request, **kwargs):
 
 # Django and ajax
 # http://djangosnippets.org/snippets/942/
+
+
+
+#-------------------------------------------------------------------------------
+# REQUESTS - Slices
+#-------------------------------------------------------------------------------
+
+def create_slice(wsgi_request, request):
+    """
+    Arguments:
+        wsgi_request (~ WSGIRequest) : 
+        request (dict) : the slice request in our own dict format
+
+    Raises:
+        Exception
+    """
+    hrn = "%s.%s" % (request['authority_hrn'], request['slice_name'])
+    # XXX tmp sfa dependency
+    from sfa.util.xrn import Xrn 
+    urn = Xrn(hrn, request['type']).get_urn()
+    
+    # Add User to Slice if we have the user_hrn in pendingslice table
+    user_hrn = request.get('user_hrn', None)
+    user_hrns = list([user_hrn]) if user_hrn else list()
+
+    # XXX We should create a slice with Manifold terminology
+    slice_params = {
+        'slice_hrn'        : hrn, 
+        'slice_urn'        : urn,
+        'slice_type'       : request['type'],
+        'users'            : user_hrns,
+        'slice_enabled'    : True
+    }
+    # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
+
+    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    results = execute_query(wsgi_request, query)
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
+    return results
+
+def create_pending_slice(wgsi_request, request):
+    """
+    """
+
+    # Insert an entry in the PendingSlice table
+    s = PendingSlice(
+        slice_name      = request['slice_name'],
+        user_hrn        = request['user_hrn'],
+        authority_hrn   = request['authority_hrn'],
+        number_of_nodes = request['number_of_nodes'],
+        purpose         = request['purpose'],
+    )
+    s.save()
+
+    # Send an email: the recipients are the PI of the authority
+    recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
+    msg = render_to_string('slice-request-email.txt', request)
+    send_mail("Onelab user %(email)s requested a slice" % request, msg, email, recipients)
+
+#-------------------------------------------------------------------------------
+# REQUESTS - Users
+#-------------------------------------------------------------------------------
+
+def manifold_add_reference_user_accounts(wsgi_request, request):
+    """When a new user is created, add reference accounts to the reference platform.
+    """
+    # XXX XXX XXX The rest of this function has to be checked XXX XXX XXX
+
+    # Retrieve user information
+    user_query  = Query().get('local:user')             \
+        .select('user_id', 'config', 'email', 'status') \
+        .filter_by('email', '==', request['email'])
+    user_details = execute_admin_query(wsgi_request, user_query)
+
+    # USER MAIN ACCOUNT != reference
+    #print 'USER MAIN ACCOUNT != reference'
+    list_accounts_query = Query().get('local:account')              \
+        .select('user_id', 'platform_id', 'auth_type', 'config')    \
+        .filter_by('user_id', '==', user_details[0]['user_id'])     \
+        .filter_by('auth_type', '!=', 'reference')
+    list_accounts = execute_admin_query(wsgi_request, list_accounts_query)
+
+    # XXX main_platform is being erased several times ???
+    for account in list_accounts:
+        main_platform_query = Query().get('local:platform')         \
+            .select('platform_id', 'platform')                      \
+            .filter_by('platform_id', '==', account['platform_id'])
+        main_platform = execute_admin_query(wsgi_request, main_platform_query)
+
+    # Add reference accounts on SFA enabled platforms
+    platforms_query = Query().get('local:platform') \
+        .filter_by('disabled', '==', '0')           \
+        .filter_by('gateway_type', '==', 'sfa')     \
+        .select('platform_id', 'gateway_type')
+    platforms = execute_admin_query(wsgi_request, platforms_query)
+    for platform in platforms:
+        #print "add reference to platform ",platform
+        manifold_account_params = {
+            'user_id'       : user_details[0]['user_id'],
+            'platform_id'   : platform['platform_id'],
+            'auth_type'     : 'reference',
+            'config'        : '{"reference_platform": "' + main_platform[0]['platform'] + '"}',
+        }
+        manifold_add_account(wsgi_request, manifold_account_params)
+
+def sfa_create_user(wsgi_request, request):
+    """
+    Arguments:
+        wsgi_request (~ WSGIRequest) : 
+        request (dict) : the user request in our own dict format
+
+    Raises:
+        Exception
+    """
+    from sfa.util.xrn import Xrn 
+
+    auth_pi = request.get('pi', None)
+    auth_pi = list([auth_pi]) if auth_pi else list()
+
+    # We create a slice request with Manifold terminology
+    sfa_user_params = {
+        'user_hrn'   : request['user_hrn'],
+        'user_email' : request['email'],
+        'urn'        : Xrn(request['user_hrn'], request['type']).get_urn(),
+        'type'       : request['type'],
+        'keys'       : request['public_key'],
+        'first_name' : request['first_name'],
+        'last_name'  : request['last_name'],
+        #'slices'    : None,
+        #'researcher': None,
+        'pi'         : auth_pi,
+        'enabled'    : True
+    }
+
+    query = Query.create('user').set(sfa_user_params).select('user_hrn')
+    results = execute_query(wsgi_request, query)
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % user_params['user_hrn']
+    return results
+
+def create_user(wsgi_request, request):
+    
+    # XXX This has to be stored centrally
+    USER_STATUS_ENABLED = 2
+
+    # NOTE : if we were to create a user directly (just like we create slices,
+    # we would have to perform the steps in create_pending_user too
+
+    # Add the user to the SFA registry
+    sfa_create_user(wsgi_request, request)
+
+    # Update Manifold user status
+    manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})
+
+    # Add reference accounts for platforms
+    manifold_add_reference_user_accounts(wsgi_request, request)
+
+def create_pending_user(wsgi_request, request, user_detail):
+    """
+    """
+
+    # Insert an entry in the PendingUser table
+    b = PendingUser(
+        first_name    = request['first_name'],
+        last_name     = request['last_name'],
+        authority_hrn = request['authority_hrn'],
+        email         = request['email'],
+        password      = request['password'],
+        public_key    = request['public_key'],
+        private_key   = request['private_key'],
+        user_hrn      = request['user_hrn'],
+        pi            = '',                         # XXX Why not None ?
+    )
+    b.save()
+
+    # saves the user to django auth_user table [needed for password reset]
+    user = User.objects.create_user(request['email'], request['email'], request['password'])
+
+    # Creating a manifold user
+    user_id = manifold_add_user(wsgi_request, request)
+
+    # Creating a Manifold account on the MySlice platform
+    # Note the JSON representation of public and private keys already includes quotes
+    account_config = {
+        'user_hrn'          : request['user_hrn'],
+        'user_public_key'   : request['public_key'],
+    }
+    if request['private_key']:
+        account_config['user_private_key'] = request['private_key']
+
+    user_id = user_detail['user_id'] + 1 # the user_id for the newly created user in local:user
+    account_params = {
+        'platform_id'   : 5, # XXX ALERT !!
+        'user_id'       : user_id, 
+        'auth_type'     : request['auth_type'], 
+        'config'        : json.dumps(account_config),
+    }
+    manifold_add_account(wsgi_request, account_params)
+
+    # Send an email: the recipients are the PI of the authority
+    recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+    msg = render_to_string('user_request_email.txt', request)
+    send_mail("Onelab New User request for %(email)s submitted" % request, msg, 'support@myslice.info', recipients)

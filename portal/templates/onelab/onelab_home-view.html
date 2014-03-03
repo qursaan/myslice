@@ -106,8 +106,8 @@
 		{% if person %}
         $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
 		  var items = [];
-		  $.each( data[0].slice, function( key, val ) {
-		  	items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+		  $.each( data[0].slices, function(i, val) {
+		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
 		  });
 		  
 		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
