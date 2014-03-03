@@ -18,10 +18,6 @@ def dispatch(request, object_type, object_name):
     
     o = ObjectRequest(request, object_type, object_name)    
     
-    object_filters = {}
-    object_params = {}
-    result = {}
-    
     if request.method == 'POST':
         req_items = request.POST
     elif request.method == 'GET':
