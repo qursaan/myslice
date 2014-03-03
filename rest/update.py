@@ -23,21 +23,17 @@ def dispatch(request, object_type, object_name):
     elif request.method == 'GET':
         #return error('only post request is supported')
         req_items = request.GET
-    print req_items
     for el in req_items.items():
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
-            print o.filters
         elif el[0].startswith('params'):
             o.params[el[0][7:-1]] = el[1]
-            print o.params
         elif el[0].startswith('fields'):
             o.fields=req_items.getlist('fields[]')
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')
 
     try:
-        print o.params
         response = o.update()
 
         if response :
