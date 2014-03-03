@@ -41,12 +41,10 @@ class ObjectRequest(object):
             self.filters['platform'] = '!myslice'
         else :
             self.setKey()
-        
             self.setLocalFields()
         
     
     def setKey(self):
-        print self.type
         # What about key formed of multiple fields???
         query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
         results = execute_query(self.request, query)
