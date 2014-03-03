@@ -44,8 +44,6 @@
                     	<th>+/-</th>
                     	<th>Email</th>
                     	<th>user_hrn</th>
-                    	<th>First name</th>
-                    	<th>Last name</th>
                     	<th>Enabled</th>
                 	</tr>
             	</table>
@@ -61,11 +59,27 @@
             $.each( data, function( key, val ) {
                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
                 user_row = "<tr>";
-                user_row += "<td><input type='checkbox'></td>";
+				// checking the box for the users that belong to the selected slice
+				var flag_checkbox = 0;
+				for(var data in val.slice) {
+    				var element = val.slice[data];
+					console.log("element");
+					console.log(element);
+					for(var key in element) {
+    					var value = element[key];
+						if (value == 'ple.upmc.myslicedemo'){
+     						console.log("found!!");
+							flag_checkbox = 1;
+							user_row += "<td><input type='checkbox' checked='True'></td>";
+						}
+
+					}
+				}
+				if(flag_checkbox != 1){
+                	user_row += "<td><input type='checkbox'></td>";
+				}
                 user_row += "<td>"+val.user_email+"</td>";
                 user_row += "<td>"+val.user_hrn+"</td>";
-                user_row += "<td>"+val.user_first_name+"</td>";
-                user_row += "<td>"+val.user_last_name+"</td>";
 				user_row += "<td>"+val.enabled+"</td>";
                 user_row += "</tr>";
                 table_users.push(user_row);
