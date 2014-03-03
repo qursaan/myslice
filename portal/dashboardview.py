@@ -48,7 +48,7 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 #            root_authority = sub_authority[0]
 #            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
 #        else:
-        slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('slice.slice_hrn')
+        slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)
 

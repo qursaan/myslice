@@ -1,29 +1,22 @@
-from django.template.loader      import render_to_string
-from django.shortcuts            import render
-from django.core.mail            import send_mail
+from django.shortcuts           import render
 
-from unfold.page                 import Page
+from unfold.page                import Page
 
-from manifold.core.query         import Query
-from manifoldapi.manifoldapi     import execute_admin_query, execute_query
+from manifold.core.query        import Query
+from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
-from portal.models               import PendingSlice
-from portal.actions              import authority_get_pi_emails
-from portal.forms                import SliceRequestForm
-from unfold.loginrequired        import LoginRequiredAutoLogoutView
-from ui.topmenu                  import topmenu_items_live, the_user
+from portal.actions             import is_pi, create_slice, create_pending_slice
+from portal.forms               import SliceRequestForm
+from unfold.loginrequired       import LoginRequiredAutoLogoutView
+from ui.topmenu                 import topmenu_items_live, the_user
 
 from theme import ThemeView
 
-import json
+import json, time
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
     
-    def __init__ (self):
-        self.user_email = ''
-        self.errors = []
-
     # because we inherit LoginRequiredAutoLogoutView that is implemented by redefining 'dispatch'
     # we cannot redefine dispatch here, or we'd lose LoginRequired and AutoLogout behaviours
     def post (self, request):
@@ -32,23 +25,27 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     def get (self, request):
         return self.get_or_post (request, 'GET')
 
-    def get_or_post  (self, request, method):
-        # Using cache manifold-tables to get the list of authorities faster
+    def get_or_post  (self, wsgi_request, method):
+        """
+        """
+        errors = []
+
+        # Retrieve the list of authorities
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
-        authorities = execute_admin_query(request, authorities_query)
+        authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities)
 
+        # Get user_hrn (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email')
-        user_email = execute_query(self.request, user_query)
-        self.user_email = user_email[0].get('email')
-
-
+        user_emails = execute_query(wsgi_request, user_query)
+        user_email = user_emails[0].get('email')
+        #
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-        account_details = execute_query(self.request, account_query)
-
+        account_details = execute_query(wsgi_request, account_query)
+        #
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        platform_details = execute_query(self.request, platform_query)
+        platform_details = execute_query(wsgi_request, platform_query)
         user_hrn = None
         # getting user_hrn from local:account
         for account_detail in account_details:
@@ -60,73 +57,61 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                         account_config = json.loads(account_detail['config'])
                         user_hrn = account_config.get('user_hrn','N/A')
 
-
-        #user_query  = Query().get('user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
-        #user_hrn = execute_query(self.request, user_query)
-        #self.user_hrn = user_hrn[0].get('user_hrn')
-        
-        
-        page = Page(request)
+        # Page rendering
+        page = Page(wsgi_request)
         page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
-            self.errors = []
-    
             # The form has been submitted
-            slice_name = request.POST.get('slice_name', '')
-            authority_hrn = request.POST.get('authority_hrn', '')
-            number_of_nodes = request.POST.get('number_of_nodes', '')
-            purpose = request.POST.get('purpose', '')
-            email = self.user_email
-            cc_myself = True
+            slice_request = {
+                'type'              : 'slice',
+                'id'                : None,
+                'user_hrn'          : user_hrn,
+                'timestamp'         : time.time(),
+                'authority_hrn'     : wsgi_request.POST.get('authority_hrn', ''),
+                'slice_name'        : wsgi_request.POST.get('slice_name', ''),
+                'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
+                'type_of_nodes'     : wsgi_request.POST.get('type_of_nodes', ''),
+                'purpose'           : wsgi_request.POST.get('purpose', ''),
+            }
             
+            authority_hrn = slice_request['authority_hrn']
             if (authority_hrn is None or authority_hrn == ''):
-                self.errors.append('Please, select an authority')
+                errors.append('Please, select an authority')
+
             # What kind of slice name is valid?
+            slice_name = slice_request['slice_name']
             if (slice_name is None or slice_name == ''):
-                self.errors.append('Slice Name is mandatory')
+                errors.append('Slice Name is mandatory')
     
+            purpose = slice_request['purpose']
             if (purpose is None or purpose == ''):
-                self.errors.append('Purpose is mandatory')
+                errors.append('Purpose is mandatory')
     
-            if not self.errors:
-                ctx = {
-                    'email': email,
-                    'slice_name': slice_name,
-                    'authority_hrn': authority_hrn,
-                    'number_of_nodes': number_of_nodes,
-                    'purpose': purpose,
-                }            
-                s = PendingSlice(
-                    slice_name      = slice_name,
-                    user_hrn        = user_hrn,
-                    authority_hrn   = authority_hrn,
-                    number_of_nodes = number_of_nodes,
-                    purpose         = purpose
-                )
-                s.save()
-    
-                # The recipients are the PI of the authority
-                recipients = authority_get_pi_emails(request, authority_hrn)
-                msg = render_to_string('slice-request-email.txt', ctx)
-                send_mail("Onelab user %s requested a slice"%email , msg, email, recipients)
+            if not errors:
+                if is_pi(wsgi_request, user_hrn, authority_hrn):
+                    # PIs can directly create slices in their own authority...
+                    create_slice(wsgi_request, slice_request)
+                    self.template_name = 'slice-request-done-view.html'
+                else:
+                    # Otherwise a wsgi_request is sent to the PI
+                    create_pending_slice(wsgi_request, user_email, slice_name, user_hrn, authority_hrn, number_of_nodes, purpose)
+                    self.template_name = 'slice-request-ack-view.html'
                 
-                self.template_name = 'slice-request-ack-view.html'
-                
-                return render(request, self.template, {'theme': self.theme}) # Redirect after POST
+                return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
+        else:
+            slice_request = {}
+
         template_env = {
-            'username': request.user.email,
-          'topmenu_items': topmenu_items_live('Request a slice', page),
-          'errors': self.errors,
-          'slice_name': request.POST.get('slice_name', ''),
-          'authority_hrn': request.POST.get('authority_hrn', ''),
-          'number_of_nodes': request.POST.get('number_of_nodes', ''),
-          'purpose': request.POST.get('purpose', ''),
-          'email': self.user_email,
-          'user_hrn': user_hrn,
-          'cc_myself': True,
-          'authorities': authorities,
-          'theme': self.theme
+            'username': wsgi_request.user.email,
+            'topmenu_items': topmenu_items_live('Request a slice', page),
+            'errors': errors,
+            'email': user_email,
+            'user_hrn': user_hrn,
+            'cc_myself': True,
+            'authorities': authorities,
+            'theme': self.theme
         }
-        template_env.update(page.prelude_env ())
-        return render(request, self.template, template_env)
+        template_env.update(slice_request)
+        template_env.update(page.prelude_env())
+        return render(wsgi_request, self.template, template_env)

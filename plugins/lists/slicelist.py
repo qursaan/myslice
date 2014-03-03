@@ -5,7 +5,7 @@ from plugins.lists.simplelist import SimpleList
 class SliceList (SimpleList):
     
     def __init__ (self, **settings):
-        SimpleList.__init__(self, key='slice.slice_hrn', classname='slicelist', **settings)
+        SimpleList.__init__(self, key='slices.slice_hrn', classname='slicelist', **settings)
 
     # writing a js plugin for that would be overkill, just use SimpleList
     def plugin_classname (self):

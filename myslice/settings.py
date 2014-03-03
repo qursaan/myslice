@@ -31,8 +31,6 @@ if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT
     DATAROOT=ROOT
 
-print "HTTPROOT = ",HTTPROOT
-
 if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
 if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
 
