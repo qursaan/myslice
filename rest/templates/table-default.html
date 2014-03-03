@@ -1,15 +1,15 @@
 {% load rest_filters %}
 <thead>
 <tr>
-	{% if "checkbox" in options %}<th>checkbox</th>{% endif %}
-	{% for p in properties %}<th>{{ p }}</th>{% endfor %}
+	{% if "checkbox" in options %}<th><input type="checkbox" name="{{ id }}" /></th>{% endif %}
+	{% for f in fields %}<th>{{ f }}</th>{% endfor %}
 </tr>
 </thead>
 <tbody>
 {% for d in data %}
-<tr id="{{ id }}">
-	{% if "checkbox" in options %}<td><input type="checkbox" name="{{ id }}" /></td>{% endif %}
-	{% for p in properties %}<td><div class="line1">{{ d|key:p }}</div></td>{% endfor %}
+<tr id="{{ d|key:id }}">
+	{% if "checkbox" in options %}<td><input type="checkbox" name="{{ id }}" value="{{ d|key:id }}" /></td>{% endif %}
+	{% for f in fields %}<td><div class="line1">{{ d|key:f }}</div></td>{% endfor %}
 </tr>
 {% endfor %}
 </tbody>

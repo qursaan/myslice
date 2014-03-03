@@ -29,13 +29,13 @@ $(document).ready(function() {
 	
 	/* Testbeds list */
 	$('div#testbed-list').ready(function() {
-		$('table#testbedList').load("/table/testbed", function() {
+		$('table#testbedList').load("/table/network/",{'fields' : ['platform'], 'options': ['checkbox']}, function() {
 			
 		});
 	});
 	
 	//{'columns' : ['hostname','country','type'], 'filters' : { 'country' : 'France' } }
-	oTable.load("/table/resource/", {'columns' : ['hostname','country','type'] }, function(data) {
+	oTable.load("/table/resource/", {'fields' : ['hostname','hrn','country','type'], 'options': ['checkbox'] }, function(data) {
 		$(this).dataTable( {
 			"sScrollY": window.innerHeight - 275,
 			"sDom": "frtiS",

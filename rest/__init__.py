@@ -1,15 +1,8 @@
 from manifold.core.query            import Query
-
-from django.views.generic.base      import TemplateView
-from django.shortcuts               import render_to_response
-
-from unfold.loginrequired           import LoginRequiredView
-from django.http                    import HttpResponse
-
-from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
 
-from string                         import join
+from django.http                    import HttpResponse
+
 
 import decimal
 import datetime
@@ -27,54 +20,65 @@ class DecimalEncoder(json.JSONEncoder):
         if isinstance(o, decimal.Decimal):
             return (str(o) for o in [o])
         return super(DecimalEncoder, self)._iterencode(o, markers)
-
-class objectRequest(object):
+    
+class ObjectRequest(object):
     
     def __init__(self, request, object_type, object_name):
         self.type = object_type
         self.name = object_name
-        self.properties = []
+        self.fields = []
         self.filters = {}
         self.options = None
-        
+
         self.request = request
-
-    # XXX TODO: What about the local: objects? 
-    # Example: local:user (Manifold) is different from user (SFA GW)   
-
+        
         if ((self.type == 'platform') or (self.type == 'testbed')) :
             self.type = 'local:platform'
             self.id = 'platform'
-            self.properties = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
+            self.fields = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
             self.filters['disabled'] = '0'
             self.filters['gateway_type'] = 'sfa'
             self.filters['platform'] = '!myslice'
         else :
-            self.id = 'hrn'
-            query = Query.get('local:object').filter_by('table', '==', self.type).select('column.name')
-            results = execute_query(self.request, query)
-            if results :
-                for r in results[0]['column'] :
-                    self.properties.append(r['name'])
-            else :
-                return error('db error')
-        return None
+            self.setKey()
+            self.setLocalFields()
+        
     
-    def addFilters(self, properties):
-        selected_properties = []
-        for p in properties :
-            if p in self.properties :
-                selected_properties.append(p)
-        self.properties = selected_properties
-        self.setId()
+    def setKey(self):
+        # What about key formed of multiple fields???
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
+        results = execute_query(self.request, query)
+        print "key of object = %s" % results
+        if results :
+            for r in results[0]['key'] :
+                self.id = r
+        else :
+            raise Exception, 'Manifold db error'
     
-    def setId(self):
-        if self.id in self.properties :
-            self.properties.remove(self.id)
-            [self.id].extend(self.properties)
+    def setLocalFields(self):
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('column.name')
+        results = execute_query(self.request, query)
+        if results :
+            for r in results[0]['column'] :
+                self.fields.append(r['name'])
+        else :
+            raise Exception, 'Manifold db error'
     
-    def execute(self):
-        query = Query.get(self.type).select(self.properties)
+    def setFields(self, fields):
+        selected_fields = []
+        for p in fields :
+            if p in self.fields :
+                selected_fields.append(p)
+        self.fields = selected_fields
+        
+        # 
+        if self.id in self.fields :
+            self.fields.remove(self.id)
+            [self.id].extend(self.fields)
+    
+    def applyFilters(self, query, force_filters = False):
+        if (force_filters and not self.filters) :
+            raise Exception, "Filters required"
         if self.filters :
             for k, f in self.filters.iteritems() :
                 if (f[:1] == "!") :
@@ -89,41 +93,44 @@ class objectRequest(object):
                     query.filter_by(k, '<', f[1:])
                 else :
                     query.filter_by(k, '==', f)
+        return query
+    
+    def get(self):
+        query = Query.get(self.type).select(self.fields)
+        query = self.applyFilters(query)
         return execute_query(self.request, query)
-
-def dispatch(request, object_type, object_name):
     
-    o = objectRequest(request, object_type, object_name)
+    def update(self):
+        query = Query.update(self.type)
+        query = self.applyFilters(query, True)
+        if self.params :
+            query.set(self.params)
+        else:
+            raise Exception, "Params are required for update"
+        return execute_query(self.request, query)
     
-    if request.method == 'POST':
-        req_items = request.POST
-    elif request.method == 'GET':
-        req_items = request.GET
-
-    for el in req_items.items():
-        if el[0].startswith('filters'):
-            o.filters[el[0][8:-1]] = el[1]
-        elif el[0].startswith('columns'):
-            o.addFilters(req_items.getlist('columns[]'))
-        elif el[0].startswith('options'):
-            o.options = req_items.getlist('options[]')
-
-    response = o.execute()
+    def delete(self):
+        query = Query.delete(self.type)
+        query = self.applyFilters(query, True)
+        if self.params :
+            query.set(self.params)
+        else:
+            raise Exception, "Params are required for update"
+        return execute_query(self.request, query)
     
-    if request.path.split('/')[1] == 'rest' :
-        response_data = response
-        return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
-    elif request.path.split('/')[1] == 'table' :
-        return render_to_response('table-default.html', {'data' : response, 'properties' : o.properties, 'id' : o.id, 'options' : o.options})
-    elif request.path.split('/')[1] == 'datatable' :
+    def json(self):
+        return HttpResponse(json.dumps(self.get(), cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
+    
+    def datatable(self):
+        response = self.get()
         response_data = {}
-        response_data['columns'] = o.properties
-        response_data['labels'] = o.properties
+        response_data['fields'] = self.fields
+        response_data['labels'] = self.fields
         response_data['data'] = []
         response_data['total'] = len(response)
         for r in response :
             d = []
-            for p in o.properties :
+            for p in self.fields :
                 d.append(r[p])
             response_data['data'].append(d)
          
@@ -131,3 +138,6 @@ def dispatch(request, object_type, object_name):
 
 def error(msg):
     return HttpResponse(json.dumps({'error' : msg}), content_type="application/json")
+
+def success(msg):
+    return HttpResponse(json.dumps({'success' : msg}), content_type="application/json")
