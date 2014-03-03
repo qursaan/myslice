@@ -57,14 +57,6 @@ class objectRequest(object):
         else :
             return error('Manifold db error')
 
-    def addFilters(self, properties):
-        selected_properties = []
-        for p in properties :
-            if p in self.properties :
-                selected_properties.append(p)
-        self.properties = selected_properties
-        self.setId()
-
     def setId(self):
         if self.id in self.properties :
             self.properties.remove(self.id)
@@ -107,8 +99,6 @@ def dispatch(request, object_type, object_name):
     for el in req_items.items():
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
-        elif el[0].startswith('columns'):
-            o.addFilters(req_items.getlist('columns[]'))
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')
 
