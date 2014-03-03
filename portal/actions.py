@@ -457,25 +457,23 @@ def sfa_create_user(wsgi_request, request):
     auth_pi = request.get('pi', None)
     auth_pi = list([auth_pi]) if auth_pi else list()
 
-    # We create a slice request with Manifold terminology
+    # We create a user request with Manifold terminology
     sfa_user_params = {
-        'user_hrn'   : request['user_hrn'],
-        'user_email' : request['email'],
-        'urn'        : Xrn(request['user_hrn'], request['type']).get_urn(),
-        'type'       : request['type'],
-        'keys'       : request['public_key'],
-        'first_name' : request['first_name'],
-        'last_name'  : request['last_name'],
-        #'slices'    : None,
-        #'researcher': None,
-        'pi'         : auth_pi,
-        'enabled'    : True
+        'user_hrn'          : request['user_hrn'],
+        'user_email'        : request['email'],
+        'user_urn'          : Xrn(request['user_hrn'], request['type']).get_urn(),
+        'user_type'         : request['type'],
+        'keys'              : request['public_key'],
+        'user_first_name'   : request['first_name'],
+        'user_last_name'    : request['last_name'],
+        'pi_authorities'    : auth_pi,
+        'user_enabled'      : True
     }
 
     query = Query.create('user').set(sfa_user_params).select('user_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
-        raise Exception, "Could not create %s. Already exists ?" % user_params['user_hrn']
+        raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     return results
 
 def create_user(wsgi_request, request):
