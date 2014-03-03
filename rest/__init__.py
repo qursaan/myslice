@@ -27,6 +27,7 @@ class ObjectRequest(object):
         self.type = object_type
         self.name = object_name
         self.fields = []
+        self.params = {}
         self.filters = {}
         self.options = None
 
@@ -113,8 +114,8 @@ class ObjectRequest(object):
     def delete(self):
         query = Query.delete(self.type)
         query = self.applyFilters(query, True)
-        if self.params :
-            query.set(self.params)
+        if self.filters :
+            query.set(self.filters)
         else:
             raise Exception, "Params are required for update"
         return execute_query(self.request, query)

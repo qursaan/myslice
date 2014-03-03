@@ -16,7 +16,7 @@ import json
 
 def dispatch(request, object_type, object_name):
     
-    o = objectRequest(request, object_type, object_name)    
+    o = ObjectRequest(request, object_type, object_name)    
     
     object_filters = {}
     object_params = {}
@@ -27,19 +27,22 @@ def dispatch(request, object_type, object_name):
     elif request.method == 'GET':
         #return error('only post request is supported')
         req_items = request.GET
-
+    print req_items
     for el in req_items.items():
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
+            print o.filters
         elif el[0].startswith('params'):
-            o.addParams(req_items.getlist('params[]'))
-        elif el[0].startswith('columns'):
-            o.addFilters(req_items.getlist('columns[]'))
+            o.params[el[0][7:-1]] = el[1]
+            print o.params
+        elif el[0].startswith('fields'):
+            o.fields=req_items.getlist('fields[]')
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')
 
     try:
-        response = o.execute()
+        print o.params
+        response = o.update()
 
         if response :
             return success('record updated')
