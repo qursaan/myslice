@@ -1,13 +1,10 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block head %}
-{{ wizard.form.media }}
-{% endblock %}
-
-{% block unfold_main %}
-
-<h1>OneLab Portal Documentation<h1>
-
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> OneLab Portal Documentation</h1>
+</div>
+<div class="row">
 <h2>Portal Components</h2>
 <h3>Myslice (Web Frontend)</h3>
 <p>
@@ -32,6 +29,6 @@ Manifold is the backend that is running behind the portal.
 <h2>FAQ<h2>
 <h3>Users</h3>
 <h3>Managers</h3>
-
+</div>
 {% endblock %}
 

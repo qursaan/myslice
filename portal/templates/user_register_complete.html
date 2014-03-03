@@ -1,8 +1,15 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}
+{% block content %}
 
-  <h1>User registration complete !</h1>
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> OneLab Experimenter Registration</h1>
+</div>
+<div class="row">
+  <h3>User registration complete !</h3>
+  <p>
+  	You will receive an email with further instructions.
+  </p>
+ </div>
 
-You will receive an email with further instructions.
 {% endblock %}

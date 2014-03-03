@@ -4,7 +4,7 @@ from manifoldapi.manifoldapi        import execute_query,execute_admin_query
 from portal.models               import PendingUser, PendingSlice, PendingAuthority
 import json
 
-from portal.models               import PendingSlice
+from django.contrib.auth.models import User
 from django.template.loader      import render_to_string
 from django.core.mail            import send_mail
 
@@ -33,10 +33,9 @@ def authority_get_pi_emails(request, authority_hrn):
         return ['support@myslice.info']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
-        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('email')
+        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
         results = execute_admin_query(request, query)
-        print "mails",  [result['email'] for result in results]
-        return [result['email'] for result in results]
+        return [result['user_email'] for result in results]
 
 def is_pi(wsgi_request, user_hrn, authority_hrn):
     # XXX could be done in a single query !
@@ -172,7 +171,9 @@ def make_request_user(user):
     request['last_name']     = user.last_name
     request['email']         = user.email
     request['login']         = user.login
-    request['keypair']       = user.keypair
+    request['user_hrn']      = user.user_hrn
+    request['public_key']    = user.public_key
+    request['private_key']   = user.private_key
     return request
 
 def make_request_slice(slice):
@@ -471,7 +472,7 @@ def sfa_create_user(wsgi_request, request):
         'enabled'    : True
     }
 
-    query = Query.create('user').set(user_params).select('user_hrn')
+    query = Query.create('user').set(sfa_user_params).select('user_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % user_params['user_hrn']
@@ -486,7 +487,7 @@ def create_user(wsgi_request, request):
     # we would have to perform the steps in create_pending_user too
 
     # Add the user to the SFA registry
-    sfa_add_user(wsgi_request, request)
+    sfa_create_user(wsgi_request, request)
 
     # Update Manifold user status
     manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})
@@ -494,7 +495,7 @@ def create_user(wsgi_request, request):
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
 
-def create_pending_user(wgsi_request, request, user_detail):
+def create_pending_user(wsgi_request, request, user_detail):
     """
     """
 
@@ -505,10 +506,9 @@ def create_pending_user(wgsi_request, request, user_detail):
         authority_hrn = request['authority_hrn'],
         email         = request['email'],
         password      = request['password'],
-        keypair       = request['account_config'],  # XXX REMOVE
-        public_key    = request['public_key'],      # TODO NEW
-        private_key   = request['private_key'],     # TODO NEW
-        user_hrn      = request['user_hrn'],        # TODO NEW
+        public_key    = request['public_key'],
+        private_key   = request['private_key'],
+        user_hrn      = request['user_hrn'],
         pi            = '',                         # XXX Why not None ?
     )
     b.save()
@@ -538,6 +538,6 @@ def create_pending_user(wgsi_request, request, user_detail):
     manifold_add_account(wsgi_request, account_params)
 
     # Send an email: the recipients are the PI of the authority
-    recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
+    recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
     msg = render_to_string('user_request_email.txt', request)
     send_mail("Onelab New User request for %(email)s submitted" % request, msg, 'support@myslice.info', recipients)

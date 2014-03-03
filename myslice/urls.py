@@ -23,6 +23,7 @@ platforms_view=portal.platformsview.PlatformsView.as_view()
 import portal.testbedlist
 import portal.sliceview
 import portal.sliceresourceview
+from portal.sliceuserview import SliceUserView 
 
 
 #### high level choices
@@ -65,6 +66,9 @@ urls = [
     (r'^rest/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
     (r'^table/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
     (r'^datatable/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.dispatch'),
+    (r'^update/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.update.dispatch'),
+    (r'^create/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.create.dispatch'),
+    (r'^delete/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.delete.dispatch'),
     #
     #
     #(r'^view/?', include('view.urls')),
@@ -74,6 +78,7 @@ urls = [
     # Portal
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.testbedlist.TestbedList.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
+    (r'^users/(?P<slicename>[^/]+)/?$', SliceUserView.as_view()),
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]

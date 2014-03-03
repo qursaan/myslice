@@ -22,7 +22,6 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
         # We might have slices on different registries with different user accounts 
         # We note that this portal could be specific to a given registry, to which we register users, but i'm not sure that simplifies things
         # Different registries mean different identities, unless we identify via SFA HRN or have associated the user email to a single hrn
-	print self.request
         #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 
@@ -48,6 +47,8 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 #            root_authority = sub_authority[0]
 #            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
 #        else:
+        print "SLICE QUERY"
+        print "-" * 80
         slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)

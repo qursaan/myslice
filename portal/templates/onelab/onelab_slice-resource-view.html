@@ -1,10 +1,9 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout_wide.html" %}
 
-{% block unfold_main %}
-<div id="slice-view">	
+{% block content %}
 	<div class="col-md-2">
-  		<div id="select-platform" class="list-group">
-  		</div>
+		<div id="select-platform" class="list-group">
+		</div>
 			
 		<ul class="list-group">
 		  <li class="list-group-item">Filter: CPU</li>
@@ -13,8 +12,8 @@
 		  <li class="list-group-item">...</li>
 		  <li class="list-group-item">...</li>
 		</ul>
-
-  	</div>
+	
+	</div>
 	<div class="col-md-10">
 		<div class="row">
 		  	{% include theme|add:"_widget-slice-sections.html" %}
@@ -39,5 +38,4 @@
 		</div>
 		<table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table>
 	</div>
-</div>
-{% endblock unfold_main %}
+{% endblock %}

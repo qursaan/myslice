@@ -3,7 +3,6 @@ import json
 from random import randint
 
 from django.core.mail           import send_mail
-from django.contrib.auth.models import User
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
@@ -17,7 +16,7 @@ from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser
-from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account
+from portal.actions             import create_pending_user
 
 from theme import ThemeView
 
@@ -68,7 +67,7 @@ class RegistrationView (FreeAccessView, ThemeView):
             }
 
             # Construct user_hrn from email (XXX Should use common code)
-            split_email = reg_email.split("@")[0] 
+            split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
             user_request['user_hrn'] = user_request['authority_hrn'] \
                      + '.' + split_email + str(randint(1,1000000))
@@ -99,7 +98,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 # Example: private_key = '-----BEGIN RSA PRIVATE KEY-----\nMIIC...'
                 # Example: public_key = 'ssh-rsa AAAAB3...'
                 user_request['private_key'] = private.exportKey()
-                user_request['public_key']  = private.public_key().exportKey(format='OpenSSH')
+                user_request['public_key']  = private.publickey().exportKey(format='OpenSSH')
 
             else: 
                 user_request['auth_type'] = 'user'
@@ -122,9 +121,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                 self.template_name = 'user_register_complete.html'
                 return render(wsgi_request, self.template, {'theme': self.theme}) 
 
-
-        # Backlashed \n => \\n but no surrounding " "
-        public_key_formatted = request['public_key'].replace('"', '');
+        else:
+            user_request = {}
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),

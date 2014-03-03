@@ -1,5 +1,9 @@
-{% extends "layout-unfold1.html" %}
-{% block unfold_main %}
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_users_small.png" alt="Manage Users" /> Manage Users</h1>
+</div>
 
 
 {% if messages %}
@@ -10,200 +14,194 @@
 </ul>
 {% endif %}
 
-<div class="wrapper" id="institution">
+<div class="row">
     <ul class="nav nav-tabs">
       <li class="active"><a class="home-tab" data-panel="user_profile" href="#">User Profile</a></li>
       <li><a class="home-tab" data-panel="principal_acc" href="#">User Account</a></li>
       <li><a class="home-tab" data-panel="ref_acc" href="#">Testbed Access</a></li>
     </ul>
-<div class="home-panel" id="user_profile">
-<p></p>         
-<form id="editForm"  method="POST" action="{{user_email}}/user_process" enctype="multipart/form-data">
-<div id="middle" align="center">
-	<div class="well">
-	  	{% csrf_token %}
-	  		<table class="profile">          
-	    		<tr class="odd">
-	      			<td colspan="2">
-						<div id="info">Platform: Myslice</div>
-	      			</td>
-	    		</tr>
-				<tr class="even">
-    				<td class="key">Email</td>
-    				<td class="value"> <span id="emailval" class="value" >{{ user_email }}</span> </td>
-				</tr>
-	      		<tr class="odd">
-					<td class="key">Full Name</td>
-					<td class="value">
-		  				<span id="nameval" class="value" >{{ fullname }} </span>
-		  				<span class="hide_this" id="span_name">
-		    				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_name_change"> Cancel </button> 
-		    				<div style='display:none;'><input type='hidden'  name='nameform'  /></div>
-		    				<input id="fname" type="text" name="fname" class="required"  maxlength="200" value="{{firstname}}" />
-		    				<input id="lname" type="text" name="lname" class="required"  maxlength="200" value="{{lastname}}" />
-		    				<input type="submit" class="btn btn-default btn-xs" name="submit_name" value="Save"/>
-		  				</span>
-		  				<button class="btn btn-default btn-xs" type="button"title="Full Name" id="edit_name">
-							<span class="glyphicon glyphicon-edit"></span> Edit
-						</button>
-					</td>
-	      		</tr>
-				<tr class="even">
-     				<td class="key">Authority</td>
-     				<td class="value">
-         				<span id="authval" class="value" >{{ authority }} </span>
-         				<span class="hide_this" id="span_auth">
-             				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_auth_change"> Cancel </button>
-             				<div style='display:none;'><input type='hidden'  name='authform'  /></div>
-             				<input id="authority" type="text" name="authority" class="required"  maxlength="200" value="{{authority}}" />
-             				<input type="submit" class="btn btn-default btn-xs" name="submit_auth" value="Save"/>
-         				</span>
-         				<button class="btn btn-default btn-xs" type="button"title="auth" id="edit_auth">
-             				<span class="glyphicon glyphicon-edit"></span> Edit
-        	 			</button>
-     				</td>
- 				</tr>     
-				<tr class="odd">
-		  			<td class="key">Generate Keys</td>
-		  			<td>
-						<input type="submit" name="generate" class="btn btn-danger btn-xs" value="Generate a new Key Pair" id="generate_keypair" 
-							   onclick="return confirm('Are you sure? If you do so, your current credentials will be overwritten.');" 
-							   title="It will generate a new key Pair and your current credentials will be overwritten."/>
-	      			</td> 
-	    		</tr>
-	    		<tr class="even">
-	      			<td class="key">Public Key</td>
-	      			<td class="value">
-						<span id="keyval" class="value">******** </span>
-						<span class="hide_this" id="span_upload">
-		  					<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_upload"> Cancel </button>
-		  					<div style='display:none;'>
-		  						<input type='hidden'  name='upload'  /></div>
-		  						<input type="file" name="pubkey" class="required" id="pubkey"/>  
-		  						<input class="btn btn-default btn-xs" name="upload_key" id="upload_key"  type="submit" title="Upload your public key" value="Upload"
-								   onclick="return confirm('Are you sure? It will overwrite your current credentials and you have delegate it manually.');"/>
-						</span>
-						<div style='display:none;'> <input type='hidden'  name='dload'  /> </div> 
-						<button type="submit" name="dl_pubkey" class="btn btn-default btn-xs" title="Download your public key" id="dl_file">
-							<span class="glyphicon glyphicon-download"></span> Download
-						</button>
-						<button class="btn btn-default btn-xs" id="upload_file" type="button" title="Upload a public key">
-							<span class="glyphicon glyphicon-upload"></span> Upload
-						</button>       
-	      			</td>
-	    		</tr>
+	<div class="home-panel" id="user_profile">
+	<form id="editForm"  method="POST" action="{{user_email}}/user_process" enctype="multipart/form-data">
+	<div id="middle" align="center">
+		<div class="well">
+		  	{% csrf_token %}
+		  		<table class="profile">          
+		    		<tr class="odd">
+		      			<td colspan="2">
+							<div id="info">Platform: Myslice</div>
+		      			</td>
+		    		</tr>
+					<tr class="even">
+	    				<td class="key">Email</td>
+	    				<td class="value"> <span id="emailval" class="value" >{{ user_email }}</span> </td>
+					</tr>
+		      		<tr class="odd">
+						<td class="key">Full Name</td>
+						<td class="value">
+			  				<span id="nameval" class="value" >{{ fullname }} </span>
+			  				<span class="hide_this" id="span_name">
+			    				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_name_change"> Cancel </button> 
+			    				<div style='display:none;'><input type='hidden'  name='nameform'  /></div>
+			    				<input id="fname" type="text" name="fname" class="required"  maxlength="200" value="{{firstname}}" />
+			    				<input id="lname" type="text" name="lname" class="required"  maxlength="200" value="{{lastname}}" />
+			    				<input type="submit" class="btn btn-default btn-xs" name="submit_name" value="Save"/>
+			  				</span>
+			  				<button class="btn btn-default btn-xs" type="button"title="Full Name" id="edit_name">
+								<span class="glyphicon glyphicon-edit"></span> Edit
+							</button>
+						</td>
+		      		</tr>
+					<tr class="even">
+	     				<td class="key">Authority</td>
+	     				<td class="value">
+	         				<span id="authval" class="value" >{{ authority }} </span>
+	         				<span class="hide_this" id="span_auth">
+	             				<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_auth_change"> Cancel </button>
+	             				<div style='display:none;'><input type='hidden'  name='authform'  /></div>
+	             				<input id="authority" type="text" name="authority" class="required"  maxlength="200" value="{{authority}}" />
+	             				<input type="submit" class="btn btn-default btn-xs" name="submit_auth" value="Save"/>
+	         				</span>
+	         				<button class="btn btn-default btn-xs" type="button"title="auth" id="edit_auth">
+	             				<span class="glyphicon glyphicon-edit"></span> Edit
+	        	 			</button>
+	     				</td>
+	 				</tr>     
+					<tr class="odd">
+			  			<td class="key">Generate Keys</td>
+			  			<td>
+							<input type="submit" name="generate" class="btn btn-danger btn-xs" value="Generate a new Key Pair" id="generate_keypair" 
+								   onclick="return confirm('Are you sure? If you do so, your current credentials will be overwritten.');" 
+								   title="It will generate a new key Pair and your current credentials will be overwritten."/>
+		      			</td> 
+		    		</tr>
+		    		<tr class="even">
+		      			<td class="key">Public Key</td>
+		      			<td class="value">
+							<span id="keyval" class="value">******** </span>
+							<span class="hide_this" id="span_upload">
+			  					<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_upload"> Cancel </button>
+			  					<div style='display:none;'>
+			  						<input type='hidden'  name='upload'  /></div>
+			  						<input type="file" name="pubkey" class="required" id="pubkey"/>  
+			  						<input class="btn btn-default btn-xs" name="upload_key" id="upload_key"  type="submit" title="Upload your public key" value="Upload"
+									   onclick="return confirm('Are you sure? It will overwrite your current credentials and you have delegate it manually.');"/>
+							</span>
+							<div style='display:none;'> <input type='hidden'  name='dload'  /> </div> 
+							<button type="submit" name="dl_pubkey" class="btn btn-default btn-xs" title="Download your public key" id="dl_file">
+								<span class="glyphicon glyphicon-download"></span> Download
+							</button>
+							<button class="btn btn-default btn-xs" id="upload_file" type="button" title="Upload a public key">
+								<span class="glyphicon glyphicon-upload"></span> Upload
+							</button>       
+		      			</td>
+		    		</tr>
+				</table>
+		</div>
+	</div>
+	</div>
+
+	
+	<div class="home-panel" id="principal_acc" style="display:none;">
+	<div class="row">
+		
+	<h3>Principal Account <small>Account used for delegating credentials</small></h3>
+	
+			<table class="table table-bordered table-hover  mytable"> 
+				<tr class="odd"> 
+	    			<th>Platform</th> 
+	        		<th>Account Type</th>
+					<th>Account Delegation</th>
+	        		<th>User hrn</th>
+					<th>User Status</th>
+	        		<!--<th>Pub Key</th> -->
+	    		</tr>   
+				{% for row in principal_acc %}         
+	   			<tr class="border_bottom">
+	    			<td class="odd"> {{ row.platform_name }} </td>
+	        		<td class="odd"> {{ row.account_type }} </td>
+					<td class="odd"> {{ row.delegation_type }} </td>
+	       			<td class="odd"> {{ row.usr_hrn }}  </td>
+					<td class="odd"> {{ row.user_status }}  </td>
+	        	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
+	    		</tr> 
+				{%endfor%}               
 			</table>
 	</div>
-</div>
-</div>
-
-
-<div class="home-panel" id="principal_acc" style="display:none;">
-
-<h3>Principal Account <small>Account used for delegating credentials</small></h3>
-<div id="middle" align="center">
-	<div class="well">
-		<table class="table table-bordered table-hover  mytable"> 
-			<tr class="odd"> 
-    			<th>Platform</th> 
-        		<th>Account Type</th>
-				<th>Account Delegation</th>
-        		<th>User hrn</th>
-				<th>User Status</th>
-        		<!--<th>Pub Key</th> -->
-    		</tr>   
-			{% for row in principal_acc %}         
-   			<tr class="border_bottom">
-    			<td class="odd"> {{ row.platform_name }} </td>
-        		<td class="odd"> {{ row.account_type }} </td>
-				<td class="odd"> {{ row.delegation_type }} </td>
-       			<td class="odd"> {{ row.usr_hrn }}  </td>
-				<td class="odd"> {{ row.user_status }}  </td>
-        	<!--	<td class="even"> {{ row.usr_pubkey }} </td> -->
-    		</tr> 
-			{%endfor%}               
-		</table>
-	</div>
-</div>
 
 
 
 {%if 'Enabled'  in user_status %}
-<h3>Credentials <small>Delegated to Principal Account</small></h3>
-<div id="middle" align="center">
-    <div class="well">
-        <table class="mytable table table-bordered table-hover">
-			<caption><b>Delegated User Credential</b></caption> 
-            <tr class="odd"> 
-                <th>Expiration Date</th>
-				<th>Download</th>
-            </tr>
-			{% for row in my_users %}         
-			<tr class="border_bottom">
-    			<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="odd">
-					<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
-						<span class="glyphicon glyphicon-download"></span> Download
-					</button>
-				</td>
-			</tr>
-			{%endfor%}
-		 </table>
-		<p></p>
-		<table class="mytable table table-bordered table-hover">
-			<caption><b>Delegated Slice Credentials</b></caption>  
-     		<tr class="odd"> 
-				<th>Slice Name</th> 
-         		<th>Expiration Date</th>
-				<th>Download</th>
-     		</tr>
-			{% for row in my_slices %}     
-     		<tr class="border_bottom">
-         		<td class="odd"> {{ row.slice_name }} </td>
-				<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="odd"> 
-					<button class="btn btn-default btn-xs" name= "dl_{{row.slice_name}}" type="submit" title="Download Slice Credentials">
-						<span class="glyphicon glyphicon-download"></span> Download
-					</button> 
-				</td>
-     		</tr>
-     		{%endfor%}
-  		</table>
-		<p></p>
-		<table class="mytable table table-bordered table-hover">
-   			<caption><b>Delegated Authority Credentials</b></caption>
-   			<tr class="odd"> 
-       			<th>Authority Name</th> 
-       			<th>Expiration Date</th>
-				<th>Download</th>
-   			</tr>
-   			{% for row in my_auths %}
-   			<tr class="border_bottom">
-       			<td class="odd"> {{ row.auth_name }} </td>
-       			<td class="odd"> {{ row.cred_exp }} </td>
-				<td class="odd">
-					<button class="btn btn-default btn-xs" name= "dl_{{row.auth_name}}" type="submit" title="Download Authority Credentials">
-						<span class="glyphicon glyphicon-download"></span> Download
-					</button>
-				</td>
-   			</tr>
-   			{%endfor%}
-		</table>
-		<p></p>
-		 {%if '' not in my_users%}	
-		<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
-		{%else%}
-		<p><button class="btn btn-danger btn-lg btn-block disabled"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
-		{%endif%}
-    </div>
-</div>
+	<div class="row">
+	<h3>Credentials <small>Delegated to Principal Account</small></h3>
+	        <table class="mytable table table-bordered table-hover">
+				<caption><b>Delegated User Credential</b></caption> 
+	            <tr class="odd"> 
+	                <th>Expiration Date</th>
+					<th>Download</th>
+	            </tr>
+				{% for row in my_users %}         
+				<tr class="border_bottom">
+	    			<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd">
+						<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
+							<span class="glyphicon glyphicon-download"></span> Download
+						</button>
+					</td>
+				</tr>
+				{%endfor%}
+			 </table>
+			<p></p>
+			<table class="mytable table table-bordered table-hover">
+				<caption><b>Delegated Slice Credentials</b></caption>  
+	     		<tr class="odd"> 
+					<th>Slice Name</th> 
+	         		<th>Expiration Date</th>
+					<th>Download</th>
+	     		</tr>
+				{% for row in my_slices %}     
+	     		<tr class="border_bottom">
+	         		<td class="odd"> {{ row.slice_name }} </td>
+					<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd"> 
+						<button class="btn btn-default btn-xs" name= "dl_{{row.slice_name}}" type="submit" title="Download Slice Credentials">
+							<span class="glyphicon glyphicon-download"></span> Download
+						</button> 
+					</td>
+	     		</tr>
+	     		{%endfor%}
+	  		</table>
+			<p></p>
+			<table class="mytable table table-bordered table-hover">
+	   			<caption><b>Delegated Authority Credentials</b></caption>
+	   			<tr class="odd"> 
+	       			<th>Authority Name</th> 
+	       			<th>Expiration Date</th>
+					<th>Download</th>
+	   			</tr>
+	   			{% for row in my_auths %}
+	   			<tr class="border_bottom">
+	       			<td class="odd"> {{ row.auth_name }} </td>
+	       			<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd">
+						<button class="btn btn-default btn-xs" name= "dl_{{row.auth_name}}" type="submit" title="Download Authority Credentials">
+							<span class="glyphicon glyphicon-download"></span> Download
+						</button>
+					</td>
+	   			</tr>
+	   			{%endfor%}
+			</table>
+			<p></p>
+			 {%if '' not in my_users%}	
+			<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+			{%else%}
+			<p><button class="btn btn-danger btn-lg btn-block disabled"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+			{%endif%}
+	</div>
 </div>
 
 
-<div class="home-panel" id="ref_acc" style="display:none;">
-<h3>Testbed Access <small>Reference Accounts in the following testbeds</small></h3>
-<div id="middle" align="center">
-    <div class="well">
+	<div class="home-panel" id="ref_acc" style="display:none;">
+		<h3>Testbed Access <small>Reference Accounts in the following testbeds</small></h3>
         <table class="mytable table table-bordered table-hover"> 
             <tr class="odd"> 
                 <th>Platform</th> 
@@ -224,13 +222,10 @@
             </tr> 
             {%endfor%}               
         </table>
-    </div>
-</div>
 
 
-<h3>Add reference account to the following testbeds</h3>
-<div id="middle" align="center">
-    <div class="well">
+		<h3>Add reference account to the following testbeds</h3>
+
         <table class="mytable table table-bordered table-hover"> 
             <tr class="odd"> 
                 <th>Platforms</th> 
@@ -247,9 +242,8 @@
             </tr> 
             {%endfor%}               
         </table>
-    </div>
-</div>
-</div>
+    
+	</div>
 {%endif%} 
 </div>
 </form>

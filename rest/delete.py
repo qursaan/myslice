@@ -6,11 +6,10 @@ from django.shortcuts               import render_to_response
 from unfold.loginrequired           import LoginRequiredView
 from django.http                    import HttpResponse
 
-from manifold.core.query            import Query
+from manifold.core.query            import Query, AnalyzedQuery
 from manifoldapi.manifoldapi        import execute_query
 
-from string                         import join
-
+from string import join
 import decimal
 import datetime
 import json
@@ -29,37 +28,35 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self)._iterencode(o, markers)
 
 class objectRequest(object):
-    
+
     def __init__(self, request, object_type, object_name):
         self.type = object_type
         self.name = object_name
+        # No params in delete    
         self.properties = []
         self.filters = {}
         self.options = None
-        
+
         self.request = request
 
-    # XXX TODO: What about the local: objects? 
-    # Example: local:user (Manifold) is different from user (SFA GW)   
-
-        if ((self.type == 'platform') or (self.type == 'testbed')) :
-            self.type = 'local:platform'
-            self.id = 'platform'
-            self.properties = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
-            self.filters['disabled'] = '0'
-            self.filters['gateway_type'] = 'sfa'
-            self.filters['platform'] = '!myslice'
+        # What about key formed of multiple fields???
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
+        results = execute_query(self.request, query)
+        print "key of object = %s" % results
+        if results :
+            for r in results[0]['key'] :
+                self.id = r
         else :
-            self.id = 'hrn'
-            query = Query.get('local:object').filter_by('table', '==', self.type).select('column.name')
-            results = execute_query(self.request, query)
-            if results :
-                for r in results[0]['column'] :
-                    self.properties.append(r['name'])
-            else :
-                return error('db error')
-        return None
-    
+            return error('Manifold db error')
+
+        query = Query.get('local:object').filter_by('table', '==', self.type).select('column.name')
+        results = execute_query(self.request, query)
+        if results :
+            for r in results[0]['column'] :
+                self.properties.append(r['name'])
+        else :
+            return error('Manifold db error')
+
     def addFilters(self, properties):
         selected_properties = []
         for p in properties :
@@ -67,14 +64,14 @@ class objectRequest(object):
                 selected_properties.append(p)
         self.properties = selected_properties
         self.setId()
-    
+
     def setId(self):
         if self.id in self.properties :
             self.properties.remove(self.id)
             [self.id].extend(self.properties)
-    
+
     def execute(self):
-        query = Query.get(self.type).select(self.properties)
+        query = Query.delete(self.type)
         if self.filters :
             for k, f in self.filters.iteritems() :
                 if (f[:1] == "!") :
@@ -89,15 +86,22 @@ class objectRequest(object):
                     query.filter_by(k, '<', f[1:])
                 else :
                     query.filter_by(k, '==', f)
+        else:
+            raise Exception, "Filters are required for delete"
         return execute_query(self.request, query)
 
 def dispatch(request, object_type, object_name):
     
-    o = objectRequest(request, object_type, object_name)
+    o = objectRequest(request, object_type, object_name)    
+    
+    object_filters = {}
+    object_params = {}
+    result = {}
     
     if request.method == 'POST':
         req_items = request.POST
     elif request.method == 'GET':
+        #return HttpResponse(json.dumps({'error' : 'only post request is supported'}), content_type="application/json")
         req_items = request.GET
 
     for el in req_items.items():
@@ -108,26 +112,14 @@ def dispatch(request, object_type, object_name):
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')
 
-    response = o.execute()
-    
-    if request.path.split('/')[1] == 'rest' :
-        response_data = response
-        return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
-    elif request.path.split('/')[1] == 'table' :
-        return render_to_response('table-default.html', {'data' : response, 'properties' : o.properties, 'id' : o.id, 'options' : o.options})
-    elif request.path.split('/')[1] == 'datatable' :
-        response_data = {}
-        response_data['columns'] = o.properties
-        response_data['labels'] = o.properties
-        response_data['data'] = []
-        response_data['total'] = len(response)
-        for r in response :
-            d = []
-            for p in o.properties :
-                d.append(r[p])
-            response_data['data'].append(d)
-         
-        return HttpResponse(json.dumps(response_data, cls=DecimalEncoder, default=DateEncoder), content_type="application/json")
+    try:
+        response = o.execute()
 
-def error(msg):
-    return HttpResponse(json.dumps({'error' : msg}), content_type="application/json")
+        if response :
+            return HttpResponse(json.dumps({'success' : 'record deleted'}), content_type="application/json")
+        else :
+            return HttpResponse(json.dumps({'error' : 'an error has occurred'}), content_type="application/json")
+ 
+    except Exception, e:
+        return HttpResponse(json.dumps({'error' : str(e)}), content_type="application/json")
+

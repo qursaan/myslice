@@ -1,28 +1,28 @@
-{% extends "layout-unfold1.html" %}
-
-{% block unfold_main %}
-<div class="wrapper" id="institution">
+{% extends "layout.html" %}
+{% block head %} 
+<script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
+{% endblock head %}
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Institution: {{user_details.parent_authority}}</h1>
+</div>
+<div class="row" id="institution">
     <ul class="nav nav-tabs">
-      <li class="active"><a class="home-tab" data-panel="institution" href="#">INSTITUTION</a></li>
-      <li><a class="home-tab" data-panel="users" href="#">USERS</a></li>
-      <li><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
+      <li class="active" id="authority-tab"><a class="home-tab" data-panel="institution" href="#">INFO</a></li>
+      <li id="users-tab"><a class="home-tab" data-panel="users" href="#">USERS</a></li>
+      <li id="slices-tab"><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
     </ul>
     <div class="home-panel" id="institution">
-        <h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Affiliation to an Institution</h1>
-        <br>
         <div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
         <div id="authority-tab-loaded" style="display:none;">
-            <div id="onelab_membership" style="float:left; width:30%;">
+            <div id="authority-data" style="float:left; width:50%;"></div>
+            <div id="onelab_membership" style="float:right; width:50%;">
                 <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
                 <div id="onelab-data"></div>
-            </div>
-            <div id="authority-data" style="float:right; width:70%;">
             </div>
         </div>
     </div>
     <div class="home-panel" id="users" style="display:none;">
-		<br>
-        <h1>Users: {{user_details.parent_authority}}</button></h1>
         <div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
         <div id="user-tab-loaded" style="display:none;">
             <table id="user-tab">
@@ -40,8 +40,6 @@
         </div>
   	</div>
     <div class="home-panel" id="slices" style="display:none;">
-        <br>
-        <h1>Slices: {{user_details.parent_authority}} <button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button></h1>
         <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
         <div id="slice-tab-loaded" style="display:none;">
             <table id="slice-tab">
@@ -64,20 +62,6 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('a.home-tab').click(function() {
-            $('ul.nav-tabs li').removeClass('active');
-            $(this).parent().addClass('active');
-            $('div.home-panel').hide();
-            $('div#'+$(this).data('panel')).show();
-        });
-        $('button#createslice').click(function() {
-            window.location="/portal/slice_request/";
-        })
-        ;$('button#slicerequestbtn').click(function() {
-            /*
-            window.location="/portal/slice_request/";
-            */
-        });
         {% if person %}
         {% if user_details.parent_authority %}
         $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
@@ -125,7 +109,7 @@
                 */
                     authority_row += val.scientific+"<br>";
                 //}
-                onelab_membership = "<b>Membership:</b> "+val.onelab_membership;
+                onelab_membership = "<b>Status: </b>"+val.onelab_membership;
                 onelab_data.push(onelab_membership);
                 authority_data.push(authority_row);
             });
@@ -159,9 +143,9 @@
                     slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
                 }
                 
-                slice_row = "<tr>";
-                slice_row += "<td><input type='checkbox'></td>";
-                slice_row += "<td><a href=\"/portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
+                slice_row = "<tr id='"+val.slice_hrn+"'>";
+                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
+                slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
                 slice_row += "<td>"+user_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
                 slice_row += "<td>"+nodes_length+"</td>";
@@ -185,8 +169,9 @@
 			*/
             $.each( data, function( key, val ) {
                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                user_row = "<tr>";
-                user_row += "<td><input type='checkbox'></td>";
+
+                user_row = "<tr id='"+val.user_hrn+"'>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
                 user_row += "<td>"+val.user_email+"</td>";
                 user_row += "<td>"+val.user_hrn+"</td>";
                 user_row += "<td>"+val.user_first_name+"</td>";
@@ -204,4 +189,4 @@
          {% endif %}
     });
 </script>
-{% endblock unfold_main %}
+{% endblock %}

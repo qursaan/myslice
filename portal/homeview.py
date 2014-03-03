@@ -43,7 +43,6 @@ class HomeView (FreeAccessView, ThemeView):
             manifoldresult = auth_result
             # let's use ManifoldResult.__repr__
             env['state']="%s"%manifoldresult
-            env['layout_1_or_2']="layout-unfold2.html"
             
             return render_to_response(self.template,env, context_instance=RequestContext(request))
         # user was authenticated at the backend
@@ -55,6 +54,7 @@ class HomeView (FreeAccessView, ThemeView):
                 
                 if request.user.is_authenticated(): 
                     env['person'] = self.request.user
+                    env['username'] = self.request.user
                 else: 
                     env['person'] = None
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
@@ -66,7 +66,6 @@ class HomeView (FreeAccessView, ThemeView):
         # otherwise
         else:
             env['state'] = "Your username and/or password were incorrect."
-            env['layout_1_or_2']="layout-unfold2.html"
             
             return render_to_response(self.template, env, context_instance=RequestContext(request))
 
@@ -86,7 +85,6 @@ class HomeView (FreeAccessView, ThemeView):
         if state: env['state'] = state
         elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
-        env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
         
         
         return render_to_response(self.template, env, context_instance=RequestContext(request))

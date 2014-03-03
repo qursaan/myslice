@@ -1,15 +1,11 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 {% load i18n %}
 
-{% block head %}
-{{ wizard.form.media }}
-{% endblock %}
+{% block content %}
 
-{% block unfold_main %}
-
-<div class="wrapper" id="slice-request">
-<h1><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="Request a Slice" /> Request a new Slice</h1>
-
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="Request a Slice" /> Request a new Slice</h1>
+</div>
 {% if errors %}
 <ul>
   {% for error in errors %}
@@ -18,7 +14,7 @@
 </ul>
 {% endif %}
 
-<div>
+<div class="row">
   <form id="commentForm" class="form-horizontal" method="post">
   {% csrf_token %}
   <fieldset>
@@ -81,7 +77,6 @@
   </fieldset>
   </form>
 </div>
-</div>
 <script>
 jQuery(document).ready(function(){
     var availableTags = [
@@ -99,6 +94,7 @@ jQuery(document).ready(function(){
     ];
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
+      minLength: 0,
       select: function( event, ui ) {console.log(jQuery(this))}
     });
 });
