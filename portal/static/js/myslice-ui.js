@@ -5,15 +5,7 @@ $(document).ready(function() {
 	var platformParameters = {};
 	
 		
-	$.get("/rest/platform", function(data) {
-		var list = '<div class="list-group-item sl-platfrom"><span class="list-group-item-heading">Testbeds</span></div>';
-		for(i=0; i<data.length;i++) {
-			list += '<a href="#" class="list-group-item sl-platfrom" data-platform="'+data[i].platform+'"><span class="list-group-item-heading">'+data[i].platform_longname+'</span><p class="list-group-item-text">'+data[i].platform+'</p></a>';
-		}
-		$('#select-platform').html(list);
-	}).done(function() {
-		
-	});
+	
 	
 	/* Testbeds list */
 	$("div#testbed-list").ready(function() {
