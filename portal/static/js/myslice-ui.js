@@ -8,10 +8,20 @@ $(document).ready(function() {
 	
 	
 	/* Testbeds list */
-	$("div#testbed-list").ready(function() {
-		$("table#testbedList").load("/table/network/", { "fields" : ["network_hrn","description"], "options": ["checkbox"] }, function() {
-			
-		});
+	$("table#testbedList").load("/table/network/", { "fields" : ["network_hrn","description"], "options": ["checkbox"] }, function() {
+			$(this).dataTable( {
+			"sScrollY": window.innerHeight - 275,
+			"sDom": "frtiS",
+	        "bScrollCollapse": true,
+	        "bStateSave": true,
+	        "bPaginate": false,
+	        "bLengthChange": false,
+	        "bFilter": false,
+	        "bSort": true,
+	        "bInfo": false,
+	        "bAutoWidth": true,
+	        "bAutoHeight": false
+		} );
 	});
 	
 	$("#objectList").load("/table/resource/", {"fields" : ["hostname","hrn","country","type"], "options": ["checkbox"] }, function(data) {
@@ -32,6 +42,10 @@ $(document).ready(function() {
 					var el = $('*[data-key="'+myslice.pending[i]+'"]');
 					el.addClass("active");
 					el.find('input[type=checkbox]').prop('checked', true);
+					if (myslice.count() > 0) {
+						$('#badge-pending').text(myslice.count());
+						$('#badge-pending').show();
+					}
 				}
 		    }
 		} );
