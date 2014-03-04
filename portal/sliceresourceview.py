@@ -21,7 +21,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
     
     def get(self, request, slicename):
         if request.GET.get('message') : 
-            msg = "Successfully updated Slice"
+            msg = "Slice successfully updated"
         else :
             msg = None
         return render_to_response(self.template, {"msg" : msg, "slice": slicename, "theme": self.theme, "username": request.user, "section":"resources"}, context_instance=RequestContext(request))
