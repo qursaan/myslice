@@ -4,6 +4,10 @@ $(document).ready(function() {
         $(this).parent().addClass('active');
         $('div.panel').hide();
         $('div#'+$(this).data('panel')).show();
+        
+        if ($(this).data('panel') == 'map') {
+        	mapInit();
+        }
     });
     
     $.get("/rest/platform", function(data) {
@@ -16,33 +20,39 @@ $(document).ready(function() {
 		
 	});
 	
-    $.get("/rest/resource/", {"fields" : ["hostname","latitude","longitude"] }, function(data) {
-  	
-  	var mapOptions = {
-      center: new google.maps.LatLng(48.8567, 2.3508),
-      zoom: 4,
-      scrollwheel: false
-    };
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-  	 marker = new google.maps.Marker({
-	        position: new google.maps.LatLng(48.8567, 2.3508),
-	        map: map,
-	        icon: '/static/img/marker2.png'
-	    });
-  	for (i = 0; i < data.length; i++) {  
-  		if (!data[i].longitude) continue;
-	    marker = new google.maps.Marker({
-	        position: new google.maps.LatLng(data[i].latitude, data[i].longitude),
-	        map: map
-	    });
-	
-	    google.maps.event.addListener(marker, 'click', (function(marker, i) {
-	        return function() {
-	          infowindow.setContent(data[i].hostname);
-	          infowindow.open(map, marker);
-	     	};
-      	})(marker, i));
-    }
-  });
    //google.maps.event.addDomListener(window, 'load', initialize);
 });
+
+function mapInit() {
+	
+    $.get("/rest/resource/", {"fields" : ["hostname","latitude","longitude"] }, function(data) {
+  	
+	  	var mapOptions = {
+	      center: new google.maps.LatLng(48.8567, 2.3508),
+	      zoom: 4,
+	      scrollwheel: false
+	    };
+	    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	  	 marker = new google.maps.Marker({
+		        position: new google.maps.LatLng(48.8567, 2.3508),
+		        map: map,
+		        icon: '/static/img/marker2.png'
+		    });
+		
+	  	for (i = 0; i < data.length; i++) {  
+	  		if (!data[i].longitude) continue;
+		    marker = new google.maps.Marker({
+		        position: new google.maps.LatLng(data[i].latitude, data[i].longitude),
+		        map: map
+		    });
+			var infowindow = new google.maps.InfoWindow();
+
+		    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+		        return function() {
+		          infowindow.setContent(data[i].hostname);
+		          infowindow.open(map, marker);
+		     	};
+	      	})(marker, i));
+	    }
+	  });
+}

@@ -29,7 +29,9 @@ $(document).ready(function() {
 	        "bAutoHeight": false,
 	        "fnInitComplete": function(oSettings, json) {
 				for(var i = 0; i < myslice.pending.length; i++) {
-					$('*[data-key="'+myslice.pending[i]+'"]').addClass("active");
+					var el = $('*[data-key="'+myslice.pending[i]+'"]');
+					el.addClass("active");
+					el.find('input[type=checkbox]').prop('checked', true);
 				}
 		    }
 		} );
