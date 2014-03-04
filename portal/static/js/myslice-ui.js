@@ -8,10 +8,34 @@ $(document).ready(function() {
 	
 	
 	/* Testbeds list */
-	$("div#testbed-list").ready(function() {
-		$("table#testbedList").load("/table/network/", { "fields" : ["network_hrn","description"], "options": ["checkbox"] }, function() {
-			
+	$.post("/rest/network/", { "fields" : ["network_hrn", "network_longname", "description"]}, function(data) {
+		var testbed_data = [];
+		var testbed_row = "<thead>";
+		testbed_row += "<tr>";
+		testbed_row += "<th id=testbed_check><input type=\"checkbox\" name=\"network_hrn\" value=\"all\"/></th>";
+		testbed_row += "<th id=testbed_icon></th>";
+		testbed_row += "<th>network_hrn</th>";
+		testbed_row += "<th>Full name</th>";
+		testbed_row += "<th>Description</th>";
+		testbed_row += "</tr>";
+		testbed_row += "</thead>";
+		testbed_data.push(testbed_row);
+		$.each( data, function(key, val) {
+			testbed_row = "<tr data-keys=\""+val.network_hrn+"\">"
+			testbed_row += "<td><input type=\"checkbox\" name=\"network_hrn\" value=\""+val.network_hrn+"\"/></td>";
+			testbed_row += "<td><img src='/static/img/testbeds/"+val.network_hrn+".png' alt='' /></td>";
+			testbed_row += "<td>"+val.network_hrn+"</td>";
+			testbed_row += "<td>"+val.network_longname+"</td>";
+			testbed_row += "<td>"+val.description+"</td>";
+			testbed_row += "</thead>";
+
+			testbed_data.push(testbed_row);
 		});
+	$("table#testbedList").html(testbed_data.join(''));
+	$("div#testbed-list-loaded").css("display","block");
+	$("div#testbed-list-loading").css("display","none");
+
+			
 	});
 	
 	$("#objectList").load("/table/resource/", {"fields" : ["hostname","hrn","country","type"], "options": ["checkbox"] }, function(data) {
