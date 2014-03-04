@@ -43,7 +43,7 @@ $(document).ready(function() {
 		} );
 		
 		
-		$("input[type=checkbox]").live('click',function() {
+		$("input[type=checkbox]").click(function() {
 			var cnt = 0;
 			var id = $(this).val();
 			var row = $(this).parent().parent()
