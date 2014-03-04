@@ -27,6 +27,7 @@ class ObjectRequest(object):
         self.type = object_type
         self.name = object_name
         self.fields = []
+        self.params = {}
         self.filters = {}
         self.options = None
 
@@ -100,10 +101,24 @@ class ObjectRequest(object):
         
         query = self.applyFilters(query)
         return execute_query(self.request, query)
-    
+
+    def create(self):
+        query = Query.create(self.type)
+        # No filters for create
+        if self.params :
+            query.set(self.params)
+        else:
+            raise Exception, "Params are required for create"
+        return execute_query(self.request, query)
+   
     def update(self):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
+        if self.filters :
+            query.set(self.filters)
+        else:
+            raise Exception, "Filters are required for update"
+
         if self.params :
             query.set(self.params)
         else:
@@ -113,10 +128,10 @@ class ObjectRequest(object):
     def delete(self):
         query = Query.delete(self.type)
         query = self.applyFilters(query, True)
-        if self.params :
-            query.set(self.params)
+        if self.filters :
+            query.set(self.filters)
         else:
-            raise Exception, "Params are required for update"
+            raise Exception, "Filters are required for update"
         return execute_query(self.request, query)
     
     def json(self):

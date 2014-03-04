@@ -7,11 +7,17 @@ from manifoldapi.manifoldapi    import execute_admin_query
 from plugins.querytable         import QueryTable
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from theme import ThemeView
+
+from django.shortcuts import render, render_to_response
+
 import json
 
 # View for platforms
 class UsersView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "usersview.html"
+    def dispatch(self, *args, **kwargs):
+        return super(UsersView, self).dispatch(*args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         page = Page(self.request)
@@ -49,26 +55,6 @@ class UsersView(LoginRequiredAutoLogoutView, ThemeView):
         user_list = [{'email': t[0], 'status': t[1], 'authority':t[2]}
             for t in zip(email_list, status_list, authority_list)]
 
-            
-        #page.enqueue_query(user_query)
-
-        #page.expose_js_metadata()
-        #userlist = QueryTable(
-        #    page  = page,
-        #    title = 'List',
-        #    domid = 'checkboxes',
-        #    # this is the query at the core of the slice list
-        #    query = user_query,
-        #    query_all = user_query,
-        #    checkboxes = False,
-        #    init_key   = 'user',
-        #    datatables_options = { 
-        #        'iDisplayLength': 10,
-        #        'bLengthChange' : True,
-        #        'bAutoWidth'    : True,
-        #        },
-        #)
-
         context = super(UsersView, self).get_context_data(**kwargs)
         context['person']   = self.request.user
         context['user_list'] = user_list
@@ -77,12 +63,12 @@ class UsersView(LoginRequiredAutoLogoutView, ThemeView):
         # more general variables expected in the template
         context['title'] = 'Users in MySlice'
         # the menu items on the top
-        context['topmenu_items'] = topmenu_items_live('Users', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
         context['theme'] = self.theme
-        context.update(page.prelude_env())
 
         context['layout_1_or_2']="layout-unfold2.html" if not context['username'] else "layout-unfold1.html"
+        #prelude_env = page.prelude_env()
+        #context.update(prelude_env)
 
-        return context
+        return render_to_response(self.template)

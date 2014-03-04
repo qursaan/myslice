@@ -61,18 +61,11 @@
                 user_row = "<tr>";
 				// checking the box for the users that belong to the selected slice
 				var flag_checkbox = 0;
-				for(var data in val.slice) {
-    				var element = val.slice[data];
-					console.log("element");
-					console.log(element);
-					for(var key in element) {
-    					var value = element[key];
-						if (value == 'ple.upmc.myslicedemo'){
-     						console.log("found!!");
-							flag_checkbox = 1;
-							user_row += "<td><input type='checkbox' checked='True'></td>";
-						}
-
+				for(var data in val.slices) {
+    				var element = val.slices[data];
+					if (element == 'ple.upmc.myslicedemo'){
+						flag_checkbox = 1;
+						user_row += "<td><input type='checkbox' checked='True'></td>";
 					}
 				}
 				if(flag_checkbox != 1){
