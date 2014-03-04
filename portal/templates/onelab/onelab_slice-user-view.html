@@ -7,7 +7,14 @@
 		</div>
 			
 		<ul class="list-group">
-		  <li class="list-group-item">Filter: authority</li>
+		  <li class="list-group-item">Filter: authority
+			<!--<select id="auth_list">
+  				<option value="ple.upmc">UPMC</option>
+  				<option value="ple.inria">INRIA</option>
+  				<option value="ple.nitos">NITOS</option>
+  				<option value="ple.iminds">iMinds</option>
+			</select> -->
+		  </li>
 		  <li class="list-group-item">Filter: slice</li>
 		  <li class="list-group-item">...</li>
 		  <li class="list-group-item">...</li>
@@ -50,38 +57,46 @@
         	</div>
 <script>
     $(document).ready(function() {
-        $.post("/rest/user/",{'filters':{'parent_authority':'ple.upmc'}}, function( data ) {
-            var list_users = [];
-            var table_users = [];
-			/*
-			"enabled", "keys", "parent_authority", "user_first_name", "user_last_name", "user_phone", "user_hrn", "slice", "user_email"
-			*/
-            $.each( data, function( key, val ) {
-                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                user_row = "<tr>";
-				// checking the box for the users that belong to the selected slice
-				var flag_checkbox = 0;
-				for(var data in val.slices) {
-    				var element = val.slices[data];
-					if (element == 'ple.upmc.myslicedemo'){
-						flag_checkbox = 1;
-						user_row += "<td><input type='checkbox' checked='True'></td>";
+		//var selectedValue = $( "#auth_list option:selected" ).val();    
+		//console.log(selectedValue);
+		//console.log("Name of the authority: " + "{{user_details.parent_authority}}");
+		//$("#auth_list").change(function(){
+			//selectedValue = $(this).find(":selected").val();
+			//console.log("the value you selected: " + selectedValue);
+        	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
+            	var list_users = [];
+            	var table_users = [];
+				/*
+				"enabled", "keys", "parent_authority", "user_first_name", "user_last_name", "user_phone", "user_hrn", "slice", "user_email"
+				*/
+            	$.each( data, function( key, val ) {
+                	list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                	user_row = "<tr>";
+					// checking the box for the users that belong to the selected slice
+					var flag_checkbox = 0;
+					for(var data in val.slices) {
+    					var element = val.slices[data];
+						if (element == "{{slice}}"){
+							//console.log("the slice is: "+ element);	
+							flag_checkbox = 1;
+							user_row += "<td><input type='checkbox' checked='True'></td>";
+						}
 					}
-				}
-				if(flag_checkbox != 1){
-                	user_row += "<td><input type='checkbox'></td>";
-				}
-                user_row += "<td>"+val.user_email+"</td>";
-                user_row += "<td>"+val.user_hrn+"</td>";
-				user_row += "<td>"+val.enabled+"</td>";
-                user_row += "</tr>";
-                table_users.push(user_row);
+					if(flag_checkbox != 1){
+                		user_row += "<td><input type='checkbox'></td>";
+					}
+                	user_row += "<td>"+val.user_email+"</td>";
+                	user_row += "<td>"+val.user_hrn+"</td>";
+					user_row += "<td>"+val.enabled+"</td>";
+                	user_row += "</tr>";
+                	table_users.push(user_row);
                 
-            });
-			$("table#user-tab tr:last").after(table_users.join( "" ));
-            $("div#user-tab-loaded").css("display","block");
-            $("div#user-tab-loading").css("display","none");
-         });
+            	});
+				$("table#user-tab tr:last").after(table_users.join( "" ));
+            	$("div#user-tab-loaded").css("display","block");
+            	$("div#user-tab-loading").css("display","none");
+         	});
+	//	});
     });
 </script>
 
