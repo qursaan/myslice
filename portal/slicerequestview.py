@@ -87,7 +87,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             purpose = slice_request['purpose']
             if (purpose is None or purpose == ''):
                 errors.append('Purpose is mandatory')
-    
+
             if not errors:
                 if is_pi(wsgi_request, user_hrn, authority_hrn):
                     # PIs can directly create slices in their own authority...
@@ -95,7 +95,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     self.template_name = 'slice-request-done-view.html'
                 else:
                     # Otherwise a wsgi_request is sent to the PI
-                    create_pending_slice(wsgi_request, user_email, slice_name, user_hrn, authority_hrn, number_of_nodes, purpose)
+                    create_pending_slice(wsgi_request, slice_request)
                     self.template_name = 'slice-request-ack-view.html'
                 
                 return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST

@@ -7,11 +7,7 @@ from rest import ObjectRequest, error, success
 
 def dispatch(request, object_type, object_name):
     
-    o = objectRequest(request, object_type, object_name)    
-    
-    object_filters = {}
-    object_params = {}
-    result = {}
+    o = ObjectRequest(request, object_type, object_name)    
     
     if request.method == 'POST':
         req_items = request.POST
@@ -26,7 +22,7 @@ def dispatch(request, object_type, object_name):
             o.options = req_items.getlist('options[]')
 
     try:
-        response = o.execute()
+        response = o.delete()
 
         if response :
             return success('record deleted')

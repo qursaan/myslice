@@ -7,8 +7,8 @@
 </thead>
 <tbody>
 {% for d in data %}
-<tr id="{{ d|key:id }}">
-	{% if "checkbox" in options %}<td class="checkbox"><input type="checkbox" name="{{ id }}" value="{{ d|key:id }}" /></td>{% endif %}
+<tr data-key="{{ d|key:id }}">
+	{% if "checkbox" in options %}<td><input type="checkbox" name="{{ id }}" value="{{ d|key:id }}" /></td>{% endif %}
 	{% for f in fields %}<td><div class="line1">{{ d|key:f }}</div></td>{% endfor %}
 </tr>
 {% endfor %}
