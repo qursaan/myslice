@@ -19,6 +19,7 @@ def dispatch(request, object_type, object_name):
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('fields'):
+            print req_items.getlist('fields[]')
             o.setFields(req_items.getlist('fields[]'))
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')

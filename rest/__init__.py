@@ -66,11 +66,11 @@ class ObjectRequest(object):
             raise Exception, 'Manifold db error'
     
     def setFields(self, fields):
-        selected_fields = []
-        for p in fields :
-            if p in self.fields :
-                selected_fields.append(p)
-        self.fields = selected_fields
+#         selected_fields = []
+#         for p in fields :
+#             if p in self.fields :
+#                 selected_fields.append(p)
+        self.fields = fields
         
     
     def applyFilters(self, query, force_filters = False):
@@ -114,7 +114,6 @@ class ObjectRequest(object):
     def update(self):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
-        
 
         if self.params :
             query.set(self.params)
