@@ -17,7 +17,7 @@ $(document).ready(function() {
 	
 	/* Testbeds list */
 	$("div#testbed-list").ready(function() {
-		$("table#testbedList").load("/table/network/", { "fields" : ["platform"], "options": ["checkbox"] }, function() {
+		$("table#testbedList").load("/table/network/", { "fields" : ["network_hrn","description"], "options": ["checkbox"] }, function() {
 			
 		});
 	});
