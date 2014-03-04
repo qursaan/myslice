@@ -27,7 +27,7 @@ class ObjectRequest(object):
         self.type = object_type
         self.name = object_name
         self.fields = []
-        self.params = {}
+        self.params = []
         self.filters = {}
         self.options = None
 
@@ -114,9 +114,12 @@ class ObjectRequest(object):
     def update(self):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
-
+        print ">>>>>",self.params
+        
         if self.params :
-            query.set(self.params)
+            query.set({ 'resource' : self.params})
+#             for param in self.params :
+                
         else:
             raise Exception, "Params are required for update"
         

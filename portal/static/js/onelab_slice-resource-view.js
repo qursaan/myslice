@@ -10,14 +10,24 @@ $(document).ready(function() {
         }
     });
     
-    $.get("/rest/platform", function(data) {
+    $.get("/rest/network", function(data) {
 		var list = '<div class="list-group-item sl-platfrom"><span class="list-group-item-heading">Testbeds</span></div>';
 		for(i=0; i<data.length;i++) {
-			list += '<a href="#" class="list-group-item sl-platfrom" data-platform="'+data[i].platform+'"><span class="list-group-item-heading">'+data[i].platform_longname+'</span><p class="list-group-item-text">'+data[i].platform+'</p></a>';
+			list += '<a href="#" class="list-group-item sl-platfrom" data-platform="'+data[i].network_hrn+'"><span class="list-group-item-heading">'+data[i].network_longname+'</span><p class="list-group-item-text">'+data[i].network_hrn+'</p></a>';
 		}
 		$('#select-platform').html(list);
 	}).done(function() {
 		
+	});
+	
+	$('button#ApplyPendind').click(function() {
+		myslice.apply();
+		// $.each(myslice.pending, function(k, p) {
+			// console.log(p);
+		// });
+		// $.post("/update/slice", {}, function() {
+// 			
+		// });
 	});
 	
    //google.maps.event.addDomListener(window, 'load', initialize);
@@ -47,7 +57,7 @@ function mapInit() {
 		    });
 			var infowindow = new google.maps.InfoWindow();
 
-		    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+			google.maps.event.addListener(marker, 'click', (function(marker, i) {
 		        return function() {
 		          infowindow.setContent(data[i].hostname);
 		          infowindow.open(map, marker);
