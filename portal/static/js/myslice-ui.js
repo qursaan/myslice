@@ -17,7 +17,7 @@ $(document).ready(function() {
 	
 	/* Testbeds list */
 	$("div#testbed-list").ready(function() {
-		$("table#testbedList").load("/table/network/", { "fields" : ["platform"], "options": ["checkbox"] }, function() {
+		$("table#testbedList").load("/table/network/", { "fields" : ["network_hrn","description"], "options": ["checkbox"] }, function() {
 			
 		});
 	});
@@ -43,7 +43,7 @@ $(document).ready(function() {
 		} );
 		
 		
-		$("input[type=checkbox]").live('click',function() {
+		$("input[type=checkbox]").click(function() {
 			var cnt = 0;
 			var id = $(this).val();
 			var row = $(this).parent().parent()
