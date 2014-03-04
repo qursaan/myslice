@@ -5,15 +5,7 @@ $(document).ready(function() {
 	var platformParameters = {};
 	
 		
-	$.get("/rest/platform", function(data) {
-		var list = '<div class="list-group-item sl-platfrom"><span class="list-group-item-heading">Testbeds</span></div>';
-		for(i=0; i<data.length;i++) {
-			list += '<a href="#" class="list-group-item sl-platfrom" data-platform="'+data[i].platform+'"><span class="list-group-item-heading">'+data[i].platform_longname+'</span><p class="list-group-item-text">'+data[i].platform+'</p></a>';
-		}
-		$('#select-platform').html(list);
-	}).done(function() {
-		
-	});
+	
 	
 	/* Testbeds list */
 	$("div#testbed-list").ready(function() {
@@ -37,7 +29,9 @@ $(document).ready(function() {
 	        "bAutoHeight": false,
 	        "fnInitComplete": function(oSettings, json) {
 				for(var i = 0; i < myslice.pending.length; i++) {
-					$('*[data-key="'+myslice.pending[i]+'"]').addClass("active");
+					var el = $('*[data-key="'+myslice.pending[i]+'"]');
+					el.addClass("active");
+					el.find('input[type=checkbox]').prop('checked', true);
 				}
 		    }
 		} );
