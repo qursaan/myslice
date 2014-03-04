@@ -114,15 +114,13 @@ class ObjectRequest(object):
     def update(self):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
-        if self.filters :
-            query.set(self.filters)
-        else:
-            raise Exception, "Filters are required for update"
+        
 
         if self.params :
             query.set(self.params)
         else:
             raise Exception, "Params are required for update"
+        
         return execute_query(self.request, query)
     
     def delete(self):
