@@ -13,6 +13,9 @@
 			  <li><a href="#"></a></li>
 			</ul>
 		</div>
-		<table cellpadding="0" cellspacing="0" border="0" class="table" id="testbedList"></table>
+		<div id="testbed-list-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Testbeds" /></d    iv>
+		<div id="testbed-list-loaded" style="display:none;">
+			<table cellpadding="0" cellspacing="0" border="0" class="table" id="testbedList"></table>
+		</div>
 	</div>
 {% endblock %}
