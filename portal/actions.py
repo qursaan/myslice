@@ -378,7 +378,7 @@ def create_slice(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     return results
 
-def create_pending_slice(wgsi_request, request):
+def create_pending_slice(wsgi_request, request, email):
     """
     """
 
@@ -393,9 +393,9 @@ def create_pending_slice(wgsi_request, request):
     s.save()
 
     # Send an email: the recipients are the PI of the authority
-    recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
+    recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
     msg = render_to_string('slice-request-email.txt', request)
-    send_mail("Onelab user %(email)s requested a slice" % request, msg, email, recipients)
+    send_mail("Onelab user %(email)s requested a slice" % locals(), msg, email, recipients)
 
 #-------------------------------------------------------------------------------
 # REQUESTS - Users

@@ -95,7 +95,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     self.template_name = 'slice-request-done-view.html'
                 else:
                     # Otherwise a wsgi_request is sent to the PI
-                    create_pending_slice(wsgi_request, slice_request)
+                    create_pending_slice(wsgi_request, slice_request, user_email)
                     self.template_name = 'slice-request-ack-view.html'
                 
                 return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
