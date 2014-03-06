@@ -1,12 +1,16 @@
-from django.http                 import HttpResponse
-from manifold.core.query         import Query
-from manifoldapi.manifoldapi        import execute_query,execute_admin_query
-from portal.models               import PendingUser, PendingSlice, PendingAuthority
+from django.http                import HttpResponse
+from manifold.core.query        import Query
+from manifoldapi.manifoldapi    import execute_query,execute_admin_query
+from portal.models              import PendingUser, PendingSlice, PendingAuthority
 import json
 
 from django.contrib.auth.models import User
-from django.template.loader      import render_to_string
-from django.core.mail            import send_mail
+from django.template.loader     import render_to_string
+from django.core.mail           import send_mail,EmailMultiAlternatives
+
+from theme                      import ThemeView
+
+theme = ThemeView()
 
 # Thierry: moving this right into the code so 
 # most people can use myslice without having to install sfa
@@ -30,7 +34,10 @@ def authority_get_pis(request, authority_hrn):
 def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
     if any(d['pi_users'] == None for d in pi_users):
-        return ['support@myslice.info']
+        theme.template_name = 'email_default_recipients.txt' 
+        default_email = render_to_string(theme.template, request)
+        default_email = default_email.replace('\n', '')
+        return default_email
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
         query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
@@ -156,7 +163,7 @@ def manifold_add_platform(request, platform_params):
     query = Query.create('local:platform').set(platform_params).select(['user', 'platform'])
     results = execute_admin_query(request,query)
     if not results:
-        raise Exception, "Failed creating manifold  platform %s for user: %s" % (platform_params['platform'], platform_params['user'])
+        raise Exception, "Failed creating manifold platform %s for user: %s" % (platform_params['platform'], platform_params['user'])
     result, = results
     return result['platform_id']
 
@@ -394,8 +401,23 @@ def create_pending_slice(wsgi_request, request, email):
 
     # Send an email: the recipients are the PI of the authority
     recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
-    msg = render_to_string('slice-request-email.txt', request)
-    send_mail("Onelab user %(email)s requested a slice" % locals(), msg, email, recipients)
+
+    theme.template_name = 'slice_request_email.txt' 
+    text_content = render_to_string(theme.template, request)
+
+    theme.template_name = 'slice_request_email.html' 
+    html_content = render_to_string(theme.template, request)
+
+    theme.template_name = 'slice_request_email_subject.txt'
+    subject = render_to_string(theme.template, request)
+    subject = subject.replace('\n', '')
+
+    sender = email
+    msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+    print msg
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    #send_mail(subject, msg, email, recipients)
 
 #-------------------------------------------------------------------------------
 # REQUESTS - Users
@@ -527,15 +549,47 @@ def create_pending_user(wsgi_request, request, user_detail):
         account_config['user_private_key'] = request['private_key']
 
     user_id = user_detail['user_id'] + 1 # the user_id for the newly created user in local:user
-    account_params = {
-        'platform_id'   : 5, # XXX ALERT !!
-        'user_id'       : user_id, 
-        'auth_type'     : request['auth_type'], 
-        'config'        : json.dumps(account_config),
-    }
-    manifold_add_account(wsgi_request, account_params)
+
+    # XXX TODO: Require a myslice platform
+    # ALERT: this will disapear with ROUTERV2 of Manifold
+    # We have to consider the case where several registries can be used
+    # Removed hardcoded platform = 5
+    # This platform == 'myslice' is a TMP FIX !!
+    try:
+        reg_platform_query = Query().get('local:platform') \
+            .filter_by('platform', '==', 'myslice')           \
+            .select('platform_id')
+        reg_platform = execute_admin_query(wsgi_request, reg_platform_query)
+
+        registry_platform_id = reg_platform[0]['platform_id']
+        account_params = {
+            'platform_id'   : reg_platform_id, # XXX ALERT !!
+            'user_id'       : user_id, 
+            'auth_type'     : request['auth_type'], 
+            'config'        : json.dumps(account_config),
+        }
+        manifold_add_account(wsgi_request, account_params)
+    except Exception, e:
+        print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
 
     # Send an email: the recipients are the PI of the authority
+    # If No PI is defined for this Authority, send to a default email (different for each theme)
     recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
-    msg = render_to_string('user_request_email.txt', request)
-    send_mail("Onelab New User request for %(email)s submitted" % request, msg, 'support@myslice.info', recipients)
+    
+    theme.template_name = 'user_request_email.html'
+    html_content = render_to_string(theme.template, request)
+
+    theme.template_name = 'user_request_email.txt'
+    text_content = render_to_string(theme.template, request)
+
+    theme.template_name = 'user_request_email_subject.txt'
+    subject = render_to_string(theme.template, request)
+    subject = subject.replace('\n', '')
+
+    theme.template_name = 'email_default_sender.txt'
+    sender =  render_to_string(theme.template, request)
+    sender = sender.replace('\n', '')
+
+    msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
