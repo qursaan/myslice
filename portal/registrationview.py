@@ -41,14 +41,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities)
-
-        # xxx tocheck - if authorities is empty, it's no use anyway
-        # (users won't be able to validate the form anyway)
-
-        # Who am I ?
-        user_query  = Query().get('local:user').select('user_id','email')
-        user_details = execute_admin_query(wsgi_request, user_query)
-
+        
         # Page rendering
         page = Page(wsgi_request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
@@ -83,9 +76,18 @@ class RegistrationView (FreeAccessView, ThemeView):
                 errors.append('Email is pending for validation. Please provide a new email address.')
             if UserModel._default_manager.filter(email__iexact = user_request['email']): 
                 errors.append('This email is not usable. Please contact the administrator or try with another email.')
+            # Does the user exist in Manifold?
+            user_query  = Query().get('local:user').select('user_id','email')
+            user_details = execute_admin_query(wsgi_request, user_query)
             for user_detail in user_details:
                 if user_detail['email'] == user_request['email']:
                     errors.append('Email already registered in Manifold. Please provide a new email address.')
+            # Does the user exist in sfa? [query is very slow!!]
+            user_query  = Query().get('user').select('user_hrn','user_email')
+            user_details_sfa = execute_admin_query(wsgi_request, user_query)
+            for user in user_details_sfa:
+                if user['user_email'] == user_request['email']:
+                    errors.append('Email already registered in SFA registry. Please use another email.')
 
             # XXX TODO: Factorize with portal/accountview.py
             if 'generate' in wsgi_request.POST['question']:
