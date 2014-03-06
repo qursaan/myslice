@@ -130,6 +130,12 @@ div#navigation li:last-child {
     margin-right:0;
 }
 
+div#navigation li.active {
+	padding:5px;
+	background-color:gray;
+	color:#FF0000;
+}
+
 /* HOME DASHBOARD */
 div#home-dashboard {
     color:black;

@@ -1,4 +1,6 @@
 $(document).ready(function() {
+	$('li#nav-institution').addClass("active");
+
     $('a.home-tab').click(function() {
         $('ul.nav-tabs li').removeClass('active');
         $(this).parent().addClass('active');

@@ -307,6 +307,8 @@
 
 <script>
     $(document).ready(function() {
+		$('li#nav-account').addClass("active");
+
         $('a.account-tab').click(function() {
             $('ul.nav-tabs li').removeClass('active');
             $(this).parent().addClass('active');
