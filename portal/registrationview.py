@@ -63,7 +63,7 @@ class RegistrationView (FreeAccessView, ThemeView):
             split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
             user_request['user_hrn'] = user_request['authority_hrn'] \
-                     + '.' + split_email + str(randint(1,1000000))
+                     + '.' + split_email
             
             # Validate input
             UserModel = get_user_model()
@@ -88,7 +88,11 @@ class RegistrationView (FreeAccessView, ThemeView):
             for user in user_details_sfa:
                 if user['user_email'] == user_request['email']:
                     errors.append('Email already registered in SFA registry. Please use another email.')
-
+                if user['user_hrn'] == user_request['user_hrn']:
+                    # add random number if user_hrn already exists in the registry
+                    user_request['user_hrn'] = user_request['authority_hrn'] \
+                            + '.' + split_email + str(randint(1,1000000))
+                
             # XXX TODO: Factorize with portal/accountview.py
             if 'generate' in wsgi_request.POST['question']:
                 user_request['auth_type'] = 'managed'
