@@ -132,6 +132,8 @@ div#navigation li:last-child {
 
 div#navigation li.active {
 	padding:5px;
+    min-height: 40px;
+    margin-top: 0px;
 	background-color:gray;
 	color:#FF0000;
 }
