@@ -138,7 +138,30 @@ div#navigation li.active {
 	background-color:gray;
 	color:#FF0000;
 }
+div#navigation li.slices {
+    position:relative;
+    cursor:pointer;
+}
 
+div#menu-slice-list{
+    display:none;
+    position:absolute;
+    background-color:black;
+    padding:15px;
+    left:-15px;
+}
+div#menu-slice-list ul {
+    margin:0;
+    padding:0;
+}
+div#menu-slice-list li {
+    margin:0;
+    padding:10px 0;
+}
+div#menu-slice-list li:first-child {
+    border-bottom:1px solid white;
+     
+}
 /* HOME DASHBOARD */
 div#home-dashboard {
     color:black;

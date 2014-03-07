@@ -25,7 +25,20 @@
 			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
 			<li>|</li>
 			<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
-			<li>SLICES</li>
+			<li class="slices">SLICES
+				<div id="menu-slice-list">
+						<ul>
+							<li>Request Slice</li>
+							<li>   ple.upmc.agent3</li>
+						    <li>  ple.upmc.agent</li>
+						    <li>  ple.upmc.myslicedemo</li>
+						    <li>  ple.upmc.slicestat</li>
+						    <li>  ple.upmc.agent2</li>
+								
+							
+						</ul>
+				</div>
+				</li>
 			<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
 			<li id="nav-support"><a href="/portal/support/">SUPPORT</a></li>
 			<li>|</li>
@@ -41,6 +54,12 @@
 </div>
 <script>
 	$(document).ready(function() {
+		$('li.slices').mouseenter(function() {
+			$('div#menu-slice-list').fadeIn(100);
+		});
+		$('li.slices').mouseleave(function() {
+			$('div#menu-slice-list').fadeOut(100);
+		});
 		// var slices = localStorage.getItem('slices');
 		// if (slices.length == 0) {
 			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
