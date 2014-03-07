@@ -26,7 +26,6 @@ import random
 import re
 
 from django.conf              import settings
-from django.core.mail         import send_mail
 from django.db                import models
 from django.db                import transaction
 from django.utils.translation import ugettext_lazy as _

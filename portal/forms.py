@@ -170,28 +170,31 @@ class PasswordResetForm(forms.Form):
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        from django.core.mail import send_mail
-        for user in self.users_cache:
-            if not domain_override:
-                current_site = get_current_site(request)
-                site_name = current_site.name
-                domain = current_site.domain
-            else:
-                site_name = domain = domain_override
-            c = {
-                'email': user.email,
-                'domain': domain,
-                'site_name': site_name,
-                'uid': int_to_base36(user.pk),
-                'user': user,
-                'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
-            }
-            subject = loader.render_to_string(subject_template_name, c)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            email = loader.render_to_string(email_template_name, c)
-            send_mail(subject, email, from_email, [user.email])
+        from django.core.mail import send_mail,EmailMultiAlternatives
+        try:        
+            for user in self.users_cache:
+                if not domain_override:
+                    current_site = get_current_site(request)
+                    site_name = current_site.name
+                    domain = current_site.domain
+                else:
+                    site_name = domain = domain_override
+                c = {
+                    'email': user.email,
+                    'domain': domain,
+                    'site_name': site_name,
+                    'uid': int_to_base36(user.pk),
+                    'user': user,
+                    'token': token_generator.make_token(user),
+                    'protocol': use_https and 'https' or 'http',
+                }
+                subject = loader.render_to_string(subject_template_name, c)
+                # Email subject *must not* contain newlines
+                subject = ''.join(subject.splitlines())
+                email = loader.render_to_string(email_template_name, c)
+                send_mail(subject, email, from_email, [user.email])
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
 
 
 class SetPasswordForm(forms.Form):

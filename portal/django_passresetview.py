@@ -72,7 +72,6 @@ import json
 
 from random                     import choice
 
-from django.core.mail           import send_mail
 from django.contrib             import messages
 from django.views.generic       import View
 from django.shortcuts           import render

@@ -2,7 +2,6 @@ import os.path, re
 import json
 from random import randint
 
-from django.core.mail           import send_mail
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render

@@ -6,7 +6,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.template.loader     import render_to_string
-from django.core.mail           import send_mail,EmailMultiAlternatives
+from django.core.mail           import EmailMultiAlternatives
 
 from theme                      import ThemeView
 
@@ -399,25 +399,27 @@ def create_pending_slice(wsgi_request, request, email):
     )
     s.save()
 
-    # Send an email: the recipients are the PI of the authority
-    recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
-
-    theme.template_name = 'slice_request_email.txt' 
-    text_content = render_to_string(theme.template, request)
-
-    theme.template_name = 'slice_request_email.html' 
-    html_content = render_to_string(theme.template, request)
-
-    theme.template_name = 'slice_request_email_subject.txt'
-    subject = render_to_string(theme.template, request)
-    subject = subject.replace('\n', '')
-
-    sender = email
-    msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
-    print msg
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    #send_mail(subject, msg, email, recipients)
+    try:
+        # Send an email: the recipients are the PI of the authority
+        recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+    
+        theme.template_name = 'slice_request_email.txt' 
+        text_content = render_to_string(theme.template, request)
+    
+        theme.template_name = 'slice_request_email.html' 
+        html_content = render_to_string(theme.template, request)
+    
+        theme.template_name = 'slice_request_email_subject.txt'
+        subject = render_to_string(theme.template, request)
+        subject = subject.replace('\n', '')
+    
+        sender = email
+        msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+        print msg
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+    except Exception, e:
+        print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
 
 #-------------------------------------------------------------------------------
 # REQUESTS - Users
@@ -572,24 +574,27 @@ def create_pending_user(wsgi_request, request, user_detail):
     except Exception, e:
         print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
 
-    # Send an email: the recipients are the PI of the authority
-    # If No PI is defined for this Authority, send to a default email (different for each theme)
-    recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+    try:
+        # Send an email: the recipients are the PI of the authority
+        # If No PI is defined for this Authority, send to a default email (different for each theme)
+        recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+        
+        theme.template_name = 'user_request_email.html'
+        html_content = render_to_string(theme.template, request)
     
-    theme.template_name = 'user_request_email.html'
-    html_content = render_to_string(theme.template, request)
-
-    theme.template_name = 'user_request_email.txt'
-    text_content = render_to_string(theme.template, request)
-
-    theme.template_name = 'user_request_email_subject.txt'
-    subject = render_to_string(theme.template, request)
-    subject = subject.replace('\n', '')
-
-    theme.template_name = 'email_default_sender.txt'
-    sender =  render_to_string(theme.template, request)
-    sender = sender.replace('\n', '')
-
-    msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+        theme.template_name = 'user_request_email.txt'
+        text_content = render_to_string(theme.template, request)
+    
+        theme.template_name = 'user_request_email_subject.txt'
+        subject = render_to_string(theme.template, request)
+        subject = subject.replace('\n', '')
+    
+        theme.template_name = 'email_default_sender.txt'
+        sender =  render_to_string(theme.template, request)
+        sender = sender.replace('\n', '')
+    
+        msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+    except Exception, e:
+        print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
