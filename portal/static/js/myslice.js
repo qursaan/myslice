@@ -44,38 +44,38 @@ var myslice = {
     },
     
     apply: function() {
-    	$('div#loading').show();
-    	this.pending = [];
-    	this.save();
-    	setTimeout(function(){
-    		$('div#loading').hide();
-    		window.location.href = '/resources/' + this.slice + '?message=true';
-    		},6000);
+    	//$('div#loading').show();
+    	//this.pending = [];
+    	//this.save();
+    	//setTimeout(function(){
+    		//$('div#loading').hide();
+    		//window.location.href = '/resources/' + this.slice + '?message=true';
+    		//},6000);
     	
     	 
 
-    	// $.post("/rest/slice/", { 'fields': ['resource','slice_hrn'], 'filters': { 'slice_hrn' : this.slice  } }, function(data) {
-    		// console.log(data);
-    		// resources = [];
-    		// reserved = [];
-    		// update = [];
-    		// if ('resource' in data[0]) {
-    			// $.each(data[0].resource, function(idx, r) {
-    				// resources.push(r.urn);
-    			// });
-    		// }
-    		// //myslice.pending
-    		// console.log(myslice.pending);
-    		// console.log(resources);
-    		// $.each(resources.concat(myslice.pending), function(idx, v) {
-    			// update.push({ 'resource': v });
-    		// });
-    		// console.log(update);
-    		// $.post("/update/slice/", { 'filters': { 'slice_hrn' : myslice.slice  }, 'params' : update }, function(data) {
-    			// console.log(data);
-    		// });
-    	// });
-    	//console.log(this.slice);
+    	 $.post("/rest/slice/", { 'fields': ['resource','slice_hrn'], 'filters': { 'slice_hrn' : this.slice  } }, function(data) {
+    		 console.log(data);
+    		 resources = [];
+    		 reserved = [];
+    		 update = [];
+    		 if ('resource' in data[0]) {
+    			 $.each(data[0].resource, function(idx, r) {
+    				 resources.push(r.urn);
+    			 });
+    		 }
+    		 //myslice.pending
+    		 console.log(myslice.pending);
+    		 console.log(resources);
+    		 $.each(resources.concat(myslice.pending), function(idx, v) {
+    			 update.push( v );
+    		 });
+    		 console.log(update);
+    		 $.post("/update/slice/", { 'filters': { 'slice_hrn' : myslice.slice  }, 'params' : update }, function(data) {
+    			 console.log(data);
+    		 });
+    	 });
+    	console.log(this.slice);
     }
     
 };
