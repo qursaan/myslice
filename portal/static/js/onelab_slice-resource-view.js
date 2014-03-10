@@ -4,10 +4,11 @@ $(document).ready(function() {
         $(this).parent().addClass('active');
         $('div.panel').hide();
         $('div#'+$(this).data('panel')).show();
-        
+        /*
         if ($(this).data('panel') == 'map') {
         	mapInit();
         }
+        */
     });
     
     $.get("/rest/network", function(data) {
