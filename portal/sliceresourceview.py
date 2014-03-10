@@ -14,14 +14,117 @@ from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 from manifoldapi.manifoldapi         import execute_query
 
+from myslice.configengine            import ConfigEngine
+from plugins.querytable              import QueryTable
+from plugins.googlemap               import GoogleMap
+from plugins.queryupdater            import QueryUpdater
+
 from theme import ThemeView
 
 class SliceResourceView (LoginRequiredView, ThemeView):
     template_name = "slice-resource-view.html"
     
     def get(self, request, slicename):
+
         if request.GET.get('message') : 
             msg = "Slice successfully updated"
         else :
             msg = None
-        return render_to_response(self.template, {"msg" : msg, "slice": slicename, "theme": self.theme, "username": request.user, "section":"resources"}, context_instance=RequestContext(request))
+
+        page = Page(request)
+        metadata = page.get_metadata()
+        page.expose_js_metadata()
+
+        resource_md = metadata.details_by_object('resource')
+        resource_fields = [column['name'] for column in resource_md['column']]
+
+        user_md = metadata.details_by_object('user')
+        user_fields = ['user_hrn'] # [column['name'] for column in user_md['column']]
+
+        # TODO The query to run is embedded in the URL
+        main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
+        main_query.select(
+                'slice_hrn',
+                'resource.urn', 
+                'resource.hostname', 'resource.type',
+                'resource.network_hrn',
+                'lease.urn',
+                'user.user_hrn',
+                #'application.measurement_point.counter'
+        )
+        # for internal use in the querytable plugin;
+        # needs to be a unique column present for each returned record
+        main_query_init_key = 'urn'
+        aq = AnalyzedQuery(main_query, metadata=metadata)
+        page.enqueue_query(main_query, analyzed_query=aq)
+
+        query_resource_all = Query.get('resource').select(resource_fields)
+        page.enqueue_query(query_resource_all)
+
+        sq_resource    = aq.subquery('resource')
+        sq_lease       = aq.subquery('lease')
+
+        list_resources = QueryTable(
+            page       = page,
+            domid      = 'resources-list',
+            title      = 'List view',
+            query      = sq_resource,
+            query_all  = query_resource_all,
+            init_key   = "urn",
+            checkboxes = True,
+            datatables_options = {
+                'iDisplayLength': 25,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+        # --------------------------------------------------------------------------
+        # RESOURCES
+        # the resources part is made of a Tabs (Geographic, List), 
+
+        map_resources  = GoogleMap(
+            page       = page,
+            title      = 'Geographic view',
+            domid      = 'resources-map',
+            # tab's sons preferably turn this off
+            togglable  = False,
+            query      = sq_resource,
+            query_all  = query_resource_all,
+            # this key is the one issued by google
+            googlemap_api_key = ConfigEngine().googlemap_api_key(),
+            # the key to use at init-time
+            init_key   = main_query_init_key,
+            checkboxes = True,
+            # center on Paris
+            latitude   = 49.,
+            longitude  = 9,
+            zoom       = 4,
+        )
+
+        # --------------------------------------------------------------------------
+        # QueryUpdater (Pending Operations)
+ 
+        pending_resources = QueryUpdater(
+            page                = page,
+            title               = 'Pending operations',
+            query               = main_query,
+            togglable           = True,
+            # start turned off, it will open up itself when stuff comes in
+            toggled             = False,
+            domid               = 'pending',
+            outline_complete    = True,
+        )
+
+        template_env = {}
+        template_env['list_resources'] = list_resources.render(self.request)
+        template_env['map_resources'] = map_resources.render(self.request)
+        template_env['pending_resources'] = pending_resources.render(self.request)
+        template_env["theme"] = self.theme
+        template_env["username"] = request.user
+        template_env["slice"] = slicename
+        template_env["section"] = "resources"
+        template_env["msg"] = msg
+        template_env.update(page.prelude_env())
+
+        return render_to_response(self.template, template_env, context_instance=RequestContext(request))

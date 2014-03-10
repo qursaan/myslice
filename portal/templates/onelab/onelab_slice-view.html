@@ -1,24 +1,29 @@
 {% extends "layout_wide.html" %}
 
 {% block content %}
-	<div class="col-md-2"></div>
-	<div class="col-md-10">
-		<div class="row">
-		  	{% include theme|add:"_widget-slice-sections.html" %}
+<div class="wrapper">
+	<div class="row">
+		<div class="col-md-12">
+		{% include theme|add:"_widget-slice-sections.html" %}
+	    </div>
+	</div>
+</div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-2">
+			ll
 		</div>
-    </div>
-    
-	<div class="col-md-2"></div>
-	<div class="col-md-10">
-        <br>
-        <br>
-        <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-        <div id="slice-tab-loaded" style="display:none;">
-            <table id="slice-tab">
-            </table>
-        </div>
-  	</div>
- 
+		<div class="col-md-10">
+        	<br>
+        	<br>
+        	<div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+        	<div id="slice-tab-loaded" style="display:none;">
+        	    <table id="slice-tab">
+        	    </table>
+        	</div>
+  		</div>
+	</div>
+</div>
 <script>
     $(document).ready(function() {
         $.post("/rest/slice/",{'filters':{'slice_hrn':'{{slice}}'}}, function( data ) {

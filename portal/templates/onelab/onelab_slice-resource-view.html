@@ -49,15 +49,20 @@
 			<ul class="nav nav-tabs nav-resources">
 			  <li class="active"><a data-panel="resources" href="#">Resources</a></li>
 			  <li><a data-panel="map" href="#">Map</a></li>
+			  <li><a data-panel="pending" href="#">Pending</a></li>
 			  <li><a href="#"></a></li>
 			</ul>
 		</div>
 		<div class="row" style="height:100%;">
 			<div id="resources" class="panel">
+                {{list_resources}}
 				<table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table>
 			</div>
 			<div id="map" class="panel" style="height:370px;display:none;">
-				<div id="map-canvas" style="height:100%;"></div>
+                {{map_resources}}
+			</div>
+			<div id="pending" class="panel" style="height:370px;display:none;">
+                {{pending_resources}}
 			</div>
 		</div>
 	</div>

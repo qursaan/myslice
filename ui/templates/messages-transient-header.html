@@ -23,10 +23,10 @@ $(function(){
 	$(document).ready(function(){
 		{% for message in messages %}
             $("#notifications").notify("create", {
-              title: 'Test Notification',
+              title: 'Notification',
               text: '{{ message }}'
             },{
-              expires: false,
+              expires: true,
               speed: 1000
             });
 		{% endfor %}

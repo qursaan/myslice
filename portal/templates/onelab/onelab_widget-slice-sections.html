@@ -1,13 +1,14 @@
-<div class="col-md-8 slice-sections">
-	<ul class="nav nav-pills nav-justified">
-		<li {% if section == 'slice' %}class="active"{% endif %}><a href="/slice/{{ slice }}/">{{ slice }}</a></li>
-		<li {% if section == 'testbeds' %}class="active"{% endif %}><a href="/testbeds/{{ slice }}/">Testbeds</a></li>
-		<li {% if section == 'resources' %}class="active"{% endif %}><a href="/resources/{{ slice }}/">Resources</a></li>
-		<li {% if section == 'users' %}class="active"{% endif %}><a href="/users/{{ slice }}/">Users</a></li>
-		<li><a href="">Statistics</a></li>
-		<li><a href="">Measurements</a></li>
-	</ul>
-</div>
-<div class="col-md-4 slice-experiment">
-	<a href="/portal/experiment"><button type="button" class="btn btn-default">Experiment</button></a>
-</div>
+<ul class="nav nav-tabs nav-sliceview">
+	<li class="active"><a href="/slice/{{ slice }}/"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
+	<li><a href="/testbeds/{{ slice }}/">Testbeds</a></li>
+	<li><a href="/resources/{{ slice }}/">Resources</a></li>
+	<li><a href="/users/{{ slice }}/">Users</a></li>
+	<li><a href="">Statistics</a></li>
+	<li><a href="">Measurements</a></li>
+	<li><a href="/portal/experiment">Experiment</a></li>
+</ul>
+<script>
+	$(document).ready(function() {
+		
+	});
+</script>
