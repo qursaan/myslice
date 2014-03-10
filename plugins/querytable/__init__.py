@@ -92,11 +92,11 @@ Current implementation makes the following assumptions
                           # dataTableExt.afnSortData
                            "js/querytable.js", 
                            ] ,
-            'css_files': [ "css/dataTables.bootstrap.css",
+            'css_files': [ #"css/dataTables.bootstrap.css",
                            # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
                            # for now we use full_numbers, with our own ad hoc css 
                            "css/dataTables.full_numbers.css",
-                           "css/querytable.css" , 
+                           #"css/querytable.css" , 
                            ],
             }
         return reqs
