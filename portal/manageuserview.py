@@ -281,16 +281,16 @@ def user_process(request, **kwargs):
                     if 'N/A' not in acc_auth_cred:
                         auth_list = []
                         auth_cred = [] 
-                    for key, value in acc_auth_cred.iteritems():
-                        auth_list.append(key)       
-                        auth_cred.append(value)
-                    # special case: download each slice credentials separately
-                    for i in range(0, len(auth_list)):
-                        if 'dl_'+auth_list[i] in request.POST:
-                            auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
-                            response = HttpResponse(auth_detail, content_type='text/plain')
-                            response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
-                            return response
+                        for key, value in acc_auth_cred.iteritems():
+                            auth_list.append(key)       
+                            auth_cred.append(value)
+                        # special case: download each slice credentials separately
+                        for i in range(0, len(auth_list)):
+                            if 'dl_'+auth_list[i] in request.POST:
+                                auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
+                                response = HttpResponse(auth_detail, content_type='text/plain')
+                                response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
+                                return response
 
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
