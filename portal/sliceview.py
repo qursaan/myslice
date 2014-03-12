@@ -18,7 +18,8 @@ from plugins.querygrid               import QueryGrid
 from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
-from plugins.scheduler               import Scheduler
+#from plugins.scheduler               import Scheduler
+from plugins.scheduler2              import Scheduler2
 from plugins.querycode               import QueryCode
 # Thierry
 # stay away from query editor for now as it seems to make things go very slow
@@ -244,15 +245,29 @@ class SliceView (LoginRequiredAutoLogoutView):
                 checkboxes = True,
                 )
 
-        if do_query_leases:
-            resources_as_scheduler = Scheduler(
-                page        = page,
-                title       = 'Scheduler',
-                domid       = 'scheduler',
-                query       = sq_resource,
-                query_all_resources = query_resource_all,
-                query_lease = sq_lease,
-                )
+        
+
+        #if do_query_leases:
+        #    resources_as_scheduler = Scheduler(
+
+        #        page        = page,
+        #        title       = 'Scheduler',
+        #        domid       = 'scheduler',
+        #        query       = sq_resource,
+        #        query_all_resources = query_resource_all,
+        #        query_lease = sq_lease,
+
+        #        )
+
+        resources_as_scheduler2 = Scheduler2( 
+            page       = page,
+            domid      = 'scheduler',
+            title      = 'Scheduler',
+            # this is the query at the core of the slice list
+            query = sq_resource,
+            query_all_resources = query_resource_all,
+            query_lease = sq_lease,
+            )
 
        # with the new 'Filter' stuff on top, no need for anything but the querytable
         resources_as_list_area = resources_as_list 
@@ -260,12 +275,13 @@ class SliceView (LoginRequiredAutoLogoutView):
         resources_sons = [
             resources_as_gmap, 
             resources_as_3dmap,
-            resources_as_scheduler,
+            resources_as_scheduler2,
             resources_as_list_area,
             ] if do_query_leases else [
             resources_as_gmap, 
             resources_as_3dmap,
             resources_as_list_area,
+            resources_as_scheduler2,
             ]
         if insert_grid:
             resources_sons.append(resources_as_grid)
@@ -276,7 +292,8 @@ class SliceView (LoginRequiredAutoLogoutView):
                                 title="Resources",
                                 outline_complete=True,
                                 sons= resources_sons,
-                                active_domid = 'resources-map',
+
+                                active_domid = 'scheduler',
                                 persistent_active=True,
                                 )
         main_stack.insert (resources_area)
