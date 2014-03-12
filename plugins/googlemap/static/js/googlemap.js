@@ -76,7 +76,7 @@
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("googlemap.on_show");
+	        if (debug) messages.debug("googlemap.on_show");
             var googlemap = e.data;
             google.maps.event.trigger(googlemap.map, 'resize');
         }, 
