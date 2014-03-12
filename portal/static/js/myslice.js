@@ -216,5 +216,5 @@ $(document).ready(function() {
 /* EXEMPLES */
 // add a resource to pending
 
-myslice.user.slice('ple.upmc.myslicedemo').resources.pending.add(resource);
+//myslice.user.slice('ple.upmc.myslicedemo').resources.pending.add(resource);
 
