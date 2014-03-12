@@ -1,5 +1,7 @@
 <ul class="nav nav-tabs nav-sliceview">
-	<li {% if section != "resources" %}class="active"{% endif %}><a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
+	<li {% if section != "resources" %}class="active"{% endif %}>
+		<a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a>
+	</li>
 	<li><a href="#testbeds">Testbeds</a></li>
 	<li {% if section == "resources" %}class="active"{% endif %}><a class="link" href="/resources/{{ slice }}">Resources</a></li>
 	<li><a href="#users">Users</a></li>
