@@ -1,14 +1,21 @@
 <ul class="nav nav-tabs nav-sliceview">
-	<li class="active"><a href="/slice/{{ slice }}/"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
-	<li><a href="/testbeds/{{ slice }}/">Testbeds</a></li>
-	<li><a href="/resources/{{ slice }}/">Resources</a></li>
-	<li><a href="/users/{{ slice }}/">Users</a></li>
-	<li><a href="">Statistics</a></li>
-	<li><a href="">Measurements</a></li>
-	<li><a href="/portal/experiment">Experiment</a></li>
+	<li {% if section != "resources" %}class="active"{% endif %}><a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
+	<li><a href="#testbeds">Testbeds</a></li>
+	<li {% if section == "resources" %}class="active"{% endif %}><a class="link" href="/resources/{{ slice }}">Resources</a></li>
+	<li><a href="#users">Users</a></li>
+	<li><a href="#experiment">Statistics</a></li>
+	<li><a href="#experiment">Measurements</a></li>
+	<li><a href="#experiment" data-toggle="tab">Experiment</a></li>
 </ul>
 <script>
-	$(document).ready(function() {
-		
+$(document).ready(function() {
+	$('.nav-sliceview a').click(function (e) {
+		if ($(this).hasClass('link')) return;
+  		e.preventDefault();
+  		$(this).tab('show');
+    	var id = $(this).attr('href').substr(1);    	
+    	$("#" + id).load('/' + id + '/{{ slice }}/');
 	});
+	$('div#info').load('/info/{{ slice }}/');
+});
 </script>

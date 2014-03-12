@@ -16,36 +16,8 @@ from theme import ThemeView
 
 class ExperimentView (FreeAccessView, ThemeView):
     template_name = 'experimentview.html'
+
+    def get (self, request, slicename, state=None):
         
-    # expose this so we can mention the backend URL on the welcome page
-    def default_env (self):
-        return { 
-                 'MANIFOLD_URL':ConfigEngine().manifold_url(),
-                 }
-
-    def post (self,request):
-        env = self.default_env()
-        env['theme'] = self.theme
-        return render_to_response(self.template, env, context_instance=RequestContext(request))
-
-    def get (self, request, state=None):
-        env = self.default_env()
-
-        if request.user.is_authenticated(): 
-            env['person'] = self.request.user
-        else: 
-            env['person'] = None
-    
-        env['theme'] = self.theme
-    
-
-        env['username']=the_user(request)
-        env['topmenu_items'] = topmenu_items(None, request)
-        if state: env['state'] = state
-        elif not env['username']: env['state'] = None
-        # use one or two columns for the layout - not logged in users will see the login prompt
-        env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
-        
-        
-        return render_to_response(self.template, env, context_instance=RequestContext(request))
+        return render_to_response(self.template, { 'theme' : self.theme }, context_instance=RequestContext(request))
 

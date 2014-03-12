@@ -150,6 +150,7 @@ div#menu-slice-list{
     background-color:black;
     padding:15px;
     left:-15px;
+    z-index:10;
 }
 div#menu-slice-list ul {
     margin:0;
@@ -350,7 +351,12 @@ ul.nav-sliceview li:first-child img {
     padding:0;
 }
 
-
+ul.nav-resources {
+    margin:15px 0;
+}
+ul.nav-resources a {
+    padding: 4px 10px 5px 10px;
+}
 
 
 

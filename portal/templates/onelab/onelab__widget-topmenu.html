@@ -54,8 +54,8 @@
 		$('li.slices').mouseenter(function() {
 			$('div#menu-slice-list').fadeIn(100);
 		});
-		$('li.slices').mouseleave(function() {
-			$('div#menu-slice-list').fadeOut(100);
+		$('div#menu-slice-list').mouseleave(function() {
+			$(this).fadeOut(100);
 		});
 		// var slices = localStorage.getItem('slices');
 		// if (slices.length == 0) {
