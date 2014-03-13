@@ -90,3 +90,10 @@ for aux in auxiliaries:
         urls.append ( url ( r'^%s/'%aux, include ('%s.urls'%aux )))
 
 urlpatterns = patterns(*urls)
+
+# Shibboleth - Edelberto
+urlpatterns += patterns('',
+   #url(r'^cafe/', 'plugins.cafe.edelberto.EdelbertoView.as_view()'),
+   url(r'^cafe/', 'plugins.cafe.edelberto.index'),
+)
+

@@ -23,9 +23,9 @@ except:
 # when deployed from a package
 # this code is run by collectstatic too, so we cannot
 # assume we have ./static present already
-HTTPROOT="/usr/share/unfold"
+HTTPROOT="/var/www/myslice"
 # the place to store local data, like e.g. the sqlite db
-DATAROOT="/var/unfold"
+DATAROOT="/var/www/myslice"
 # if not there, then we assume it's from a devel tree
 if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT
@@ -181,11 +181,13 @@ ROOT_URLCONF = 'myslice.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'unfold.wsgi.application'
+#WSGI_APPLICATION = 'myslice.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    #os.path.join(HTTPROOT,"templates"),
     os.path.join(HTTPROOT,"templates"),
 )
 
