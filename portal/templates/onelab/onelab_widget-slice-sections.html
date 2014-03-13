@@ -1,5 +1,5 @@
 {% if section == "resources" %}
-<ul class="nav nav-tabs nav-sliceview">
+<ul class="nav nav-tabs">
 	<li><a href="/slice/{{ slice }}#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
 	<li><a href="/slice/{{ slice }}#testbeds">Testbeds</a></li>
 	<li class="active"><a class="link" href="/resources/{{ slice }}">Resources</a></li>
@@ -9,7 +9,7 @@
 	<li><a href="/slice/{{ slice }}#experiment" data-toggle="tab">Experiment</a></li>
 </ul>
 {% else %}
-<ul class="nav nav-tabs nav-sliceview">
+<ul class="nav nav-tabs">
 	<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
 	<li class="testbeds"><a href="#testbeds">Testbeds</a></li>
 	<li><a class="link" href="/resources/{{ slice }}">Resources</a></li>
@@ -20,7 +20,7 @@
 </ul>
 <script>
 $(document).ready(function() {
-	$('.nav-sliceview a').click(function (e) {
+	$('.nav-tabs a').click(function (e) {
 		if ($(this).hasClass('link')) return;
   		e.preventDefault();
   		$(this).tab('show');

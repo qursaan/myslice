@@ -339,24 +339,24 @@ div#ticket-request p {
 }
 
 /* SLICE VIEW */
-ul.nav-sliceview {}
-ul.nav-sliceview li {
+ul.nav-tabs {}
+ul.nav-tabs li {
     
 }
-ul.nav-sliceview li a {
+ul.nav-tabs li a {
     border-bottom:0;
 }
-ul.nav-sliceview li:first-child {
+ul.nav-tabs li:first-child {
     padding:0;
 }
-ul.nav-sliceview li:first-child a {
+ul.nav-tabs li:first-child a {
     font-weight:bold;
     padding:6px 15px 4px 15px;
 }
-ul.nav-sliceview li:first-child.active a {
+ul.nav-tabs li:first-child.active a {
     padding:6px 15px 3px 15px;
 }
-ul.nav-sliceview li:first-child img {
+ul.nav-tabs li:first-child img {
     margin:0 4px 1px 0;
     padding:0;
 }
