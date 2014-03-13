@@ -82,12 +82,11 @@ urls = [
     # Portal
     
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
+    (r'^users/(?P<slicename>[^/]+)/?$', SliceUserView.as_view()),
     
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
-    
     (r'^info/(?P<slicename>[^/]+)/?$', portal.slicetabinfo.SliceInfoView.as_view()),
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
-    (r'^users/(?P<slicename>[^/]+)/?$', SliceUserView.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]

@@ -343,12 +343,18 @@ ul.nav-sliceview {}
 ul.nav-sliceview li {
     
 }
+ul.nav-sliceview li a {
+    border-bottom:0;
+}
 ul.nav-sliceview li:first-child {
     padding:0;
 }
 ul.nav-sliceview li:first-child a {
     font-weight:bold;
     padding:6px 15px 4px 15px;
+}
+ul.nav-sliceview li:first-child.active a {
+    padding:6px 15px 3px 15px;
 }
 ul.nav-sliceview li:first-child img {
     margin:0 4px 1px 0;
@@ -386,6 +392,22 @@ a.list-group-item.active, a.list-group-item:hover {
 a.list-group-item p.list-group-item-text {
     font-size:9pt;
     font-style:italic;
+}
+
+div#slice-info {
+    margin-top:25px;
+}
+div#slice-info table {
+    width:100%;
+    margin:0 auto;
+}
+div#slice-info table td:first-child {
+    text-align:right;
+    font-weight:bold;
+    padding-right:15px;
+}
+div#slice-info td {
+    padding:5px;
 }
 
 /* SLICE VIEW sections */

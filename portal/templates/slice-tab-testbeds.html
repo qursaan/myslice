@@ -3,14 +3,15 @@
 <div class="col-md-8">		
 	<div id="testbed-list-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Testbeds" /></div>
 	<div id="testbed-list-loaded" style="display:none;margin-top:15px;">
-		<table cellpadding="0" cellspacing="0" border="0" class="table" id="testbedList"></table>
+		<table cellpadding="0" cellspacing="0" border="0" class="table" id="testbedList">
+		</table>
 	</div>
 </div>
 <div class="col-md-2">
 </div>
 <script>
 $(document).ready(function() {
-	$.post("/rest/network/", { "fields" : ["network_hrn", "network_longname", "description"]}, function(data) {
+	$.post("/rest/network/", { "fields" : ["network_hrn", "network_longname", "description"] }, function(data) {
 			var testbed_data = [];
 			var testbed_row = "<thead>";
 			testbed_row += "<tr>";
@@ -23,7 +24,7 @@ $(document).ready(function() {
 			testbed_row += "</thead>";
 			testbed_data.push(testbed_row);
 			$.each( data, function(key, val) {
-				testbed_row = "<tr data-keys=\""+val.network_hrn+"\" class=\"odd\">"
+				testbed_row = "<tr data-keys=\""+val.network_hrn+"\" class=\"odd\">";
 				testbed_row += "<td><input type=\"checkbox\" name=\"network_hrn\" value=\""+val.network_hrn+"\"/></td>";
 				testbed_row += "<td><img src='/static/img/testbeds/"+val.network_hrn+".png' alt='' /></td>";
 				testbed_row += "<td>"+val.network_hrn+"</td>";
@@ -40,7 +41,7 @@ $(document).ready(function() {
 		$("input[type=checkbox]").click(function() {
 			var cnt = 0;
 			var id = $(this).val();
-			var row = $(this).parent().parent()
+			var row = $(this).parent().parent();
 			if (row.hasClass("active")) {
 				row.removeClass("active");
 			} else {
