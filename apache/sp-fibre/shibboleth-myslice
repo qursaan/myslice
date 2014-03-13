@@ -1,0 +1,61 @@
+<VirtualHost 200.130.15.182:443>
+        ServerName	200.130.15.182
+        ServerSignature Off
+
+        SSLEngine               on
+        #SSLCertificateFile      /etc/unfold/trusted_roots
+        SSLCertificateFile      /etc/ssl/certs/fibre.crt
+        SSLCertificateKeyFile   /etc/ssl/private/fibre.key
+
+        #ShibURLScheme https
+
+        DocumentRoot /var/www/
+        <Directory /var/www/>
+                Options -Indexes FollowSymLinks -MultiViews
+                AllowOverride None
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+#        WSGIScriptAlias / /usr/share/unfold/apache/myslice.wsgi
+#        <Directory /usr/share/unfold/apache>
+#        <Files myslice.wsgi>
+#        Order deny,allow
+#        Allow from all
+#        </Files>
+#        </Directory>
+#        Alias /static/ /usr/share/unfold/static/
+#        <Directory /usr/share/unfold/static>
+#        Order deny,allow
+#        Allow from all
+#        </Directory>
+
+
+#<Location myslice/secure>
+#	AuthType Shibboleth
+#	ShibRequestSetting requireSession true
+#        ShibRequestSetting applicationId default
+#	Require valid-user
+#</Location>
+
+<Location /Shibboleth.sso>
+  SetHandler shib
+</Location>
+<Location /shibboleth-sp2>
+  SetHandler shib
+</Location>
+
+
+#         <Location /moodle/auth/shibboleth>
+#                 AuthType shibboleth
+#                 ShibRequireSession On
+#                 require valid-user
+#         </Location>
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        ErrorLog /var/log/apache2/error.log
+        LogLevel info
+        CustomLog /var/log/apache2/sp-access-443.log combined
+
+</VirtualHost>

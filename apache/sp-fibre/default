@@ -1,0 +1,24 @@
+NameVirtualHost *:80
+<VirtualHost *:80>
+        ServerName	200.130.15.182
+        ServerSignature Off
+ 
+        # Redirecionamento para SSL
+        #RewriteEngine on
+        #RewriteCond %{HTTPS} !=on
+        #RewriteRule ^(.*) https://%{SERVER_NAME}/$1 [R,L]
+ 
+        DocumentRoot /var/www/
+        <Directory /var/www/>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+ 
+        ErrorLog /var/log/apache2/error.log
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel info
+        CustomLog /var/log/apache2/sp-access-80.log combined
+</VirtualHost>
