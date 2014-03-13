@@ -81,7 +81,7 @@ list-templates: plugins-templates local-templates
 #################### manage templates for the plugin area
 templates: force
 	@mkdir -p templates
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./templates
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),"../$(x)") ./templates
 
 clean-templates templates-clean: force
 	rm -rf ./templates
