@@ -7,6 +7,7 @@ class ThemeView (object):
     @property
     def theme(self):
         self.config = ConfigEngine()
+        print self.config
         if self.config.myslice.theme :
             return self.config.myslice.theme
     
@@ -14,7 +15,7 @@ class ThemeView (object):
     def template(self):
         # Load a template from the theme directory if it exists
         # else load it from the common templates dir
-        print "THEME = ",self.theme
+        print "THEME 00 = ",self.theme
         print "TEMPLATE = ",self.template_name
         print "TEMPLATE_DIRS = ",TEMPLATE_DIRS
         filename = self.theme + '_' + self.template_name

@@ -28,9 +28,16 @@ class HomeView (FreeAccessView, ThemeView):
         env['theme'] = self.theme
         username = request.POST.get('username')
         password = request.POST.get('password')
+       
+        # LDAP form - If FIBRE, then get the possibilite to authenticate using usernameldap
+        #if self.theme == 'fibre':
+        usernameldap = request.POST.get('usernameldap')
+        token = {'usernameldap': usernameldap, 'username': username ,'password': password, 'request': request}    
+        #else:
         
-        # pass request within the token, so manifold session key can be attached to the request session.
-        token = {'username': username, 'password': password, 'request': request}    
+        # Follow original code
+        ## pass request within the token, so manifold session key can be attached to the request session.
+        #token = {'username': username, 'password': password, 'request': request}    
 
         # our authenticate function returns either
         # . a ManifoldResult - when something has gone wrong, like e.g. backend is unreachable
