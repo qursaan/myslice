@@ -346,14 +346,17 @@ def account_process(request):
                         #sfa_update_user(request, user_hrn, user_pub_key)
                         sfa_update_user(request, user_hrn, user_pub_key)
                         result_sfa_user = sfa_get_user(request, user_hrn, public_key)
-                        result_sfa_user = result_sfa_user[0]
-                        if 'keys' in result_sfa_user and result_sfa_user['keys'][0] == public_key:
-                            # updating manifold
-                            updated_config = json.dumps(account_config) 
-                            user_params = { 'config': keypair, 'auth_type':'managed'}
-                            manifold_update_account(request, user_id, user_params)
-                            messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
-                        else:
+                        try:
+                            result_sfa_user = result_sfa_user[0]
+                            if 'keys' in result_sfa_user and result_sfa_user['keys'][0] == public_key:
+                                # updating manifold
+                                updated_config = json.dumps(account_config) 
+                                user_params = { 'config': keypair, 'auth_type':'managed'}
+                                manifold_update_account(request, user_id, user_params)
+                                messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
+                            else:
+                                raise Exception,"Keys are not matching"
+                        except Exception,e:
                             messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
                         return HttpResponseRedirect("/portal/account/")
         else:

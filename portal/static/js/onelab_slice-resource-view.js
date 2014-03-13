@@ -1,13 +1,18 @@
 $(document).ready(function() {
+    $('li#GoogleMap').click(function (e) {
+        $('.'+this.id).trigger('show');
+    });
+
 	$('ul.nav-resources a').click(function() {
         $('ul.nav-resources li').removeClass('active');
         $(this).parent().addClass('active');
         $('div.panel').hide();
         $('div#'+$(this).data('panel')).show();
-        
+        /*
         if ($(this).data('panel') == 'map') {
         	mapInit();
         }
+        */
     });
     
     $.get("/rest/network", function(data) {

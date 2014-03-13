@@ -705,7 +705,6 @@ def create_pending_user(wsgi_request, request, user_detail):
             .filter_by('platform', '==', 'myslice')           \
             .select('platform_id')
         reg_platform = execute_admin_query(wsgi_request, reg_platform_query)
-    
         reg_platform_id = reg_platform[0]['platform_id']
         account_params = {
             'platform_id'   : reg_platform_id, # XXX ALERT !!

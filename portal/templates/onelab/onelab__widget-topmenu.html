@@ -1,7 +1,4 @@
-{% insert_str prelude "js/bootstrap.js" %}
-{% insert_str prelude "css/bootstrap.css" %}
-{% insert_str prelude "css/topmenu.css" %}
-{% insert_str prelude "js/logout.js" %}
+
 <div id="header">
 	<div class="wrapper">
 		<div class="logo">
@@ -25,7 +22,22 @@
 			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
 			<li>|</li>
 			<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
-			<li>SLICES</li>
+			<li class="slices">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+       				SLICES <span class="caret"></span>
+    			</a>
+				
+				<div class="dropdown-menu">
+						<ul>
+							<li><a href="/portal/slice_request/">Request Slice</a></li>
+							<li><a href="/slice/ple.upmc.agent3/">ple.upmc.agent3</a></li>
+						    <li><a href="/slice/ple.upmc.agent/">ple.upmc.agent</a></li>
+						    <li><a href="/slice/ple.upmc.myslicedemo/">ple.upmc.myslicedemo</a></li>
+						    <li><a href="/slice/ple.upmc.slicestat/">ple.upmc.slicestat</a></li>
+						    <li><a href="/slice/ple.upmc.agent2/">ple.upmc.agent2</a></li>
+						</ul>
+				</div>
+				</li>
 			<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
 			<li id="nav-support"><a href="/portal/support/">SUPPORT</a></li>
 			<li>|</li>
@@ -41,6 +53,14 @@
 </div>
 <script>
 	$(document).ready(function() {
+		$('li.slices').mouseenter(function() {
+			$('div#menu-slice-list').fadeIn(100);
+		});
+		$('div#menu-slice-list').mouseleave(function(e) {
+			if (!$('li.slices').is(":hover")) {
+				$(this).fadeOut(100);
+			}
+		});
 		// var slices = localStorage.getItem('slices');
 		// if (slices.length == 0) {
 			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {

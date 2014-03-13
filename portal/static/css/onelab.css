@@ -13,13 +13,13 @@ a, a:active, a:focus {
 
 h1 {
     border-bottom:1px solid #DDDDDD;
-    padding:0 0 5px 0;
-    margin:0 0 15px 0;
+    padding:0 0 0 0;
+    margin:0 0 0 0;
     font-size:18pt;
 }
 h1 img {
     vertical-align:middle;
-    margin-bottom:4px;
+    margin-bottom:6px;
 }
 h2 {
     font-size:14pt;
@@ -29,6 +29,7 @@ h3 {
     font-size:13pt;
     color:#201E62;
 }
+
 div.wrapper {
     width:980px;
     margin:0 auto;
@@ -132,12 +133,41 @@ div#navigation li:last-child {
 
 div#navigation li.active {
 	padding:5px;
+    padding-top: 15px;
     min-height: 40px;
     margin-top: 0px;
 	background-color:gray;
 	color:#FF0000;
 }
+div#navigation li.slices {
+    position:relative;
+    cursor:pointer;
+}
+div#navigation .dropdown-menu {
+    color:white;
+    padding:0 15px 15px 15px;
+    margin-top:5px;
+    margin-left:-16px;
+    background-color:black;
+}
+div#navigation .dropdown-menu a {
+    color:white;
+}
 
+div#menu-slice-list{
+    display:none;
+    position:absolute;
+    background-color:black;
+    padding:15px;
+    left:-15px;
+    z-index:10;
+}
+
+div#navigation .dropdown-menu li:first-child {
+    border-bottom:1px solid white;
+    padding-bottom:5px;
+     
+}
 /* HOME DASHBOARD */
 div#home-dashboard {
     color:black;
@@ -234,7 +264,6 @@ div#home-dashboard div#home-slice-list li {
 /* NAV TABS */
 
 .nav.nav-tabs {
-    margin-bottom:25px;
 }
 
 .nav.nav-tabs li.active a {
@@ -310,6 +339,32 @@ div#ticket-request p {
 }
 
 /* SLICE VIEW */
+ul.nav-sliceview {}
+ul.nav-sliceview li {
+    
+}
+ul.nav-sliceview li:first-child {
+    padding:0;
+}
+ul.nav-sliceview li:first-child a {
+    font-weight:bold;
+    padding:6px 15px 4px 15px;
+}
+ul.nav-sliceview li:first-child img {
+    margin:0 4px 1px 0;
+    padding:0;
+}
+
+ul.nav-resources {
+    margin:15px 0;
+}
+ul.nav-resources a {
+    padding: 4px 10px 5px 10px;
+}
+
+
+
+
 div#slice-view {
     margin:0;
 }
