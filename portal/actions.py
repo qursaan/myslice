@@ -500,6 +500,138 @@ def sfa_create_user(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     return results
 
+def ldap_create_user(wsgi_request, request, user_detail):
+    """
+    Populating LDAP withuser data - Edelberto 10/03/2014
+    """
+    # import needed modules
+    import ldap
+    import ldap.modlist as modlist
+
+    # Open a connection
+    # XXX We need to create this in settings
+    # ldap.open is deprecated!
+    #l = ldap.open("127.0.0.1")
+    l = ldap.initialize('ldap://127.0.0.1:389')
+
+    # you should  set this to ldap.VERSION2 if you're using a v2 directory
+    l.protocol_version = ldap.VERSION3
+
+    # Bind/authenticate with a user with apropriate rights to add objects
+    # XXX Now we set the force rootd but after we need to set this in settings file for could change the dn and password of root
+    l.simple_bind_s("cn=Manager,dc=br","fibre")
+
+    # The dn of our new entry/object
+    #dn="uid=addtest@uff.br,ou=people,o=uff,dc=br"
+
+    # we need to create the dn entry
+    # Receiving an email address, how can we split and mount it in DN format?
+    #mail = "debora@uff.br"
+    mail = request['email']
+    login = mail.split('@')[0]
+    org = mail.split('@')[1]
+    o = org.split('.')[-2]
+    dc = org.split('.')[-1]
+
+    # DN format to authenticate - IMPORTANT!
+    #FIBRE-BR format
+    dn = "uid="+mail+",ou=people,o="+o+",dc="+dc
+
+    # DEBUG
+    print "dn:"+dn
+    print request['password']
+
+    # Creating a unique uidNumber - Necessary for experiments
+    # Was defined to began in 100000
+    unique = int(user_detail['user_id']) + 100000
+    #unique = int(unique)
+    print unique
+
+    # A dict to help build the "body" of the object
+    attrs = {}
+    attrs['objectclass'] = ['person','inetOrgPerson','posixAccount','eduPerson','brPerson','schacPersonalCharacteristics','fibre', 'ldapPublicKey']
+    # XXX Converting all unicodes to string
+    attrs['uid'] = mail.encode('utf-8')
+    attrs['cn'] = request['first_name'].encode('latin1')
+    attrs['sn'] = request['last_name'].encode('latin1')
+    # XXX we need to set a unique uidNumber. How?
+    attrs['uidNumber'] = str(unique)
+    attrs['gidNumber'] = '500'
+    attrs['homeDirectory'] = "/home/"+org+"/"+mail
+    attrs['homeDirectory'] = attrs['homeDirectory'].encode('utf-8')
+    attrs['mail'] = mail.encode('utf-8')
+    attrs['eppn'] = mail.encode('utf8')
+    attrs['userPassword'] = request['password'].encode('utf-8')
+    attrs['sshPublicKey'] = request['public_key'].encode('utf-8')
+    # XXX We really set TRUE for those attributes? 
+    #attrs['userEnable'] = 'TRUE'
+    # set FALSE and change after when the user is validated
+    attrs['userEnable'] = 'FALSE'
+    attrs['omfAdmin'] = 'TRUE'
+
+    # Convert our dict to nice syntax for the add-function using modlist-module
+    ldif = modlist.addModlist(attrs)
+
+    # DEBUG
+    print attrs['userPassword']
+    print attrs['cn']
+    print attrs['sn']
+    print attrs['homeDirectory']
+    #print ldif
+
+    # Do the actual synchronous add-operation to the ldapserver
+    l.add_s(dn,ldif)
+
+    # Its nice to the server to disconnect and free resources when done
+    l.unbind_s()
+
+    return ldif
+
+def ldap_modify_user(wsgi_request, request):
+    #Modify entries in an LDAP Directory
+
+    #Synchrounous modify
+    # import needed modules
+    import ldap
+    import ldap.modlist as modlist
+
+    # Open a connection
+    l = ldap.initialize("ldap://localhost:389/")
+
+    # Bind/authenticate with a user with apropriate rights to add objects
+    l.simple_bind_s("cn=Manager,dc=br","fibre")
+
+    # we need to create the dn entry
+    # Receiving an email address, how can we split and mount it in DN format?
+    #mail = "debora@uff.br"
+    mail = request['email']
+    login = mail.split('@')[0]
+    org = mail.split('@')[1]
+    o = org.split('.')[-2]
+    dc = org.split('.')[-1]
+
+    # DN format to authenticate - IMPORTANT!
+    #FIBRE-BR format
+    dn = "uid="+mail+",ou=people,o="+o+",dc="+dc
+
+    # The dn of our existing entry/object
+    #dn="uid=mario@uff.br,ou=people,o=uff,dc=br"
+
+    # Some place-holders for old and new values
+    old = {'userEnable':'FALSE'}
+    new = {'userEnable':'TRUE'}
+
+    # Convert place-holders for modify-operation using modlist-module
+    ldif = modlist.modifyModlist(old,new)
+
+    # Do the actual modification
+    l.modify_s(dn,ldif)
+
+    # Its nice to the server to disconnect and free resources when done
+    l.unbind_s()
+
+    return ldif
+
 def create_user(wsgi_request, request):
     
     # XXX This has to be stored centrally
@@ -507,6 +639,7 @@ def create_user(wsgi_request, request):
 
     # NOTE : if we were to create a user directly (just like we create slices,
     # we would have to perform the steps in create_pending_user too
+    
 
     # Add the user to the SFA registry
     sfa_create_user(wsgi_request, request)
@@ -516,6 +649,16 @@ def create_user(wsgi_request, request):
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
+
+    # LDAP update user userEnabled = True
+    mail = request['email']
+    login = mail.split('@')[0]
+    org = mail.split('@')[1]
+    o = org.split('.')[-2]
+    dc = org.split('.')[-1]
+    # To know if user is a LDAP user - Need to has a 'dc' identifier
+    if dc == 'br' or 'eu':
+        ldap_modify_user(wsgi_request, request)
 
 def create_pending_user(wsgi_request, request, user_detail):
     """
@@ -562,8 +705,8 @@ def create_pending_user(wsgi_request, request, user_detail):
             .filter_by('platform', '==', 'myslice')           \
             .select('platform_id')
         reg_platform = execute_admin_query(wsgi_request, reg_platform_query)
-
-        registry_platform_id = reg_platform[0]['platform_id']
+    
+        reg_platform_id = reg_platform[0]['platform_id']
         account_params = {
             'platform_id'   : reg_platform_id, # XXX ALERT !!
             'user_id'       : user_id, 
@@ -572,7 +715,11 @@ def create_pending_user(wsgi_request, request, user_detail):
         }
         manifold_add_account(wsgi_request, account_params)
     except Exception, e:
-        print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
+       print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
+
+    # Add user to LDAP userEnabled = False
+    # Not more here. Create before directly to the registrationview.py
+    # After we change userEnable = TRUE when validate the user
 
     try:
         # Send an email: the recipients are the PI of the authority
