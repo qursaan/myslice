@@ -1,0 +1,55 @@
+{% insert_str prelude "js/bootstrap.js" %}
+{% insert_str prelude "css/bootstrap.css" %}
+{% insert_str prelude "css/topmenu.css" %}
+{% insert_str prelude "js/logout.js" %}
+<div id="header">
+	<div class="wrapper">
+		<div class="logo">
+			<a href="/"><img width="145px" height="75px" src="{{ STATIC_URL }}img/fibre-logo.gif" alt=FIBRE" /></a>
+		</div>
+		
+		<div id="secondary">
+			<ul>
+				<li>News</li>
+				<li><a href="/portal/about">About</a></li>
+				<li><a target="_blank" href="http://www.fibre-ict.eu">Public Website</a></li>
+				<li><a target="_blank" href="http://intranet.fibre-ict.eu">Intranet</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	{% if username %}
+	<div id="navigation">
+		<div class="wrapper">
+		<ul>
+			<li>SLICES</li>
+			<li><a href="/portal/validate">REQUESTS</a></li>
+			<li><a href="/portal/institution">INSTITUTION</a></li>
+			<li><a href="/portal/support/">SUPPORT</a></li>
+			<li>|</li>
+			<li><a href="/portal/account/">{{ username }}</a></li>
+			<li><a id="logout" style="cursor:pointer;" data-username="{{ username }}">LOGOUT</a></li>
+		</ul>
+		</div>
+	</div>
+	{% else %}
+	<div id="navigation">
+		<div class="wrapper"></div>
+	</div>
+	{% endif %}
+</div>
+<script>
+	$(document).ready(function() {
+		// var slices = localStorage.getItem('slices');
+		// if (slices.length == 0) {
+			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+		  	// var items = [];
+		  		// localStorage.setItem('slices', data[0].slice);
+			// });
+		// }
+		// $.each(slices, function( key, val ) {
+		  	// items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+		// });
+		// $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+	});
+</script>
