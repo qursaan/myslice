@@ -6,30 +6,37 @@
 
 {% block content %}
 <div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="Open a Ticket" /> OneLab Support</h1>
+	<div class="col-md-12">
+	<h1><img src="{{ STATIC_URL }}icons/support-xs.png" alt="Open a Ticket" /> OneLab Support</h1>
+	</div>
 </div>
 <div class="row">
+	<div class="col-md-12">&nbsp;</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
 	<p>Please check our <a href="/portal/support/documentation">FAQ</a> section. Most of the basic problems are explained there.</p>
 	<p>
 	If you haven't find your answes in the FAQ, please contact us by filling the form below.<br />
 	You can also <a href="mailto:support@myslice.info">e-mail</a> us directly.
 	</p>
+	</div>
 </div>
 
 <div class="row">
-  <form class="cmxform form-horizontal" id="commentForm" action="#" method="post" role="form">{% csrf_token %}
-  <fieldset>
-    {% for field in form %}
-    <div class="form-group">
-      <label for="{{ field.html_name }}" class="col-xs-3 control-label">{{ field.label }}</label>
-      <div class="col-xs-6"> {{ field.errors }} {{ field }} <p class="form-hint">{{ field.help_text }}</p> </div>
-    </div>
-    {% endfor %}
-    <div class="col-xs-5">
-    </div>
-    <button class="submit btn btn-default col-xs-2" type="submit">Create Ticket</button>
-  </fieldset>
-  </form>
+	<div class="col-md-2"></div>
+	<div class="col-md-8">
+		<form role="form" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+	    <div class="form-group">
+	      	<label for="{{ field.html_name }}" class="control-label">{{ field.label }}</label>
+	      	{{ field.errors }} {{ field }}
+	    </div>
+	    {% endfor %}
+		<button type="submit" class="btn btn-default">Create Ticket</button>
+		</form>
+	</div>
 </div>
 {% endblock %}
 

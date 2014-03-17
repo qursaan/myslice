@@ -3,12 +3,15 @@
 {% block content %}        
 
 <div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> OneLab Experimenter Registration</h1>
+	<div class="col-md-12">
+	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" /> OneLab Experimenter Registration</h1>
+	</div>
 </div>
 <div class="row">
-
-  <h4>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
-
+	<div class="col-md-12">
+  		<h3>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
+	</div>
+</div>
 {% if errors %}
 <ul>
   {% for error in errors %}
@@ -17,31 +20,23 @@
 </ul>
 {% endif %}
    
- <form class="cmxform form-horizontal" id="registrationForm" method="post" action="" enctype="multipart/form-data" role="form">
-    <fieldset>
+<div class="row">
+	<div class="col-md-2"></div>
+	<div class="col-md-8">
+	<form class="cmxform form-horizontal" id="registrationForm" method="post" enctype="multipart/form-data" role="form">
     {% csrf_token %}
     <div class="form-group">
-      <label for="firstname" class="col-xs-2 control-label">First Name</label>
-      <div class="col-xs-4">
-	<input type="text" name="firstname" class="form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" required />
-      </div>
-      <div class="col-xs-6"> <p class="form-hint">Enter your first name</p> </div>
+    	<label for="firstname" class="control-label">First Name</label>
+		<input type="text" name="firstname" class="form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" required />
     </div>
     <div class="form-group">
-      <label for="lastname" class="col-xs-2 control-label">Last Name</label>
-      <div class="col-xs-4">
-	<input type="text" name="lastname" size="25" class="form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" required />
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Enter your last name</p></div>
+    	<label for="lastname" class="control-label">Last Name</label>
+		<input type="text" name="lastname" size="25" class="form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" required />
     </div>
     <div class="form-group">
-      <label for="authority_hrn" class="col-xs-2 control-label">Authority</label>
-      <div class="col-xs-4">
-        <div class="ui-widget">
-            <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" required>
-        </div>
-     </div>
-      <div class="col-xs-6"><p class="form-hint">An authority responsible for vetting your account</p></div>
+      <label for="authority_hrn" class="control-label">Authority</label>
+      <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" required>
+      <p class="help-block">An authority responsible for vetting your account</p>
     </div>
 
 	<!-- LOGIN
@@ -58,49 +53,37 @@
 	-->
 
     <div class="form-group">
-      <label for="email" class="col-xs-2 control-label">Email</label>
-      <div class="col-xs-4">
-	<input type="email" name="email" size="25"  class="form-control" value="{{ email }}" required/> 
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Enter a valid email address</p></div>
+    	<label for="email" class="control-label">Email</label>
+    	<input type="email" name="email" size="25"  class="form-control" value="{{ email }}" required/>
     </div>
     <div class="form-group">
-      <label for="password" class="col-xs-2 control-label">Password</label>
-      <div class="col-xs-4">
-	<input type="password"  id="password" name="password"   class="form-control" minlength="4" value="{{ password }}" required/> 
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Enter password</p></div>
+      <label for="password" class="control-label">Password</label>
+      <input type="password"  id="password" name="password"   class="form-control" minlength="4" value="{{ password }}" required/>
     </div>
     <div class="form-group">
-      <label for="password" class="col-xs-2 control-label">Confirm Password</label>
-      <div class="col-xs-4">
-	<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="form-control" 
-	       value="" placeholder="Confirm Password" required/>
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Retype the password</p></div>
+    	<label for="password" class="control-label">Confirm Password</label>
+		<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="form-control" value="" placeholder="Confirm Password" required/>
     </div>
     <div class="form-group">
-      <label for="question" class="col-xs-2 control-label">My Keys</label>
-      <div class="col-xs-4">
-	<select name="question" class="form-control" id="key-policy" required>        
-	  <option value="generate">Generate key pairs for me </option>
-	  <option value="upload">Upload my public key </option>
-	</select>
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Genkey: Account Delegation Automatic (Recommended)</p> </div>
+    	<label for="question" class="control-label">My Keys</label>
+		<select name="question" class="form-control" id="key-policy" required>        
+	  		<option value="generate">Generate key pairs for me </option>
+	  		<option value="upload">Upload my public key </option>
+		</select>
+      	<p class="help-block">Genkey: Account Delegation Automatic (Recommended)</p>
     </div>
     <div class="form-group" style="display:none;" id="upload_key">
-      <label for="file" class="col-xs-2 control-label">Upload public key</label>
-      <div class="col-xs-4">
-	<input type="file" name="user_public_key" class="form-control" id="user_public_key" required/>
-	<p class="warning" id="pkey_del_msg">Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]</p>
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Account Delegation: Manual (Advanced Users)</p></div>
+      	<label for="file" class="control-label">Upload public key</label>
+      	<input type="file" name="user_public_key" class="form-control" id="user_public_key" required>
+      	<br />
+		<div class="alert alert-danger" id="pkey_del_msg">
+			Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]
+		</div>
+      	<p class="help-block">Account Delegation: Manual (Advanced Users)</p>
     </div>
     <div class="form-group" id="register">
-      <button class="submit btn btn-default col-xs-12" type="submit">Register</button>
+      <button class="submit btn btn-default" type="submit">Register</button>
     </div>
-  </fieldset>
   </form>  
 </div>
 <script>
