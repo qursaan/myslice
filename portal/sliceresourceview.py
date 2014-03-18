@@ -11,13 +11,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from unfold.page                     import Page
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
 
 from myslice.configengine            import ConfigEngine
 from plugins.querytable              import QueryTable
 from plugins.googlemap               import GoogleMap
 from plugins.queryupdater            import QueryUpdater
+from plugins.testbeds                import TestbedsPlugin
 
 from theme import ThemeView
 
@@ -64,6 +63,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         sq_resource    = aq.subquery('resource')
         sq_lease       = aq.subquery('lease')
 
+        # --------------------------------------------------------------------------
+        # RESOURCES
+        # resources as a list using datatable plugin
+ 
         list_resources = QueryTable(
             page       = page,
             domid      = 'resources-list',
@@ -116,8 +119,36 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             outline_complete    = True,
         )
 
+        # --------------------------------------------------------------------------
+        # NETWORKS
+        # testbeds as a list of filters 
+
+        network_md = metadata.details_by_object('network')
+        network_fields = [column['name'] for column in network_md['column']]
+        print "sliceresourceview.py ====> ",network_fields
+
+        query_network = Query.get('network').select(network_fields)
+        page.enqueue_query(query_network)
+
+        filter_testbeds = TestbedsPlugin(
+            page          = page,
+            domid         = 'testbeds-filter',
+            title         = 'Filter by testbeds',
+            query         = sq_resource,
+            query_all     = query_resource_all,
+            query_network = query_network,
+            init_key      = "network_hrn",
+            checkboxes    = True,
+            datatables_options = {
+                'iDisplayLength': 25,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
         template_env = {}
         template_env['list_resources'] = list_resources.render(self.request)
+        template_env['filter_testbeds'] = filter_testbeds.render(self.request)
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['pending_resources'] = pending_resources.render(self.request)
         template_env["theme"] = self.theme
