@@ -415,7 +415,7 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkboxfrom_data(data.value, true);
+                    this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
