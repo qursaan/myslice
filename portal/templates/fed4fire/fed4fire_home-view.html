@@ -1,19 +1,119 @@
-{# fine for either layout-unfold1.html (logged in) or layout-unfold2.html (needs a login prompt) #}
-{% extends layout_1_or_2 %}
- 
-{% block unfold_margin %}
-{% include 'fed4fire/_widget-login.html' %}
-{% endblock unfold_margin %}
+{% extends "layout.html" %}
 
-{% block unfold_main %}
-<div class='well-lg f4f-title'>
-  <h2 style="font-weight: bold;">Welcome to Fed4Fire portal !</h2>
-  <h4>New to Fed4fire? Please <a href="/portal/register">register</a> or learn more about <a href="http://fed4fire.eu/" target="_blank">the project</a>.</h3>
+{% block content %}
+<div class="row" id="home-dashboard">
+	<ul class="nav nav-tabs">
+	  <li class="active"><a class="home-tab" data-panel="user" href="#">USER</a></li>
+	  <li><a class="home-tab" data-panel="manager" href="#">MANAGER</a></li>
+	</ul>
+	<div class="home-panel" id="user">
+		<table>
+			<tr>
+				<td>ACCOUNT</td>
+				<td>SLICES</td>
+				<td>SUPPORT</td>
+			</tr>
+			<tr>
+				<td><a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a></td>
+				<td><a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
+				<td><a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a></td>
+			</tr>
+			<tr>
+				{% if person %}
+				<td class="logged-in">
+					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+					<div>
+					{% if person.last_name %}
+						{{person.first_name}} {{person.last_name}}<br />
+					{% endif %}
+	    				<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
+	    			</div>
+	   			{% else %}
+	   			<td>
+					{% include '_widget-login-user.html' %}
+				{% endif %}
+				</td>
+				<td>
+				{% if person %}
+					<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+					<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+				{% else %}
+				{% endif %}
+				</td>
+				<td class="support">
+					<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
+					<div>
+						<a href="/portal/contact">Contact</a> <br />
+						<a href="/portal/support/documentation">Documentation</a>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="home-panel" id="manager">
+		<table>
+			<tr>
+				<td>INSTITUTION</td>
+				<td>SLICES</td>
+				<td>REQUESTS</td>
+			</tr>
+			<tr>
+				<td><a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a></td>
+				<td><a href="/portal/institution#slices"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
+				<td><a href="/portal/validate"><img src="{{ STATIC_URL }}img/icon_testbed_color.png" alt="" /></a></td>
+			</tr>
+			<tr>
+				{% if person %}
+				<td class="logged-in">
+					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+	   			{% else %}
+	   			<td>
+					{% include '_widget-login-manager.html' %}
+				{% endif %}
+				</td>
+				<td>
+					{% if person %}
+				    <button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Slice</button>
+					{% endif %}
+				</td>
+				<td class="support">
+					{% if person %}
+				    <button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
+					{% endif %}
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
-<div class='well'>
-<p>
-A federation of experimentation facilities will significantly accelerate Future Internet research. Fed4FIRE will deliver open and easily accessible facilities to the FIRE experimentation communities, which focus on fixed and wireless infrastructures, services and applications, and combinations thereof. 
-</p>
-<p>This UI server is connected to the manifold backend running at <code>{{ MANIFOLD_URL }}</code>.</p>
-</div>
-{% endblock unfold_main %}
+<script>
+	$(document).ready(function() {
+		$('a.home-tab').click(function() {
+			$('ul.nav-tabs li').removeClass('active');
+			$(this).parent().addClass('active');
+			$('div.home-panel').hide();
+			$('div#'+$(this).data('panel')).show();
+		});
+		$('button#validaterequestbtn').click(function() {
+			window.location="/portal/validate/";
+		});
+		$('button#ticketbtn').click(function() {
+			window.location="/portal/contact/";
+		});
+		$('button#slicerequestbtn').click(function() {
+			window.location="/portal/slice_request/";
+		});
+		
+		{% if person %}
+        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+		  var items = [];
+		  $.each( data[0].slices, function(i, val) {
+		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+		  });
+		  
+		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+		  
+		});
+		{% endif %}
+	});
+</script>
+{% endblock %}

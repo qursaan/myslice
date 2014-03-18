@@ -1,38 +1,77 @@
-{% insert_str prelude "js/bootstrap.js" %}
-{% insert_str prelude "css/bootstrap.css" %}
-{% insert_str prelude "css/topmenu.css" %}
-{% insert_str prelude "js/logout.js" %}
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-myslice-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="/"><img src="{{ STATIC_URL }}img/f4f-logo.png" height="30" alt="Fed4Fire logo" /></a>
-     <a href="/" alt="Home" class="logoTxt">Fed4Fire Portal</a>
-  </div>
-  <div class="collapse navbar-collapse navbar-myslice-collapse topmenu">
-    <ul class="nav navbar-nav">
-	{% for d in topmenu_items %} 
-	{% if d.dropdown %}
-	{% if d.is_active %} <li class='active'> {% else %} <li class='other'> {% endif %}
-	  <a class="dropdown-toggle" data-toggle="dropdown" href="{{ d.href }}">{{ d.label }}<b class="caret"></b></a>
-	  <ul class="dropdown-menu">
-	    {% for dd in d.contents %}
-	    <li class='{% if dd.is_active %}active{% else %}other{% endif %}{% if dd.disabled %} disabled{%endif%}'
-	    {% if dd.domid %} id='{{dd.domid}}'{% endif %}>
-	    <a href="{{ dd.href }}"> {{ dd.label }} </a> </li>
-	    {% endfor %}
-	  </ul>
-        </li>
-        {% else %} 
-	<li class='{% if d.is_active %}active{% else %}other{% endif %}{% if d.disabled %} disabled{%endif%}'
-	{% if d.domid %} id='{{d.domid}}'{% endif %}>
-	<a href="{{ d.href }}"> {{ d.label }} </a> </li>
-    {% endif %}
-    {% endfor %}
+
+<div id="header">
+	<div class="wrapper">
+		<div class="logo">
+			<a href="/"><img src="{{ STATIC_URL }}img/f4f-logo.png" alt="Fed4Fire Portal" width="80px" /> Fed4Fire Portal</a>
+		</div>
+		
+		<div id="secondary">
+			<ul>
+				<li>News</li>
+				<li><a href="/portal/about">About</a></li>
+				<li><a target="_blank" href="http://www.fed4fire.eu">Project Website</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	{% if username %}
+	<div id="navigation">
+		<div class="wrapper">
+		<ul>
+			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
+			<li>|</li>
+			<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
+			<li class="slices">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+       				SLICES <span class="caret"></span>
+    			</a>
+				
+				<div class="dropdown-menu" style="z-index:99;">
+						<ul>
+							<li><a href="/portal/slice_request/">Request Slice</a></li>
+                            <!--
+							<li><a href="/slice/ple.upmc.agent3/">ple.upmc.agent3</a></li>
+						    <li><a href="/slice/ple.upmc.agent/">ple.upmc.agent</a></li>
+						    <li><a href="/slice/ple.upmc.myslicedemo/">ple.upmc.myslicedemo</a></li>
+						    <li><a href="/slice/ple.upmc.slicestat/">ple.upmc.slicestat</a></li>
+						    <li><a href="/slice/ple.upmc.agent2/">ple.upmc.agent2</a></li>
+                            -->
+						</ul>
+				</div>
+				</li>
+			<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
+			<li id="nav-support"><a href="http://doc.fed4fire.eu/support.html" target="_blank">SUPPORT</a></li>
+			<li>|</li>
+			<li id="nav-logout" style="margin-top: 10px;"><a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> LOGOUT</a></li>
+		</ul>
+		</div>
+	</div>
+	{% else %}
+	<div id="navigation">
+		<div class="wrapper"></div>
+	</div>
+	{% endif %}
 </div>
-
-
+<script>
+	$(document).ready(function() {
+		$('li.slices').mouseenter(function() {
+			$('div#menu-slice-list').fadeIn(100);
+		});
+		$('div#menu-slice-list').mouseleave(function(e) {
+			if (!$('li.slices').is(":hover")) {
+				$(this).fadeOut(100);
+			}
+		});
+		// var slices = localStorage.getItem('slices');
+		// if (slices.length == 0) {
+			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+		  	// var items = [];
+		  		// localStorage.setItem('slices', data[0].slice);
+			// });
+		// }
+		// $.each(slices, function( key, val ) {
+		  	// items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+		// });
+		// $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+	});
+</script>
