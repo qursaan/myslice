@@ -23,7 +23,5 @@ class SliceUserView (LoginRequiredView, ThemeView):
         if request.user.is_authenticated():
             user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
             user_details = execute_query(self.request, user_query)
-
-            print self.template
     
         return render_to_response(self.template, {"slice": slicename, "user_details":user_details[0], "theme": self.theme, "username": request.user, "section":"users"}, context_instance=RequestContext(request))
