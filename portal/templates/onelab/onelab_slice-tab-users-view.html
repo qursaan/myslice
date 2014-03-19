@@ -1,7 +1,3 @@
-{% extends "layout_wide.html" %}
-
-
-{% block content %}
 	<div class="col-md-2">
 		<div id="select-platform" class="list-group">
 		</div>
@@ -24,25 +20,6 @@
 	</div>
 	<div class="col-md-10">
 		<div class="row">
-		  	{% include theme|add:"_widget-slice-sections.html" %}
-		</div>
-		<div class="row slice-pending">
-			<ul class="nav nav-pills">
-				<li><a href="">All users</a></li>
-				<li><a href="">Users in Slice</a></li>
-				<li><a href="">Pending<span class="badge">42</span></a></li>
-				<li>
-					<button type="button" class="btn btn-primary apply">Apply</button>
-					<button type="button" class="btn btn-default clear">Clear</button>
-				</li>
-			</ul>
-		</div>
-		<div class="row">
-			<ul class="nav nav-tabs">
-			  <li class="active"><a href="#">Users</a></li>
-			  <li><a href="#"></a></li>
-			  <li><a href="#"></a></li>
-			</ul>
 		</div>
         	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
         	<div id="user-tab-loaded" style="display:none;">
@@ -57,11 +34,6 @@
         	</div>
 <script>
     $(document).ready(function() {
-		//var selectedValue = $( "#auth_list option:selected" ).val();    
-		//console.log(selectedValue);
-		//console.log("Name of the authority: " + "{{user_details.parent_authority}}");
-		//$("#auth_list").change(function(){
-			//selectedValue = $(this).find(":selected").val();
 			//console.log("the value you selected: " + selectedValue);
         	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
             	var list_users = [];
@@ -101,4 +73,3 @@
     });
 </script>
 
-{% endblock %}
