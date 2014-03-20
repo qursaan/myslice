@@ -131,7 +131,9 @@
 	    // make sure the change is visible : toggle on the whole plugin
 	    // this might have to be made an 'auto-toggle' option of this plugin..
 	    // also it might be needed to be a little finer-grained here
-	    this.toggle_on();
+
+        // XXX we don't want to show automaticaly the pending when a checkbox is checked
+	    //this.toggle_on();
 	    
             switch(data.request) {
                 case FIELD_REQUEST_ADD_RESET:
