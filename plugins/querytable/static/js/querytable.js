@@ -300,7 +300,7 @@
         {
             // Remove corresponding filters
             this.filters = $.grep(this.filters, function(x) {
-                return x != filter;
+                return x == filter;
             });
             this.redraw_table();
         },
@@ -490,6 +490,15 @@
                 if (op == '=' || op == '==') {
                     if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
                         ret = false;
+                }else if (op == 'included') {
+                    $.each(value, function(i,x) {
+                      if(x == col_value){
+                          ret = true;
+                          return false;
+                      }else{
+                          ret = false;
+                      }
+                    });
                 }else if (op == '!=') {
                     if ( col_value == value || col_value==null || col_value=="" || col_value=="n/a")
                         ret = false;

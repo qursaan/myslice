@@ -371,12 +371,23 @@ a.list-group-item {
     padding:3px 0 3px 10px;
     border-left:2pt white solid;
 }
-a.list-group-item.active, a.list-group-item:hover {
+a.list-group-item.active, a.list-group-item.active:hover {
+    font-weight: bold;
+    color:black;
+    background-color:transparent;
+    border-left:2pt blue solid;
+}
+a.list-group-item.active:hover {
+    background-color:#dddddd;
+}
+a.list-group-item:hover {
     border-left:2pt blue solid;
 }
 a.list-group-item p.list-group-item-text {
     font-size:9pt;
     font-style:italic;
+    font-weight: normal;
+    color: black !important;
 }
 
 div#slice-info {

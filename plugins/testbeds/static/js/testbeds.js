@@ -22,12 +22,13 @@
          *     applied, which allows to maintain chainability of calls
          */
         init: function(options, element) {
-	    // for debugging tools
-	    this.classname="testbedsplugin";
+	        // for debugging tools
+	        this.classname="testbedsplugin";
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
 
             /* Member variables */
+            this.filters = Array();
 
             /* Plugin events */
 
@@ -80,9 +81,34 @@
 
         // no prefix
 
+        /* When a filter is added/removed, update the list of filters local to the plugin */
         on_filter_added: function(filter)
         {
-
+            this.filters.push(filter);
+            if(filter[0]=='network_hrn'){
+                if(filter[1]=='included'){
+                    $.each(filter[2], function(value){
+                        $("#testbeds-filter_"+value).addClass("active");
+                    });
+                }else if(filter[1]=='=' || filter[1]=='=='){
+                    $("#testbeds-filter_"+filter[2]).addClass("active");
+                }
+            }
+        },
+        on_filter_removed: function(filter)
+        {
+            this.filters = $.grep(this.filters, function(x) {
+                return x == filter;
+            });
+            if(filter[0]=='network_hrn'){
+                if(filter[1]=='included'){
+                    $.each(filter[2], function(value){
+                        $("#testbeds-filter_"+value).removeClass("active");
+                    });
+                }else if(filter[1]=='=' || filter[1]=='=='){
+                    $("#testbeds-filter_"+filter[2]).removeClass("active");
+                }
+            }
         },
 
         // ... be sure to list all events here
@@ -90,18 +116,83 @@
         /* RECORD HANDLERS */
         on_network_new_record: function(record)
         {
-            console.log(record);
-            row  = '<a href="#" class="list-group-item sl-platform" data-platform="'+record["network_hrn"]+'">';
+            row  = '<a href="#" class="list-group-item sl-platform" id="testbeds-filter_'+record["network_hrn"]+'" data-platform="'+record["network_hrn"]+'">';
             row += '<span class="list-group-item-heading">'+record["platform"]+'</span>';
             //row += '<span class="list-group-item-heading">'+record["network_hrn"]+'</span></a>';
             row += '<p class="list-group-item-text">'+record["network_hrn"]+'</p></a>';
             $('#testbeds-filter').append(row);
         },
 
+        /* When the network query is done, add the click event to the elements  */
+        on_network_query_done: function() {
+            var self = this;
+            console.log('query network DONE');
+            $("[id^='testbeds-filter_']").on('click',function(e) {
+                $(this).toggleClass("active");
+
+                // avoid multiple calls when an event is raised to manifold.js
+                e.stopPropagation();
+
+                value = this.dataset['platform'];
+                key = "network_hrn";
+                op = "included";
+                return $(this).hasClass('active') ? self._addFilter(key, op, value) : self._removeFilter(key, op, value);
+            });
+           
+        },
+
         /* INTERNAL FUNCTIONS */
         _dummy: function() {
             // only convention, not strictly enforced at the moment
         },
+        _addFilter: function(key, op, value)
+        {
+            console.log("add "+value);
+            var self = this;
+            values = Array();
+            // get the previous list of values for this key, ex: [ple,nitos]
+            // remove the previous filter
+            network_filter = $.grep(this.filters, function(x) {
+                return x[0] == "network_hrn";
+            });
+            if(network_filter.length > 0){
+                $.each(network_filter, function(i,f){
+                    values = f[2];
+                    manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, [key, op, values]);
+                });
+            }
+            // Add the new value to list of values, ex: wilab
+            values.push(value);
+            
+            // Update the filter with the new list of values, ex: [ple,nitos,wilab]
+            manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
+        },
+        _removeFilter: function(key, op, value)
+        {
+            console.log("remove "+value);
+            var self = this;
+            values = Array();
+            // get the previous list of values for this key, ex: [ple,nitos,wilab]
+            // remove the previous filter
+            network_filter = $.grep(this.filters, function(x) {
+                return x[0] == "network_hrn";
+            });
+            if(network_filter.length > 0){
+                $.each(network_filter, function(i,f){
+                    values = f[2];
+                    manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, [key, op, values]);
+                });
+            }
+
+            // remove the value from the list of values, ex: wilab
+            values = $.grep(values, function(x) {
+                return x != value;
+            });
+            if(values.length>0){
+                // Update the filter with the new list of values, ex: [ple,nitos]
+                manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
+            }
+        }
 
     });
 
