@@ -14,6 +14,7 @@ from ui.topmenu                     import topmenu_items, the_user
 from myslice.configengine           import ConfigEngine
 
 from theme                          import ThemeView
+import json
 
 class InstitutionView (FreeAccessView, ThemeView):
     template_name = 'institution.html'
@@ -40,6 +41,18 @@ class InstitutionView (FreeAccessView, ThemeView):
                 env['user_details'] = user_details[0]
             except Exception,e:
                 env['error'] = "Please check your Credentials"
+            
+            try:
+                user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(env['person']))
+                user_local_details = execute_query(self.request, user_local_query)
+                user_local = user_local_details[0]            
+                user_local_config = user_local['config']
+                user_local_config = json.loads(user_local_config)
+                user_local_authority = user_local_config.get('authority')
+                if 'user_details' not in env or 'parent_authority' not in env['user_details'] or env['user_details']['parent_authority'] is None:
+                    env['user_details'] = {'parent_authority': user_local_authority}
+            except Exception,e:
+                env['error'] = "Please check your Manifold user config"
         else: 
             env['person'] = None
     
