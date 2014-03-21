@@ -22,10 +22,10 @@
 		  	<div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
 		    <div id="authority-tab-loaded" style="display:none;">
 		        <div id="authority-data" style="float:left; width:50%;"></div>
-		        <div id="onelab_membership" style="float:right; width:50%;">
-		            <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
-		            <div id="onelab-data"></div>
-		        </div>
+				<div id="onelab_membership" style="float:right; width:50%;">
+				    <img src="{{ STATIC_URL }}img/onelab-logo.png" alt="" /><br>
+    				<div id="onelab-data"></div>
+				</div>
 		    </div>
 	   </div>
 	</div>
@@ -33,13 +33,19 @@
 	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
 		<div class="col-md-12">
 			<table class="table"><tr><td><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></td></tr></table>
+			{%if 'is_pi'  in pi %}	
 			<div>
 				<button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
 			</div>
+			{%endif%}
 		</div>
 	</div>
 	<div class="tab-pane row" id="slices">
+		{%if 'is_pi'  in pi %}
 	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
+		{%else%}
+		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> request slice</button>
+		{%endif%}
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 	    <div id="slice-tab-loaded" style="display:none;">
 	        <table id="slice-tab">
@@ -53,10 +59,12 @@
 	            </tr>
 	        </table>
 	        <br>
+			{%if 'is_pi'  in pi %}
 	        <div>
 	            <button id="renewslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
 	            <button id="deleteslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
 	        </div>
+			{%endif%} 
 	    </div>
 	</div>
 </div>
@@ -74,44 +82,6 @@
                 authority_row = "<img src='{{ STATIC_URL }}img/institutions/{{user_details.parent_authority}}.gif' alt='' /><br>";
                 authority_row += "<br>";
                 authority_row += "<b>authority:</b> "+val.authority_hrn+"<br>";
-                authority_row += "<br>";
-                authority_row += "<b>"+val.name+"</b><br>";
-                authority_row += "<br>";
-                authority_row += "<b>Address:</b> "+val.address+"<br>";
-                authority_row += "<b>City:</b> "+val.postcode+" "+val.city+"<br>";
-                authority_row += "<br>";
-                authority_row += "<b>Country:</b> "+val.country+"<br>";
-                authority_row += "<br>";
-                authority_row += "<br>";
-                authority_row += "<h2>Contacts</h2>";
-                authority_row += "<b>Legal:</b> ";
-                /*
-
-                TODO: find a way to express JSON correctly given the constrains: CSV / JSON
-
-                legal = jQuery.parseJSON(val.legal);
-                if($.isArray(legal)){
-                    $.each(legal, function(k,v){
-                        authority_row += k+" "+v+"<br>";
-                    });
-                }else{
-                */
-                    authority_row += val.legal+"<br>";
-                //}
-                authority_row += "<br>";
-                authority_row += "<b>Scientific:</b> ";
-                /*
-                scientific = jQuery.parseJSON(val.scientific);
-                if($.isArray(scientific)){
-                    $.each(scientific, function(v){
-                        authority_row += v+", ";
-                    });
-                }else{
-                */
-                    authority_row += val.scientific+"<br>";
-                //}
-                onelab_membership = "<b>Status: </b>"+val.onelab_membership;
-                onelab_data.push(onelab_membership);
                 authority_data.push(authority_row);
             });
             $("div#authority-data").html(authority_data.join( "" ));

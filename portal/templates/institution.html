@@ -29,13 +29,19 @@
 	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
 		<div class="col-md-12">
 			<table class="table"><tr><td><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></td></tr></table>
+			{%if 'is_pi'  in pi %}	
 			<div>
 				<button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
 			</div>
+			{%endif%}
 		</div>
 	</div>
 	<div class="tab-pane row" id="slices">
+		{%if 'is_pi'  in pi %}
 	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
+		{%else%}
+		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> request slice</button>
+		{%endif%}
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 	    <div id="slice-tab-loaded" style="display:none;">
 	        <table id="slice-tab">
@@ -49,10 +55,12 @@
 	            </tr>
 	        </table>
 	        <br>
+			{%if 'is_pi'  in pi %}
 	        <div>
 	            <button id="renewslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
 	            <button id="deleteslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
 	        </div>
+			{%endif%} 
 	    </div>
 	</div>
 </div>
