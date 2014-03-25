@@ -474,3 +474,9 @@ div#slice-info td {
 tr.active, tr.active td {
     background-color:#FFFFCC !important;
 }
+
+div.dataTables_filter label{
+    float:left;
+    width:400px;
+}
+
