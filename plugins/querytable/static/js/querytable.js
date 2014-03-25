@@ -91,7 +91,8 @@
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+                //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+                sDom: "<'row'<'col-xs-5'f><'col-xs-1'r><'col-xs-6 columns_selector'>>t<'row'<'col-xs-5'l><'col-xs-7'p>>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
@@ -145,6 +146,11 @@
                 //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
                 self.hide_column(field);
             });
+            $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
+            $(".dataTables_filter input").css("width","100%");
+            $(".columns_selector").append("columns");
+            $(".columns_selector").css("float","right");
+            $(".columns_selector").css("width","inherit");
         }, // initialize_table
 
         /**
