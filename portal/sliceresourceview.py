@@ -17,6 +17,7 @@ from plugins.querytable              import QueryTable
 from plugins.googlemap               import GoogleMap
 from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
+from plugins.scheduler2              import Scheduler2
 
 from theme import ThemeView
 
@@ -56,15 +57,23 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         main_query_init_key = 'urn'
         aq = AnalyzedQuery(main_query, metadata=metadata)
         page.enqueue_query(main_query, analyzed_query=aq)
+        sq_resource    = aq.subquery('resource')
+        sq_lease       = aq.subquery('lease')
 
         query_resource_all = Query.get('resource').select(resource_fields)
         page.enqueue_query(query_resource_all)
 
-        sq_resource    = aq.subquery('resource')
-        sq_lease       = aq.subquery('lease')
+        # leases query
+        lease_md = metadata.details_by_object('lease')
+        lease_fields = [column['name'] for column in lease_md['column']]
+
+        query_all_lease = Query.get('lease').select(lease_fields)
+        page.enqueue_query(query_all_lease)
+
+        print "!!!!!!!!!!   query leases = ",query_all_lease
 
         # --------------------------------------------------------------------------
-        # RESOURCES
+        # RESOURCES LIST
         # resources as a list using datatable plugin
  
         list_resources = QueryTable(
@@ -83,7 +92,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         )
 
         # --------------------------------------------------------------------------
-        # RESOURCES
+        # RESOURCES MAP
         # the resources part is made of a Tabs (Geographic, List), 
 
         map_resources  = GoogleMap(
@@ -106,6 +115,20 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         )
 
         # --------------------------------------------------------------------------
+        # LEASES Nitos Scheduler
+        # Display the leases reservation timeslots of the resources
+
+        resources_as_scheduler2 = Scheduler2( 
+            page       = page,
+            domid      = 'scheduler',
+            title      = 'Scheduler',
+            # this is the query at the core of the slice list
+            query = sq_resource,
+            query_all_resources = query_resource_all,
+            query_lease = query_all_lease,
+        )
+
+        # --------------------------------------------------------------------------
         # QueryUpdater (Pending Operations)
  
         pending_resources = QueryUpdater(
@@ -125,7 +148,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
-        print "sliceresourceview.py ====> ",network_fields
 
         query_network = Query.get('network').select(network_fields)
         page.enqueue_query(query_network)
@@ -150,6 +172,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['list_resources'] = list_resources.render(self.request)
         template_env['filter_testbeds'] = filter_testbeds.render(self.request)
         template_env['map_resources'] = map_resources.render(self.request)
+        template_env['scheduler'] = resources_as_scheduler2.render(self.request)
         template_env['pending_resources'] = pending_resources.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
