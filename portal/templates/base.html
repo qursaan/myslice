@@ -1,3 +1,4 @@
+{% load portal_filters %}
 {# This is required by insert_above #}{% insert_handler %}<!DOCTYPE html>
 <html lang="en"><head>
 <title>OneLab - {{ section }}</title>
@@ -8,6 +9,7 @@
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
 <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.datatables.js"></script>
+<script src="{{ STATIC_URL }}js/stash.min.js"></script>
 <script src="{{ STATIC_URL }}js/myslice.js"></script>
 <script src="{{ STATIC_URL }}js/myslice-ui.js"></script>
 <style type="text/css">{# In case we need to add raw css code #}{% container prelude_css %}</style>
@@ -33,7 +35,7 @@
 <body>
 {% block container %}
   	{% block topmenu %}
-  	{% include theme|add:"__widget-topmenu.html" %}
+  	{% widget "_widget-topmenu.html" %}
   	{% endblock topmenu %}
 	{% include 'messages-transient.html' %}
 	{% block base_content %}

@@ -3,7 +3,7 @@ from django.shortcuts                import render_to_response
 
 from unfold.loginrequired           import LoginRequiredView
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class SliceTabTestbeds (LoginRequiredView, ThemeView):
     template_name = "slice-tab-testbeds.html"

@@ -87,7 +87,7 @@ from portal.actions             import manifold_update_user
 from portal.forms               import PassResetForm
 from portal.actions             import manifold_update_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # 4 views for password reset:
 # - password_reset sends the mail

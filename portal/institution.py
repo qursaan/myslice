@@ -13,7 +13,7 @@ from manifoldapi.manifoldresult     import ManifoldResult
 from ui.topmenu                     import topmenu_items, the_user
 from myslice.configengine           import ConfigEngine
 
-from theme                          import ThemeView
+from myslice.theme                          import ThemeView
 import json
 
 class InstitutionView (FreeAccessView, ThemeView):

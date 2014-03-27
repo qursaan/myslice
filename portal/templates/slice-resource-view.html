@@ -1,4 +1,5 @@
 {% extends "layout_wide.html" %}
+{% load portal_filters %}
 
 {% block head %}
 <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1RUj824JAiHRVqgc2CSIg4CpKHhh84Lw&sensor=false"></script> -->
@@ -24,7 +25,7 @@
 	</div>
 	<div class="col-md-10" style="height:100%;">
 		<div class="row">
-		  	{% include theme|add:"_widget-slice-sections.html" %}
+		  	{% widget '_widget-slice-sections.html' %}
 		</div>
 		<!-- <div class="row slice-pending">
 			<ul class="nav nav-pills">
@@ -63,7 +64,7 @@
                 {{map_resources}}
 			</div>
 			<div id="scheduler-tab" class="panel" style="height:370px;display:none;">
-                {{scheduler_leases}}
+                {{scheduler}}
 			</div>
 			<div id="pending" class="panel" style="height:370px;display:none;">
                 {{pending_resources}}

@@ -7,7 +7,7 @@ from ui.topmenu                 import topmenu_items, the_user
 
 from portal.forms               import ContactForm
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # splitting the 2 functions done here
 # GET is for displaying the empty form

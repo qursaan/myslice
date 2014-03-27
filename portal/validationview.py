@@ -44,7 +44,7 @@ from portal.actions             import get_requests
 from manifoldapi.manifoldapi    import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class ValidatePendingView(FreeAccessView, ThemeView):
     template_name = "validate_pending.html"

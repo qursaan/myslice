@@ -6,24 +6,6 @@ function list() {
 	this.elements = [];
 }
 
-list.prototype.save = function() {
-	for (var prop in this) {
-      if (typeof this[prop] != 'function') {
-        console.log("prop: " + prop);
-      } else {
-      	console.log("func: " + prop);
-      }
-    }
-	//localStorage.setItem(name, JSON.stringify(value));
-};
-
-list.prototype.load = function(name) {
-	this.pending = JSON.parse(localStorage.getItem(name));
-	if (!this.pending) {
-		this.pending = [];
-	}
-};
-
 list.prototype.add = function(element) {
 	if (!this.has(element)) {
 		this.elements.push(element);
@@ -60,14 +42,14 @@ function resources() {
 	};
 };
 
-function users() {
+function leases() {
 	this.pending = {
 		toremove: new list(),
 		toadd: new list(),
 	};
 };
 
-function leases() {
+function users() {
 	this.pending = {
 		toremove: new list(),
 		toadd: new list(),
@@ -84,26 +66,18 @@ function slice(name) {
 	this.leases = new leases();
 	
 };
-slice.prototype.pending = function() {
-	
-};
-slice.prototype.reserve = function() {
-	
-};
-slice.prototype.unreserve = function() {
-	
-};
+
 
 /*
  * User
  */
-function user(u) {
-	this.u = u;
-	this.testbeds = {};
-	this.slices = {};
+function user(user) {
+	this.user = user;
+	this.testbeds = new list();
+	this.slices = new list();
 	
-	for (i = 0; i < this.u.slices.length; i++) {
-		this.slices[this.u.slices[i]] = new slice(this.u.slices[i]);
+	for (i = 0; i < this.user.slices.length; i++) {
+		this.slices[this.user.slices[i]] = new slice(this.user.slices[i]);
 	}
 };
 
@@ -113,7 +87,7 @@ user.prototype.slice = function(name) {
 
 user.prototype.list = function() {
     for (s in this.slices) {
-    	for (o in s) {
+    for (o in s) {
       if (typeof o != 'function') {
         console.log(o);
       } else {
@@ -128,7 +102,21 @@ user.prototype.list = function() {
  */
 var myslice = {
 	user: {},
-    
+	
+	user: function() {
+		if ($.isEmptyObject(this.user)) {
+			//this.login(function() { return this.user; });
+		} else {
+			return this.user;
+		}
+	},
+
+	login: function(fn) {
+		$.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+			myslice.user = new user(data[0]);
+		});
+	},
+
     getSlices: function(name) {
     	
     },
@@ -197,6 +185,8 @@ var myslice = {
 
 
 $(document).ready(function() {
+	//console.log(myslice.user().slices);
+	
 	// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function(data) {
 		// myslice.user = new user(data[0]);
 		// console.log(myslice.user.slices);

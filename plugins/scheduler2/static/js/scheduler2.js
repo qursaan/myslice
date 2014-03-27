@@ -48,6 +48,7 @@ var schdlr_PartsInOneHour = 6;
          *     applied, which allows to maintain chainability of calls
          */
         init: function (options, element) {
+            this.classname="scheduler2";
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
 
@@ -113,18 +114,21 @@ var schdlr_PartsInOneHour = 6;
             var totalCell = "";
             for (var i = 0; i < totalColums; i++) totalCell +="<td></td>"; 
             var srt_body = "";
-
+            
             $.each(SchedulerResources, function (i, group) {
+                console.log(group.groupName);
                 //var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + group.resources.length + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
-                var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + 30 + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
+                //var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + 30 + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
+                var groupTR = $("#ShedulerNodes tbody").html('<tr><td id="schdlr_frstTD" class="info fixed"></td></tr>');
                 
-                $.each(group.resources.slice(0,30), function (i, resource) {
+                //$.each(group.resources.slice(0,30), function (i, resource) {
+                $.each(group.resources, function (i, resource) {
                     if (i == 0) {
                         //$("#ShedulerNodes tbody tr:first").append('<td class="info fixed">' + resource.hostname + '</td>');
-                        $(groupTR).find("#schdlr_frstTD").html(resource.hostname);
+                        $(groupTR).find("#schdlr_frstTD").html(resource.urn);
                         //$(srt_body).html("<tr>" + totalCell + "</tr>");
                     } else {
-                        $(groupTR).find("tr:last").after('<tr><td class="info fixed">' + resource.hostname + '</td></tr>');
+                        $(groupTR).find("tr:last").after('<tr><td class="info fixed">' + resource.urn + '</td></tr>');
                         //$(srt_body).find("tr:last").after("<tr>" + totalCell + "</tr>");
                     }
                     srt_body += "<tr>" + totalCell + "</tr>";
@@ -181,6 +185,7 @@ var schdlr_PartsInOneHour = 6;
             //data is empty on load
         },
         on_all_resources_new_record: function (data) {
+            //console.log(data);
             var tmpGroup = lookup(SchedulerResources, 'groupName', data.type);
             if (tmpGroup == null) {
                 tmpGroup = { groupName: data.type, resources: [] };
@@ -204,12 +209,12 @@ var schdlr_PartsInOneHour = 6;
         },
         /* all_resources QUERY HANDLERS End */
         /* lease QUERY HANDLERS Start */
-        on_lease_clear_records: function (data) { alert('clear_records'); },
-        on_lease_query_in_progress: function (data) { alert('query_in_progress'); },
-        on_lease_new_record: function (data) { alert('new_record'); },
-        on_lease_query_done: function (data) { alert('query_done'); },
+        on_lease_clear_records: function (data) { console.log('clear_records'); },
+        on_lease_query_in_progress: function (data) { console.log('lease_query_in_progress'); },
+        on_lease_new_record: function (data) { console.log('lease_new_record'); },
+        on_lease_query_done: function (data) { console.log('lease_query_done'); },
         //another plugin has modified something, that requires you to update your display. 
-        on_lease_field_state_changed: function (data) { alert('query_done'); },
+        on_lease_field_state_changed: function (data) { console.log('lease_field_state_changed'); },
         /* lease QUERY HANDLERS End */
 
 
