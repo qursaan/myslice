@@ -34,8 +34,10 @@ def dispatch(request, object_type, object_name):
             #print "#======>", el[0][7:8]
             #print "#======>", el[0][10:-1]
             print "#======> 1 ", el[1]
-            o.params = req_items.getlist('params[]')
-            
+            #o.params = req_items.getlist('params[]')
+            #o.params.append({el[0]:el[1]})
+            o.params.append({el[0][7:-1]:el[1]})
+            print "o.params = ",o.params
             
         elif el[0].startswith('fields'):
             o.fields=req_items.getlist('fields[]')
@@ -51,5 +53,5 @@ def dispatch(request, object_type, object_name):
             return error('an error has occurred')
  
     except Exception, e:
-        return error(str(e))
+        return error("exception:"+str(e))
 
