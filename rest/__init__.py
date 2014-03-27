@@ -50,7 +50,7 @@ class ObjectRequest(object):
                 self.fields = ['user_id', 'email', 'password', 'config','status'];
             elif table == "account":
                 # XXX TODO: Multiple key for account = (platform_id, user_id)
-                self.id = None
+                self.id = "platform_id, user_id"
                 self.fields = ['platform_id', 'user_id', 'auth_type', 'config'];
             elif table == "platform":
                 self.id = 'platform'
@@ -141,7 +141,10 @@ class ObjectRequest(object):
             print "query = ",query
         else:
             raise Exception, "Params are required for update"
-        
+
+        if self.id is not None:
+           query.select(self.id)
+       
         return execute_query(self.request, query)
     
     def delete(self):
