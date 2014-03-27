@@ -11,7 +11,7 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 #
 import json, os, re, itertools

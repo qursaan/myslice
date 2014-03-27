@@ -2,6 +2,7 @@
 
 import os.path
 
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -19,6 +20,12 @@ except:
     import traceback
     traceback.print_exc()
 
+# themes
+from myslice.configengine import ConfigEngine
+configEngine = ConfigEngine()
+if configEngine.myslice.theme :
+    theme = configEngine.myslice.theme
+    
 # find out HTTPROOT, which is different from ROOT 
 # when deployed from a package
 # this code is run by collectstatic too, so we cannot
@@ -186,6 +193,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(HTTPROOT,"portal/templates", theme),
+    os.path.join(HTTPROOT,"portal/templates"),
     os.path.join(HTTPROOT,"templates"),
 )
 

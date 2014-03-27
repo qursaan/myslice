@@ -10,7 +10,7 @@ from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 import json, time
 

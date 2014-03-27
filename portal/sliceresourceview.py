@@ -18,7 +18,7 @@ from plugins.googlemap               import GoogleMap
 from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class SliceResourceView (LoginRequiredView, ThemeView):
     template_name = "slice-resource-view.html"

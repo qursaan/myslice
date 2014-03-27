@@ -14,7 +14,7 @@ from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 from manifoldapi.manifoldapi         import execute_query
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class SliceInfoView (LoginRequiredView, ThemeView):
     template_name = "slice-tab-info.html"

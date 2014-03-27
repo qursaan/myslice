@@ -17,7 +17,7 @@ from manifold.core.query        import Query
 from portal.models              import PendingUser
 from portal.actions             import create_pending_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead

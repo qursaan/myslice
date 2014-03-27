@@ -19,7 +19,7 @@ from manifold.core.query        import Query
 from portal.models              import PendingUser,PendingAuthority
 from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead

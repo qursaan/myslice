@@ -31,7 +31,7 @@ from plugins.slicestat               import SliceStat
 
 from myslice.configengine            import ConfigEngine
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 tmp_default_slice='ple.upmc.myslicedemo'
 

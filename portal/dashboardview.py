@@ -11,7 +11,7 @@ from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
 from ui.topmenu                  import topmenu_items_live, the_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 #This view requires login 
 class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
