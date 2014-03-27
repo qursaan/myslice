@@ -11,8 +11,11 @@ class Scheduler2 (Plugin):
         self.query=query
         self.query_all_resources = query_all_resources
         self.query_all_resources_uuid = query_all_resources.query_uuid
+
         self.query_lease = query_lease
-        query_lease.query_uuid if query_lease else None
+        self.query_lease_uuid = query_lease.query_uuid
+
+        #query_lease.query_uuid if query_lease else None
 
         #granularity in minutes
         granularity = 10
