@@ -120,7 +120,11 @@ class ObjectRequest(object):
         query = Query.create(self.type)
         # No filters for create
         if self.params :
-            query.set(self.params)
+            for p in self.params :
+                for k,v in p.iteritems() :
+                    print "param: %s : %s" % (k,v)
+                    query.set({k : v})
+            print "query = ",query
         else:
             raise Exception, "Params are required for create"
         return execute_query(self.request, query)
@@ -129,15 +133,12 @@ class ObjectRequest(object):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
 
-        print "rest/__init__ self = ",self
-        print "rest/__init__ params = ",self.params
-        
         if self.params :
+            for p in self.params :
+                for k,v in p.iteritems() :
+                    print "param: %s : %s" % (k,v)
+                    query.set({k : v})
             print "query = ",query
-            query.set(self.params)
-#            query.set({ 'resource' : self.params})
-#             for param in self.params :
-                
         else:
             raise Exception, "Params are required for update"
         
