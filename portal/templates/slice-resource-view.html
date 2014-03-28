@@ -14,13 +14,12 @@
 		<!-- <div id="select-platform" class="list-group"></div> -->
         {{filter_testbeds}}
 
-		<!-- <ul class="list-group">
-		  <li class="list-group-item">Filter: CPU</li>
-		  <li class="list-group-item">Filter: Interface</li>
-		  <li class="list-group-item">...</li>
-		  <li class="list-group-item">...</li>
-		  <li class="list-group-item">...</li>
-		</ul> -->
+		<div class="list-group-item list-resources">
+			<span class="list-group-item-heading">Resources</span>
+			<a class="list-group-item" data-panel="resources" href="#">All</a>
+		  	<a class="list-group-item" data-panel="resources" href="#">Reserved</a>
+		  	<a class="list-group-item" data-panel="pending" href="#">Pending <span class="badge" id="badge-pending" data-number="0"></span></a>
+		</div>
 	
 	</div>
 	<div class="col-md-10" style="height:100%;">
@@ -51,8 +50,6 @@
 			  <li class="active"><a data-panel="resources" href="#">Resources</a></li>
 			  <li id="GoogleMap"><a data-panel="map" href="#">Map</a></li>
 			  <li id="Scheduler"><a data-panel="scheduler-tab" href="#">Scheduler</a></li>
-			  <li><a data-panel="pending" href="#">Pending</a></li>
-			  <li><a href="#"></a></li>
 			</ul>
 		</div>
 		<div class="row" style="height:100%;">
@@ -64,7 +61,7 @@
                 {{map_resources}}
 			</div>
 			<div id="scheduler-tab" class="panel" style="height:370px;display:none;">
-                {{scheduler}}
+                {#scheduler#}
 			</div>
 			<div id="pending" class="panel" style="height:370px;display:none;">
                 {{pending_resources}}

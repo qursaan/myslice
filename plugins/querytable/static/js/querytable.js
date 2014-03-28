@@ -403,10 +403,15 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
+                	// update pending number
+                	$("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
+                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
+                	$("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
+                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, false);
                     break;
                 default:
@@ -451,18 +456,18 @@
 
         on_all_query_done: function()
         {
-	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
-	    this.table.fnAddData (this.buffered_lines);
-	    this.buffered_lines=[];
+	    	if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
+	    	this.table.fnAddData (this.buffered_lines);
+	    	this.buffered_lines=[];
 	    
             var self = this;
 	    // if we've already received the slice query, we have not been able to set 
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
-		if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
+				if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
                 self.set_checkbox_from_record(record, true);
             });
-	    this.buffered_records_to_check = [];
+	    	this.buffered_records_to_check = [];
 
             this.received_all_query = true;
 	    // unspin once we have received both

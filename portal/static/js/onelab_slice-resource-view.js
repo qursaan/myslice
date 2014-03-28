@@ -19,6 +19,13 @@ $(document).ready(function() {
         }
         */
     });
+    $('div.list-resources a').click(function() {
+        $('div.list-resources a').removeClass('active');
+        $(this).addClass('active');
+        $('div.panel').hide();
+        $('div#'+$(this).data('panel')).show();
+       
+    });
     
     $.get("/rest/network", function(data) {
 		var list = '<div class="list-group-item sl-platform"><span class="list-group-item-heading">Testbeds</span></div>';

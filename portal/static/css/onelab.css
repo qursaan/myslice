@@ -353,7 +353,6 @@ ul.nav-resources a {
     padding: 4px 10px 5px 10px;
 }
 
-
 /* SLICE VIEW */
 
 
@@ -369,18 +368,16 @@ div.list-group-item {
 a.list-group-item {
     border:0;
     background-color:white;
-    padding:3px 0 3px 10px;
+    padding:3px 2px 3px 10px;
     border-left:2pt white solid;
 }
-a.list-group-item.active, a.list-group-item.active:hover {
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
     font-weight: bold;
     color:black;
-    background-color:transparent;
+    background-color:#F5F5F5;
     border-left:2pt blue solid;
 }
-a.list-group-item.active:hover {
-    background-color:#dddddd;
-}
+
 a.list-group-item:hover {
     border-left:2pt blue solid;
 }
