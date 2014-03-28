@@ -361,17 +361,23 @@ div#slice-view {
 }
 div.list-group-item {
     border:0;
+    -moz-border-radius: 0;
+    border-radius: 0;
     background-color:white;
     font-weight:bold;
     padding-left:0;
 }
 a.list-group-item {
+    -moz-border-radius: 0;
+    border-radius: 0;
     border:0;
     background-color:white;
     padding:3px 2px 3px 10px;
     border-left:2pt white solid;
 }
 a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+    -moz-border-radius: 0;
+    border-radius: 0;
     font-weight: bold;
     color:black;
     background-color:#F5F5F5;
@@ -379,9 +385,13 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 }
 
 a.list-group-item:hover {
+    -moz-border-radius: 0;
+    border-radius: 0;
     border-left:2pt blue solid;
 }
 a.list-group-item p.list-group-item-text {
+    -moz-border-radius: 0;
+    border-radius: 0;
     font-size:9pt;
     font-style:italic;
     font-weight: normal;
