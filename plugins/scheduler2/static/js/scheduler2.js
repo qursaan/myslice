@@ -78,6 +78,7 @@ var schdlr_PartsInOneHour = 6;
             //this.listen_query(options.query_lease_uuid, 'lease');
             if (Debug) console.timeEnd("Listening_to_queries");
 
+            $("#ShedulerNodes tbody").html('<tr><td id="schdlr_frstTD" style="background:transparent; height:45px; border:none;"></td></tr>');
         },
 
         /* PLUGIN EVENTS */
@@ -101,7 +102,8 @@ var schdlr_PartsInOneHour = 6;
             // same output as a jquery selector with some guarantees
         },
 
-        drawResources: function () {
+        //drawResources: function () {
+        drawLeases: function () {
             
             //if (Debug) this.debug('foo');
             if (Debug) console.time("each:SchedulerResources");
@@ -114,7 +116,7 @@ var schdlr_PartsInOneHour = 6;
             var totalCell = "";
             for (var i = 0; i < totalColums; i++) totalCell +="<td></td>"; 
             var srt_body = "";
-            
+            /*
             $.each(SchedulerResources, function (i, group) {
                 console.log(group.groupName);
                 //var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + group.resources.length + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
@@ -135,9 +137,10 @@ var schdlr_PartsInOneHour = 6;
                     //srt_body.push('<tr>'); srt_body = srt_body.concat(totalCell.concat()); srt_body.push('/<tr>');
                 });
             });
-
+            */
+            srt_body += "<tr>" + totalCell + "</tr>";
             //$("#scheduler-reservation-table tbody").html(srt_body.join(""));
-            $("#scheduler-reservation-table tbody").html(srt_body);
+            $("#scheduler-reservation-table tbody").append(srt_body);
 
             if (Debug) console.timeEnd("each:SchedulerResources");
             
@@ -185,6 +188,8 @@ var schdlr_PartsInOneHour = 6;
             //data is empty on load
         },
         on_all_resources_new_record: function (data) {
+            $("#ShedulerNodes tbody").find("tr:last").after('<tr><td class="info fixed">' + data.urn + '</td></tr>');
+            this.drawLeases();
             //console.log(data);
             var tmpGroup = lookup(SchedulerResources, 'groupName', data.type);
             if (tmpGroup == null) {
@@ -196,7 +201,7 @@ var schdlr_PartsInOneHour = 6;
             //alert('new_record');
         },
         on_all_resources_query_done: function (data) {
-            this.drawResources();
+            //this.drawResources();
             //data is empty on load
             /* GUI setup and event binding */
             this._initUI();
