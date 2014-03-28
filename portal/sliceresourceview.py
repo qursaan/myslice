@@ -18,6 +18,7 @@ from plugins.googlemap               import GoogleMap
 from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
 from plugins.scheduler2              import Scheduler2
+from plugins.columns_editor          import ColumnsEditor
 
 from myslice.theme import ThemeView
 
@@ -70,10 +71,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         query_all_lease = Query.get('lease').select(lease_fields)
         page.enqueue_query(query_all_lease)
 
-        print "!!!!!!!!!!   query leases = ",query_all_lease
-
         # --------------------------------------------------------------------------
-        # RESOURCES LIST
+        # ALL RESOURCES LIST
         # resources as a list using datatable plugin
  
         list_resources = QueryTable(
@@ -89,6 +88,39 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'bLengthChange' : True,
                 'bAutoWidth'    : True,
                 },
+        )
+
+
+        # --------------------------------------------------------------------------
+        # RESERVED RESOURCES LIST
+        # resources as a list using datatable plugin
+ 
+        list_reserved_resources = QueryTable(
+            page       = page,
+            domid      = 'resources-reserved-list',
+            title      = 'List view',
+            query      = sq_resource,
+            query_all  = sq_resource,
+            init_key   = "urn",
+            checkboxes = True,
+            datatables_options = {
+                'iDisplayLength': 25,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+        # --------------------------------------------------------------------------
+        # COLUMNS EDITOR
+        # list of fields to be applied on the query 
+        # this will add/remove columns in QueryTable plugin
+ 
+        filter_column_editor = ColumnsEditor(
+            page  = page,
+            query = sq_resource, 
+            query_all = query_resource_all,
+            title = "Select Columns",
+            domid = 'select-columns',
         )
 
         # --------------------------------------------------------------------------
@@ -170,6 +202,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env = {}
         template_env['list_resources'] = list_resources.render(self.request)
+        template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
+
+        template_env['columns_editor'] = filter_column_editor.render(self.request)
+
         template_env['filter_testbeds'] = filter_testbeds.render(self.request)
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
