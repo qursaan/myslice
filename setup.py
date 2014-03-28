@@ -15,7 +15,7 @@ packages= [ os.path.dirname(init) for init in (glob("*/__init__.py")+glob("*/*/_
 print packages
 
 # Avoid troubles : clean /usr/share/unfold/
-shutil.rmtree('/usr/share/unfold/')
+#shutil.rmtree('/usr/share/unfold/')
 
 setup(packages = packages,
       # xxx somehow this does not seem to show up in debian packaging
