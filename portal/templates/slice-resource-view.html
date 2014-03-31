@@ -52,11 +52,16 @@
 			  <li id="Scheduler"><a data-panel="scheduler-tab" href="#">Scheduler</a></li>
 			</ul>
 		</div>
-		<div class="row" style="height:100%;display:none;">
+		<div class="row" id="columns_selector" style="height:100%;display:none;">
         {{columns_editor}}
         </div>
+		
 		<div class="row" style="height:100%;">
 			<div id="resources" class="panel">
+				<p style="margin-left: 1050px;">
+    				<button type="button" id="show_col_selector" class="btn btn-default btn-sm">Select columns</button>
+    				<button type="button" id="hide_col_selector" style="display:none;" class="btn btn-primary btn-sm">Select columns</button>
+				</p>
                 {{list_resources}}
 				<!-- <table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table> -->
 			</div>
@@ -74,4 +79,21 @@
 			</div>
 		</div>
 	</div>
+
+<script>
+jQuery(document).ready(function(){
+	jQuery("#show_col_selector").click(function(){
+    	jQuery("#columns_selector").show();
+		jQuery("#hide_col_selector").show();
+       	jQuery("#show_col_selector").hide();
+	});
+	jQuery("#hide_col_selector").click(function(){
+    	jQuery("#columns_selector").hide();
+    	jQuery("#show_col_selector").show();
+    	jQuery("#hide_col_selector").hide();
+	});                 				
+});
+
+			
+</script>
 {% endblock %}
