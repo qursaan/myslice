@@ -11,16 +11,16 @@
 
 {% block content %}
 	<div class="col-md-2">
-		<!-- <div id="select-platform" class="list-group"></div> -->
-        {{filter_testbeds}}
-
+		
 		<div class="list-group-item list-resources">
-			<span class="list-group-item-heading">Resources</span>
+			<span class="list-group-item-heading">View</span>
 			<a class="list-group-item" data-panel="resources" href="#">All</a>
 		  	<a class="list-group-item" data-panel="reserved" href="#">Reserved</a>
 		  	<a class="list-group-item" data-panel="pending" href="#">Pending <span class="badge" id="badge-pending" data-number="0"></span></a>
 		</div>
-	
+		
+		<!-- <div id="select-platform" class="list-group"></div> -->
+		{{filter_testbeds}}
 	</div>
 	<div class="col-md-10" style="height:100%;">
 		<div class="row">
@@ -47,7 +47,7 @@
 		</div>
 		<div class="row">
 			<ul class="nav nav-pills nav-resources">
-			  <li class="active"><a data-panel="resources" href="#">Resources</a></li>
+			  <li class="active"><a data-panel="resources" href="#">Table</a></li>
 			  <li id="GoogleMap"><a data-panel="map" href="#">Map</a></li>
 			  <li id="Scheduler"><a data-panel="scheduler-tab" href="#">Scheduler</a></li>
 			</ul>
