@@ -33,7 +33,7 @@ class SupportView (FreeAccessView, ThemeView):
             env['person'] = None
     
         env['theme'] = self.theme
-    
+        env['section'] = "Support"
 
         env['username']=the_user(request)
 

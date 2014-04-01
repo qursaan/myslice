@@ -75,6 +75,7 @@ class InstitutionView (FreeAccessView, ThemeView):
             env['person'] = None
     
         env['theme'] = self.theme
+        env['section'] = "Institution"
         env['pi'] = pi 
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
