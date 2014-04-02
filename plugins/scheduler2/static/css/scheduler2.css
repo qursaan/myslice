@@ -82,7 +82,8 @@
 }
 
 /** tables css **/
-#ShedulerNodes-scroll-container {
+
+/*#ShedulerNodes-scroll-container {
     float: left;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -94,7 +95,6 @@
     max-width: 500px;
     width: 450px;
     margin-top: 6px !important;
-    /* margin-top:55px; */
 }
 
 #ShedulerNodes th{
@@ -140,15 +140,10 @@
     width: 100%;
 }
 
-#scheduler-reservation-table tr{
-    background-color: #A6C9E2 ;
-}
 
-#scheduler-reservation-table tr.even{
-    background-color: #E0E0E0 ;
-}
-
+    */
 /*background: url("../img/opened-lock-15.png") no-repeat scroll 50% 50% transparent;*/
+/*
 #scheduler-reservation-table td {
     border: 1px solid #FFFFFF;
     cursor: pointer;
@@ -185,20 +180,39 @@
     padding: 0 5px;
     width: 3px;
 }
-
-#scheduler-reservation-table td.free {
+    
+*/
+#scheduler-reservation-table {
+    margin-top: 0 !important;
+}
+#scheduler-reservation-table tbody tr {
+    border: none !important;
+}
+#scheduler-reservation-table tbody tr td{
+    background-color: #A6C9E2 ;
+    border: 1px solid #111111;
 }
 
-#scheduler-reservation-table td.closed {
+#scheduler-reservation-table tbody tr.even td{
+    background-color: #E0E0E0 ;
+}
+
+#scheduler-reservation-table tbody tr th::selection {color:	#000000;background:transparent;}
+#scheduler-reservation-table tbody tr th::-moz-selection {color:	#000000;background:transparent;}
+
+#scheduler-reservation-table tbody tr td.free {
+}
+
+#scheduler-reservation-table tbody tr td.reserved {
     background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50% #DD4444;
     cursor: not-allowed;
 }
 
-#scheduler-reservation-table td.maintenance {
+#scheduler-reservation-table tbody tr td.maintenance {
     background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
 }
 
-#scheduler-reservation-table td.free:hover ,#scheduler-reservation-table td.selected, #scheduler-reservation-table td.selected_tmp {
+#scheduler-reservation-table tbody tr td.free:hover ,#scheduler-reservation-table tbody tr td.selected, #scheduler-reservation-table tbody tr td.selected_tmp {
     background: #25BA25;
 }
 
@@ -244,4 +258,12 @@ td.no-image {
 
 .legend ol li.selected {
     background: #25BA25;
+}
+
+/* latest stuff */
+.sliderContainer {
+    margin: 10px 0;
+}
+.table-responsive{
+    overflow: hidden !important;
 }

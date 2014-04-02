@@ -18,7 +18,7 @@ var isExecuting = false;
 
 function rangeMouseDown(e) {
     if (Debug) console.time("mouse:rangeMouseDown");
-    if (isRightClick(e)) {
+    if (schedulerIsRightClick(e)) {
         return false;
     } else {
         dragStart_tr = $(this).parent().index();
@@ -43,7 +43,7 @@ function rangeMouseDown(e) {
 
 function rangeMouseUp(e) {
     if (Debug) console.time("mouse:rangeMouseUp");
-    if (isRightClick(e)) {
+    if (schedulerIsRightClick(e)) {
         return false;
     } else {
         //var allCells = $("#tblReservation td");
