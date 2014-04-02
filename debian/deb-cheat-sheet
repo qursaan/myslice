@@ -16,3 +16,8 @@ dpkg-deb -c myslice_0.2.4.lxc.2013.11.26_amd64.deb
 dpkg -s myslice
 dpkg --info -c myslice_0.2.4.lxc.2013.11.26_amd64.deb
 
+--- install from a local .deb 
+dpkg -i foo.deb
+- or, if this has deps that need to be pulled through apt-get:
+gdebi foo.deb
+(install with apt-get install -y gdebi-core)
