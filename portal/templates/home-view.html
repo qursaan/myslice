@@ -86,8 +86,12 @@
 		</table>
 	</div>
 </div>
-<script>
+<script type="text/javascript">
 	$(document).ready(function() {
+        {% if person %}
+        myslice.login();
+        {% endif %}
+
 		$('a.home-tab').click(function() {
 			$('ul.nav-tabs li').removeClass('active');
 			$(this).parent().addClass('active');
@@ -103,21 +107,11 @@
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-		
-		{% if person %}
-        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-		  var items = [];
-          if(data.length > 0){
-    		  $.each( data[0].slices, function(i, val) {
-    		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
-    		  });
-    		  
-    		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
-		  }else{
-    		  $("div#home-slice-list").html("no slice");
-          } 
-		});
-		{% endif %}
-	});
+/*-------
+List of slices has been moved in 
+portal/templates/base.html
+This should go into session
+--------*/
+});
 </script>
 {% endblock %}
