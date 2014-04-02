@@ -43,14 +43,14 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th ng-repeat="slot in slots">
+                        <th ng-repeat="slot in slots" >
                             {[{ slot.time }]}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
-                        <th>{[{ resource.name }]}</th>
+                        <th data-resourceid="{[{ resource.id }]}">{[{ resource.name }]}</th>
                         <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" ng-class="{{ 'lease.status' }}"></td>
                     </tr>
                 </tbody>

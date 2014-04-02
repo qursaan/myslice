@@ -43,8 +43,12 @@ var SchedulerTotalCells;
 var SchedulerTotalVisibleCells;
 //Help Variables
 var _schedulerCurrentCellPosition = 0;
+var _leasesDone = false;
+var _resourcesDone = false;
 //Enable Debug
-var schedulerDebug = true;
+var schedulerDebug = false;
+//tmp to delete
+var tmpSchedulerLeases = [];
 
 (function ($) {
     var scheduler2 = Plugin.extend({
@@ -72,7 +76,7 @@ var schedulerDebug = true;
                     schedulerCtrlPressed = false;
                 }
             });
-            //$("#" + schedulerTblId).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
+            $("#" + schedulerTblId).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
 
             // Explain this will allow query events to be handled
             // What happens when we don't define some events ?
@@ -116,14 +120,14 @@ var schedulerDebug = true;
             //data is empty on load
         },
         on_all_resources_new_record: function (data) {
+            //alert(data.toSource());
             if (SchedulerData.length < schedulerMaxRows)
-                SchedulerData.push({ name: data.hrn, leases: schedulerGetLeases(schedulerSlotsPerHour), urn: data.urn, type: data.type });
+                SchedulerData.push({ id: data.urn, name: data.hrn, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
             //alert(data.toSource());
         },
         on_all_resources_query_done: function (data) {
-            /* GUI setup and event binding */
-            this._initUI();
-            //this.loadWithDate();
+            _resourcesDone = true;
+            this._initScheduler();
         },
         //another plugin has modified something, that requires you to update your display. 
         on_all_resources_field_state_changed: function (data) {
@@ -133,8 +137,25 @@ var schedulerDebug = true;
         /* lease QUERY HANDLERS Start */
         on_lease_clear_records: function (data) { console.log('clear_records'); },
         on_lease_query_in_progress: function (data) { console.log('lease_query_in_progress'); },
-        on_lease_new_record: function (data) { alert(data.toSource()); console.log('lease_new_record'); },
-        on_lease_query_done: function (data) { console.log('lease_query_done'); },
+        on_lease_new_record: function (data) {
+            tmpSchedulerLeases.push({
+                id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
+                slice: data.slice,
+                status: 'reserved',
+                resource: data.resource,
+                network: data.network,
+                start_time: data.start_time,
+                lease_type: data.lease_type,
+                granularity: data.granularity,
+                duration: data.duration
+            });
+            //console.log(data.toSource()); console.log('lease_new_record');
+        },
+        on_lease_query_done: function (data) {
+            _leasesDone = true;
+            this._initScheduler();
+            // console.log('lease_query_done');
+        },
         //another plugin has modified something, that requires you to update your display. 
         on_lease_field_state_changed: function (data) { console.log('lease_field_state_changed'); },
         /* lease QUERY HANDLERS End */
@@ -160,7 +181,16 @@ var schedulerDebug = true;
         },
 
         /* INTERNAL FUNCTIONS */
-        _initUI: function () {
+        _initScheduler: function () {
+            if (_resourcesDone && _leasesDone)
+            {
+                /* GUI setup and event binding */
+                this._FixLeases();
+                this._initUI();
+            }
+        },
+
+        _initUI : function () {
             if (schedulerDebug) console.time("_initUI");
             //init DatePicker Start
             $("#DateToRes").datepicker({
@@ -200,6 +230,18 @@ var schedulerDebug = true;
             //$("#" + schedulerTblId + " td:not([class])").addClass("free");
             if (schedulerDebug) console.timeEnd("_initUI");
         },
+
+        _FixLeases  : function () {
+            for (var i = 0; i < tmpSchedulerLeases.length; i++) {
+                var tmpLea = tmpSchedulerLeases[i];
+                var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
+                if (tmpRes != null) {
+                    alert(tmpLea.id + '-' + tmpLea.start_time);
+                    tmpRes.leases[tmpLea.id] = tmpLea;
+                }
+            }
+        },
+
         _FixTable: function () {
             var colWidth = 50;
             SchedulerTotalCells = SchedulerSlots.length;
@@ -208,13 +250,13 @@ var schedulerDebug = true;
             var tblwidth = $('#scheduler-tab').parent().outerWidth();
             SchedulerTotalVisibleCells = parseInt((tblwidth - schedulerTblFirstColWidth) / colWidth);
 
-            if (SchedulerData.length == 0) {
-                //puth some test data
-                SchedulerData.push({ name: 'xyz+aaa', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+aaa', type: 'node' });
-                SchedulerData.push({ name: 'xyz+bbb', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+bbb', type: 'node' });
-                SchedulerData.push({ name: 'xyz+ccc', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+ccc', type: 'node' });
-                SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
-            }
+            //if (SchedulerData.length == 0) {
+            //    //puth some test data
+            //    SchedulerData.push({ name: 'xyz+aaa', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+aaa', type: 'node' });
+            //    SchedulerData.push({ name: 'xyz+bbb', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+bbb', type: 'node' });
+            //    SchedulerData.push({ name: 'xyz+ccc', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+ccc', type: 'node' });
+            //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
+            //}
             angular.element(document.getElementById('SchedulerCtrl')).scope().initSlots(0, SchedulerTotalVisibleCells);
         },
         _SetPeriodInPage: function (start, end) {

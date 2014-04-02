@@ -66,14 +66,38 @@ function schedulerGetLeases(slotSpan) {
     var d = new Date(2014, 1, 1, 0, 0, 0, 0);
     var i = 0;
     while (d.getDate() == 1) {
-        //var tmpTime = schedulerPadStr(d.getHours()) + schedulerPadStr(d.getMinutes());
-        slots.push({ id: i, status: getRandomStatus() });
+        //slots.push({ id: i, status: getRandomStatus() });
+        slots.push({ id: i, status: "free" });
         d = schedulerAddMinutes(d, slotSpan);
         i++;
     }
     return slots;
 }
 
+//
+//GetSlotId from time
+function schedulerGetSlotId(startTime, duration, granularity) {
+    startTime = parseInt(startTime);
+    var d = new Date(startTime * 1000);
+    var timespan = 60 / schedulerSlotsPerHour;
+    var slotid = 0;
+    slotid += d.getHours() * schedulerSlotsPerHour;
+    slotid += d.getMinutes() / timespan;
+    return slotid;
+}
+//
+//Find Resource By Id
+function schedulerFindResourceById(Resources, id) {
+
+    for (var i = 0, len = Resources.length; i < len; i++) {
+        if (Resources[i].id == id)
+            return Resources[i]; // Return as soon as the object is found
+    }
+    return null; // The object was not found
+}
+
+//
+//for testing
 function getRandomStatus() {
     var randint = Math.floor(Math.random() * (10 - 0 + 1) + 0);
     switch (randint) {
