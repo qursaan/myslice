@@ -77,4 +77,5 @@ class ContactView (FreeAccessView, ThemeView):
                 'topmenu_items': topmenu_items('Contact', request),
                 'theme' : self.theme,
                 'username': username,
+                'section': "Contact"
                 })

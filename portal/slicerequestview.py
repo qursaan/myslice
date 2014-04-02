@@ -110,7 +110,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'user_hrn': user_hrn,
             'cc_myself': True,
             'authorities': authorities,
-            'theme': self.theme
+            'theme': self.theme,
+            'section': "Slice request"
         }
         template_env.update(slice_request)
         template_env.update(page.prelude_env())
