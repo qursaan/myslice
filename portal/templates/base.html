@@ -1,7 +1,7 @@
 {% load portal_filters %}
 {# This is required by insert_above #}{% insert_handler %}<!DOCTYPE html>
 <html lang="en"><head>
-<title>OneLab - {{ section }}</title>
+<title>{{theme}} portal - {{ section }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="/static/img/myslice-icon.png">
 {# This is where insert_str will end up #}{% media_container prelude %}
@@ -31,6 +31,39 @@
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
+
+<script type="text/javascript">
+/*
+XXX TODO: session
+This list of slices should go into SESSION !
+*/
+$(document).ready(function() {
+
+    user = myslice.user();
+    if(user.length>0){
+    	$.each( user.slices, function(i, val) {
+    		items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+    	});
+    	$("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+    	$("ul#dropdown-slice-list").append(items.join( "" ));
+    }
+	{% if person %}
+    $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+	  var items = [];
+      if(data.length > 0){
+		  $.each( data[0].slices, function(i, val) {
+		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+		  });
+		  
+		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+		  $("ul#dropdown-slice-list").append(items.join( "" ));
+	  }else{
+		  $("div#home-slice-list").html("no slice");
+      } 
+	});
+	{% endif %}
+});
+</script>
 </head>
 <body>
 {% block container %}
