@@ -88,7 +88,6 @@ function schedulerGetSlotId(startTime, duration, granularity) {
 //
 //Find Resource By Id
 function schedulerFindResourceById(Resources, id) {
-
     for (var i = 0, len = Resources.length; i < len; i++) {
         if (Resources[i].id == id)
             return Resources[i]; // Return as soon as the object is found

@@ -226,6 +226,9 @@ var tmpSchedulerLeases = [];
             //End init Slider
 
             //other stuff
+            $("#plugin-scheduler-loader").hide();
+            $("#plugin-scheduler").show();
+
             //fixOddEvenClasses();
             //$("#" + schedulerTblId + " td:not([class])").addClass("free");
             if (schedulerDebug) console.timeEnd("_initUI");
@@ -236,7 +239,7 @@ var tmpSchedulerLeases = [];
                 var tmpLea = tmpSchedulerLeases[i];
                 var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
                 if (tmpRes != null) {
-                    alert(tmpLea.id + '-' + tmpLea.start_time);
+                    //alert(tmpLea.id + '-' + tmpLea.start_time);
                     tmpRes.leases[tmpLea.id] = tmpLea;
                 }
             }
