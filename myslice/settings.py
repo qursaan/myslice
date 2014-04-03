@@ -2,6 +2,12 @@
 
 import os.path
 
+### detect if we're in a build environment
+try:
+    import manifold
+    building=False
+except:
+    building=True
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -20,11 +26,17 @@ except:
     import traceback
     traceback.print_exc()
 
+#### this is where the problem lies I believe
+# first try to run manage.py collectstatic without this
 # themes
-from myslice.configengine import ConfigEngine
-configEngine = ConfigEngine()
-if configEngine.myslice.theme :
-    theme = configEngine.myslice.theme
+theme=None
+try:
+    from myslice.configengine import ConfigEngine
+    configEngine = ConfigEngine()
+    if configEngine.myslice.theme :
+        theme = configEngine.myslice.theme
+except:
+    pass
     
 # find out HTTPROOT, which is different from ROOT 
 # when deployed from a package
@@ -189,16 +201,16 @@ ROOT_URLCONF = 'myslice.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'unfold.wsgi.application'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(HTTPROOT,"portal/templates", theme),
-    os.path.join(HTTPROOT,"portal/templates"),
-    os.path.join(HTTPROOT,"templates"),
-)
+TEMPLATE_DIRS = [ ]
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
+if theme is not None:
+    TEMPLATE_DIRS.append ( os.path.join(HTTPROOT,"portal/templates", theme))
+TEMPLATE_DIRS.append     ( os.path.join(HTTPROOT,"portal/templates"))
+TEMPLATE_DIRS.append     (  os.path.join(HTTPROOT,"templates"))
 
-INSTALLED_APPS = [
+INSTALLED_APPS = [ 
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -211,7 +223,9 @@ INSTALLED_APPS = [
     # our django project
     'myslice',
     # the core of the UI
-    'auth', 'manifoldapi', 'unfold',
+    'auth', 
+    'manifoldapi',
+    'unfold',
     # plugins
     'plugins',
     # views - more or less stable 
@@ -223,8 +237,10 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
-    'rest',
 ]
+# this app won't load in a build environment
+if not building: INSTALLED_APPS.append ('rest')
+
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
         print "Using devel auxiliary",aux
