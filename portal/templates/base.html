@@ -38,30 +38,34 @@ XXX TODO: session
 This list of slices should go into SESSION !
 */
 $(document).ready(function() {
+    {% if username %}
+    myslice.login();
 
     user = myslice.user();
-    if(user.length>0){
-    	$.each( user.slices, function(i, val) {
-    		items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+    
+    var slices = [];
+    if($.isEmptyObject(user)){
+        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+            if(data.length > 0){
+                slices = data[0].slices;  
+            }else{
+                slices.push("no slice");
+            }
+            drawSlices(slices);
     	});
-    	$("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
-    	$("ul#dropdown-slice-list").append(items.join( "" ));
+    }else{
+        slices = user.slices;
+        drawSlices(slices);
     }
-	{% if person %}
-    $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-	  var items = [];
-      if(data.length > 0){
-		  $.each( data[0].slices, function(i, val) {
-		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
-		  });
-		  
-		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
-		  $("ul#dropdown-slice-list").append(items.join( "" ));
-	  }else{
-		  $("div#home-slice-list").html("no slice");
-      } 
-	});
-	{% endif %}
+    function drawSlices(slices){
+        var items = [];
+        $.each( slices, function(i, val) {
+            items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+        });
+        $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+        $("ul#dropdown-slice-list").append(items.join( "" ));
+    }
+    {% endif %}
 });
 </script>
 </head>

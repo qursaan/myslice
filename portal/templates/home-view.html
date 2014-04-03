@@ -88,10 +88,6 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-        {% if person %}
-        myslice.login();
-        {% endif %}
-
 		$('a.home-tab').click(function() {
 			$('ul.nav-tabs li').removeClass('active');
 			$(this).parent().addClass('active');
