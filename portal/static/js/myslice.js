@@ -106,16 +106,19 @@ var myslice = {
 	user: function() {
 		if ($.isEmptyObject(this.user)) {
 			//this.login(function() { return this.user; });
-			this.user = localStorage.getItem('user');
+			this.user = JSON.parse(localStorage.getItem('user'));
 		}
 		return this.user;
 	},
 
 	login: function(fn) {
-		$.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-			myslice.user = new user(data[0]);
-			localStorage.setItem('user', JSON.stringify(myslice.user));
-		});
+        user = localStorage.getItem('user');
+        if($.isEmptyObject(user)){
+		    $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+			    //myslice.user = new user(data[0]);
+			    localStorage.setItem('user', JSON.stringify(data[0]));
+		    });
+        }
 	},
 
     getSlices: function(name) {
