@@ -32,7 +32,8 @@ class Scheduler2 (Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [
-                'js/angular/angular.min.js',
+                # Thierry: I have to move this one step up - was 'js/angular/angular.min.js',
+                'js/angular.min.js',
                 'js/scheduler2.js',
                 'js/SchedulerCtrl.js',
                 #'js/slider/jquery-ui-1.10.3.slider.min.js',
