@@ -48,7 +48,6 @@ DATAROOT="/var/unfold"
 # if not there, then we assume it's from a devel tree
 if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT
-    DATAROOT=ROOT
 
 if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
 if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
