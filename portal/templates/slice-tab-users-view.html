@@ -31,9 +31,11 @@
                     	<th>Enabled</th>
                 	</tr>
             	</table>
+				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span>Add users</button>
         	</div>
 <script>
     $(document).ready(function() {
+			var slice_users = [];
 			//console.log("the value you selected: " + selectedValue);
         	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
             	var list_users = [];
@@ -52,11 +54,12 @@
 						if (element == "{{slice}}"){
 							//console.log("the slice is: "+ element);	
 							flag_checkbox = 1;
+							slice_users.push (val.user_email)
 							user_row += "<td><input type='checkbox' checked='True'></td>";
 						}
 					}
 					if(flag_checkbox != 1){
-                		user_row += "<td><input type='checkbox'></td>";
+                		user_row += "<td><input type='checkbox' class='user'></td>";
 					}
                 	user_row += "<td>"+val.user_email+"</td>";
                 	user_row += "<td>"+val.user_hrn+"</td>";
@@ -65,9 +68,40 @@
                 	table_users.push(user_row);
                 
             	});
+				 console.log("slice users before")
+				 console.log(slice_users)
+
 				$("table#user-tab tr:last").after(table_users.join( "" ));
             	$("div#user-tab-loaded").css("display","block");
             	$("div#user-tab-loading").css("display","none");
+
+				$('button#addusers').click(function() {
+          	$('input:checkbox.user').each(function (index) {
+            	if(this.checked){
+                	var record_id = this.id;
+					console.log("checked")
+					console.log($(this)
+       					.closest('tr') //get the enclosing tr
+       					.find('td:eq(1)'));  //find any using td:eq(<index>)
+					slice_users.push ("yasin.upmc@gmail.com")
+					console.log("after")
+					console.log(slice_users)
+					//console.log(user_email)
+                	$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+                    	if(data.success){
+                        	// TODO: highlight row after success
+                        	//$('tr[id="'+record_id+'"]').highlight();
+                    	}else{
+                        	alert("Rest Error for "+record_id+": "+data.error);
+                    	}
+                	});
+                
+            	}
+        	});
+        	// TODO: refresh table
+        	//window.location="/portal/institution#slices";
+    	});
+
          	});
 	//	});
     });
