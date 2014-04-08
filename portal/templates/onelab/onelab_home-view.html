@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
+{% load portal_filters %}
 
 {% block content %}
+<div class="row">
+{% widget '_widget-news.html' %}
+</div>
 <div class="row" id="home-dashboard">
 	<ul class="nav nav-tabs">
 	  <li class="active"><a class="home-tab" data-panel="user" href="#">USER</a></li>
