@@ -27,18 +27,31 @@
 */
 
 /* some params */
-var init_start_visible_index = 10;
-var init_end_visible_index = 21;
-var rsvrTblNm = "scheduler-reservation-table";
-var SchedulerResources = [];
-var schdlr_totalColums = 0;
-var SetPerFun = null;
-var Sched2 = null;
-var Debug = true;
-var schdlr_PartsInOneHour = 6;
+//is ctrl keyboard button pressed
+var schedulerCtrlPressed = false;
+//table Id
+var schedulerTblId = "scheduler-reservation-table";
+var schedulerTblFirstColWidth = 150;
+//Some Data
+var schedulerSlotsPerHour = 6;
+var schedulerMaxRows = 50;
+var SchedulerData = [];
+var SchedulerSlots = [];
+var SchedulerDataViewData = [];
+var SchedulerSlotsViewData = [];
+var SchedulerTotalCells;
+var SchedulerTotalVisibleCells;
+//Help Variables
+var _schedulerCurrentCellPosition = 0;
+var _leasesDone = false;
+var _resourcesDone = false;
+//Enable Debug
+var schedulerDebug = false;
+//tmp to delete
+var tmpSchedulerLeases = [];
 
 (function ($) {
-    var Scheduler2 = Plugin.extend({
+    var scheduler2 = Plugin.extend({
 
         /** XXX to check
          * @brief Plugin constructor
@@ -52,115 +65,34 @@ var schdlr_PartsInOneHour = 6;
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
 
-            schdlr_totalColums = $("#scheduler-reservation-table th").length;
-
+            SchedulerSlots = schedulerGetSlots(60/schedulerSlotsPerHour);
             //selection from table 
             $(window).keydown(function (evt) {
                 if (evt.which == 17) { // ctrl
-                    ctrlPressed = true;
+                    schedulerCtrlPressed = true;
                 }
             }).keyup(function (evt) {
                 if (evt.which == 17) { // ctrl
-                    ctrlPressed = false;
+                    schedulerCtrlPressed = false;
                 }
             });
-            $("#" + rsvrTblNm).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
+            $("#" + schedulerTblId).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
 
             // Explain this will allow query events to be handled
             // What happens when we don't define some events ?
             // Some can be less efficient
 
-            if (Debug) console.time("Listening_to_queries");
+            if (schedulerDebug) console.time("Listening_to_queries");
             /* Listening to queries */
             this.listen_query(options.query_uuid, 'all_ev');
             this.listen_query(options.query_all_resources_uuid, 'all_resources');
             this.listen_query(options.query_lease_uuid, 'lease');
             //this.listen_query(options.query_lease_uuid, 'lease');
-            if (Debug) console.timeEnd("Listening_to_queries");
-
-            $("#ShedulerNodes tbody").html('<tr><td id="schdlr_frstTD" style="background:transparent; height:45px; border:none;"></td></tr>');
-        },
-
-        /* PLUGIN EVENTS */
-        // on_show like in querytable
-
-
-        /* GUI EVENTS */
-
-        // a function to bind events here: click change
-        // how to raise manifold events
-
-
-        /* GUI MANIPULATION */
-
-        // We advise you to write function to change behaviour of the GUI
-        // Will use naming helpers to access content _inside_ the plugin
-        // always refer to these functions in the remaining of the code
-
-        show_hide_button: function () {
-            // this.id, this.el, this.cl, this.elts
-            // same output as a jquery selector with some guarantees
-        },
-
-        //drawResources: function () {
-        drawLeases: function () {
-            
-            //if (Debug) this.debug('foo');
-            if (Debug) console.time("each:SchedulerResources");
-
-            //scheduler-reservation-table main table columns
-            totalColums = $("#scheduler-reservation-table thead tr th").length;
-            //var totalCell = [];
-            //for (var i = 0; i < totalColums; i++) { totalCell.push("<td></td>"); }
-            //var srt_body = [];
-            var totalCell = "";
-            for (var i = 0; i < totalColums; i++) totalCell +="<td></td>"; 
-            var srt_body = "";
-            /*
-            $.each(SchedulerResources, function (i, group) {
-                console.log(group.groupName);
-                //var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + group.resources.length + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
-                //var groupTR = $("#ShedulerNodes tbody").html('<tr><td class="no-image verticalIndex" rowspan="' + 30 + '"><div class="verticalText">' + group.groupName + '</div></td><td id="schdlr_frstTD" class="info fixed"></td></tr>');
-                var groupTR = $("#ShedulerNodes tbody").html('<tr><td id="schdlr_frstTD" class="info fixed"></td></tr>');
-                
-                //$.each(group.resources.slice(0,30), function (i, resource) {
-                $.each(group.resources, function (i, resource) {
-                    if (i == 0) {
-                        //$("#ShedulerNodes tbody tr:first").append('<td class="info fixed">' + resource.hostname + '</td>');
-                        $(groupTR).find("#schdlr_frstTD").html(resource.urn);
-                        //$(srt_body).html("<tr>" + totalCell + "</tr>");
-                    } else {
-                        $(groupTR).find("tr:last").after('<tr><td class="info fixed">' + resource.urn + '</td></tr>');
-                        //$(srt_body).find("tr:last").after("<tr>" + totalCell + "</tr>");
-                    }
-                    srt_body += "<tr>" + totalCell + "</tr>";
-                    //srt_body.push('<tr>'); srt_body = srt_body.concat(totalCell.concat()); srt_body.push('/<tr>');
-                });
-            });
-            */
-            srt_body += "<tr>" + totalCell + "</tr>";
-            //$("#scheduler-reservation-table tbody").html(srt_body.join(""));
-            $("#scheduler-reservation-table tbody").append(srt_body);
-
-            if (Debug) console.timeEnd("each:SchedulerResources");
-            
-
-            $("#" + rsvrTblNm + " tbody tr").each(function (index) { $(this).attr("data-trindex", index); });
+            if (schedulerDebug) console.timeEnd("Listening_to_queries");
 
         },
 
-        /* TEMPLATES */
-
-        // see in the html template
-        // How to load a template, use of mustache
-
-        /* QUERY HANDLERS */
-        loadWithDate: function () {
-            // only convention, not strictly enforced at the moment
-        },
-        // How to make sure the plugin is not desynchronized
-        // He should manifest its interest in filters, fields or records
-        // functions triggered only if the proper listen is done
+        /* Handlers */
 
         /* all_ev QUERY HANDLERS Start */
         on_all_ev_clear_records: function (data) {
@@ -188,25 +120,14 @@ var schdlr_PartsInOneHour = 6;
             //data is empty on load
         },
         on_all_resources_new_record: function (data) {
-            $("#ShedulerNodes tbody").find("tr:last").after('<tr><td class="info fixed">' + data.urn + '</td></tr>');
-            this.drawLeases();
-            //console.log(data);
-            var tmpGroup = lookup(SchedulerResources, 'groupName', data.type);
-            if (tmpGroup == null) {
-                tmpGroup = { groupName: data.type, resources: [] };
-                SchedulerResources.push(tmpGroup);
-                //if (data.type != "node")  alert('not all node');
-            }
-            tmpGroup.resources.push(data);
-            //alert('new_record');
+            //alert(data.toSource());
+            if (SchedulerData.length < schedulerMaxRows)
+                SchedulerData.push({ id: data.urn, name: data.hrn, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
+            //alert(data.toSource());
         },
         on_all_resources_query_done: function (data) {
-            //this.drawResources();
-            //data is empty on load
-            /* GUI setup and event binding */
-            this._initUI();
-            this._SetPeriodInPage(init_start_visible_index, init_end_visible_index);
-            this.loadWithDate();
+            _resourcesDone = true;
+            this._initScheduler();
         },
         //another plugin has modified something, that requires you to update your display. 
         on_all_resources_field_state_changed: function (data) {
@@ -216,8 +137,25 @@ var schdlr_PartsInOneHour = 6;
         /* lease QUERY HANDLERS Start */
         on_lease_clear_records: function (data) { console.log('clear_records'); },
         on_lease_query_in_progress: function (data) { console.log('lease_query_in_progress'); },
-        on_lease_new_record: function (data) { console.log('lease_new_record'); },
-        on_lease_query_done: function (data) { console.log('lease_query_done'); },
+        on_lease_new_record: function (data) {
+            tmpSchedulerLeases.push({
+                id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
+                slice: data.slice,
+                status: 'reserved',
+                resource: data.resource,
+                network: data.network,
+                start_time: data.start_time,
+                lease_type: data.lease_type,
+                granularity: data.granularity,
+                duration: data.duration
+            });
+            //console.log(data.toSource()); console.log('lease_new_record');
+        },
+        on_lease_query_done: function (data) {
+            _leasesDone = true;
+            this._initScheduler();
+            // console.log('lease_query_done');
+        },
         //another plugin has modified something, that requires you to update your display. 
         on_lease_field_state_changed: function (data) { console.log('lease_field_state_changed'); },
         /* lease QUERY HANDLERS End */
@@ -233,36 +171,28 @@ var schdlr_PartsInOneHour = 6;
 
         /* RECORD HANDLERS */
         on_all_new_record: function (record) {
-            //
-            alert('on_all_new_record');
+            //alert('on_all_new_record');
         },
 
-        debug : function (log_txt) {
+        debug : function (logTxt) {
             if (typeof window.console != 'undefined') {
-                console.debug(log_txt);
+                console.debug(logTxt);
             }
         },
 
         /* INTERNAL FUNCTIONS */
-        _initUI: function () {
-            if (Debug) console.time("_initUI");
-            //fix margins in tables
-            mtNodesTbl = $("#" + rsvrTblNm + " tr:first").outerHeight() + 6;
-            mtSchrollCon = $("#nodes").outerWidth();
-            $("#nodes").css("margin-top", mtNodesTbl);
-            $("#reservation-table-scroll-container").css("margin-left", mtSchrollCon);
-            SetPerFun = this._SetPeriodInPage;
-            //slider
-            $("#time-range").slider({
-                range: true,
-                min: 0,
-                max: 24,
-                step: 0.5,
-                values: [init_start_visible_index, init_end_visible_index],
-                slide: function (event, ui) {
-                    SetPerFun(ui.values[0], ui.values[1]);
-                }
-            });
+        _initScheduler: function () {
+            if (_resourcesDone && _leasesDone)
+            {
+                /* GUI setup and event binding */
+                this._FixLeases();
+                this._initUI();
+            }
+        },
+
+        _initUI : function () {
+            if (schedulerDebug) console.time("_initUI");
+            //init DatePicker Start
             $("#DateToRes").datepicker({
                 dateFormat: "yy-mm-dd",
                 minDate: 0,
@@ -272,48 +202,74 @@ var schdlr_PartsInOneHour = 6;
             }).click(function () {
                 $("#ui-datepicker-div").css("z-index", 5);
             });
+            //End init DatePicker
+            
+            //init Table
+            this._FixTable();
+            //End init Table
+
+            //init Slider
+            $('#tblSlider').slider({
+                min: 0,
+                max: SchedulerTotalCells - SchedulerTotalVisibleCells - 1,
+                value: 0,
+                slide: function (event, ui) {
+                    //$("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
+                    //console.log(ui.value);
+                    if (_schedulerCurrentCellPosition > ui.value)
+                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveBackSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
+                    else if (_schedulerCurrentCellPosition < ui.value)
+                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveFrontSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
+                    _schedulerCurrentCellPosition = ui.value;
+                }
+            });
+            //End init Slider
+
             //other stuff
-            fixOddEvenClasses();
-            $("#" + rsvrTblNm + " td:not([class])").addClass("free");
-            if (Debug) console.timeEnd("_initUI");
+            $("#plugin-scheduler-loader").hide();
+            $("#plugin-scheduler").show();
+
+            //fixOddEvenClasses();
+            //$("#" + schedulerTblId + " td:not([class])").addClass("free");
+            if (schedulerDebug) console.timeEnd("_initUI");
+        },
+
+        _FixLeases  : function () {
+            for (var i = 0; i < tmpSchedulerLeases.length; i++) {
+                var tmpLea = tmpSchedulerLeases[i];
+                var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
+                if (tmpRes != null) {
+                    //alert(tmpLea.id + '-' + tmpLea.start_time);
+                    tmpRes.leases[tmpLea.id] = tmpLea;
+                }
+            }
+        },
+
+        _FixTable: function () {
+            var colWidth = 50;
+            SchedulerTotalCells = SchedulerSlots.length;
+            $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", schedulerTblFirstColWidth);
+            //this get width might need fix depending on the template 
+            var tblwidth = $('#scheduler-tab').parent().outerWidth();
+            SchedulerTotalVisibleCells = parseInt((tblwidth - schedulerTblFirstColWidth) / colWidth);
+
+            //if (SchedulerData.length == 0) {
+            //    //puth some test data
+            //    SchedulerData.push({ name: 'xyz+aaa', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+aaa', type: 'node' });
+            //    SchedulerData.push({ name: 'xyz+bbb', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+bbb', type: 'node' });
+            //    SchedulerData.push({ name: 'xyz+ccc', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+ccc', type: 'node' });
+            //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
+            //}
+            angular.element(document.getElementById('SchedulerCtrl')).scope().initSlots(0, SchedulerTotalVisibleCells);
         },
         _SetPeriodInPage: function (start, end) {
-            if (Debug) console.time("_SetPeriodInPage");
-            ClearTableSelection();
-            $("#lbltime").html(GetTimeFromInt(start) + " - " + GetTimeFromInt(end));
-            
-            var start_visible_index = (start * schdlr_PartsInOneHour) + 1;
-            var end_visible_index = (end * schdlr_PartsInOneHour);
-
-            //hide - show
-            for (i = 0; i < start_visible_index; i++) {
-                $("#" + rsvrTblNm + " td:nth-child(" + i + "), #" + rsvrTblNm + " th:nth-child(" + i + ")").hide();
-            }
-            for (i = end_visible_index + 1; i <= schdlr_totalColums; i++) {
-                $("#" + rsvrTblNm + " td:nth-child(" + i + "), #" + rsvrTblNm + " th:nth-child(" + i + ")").hide();
-            }
-            /*$("#" + rsvrTblNm + " td:not([class*='info']), #" + rsvrTblNm + " th:not([class*='fixed'])").hide();*/
-            for (i = start_visible_index; i <= end_visible_index; i++) {
-                $("#" + rsvrTblNm + " td:nth-child(" + i + "), #" + rsvrTblNm + " th:nth-child(" + i + ")").show();
-            }
-
-            if ($("#" + rsvrTblNm + " th:visible:first").width() > 105) {
-                $("#" + rsvrTblNm + " th span").css("display", "inline")
-            } else {
-                $("#" + rsvrTblNm + " th span").css("display", "block");
-            }
-            mtNodesTbl = $("#" + rsvrTblNm + " tr:first").outerHeight() + 6;
-            $("#nodes").css("margin-top", mtNodesTbl);
-            //$("#scroll_container").width($("#Search").width() - $("#nodes").width());
-            //$("#nodes th").height($("#tblReservation th:visible:first").height() - 2);
-            if (Debug) console.timeEnd("_SetPeriodInPage");
         }
     });
 
     //Sched2 = new Scheduler2();
 
     /* Plugin registration */
-    $.plugin('Scheduler2', Scheduler2);
+    $.plugin('Scheduler2', scheduler2);
 
     // TODO Here use cases for instanciating plugins in different ways like in the pastie.
 

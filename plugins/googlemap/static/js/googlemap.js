@@ -94,6 +94,8 @@
             //create empty LatLngBounds object in order to automatically center the map on the displayed objects
             this.bounds = new google.maps.LatLngBounds();
             var center = new google.maps.LatLng(this.options.latitude, this.options.longitude);
+
+            console.log("GoogleMap zoom = "+this.options.zoom);
             var myOptions = {
                 zoom: this.options.zoom,
                 center: center,

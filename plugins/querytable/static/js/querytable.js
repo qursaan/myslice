@@ -148,9 +148,6 @@
             });
             $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
             $(".dataTables_filter input").css("width","100%");
-            $(".columns_selector").append("columns");
-            $(".columns_selector").css("float","right");
-            $(".columns_selector").css("width","inherit");
         }, // initialize_table
 
         /**

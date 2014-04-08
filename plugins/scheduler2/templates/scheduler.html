@@ -1,4 +1,8 @@
-<div id="plugin-{{ domid }}" class="row">
+<div id="plugin-{{ domid }}-loader" style="text-align:center;">
+    <img src="../../static/img/loading-7b6dc55620a355b55b835f6b4c300f9b.gif" alt="loading" style="width:100px;" />
+    <h3>Loading Data...</h3>
+</div>
+<div id="plugin-{{ domid }}" class="" ng-app="myApp" style="display:none;">
     <div class="row m-b">
         <div class="col-md-1">
             <label for="inputEmail3" class="col-sm-2 control-label">Date</label>
@@ -23,7 +27,7 @@
 
         </div>
     </div>
-    <div class="row m-b">
+    <!--<div class="row m-b">
         <div class="col-md-1">
             <label for="inputEmail3" class="col-sm-1 control-label">Time</label>
         </div>
@@ -33,29 +37,30 @@
         <div class="col-md-2">
             <span id="lbltime" class="label label-primary"></span>
         </div>
-    </div>
-
-    <div class='query-editor-spacer'>
-        <div id="ShedulerNodes-scroll-container">
-            <table id="ShedulerNodes">
-                <tbody>
-                    {% comment %}
-                    {% for itms in nodes %}
+    </div>-->
+    <div id="SchedulerCtrl" ng-controller="SchedulerCtrl" class='query-editor-spacer'>
+        <div class="sliderContainer">
+            <div id="tblSlider"></div>
+        </div>
+        <div class="table-responsive">
+            <table id="scheduler-reservation-table" class="table table-bordered table-condensed">
+                <thead>
                     <tr>
-                        <td class="no-image verticalIndex" rowspan="{{ itms.1|length }}"><div class="verticalText">{{ itms.0 }}</div></td>
-
-                        {% for n in itms.1 %}
-                        {% if not forloop.first %}
-                    <tr>
-                        {% endif %}
-                        <td class="info fixed">{{ n }}</td>
+                        <th>#</th>
+                        <th ng-repeat="slot in slots" >
+                            {[{ slot.time }]}
+                        </th>
                     </tr>
-                    {% endfor %}
-                    {% endfor %}
-                    {% endcomment  %}
+                </thead>
+                <tbody>
+                    <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
+                        <th data-resourceid="{[{ resource.id }]}">{[{ resource.name }]}</th>
+                        <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" ng-class="{{ 'lease.status' }}"></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
+        {% comment %}
         <div id="reservation-table-scroll-container">
             <table id='{{domid}}-reservation-table' class='table table-bordered'>
                 <thead>
@@ -66,7 +71,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% comment %}
+
                     {% for itms in nodes %}
                     {% for n in itms.1 %}
                     <tr data-trindex="">
@@ -82,10 +87,10 @@
                     </tr>
                     {% endfor %}
                     {% endfor %}
-                    {% endcomment  %}
                 </tbody>
             </table>
         </div>
+        {% endcomment  %}
 
         <div class="legend">
             <ol>

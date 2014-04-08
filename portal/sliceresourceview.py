@@ -143,7 +143,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             # center on Paris
             latitude   = 49.,
             longitude  = 9,
-            zoom       = 4,
+            zoom       = 8,
         )
 
         # --------------------------------------------------------------------------

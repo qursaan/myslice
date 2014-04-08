@@ -699,6 +699,7 @@ var manifold = {
         if (data.code == 2) { // ERROR
             // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
+            localStorage.removeItem('user');
             window.location="/logout/";
             if (manifold.asynchroneous_debug) {
                 duration=new Date()-start;
