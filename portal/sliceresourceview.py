@@ -202,7 +202,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env = {}
         template_env['list_resources'] = list_resources.render(self.request)
-        template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
+#         template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
 
         template_env['columns_editor'] = filter_column_editor.render(self.request)
 

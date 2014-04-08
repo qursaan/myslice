@@ -197,10 +197,15 @@
             var colnames = cols.map(function(x) {return x.sTitle})
             var nb_col = cols.length;
             /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-
+            //if (this.options.checkboxes) nb_col -= 1;
+			// catch up with the last column if checkboxes were requested 
+            if (this.options.checkboxes) {
+                // Use a key instead of hostname (hard coded...)
+                line.push(this.checkbox_html(record));
+	        }
+	        
             /* fill in stuff depending on the column name */
-            for (var j = 0; j < nb_col; j++) {
+            for (var j = 1; j < nb_col; j++) {
                 if (typeof colnames[j] == 'undefined') {
                     line.push('...');
                 } else if (colnames[j] == 'hostname') {
@@ -220,10 +225,11 @@
                     }
                     /* XXX TODO: Remove this and have something consistant */
                     if(obj=='resource'){
-                        line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }else{
-                        line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }
+                    line.push(record[this.init_key]);
                 } else {
                     if (record[colnames[j]])
                         line.push(record[colnames[j]]);
@@ -232,11 +238,7 @@
                 }
             }
     
-            // catch up with the last column if checkboxes were requested 
-            if (this.options.checkboxes) {
-                // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox_html(record));
-	        }
+            
     
     	    // adding an array in one call is *much* more efficient
 	        // this.table.fnAddData(line);
@@ -606,10 +608,10 @@
      was in fact given as a third argument, and not second 
      as the various online resources had it - go figure */
     $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
-	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
-	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
-	} );
-    }
+		return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
+		    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
+		});
+    };
 
 })(jQuery);
 

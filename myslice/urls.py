@@ -15,6 +15,7 @@ from settings import auxiliaries, INSTALLED_APPS
 import portal.platformsview
 import portal.dashboardview
 import portal.homeview
+import portal.newsview
 
 home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
@@ -79,7 +80,7 @@ urls = [
     #
     #
     # Portal
-    
+    (r'^news/?$', portal.newsview.NewsView.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
     (r'^users/(?P<slicename>[^/]+)/?$', portal.slicetabusers.SliceUserView.as_view()),
     

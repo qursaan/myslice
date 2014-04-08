@@ -71,7 +71,7 @@ Current implementation makes the following assumptions
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])
             # here 'checkbox' is the class that we give to the <th> dom elem
             # dom-checkbox is a sorting type that we define in querytable.js
-            aoColumnDefs.append ( {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
+            #aoColumnDefs.insert (0, {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
 
     def template_file (self):
         return "querytable.html"
@@ -95,7 +95,7 @@ Current implementation makes the following assumptions
             'css_files': [ #"css/dataTables.bootstrap.css",
                            # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
                            # for now we use full_numbers, with our own ad hoc css 
-                           "css/dataTables.full_numbers.css",
+                           #"css/dataTables.full_numbers.css",
                            #"css/querytable.css" , 
                            ],
             }
