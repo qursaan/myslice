@@ -36,7 +36,14 @@ def dispatch(request, object_type, object_name):
             print "#======> 1 ", el[1]
             #o.params = req_items.getlist('params[]')
             #o.params.append({el[0]:el[1]})
-            o.params.append({el[0][7:-1]:el[1]})
+
+            #params[key][]
+            if (el[0][-2:-1] == '[]') :
+                o.params.append({el[0][7:-3]:",".join(el[1])})
+            else :
+                #params[key]
+                o.params.append({el[0][7:-1]:el[1]})
+            
             print "o.params = ",o.params
             
         elif el[0].startswith('fields'):
