@@ -31,17 +31,13 @@ def dispatch(request, object_type, object_name):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('params'):
             print "#======> 0 ", el[0]
-            #print "#======>", el[0][7:8]
-            #print "#======>", el[0][10:-1]
-            print "#======> 1 ", el[1]
-            #o.params = req_items.getlist('params[]')
-            #o.params.append({el[0]:el[1]})
+            print "#======> 1 ", req_items.getlist(el[0])
 
-            #params[key][]
-            if (el[0][-2:-1] == '[]') :
-                o.params.append({el[0][7:-3]:",".join(el[1])})
+            if (el[0][-2:] == '[]') :
+                # when receiving params[key][] = 'value1' ...
+                o.params.append({el[0][7:-3]:",".join(req_items.getlist(el[0]))})
             else :
-                #params[key]
+                # when receiving params[key] = 'value'
                 o.params.append({el[0][7:-1]:el[1]})
             
             print "o.params = ",o.params
