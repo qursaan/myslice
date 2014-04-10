@@ -16,12 +16,12 @@ var isExecuting = false;
 
 
 function rangeMouseDown(e) {
-    if (Debug) console.time("mouse:rangeMouseDown");
+    if (SchedulerData) console.time("mouse:rangeMouseDown");
     if (schedulerIsRightClick(e)) {
         return false;
     } else {
         scheduler_table_dragStart_tr = $(this).parent().index();
-        scheduler_table_dragStart_td = $(this).index();
+        scheduler_table_dragStart_td = $(this).index() -1;
         scheduler_table_dragEnd_tr = scheduler_table_dragStart_tr;
         scheduler_table_dragEnd_td = scheduler_table_dragStart_td;
         //alert(scheduler_table_dragStart_tr);
@@ -37,11 +37,11 @@ function rangeMouseDown(e) {
         if (typeof e.preventDefault != 'undefined') { e.preventDefault(); }
         document.documentElement.onselectstart = function () { return false; };
     }
-    if (Debug) console.timeEnd("mouse:rangeMouseDown");
+    if (SchedulerData) console.timeEnd("mouse:rangeMouseDown");
 }
 
 function rangeMouseUp(e) {
-    if (Debug) console.time("mouse:rangeMouseUp");
+    if (SchedulerData) console.time("mouse:rangeMouseUp");
     if (schedulerIsRightClick(e)) {
         return false;
     } else {
@@ -49,23 +49,23 @@ function rangeMouseUp(e) {
         //dragEnd = allCells.index($(this));
 
         scheduler_table_dragEnd_tr = $(this).parent().index();
-        scheduler_table_dragEnd_td = $(this).index();
+        scheduler_table_dragEnd_td = $(this).index() -1;
 
         schedulerTableIsDragging = false;
         selectRange(false);
 
         document.documentElement.onselectstart = function () { return true; };
     }
-    if (Debug) console.timeEnd("mouse:rangeMouseUp");
+    if (SchedulerData) console.timeEnd("mouse:rangeMouseUp");
 }
 
 function rangeMouseMove(e) {
-    //if (Debug) console.time("mouse:rangeMouseMove");
+    //if (SchedulerData) console.time("mouse:rangeMouseMove");
     if (schedulerTableIsDragging) {
         scheduler_table_dragEnd_tr = $(this).parent().attr('data-trindex');
         scheduler_table_dragEnd_td = $(this).attr('data-tdindex');
 
-        //if (Debug) this.debug('foo');
+        //if (SchedulerData) this.SchedulerData('foo');
 
         if ((scheduler_table_dragEnd_tr != tmp_scheduler_table_dragEnd_tr) || (scheduler_table_dragEnd_td != tmp_scheduler_table_dragEnd_td)) {
             //console.log(scheduler_table_dragEnd_tr + " - " + tmp_scheduler_table_dragEnd_tr);
@@ -73,14 +73,17 @@ function rangeMouseMove(e) {
             //selectRange(true);
         }
     }
-    //if (Debug) console.timeEnd("mouse:rangeMouseMove");
+    //if (SchedulerData) console.timeEnd("mouse:rangeMouseMove");
 }
 
 function selectRange(isTemp) {
-    if (Debug) console.time("mouse:---selectRange");
+    if (SchedulerData) console.time("mouse:---selectRange");
 
     if (!schedulerCtrlPressed)
-        $("#" + rsvrTblNm + "  td:not([class='info'],[class='closed'])").removeClass('selected selected_tmp').addClass('free');
+        $("#" + schedulerTblId + "  td.selected, #" + schedulerTblId + "  td.selected_tmp").each(function() {
+            $(this).removeClass('selected selected_tmp').addClass('free');
+            schedulerFreeSlot($(this).data('slotid'), $(this).siblings('th').data('resourceindex'));
+        });
 
     tmp_scheduler_table_dragStart_td = scheduler_table_dragStart_td;
     tmp_scheduler_table_dragStart_tr = scheduler_table_dragStart_tr;
@@ -98,45 +101,54 @@ function selectRange(isTemp) {
         tmp_scheduler_table_dragStart_tr = tmp_scheduler_table_dragEnd_tr;
         tmp_scheduler_table_dragEnd_tr = tmp;
     }
-
+    //var angularScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
     //alert("tmp_scheduler_table_dragStart_td:" + tmp_scheduler_table_dragStart_td + "\n tmp_scheduler_table_dragStart_tr:" + tmp_scheduler_table_dragStart_tr + "\n tmp_scheduler_table_dragEnd_td:" + tmp_scheduler_table_dragEnd_td + "\n tmp_scheduler_table_dragEnd_tr:" + tmp_scheduler_table_dragEnd_tr);
 
 
     for (var i = tmp_scheduler_table_dragStart_tr; i <= tmp_scheduler_table_dragEnd_tr; i++) {
         for (var j = tmp_scheduler_table_dragStart_td; j <= tmp_scheduler_table_dragEnd_td; j++) {
             //alert("i:" + i + "j:" + j);
-            var cell = $('#' + rsvrTblNm + '  tbody tr:eq(' + i + ') td:eq(' + j + ')');
+            var cell = $('#' + schedulerTblId + '  tbody tr:eq(' + i + ') td:eq(' + j + ')');
             //$(cell)
             var curClass = $(cell).attr("class");
+            curClass = curClass.replace('ng-scope','').trim();
             //alert(curClass);
             switch (curClass) {
                 case "free_tmp":
-                    $(cell).removeClass();
+                    $(cell).removeClass('selected_tmp selected free_tmp free');
                     if (isTemp)
                         $(cell).addClass("free_tmp");
-                    else
+                    else{
+                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
+                    }
                     break;
                 case "free":
-                    $(cell).removeClass();
+                    $(cell).removeClass('selected_tmp selected free_tmp free');
                     if (isTemp)
                         $(cell).addClass("selected_tmp");
-                    else
+                    else {
+                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
+                    }
                     break;
                 case "selected_tmp":
-                    $(cell).removeClass();
+                    $(cell).removeClass('selected_tmp selected free_tmp free');
                     if (isTemp)
                         $(cell).addClass("selected_tmp");
-                    else
+                    else {
+                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
+                    }
                     break;
                 case "selected":
-                    $(cell).removeClass();
+                    $(cell).removeClass('selected_tmp selected free_tmp free');
                     if (isTemp)
                         $(cell).addClass("free_tmp");
-                    else
+                    else {
+                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
+                    }
                     break;
                 case "closed":
                     //do nothing
@@ -156,11 +168,11 @@ function selectRange(isTemp) {
     }*/
 
 
-    if (Debug) console.timeEnd("mouse:---selectRange");
+    if (SchedulerData) console.timeEnd("mouse:---selectRange");
 }
 
 function ClearTableSelection(){
-    $('#' + rsvrTblNm + ' .selected').addClass("free").removeClass("selected");
+    $('#' + schedulerTblId + ' .selected').addClass("free").removeClass("selected");
 }
 
 

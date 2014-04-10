@@ -85,6 +85,13 @@ function schedulerGetSlotId(startTime, duration, granularity) {
     slotid += d.getMinutes() / timespan;
     return slotid;
 }
+
+function schedulerSelectSlot(slotId, resourceIndex) {
+    SchedulerDataViewData[resourceIndex].leases[slotId].status = 'selected';
+}
+function schedulerFreeSlot(slotId, resourceIndex) {
+    SchedulerDataViewData[resourceIndex].leases[slotId].status = 'free';
+}
 //
 //Find Resource By Id
 function schedulerFindResourceById(Resources, id) {

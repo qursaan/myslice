@@ -40,32 +40,35 @@ myApp.factory('$exceptionHandler', function () {
         });
 
         $scope.moveFrontSlot = function(from, to) {
-            $scope.slots.shift();
-            $scope.slots.push(SchedulerSlots[to]);
-            for (var j = 0; j < $scope.resources.length; j++) {
-                $scope.resources[j].leases.shift();
-                $scope.resources[j].leases.push(SchedulerData[j].leases[to]);
-            }
-            try {
-                $scope.$digest();
-                //$scope.$apply();
-            } catch (err) {
-                $scope.initSlots(from, to);
-            }
+            //$scope.slots.shift();
+            //$scope.slots.push(SchedulerSlots[to]);
+            //for (var j = 0; j < $scope.resources.length; j++) {
+            //    $scope.resources[j].leases.shift();
+            //    $scope.resources[j].leases.push(SchedulerData[j].leases[to]);
+            //}
+            //try {
+            //    $scope.$digest();
+            //    //$scope.$apply();
+            //} catch (err) {
+            //    $scope.initSlots(from, to);
+            //}
+            $scope.initSlots(from, to);
         };
 
         $scope.moveBackSlot = function(from, to) {
             $scope.$apply(function() {
-                try {
-                    $scope.slots.pop();
-                    $scope.slots.unshift(SchedulerSlots[from]);
-                    for (var j = 0; j < $scope.resources.length; j++) {
-                        $scope.resources[j].leases.pop();
-                        $scope.resources[j].leases.unshift(SchedulerData[j].leases[from]);
-                    }
-                } catch (err) {
-                    alert("error");
-                }
+                //try {
+                //    $scope.slots.pop();
+                //    $scope.slots.unshift(SchedulerSlots[from]);
+                //    for (var j = 0; j < $scope.resources.length; j++) {
+                //        $scope.resources[j].leases.pop();
+                //        $scope.resources[j].leases.unshift(SchedulerData[j].leases[from]);
+                //    }
+                //} catch (err) {
+                //    alert("error");
+                //}
+
+                $scope.initSlots(from, to);
             });
         };
 

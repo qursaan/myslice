@@ -34,7 +34,7 @@ var schedulerTblId = "scheduler-reservation-table";
 var schedulerTblFirstColWidth = 150;
 //Some Data
 var schedulerSlotsPerHour = 6;
-var schedulerMaxRows = 50;
+var schedulerMaxRows = 25;
 var SchedulerData = [];
 var SchedulerSlots = [];
 var SchedulerDataViewData = [];
@@ -122,7 +122,7 @@ var tmpSchedulerLeases = [];
         on_all_resources_new_record: function (data) {
             //alert(data.toSource());
             if (SchedulerData.length < schedulerMaxRows)
-                SchedulerData.push({ id: data.urn, name: data.hrn, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
+                SchedulerData.push({ id: data.urn, index: SchedulerData.length, name: data.hrn, granularity: data.granularity, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
             //alert(data.toSource());
         },
         on_all_resources_query_done: function (data) {
@@ -228,7 +228,6 @@ var tmpSchedulerLeases = [];
             //other stuff
             $("#plugin-scheduler-loader").hide();
             $("#plugin-scheduler").show();
-
             //fixOddEvenClasses();
             //$("#" + schedulerTblId + " td:not([class])").addClass("free");
             if (schedulerDebug) console.timeEnd("_initUI");
