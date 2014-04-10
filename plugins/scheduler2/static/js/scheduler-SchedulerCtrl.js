@@ -6,7 +6,9 @@ myApp.factory('$exceptionHandler', function () {
     return function (exception, cause) {
         if (exception.message.contains('leases')) {
             console.log(exception.message);
-            angular.element(document.getElementById('SchedulerCtrl')).scope().initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
+            
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            tmpScope.initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
         }
             
     };
@@ -72,14 +74,18 @@ myApp.factory('$exceptionHandler', function () {
             });
         };
 
-        $scope.initSlots = function(from, to) {
-            //init
-            $scope.slots = [];
-            for (var k = 0; k < SchedulerData.length; k++) {
+        $scope.SetSchedulerResources = function (start, to, filter) {
+            for (var k = start; k < to; k++) {
                 if ($scope.resources.length < SchedulerData.length)
                     $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
                 $scope.resources[k].leases = [];
             }
+            $scope.initSlots(0, SchedulerTotalVisibleCells);
+        };
+
+        $scope.initSlots = function(from, to) {
+            //init
+            $scope.slots = [];
             //set
             for (var i = from; i < to; i++) {
                 $scope.slots.push(SchedulerSlots[i]);
