@@ -50,7 +50,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'resource.hostname', 'resource.type',
                 'resource.network_hrn',
                 'lease.urn',
-                'user.user_hrn',
+                #'user.user_hrn',
                 #'application.measurement_point.counter'
         )
         # for internal use in the querytable plugin;
