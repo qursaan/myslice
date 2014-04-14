@@ -32,14 +32,27 @@
 	
 	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
 		<div class="col-md-12">
-			<table class="table"><tr><td><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></td></tr></table>
-			{%if 'is_pi'  in pi %}	
-			<div>
-				<button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
+			<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+				<div id="user-tab-loaded" style="display:none;">
+    				<table id="user-tab">
+        				<tr>
+            				<th>+/-</th>
+            				<th>email</th>
+            				<th>user_hrn</th>
+            				<th>first name</th>
+            				<th>last name</th>
+            				<th>enabled</th>
+        				</tr>
+    				</table>
+				{%if 'is_pi'  in pi %}	
+				<div>
+					<button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
+				</div>
+				{%endif%}
 			</div>
-			{%endif%}
 		</div>
-	</div>
+ 	</div>
+
 	<div class="tab-pane row" id="slices">
 		{%if 'is_pi'  in pi %}
 	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
@@ -172,34 +185,49 @@
         });
 		
 		
-        // $.post("/rest/user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
-            // var list_users = [];
-            // var table_users = [];
-			// /* Available fields
-			// user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
-			// user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
-			// */
-            // $.each( data, function( key, val ) {
-                // list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-// 
-                // user_row = "<tr id='"+val.user_hrn+"'>";
-                // user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
-                // user_row += "<td>"+val.user_email+"</td>";
-                // user_row += "<td>"+val.user_hrn+"</td>";
-                // user_row += "<td>"+val.user_first_name+"</td>";
-                // user_row += "<td>"+val.user_last_name+"</td>";
-				// user_row += "<td>"+val.user_enabled+"</td>";
-                // user_row += "</tr>";
-                // table_users.push(user_row);
+         $.post("/rest/user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+             var list_users = [];
+             var table_users = [];
+			 /* Available fields
+			 user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+			 user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+			 */
+             $.each( data, function( key, val ) {
+                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                 user_row = "<tr id='"+val.user_hrn+"'>";
+                 user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
+                 user_row += "<td>"+val.user_email+"</td>";
+                 user_row += "<td>"+val.user_hrn+"</td>";
+                 user_row += "<td>"+val.user_first_name+"</td>";
+                 user_row += "<td>"+val.user_last_name+"</td>";
+				 user_row += "<td>"+val.user_enabled+"</td>";
+                 user_row += "</tr>";
+                 table_users.push(user_row);
 //                 
-            // });
-            // $("table#user-tab tr:last").after(table_users.join( "" ));
-            // $("div#user-tab-loaded").css("display","block");
-            // $("div#user-tab-loading").css("display","none");
-         // });
-         {% endif %}
-         {% endif %}
-    });
+             });
+             $("table#user-tab tr:last").after(table_users.join( "" ));
+             $("div#user-tab-loaded").css("display","block");
+             $("div#user-tab-loading").css("display","none");
+          });
+
+ 		$('button#deleteusers').click(function() {
+     		$('input:checkbox.user').each(function (index) {
+         		if(this.checked){
+             		var record_id = this.id;
+             		$.post("/delete/user/",{'filters':{'user_hrn':this.id}}, function(data) {
+                 	if(data.success){
+                     	$('tr[id="'+record_id+'"]').fadeOut("slow");
+                     	$('tr[id="'+record_id+'"]').remove();
+                 	}else{
+                     	alert("Rest Error for "+record_id+": "+data.error);
+                 	}   
+             	});     
+         	} 
+     	}); 
+ 	}); 
+ {% endif %}
+ {% endif %}
+});
 
 
 </script>
