@@ -1,8 +1,9 @@
 NEW USER REQUEST
 
-First Name   : {{first_name}}
-Last Name    : {{last_name}} 
+First name   : {{first_name}}
+Last name    : {{last_name}} 
 Authority hrn: {{authority_hrn}}
 Public key   : {{public_key}}
 Email        : {{email}}
-User Hrn     : {{user_hrn}}
+User hrn     : {{user_hrn}}
+Portal url   : {{ current_site }}
