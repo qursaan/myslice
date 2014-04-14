@@ -88,8 +88,11 @@ class RegistrationView (FreeAccessView, ThemeView):
                 if user_detail['email'] == user_request['email']:
                     errors.append('Email already registered in Manifold. Please provide a new email address.')
             # Does the user exist in sfa? [query is very slow!!]
-            user_query  = Query().get('user').select('user_hrn','user_email')
+            #user_query  = Query().get('user').select('user_hrn','user_email')
+            # XXX Test based on the user_hrn is quick
+            user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_request['user_hrn'])
             user_details_sfa = execute_admin_query(wsgi_request, user_query)
+
             for user in user_details_sfa:
                 if user['user_email'] == user_request['email']:
                     errors.append('Email already registered in SFA registry. Please use another email.')

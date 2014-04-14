@@ -50,7 +50,7 @@ class ContactView (FreeAccessView, ThemeView):
                 else:
                     sender = email
         
-                msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+                msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
             except Exception, e:

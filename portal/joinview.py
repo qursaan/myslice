@@ -205,7 +205,7 @@ class JoinView (FreeAccessView, ThemeView):
                     sender =  render_to_string(theme.template, ctx)
                     sender = sender.replace('\n', '')
             
-                    msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+                    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
     
