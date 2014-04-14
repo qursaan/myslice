@@ -282,7 +282,7 @@ def portal_validate_request(wsgi_request, request_ids):
             try:
                 create_user(wsgi_request, request)
                 request_status['SFA user'] = {'status': True }
-
+                PendingUser.objects.get(id=request['id']).delete()
             except Exception, e:
                  request_status['SFA user'] = {'status': False, 'description': str(e)}
                        
@@ -306,6 +306,7 @@ def portal_validate_request(wsgi_request, request_ids):
             try:
                 create_slice(wsgi_request, request)
                 request_status['SFA slice'] = {'status': True }
+                PendingSlice.objects.get(id=request['id']).delete()
 
             except Exception, e:
                 request_status['SFA slice'] = {'status': False, 'description': str(e)}
@@ -328,6 +329,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 print "ADD Authority"
                 sfa_add_authority(wsgi_request, sfa_authority_params)
                 request_status['SFA authority'] = {'status': True }
+                PendingAuthority.objects.get(id=request['id']).delete()
 
             except Exception, e:
                 request_status['SFA authority'] = {'status': False, 'description': str(e)}

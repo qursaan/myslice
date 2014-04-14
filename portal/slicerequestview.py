@@ -1,4 +1,6 @@
 from django.shortcuts           import render
+from django.contrib.sites.models import Site
+
 
 from unfold.page                import Page
 
@@ -63,6 +65,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
         if method == 'POST':
             # The form has been submitted
+
+            # get the domain url
+            current_site = Site.objects.get_current()
+            current_site = current_site.domain
+
             slice_request = {
                 'type'              : 'slice',
                 'id'                : None,
@@ -73,6 +80,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
                 'type_of_nodes'     : wsgi_request.POST.get('type_of_nodes', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
+                'current_site'      : current_site
             }
             
             authority_hrn = slice_request['authority_hrn']
