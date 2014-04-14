@@ -18,7 +18,7 @@ $(document).ready(function() {
 			testbed_row += "<th id=testbed_check><input type=\"checkbox\" name=\"network_hrn\" value=\"all\"/></th>";
 			testbed_row += "<th id=testbed_icon></th>";
 			testbed_row += "<th>network_hrn</th>";
-			testbed_row += "<th>Full name</th>";
+			//testbed_row += "<th>Full name</th>";
 			testbed_row += "<th>Description</th>";
 			testbed_row += "</tr>";
 			testbed_row += "</thead>";
@@ -26,10 +26,12 @@ $(document).ready(function() {
 			$.each( data, function(key, val) {
 				testbed_row = "<tr data-keys=\""+val.network_hrn+"\" class=\"odd\">";
 				testbed_row += "<td><input type=\"checkbox\" name=\"network_hrn\" value=\""+val.network_hrn+"\"/></td>";
-				testbed_row += "<td><img src='/static/img/testbeds/"+val.network_hrn+".png' alt='' /></td>";
+                net_hrn = val.network_hrn;
+                net_hrn = net_hrn.replace(/\\/g, '');
+				testbed_row += "<td><img src='/static/img/testbeds/"+net_hrn+".png' alt='' /></td>";
 				testbed_row += "<td>"+val.network_hrn+"</td>";
 				testbed_row += "<td>"+val.network_longname+"</td>";
-				testbed_row += "<td>"+val.description+"</td>";
+				//testbed_row += "<td>"+val.description+"</td>";
 				testbed_row += "</thead>";
 	
 				testbed_data.push(testbed_row);
