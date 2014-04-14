@@ -135,7 +135,7 @@
 
                 value = this.dataset['platform'];
                 // handle the hrn that include . in their name (has to be in sync with the data from SFA)
-                value = value.replace(/\./g,"\\.");
+                //value = value.replace(/\./g,"\\.");
                 key = "network_hrn";
                 op = "included";
                 return $(this).hasClass('active') ? self._addFilter(key, op, value) : self._removeFilter(key, op, value);
