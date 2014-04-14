@@ -34,7 +34,7 @@ var schedulerTblId = "scheduler-reservation-table";
 var schedulerTblFirstColWidth = 150;
 //Some Data
 var schedulerSlotsPerHour = 6;
-var schedulerMaxRows = 50;
+var schedulerMaxRows = 25;
 var SchedulerData = [];
 var SchedulerSlots = [];
 var SchedulerDataViewData = [];
@@ -122,8 +122,9 @@ var tmpSchedulerLeases = [];
         on_all_resources_new_record: function (data) {
             //alert(data.toSource());
             if (SchedulerData.length < schedulerMaxRows)
-                SchedulerData.push({ id: data.urn, name: data.hrn, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
+                SchedulerData.push({ id: data.urn, index: SchedulerData.length, name: data.hrn, granularity: data.granularity, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
             //alert(data.toSource());
+
         },
         on_all_resources_query_done: function (data) {
             _resourcesDone = true;
@@ -162,9 +163,9 @@ var tmpSchedulerLeases = [];
 
 
         // no prefix
-
         on_filter_added: function (filter) {
-
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            tmpScope.SetSchedulerResources(0, schedulerMaxRows, filter);
         },
 
         // ... be sure to list all events here
@@ -190,7 +191,8 @@ var tmpSchedulerLeases = [];
             }
         },
 
-        _initUI : function () {
+        _initUI: function () {
+            //alert(1);
             if (schedulerDebug) console.time("_initUI");
             //init DatePicker Start
             $("#DateToRes").datepicker({
@@ -228,7 +230,6 @@ var tmpSchedulerLeases = [];
             //other stuff
             $("#plugin-scheduler-loader").hide();
             $("#plugin-scheduler").show();
-
             //fixOddEvenClasses();
             //$("#" + schedulerTblId + " td:not([class])").addClass("free");
             if (schedulerDebug) console.timeEnd("_initUI");
@@ -260,7 +261,8 @@ var tmpSchedulerLeases = [];
             //    SchedulerData.push({ name: 'xyz+ccc', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+ccc', type: 'node' });
             //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
             //}
-            angular.element(document.getElementById('SchedulerCtrl')).scope().initSlots(0, SchedulerTotalVisibleCells);
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            tmpScope.SetSchedulerResources(0, schedulerMaxRows, null);
         },
         _SetPeriodInPage: function (start, end) {
         }

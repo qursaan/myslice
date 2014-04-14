@@ -6,7 +6,9 @@ myApp.factory('$exceptionHandler', function () {
     return function (exception, cause) {
         if (exception.message.contains('leases')) {
             console.log(exception.message);
-            angular.element(document.getElementById('SchedulerCtrl')).scope().initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
+            
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            tmpScope.initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
         }
             
     };
@@ -40,43 +42,50 @@ myApp.factory('$exceptionHandler', function () {
         });
 
         $scope.moveFrontSlot = function(from, to) {
-            $scope.slots.shift();
-            $scope.slots.push(SchedulerSlots[to]);
-            for (var j = 0; j < $scope.resources.length; j++) {
-                $scope.resources[j].leases.shift();
-                $scope.resources[j].leases.push(SchedulerData[j].leases[to]);
-            }
-            try {
-                $scope.$digest();
-                //$scope.$apply();
-            } catch (err) {
-                $scope.initSlots(from, to);
-            }
+            //$scope.slots.shift();
+            //$scope.slots.push(SchedulerSlots[to]);
+            //for (var j = 0; j < $scope.resources.length; j++) {
+            //    $scope.resources[j].leases.shift();
+            //    $scope.resources[j].leases.push(SchedulerData[j].leases[to]);
+            //}
+            //try {
+            //    $scope.$digest();
+            //    //$scope.$apply();
+            //} catch (err) {
+            //    $scope.initSlots(from, to);
+            //}
+            $scope.initSlots(from, to);
         };
 
         $scope.moveBackSlot = function(from, to) {
             $scope.$apply(function() {
-                try {
-                    $scope.slots.pop();
-                    $scope.slots.unshift(SchedulerSlots[from]);
-                    for (var j = 0; j < $scope.resources.length; j++) {
-                        $scope.resources[j].leases.pop();
-                        $scope.resources[j].leases.unshift(SchedulerData[j].leases[from]);
-                    }
-                } catch (err) {
-                    alert("error");
-                }
+                //try {
+                //    $scope.slots.pop();
+                //    $scope.slots.unshift(SchedulerSlots[from]);
+                //    for (var j = 0; j < $scope.resources.length; j++) {
+                //        $scope.resources[j].leases.pop();
+                //        $scope.resources[j].leases.unshift(SchedulerData[j].leases[from]);
+                //    }
+                //} catch (err) {
+                //    alert("error");
+                //}
+
+                $scope.initSlots(from, to);
             });
+        };
+
+        $scope.SetSchedulerResources = function (start, to, filter) {
+            for (var k = start; k < to; k++) {
+                if ($scope.resources.length < SchedulerData.length)
+                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
+                $scope.resources[k].leases = [];
+            }
+            $scope.initSlots(0, SchedulerTotalVisibleCells);
         };
 
         $scope.initSlots = function(from, to) {
             //init
             $scope.slots = [];
-            for (var k = 0; k < SchedulerData.length; k++) {
-                if ($scope.resources.length < SchedulerData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
-                $scope.resources[k].leases = [];
-            }
             //set
             for (var i = from; i < to; i++) {
                 $scope.slots.push(SchedulerSlots[i]);

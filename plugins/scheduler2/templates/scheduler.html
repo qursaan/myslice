@@ -54,7 +54,7 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
-                        <th data-resourceid="{[{ resource.id }]}">{[{ resource.name }]}</th>
+                        <th data-resourceid="{[{ resource.id }]}" data-resourceindex="{[{ resource.index }]}">{[{ resource.name }]}</th>
                         <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" ng-class="{{ 'lease.status' }}"></td>
                     </tr>
                 </tbody>

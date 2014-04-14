@@ -32,13 +32,12 @@ class Scheduler2 (Plugin):
     def requirements (self):
         reqs = {
             'js_files' : [
-                # Thierry: I have to move this one step up - was 'js/angular/angular.min.js',
-                'js/angular.min.js',
+                'js/angular/angular.min.js',
                 'js/scheduler2.js',
-                'js/SchedulerCtrl.js',
+                'js/scheduler-SchedulerCtrl.js',
                 #'js/slider/jquery-ui-1.10.3.slider.min.js',
                 'js/scheduler-helpers.js',
-                'js/table-selector.js',
+                'js/scheduler-table-selector.js',
             ],
             'css_files': [
                 'css/scheduler2.css', 
