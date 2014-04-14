@@ -5,7 +5,7 @@ from django.template                import RequestContext
 from django.shortcuts               import render_to_response
 from django.shortcuts               import render
 
-from unfold.loginrequired           import FreeAccessView
+from unfold.loginrequired           import LoginRequiredAutoLogoutView
 
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
@@ -16,7 +16,7 @@ from myslice.configengine           import ConfigEngine
 from myslice.theme                          import ThemeView
 import json
 
-class InstitutionView (FreeAccessView, ThemeView):
+class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'institution.html'
         
     # expose this so we can mention the backend URL on the welcome page

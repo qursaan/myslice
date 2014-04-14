@@ -28,7 +28,7 @@ from django.http                import HttpResponseRedirect, HttpResponse
 from django.shortcuts           import render
 from django.template.loader     import render_to_string
 
-from unfold.loginrequired       import FreeAccessView
+from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
 from portal.event               import Event
@@ -46,7 +46,7 @@ from manifold.core.query        import Query
 from unfold.page                import Page
 from myslice.theme import ThemeView
 
-class ValidatePendingView(FreeAccessView, ThemeView):
+class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "validate_pending.html"
 
     def get_context_data(self, **kwargs):
