@@ -153,8 +153,17 @@ class ValidatePendingView(FreeAccessView, ThemeView):
             pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
             pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
             pi_authorities = set()
-            for pa in pi_authorities_tmp:
-                pi_authorities |= set(pa['pi_authorities'])
+            try:
+                for pa in pi_authorities_tmp:
+                    pi_authorities |= set(pa['pi_authorities'])
+            except:
+                print 'No pi_authorities'
+# TODO: exception if no parent_authority
+#             try:
+#                 for pa in pi_authorities_tmp:
+#                     pi_authorities |= set(pa['pi_authorities'])
+#             except:
+
 
 #            # include all sub-authorities of the PI
 #            # if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
