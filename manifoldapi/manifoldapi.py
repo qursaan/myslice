@@ -152,7 +152,9 @@ def _execute_query(request, query, manifold_api_session_auth):
 def execute_query(request, query):
     if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
         request.session.flush()
-        raise Exception, "User not authenticated"
+        #raise Exception, "User not authenticated"
+        host = request.get_host()
+        return redirect(host)
     manifold_api_session_auth = request.session['manifold']['auth']
     return _execute_query(request, query, manifold_api_session_auth)
 
