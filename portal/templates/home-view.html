@@ -42,14 +42,11 @@
 					<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
 					<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 				{% else %}
+					<button id="signupbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-user"></span> Sign Up</button>
 				{% endif %}
 				</td>
 				<td class="support">
-					<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
-					<div>
-						<a href="/portal/contact">Contact</a> <br />
-					<!--	<a href="/portal/support/documentation">Documentation</a> -->
-					</div>
+					<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
 				</td>
 			</tr>
 		</table>
@@ -102,6 +99,9 @@
 		});
 		$('button#ticketbtn').click(function() {
 			window.location="/portal/contact/";
+		});
+		$('button#signupbtn').click(function() {
+			window.location="/portal/register/";
 		});
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
