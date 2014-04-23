@@ -28,7 +28,7 @@ from django.http                import HttpResponseRedirect, HttpResponse
 from django.shortcuts           import render
 from django.template.loader     import render_to_string
 
-from unfold.loginrequired       import FreeAccessView
+from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
 from portal.event               import Event
@@ -44,9 +44,9 @@ from portal.actions             import get_requests
 from manifoldapi.manifoldapi    import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
-from theme import ThemeView
+from myslice.theme import ThemeView
 
-class ValidatePendingView(FreeAccessView, ThemeView):
+class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "validate_pending.html"
 
     def get_context_data(self, **kwargs):
@@ -153,8 +153,17 @@ class ValidatePendingView(FreeAccessView, ThemeView):
             pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
             pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
             pi_authorities = set()
-            for pa in pi_authorities_tmp:
-                pi_authorities |= set(pa['pi_authorities'])
+            try:
+                for pa in pi_authorities_tmp:
+                    pi_authorities |= set(pa['pi_authorities'])
+            except:
+                print 'No pi_authorities'
+# TODO: exception if no parent_authority
+#             try:
+#                 for pa in pi_authorities_tmp:
+#                     pi_authorities |= set(pa['pi_authorities'])
+#             except:
+
 
 #            # include all sub-authorities of the PI
 #            # if PI on ple, include all sub-auths ple.upmc, ple.inria and so on...
@@ -263,6 +272,7 @@ class ValidatePendingView(FreeAccessView, ThemeView):
         context['username'] = the_user(self.request) 
         
         context['theme'] = self.theme
+        context['section'] = "Requests"
         # XXX We need to prepare the page for queries
         #context.update(page.prelude_env())
 

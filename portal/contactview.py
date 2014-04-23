@@ -7,7 +7,7 @@ from ui.topmenu                 import topmenu_items, the_user
 
 from portal.forms               import ContactForm
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # splitting the 2 functions done here
 # GET is for displaying the empty form
@@ -50,7 +50,7 @@ class ContactView (FreeAccessView, ThemeView):
                 else:
                     sender = email
         
-                msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+                msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
             except Exception, e:
@@ -77,4 +77,5 @@ class ContactView (FreeAccessView, ThemeView):
                 'topmenu_items': topmenu_items('Contact', request),
                 'theme' : self.theme,
                 'username': username,
+                'section': "Contact"
                 })

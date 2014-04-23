@@ -60,6 +60,14 @@ when you just need to hit ^C yourself when your static files need to be refreshe
 $ pip install -r path/to/requirements/file.txt
 Note. not quite sure what this is about, I could not spot this file..
 
+=====APACHE Config=====
+if are running apache please do:
+
+$ chown www-data:www-data /var/myslice-f4f
+
+otherwise you may get the following error:
+"DatabaseError: unable to open database file"
+
 ==================== Status
 
 *** Authentication ***

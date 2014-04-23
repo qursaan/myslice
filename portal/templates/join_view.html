@@ -4,17 +4,22 @@
 
 
 <div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_testbed_small.png" alt="Join Federation" /> Join the OneLab Federation</h1>
+	<div class="col-md-12">
+	<h1><img src="{{ STATIC_URL }}icons/testbed-xs.png" alt="Join Federation" /> Join the OneLab Federation</h1>
+	</div>
 </div>
 <div class="row">
-	
-	<p>
+	<div class="col-md-12">
+	<h3>
 	OneLab welcomes companies, universities, and research laboratories to join the OneLab Federation of Testbeds. <br>
+	</h3>
+	<p>
 	We are supported by the European Commision through its 7th Framework Programs and FIRE initiative (Future Internet Research and Experimentation), as well as by other national and international funding initiatives.
 	</p>
 	<p>
 	If you wish to become a new member of OneLab Federation, you should first consult the Membership Agreement.
 	</p>
+	</div>
 </div>
 
 {% if errors %}
@@ -26,138 +31,150 @@
     </ul>
 </div>
 {% endif %}
-  
+<form id="joinForm" method="post">
 <div class="row">
-  <form action="" id="joinForm" method="post">
+  
   {% csrf_token %}
-    <fieldset>
-      <table>
-        <tr><td colspan="2"><h4>Site Information</h4></td></tr>
-        <tr>
-          <th><label for="site_name">Site name: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_name" name="site_name" value="{{ site_name }}" size="20" maxlength="40" class="form-control" required> </td>
-        </tr>
-       <tr>
-          <th><label for="root_authority_hrn">Root authority: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td> 
-               <select id="root_authority_hrn" name="root_authority_hrn" class="form-control" required>
-               {% if root_authorities %}
-                    {% for root_auth in root_authorities %}
-               <option>{{ root_auth.authority_hrn }}</option>
-                    {% endfor %}
-               {% endif %}
-               </select>
+  <div class="col-md-6">
+  	<h3>Site Information</h3>
+  	
+  	<div class="form-group">
+  		<label for="site_name">Site name:</label>
+    	<input type="text" id="site_name" name="site_name" value="{{ site_name }}" maxlength="40" class="form-control" required>
+    </div>
+	<div class="form-group">
+    	<label for="root_authority_hrn">Root authority:</label>
+	    <select id="root_authority_hrn" name="root_authority_hrn" class="form-control" required>
+		   {% if root_authorities %}
+		        {% for root_auth in root_authorities %}
+		   <option>{{ root_auth.authority_hrn }}</option>
+		        {% endfor %}
+		   {% endif %}
+		</select>
 <!--
                <div class="ui-widget">
                    <input id="root_authority_hrn" name="root_authority_hrn" class="form-control" value="{{ root_authority_hrn }}" required>
                </div>
 -->
-          </td>
-        </tr>
-        <tr>
-          <th><label for="site_authority">Site authority: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_authority" name="site_authority" value="{{ site_authority }}" size="10" maxlength="16" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="site_abbreviated_name">Abbreviated name: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_abbreviated_name" name="site_abbreviated_name" value="{{ site_abbreviated_name }}" size="20" maxlength="40" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="site_url">URL: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_url" name="site_url" value="{{ site_url }}" size="30" maxlength="128" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="site_latitude">Latitude: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_latitude" name="site_latitude" value="{{ site_latitude }}" size="10" maxlength="10" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="site_longitude">Longitude: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="site_longitude" name="site_longitude" value="{{ site_longitude }}" size="10" maxlength="10" class="form-control" required> </td>
-        </tr>
-        <tr><td colspan="2">&nbsp;</td></tr>
-        <tr><td colspan="2"><h4>Principal Investigator Information</h4></td></tr>
-        <tr>
-          <th><label for="pi_first_name">PI First Name: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="pi_first_name" name="pi_first_name" value="{{ pi_first_name }}" size="20" maxlength="20" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="pi_last_name">PI Last Name: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="pi_last_name" name="pi_last_name" value="{{ pi_last_name }}" size="20" maxlength="20" class="form-control" required> </td>
-        </tr>
+	</div>
+	<div class="form-group">
+		<label for="site_authority">Site authority:</label>
+		<input type="text" id="site_authority" name="site_authority" value="{{ site_authority }}" maxlength="16" class="form-control" required>
+    </div>
+	<div class="form-group">  
+        <label for="site_abbreviated_name">Abbreviated name:</label>
+        <input type="text" id="site_abbreviated_name" name="site_abbreviated_name" value="{{ site_abbreviated_name }}" maxlength="40" class="form-control" required>
+    </div>
+	<div class="form-group">  
+        <label for="site_url">URL:</label>
+        <input type="text" id="site_url" name="site_url" value="{{ site_url }}" maxlength="128" class="form-control" required>
+    </div>
+	<div class="form-group"> 
+        <label for="site_latitude">Latitude:</label>
+        <input type="text" id="site_latitude" name="site_latitude" value="{{ site_latitude }}" maxlength="10" class="form-control" required>
+    </div>
+	<div class="form-group"> 
+        <label for="site_longitude">Longitude:</label>
+        <input type="text" id="site_longitude" name="site_longitude" value="{{ site_longitude }}" maxlength="10" class="form-control" required>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+  	<h3>Postal address</h3>
+
+	<div class="form-group">
+  		<label class="" for="address_line1">Address: </label>
+        <input type="text" id="address_line1" name="address_line1" value="{{ address_line1 }}" maxlength="40" class="form-control">
+    </div>
+	<div class="form-group"> 
+        <label class="" for="address_line2">Address (2): </label>
+        <input type="text" id="address_line2" name="address_line2" value="{{ address_line2 }}" maxlength="40" class="form-control">
+    </div>
+	<div class="form-group"> 
+        <label class="" for="address_line3">Address (3): </label>
+        <input type="text" id="address_line3" name="address_line3" value="{{ address_line3 }}" maxlength="40" class="form-control">
+    </div>
+	<div class="form-group"> 
+        <label class="" for="address_city">City: </label>
+        <input type="text" id="address_city" name="address_city" value="{{ address_city }}" maxlength="20" class="form-control">
+    </div>
+	<div class="form-group"> 
+        <label class="" for="address_postalcode">Postal Code: </label>
+        <input type="text" id="address_postalcode" name="address_postalcode" value="{{ address_postalcode }}" size="10" maxlength="10" class="form-control">
+    </div>
+	<div class="form-group">
+        <label class="" for="address_state">State: </label>
+        <input type="text" id="address_state" name="address_state" value="{{ address_state }}" maxlength="20" class="form-control">
+    </div>
+	<div class="form-group">   
+        <label class="" for="address_country">Country: </label>
+        <input type="text" id="address_country" name="address_country" value="{{ address_country }}" maxlength="20" class="form-control">
+    </div>
+	
+  </div>
+</div>
+
+<div class="row"> 
+  
+  <div class="col-md-6">
+  	
+  	<h3>Principal Investigator Information</h3>
+
+	<div class="form-group">
+	  	<label for="pi_first_name">PI First Name</label>
+    	<input type="text" id="pi_first_name" name="pi_first_name" value="{{ pi_first_name }}" maxlength="20" class="form-control" required>
+    </div>
+	<div class="form-group">    
+    	<label for="pi_last_name">PI Last Name:</label>
+		<input type="text" id="pi_last_name" name="pi_last_name" value="{{ pi_last_name }}" maxlength="20" class="form-control" required>
 <!--
         <tr>
           <th><label class="" for="pi_title">PI Title: </label></th>
-          <td><input type="text" id="pi_title" name="pi_title" value="{{ pi_title }}" size="6" maxlength="6" class="form-text "> </td>
+          <td><input type="text" id="pi_title" name="pi_title" value="{{ pi_title }}" size="6" maxlength="6" class="form-control "> </td>
         </tr>
 -->
-        <tr>
-          <th><label for="pi_phone">PI Phone: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="pi_phone" name="pi_phone" value="{{ pi_phone }}" size="20" maxlength="20" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="pi_email">PI email: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="text" id="pi_email" name="pi_email" value="{{ pi_email }}" size="20" maxlength="40" class="form-control" required> </td>
-        </tr>
-        <tr>
-          <th><label for="pi_password">PI password: <span class="form-required" title="This field is required.">*</span></label></th>
-          <td><input type="password" id="pi_password" name="pi_password" value="" size="20" maxlength="20" class="form-control" required> </td>
-        </tr>
-        <tr><td colspan="2">&nbsp;</td></tr>
-        <tr><td colspan="2"><h4>Postal address</h4></td></tr>
-        <tr>
-          <th><label class="" for="address_line1">Address: </label></th>
-          <td><input type="text" id="address_line1" name="address_line1" value="{{ address_line1 }}" size="30" maxlength="40" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_line2">Address (2): </label></th>
-          <td><input type="text" id="address_line2" name="address_line2" value="{{ address_line2 }}" size="30" maxlength="40" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_line3">Address (3): </label></th>
-          <td><input type="text" id="address_line3" name="address_line3" value="{{ address_line3 }}" size="30" maxlength="40" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_city">City: </label></th>
-          <td><input type="text" id="address_city" name="address_city" value="{{ address_city }}" size="20" maxlength="20" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_postalcode">Postal Code: </label></th>
-          <td><input type="text" id="address_postalcode" name="address_postalcode" value="{{ address_postalcode }}" size="10" maxlength="10" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_state">State: </label></th>
-          <td><input type="text" id="address_state" name="address_state" value="{{ address_state }}" size="20" maxlength="20" class="form-text"> </td>
-        </tr>
-        <tr>
-          <th><label class="" for="address_country">Country: </label></th>
-          <td><input type="text" id="address_country" name="address_country" value="{{ address_country }}" size="20" maxlength="20" class="form-text "> </td>
-        </tr>
-        <tr><td colspan="2">&nbsp;</td></tr>
-        <tr><td colspan="2" style="text-align:center"><input type="submit" name="op" value="Register" class="form-submit"></td></tr>
-      </table>
-    </fieldset>
-  </form>
-</div>
-
-<div class="row">
+	</div>
+	<div class="form-group">
+		<label for="pi_phone">PI Phone:</label>
+    	<input type="text" id="pi_phone" name="pi_phone" value="{{ pi_phone }}" maxlength="20" class="form-control" required>
+    </div>
+	<div class="form-group">
+    	<label for="pi_email">PI email:</label>
+    	<input type="text" id="pi_email" name="pi_email" value="{{ pi_email }}" maxlength="40" class="form-control" required>
+    </div>
+	<div class="form-group">
+    	<label for="pi_password">PI password:</label>
+    	<input type="password" id="pi_password" name="pi_password" value="" maxlength="20" class="form-control" required>
+	</div>
+  	
+	</div>
+	<div class="col-md-6">
+		<h3>Site Registration Information</h3>
 	<p>
-A membership agreement document will be sent to your email address as a PDF file.
-</p><p>
-Please print and sign a copy of the agreement and send it to:
-</p><p>
-Ciro Scognamiglio<br>
-UPMC - LIP6<br>
-Campus Jussieu<br>
-Couloir 26-00, bureau 102<br>
-Boite courrier 169<br>
-4 place Jussieu<br>
-F-75252 PARIS cedex 05 - FRANCE<br>
-</p><p>
-Once your membership has been processed we will contact you to welcome you as a member.
-</p><p>
-If you have any questions about membership, contact the <a href="/portal/contact" >OneLab Support team</a>.
-</p>
+		A membership agreement document will be sent to your email address as a PDF file.
+	</p><p>
+		Please print and sign a copy of the agreement and send it to:
+	</p><p>
+	Ciro Scognamiglio<br>
+	UPMC - LIP6<br>
+	Campus Jussieu<br>
+	Couloir 26-00, bureau 102<br>
+	Boite courrier 169<br>
+	4 place Jussieu<br>
+	F-75252 PARIS cedex 05 - FRANCE<br>
+	</p><p>
+	Once your membership has been processed we will contact you to welcome you as a member.
+	</p><p>
+	If you have any questions about membership, contact the <a href="/portal/contact" >OneLab Support team</a>.
+	</p>
+	</div>
 </div>
+<div class="row">
+	<div class="col-md-12" style="text-align:center;">
+		<button type="submit" class="btn btn-default">Send registration form</button>
+	</div>
+</div>
+</form>
 <script>
 /*
 jQuery(document).ready(function(){

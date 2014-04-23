@@ -1,42 +1,22 @@
 $(document).ready(function() {
-	$('li#nav-institution').addClass("active");
-
-    $('a.home-tab').click(function() {
-        $('ul.nav-tabs li').removeClass('active');
-        $(this).parent().addClass('active');
-        $('div.home-panel').hide();
-        $('div#'+$(this).data('panel')).show();
-    });
-    var url = window.location;
-    if(url.hash) {
-        // Fragment exists 
-        tab = url.href.split("#")[1];
-        tab_exists = $('div#'+tab).length;
-        if (tab_exists) {
-           $('ul.nav-tabs li').removeClass('active');
-           $('li#'+tab+'-tab').addClass('active');
-           $('div.home-panel').hide();            
-           $('div#'+tab).show();
-        }
-    }
+	loadedTabs = [];
+	
+	$('.nav-tabs a').click(function (e) {
+		e.preventDefault();
+		$(this).tab('show');
+		id = $(this).attr('href').substr(1);
+		if (!(id in loadedTabs)) {
+			switch(id) {
+				case 'users':
+					//loadUsers();
+					loadedTabs[id] = true;
+				break;
+			}
+		}
+		
+	});
 
     /* TODO: factorize into functions */
-    $('button#deleteusers').click(function() {
-        $('input:checkbox.user').each(function (index) {
-            if(this.checked){
-                var record_id = this.id;
-                $.post("/delete/user/",{'filters':{'user_hrn':this.id}}, function(data) {
-                    if(data.success){
-                        $('tr[id="'+record_id+'"]').fadeOut("slow");
-                        $('tr[id="'+record_id+'"]').remove();
-                    }else{
-                        alert("Rest Error for "+record_id+": "+data.error);
-                    }
-                });
-                
-            }
-        });
-    });
     $('button#deleteslices').click(function() {
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
@@ -86,3 +66,13 @@ $(document).ready(function() {
         */
     });
 });
+
+/*function loadUsers() {
+	$('div#users table').load('/table/user/',
+		{
+			'fields'  : [ 'user_hrn', 'user_first_name', 'user_last_name', 'user_email', 'user_phone' ],
+			'filters' : { 'parent_authority' : $('div#users').data('authority') },
+			'options' : [ 'checkbox' ]
+		}
+	);
+}*/

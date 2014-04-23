@@ -16,7 +16,6 @@ div.QueryTable table.dataTable th {
 }
 
 div.QueryTable table.dataTable th.checkbox {
-    padding-left: 14px;
 }
 
 div.QueryTable table.dataTable td, div.QueryTable table.dataTable textarea, div.QueryTable table.dataTable input [type="text"] {

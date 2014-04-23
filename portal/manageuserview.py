@@ -10,7 +10,7 @@ from ui.topmenu                         import topmenu_items_live, the_user
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
-from theme import ThemeView
+from myslice.theme import ThemeView
 #
 import json, os, re, itertools
 

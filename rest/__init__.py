@@ -40,10 +40,24 @@ class ObjectRequest(object):
             self.filters['disabled'] = '0'
             self.filters['gateway_type'] = 'sfa'
             self.filters['platform'] = '!myslice'
+        elif(self.type.startswith('local:')):
+            # XXX TODO: find a generic Query to get the fields like 
+            # select column.name from local:object where table == local:user
+            table = self.type.split(':')
+            table = table[1]
+            if table == "user":
+                self.id = table + '_id'
+                self.fields = ['user_id', 'email', 'password', 'config','status'];
+            elif table == "account":
+                # XXX TODO: Multiple key for account = (platform_id, user_id)
+                self.id = "platform_id, user_id"
+                self.fields = ['platform_id', 'user_id', 'auth_type', 'config'];
+            elif table == "platform":
+                self.id = 'platform'
+                self.fields = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
         else :
             self.setKey()
             self.setLocalFields()
-        
     
     def setKey(self):
         # What about key formed of multiple fields???
@@ -94,7 +108,7 @@ class ObjectRequest(object):
     
     def get(self):
         query = Query.get(self.type)
-        if (self.id not in self.fields) :
+        if (self.id is not None) and (self.id not in self.fields) :
             query.select(self.fields + [self.id])
         else :
             query.select(self.fields)
@@ -106,7 +120,11 @@ class ObjectRequest(object):
         query = Query.create(self.type)
         # No filters for create
         if self.params :
-            query.set(self.params)
+            for p in self.params :
+                for k,v in p.iteritems() :
+                    print "param: %s : %s" % (k,v)
+                    query.set({k : v})
+            print "query = ",query
         else:
             raise Exception, "Params are required for create"
         return execute_query(self.request, query)
@@ -114,15 +132,19 @@ class ObjectRequest(object):
     def update(self):
         query = Query.update(self.type)
         query = self.applyFilters(query, True)
-        print ">>>>>",self.params
-        
+
         if self.params :
-            query.set({ 'resource' : self.params})
-#             for param in self.params :
-                
+            for p in self.params :
+                for k,v in p.iteritems() :
+                    print "param: %s : %s" % (k,v)
+                    query.set({k : v})
+            print "query = ",query
         else:
             raise Exception, "Params are required for update"
-        
+
+        if self.id is not None:
+           query.select(self.id)
+       
         return execute_query(self.request, query)
     
     def delete(self):

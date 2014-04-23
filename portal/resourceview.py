@@ -10,7 +10,7 @@ from plugins.lists.simplelist   import SimpleList
 from plugins.slicestat          import SliceStat
 
 from myslice.configengine       import ConfigEngine
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # View for 1 platform and its details
 class ResourceView(FreeAccessView, ThemeView):

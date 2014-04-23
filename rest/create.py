@@ -29,7 +29,8 @@ def dispatch(request, object_type, object_name):
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('params'):
-            o.params[el[0][7:-1]] = el[1]
+            #o.params[el[0][7:-1]] = el[1]
+            o.params.append({el[0][7:-1]:el[1]})
         elif el[0].startswith('fields'):
             o.fields=req_items.getlist('fields[]')
         elif el[0].startswith('options'):

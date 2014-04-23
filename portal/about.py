@@ -12,7 +12,7 @@ from manifoldapi.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class AboutView (FreeAccessView, ThemeView):
     template_name = 'about.html'
@@ -37,7 +37,7 @@ class AboutView (FreeAccessView, ThemeView):
             env['person'] = None
     
         env['theme'] = self.theme
-    
+        env['section'] = "About"
 
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)

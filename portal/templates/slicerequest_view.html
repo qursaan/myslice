@@ -2,83 +2,64 @@
 {% load i18n %}
 
 {% block content %}
-
-<div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="Request a Slice" /> Request a new Slice</h1>
-</div>
-{% if errors %}
-<ul>
-  {% for error in errors %}
-  <li>{{ error }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-<div class="row">
-  <form id="commentForm" class="form-horizontal" method="post">
-  {% csrf_token %}
-  <fieldset>
-
-   <div class="form-group">
-     <label for="email" class="col-xs-2 control-label">Experimenter</label>
-     <div class="col-xs-4">
-        <label class="col-xs-2 control-label">{{ email }}</label>
-     </div>
-     <div class="col-xs-6">
-     	<p class="form-hint">Experimenter requesting a Slice</p>
-     </div>
-   </div>
-
-   <div class="form-group">
-     <label for="slice_name" class="col-xs-2 control-label">Slice Name</label>
-     <div class="col-xs-4">
-        <input type="text" name="slice_name" class="form-control" minlength="2" value="{{ slice_name }}" placeholder="Slice Name" required />
-     </div>
-     <div class="col-xs-6"> <p class="form-hint">The name of the slice you wish to create</p> </div>
-   </div>
-
-   <div class="form-group">
-     <label for="authority_hrn" class="col-xs-2 control-label">Authority</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" placeholder="Authority" required />
-       </div>
-    </div>
-     <div class="col-xs-6"><p class="form-hint">An authority responsible for vetting your slice</p></div>
-   </div>
-
-   <div class="form-group">
-     <label for="number_of_nodes" class="col-xs-2 control-label">Number of nodes</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <input id="number_of_nodes" name="number_of_nodes" class="form-control" value="{{ number_of_nodes }}" />
-       </div>
-    </div>
-     <div class="col-xs-6"><p class="form-hint">Number of nodes you expect to request (informative)</p></div>
-   </div>
-
-   <div class="form-group">
-     <label for="purpose" class="col-xs-2 control-label">Experiment purpose</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <textarea id="purpose" name="purpose" class="form-control" style="height:110px;" placeholder="Experiment Purpose" required>{{ purpose }}</textarea>
-       </div>
-    </div>
-     <div class="col-xs-6">
-     	<p class="form-hint">Purpose of your experiment (informative)</p>
-     </div>
-   </div>
-
-	<div class="col-xs-2">
+	<div class="row">
+		<div class="col-md-12">
+		<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="Request a Slice" /> Request a new Slice</h1>
+		</div>
 	</div>
-	<div class="col-xs-4">
-		<button class="submit btn btn-default" type="submit">Request Slice</button>
+
+	{% if errors %}
+	<ul>
+	  {% for error in errors %}
+	  <li>{{ error }}</li>
+	  {% endfor %}
+	</ul>
+	{% endif %}
+	<div class="row">
+		<div class="col-md-12">&nbsp;</div>
 	</div>
-  </fieldset>
-  </form>
-</div>
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<form role="form" method="post">
+			{% csrf_token %}
+			  <div class="form-group">
+			    <label for="email">Experimenter</label>
+			    <input type="email" class="form-control" id="email" value="{{ email }}" readonly="readonly">
+			  </div>
+			  <div class="form-group">
+			    <label for="slice_name">Slice Name</label>
+			    <input type="text" class="form-control" name="slice_name" id="slice_name" placeholder="Slice Name" required="required">
+			  	<p class="help-block"></p>
+			  </div>
+			  <div class="form-group">
+			    <label for="authority">Authority</label>
+			    <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" placeholder="Authority" required="required">
+			  	<p class="help-block">An authority responsible for vetting your slice</p>
+			  </div>
+			  <div class="form-group">
+			    <label for="number_of_nodes">Number of Nodes</label>
+			    <input type="text" class="form-control" name="number_of_nodes" id="number_of_nodes" placeholder="Number of Nodes">
+			  	<p class="help-block">Number of nodes you expect to request (informative)</p>
+			  </div>
+			  <div class="form-group">
+			    <label for="purpose">Experiment Purpose</label>
+			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment Purpose" required="required">{{ purpose }}</textarea>
+			    <p class="help-block">Purpose of your experiment (informative)</p>
+			  </div>
+			  <button type="submit" class="btn btn-default">Request Slice</button>
+			</form>
+	
+		</div>
+	</div>
+		
 <script>
 jQuery(document).ready(function(){
+	
+	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+		var jsonData = JSON.parse(data)
+        $(this).attr("value", jsonData[0]['parent_authority']);
+    });
     var availableTags = [
      {% if authorities %}
          {% for authority in authorities %}

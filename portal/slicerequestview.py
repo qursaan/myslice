@@ -1,4 +1,6 @@
 from django.shortcuts           import render
+from django.contrib.sites.models import Site
+
 
 from unfold.page                import Page
 
@@ -10,7 +12,7 @@ from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 import json, time
 
@@ -63,6 +65,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
         if method == 'POST':
             # The form has been submitted
+
+            # get the domain url
+            current_site = Site.objects.get_current()
+            current_site = current_site.domain
+
             slice_request = {
                 'type'              : 'slice',
                 'id'                : None,
@@ -73,6 +80,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
                 'type_of_nodes'     : wsgi_request.POST.get('type_of_nodes', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
+                'current_site'      : current_site
             }
             
             authority_hrn = slice_request['authority_hrn']
@@ -110,7 +118,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'user_hrn': user_hrn,
             'cc_myself': True,
             'authorities': authorities,
-            'theme': self.theme
+            'theme': self.theme,
+            'section': "Slice request"
         }
         template_env.update(slice_request)
         template_env.update(page.prelude_env())

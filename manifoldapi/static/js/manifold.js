@@ -699,6 +699,7 @@ var manifold = {
         if (data.code == 2) { // ERROR
             // We need to make sense of error codes here
             alert("Your session has expired, please log in again");
+            localStorage.removeItem('user');
             window.location="/logout/";
             if (manifold.asynchroneous_debug) {
                 duration=new Date()-start;
@@ -908,9 +909,7 @@ var manifold = {
                 break;
 
             case FILTER_ADDED: 
-// Thierry - this is probably wrong but intended as a hotfix 
-// http://trac.myslice.info/ticket/32
-//                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_query_event(query_uuid, event_type, value);
                 break;
             case FILTER_REMOVED:
                 manifold.raise_query_event(query_uuid, event_type, value);
@@ -945,7 +944,11 @@ var manifold = {
         }
         // We need to inform about changes in these queries to the respective plugins
         // Note: query, main_query & update_query have the same UUID
-        manifold.raise_query_event(query_uuid, event_type, value);
+
+        // http://trac.myslice.info/ticket/32
+        // Avoid multiple calls to the same event
+        //manifold.raise_query_event(query_uuid, event_type, value);
+
         // We are targeting the same object with get and update
         // The notion of query is bad, we should have a notion of destination, and issue queries on the destination
         // NOTE: Editing a subquery == editing a local view on the destination

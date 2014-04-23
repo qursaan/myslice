@@ -11,7 +11,7 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 #
 import json, os, re, itertools
@@ -203,6 +203,7 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         # so we can sho who is logged
         context['username'] = the_user(self.request)
         context['theme'] = self.theme
+        context['section'] = "User account"
 #        context ['firstname'] = config['firstname']
         prelude_env = page.prelude_env()
         context.update(prelude_env)

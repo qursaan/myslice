@@ -10,7 +10,7 @@ from unfold.page                import Page
 from manifoldapi.manifoldapi    import execute_admin_query
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 import json
 
 class UsersView (LoginRequiredAutoLogoutView, ThemeView):

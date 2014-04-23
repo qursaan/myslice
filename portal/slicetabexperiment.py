@@ -12,10 +12,10 @@ from manifoldapi.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class ExperimentView (FreeAccessView, ThemeView):
-    template_name = 'experimentview.html'
+    template_name = 'slice-tab-experiment.html'
 
     def get (self, request, slicename, state=None):
         

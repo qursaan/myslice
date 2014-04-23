@@ -15,11 +15,12 @@ h1 {
     border-bottom:1px solid #DDDDDD;
     padding:0 0 0 0;
     margin:0 0 0 0;
-    font-size:18pt;
+    font-size:14pt;
 }
 h1 img {
     vertical-align:middle;
-    margin-bottom:6px;
+    margin-bottom:4px;
+    margin-right:10px;
 }
 h2 {
     font-size:14pt;
@@ -261,21 +262,6 @@ div#home-dashboard div#home-slice-list li {
 }
 /**/
 
-/* NAV TABS */
-
-.nav.nav-tabs {
-}
-
-.nav.nav-tabs li.active a {
-   
-}
-
-.nav.nav-tabs li a {
-}
-
-.nav.nav-tabs li a:hover {
-}
-
 /**/
 /* WELL */
 div.well {
@@ -338,19 +324,24 @@ div#ticket-request p {
     margin:20px 0;
 }
 
-/* SLICE VIEW */
-ul.nav-sliceview {}
-ul.nav-sliceview li {
-    
+ul.nav-tabs {}
+ul.nav-tabs ul {}
+ul.nav-tabs li {}
+
+ul.nav-section li a {
+    border-bottom:0;
 }
-ul.nav-sliceview li:first-child {
+ul.nav-section li:first-child {
     padding:0;
 }
-ul.nav-sliceview li:first-child a {
+ul.nav-section li:first-child a {
     font-weight:bold;
     padding:6px 15px 4px 15px;
 }
-ul.nav-sliceview li:first-child img {
+ul.nav-section li:first-child.active a {
+    padding:6px 15px 3px 15px;
+}
+ul.nav-section li:first-child img {
     margin:0 4px 1px 0;
     padding:0;
 }
@@ -362,7 +353,7 @@ ul.nav-resources a {
     padding: 4px 10px 5px 10px;
 }
 
-
+/* SLICE VIEW */
 
 
 div#slice-view {
@@ -370,22 +361,57 @@ div#slice-view {
 }
 div.list-group-item {
     border:0;
+    -moz-border-radius: 0;
+    border-radius: 0;
     background-color:white;
     font-weight:bold;
     padding-left:0;
 }
 a.list-group-item {
+    -moz-border-radius: 0;
+    border-radius: 0;
     border:0;
     background-color:white;
-    padding:3px 0 3px 10px;
+    padding:3px 2px 3px 10px;
     border-left:2pt white solid;
 }
-a.list-group-item.active, a.list-group-item:hover {
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+    -moz-border-radius: 0;
+    border-radius: 0;
+    font-weight: bold;
+    color:black;
+    background-color:#F5F5F5;
+    border-left:2pt blue solid;
+}
+
+a.list-group-item:hover {
+    -moz-border-radius: 0;
+    border-radius: 0;
     border-left:2pt blue solid;
 }
 a.list-group-item p.list-group-item-text {
+    -moz-border-radius: 0;
+    border-radius: 0;
     font-size:9pt;
     font-style:italic;
+    font-weight: normal;
+    color: black !important;
+}
+
+div#slice-info {
+    margin-top:25px;
+}
+div#slice-info table {
+    width:100%;
+    margin:0 auto;
+}
+div#slice-info table td:first-child {
+    text-align:right;
+    font-weight:bold;
+    padding-right:15px;
+}
+div#slice-info td {
+    padding:5px;
 }
 
 /* SLICE VIEW sections */
@@ -455,4 +481,8 @@ a.list-group-item p.list-group-item-text {
 }
 tr.active, tr.active td {
     background-color:#FFFFCC !important;
+}
+div.dataTables_filter label{
+    float:left;
+    width:400px;
 }

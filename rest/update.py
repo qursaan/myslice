@@ -31,11 +31,16 @@ def dispatch(request, object_type, object_name):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('params'):
             print "#======> 0 ", el[0]
-            #print "#======>", el[0][7:8]
-            #print "#======>", el[0][10:-1]
-            print "#======> 1 ", el[1]
-            o.params = req_items.getlist('params[]')
+            print "#======> 1 ", req_items.getlist(el[0])
+
+            if (el[0][-2:] == '[]') :
+                # when receiving params[key][] = 'value1' ...
+                o.params.append({el[0][7:-3]:",".join(req_items.getlist(el[0]))})
+            else :
+                # when receiving params[key] = 'value'
+                o.params.append({el[0][7:-1]:el[1]})
             
+            print "o.params = ",o.params
             
         elif el[0].startswith('fields'):
             o.fields=req_items.getlist('fields[]')
@@ -51,5 +56,5 @@ def dispatch(request, object_type, object_name):
             return error('an error has occurred')
  
     except Exception, e:
-        return error(str(e))
+        return error("exception:"+str(e))
 

@@ -38,7 +38,7 @@ from portal.registrationview    import RegistrationView
 from portal.joinview            import JoinView
 from portal.sliceviewold           import SliceView
 from portal.validationview      import ValidatePendingView
-from portal.experimentview      import ExperimentView
+#from portal.experimentview      import ExperimentView
 from portal.documentationview   import DocumentationView
 from portal.supportview         import SupportView
 
@@ -79,7 +79,7 @@ urlpatterns = patterns('',
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),
     url(r'^join/?$', JoinView.as_view(), name='join'),
     url(r'^contact/?$', ContactView.as_view(), name='contact'),
-    url(r'^experiment?$', ExperimentView.as_view(), name='experiment'),
+    #url(r'^experiment?$', ExperimentView.as_view(), name='experiment'),
     url(r'^support/?$', SupportView.as_view(), name='support'),
     url(r'^support/documentation?$', DocumentationView.as_view(), name='FAQ'),
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),

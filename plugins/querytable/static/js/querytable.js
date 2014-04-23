@@ -91,7 +91,8 @@
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+                //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+                sDom: "<'row'<'col-xs-5'f><'col-xs-1'r><'col-xs-6 columns_selector'>>t<'row'<'col-xs-5'l><'col-xs-7'p>>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
@@ -145,6 +146,8 @@
                 //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
                 self.hide_column(field);
             });
+            $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
+            $(".dataTables_filter input").css("width","100%");
         }, // initialize_table
 
         /**
@@ -194,10 +197,15 @@
             var colnames = cols.map(function(x) {return x.sTitle})
             var nb_col = cols.length;
             /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-
+            //if (this.options.checkboxes) nb_col -= 1;
+			// catch up with the last column if checkboxes were requested 
+            if (this.options.checkboxes) {
+                // Use a key instead of hostname (hard coded...)
+                line.push(this.checkbox_html(record));
+	        }
+	        
             /* fill in stuff depending on the column name */
-            for (var j = 0; j < nb_col; j++) {
+            for (var j = 1; j < nb_col; j++) {
                 if (typeof colnames[j] == 'undefined') {
                     line.push('...');
                 } else if (colnames[j] == 'hostname') {
@@ -217,10 +225,11 @@
                     }
                     /* XXX TODO: Remove this and have something consistant */
                     if(obj=='resource'){
-                        line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }else{
-                        line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }
+                    line.push(record[this.init_key]);
                 } else {
                     if (record[colnames[j]])
                         line.push(record[colnames[j]]);
@@ -229,11 +238,7 @@
                 }
             }
     
-            // catch up with the last column if checkboxes were requested 
-            if (this.options.checkboxes) {
-                // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox_html(record));
-	        }
+            
     
     	    // adding an array in one call is *much* more efficient
 	        // this.table.fnAddData(line);
@@ -300,7 +305,7 @@
         {
             // Remove corresponding filters
             this.filters = $.grep(this.filters, function(x) {
-                return x != filter;
+                return x == filter;
             });
             this.redraw_table();
         },
@@ -397,10 +402,15 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
+                	// update pending number
+                	$("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
+                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
+                	$("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
+                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, false);
                     break;
                 default:
@@ -415,7 +425,7 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkboxfrom_data(data.value, true);
+                    this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
@@ -445,18 +455,18 @@
 
         on_all_query_done: function()
         {
-	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
-	    this.table.fnAddData (this.buffered_lines);
-	    this.buffered_lines=[];
+	    	if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
+	    	this.table.fnAddData (this.buffered_lines);
+	    	this.buffered_lines=[];
 	    
             var self = this;
 	    // if we've already received the slice query, we have not been able to set 
 	    // checkboxes on the fly at that time (dom not yet created)
             $.each(this.buffered_records_to_check, function(i, record) {
-		if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
+				if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
                 self.set_checkbox_from_record(record, true);
             });
-	    this.buffered_records_to_check = [];
+	    	this.buffered_records_to_check = [];
 
             this.received_all_query = true;
 	    // unspin once we have received both
@@ -490,6 +500,15 @@
                 if (op == '=' || op == '==') {
                     if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
                         ret = false;
+                }else if (op == 'included') {
+                    $.each(value, function(i,x) {
+                      if(x == col_value){
+                          ret = true;
+                          return false;
+                      }else{
+                          ret = false;
+                      }
+                    });
                 }else if (op == '!=') {
                     if ( col_value == value || col_value==null || col_value=="" || col_value=="n/a")
                         ret = false;
@@ -589,10 +608,10 @@
      was in fact given as a third argument, and not second 
      as the various online resources had it - go figure */
     $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
-	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
-	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
-	} );
-    }
+		return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
+		    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
+		});
+    };
 
 })(jQuery);
 

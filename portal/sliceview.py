@@ -14,10 +14,10 @@ from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
 from manifoldapi.manifoldapi         import execute_query
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class SliceView (LoginRequiredView, ThemeView):
     template_name = "slice-view.html"
     
     def get(self, request, slicename):
-        return render_to_response(self.template, {"slice": slicename, "theme": self.theme, "username": request.user, "section":"slice"}, context_instance=RequestContext(request))
+        return render_to_response(self.template, {"slice": slicename, "theme": self.theme, "username": request.user, "section": "Slice %s" % slicename }, context_instance=RequestContext(request))

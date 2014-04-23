@@ -1,11 +1,7 @@
 <div class="col-md-2">
 </div>
 <div class="col-md-8">
-	<div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-	<div id="slice-tab-loaded" style="display:none;margin-top:15px;">
-	    <table id="slice-tab">
-	    </table>
-	</div>
+	<div id="slice-info"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 </div>
 <div class="col-md-2">
 </div>
@@ -33,18 +29,16 @@
                     slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
                 }
                 
-                slice_row = "<tr><td><b>Description:</b></td><td>"+val.slice_description+"</td></tr>";
-                slice_row += "<tr><td><b>url:</b></td><td><a href='"+val.slice_url+" target='_blank'>"+val.slice_url+"</a></td></tr>";
-                slice_row += "<tr><td><b>users:</b></td><td>"+user_length+"</td></tr>";
-                slice_row += "<tr><td><b>resources:</b></td><td>"+nodes_length+"</td></tr>";
-                slice_row += "<tr><td><b>created:</b></td><td>"+val.created+"</td></tr>";
-                slice_row += "<tr><td><b>last update:</b></td><td>"+val.last_updated+"</td></tr>";
-                slice_row += "<tr><td><b>expires:</b></td><td>"+val.slice_expires+"</td></tr>";
+                slice_row = "<tr><td>Description:</b></td><td>"+val.slice_description+"</td></tr>";
+                slice_row += "<tr><td>url:</td><td><a href='"+val.slice_url+" target='_blank'>"+val.slice_url+"</a></td></tr>";
+                slice_row += "<tr><td>users:</td><td>"+user_length+"</td></tr>";
+                slice_row += "<tr><td>resources:</td><td>"+nodes_length+"</td></tr>";
+                slice_row += "<tr><td>created:</td><td>"+val.created+"</td></tr>";
+                slice_row += "<tr><td>last update:</td><td>"+val.slice_last_updated+"</td></tr>";
+                slice_row += "<tr><td>expires:</td><td>"+val.slice_expires+"</td></tr>";
                 table_slices.push(slice_row);
             });
-           $("table#slice-tab").html(table_slices.join( "" ));
-           $("div#slice-tab-loaded").css("display","block");
-           $("div#slice-tab-loading").css("display","none");
+           $("div#slice-info").html("<table>" + table_slices.join( "" ) + "</table>");
         });
     });
 </script>
