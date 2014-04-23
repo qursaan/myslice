@@ -31,7 +31,9 @@
                     	<th>Enabled</th>
                 	</tr>
             	</table>
-				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span>Add users</button>
+				{% if 'is_pi'  in pi %}
+				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>Add users</button>
+				{%endif%}
         	</div>
 <script>
     $(document).ready(function() {
