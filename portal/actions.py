@@ -640,25 +640,31 @@ def create_user(wsgi_request, request):
     # NOTE : if we were to create a user directly (just like we create slices,
     # we would have to perform the steps in create_pending_user too
     
-
+    # Edelberto - I put this more below
     # Add the user to the SFA registry
-    sfa_create_user(wsgi_request, request)
+    #sfa_create_user(wsgi_request, request)
 
     # Update Manifold user status
     manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
+    
+# Add the user to the SFA registry
+    sfa_create_user(wsgi_request, request)
 
     # LDAP update user userEnabled = True
-    mail = request['email']
-    login = mail.split('@')[0]
-    org = mail.split('@')[1]
-    o = org.split('.')[-2]
-    dc = org.split('.')[-1]
-    # To know if user is a LDAP user - Need to has a 'dc' identifier
-    if dc == 'br' or 'eu':
-        ldap_modify_user(wsgi_request, request)
+    try:
+        mail = request['email']
+        login = mail.split('@')[0]
+        org = mail.split('@')[1]
+        o = org.split('.')[-2]
+        dc = org.split('.')[-1]
+        # To know if user is a LDAP user - Need to has a 'dc' identifier
+        if dc == 'br' or 'eu':
+            ldap_modify_user(wsgi_request, request)
+    except Exception, e:
+        "LDAP create user failed"
 
 def create_pending_user(wsgi_request, request, user_detail):
     """

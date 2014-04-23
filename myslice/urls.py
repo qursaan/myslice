@@ -16,6 +16,8 @@ import portal.platformsview
 import portal.dashboardview
 import portal.homeview
 
+import plugins.cafe.edelberto
+
 home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
 platforms_view=portal.platformsview.PlatformsView.as_view()
@@ -103,7 +105,7 @@ urlpatterns = patterns(*urls)
 
 # Shibboleth - Edelberto
 urlpatterns += patterns('',
-   #url(r'^cafe/', 'plugins.cafe.edelberto.EdelbertoView.as_view()'),
-   url(r'^cafe/', 'plugins.cafe.edelberto.index'),
+   url(r'^cafe/', plugins.cafe.edelberto.EdelbertoView.as_view()),
+   #url(r'^cafe/', 'plugins.cafe.edelberto.index'),
 )
 

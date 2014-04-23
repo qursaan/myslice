@@ -30,8 +30,10 @@
 	    			</div>
 	   			{% else %}
 	   			<td>
-					{% include 'fibre__widget-login-user.html' %}
-					{% include 'fibre__widget-login-ldap-user.html' %}
+                    {# include 'fibre__widget-login-user.html' #}
+					{# include 'fibre__widget-login-ldap-user.html' #}
+					{% include 'fibre__widget-login-fed-manager.html' %}
+				    <a href="/cafe"><img src="{{ STATIC_URL }}img/fibre/cafe.jpg" alt="CAFe authentication" /></a>
 				{% endif %}
 				</td>
 				<td>

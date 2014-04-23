@@ -265,3 +265,6 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"
 # put stuff under static/
 # IA_MEDIA_PREFIX = '/code/'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+

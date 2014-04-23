@@ -23,14 +23,21 @@ class ManifoldBackend:
             return None
 
         try:
-            #usernameldap is from LDAP user form. If it is filled - See portal/homeview.py too
-            usernameldap = token['usernameldap']
+            print "ManifoldBackend authenticate()"
+            # Mandatory fields in token
             username = token['username']
-            password = token['password']
             request = token['request']
 
+            # usernameldap is optional - from LDAP user form. 
+            # If it is filled - See portal/homeview.py too
+            if 'usernameldap' in token:
+                usernameldap = token['usernameldap']
+            else:
+                usernameldap = None
+            password = token['password']
             # if data are not from LDAP form then normal (local) login
             if not usernameldap:
+                print "not userldap ManifoldBackend authenticate()"
                 auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
                 api = ManifoldAPI(auth)
                 sessions_result = api.forward(Query.create('local:session').to_dict())
@@ -62,8 +69,9 @@ class ManifoldBackend:
             # Edelberto LDAP authentication
             # if data are from LDAP form, so
             else:
+                print "userldap ManifoldBackend authenticate()"
             # XXX UGLY
-            # Needing to create an specif entries at settings.py (or myslice.ini) for these vars
+            # Needing to create an specific entries at settings.py (or myslice.ini) for these vars
             ##################################################
             # Edelberto - UFF - esilva@ic.uff.br
             # v1 - ldap authentication module
