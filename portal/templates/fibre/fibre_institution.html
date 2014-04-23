@@ -1,0 +1,191 @@
+{% extends "layout.html" %}
+{% block head %} 
+<script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
+{% endblock head %}
+{% block content %}
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /> Institution: {{user_details.parent_authority}}</h1>
+</div>
+<div class="row" id="institution">
+    <ul class="nav nav-tabs">
+      <li class="active" id="authority-tab"><a class="home-tab" data-panel="institution" href="#">INFO</a></li>
+      <li id="users-tab"><a class="home-tab" data-panel="users" href="#">USERS</a></li>
+      <li id="slices-tab"><a class="home-tab" data-panel="slices" href="#">SLICES</a></li>
+    </ul>
+    <div class="home-panel" id="institution">
+        <div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
+        <div id="authority-tab-loaded" style="display:none;">
+            <div id="authority-data" style="float:left; width:50%;"></div>
+        </div>
+    </div>
+    <div class="home-panel" id="users" style="display:none;">
+        <div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+        <div id="user-tab-loaded" style="display:none;">
+            <table id="user-tab">
+                <tr>
+                    <th>+/-</th>
+                    <th>Email</th>
+                    <th>user_hrn</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Enabled</th>
+                </tr>
+            </table>
+            <br>
+            <button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
+        </div>
+  	</div>
+    <div class="home-panel" id="slices" style="display:none;">
+        <button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
+        <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+        <div id="slice-tab-loaded" style="display:none;">
+            <table id="slice-tab">
+                <tr>
+                    <th>+/-</th>
+                    <th>slice_hrn</th>
+                    <th>users</th>
+                    <th>url</th>
+                    <th>nodes</th>
+                    <th>expiration</th>
+                </tr>
+            </table>
+            <br>
+            <div>
+                <button id="renewslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
+                <button id="deleteslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        {% if person %}
+        {% if user_details.parent_authority %}
+        $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
+            var authority_data = [];
+            var onelab_data = [];
+			/* 'city','enabled','legal','longitude','onelab_membership','address','parent_authority','slice','user','country',
+            'tech','abbreviated_name','url','postcode','description','scientific','authority_hrn','latitude','name'	*/
+            $.each( data, function( key, val ) {
+                authority_row = "<img src='{{ STATIC_URL }}img/institutions/{{user_details.parent_authority}}.gif' alt='' /><br>";
+                authority_row += "<br>";
+                authority_row += "<b>authority:</b> "+val.authority_hrn+"<br>";
+                authority_row += "<br>";
+                /*
+                authority_row += "<b>"+val.name+"</b><br>";
+                authority_row += "<br>";
+                authority_row += "<b>Address:</b> "+val.address+"<br>";
+                authority_row += "<b>City:</b> "+val.postcode+" "+val.city+"<br>";
+                authority_row += "<br>";
+                authority_row += "<b>Country:</b> "+val.country+"<br>";
+                authority_row += "<br>";
+                authority_row += "<br>";
+                authority_row += "<h2>Contacts</h2>";
+                authority_row += "<b>Legal:</b> ";
+                */
+                /*
+
+                TODO: find a way to express JSON correctly given the constrains: CSV / JSON
+
+                legal = jQuery.parseJSON(val.legal);
+                if($.isArray(legal)){
+                    $.each(legal, function(k,v){
+                        authority_row += k+" "+v+"<br>";
+                    });
+                }else{
+                    authority_row += val.legal+"<br>";
+                //}
+                authority_row += "<br>";
+                authority_row += "<b>Scientific:</b> ";
+                scientific = jQuery.parseJSON(val.scientific);
+                if($.isArray(scientific)){
+                    $.each(scientific, function(v){
+                        authority_row += v+", ";
+                    });
+                }else{
+                
+                    authority_row += val.scientific+"<br>";
+                }
+                onelab_membership = "<b>Status: </b>"+val.onelab_membership;
+                onelab_data.push(onelab_membership);
+                */
+                authority_data.push(authority_row);
+            });
+            $("div#authority-data").html(authority_data.join( "" ));
+            $("div#onelab-data").html(onelab_data.join( "" ));
+            $("div#authority-tab-loaded").css("display","block");
+            $("div#authority-tab-loading").css("display","none");
+         });
+
+        $.post("/rest/slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+            var list_slices = [];
+            var table_slices = [];
+            /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "user", "slice_urn", "slice_expires" */
+            $.each( data, function( key, val ) {
+                list_slices.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+                if(val.nodes=="undefined" || val.nodes==null){
+                    nodes_length=0;
+                }else{
+                    nodes_length=val.nodes.length;
+                }
+
+                if(val.user=="undefined" || val.user==null){
+                    user_length=0;
+                }else{
+                    user_length=val.user.length;
+                }
+
+                if(val.slice_url=="undefined" || val.slice_url==null){
+                    slice_url="";
+                }else{
+                    slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
+                }
+                
+                slice_row = "<tr id='"+val.slice_hrn+"'>";
+                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
+                slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
+                slice_row += "<td>"+user_length+"</td>";
+                slice_row += "<td>"+slice_url+"</td>";
+                slice_row += "<td>"+nodes_length+"</td>";
+                slice_row += "<td>"+val.slice_expires+"</td>";
+                slice_row += "</tr>";
+                table_slices.push(slice_row);
+                
+            });
+           
+            /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */
+            $("table#slice-tab tr:last").after(table_slices.join( "" ));
+            $("div#slice-tab-loaded").css("display","block");
+            $("div#slice-tab-loading").css("display","none");
+        });
+
+        $.post("/rest/user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+            var list_users = [];
+            var table_users = [];
+			/* Available fields
+			user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+			user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+			*/
+            $.each( data, function( key, val ) {
+                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+
+                user_row = "<tr id='"+val.user_hrn+"'>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
+                user_row += "<td>"+val.user_email+"</td>";
+                user_row += "<td>"+val.user_hrn+"</td>";
+                user_row += "<td>"+val.user_first_name+"</td>";
+                user_row += "<td>"+val.user_last_name+"</td>";
+				user_row += "<td>"+val.user_enabled+"</td>";
+                user_row += "</tr>";
+                table_users.push(user_row);
+                
+            });
+            $("table#user-tab tr:last").after(table_users.join( "" ));
+            $("div#user-tab-loaded").css("display","block");
+            $("div#user-tab-loading").css("display","none");
+         });
+         {% endif %}
+         {% endif %}
+    });
+</script>
+{% endblock %}

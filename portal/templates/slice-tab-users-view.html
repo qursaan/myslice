@@ -1,0 +1,111 @@
+	<div class="col-md-2">
+		<div id="select-platform" class="list-group">
+		</div>
+			
+		<ul class="list-group">
+		  <li class="list-group-item">Authority:<b> {{user_details.parent_authority}}</b>
+			<!--<select id="auth_list">
+  				<option value="ple.upmc">UPMC</option>
+  				<option value="ple.inria">INRIA</option>
+  				<option value="ple.nitos">NITOS</option>
+  				<option value="ple.iminds">iMinds</option>
+			</select> -->
+		  </li>
+		  <li class="list-group-item">Filter: slice</li>
+		  <li class="list-group-item">...</li>
+		  <li class="list-group-item">...</li>
+		  <li class="list-group-item">...</li>
+		</ul>
+	
+	</div>
+	<div class="col-md-10">
+		<div class="row">
+		</div>
+        	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
+        	<div id="user-tab-loaded" style="display:none;">
+            	<table id="user-tab">
+                	<tr>
+                    	<th>+/-</th>
+                    	<th>Email</th>
+                    	<th>user_hrn</th>
+                    	<th>Enabled</th>
+                	</tr>
+            	</table>
+				{% if 'is_pi'  in pi %}
+				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>Add users</button>
+				{%endif%}
+        	</div>
+<script>
+    $(document).ready(function() {
+			var slice_users = [];
+			//console.log("the value you selected: " + selectedValue);
+        	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
+            	var list_users = [];
+            	var table_users = [];
+				/* Available fields
+				user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+			    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+				*/
+            	$.each( data, function( key, val ) {
+                	list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                	user_row = "<tr>";
+					// checking the box for the users that belong to the selected slice
+					var flag_checkbox = 0;
+					for(var data in val.slices) {
+    					var element = val.slices[data];
+						if (element == "{{slice}}"){
+							//console.log("the slice is: "+ element);	
+							flag_checkbox = 1;
+							slice_users.push (val.user_email)
+							user_row += "<td><input type='checkbox' checked='True'></td>";
+						}
+					}
+					if(flag_checkbox != 1){
+                		user_row += "<td><input type='checkbox' class='user'></td>";
+					}
+                	user_row += "<td>"+val.user_email+"</td>";
+                	user_row += "<td>"+val.user_hrn+"</td>";
+					user_row += "<td>"+val.user_enabled+"</td>";
+                	user_row += "</tr>";
+                	table_users.push(user_row);
+                
+            	});
+				 console.log("slice users before")
+				 console.log(slice_users)
+
+				$("table#user-tab tr:last").after(table_users.join( "" ));
+            	$("div#user-tab-loaded").css("display","block");
+            	$("div#user-tab-loading").css("display","none");
+
+				$('button#addusers').click(function() {
+          	$('input:checkbox.user').each(function (index) {
+            	if(this.checked){
+                	var record_id = this.id;
+					console.log("checked")
+					console.log($(this)
+       					.closest('tr') //get the enclosing tr
+       					.find('td:eq(1)'));  //find any using td:eq(<index>)
+					slice_users.push ("yasin.upmc@gmail.com")
+					console.log("after")
+					console.log(slice_users)
+					//console.log(user_email)
+                	$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+                    	if(data.success){
+                        	// TODO: highlight row after success
+                        	//$('tr[id="'+record_id+'"]').highlight();
+                    	}else{
+                        	alert("Rest Error for "+record_id+": "+data.error);
+                    	}
+                	});
+                
+            	}
+        	});
+        	// TODO: refresh table
+        	//window.location="/portal/institution#slices";
+    	});
+
+         	});
+	//	});
+    });
+</script>
+
