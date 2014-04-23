@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives
 
-from theme                      import ThemeView
+from myslice.theme                      import ThemeView
 
 theme = ThemeView()
 
@@ -23,6 +23,7 @@ theme = ThemeView()
 def authority_get_pis(request, authority_hrn):
     query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
     results = execute_admin_query(request, query)
+    print "authority_get_pis = %s" % results
     # NOTE: temporarily commented. Because results is giving empty list. 
     # Needs more debugging
     #if not results:
@@ -33,6 +34,8 @@ def authority_get_pis(request, authority_hrn):
 
 def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
+    print "pi_users = %s" % pi_users
+
     if any(d['pi_users'] == None for d in pi_users):
         theme.template_name = 'email_default_recipients.txt' 
         default_email = render_to_string(theme.template, request)
@@ -279,7 +282,7 @@ def portal_validate_request(wsgi_request, request_ids):
             try:
                 create_user(wsgi_request, request)
                 request_status['SFA user'] = {'status': True }
-
+                PendingUser.objects.get(id=request['id']).delete()
             except Exception, e:
                  request_status['SFA user'] = {'status': False, 'description': str(e)}
                        
@@ -303,6 +306,7 @@ def portal_validate_request(wsgi_request, request_ids):
             try:
                 create_slice(wsgi_request, request)
                 request_status['SFA slice'] = {'status': True }
+                PendingSlice.objects.get(id=request['id']).delete()
 
             except Exception, e:
                 request_status['SFA slice'] = {'status': False, 'description': str(e)}
@@ -325,6 +329,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 print "ADD Authority"
                 sfa_add_authority(wsgi_request, sfa_authority_params)
                 request_status['SFA authority'] = {'status': True }
+                PendingAuthority.objects.get(id=request['id']).delete()
 
             except Exception, e:
                 request_status['SFA authority'] = {'status': False, 'description': str(e)}
@@ -402,7 +407,7 @@ def create_pending_slice(wsgi_request, request, email):
     try:
         # Send an email: the recipients are the PI of the authority
         recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
-    
+
         theme.template_name = 'slice_request_email.txt' 
         text_content = render_to_string(theme.template, request)
     
@@ -414,8 +419,7 @@ def create_pending_slice(wsgi_request, request, email):
         subject = subject.replace('\n', '')
     
         sender = email
-        msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
-        print msg
+        msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
@@ -745,8 +749,10 @@ def create_pending_user(wsgi_request, request, user_detail):
         sender =  render_to_string(theme.template, request)
         sender = sender.replace('\n', '')
     
-        msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
+        msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+        import traceback
+        traceback.print_exc()

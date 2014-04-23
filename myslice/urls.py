@@ -15,6 +15,7 @@ from settings import auxiliaries, INSTALLED_APPS
 import portal.platformsview
 import portal.dashboardview
 import portal.homeview
+import portal.newsview
 
 import plugins.cafe.edelberto
 
@@ -22,15 +23,14 @@ home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
 platforms_view=portal.platformsview.PlatformsView.as_view()
 
-import portal.testbedlist
+#import portal.testbedlist
 import portal.sliceview
 import portal.sliceresourceview
 
 import portal.slicetabexperiment
 import portal.slicetabinfo
 import portal.slicetabtestbeds
-
-from portal.sliceuserview import SliceUserView 
+import portal.slicetabusers 
 
 #### high level choices
 # main entry point (set to the / URL)
@@ -82,14 +82,13 @@ urls = [
     #
     #
     # Portal
-    
+    (r'^news/?$', portal.newsview.NewsView.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
+    (r'^users/(?P<slicename>[^/]+)/?$', portal.slicetabusers.SliceUserView.as_view()),
     
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
-    
     (r'^info/(?P<slicename>[^/]+)/?$', portal.slicetabinfo.SliceInfoView.as_view()),
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
-    (r'^users/(?P<slicename>[^/]+)/?$', SliceUserView.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
     url(r'^portal/', include('portal.urls')),
 ]

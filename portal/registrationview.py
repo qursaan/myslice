@@ -6,6 +6,7 @@ from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
 from django.contrib.auth        import get_user_model
+from django.contrib.sites.models import Site
 
 from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
@@ -19,7 +20,7 @@ from portal.models              import PendingUser
 # Edelberto - LDAP
 from portal.actions             import create_pending_user, ldap_create_user
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
@@ -51,6 +52,10 @@ class RegistrationView (FreeAccessView, ThemeView):
 
         if method == 'POST':
             # The form has been submitted
+            
+            # get the domain url
+            current_site = Site.objects.get_current()
+            current_site = current_site.domain
 
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
@@ -58,6 +63,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'authority_hrn' : wsgi_request.POST.get('authority_hrn', ''),
                 'email'         : wsgi_request.POST.get('email',         '').lower(),
                 'password'      : wsgi_request.POST.get('password',      ''),
+                'current_site'  : current_site
             }
 
             # Construct user_hrn from email (XXX Should use common code)
@@ -84,8 +90,11 @@ class RegistrationView (FreeAccessView, ThemeView):
                 if user_detail['email'] == user_request['email']:
                     errors.append('Email already registered in Manifold. Please provide a new email address.')
             # Does the user exist in sfa? [query is very slow!!]
-            user_query  = Query().get('user').select('user_hrn','user_email')
+            #user_query  = Query().get('user').select('user_hrn','user_email')
+            # XXX Test based on the user_hrn is quick
+            user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_request['user_hrn'])
             user_details_sfa = execute_admin_query(wsgi_request, user_query)
+
             for user in user_details_sfa:
                 if user['user_email'] == user_request['email']:
                     errors.append('Email already registered in SFA registry. Please use another email.')

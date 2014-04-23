@@ -12,7 +12,7 @@ from manifoldapi.manifoldresult import ManifoldResult
 from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
-from theme import ThemeView
+from myslice.theme import ThemeView
 
 class HomeView (FreeAccessView, ThemeView):
     template_name = 'home-view.html'
@@ -26,6 +26,8 @@ class HomeView (FreeAccessView, ThemeView):
     def post (self,request):
         env = self.default_env()
         env['theme'] = self.theme
+        env['section'] = "Dashboard"
+        
         username = request.POST.get('username')
         password = request.POST.get('password')
        
@@ -85,7 +87,7 @@ class HomeView (FreeAccessView, ThemeView):
             env['person'] = None
     
         env['theme'] = self.theme
-    
+        env['section'] = "Dashboard"
 
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
