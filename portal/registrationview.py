@@ -1,6 +1,7 @@
 import os.path, re
 import json
-from random import randint
+from random     import randint
+from hashlib    import md5
 
 from django.views.generic       import View
 from django.template.loader     import render_to_string
@@ -55,13 +56,17 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
 
+            post_email = wsgi_request.POST.get('email','').lower()
+            email_hash = md5(post_email).digest().encode('base64')[:-1]
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
                 'last_name'     : wsgi_request.POST.get('lastname',      ''),
                 'authority_hrn' : wsgi_request.POST.get('authority_hrn', ''),
-                'email'         : wsgi_request.POST.get('email',         '').lower(),
+                'email'         : post_email,
                 'password'      : wsgi_request.POST.get('password',      ''),
-                'current_site'  : current_site
+                'current_site'  : current_site,
+                'email_hash'    : email_hash,
+                'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             # Construct user_hrn from email (XXX Should use common code)

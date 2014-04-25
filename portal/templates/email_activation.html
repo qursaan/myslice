@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> Experimenter registration</h1>
+</div>
+<div class="row">
+	{%if activation_status == 'success'%}
+  		<h3>Email activation complete !</h3>
+		<p>Your account is pending for validation.</p>
+		<p>PI of your institution is responsible for validating your account.</p>
+		<p>You will be notified once your account is validated.</p>
+		<p>In the meantime, you can login to the portal with your email and password and browse through the limited access features.</p>
+	{%else%}
+		<h3>Email activation Failed !</h3>
+		<p>Your email address is not registered in our server.</p>
+		<p>Please <a href="/portal/register">register</a> to get access to the portal.</p> 
+		<p>If you have already registered and still having this message, please <a href="/portal/contact/">contact support.</a>	</p>
+	{%endif%}
+ </div>
+
+{% endblock %}
