@@ -252,7 +252,8 @@ def get_request_by_id(ids):
 def get_requests(authority_hrns=None):
     print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
-        pending_users  = PendingUser.objects.all()
+        ## get those pending users who have validated their emails
+        pending_users  = PendingUser.objects.filter(status__iexact = 'True')
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
     else:
