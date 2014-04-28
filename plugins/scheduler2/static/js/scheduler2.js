@@ -34,7 +34,7 @@ var schedulerTblId = "scheduler-reservation-table";
 var schedulerTblFirstColWidth = 150;
 //Some Data
 var schedulerSlotsPerHour = 6;
-var schedulerMaxRows = 25;
+var schedulerMaxRows = 12;
 var SchedulerData = [];
 var SchedulerSlots = [];
 var SchedulerDataViewData = [];
@@ -121,7 +121,7 @@ var tmpSchedulerLeases = [];
         },
         on_all_resources_new_record: function (data) {
             //alert(data.toSource());
-            if (SchedulerData.length < schedulerMaxRows)
+            if (data.exclusive == null)
                 SchedulerData.push({ id: data.urn, index: SchedulerData.length, name: data.hrn, granularity: data.granularity, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
             //alert(data.toSource());
 
@@ -165,7 +165,7 @@ var tmpSchedulerLeases = [];
         // no prefix
         on_filter_added: function (filter) {
             var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.SetSchedulerResources(0, schedulerMaxRows, filter);
+            tmpScope.initSchedulerResources(schedulerMaxRows, filter);
         },
 
         // ... be sure to list all events here
@@ -218,10 +218,11 @@ var tmpSchedulerLeases = [];
                 slide: function (event, ui) {
                     //$("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
                     //console.log(ui.value);
+                    var angScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
                     if (_schedulerCurrentCellPosition > ui.value)
-                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveBackSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
+                        angScope.moveBackSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
                     else if (_schedulerCurrentCellPosition < ui.value)
-                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveFrontSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
+                        angScope.moveFrontSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
                     _schedulerCurrentCellPosition = ui.value;
                 }
             });
@@ -262,7 +263,7 @@ var tmpSchedulerLeases = [];
             //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
             //}
             var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.SetSchedulerResources(0, schedulerMaxRows, null);
+            tmpScope.initSchedulerResources(schedulerMaxRows, null);
         },
         _SetPeriodInPage: function (start, end) {
         }
