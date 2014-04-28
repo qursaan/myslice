@@ -4,10 +4,11 @@ from django.views.generic       import View
 
 from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items, the_user
-
+from django.core.mail           import EmailMultiAlternatives, send_mail
 from portal.forms               import ContactForm
 
 from myslice.theme import ThemeView
+theme = ThemeView()
 
 # splitting the 2 functions done here
 # GET is for displaying the empty form
@@ -25,36 +26,36 @@ class ContactView (FreeAccessView, ThemeView):
             email = form.cleaned_data['email'] # email of the sender
             cc_myself = form.cleaned_data['cc_myself']
 
-            try:
+            #try:
                 # Send an email: the support recipients
-                theme.template_name = 'email_support.txt'
-                recipients = render_to_string(theme.template, form.cleaned_data)
-                recipients = subject.replace('\n', '')
-                if cc_myself:
-                    recipients.append(email)
+            #theme.template_name = 'email_support.txt'
+            #recipients = render_to_string(theme.template, form.cleaned_data)
+            #recipients = subject.replace('\n', '')
+            #if cc_myself:
+            #    recipients.append(email)
+            recipients = ['support@myslice.info']
+            theme.template_name = 'contact_support_email.html'
+            html_content = render_to_string(theme.template, form.cleaned_data)
         
-                theme.template_name = 'contact_support_email.html'
-                html_content = render_to_string(theme.template, form.cleaned_data)
+            theme.template_name = 'contact_support_email.txt'
+            text_content = render_to_string(theme.template, form.cleaned_data)
         
-                theme.template_name = 'contact_support_email.txt'
-                text_content = render_to_string(theme.template, form.cleaned_data)
+            theme.template_name = 'contact_support_email_subject.txt'
+            subject = render_to_string(theme.template, form.cleaned_data)
+            subject = subject.replace('\n', '')
         
-                theme.template_name = 'contact_support_email_subject.txt'
-                subject = render_to_string(theme.template, form.cleaned_data)
-                subject = subject.replace('\n', '')
+            #    if not email:
+            #        theme.template_name = 'email_default_sender.txt'
+            #        sender =  render_to_string(theme.template, form.cleaned_data)
+            #        sender = sender.replace('\n', '')
+            #    else:
+            sender = email
         
-                if not email:
-                    theme.template_name = 'email_default_sender.txt'
-                    sender =  render_to_string(theme.template, form.cleaned_data)
-                    sender = sender.replace('\n', '')
-                else:
-                    sender = email
-        
-                msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-            except Exception, e:
-                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+            msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            #except Exception, e:
+                #print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
 
             if request.user.is_authenticated() :
                 username = request.user.email
