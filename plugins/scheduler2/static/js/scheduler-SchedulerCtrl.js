@@ -30,6 +30,10 @@ myApp.factory('$exceptionHandler', function () {
         // Set up the default scope value.
         this.scope.errorMessage = null;
         this.scope.name = "";
+        //Pagin
+        this.scope.totalPages = 4;
+        this.scope.curPage = 0;
+        this.scope.pageSize = 25;
 
         $scope.resources = SchedulerDataViewData;
         $scope.slots = SchedulerSlotsViewData;
@@ -40,6 +44,45 @@ myApp.factory('$exceptionHandler', function () {
             //alert('Hello World');
             //afterAngularRendered();
         });
+
+        $scope.initSchedulerResources = function (pageSize, filter) {
+            for (var k = 0; k < pageSize; k++) {
+                if ($scope.resources.length < SchedulerData.length)
+                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
+                $scope.resources[k].leases = [];
+            }
+            $scope.pageSize = pageSize;
+            $scope.curPage = 0;
+            $scope.totalPages = parseInt(Math.ceil(SchedulerData.length / $scope.pageSize));
+            $scope.initSlots(0, SchedulerTotalVisibleCells);
+        };
+
+        $scope.setPage = function(page) {
+            var tmpFrm = $scope.pageSize * page;
+            var tmpTo = tmpFrm + $scope.pageSize;
+            $scope.curPage = page;
+            $scope.resources = [];
+            for (var k = tmpFrm; k < tmpTo; k++) {
+                if ($scope.resources.length < SchedulerData.length)
+                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
+                $scope.resources[k].leases = [];
+            }
+            $scope.initSlots(0, SchedulerTotalVisibleCells);
+        };
+
+        $scope.initSlots = function (from, to) {
+            //init
+            $scope.slots = [];
+            //set
+            for (var i = from; i < to; i++) {
+                $scope.slots.push(SchedulerSlots[i]);
+                for (var j = 0; j < $scope.resources.length; j++) {
+                    $scope.resources[j].leases.push(SchedulerData[j].leases[i]);
+                }
+            }
+            //apply
+            $scope.$apply();
+        };
 
         $scope.moveFrontSlot = function(from, to) {
             //$scope.slots.shift();
@@ -74,29 +117,9 @@ myApp.factory('$exceptionHandler', function () {
             });
         };
 
-        $scope.SetSchedulerResources = function (start, to, filter) {
-            for (var k = start; k < to; k++) {
-                if ($scope.resources.length < SchedulerData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
-                $scope.resources[k].leases = [];
-            }
-            $scope.initSlots(0, SchedulerTotalVisibleCells);
+        $scope.getTimes = function (n) {
+            return new Array(n);
         };
-
-        $scope.initSlots = function(from, to) {
-            //init
-            $scope.slots = [];
-            //set
-            for (var i = from; i < to; i++) {
-                $scope.slots.push(SchedulerSlots[i]);
-                for (var j = 0; j < $scope.resources.length; j++) {
-                    $scope.resources[j].leases.push(SchedulerData[j].leases[i]);
-                }
-            }
-            //apply
-            $scope.$apply();
-        };
-
 
         // Return this object reference.
         return (this);
