@@ -46,7 +46,7 @@ var _schedulerCurrentCellPosition = 0;
 var _leasesDone = false;
 var _resourcesDone = false;
 //Enable Debug
-var schedulerDebug = false;
+var schedulerDebug = true;
 //tmp to delete
 var tmpSchedulerLeases = [];
 
@@ -126,7 +126,7 @@ var tmpSchedulerLeases = [];
         },
         on_all_resources_new_record: function (data) {
             //alert(data.toSource());
-            if (data.exclusive == true)
+            if (data.exclusive == true){
                 SchedulerData.push({
                     id: data.urn,
                     index: SchedulerData.length,
@@ -136,6 +136,10 @@ var tmpSchedulerLeases = [];
                     type: data.type,
                     org_resource: data
                 });
+                if (schedulerDebug && SchedulerData[SchedulerData.length - 1].org_resource.network_hrn == 'omf') {
+                    SchedulerData[SchedulerData.length - 1].granularity = 30;
+                }
+            }
             //alert(data.toSource());
 
         },
@@ -355,6 +359,7 @@ var tmpSchedulerLeases = [];
             var value = filter[2];
             var colValue = resource.org_resource[key];
             var ret = true;
+            if (schedulerDebug &&  colValue == 'omf') colValue = 'nitos';
 
             if (op == '=' || op == '==') {
                 if (colValue != value || colValue == null || colValue == "" || colValue == "n/a")

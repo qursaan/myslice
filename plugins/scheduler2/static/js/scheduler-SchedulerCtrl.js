@@ -54,8 +54,7 @@ myApp.factory('$exceptionHandler', function () {
             $scope.resources = new Array();
 
             for (var k = 0; k < pageSize; k++) {
-                if ($scope.resources.length < SchedulerDataViewData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
+                $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
                 $scope.resources[k].leases = [];
             }
             $scope.pageSize = pageSize;
@@ -67,12 +66,12 @@ myApp.factory('$exceptionHandler', function () {
         $scope.setPage = function(page) {
             var tmpFrm = $scope.pageSize * page;
             var tmpTo = tmpFrm + $scope.pageSize;
+            tmpTo = SchedulerDataViewData.length < tmpTo ? SchedulerDataViewData.length : tmpTo;
             $scope.curPage = page;
             $scope.resources = [];
             var j = 0;
             for (var k = tmpFrm; k < tmpTo; k++) {
-                if ($scope.resources.length < SchedulerDataViewData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
+                $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
                 $scope.resources[j].leases = [];
                 j++;
             }
@@ -134,7 +133,7 @@ myApp.factory('$exceptionHandler', function () {
         };
 
         $scope.getPageNumbers = function () {
-            var totalNumbersShowned = ($scope.totalPages > 10 ? 10 : $scope.totalPages );
+            var totalNumbersShowned = ($scope.totalPages > 10 ? 10 : $scope.totalPages + 1 );
             var tmtNumDiv = totalNumbersShowned / 2;
             //local
             var numFrom = 1;

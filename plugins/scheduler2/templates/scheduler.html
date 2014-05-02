@@ -73,7 +73,7 @@
                     <div class="dataTables_paginate paging_bootstrap">
                         <ul class="pagination">
                             <li class="prev disabled"><a href="#">← Previous</a></li>
-                            <li ng-cloak ng-repeat="t in getPageNumbers() track by $index" ng-class="{active: t==curPage+1}"><a href="" ng-click="setPage(t-1)">{[{t}]}</a></li>
+                            <li ng-cloak ng-repeat="t in getPageNumbers() track by $index" ng-class="{active: t==curPage+1}"><a href="#" ng-click="setPage(t-1)">{[{t}]}</a></li>
                             <li class="next disabled"><a href="#">Next → </a></li>
                         </ul>
                     </div>
