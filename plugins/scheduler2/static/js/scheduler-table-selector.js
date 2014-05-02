@@ -28,9 +28,10 @@ function rangeMouseDown(e) {
         //var allCells = $("#tblReservation td");
         //dragStart = allCells.index($(this));
 
-        if ( $(this).hasClass("free"))
+        if ( $(this).hasClass("free")){
             $(this).addClass("selected_tmp");
-
+            $(this).siblings("td[data-groupid='" + $(this).data('groupid') + "']").addClass("selected_tmp");
+        }
         schedulerTableIsDragging = true;
         //selectRange();
 
@@ -82,6 +83,7 @@ function selectRange(isTemp) {
     if (!schedulerCtrlPressed)
         $("#" + schedulerTblId + "  td.selected, #" + schedulerTblId + "  td.selected_tmp").each(function() {
             $(this).removeClass('selected selected_tmp').addClass('free');
+            $(this).siblings("td[data-groupid='" + $(this).data('groupid') + "']").removeClass('selected selected_tmp').addClass("free");
             schedulerFreeSlot($(this).data('slotid'), $(this).siblings('th').data('rowindex'), $(this).siblings('th').data('resourceindex'));
         });
 
@@ -116,38 +118,50 @@ function selectRange(isTemp) {
             switch (curClass) {
                 case "free_tmp":
                     $(cell).removeClass('selected_tmp selected free_tmp free');
-                    if (isTemp)
+                    $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").removeClass("selected_tmp selected free_tmp free");
+                    if (isTemp){
                         $(cell).addClass("free_tmp");
-                    else{
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("free");
+                    } else {
                         schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("free");
                     }
                     break;
                 case "free":
                     $(cell).removeClass('selected_tmp selected free_tmp free');
-                    if (isTemp)
+                    $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").removeClass("selected_tmp selected free_tmp free");
+                    if (isTemp){
                         $(cell).addClass("selected_tmp");
-                    else {
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("selected_tmp");
+                    }else {
                         schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("selected");
                     }
                     break;
                 case "selected_tmp":
                     $(cell).removeClass('selected_tmp selected free_tmp free');
-                    if (isTemp)
+                    $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").removeClass("selected_tmp selected free_tmp free");
+                    if (isTemp){
                         $(cell).addClass("selected_tmp");
-                    else {
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("selected_tmp");
+                    } else {
                         schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("selected");
                     }
                     break;
                 case "selected":
                     $(cell).removeClass('selected_tmp selected free_tmp free');
-                    if (isTemp)
+                    $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").removeClass("selected_tmp selected free_tmp free");
+                    if (isTemp){
                         $(cell).addClass("free_tmp");
-                    else {
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("free_tmp");
+                    } else {
                         schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
+                        $(cell).siblings("td[data-groupid='" + $(cell).data('groupid') + "']").addClass("free");
                     }
                     break;
                 case "closed":

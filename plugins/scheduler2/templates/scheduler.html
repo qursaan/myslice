@@ -16,6 +16,7 @@
             <span class="glyphicon glyphicon-calendar"></span>
         </div>
         <div class="col-md-2 text-center">
+            {% comment %}
             <div id="TopologyModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-header">
@@ -28,6 +29,8 @@
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal TopologyModal -->
             <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#TopologyModal">Topology</button>
+            {% endcomment  %}
+            <button id="btnSchedulerSubmit" type="button" class="btn btn-primary btn-md">Submit Leases</button>
 
         </div>
     </div>
@@ -51,7 +54,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th ng-repeat="slot in slots" >
+                        <th ng-repeat="slot in slots">
                             {[{ slot.time }]}
                         </th>
                     </tr>
@@ -59,7 +62,7 @@
                 <tbody>
                     <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
                         <th data-resourceid="{[{ resource.id }]}" data-rowindex="{[{ $index }]}" data-resourceindex="{[{ resource.index }]}" style="word-wrap: break-word; word-break: break-all; ">{[{ resource.name }]}</th>
-                        <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" ng-class="{{ 'lease.status' }}"></td>
+                        <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" data-groupid="{[{ lease.groupid }]}" ng-class="{{ 'lease.status' }}"></td>
                     </tr>
                 </tbody>
             </table>
@@ -79,48 +82,48 @@
                     </div>
                 </div>
             </div>
-        {% comment %}
-        <div id="reservation-table-scroll-container">
-            <table id='{{domid}}-reservation-table' class='table table-bordered'>
-                <thead>
-                    <tr>
-                        {% for ts in time_slots %}
-                        <th class='center info'>{{ ts|safe }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
+            {% comment %}
+            <div id="reservation-table-scroll-container">
+                <table id='{{domid}}-reservation-table' class='table table-bordered'>
+                    <thead>
+                        <tr>
+                            {% for ts in time_slots %}
+                            <th class='center info'>{{ ts|safe }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                    {% for itms in nodes %}
-                    {% for n in itms.1 %}
-                    <tr data-trindex="">
-                        {% for ts in time_slots %}
-                        {% if n == 'node020' %}
-                        <td class="maintenance closed" data-tdindex="{{forloop.counter}}"></td>
-                        {% elif n == 'node023' or n == 'node030' %}
-                        <td class="closed" data-tdindex="{{forloop.counter}}"></td>
-                        {% else %}
-                        <td class="" data-tdindex="{{forloop.counter}}"></td>
-                        {% endif %}
+                        {% for itms in nodes %}
+                        {% for n in itms.1 %}
+                        <tr data-trindex="">
+                            {% for ts in time_slots %}
+                            {% if n == 'node020' %}
+                            <td class="maintenance closed" data-tdindex="{{forloop.counter}}"></td>
+                            {% elif n == 'node023' or n == 'node030' %}
+                            <td class="closed" data-tdindex="{{forloop.counter}}"></td>
+                            {% else %}
+                            <td class="" data-tdindex="{{forloop.counter}}"></td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endcomment  %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endcomment  %}
 
-        <div class="legend">
-            <ol>
-                <li class="free">free</li>
-                <li class="selected">selected</li>
-                <li class="closed">reserved</li>
-                <li class="maintenance">maintenance</li>
-            </ol>
-        </div>
-    </div><!-- / scheduler plugin -->
-    <script type="text/javascript">
-        //alert("1");
-    </script>
-</div>
+            <div class="legend">
+                <ol>
+                    <li class="free">free</li>
+                    <li class="selected">selected</li>
+                    <li class="closed">reserved</li>
+                    <li class="maintenance">maintenance</li>
+                </ol>
+            </div>
+        </div><!-- / scheduler plugin -->
+        <script type="text/javascript">
+            //alert("1");
+        </script>
+    </div>

@@ -61,6 +61,7 @@ function schedulerGetSlots(slotSpan) {
 }
 
 function schedulerGetLeases(slotSpan, granularity) {
+    granularity = granularity / 60;
     if (slotSpan == 0) slotSpan = 10;
     var slots = [];
     var d = new Date(2014, 1, 1, 0, 0, 0, 0);
@@ -84,6 +85,7 @@ function schedulerGetLeases(slotSpan, granularity) {
 //
 //GetSlotId from time
 function schedulerGetSlotId(startTime, duration, granularity) {
+    //granularity in seconds
     startTime = parseInt(startTime);
     var d = new Date(startTime * 1000);
     var timespan = 60 / schedulerSlotsPerHour;
@@ -92,15 +94,67 @@ function schedulerGetSlotId(startTime, duration, granularity) {
     slotid += d.getMinutes() / timespan;
     return slotid;
 }
+//
+//GetSlotId from time
+function schedulerGetDateTimeFromSlotId(slotId, tmpDateTime) {
+    
+    var timespan = 60 / schedulerSlotsPerHour;
+    var totalMinutes = slotId * timespan;
+    var totalHours = totalMinutes / 60;
+    if (totalHours >= 1) {
+        totalHours = Math.floor(totalHours);
+        totalMinutes = totalMinutes - totalHours * 60;
+    } else {
+        totalHours = 0;
+    }
+    tmpDateTime.setHours(totalHours, totalMinutes, 0, 0);
 
+    return tmpDateTime;
+}
+//
+//GetSlotId from time
+function schedulerFindDuration(startTime, endTime, granularity) {
+    var duration = 0;
+    var fd = new Date(startTime * 1000);
+    var td = new Date(endTime * 1000);
+    while (fd < td) {
+        duration++;
+        fd.setMinutes(fd.getMinutes() + granularity);
+    }
+    return duration;
+}
+
+//
+// Set Select - Free Slots *******Start
 function schedulerSelectSlot(slotId, rowIndex, resourceIndex) {
-    SchedulerDataViewData[rowIndex].leases[slotId].status = 'selected';
-    SchedulerData[resourceIndex].leases[slotId].status = 'selected';
+    _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, 'selected');
 }
 function schedulerFreeSlot(slotId, rowIndex, resourceIndex) {
-    SchedulerDataViewData[rowIndex].leases[slotId].status = 'free';
-    SchedulerData[resourceIndex].leases[slotId].status = 'free';
+    _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, 'free');
 }
+
+function _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, classText) {
+    var tmpVS = SchedulerDataViewData[rowIndex].leases[slotId];  // for the display
+    var tmpS = SchedulerData[resourceIndex].leases[slotId];     // for the data
+    tmpVS.status = classText;
+    tmpS.status = classText;
+    //select other from the group in the same granularity
+    var slotSpan = 60 / schedulerSlotsPerHour;
+    var maxg = (SchedulerData[resourceIndex].granularity / 60) / slotSpan;
+
+    var startSlotId = tmpVS.groupIndex == 0 ? 0 : slotId - tmpVS.groupIndex;
+    for (var s = 0; s < maxg; s++) {
+        if (tmpVS.groupIndex != s) {
+            SchedulerDataViewData[rowIndex].leases[startSlotId].status = classText;
+            SchedulerData[rowIndex].leases[startSlotId].status = classText;
+        }
+        startSlotId++;
+    }
+
+}
+//
+// Set Select - Free Slots *******End
+
 //
 //Find Resource By Id
 function schedulerFindResourceById(Resources, id) {
