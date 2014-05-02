@@ -60,15 +60,22 @@ function schedulerGetSlots(slotSpan) {
     return slots;
 }
 
-function schedulerGetLeases(slotSpan) {
+function schedulerGetLeases(slotSpan, granularity) {
     if (slotSpan == 0) slotSpan = 10;
     var slots = [];
     var d = new Date(2014, 1, 1, 0, 0, 0, 0);
-    var i = 0;
+    var i = 0; var j = 0; var g = 0;
+    var maxg = granularity / slotSpan;
     while (d.getDate() == 1) {
         //slots.push({ id: i, status: getRandomStatus() });
-        slots.push({ id: i, status: "free" });
+        slots.push({ id: i, status: "free", groupid: j, groupIndex: g });
         d = schedulerAddMinutes(d, slotSpan);
+        //fix counters
+        g++;
+        if (maxg == g) {
+            g = 0;
+            j++;
+        }
         i++;
     }
     return slots;
@@ -122,4 +129,17 @@ function schedulerPadStr(i) {
 
 function schedulerAddMinutes(date, minutes) {
     return new Date(date.getTime() + minutes * 60000);
+}
+
+function schedulerCompareOnDay(dateOne, dateTwo) {
+    if (dateOne.getYear() == dateTwo.getYear() &&
+        dateOne.getMonth() == dateTwo.getMonth() &&
+        dateOne.getDate() == dateTwo.getDate()) {
+        return 0;
+    } else if (dateOne > dateTwo) {
+        return -1;
+    } else {
+        return 0;
+    }
+
 }

@@ -75,6 +75,9 @@ myApp.factory('$exceptionHandler', function () {
                 $scope.resources[j].leases = [];
                 j++;
             }
+            //fix slider
+            $('#tblSlider').slider('value', 0);
+            //init Slots
             $scope.initSlots(0, SchedulerTotalVisibleCells);
         };
 

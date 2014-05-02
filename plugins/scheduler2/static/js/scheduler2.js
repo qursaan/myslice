@@ -27,6 +27,8 @@
 */
 
 /* some params */
+var scheduler2;
+var scheduler2Instance;
 //is ctrl keyboard button pressed
 var schedulerCtrlPressed = false;
 //table Id
@@ -37,6 +39,7 @@ var schedulerSlotsPerHour = 6;
 var schedulerMaxRows = 12;
 var SchedulerData = [];
 var SchedulerSlots = [];
+var SchedulerDateSelected = new Date();
 var SchedulerDataViewData = [];
 var SchedulerSlotsViewData = [];
 var SchedulerTotalCells;
@@ -51,7 +54,7 @@ var schedulerDebug = true;
 var tmpSchedulerLeases = [];
 
 (function ($) {
-    var scheduler2 = Plugin.extend({
+    scheduler2 = Plugin.extend({
 
         /** XXX to check
          * @brief Plugin constructor
@@ -64,6 +67,7 @@ var tmpSchedulerLeases = [];
             this.classname="scheduler2";
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
+            scheduler2Instance = this;
             // We need to remember the active filter for datatables filtering
             this.filters = Array();
 
@@ -132,12 +136,12 @@ var tmpSchedulerLeases = [];
                     index: SchedulerData.length,
                     name: data.hrn,
                     granularity: data.granularity,
-                    leases: schedulerGetLeases(60 / schedulerSlotsPerHour),
+                    leases: schedulerGetLeases(60 / schedulerSlotsPerHour, data.granularity),
                     type: data.type,
                     org_resource: data
                 });
                 if (schedulerDebug && SchedulerData[SchedulerData.length - 1].org_resource.network_hrn == 'omf') {
-                    SchedulerData[SchedulerData.length - 1].granularity = 30;
+                    SchedulerData[SchedulerData.length - 1].granularity = 1800;
                 }
             }
             //alert(data.toSource());
@@ -156,18 +160,23 @@ var tmpSchedulerLeases = [];
         on_lease_clear_records: function (data) { console.log('clear_records'); },
         on_lease_query_in_progress: function (data) { console.log('lease_query_in_progress'); },
         on_lease_new_record: function (data) {
-            tmpSchedulerLeases.push({
-                id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
-                slice: data.slice,
-                status: 'reserved',
-                resource: data.resource,
-                network: data.network,
-                start_time: new Date(data.start_time * 1000),
-                start_time_unixtimestamp: data.start_time,
-                lease_type: data.lease_type,
-                granularity: data.granularity,
-                duration: data.duration
-            });
+            if (data.resource.indexOf("nitos")>-1){
+                tmpSchedulerLeases.push({
+                    id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
+                    end_id: schedulerGetSlotId(data.end_time, data.duration, data.granularity),
+                    slice: data.slice,
+                    status: 'reserved',
+                    resource: data.resource,
+                    network: data.network,
+                    start_time: new Date(data.start_time * 1000),
+                    start_time_unixtimestamp: data.start_time,
+                    end_time: new Date(data.end_time * 1000),
+                    end_time_unixtimestamp: data.end_time,
+                    lease_type: data.lease_type,
+                    granularity: data.granularity,
+                    duration: data.duration
+                });
+            }
             //console.log(data.toSource()); console.log('lease_new_record');
         },
         on_lease_query_done: function (data) {
@@ -266,9 +275,22 @@ var tmpSchedulerLeases = [];
                 numberOfMonths: 3
             }).change(function () {
                 //Scheduler2.loadWithDate();
-            }).click(function () {
+                SchedulerDateSelected = $("#DateToRes").datepicker("getDate");
+                if (SchedulerDateSelected != null && SchedulerDateSelected != '') {
+                    for (var i=0; i < SchedulerData.length; i++) {
+                        SchedulerData[i].leases = schedulerGetLeases(60 / schedulerSlotsPerHour, SchedulerData[i].granularity);
+                    }
+                    scheduler2Instance._FixLeases();
+                    $('#tblSlider').slider('value', 0);
+                    var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+                    tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+                } else {
+                    alert("Please select a date, so the scheduler can reserve leases.");
+                }
+            }).datepicker('setDate', SchedulerDateSelected);
+            /*.click(function () {
                 $("#ui-datepicker-div").css("z-index", 5);
-            });
+            })*/
             //End init DatePicker
             
             //init Table
@@ -306,12 +328,55 @@ var tmpSchedulerLeases = [];
         _FixLeases  : function () {
             for (var i = 0; i < tmpSchedulerLeases.length; i++) {
                 var tmpLea = tmpSchedulerLeases[i];
-                var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
-                if (tmpRes != null) {
-                    //alert(tmpLea.id + '-' + tmpLea.start_time);
-                    tmpRes.leases[tmpLea.id] = tmpLea;
+                if ((schedulerCompareOnDay(tmpLea.start_time, SchedulerDateSelected) == 0) ||
+                                (tmpLea.start_time <= SchedulerDateSelected && SchedulerDateSelected <= tmpLea.end_time) || 
+                                (schedulerCompareOnDay(tmpLea.end_time, SchedulerDateSelected) == 0)) {
+                    var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
+                    if (tmpRes != null) {
+                        //Replace Lease with current lease from the manifold
+                        var orgLease = tmpRes.leases[tmpLea.id];
+                        tmpLea['groupid'] = orgLease.groupid;
+                        tmpLea['groupIndex'] = orgLease.groupIndex;
+                        if (orgLease.groupIndex != 0) {
+                            if (!window.console) {
+                                console.warn('there is an error with the leases of the resource :' + tmpRes.name + '\n The lease start in the middle of the granularity!' + '\n The Scheduler plugin might not work!');
+                            }
+                        }
+                        tmpRes.leases[tmpLea.id] = tmpLea;
+                        this._ExtractLeaseSlots(tmpRes, tmpRes.leases[tmpLea.id]);
+                    }
                 }
             }
+        },
+
+        _ExtractLeaseSlots: function (tmpRes, lease) {
+            var tmpStartDate = lease.start_time;
+            var tmpEndDate = lease.end_time;
+            var startLoop; var toLoop;
+            if (schedulerCompareOnDay(lease.start_time,lease.end_time) == 0) {
+                //in the same date
+                startLoop = lease.id;
+                toLoop = lease.end_id;
+            } else if (lease.start_time < SchedulerDateSelected && SchedulerDateSelected < lease.end_time) {
+                //one hole day (more than 3days)
+                startLoop = 0;
+                toLoop = tmpRes.leases.length;
+            } else if (schedulerCompareOnDay(lease.start_time, SchedulerDateSelected) == 0) {
+                //the same day and extends
+                startLoop = lease.id;
+                toLoop = tmpRes.leases.length;
+            } else if (schedulerCompareOnDay(lease.end_time, SchedulerDateSelected) == 0) {
+                //extends to the last say
+                startLoop = 0;
+                toLoop = lease.end_id;
+            }
+            //var minutGran = tmpRes.granularity * 60;
+            for (var li = lease.id; li < toLoop; li++) {
+                tmpRes.leases[li].status = 'reserved';
+            }
+            
+            //reserved
+            //tmpRes.leases[tmpLea.id
         },
 
         _FixTable: function () {
