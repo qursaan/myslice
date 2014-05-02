@@ -82,7 +82,7 @@ function selectRange(isTemp) {
     if (!schedulerCtrlPressed)
         $("#" + schedulerTblId + "  td.selected, #" + schedulerTblId + "  td.selected_tmp").each(function() {
             $(this).removeClass('selected selected_tmp').addClass('free');
-            schedulerFreeSlot($(this).data('slotid'), $(this).siblings('th').data('resourceindex'));
+            schedulerFreeSlot($(this).data('slotid'), $(this).siblings('th').data('rowindex'), $(this).siblings('th').data('resourceindex'));
         });
 
     tmp_scheduler_table_dragStart_td = scheduler_table_dragStart_td;
@@ -119,7 +119,7 @@ function selectRange(isTemp) {
                     if (isTemp)
                         $(cell).addClass("free_tmp");
                     else{
-                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
+                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
                     }
                     break;
@@ -128,7 +128,7 @@ function selectRange(isTemp) {
                     if (isTemp)
                         $(cell).addClass("selected_tmp");
                     else {
-                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
+                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
                     }
                     break;
@@ -137,7 +137,7 @@ function selectRange(isTemp) {
                     if (isTemp)
                         $(cell).addClass("selected_tmp");
                     else {
-                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
+                        schedulerSelectSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("selected");
                     }
                     break;
@@ -146,7 +146,7 @@ function selectRange(isTemp) {
                     if (isTemp)
                         $(cell).addClass("free_tmp");
                     else {
-                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('resourceindex'));
+                        schedulerFreeSlot($(cell).data('slotid'), $(cell).siblings('th').data('rowindex'), $(cell).siblings('th').data('resourceindex'));
                         $(cell).addClass("free");
                     }
                     break;

@@ -2,6 +2,10 @@
     <img src="../../static/img/loading-7b6dc55620a355b55b835f6b4c300f9b.gif" alt="loading" style="width:100px;" />
     <h3>Loading Data...</h3>
 </div>
+<div id="plugin-{{ domid }}-empty" style="text-align: center; display: none;">
+    <img src="../../static/img/no-data.png" alt="no data found" style="width:100px;" />
+    <h3>no data found...</h3>
+</div>
 <div id="plugin-{{ domid }}" class="" ng-app="myApp" style="display:none;">
     <div class="row m-b">
         <div class="col-md-1">
@@ -54,19 +58,27 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
-                        <th data-resourceid="{[{ resource.id }]}" data-resourceindex="{[{ resource.index }]}">{[{ resource.name }]}</th>
+                        <th data-resourceid="{[{ resource.id }]}" data-rowindex="{[{ $index }]}" data-resourceindex="{[{ resource.index }]}" style="word-wrap: break-word; word-break: break-all; ">{[{ resource.name }]}</th>
                         <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" ng-class="{{ 'lease.status' }}"></td>
                     </tr>
                 </tbody>
             </table>
-            <div class="dataTables_paginate paging_bootstrap">
-                <ul class="pagination">
-                    <li class="prev disabled"><a href="#">← Previous</a></li>
-                    <li ng-cloak ng-repeat="t in getTimes(totalPages)"><a href="#" ng-click="setPage($index)">{[{$index+1}]}</a></li>
-                    <li class="next disabled"><a href="#">Next → </a></li>
-                </ul>
+            <div class="row">
+                <div class="col-xs-5">
+                    <div id="resources-list__table_length" class="dataTables_length">
+                        <label>total Pages : {[{totalPages}]}</label>
+                    </div>
+                </div>
+                <div class="col-xs-7">
+                    <div class="dataTables_paginate paging_bootstrap">
+                        <ul class="pagination">
+                            <li class="prev disabled"><a href="#">← Previous</a></li>
+                            <li ng-cloak ng-repeat="t in getPageNumbers() track by $index" ng-class="{active: t==curPage+1}"><a href="" ng-click="setPage(t-1)">{[{t}]}</a></li>
+                            <li class="next disabled"><a href="#">Next → </a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
         {% comment %}
         <div id="reservation-table-scroll-container">
             <table id='{{domid}}-reservation-table' class='table table-bordered'>

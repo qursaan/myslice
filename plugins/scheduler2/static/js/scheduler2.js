@@ -64,6 +64,9 @@ var tmpSchedulerLeases = [];
             this.classname="scheduler2";
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
+            // We need to remember the active filter for datatables filtering
+            this.filters = Array();
+
 
             SchedulerSlots = schedulerGetSlots(60/schedulerSlotsPerHour);
             //selection from table 
@@ -84,7 +87,9 @@ var tmpSchedulerLeases = [];
 
             if (schedulerDebug) console.time("Listening_to_queries");
             /* Listening to queries */
-            this.listen_query(options.query_uuid, 'all_ev');
+
+            this.listen_query(options.query_uuid);
+            this.listen_query(options.query_all_uuid, 'all');
             this.listen_query(options.query_all_resources_uuid, 'all_resources');
             this.listen_query(options.query_lease_uuid, 'lease');
             //this.listen_query(options.query_lease_uuid, 'lease');
@@ -121,8 +126,16 @@ var tmpSchedulerLeases = [];
         },
         on_all_resources_new_record: function (data) {
             //alert(data.toSource());
-            if (data.exclusive == null)
-                SchedulerData.push({ id: data.urn, index: SchedulerData.length, name: data.hrn, granularity: data.granularity, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
+            if (data.exclusive == true)
+                SchedulerData.push({
+                    id: data.urn,
+                    index: SchedulerData.length,
+                    name: data.hrn,
+                    granularity: data.granularity,
+                    leases: schedulerGetLeases(60 / schedulerSlotsPerHour),
+                    type: data.type,
+                    org_resource: data
+                });
             //alert(data.toSource());
 
         },
@@ -145,7 +158,8 @@ var tmpSchedulerLeases = [];
                 status: 'reserved',
                 resource: data.resource,
                 network: data.network,
-                start_time: data.start_time,
+                start_time: new Date(data.start_time * 1000),
+                start_time_unixtimestamp: data.start_time,
                 lease_type: data.lease_type,
                 granularity: data.granularity,
                 duration: data.duration
@@ -164,8 +178,54 @@ var tmpSchedulerLeases = [];
 
         // no prefix
         on_filter_added: function (filter) {
+            this.filters.push(filter);
+            this._SetFiletredResources(this.filters);
+            //angular and UI
             var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.initSchedulerResources(schedulerMaxRows, filter);
+            if (SchedulerDataViewData.length == 0) {
+                $("#plugin-scheduler").hide();
+                $("#plugin-scheduler-empty").show();
+                tmpScope.clearStuff();
+            } else {
+                $("#plugin-scheduler-empty").hide();
+                $("#plugin-scheduler").show();
+                tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+            }
+        },
+
+        on_filter_removed: function (filter) {
+            // Remove corresponding filters
+            this.filters = $.grep(this.filters, function (x) {
+                return x == filter;
+            });
+            this._SetFiletredResources(this.filters);
+            //angular and UI
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            if (SchedulerDataViewData.length == 0) {
+                $("#plugin-scheduler").hide();
+                $("#plugin-scheduler-empty").show();
+                tmpScope.clearStuff();
+            } else {
+                $("#plugin-scheduler-empty").hide();
+                $("#plugin-scheduler").show();
+                tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+            }
+        },
+
+        on_filter_clear: function () {
+            this.filters = [];
+            this._SetFiletredResources(this.filters);
+            //angular and UI
+            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
+            if (SchedulerDataViewData.length == 0) {
+                $("#plugin-scheduler").hide();
+                $("#plugin-scheduler-empty").show();
+                tmpScope.clearStuff();
+            } else {
+                $("#plugin-scheduler-empty").hide();
+                $("#plugin-scheduler").show();
+                tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+            }
         },
 
         // ... be sure to list all events here
@@ -185,6 +245,7 @@ var tmpSchedulerLeases = [];
         _initScheduler: function () {
             if (_resourcesDone && _leasesDone)
             {
+                SchedulerDataViewData = SchedulerData;
                 /* GUI setup and event binding */
                 this._FixLeases();
                 this._initUI();
@@ -213,16 +274,18 @@ var tmpSchedulerLeases = [];
             //init Slider
             $('#tblSlider').slider({
                 min: 0,
-                max: SchedulerTotalCells - SchedulerTotalVisibleCells - 1,
+                max: SchedulerTotalCells - SchedulerTotalVisibleCells,
                 value: 0,
                 slide: function (event, ui) {
                     //$("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
                     //console.log(ui.value);
                     var angScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-                    if (_schedulerCurrentCellPosition > ui.value)
+                    if (_schedulerCurrentCellPosition > ui.value) {
                         angScope.moveBackSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
-                    else if (_schedulerCurrentCellPosition < ui.value)
+                    }
+                    else if (_schedulerCurrentCellPosition < ui.value) {
                         angScope.moveFrontSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
+                    }
                     _schedulerCurrentCellPosition = ui.value;
                 }
             });
@@ -250,7 +313,7 @@ var tmpSchedulerLeases = [];
         _FixTable: function () {
             var colWidth = 50;
             SchedulerTotalCells = SchedulerSlots.length;
-            $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", schedulerTblFirstColWidth);
+            $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", schedulerTblFirstColWidth); //.css("display", "block");
             //this get width might need fix depending on the template 
             var tblwidth = $('#scheduler-tab').parent().outerWidth();
             SchedulerTotalVisibleCells = parseInt((tblwidth - schedulerTblFirstColWidth) / colWidth);
@@ -263,8 +326,56 @@ var tmpSchedulerLeases = [];
             //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
             //}
             var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.initSchedulerResources(schedulerMaxRows, null);
+            tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+
         },
+
+        _SetFiletredResources : function (filters) {
+            if (filters.length > 0) {
+                SchedulerDataViewData = new Array();
+                var tmpAddIt = true;
+                for (var i = 0; i < SchedulerData.length; i++) {
+                    loopfilters:
+                    for (var f = 0; f < filters.length; f++) {
+                        tmpAddIt = this._FilterResource(SchedulerData[i], filters[f]);
+                        if (tmpAddIt == false) break loopfilters;
+                    }
+                    if (tmpAddIt) {
+                        SchedulerDataViewData.push(SchedulerData[i]);
+                    }
+                }
+            } else {
+                SchedulerDataViewData = SchedulerData;
+            }
+        },
+
+        _FilterResource: function (resource, filter) {
+            var key = filter[0];
+            var op = filter[1];
+            var value = filter[2];
+            var colValue = resource.org_resource[key];
+            var ret = true;
+
+            if (op == '=' || op == '==') {
+                if (colValue != value || colValue == null || colValue == "" || colValue == "n/a")
+                    ret = false;
+            } else if (op == 'included') {
+                $.each(value, function (i, x) {
+                    if (x == colValue) {
+                        ret = true;
+                        return false;
+                    } else {
+                        ret = false;
+                    }
+                });
+            } else if (op == '!=') {
+                if (colValue == value || colValue == null || colValue == "" || colValue == "n/a")
+                    ret = false;
+            }
+
+            return ret;
+        },
+
         _SetPeriodInPage: function (start, end) {
         }
     });

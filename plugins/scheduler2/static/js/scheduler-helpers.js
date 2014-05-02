@@ -86,11 +86,13 @@ function schedulerGetSlotId(startTime, duration, granularity) {
     return slotid;
 }
 
-function schedulerSelectSlot(slotId, resourceIndex) {
-    SchedulerDataViewData[resourceIndex].leases[slotId].status = 'selected';
+function schedulerSelectSlot(slotId, rowIndex, resourceIndex) {
+    SchedulerDataViewData[rowIndex].leases[slotId].status = 'selected';
+    SchedulerData[resourceIndex].leases[slotId].status = 'selected';
 }
-function schedulerFreeSlot(slotId, resourceIndex) {
-    SchedulerDataViewData[resourceIndex].leases[slotId].status = 'free';
+function schedulerFreeSlot(slotId, rowIndex, resourceIndex) {
+    SchedulerDataViewData[rowIndex].leases[slotId].status = 'free';
+    SchedulerData[resourceIndex].leases[slotId].status = 'free';
 }
 //
 //Find Resource By Id
