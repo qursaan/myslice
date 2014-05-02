@@ -356,7 +356,7 @@ var tmpSchedulerLeases = [];
                     }
 
                     for (var i = 0; i < leasesForCommit.length; i++) {
-                        //manifold.raise_event(scheduler.options.query_lease_uuid, SET_ADD, new_lease);
+                        //manifold.raise_event(scheduler.options.query_lease_uuid, SET_ADD, leasesForCommit[i]);
                     }
                 });
                 //
