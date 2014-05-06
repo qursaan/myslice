@@ -102,9 +102,9 @@
                 	if(data.success){
                     	// TODO: highlight row after success
                     	//$('tr[id="'+record_id+'"]').highlight();
-                    	mysliceAlert("Success: slice updated",'success');
+                    	mysliceAlert('Success: slice updated','success', true);
                 	}else{
-                    	mysliceAlert("Rest Error for: "+data.error,'warning');
+                    	mysliceAlert('Rest Error for: '+data.error,'warning', true);
                 	}
                 }); // post update slice
             
