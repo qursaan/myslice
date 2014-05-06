@@ -2,19 +2,27 @@
 /*
  * Call it with level: success, info, warning, danger
  */
-function mysliceAlert(msg, level) {
+function mysliceAlert(msg, level, timeout) {
 	level = typeof level !== 'undefined' ? level : 'success';
+	timeout = typeof timeout !== 'undefined' ? timeout : false;
 	var el = $('#myslice-message');
 	el.find('.message').text(msg);
 	el.addClass('alert-' + level);
 	el.parent().fadeIn('fast');
+	if (timeout) {
+		setTimeout(function(){el.alert('close');},5000);
+	}
 };
 /* Table initialisation */
 $(document).ready(function() {
 	
 	var platformParameters = {};
 	
-	
+	$('#myslice-message').bind('closed.bs.alert', function () {
+		$(this).parent().hide();
+	});
+
+	mysliceAlert('hello','danger');
 	
 	
 	$("#objectList").load("/table/resource/", {"fields" : ["hostname","hrn","country","type"], "options": ["checkbox"] }, function(data) {
