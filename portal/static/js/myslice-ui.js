@@ -2,12 +2,13 @@
 /*
  * Call it with level: success, info, warning, danger
  */
-function mysliceAlert(msg, level = 'warning') {
-	var el = $('#myslice-message')
+function mysliceAlert(msg, level) {
+	level = typeof level !== 'undefined' ? level : 'success';
+	var el = $('#myslice-message');
 	el.find('.message').text(msg);
 	el.addClass('alert-' + level);
 	el.fadeIn('fast');
-}
+};
 /* Table initialisation */
 $(document).ready(function() {
 	
