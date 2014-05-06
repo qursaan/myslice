@@ -58,6 +58,15 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         user_hrn = account_config.get('user_hrn','N/A')
+                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+
+
+        # checking if pi or not
+        if acc_auth_cred == {}:
+            pi = "is_not_pi"
+        else:
+            pi = "is_pi"
+
 
         # Page rendering
         page = Page(wsgi_request)
@@ -117,6 +126,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'errors': errors,
             'email': user_email,
             'user_hrn': user_hrn,
+            'pi': pi,        
             'cc_myself': True,
             'authorities': authorities,
             'theme': self.theme,
