@@ -153,7 +153,7 @@ class ObjectRequest(object):
         if self.filters :
             query.set(self.filters)
         else:
-            raise Exception, "Filters are required for update"
+            raise Exception, "Filters are required for delete"
         return execute_query(self.request, query)
     
     def json(self):
