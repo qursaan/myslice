@@ -32,13 +32,12 @@
                 	</tr>
             	</table>
 				{% if 'is_pi'  in pi %}
-				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>Add users</button>
+				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Update users</button>
 				{%endif%}
         	</div>
 <script>
     $(document).ready(function() {
 			var slice_users = [];
-			//console.log("the value you selected: " + selectedValue);
         	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
             	var list_users = [];
             	var table_users = [];
@@ -56,8 +55,8 @@
 						if (element == "{{slice}}"){
 							//console.log("the slice is: "+ element);	
 							flag_checkbox = 1;
-							slice_users.push (val.user_email)
-							user_row += "<td><input type='checkbox' checked='True'></td>";
+							slice_users.push (val.user_hrn)
+							user_row += "<td><input type='checkbox' checked='True' class='user'></td>";
 						}
 					}
 					if(flag_checkbox != 1){
@@ -70,42 +69,47 @@
                 	table_users.push(user_row);
                 
             	});
-				 console.log("slice users before")
-				 console.log(slice_users)
-
+				 console.log("slice users before");
+				 console.log(slice_users);
+            
 				$("table#user-tab tr:last").after(table_users.join( "" ));
             	$("div#user-tab-loaded").css("display","block");
             	$("div#user-tab-loading").css("display","none");
+                $("input:checkbox.user").click(function() {
+                    console.log("user_hrn");
+                    user_hrn = $(this).closest('tr').find('td:eq(2)').html();
+                    console.log(user_hrn);
+                    console.log(this.checked);
+                    if(this.checked){
+                        var record_id = this.id;
+                        slice_users.push (user_hrn);
+                    }else{
+                        console.log("not checked");
+                        slice_users = $.grep(slice_users, function( user, i ) {
+                            return user != user_hrn;
+                        });
+                    }
+                    console.log(slice_users);
+                });
+           
+         	}); // post rest/user
 
-				$('button#addusers').click(function() {
-          	$('input:checkbox.user').each(function (index) {
-            	if(this.checked){
-                	var record_id = this.id;
-					console.log("checked")
-					console.log($(this)
-       					.closest('tr') //get the enclosing tr
-       					.find('td:eq(1)'));  //find any using td:eq(<index>)
-					slice_users.push ("yasin.upmc@gmail.com")
-					console.log("after")
-					console.log(slice_users)
-					//console.log(user_email)
-                	$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
-                    	if(data.success){
-                        	// TODO: highlight row after success
-                        	//$('tr[id="'+record_id+'"]').highlight();
-                    	}else{
-                        	alert("Rest Error for "+record_id+": "+data.error);
-                    	}
-                	});
-                
-            	}
-        	});
-        	// TODO: refresh table
-        	//window.location="/portal/institution#slices";
-    	});
+	        $('button#addusers').click(function() {
+                $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+                    console.log(data);
+                	if(data.success){
+                    	// TODO: highlight row after success
+                    	//$('tr[id="'+record_id+'"]').highlight();
+                	}else{
+                    	alert("Rest Error for: "+data.error);
+                	}
+                }); // post update slice
+            
+            	// TODO: refresh table
+            	//window.location="/portal/institution#slices";
 
-         	});
-	//	});
-    });
+            }); // button#addusers click
+
+    }); // document ready
 </script>
 
