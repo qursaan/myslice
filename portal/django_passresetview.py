@@ -129,9 +129,12 @@ def password_reset(request, is_admin_site=False,
                     
             if flag == 0:
                 messages.error(request, 'Sorry, this email is not registered.')
-                return render(request, themeview.theme, {
+                context = {
                     'form': form,
-                    })
+                    'theme': themeview.theme
+                }   
+                return TemplateResponse(request, themeview.template, context,current_app=current_app)
+
             ### end of email check in manifold  ### 
 
             opts = {

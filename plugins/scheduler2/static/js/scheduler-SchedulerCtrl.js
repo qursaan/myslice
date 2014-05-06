@@ -8,7 +8,7 @@ myApp.factory('$exceptionHandler', function () {
             console.log(exception.message);
             
             var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
+            //tmpScope.initSlots(_schedulerCurrentCellPosition, _schedulerCurrentCellPosition + SchedulerTotalVisibleCells);
         }
             
     };
@@ -31,11 +31,11 @@ myApp.factory('$exceptionHandler', function () {
         this.scope.errorMessage = null;
         this.scope.name = "";
         //Pagin
-        this.scope.totalPages = 4;
-        this.scope.curPage = 0;
+        $scope.totalPages = 4;
+        $scope.curPage = 0;
         this.scope.pageSize = 25;
 
-        $scope.resources = SchedulerDataViewData;
+        $scope.resources = new Array();
         $scope.slots = SchedulerSlotsViewData;
         //$scope.msg = "hello";
 
@@ -45,39 +45,57 @@ myApp.factory('$exceptionHandler', function () {
             //afterAngularRendered();
         });
 
-        $scope.initSchedulerResources = function (pageSize, filter) {
+        $scope.clearStuff = function() {
+            $scope.resources = new Array();
+            $scope.$apply();
+        }
+
+        $scope.initSchedulerResources = function (pageSize) {
+            $scope.resources = new Array();
+
             for (var k = 0; k < pageSize; k++) {
-                if ($scope.resources.length < SchedulerData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
+                $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
                 $scope.resources[k].leases = [];
             }
             $scope.pageSize = pageSize;
             $scope.curPage = 0;
-            $scope.totalPages = parseInt(Math.ceil(SchedulerData.length / $scope.pageSize));
+            $scope.totalPages = parseInt(Math.ceil(SchedulerDataViewData.length / $scope.pageSize));
             $scope.initSlots(0, SchedulerTotalVisibleCells);
         };
 
         $scope.setPage = function(page) {
             var tmpFrm = $scope.pageSize * page;
             var tmpTo = tmpFrm + $scope.pageSize;
+            tmpTo = SchedulerDataViewData.length < tmpTo ? SchedulerDataViewData.length : tmpTo;
             $scope.curPage = page;
             $scope.resources = [];
+            var j = 0;
             for (var k = tmpFrm; k < tmpTo; k++) {
-                if ($scope.resources.length < SchedulerData.length)
-                    $scope.resources.push(jQuery.extend(true, {}, SchedulerData[k]));
-                $scope.resources[k].leases = [];
+                $scope.resources.push(jQuery.extend(true, {}, SchedulerDataViewData[k]));
+                $scope.resources[j].leases = [];
+                j++;
             }
+            //fix slider
+            $('#tblSlider').slider('value', 0);
+            //init Slots
             $scope.initSlots(0, SchedulerTotalVisibleCells);
         };
 
         $scope.initSlots = function (from, to) {
             //init
             $scope.slots = [];
+
+            var resourceIndex; //gia to paging
             //set
             for (var i = from; i < to; i++) {
                 $scope.slots.push(SchedulerSlots[i]);
+                resourceIndex = $scope.pageSize * $scope.curPage;
                 for (var j = 0; j < $scope.resources.length; j++) {
-                    $scope.resources[j].leases.push(SchedulerData[j].leases[i]);
+                    if (i == from) {
+                        $scope.resources[j].leases = [];
+                    }
+                    $scope.resources[j].leases.push(SchedulerDataViewData[resourceIndex].leases[i]);
+                    resourceIndex++;
                 }
             }
             //apply
@@ -101,7 +119,7 @@ myApp.factory('$exceptionHandler', function () {
         };
 
         $scope.moveBackSlot = function(from, to) {
-            $scope.$apply(function() {
+            //$scope.$apply(function() {
                 //try {
                 //    $scope.slots.pop();
                 //    $scope.slots.unshift(SchedulerSlots[from]);
@@ -113,12 +131,38 @@ myApp.factory('$exceptionHandler', function () {
                 //    alert("error");
                 //}
 
-                $scope.initSlots(from, to);
-            });
+            $scope.initSlots(from, to);
+            //});
         };
 
-        $scope.getTimes = function (n) {
-            return new Array(n);
+        $scope.getPageNumbers = function () {
+            var totalNumbersShowned = ($scope.totalPages > 10 ? 10 : $scope.totalPages + 1 );
+            var tmtNumDiv = totalNumbersShowned / 2;
+            //local
+            var numFrom = 1;
+            var numTo = totalNumbersShowned;
+            var rtrnArr = new Array();
+
+            if (totalNumbersShowned > 1) {
+                //set from - to
+                if ($scope.totalPages > totalNumbersShowned) {
+                    if ($scope.curPage <= tmtNumDiv) {
+                        //nothing
+                    } else if ($scope.curPage >= $scope.totalPages - tmtNumDiv) {
+                        numTo = $scope.totalPages;
+                        numFrom = numTo - totalNumbersShowned;
+                    } else {
+                        numFrom = $scope.curPage - tmtNumDiv;
+                        numTo = numFrom + totalNumbersShowned;
+                    }
+                }
+
+                for (var i = numFrom; i < numTo; i++)
+                    rtrnArr.push(i);
+            } else {
+                rtrnArr.push(1);
+            }
+            return rtrnArr;
         };
 
         // Return this object reference.
