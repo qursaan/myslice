@@ -1,4 +1,4 @@
-
+{% load portal_filters %}
 <div id="header">
 	<div class="wrapper">
 		<div class="logo">
@@ -45,6 +45,9 @@
 		<div class="wrapper"></div>
 	</div>
 	{% endif %}
+</div>
+<div class="row">
+{% widget '_widget-message.html' %}
 </div>
 <script>
 	$(document).ready(function() {

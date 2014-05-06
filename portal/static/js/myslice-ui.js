@@ -7,13 +7,12 @@ function mysliceAlert(msg, level) {
 	var el = $('#myslice-message');
 	el.find('.message').text(msg);
 	el.addClass('alert-' + level);
-	el.fadeIn('fast');
+	el.parent().fadeIn('fast');
 };
 /* Table initialisation */
 $(document).ready(function() {
 	
 	var platformParameters = {};
-	
 	
 	
 	
