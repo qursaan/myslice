@@ -1,4 +1,8 @@
 
+function mysliceAlert(msg) {
+	$('#myslice-message').find('.message').text(msg);
+	$('#myslice-message').fadeIn('fast');
+}
 /* Table initialisation */
 $(document).ready(function() {
 	
