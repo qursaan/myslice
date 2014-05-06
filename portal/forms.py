@@ -69,12 +69,31 @@ def is_password_unusable(pw):
 #    cc_myself = forms.BooleanField(required=False)
 
 class ContactForm(forms.Form):
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    authority = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    first_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+                                regex=r'^[\w.@+-]+$',
+                                 max_length=30,
+                                 label=_("First name"),
+                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    last_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+                                regex=r'^[\w.@+-]+$',
+                                 max_length=30,
+                                 label=_("Last name"),
+                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    authority = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+                                regex=r'^[\w.@+-]+$',
+                                 max_length=30,
+                                 label=_("authority"),
+                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    subject = forms.CharField(max_length=100,widget=forms.TextInput(attrs={'class':'form-control'}))
-    description = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    subject = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+                                regex=r'^[\w.@+-]+$',
+                                 max_length=100,
+                                 label=_("subject"),
+                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    description = forms.RegexField(widget=forms.Textarea(attrs={'class':'form-control'}),
+                                regex=r'^[\w.@+-]+$',
+                                 label=_("description"),
+                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
     cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class PassResetForm(forms.Form):
