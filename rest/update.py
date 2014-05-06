@@ -35,7 +35,8 @@ def dispatch(request, object_type, object_name):
 
             if (el[0][-2:] == '[]') :
                 # when receiving params[key][] = 'value1' ...
-                o.params.append({el[0][7:-3]:",".join(req_items.getlist(el[0]))})
+                #o.params.append({el[0][7:-3]:",".join(req_items.getlist(el[0]))})
+                o.params.append({el[0][7:-3]:req_items.getlist(el[0])})
             else :
                 # when receiving params[key] = 'value'
                 o.params.append({el[0][7:-1]:el[1]})
