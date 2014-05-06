@@ -1,14 +1,18 @@
 
-function mysliceAlert(msg) {
-	$('#myslice-message').find('.message').text(msg);
-	$('#myslice-message').fadeIn('fast');
+/*
+ * Call it with level: success, info, warning, danger
+ */
+function mysliceAlert(msg, level = 'warning') {
+	var el = $('#myslice-message')
+	el.find('.message').text(msg);
+	el.addClass('alert-' + level);
+	el.fadeIn('fast');
 }
 /* Table initialisation */
 $(document).ready(function() {
 	
 	var platformParameters = {};
 	
-		
 	
 	
 	
