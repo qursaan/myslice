@@ -22,7 +22,7 @@ $(document).ready(function() {
 		$(this).parent().hide();
 	});
 
-	mysliceAlert('hello','danger');
+	//mysliceAlert('hello','danger');
 	
 	
 	$("#objectList").load("/table/resource/", {"fields" : ["hostname","hrn","country","type"], "options": ["checkbox"] }, function(data) {
