@@ -31,6 +31,9 @@
                     	<th>Enabled</th>
                 	</tr>
             	</table>
+
+                <!-- XXX TODO: for the moment only PIs have access to Update but users that have slice credentials should also have access to that -->
+
 				{% if 'is_pi'  in pi %}
 				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Update users</button>
 				{%endif%}
@@ -93,15 +96,15 @@
                 });
            
          	}); // post rest/user
-
 	        $('button#addusers').click(function() {
                 $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
                     console.log(data);
                 	if(data.success){
                     	// TODO: highlight row after success
                     	//$('tr[id="'+record_id+'"]').highlight();
+                    	mysliceAlert('Success: slice updated','success', true);
                 	}else{
-                    	alert("Rest Error for: "+data.error);
+                    	mysliceAlert('Rest Error for: '+data.error,'warning', true);
                 	}
                 }); // post update slice
             

@@ -50,13 +50,13 @@
  	</div>
 	
 	<div class="tab-pane row" id="slices">
-		{%if 'is_pi'  in pi %}
-	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
-		{%else%}
-		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> request slice</button>
-		{%endif%}
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 	    <div id="slice-tab-loaded" style="display:none;">
+	    	{%if 'is_pi'  in pi %}
+	      	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
+	    	{%else%}
+	    	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> request slice</button>
+	    	{%endif%}
 	        <table id="slice-tab">
 	            <tr>
 	                <th>+/-</th>
