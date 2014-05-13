@@ -1,0 +1,22 @@
+<div id='main-{{ domid }}' class='univbrisfoam-spacer'>
+ <form id="uob_form">
+  <table class='table table-striped table-bordered dataTable' id='{{domid}}__table'>
+    <thead>
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
+        {% if checkboxes %} <th class="checkbox">+/-</th> {% endif %}
+      </tr>
+    </thead> 
+    <tbody> 
+    </tbody>
+    <tfoot>
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
+        {% if checkboxes %} <th>+/-</th> {% endif %}
+      </tr>
+    </tfoot> 
+  </table>
+ </form>
+</div>

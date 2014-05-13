@@ -1,0 +1,162 @@
+<html> 
+<style>
+.multiselect {
+    width:40em;
+    height:5em;
+    border:solid 1px #c0c0c0;
+    overflow:auto;
+}
+ 
+.multiselect label {
+    display:block;
+}
+ 
+.multiselect-on {
+    color:#ffffff;
+    background-color:#000099;
+}
+</style>
+
+<form id="uob_fv_form">
+  <table id='uob_fv_table'>
+		            <tr>
+		            	<th><strong>MAC Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_src_start"></label>
+		            		<input id="id_form-0-dl_src_start" type="text" name="form-0-dl_src_start" maxlength="17" title="Link layer source address range start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_src_end"></label>
+		            		<input id="id_form-0-dl_src_end" type="text" name="form-0-dl_src_end" maxlength="17" title="Link layer source address range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>MAC Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_dst_start"></label>
+		            		<input id="id_form-0-dl_dst_start" type="text" name="form-0-dl_dst_start" maxlength="17" title="Link layer destination address range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_dst_end"></label>
+		            		<input id="id_form-0-dl_dst_end" type="text" name="form-0-dl_dst_end" maxlength="17" title="Link layer destination address range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>Ethernet Type</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_type_start"></label>
+		            		<input type="text" name="form-0-dl_type_start" id="id_form-0-dl_type_start" title="Link layer type range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_type_end"></label>
+		            		<input type="text" name="form-0-dl_type_end" id="id_form-0-dl_type_end" title="Link layer type range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>VLAN ID</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-vlan_id_start"></label>
+		            		<input type="text" name="form-0-vlan_id_start" value="25" id="id_form-0-vlan_id_start" title= "VLAN ID range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-vlan_id_end"></label>
+		            		<input type="text" name="form-0-vlan_id_end" value="25" id="id_form-0-vlan_id_end" title="VLAN ID range end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_src_start"></label>
+		            		<input type="text" name="form-0-nw_src_start" id="id_form-0-nw_src_start" title="Network source address range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_src_end"></label>
+		            		<input type="text" name="form-0-nw_src_end" id="id_form-0-nw_src_end" title="Network source address range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_dst_start"></label>
+		            		<input type="text" name="form-0-nw_dst_start" value="192.168.1.0" id="id_form-0-nw_dst_start" title="Network destination address range start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_dst_end"></label>
+		            		<input type="text" name="form-0-nw_dst_end" value="192.168.1.31" id="id_form-0-nw_dst_end" title="Network destination address range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Protocol</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_proto_start"></label>
+		            		<input type="text" name="form-0-nw_proto_start" id="id_form-0-nw_proto_start" title="Network protocol range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_proto_end"></label>
+		            		<input type="text" name="form-0-nw_proto_end" id="id_form-0-nw_proto_end" title="Network protocol range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>TCP/UDP Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_src_start"></label>
+		            		<input type="text" name="form-0-tp_src_start" id="id_form-0-tp_src_start" title="Transport source port range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_src_end"></label>
+		            		<input type="text" name="form-0-tp_src_end" id="id_form-0-tp_src_end" title="Transport source port range end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>TCP/UDP Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_dst_start"></label>
+		            		<input type="text" name="form-0-tp_dst_start" id="id_form-0-tp_dst_start" title="Transport destination port range start"/>
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_dst_end"></label>
+		            		<input type="text" name="form-0-tp_dst_end" id="id_form-0-tp_dst_end" title="Transport destination port range end"/>
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>Ports</strong></th>
+		            	<td COLSPAN="2">
+		            		
+		            		<label for="id_form-0-slivers"></label>
+		            		<div class="multiselect">
+    						<label><input type="checkbox" name="option[]" value="1" />Green</label>
+    						<label><input type="checkbox" name="option[]" value="2" />Red</label>
+    						<label><input type="checkbox" name="option[]" value="3" />Blue</label>
+    						<label><input type="checkbox" name="option[]" value="4" />Orange</label>
+    						<label><input type="checkbox" name="option[]" value="5" />Purple</label>
+    						<label><input type="checkbox" name="option[]" value="6" />Black</label>
+    						<label><input type="checkbox" name="option[]" value="7" />White</label>
+					</div>
+		            	</td>
+		            </tr>
+  </table>
+
+  <input type="submit" value="cancel" id="cancel flowspace"></input>
+  <input type="submit" value= "add flowspace" id="add_flowspace"></input>
+
+ </form>
+</html>
+

@@ -1,0 +1,143 @@
+<html> 
+<form id="uob_fv_form">
+  <table class='table table-striped table-bordered dataTable' id='uob_fv_table'>
+		            <tr>
+		            	<th><strong>MAC Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_src_start">Link layer source address range start</label>
+		            		<input id="id_form-0-dl_src_start" type="text" name="form-0-dl_src_start" maxlength="17" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_src_end">Link layer source address range end</label>
+		            		<input id="id_form-0-dl_src_end" type="text" name="form-0-dl_src_end" maxlength="17" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>MAC Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_dst_start">Link layer destination address range start</label>
+		            		<input id="id_form-0-dl_dst_start" type="text" name="form-0-dl_dst_start" maxlength="17" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_dst_end">Link layer destination address range end</label>
+		            		<input id="id_form-0-dl_dst_end" type="text" name="form-0-dl_dst_end" maxlength="17" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>Ethernet Type</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_type_start">Link layer type range start</label>
+		            		<input type="text" name="form-0-dl_type_start" id="id_form-0-dl_type_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-dl_type_end">Link layer type range end</label>
+		            		<input type="text" name="form-0-dl_type_end" id="id_form-0-dl_type_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>VLAN ID</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-vlan_id_start">VLAN ID range start</label>
+		            		<input type="text" name="form-0-vlan_id_start" value="25" id="id_form-0-vlan_id_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-vlan_id_end">VLAN ID range end</label>
+		            		<input type="text" name="form-0-vlan_id_end" value="25" id="id_form-0-vlan_id_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_src_start">Network source address range start</label>
+		            		<input type="text" name="form-0-nw_src_start" id="id_form-0-nw_src_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_src_end">Network source address range end</label>
+		            		<input type="text" name="form-0-nw_src_end" id="id_form-0-nw_src_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_dst_start">Network destination address range start</label>
+		            		<input type="text" name="form-0-nw_dst_start" value="192.168.1.0" id="id_form-0-nw_dst_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_dst_end">Network destination address range end</label>
+		            		<input type="text" name="form-0-nw_dst_end" value="192.168.1.31" id="id_form-0-nw_dst_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>IP Protocol</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_proto_start">Network protocol range start</label>
+		            		<input type="text" name="form-0-nw_proto_start" id="id_form-0-nw_proto_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-nw_proto_end">Network protocol range end</label>
+		            		<input type="text" name="form-0-nw_proto_end" id="id_form-0-nw_proto_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>TCP/UDP Source</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_src_start">Transport source port range start</label>
+		            		<input type="text" name="form-0-tp_src_start" id="id_form-0-tp_src_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_src_end">Transport source port range end</label>
+		            		<input type="text" name="form-0-tp_src_end" id="id_form-0-tp_src_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>TCP/UDP Destination</strong></th>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_dst_start">Transport destination port range start</label>
+		            		<input type="text" name="form-0-tp_dst_start" id="id_form-0-tp_dst_start" />
+		            	</td>
+		            	<td>
+		            		
+		            		<label for="id_form-0-tp_dst_end">Transport destination port range end</label>
+		            		<input type="text" name="form-0-tp_dst_end" id="id_form-0-tp_dst_end" />
+		            	</td>
+		            </tr>
+		            <tr>
+		            	<th><strong>Ports</strong></th>
+		            	<td COLSPAN="2">
+		            		
+		            		<label for="id_form-0-slivers">Slivers</label>
+		            		<select multiple="multiple" id="id_form-0-slivers" class="wide" name="form-0-slivers">
+<option value="1241" selected="selected">Aggregate ETHZ island Openflow AM: Port 14 on OpenFlow Switch 02:00:00:00:00:00:00:02</option>
+<option value="1240" selected="selected">Aggregate ETHZ island Openflow AM: Port 6 on OpenFlow Switch 02:00:00:00:00:00:00:02</option>
+<option value="1239" selected="selected">Aggregate ETHZ island Openflow AM: Port 6 on OpenFlow Switch 02:00:00:00:00:00:00:03</option>
+<option value="1238" selected="selected">Aggregate ETHZ island Openflow AM: Port 13 on OpenFlow Switch 02:00:00:00:00:00:00:03</option>
+</select>
+		            	</td>
+		            </tr>
+					<tr>
+						<th><strong>Delete?</strong></th>
+						<td COLSPAN="2">
+							<input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" />
+						</td>
+					</tr>
+  </table>
+ </form>
+</html>
+

@@ -42,6 +42,9 @@ from portal.joinview                import JoinView
 from portal.sliceviewold            import SliceView
 from portal.validationview          import ValidatePendingView
 #from portal.experimentview         import ExperimentView
+
+from portal.univbrisview            import UnivbrisView
+
 from portal.documentationview       import DocumentationView
 from portal.supportview             import SupportView
 from portal.emailactivationview     import ActivateEmailView
@@ -112,6 +115,8 @@ urlpatterns = patterns('',
         {'post_reset_redirect' : '/portal/password/done/'}),
     (r'^password/done/$', 
         'portal.django_passresetview.password_reset_complete'),
+
+    url(r'^univbris/?$', UnivbrisView.as_view(), name='univbris'),
     # ...
 
 )
