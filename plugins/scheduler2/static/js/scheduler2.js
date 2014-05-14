@@ -242,6 +242,10 @@ var tmpSchedulerLeases = [];
                 }
             },
 
+            on_lease_filter_added: function(filter) {
+                console.log("Filter on Leases added !");
+            },
+
             // ... be sure to list all events here
 
             /* RECORD HANDLERS */
@@ -284,6 +288,21 @@ var tmpSchedulerLeases = [];
                         $('#tblSlider').slider('value', 0);
                         var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
                         tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+
+                        console.log(SchedulerDateSelected);
+                        console.log(SchedulerDateSelected.getTime()/1000);
+                        var tomorrow = new Date(SchedulerDateSelected);
+                        tomorrow.setDate(SchedulerDateSelected.getDate()+1);
+                        console.log(tomorrow);
+                        console.log(tomorrow.getTime()/1000);
+                        
+                        // Remove previous date interval
+                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_REMOVED, ['start_time', '>']);
+                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_REMOVED, ['start_time', '<']);
+
+                        // Add new date interval
+                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_ADDED, ['start_time', '>', SchedulerDateSelected.getTime()/1000]);
+                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_ADDED, ['start_time', '<', tomorrow.getTime()/1000]);
                     } else {
                         alert("Please select a date, so the scheduler can reserve leases.");
                     }
