@@ -93,10 +93,10 @@ var tmpSchedulerLeases = [];
                 /* Listening to queries */
 
                 this.listen_query(options.query_uuid);
-                this.listen_query(options.query_all_uuid, 'all');
+                //this.listen_query(options.query_all_uuid, 'all');
                 this.listen_query(options.query_all_resources_uuid, 'all_resources');
                 this.listen_query(options.query_lease_uuid, 'lease');
-                //this.listen_query(options.query_lease_uuid, 'lease');
+                this.listen_query(options.query_all_leases_uuid, 'all_leases');
                 if (schedulerDebug) console.timeEnd("Listening_to_queries");
 
             },
@@ -160,7 +160,7 @@ var tmpSchedulerLeases = [];
             /* lease QUERY HANDLERS Start */
             on_lease_clear_records: function(data) { console.log('clear_records'); },
             on_lease_query_in_progress: function(data) { console.log('lease_query_in_progress'); },
-            on_lease_new_record: function(data) {
+            on_all_leases_new_record: function(data) {
                 if (data.resource.indexOf("nitos") > -1) {
                     tmpSchedulerLeases.push({
                         id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
@@ -180,7 +180,7 @@ var tmpSchedulerLeases = [];
                 }
                 //console.log(data.toSource()); console.log('lease_new_record');
             },
-            on_lease_query_done: function(data) {
+            on_all_leases_query_done: function(data) {
                 _leasesDone = true;
                 this._initScheduler();
                 // console.log('lease_query_done');
@@ -242,7 +242,7 @@ var tmpSchedulerLeases = [];
                 }
             },
 
-            on_lease_filter_added: function(filter) {
+            on_all_leases_filter_added: function(filter) {
                 console.log("Filter on Leases added !");
             },
 
@@ -297,12 +297,12 @@ var tmpSchedulerLeases = [];
                         console.log(tomorrow.getTime()/1000);
                         
                         // Remove previous date interval
-                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_REMOVED, ['start_time', '>']);
-                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_REMOVED, ['start_time', '<']);
+                        manifold.raise_event(scheduler2Instance.options.query_all_leases_uuid, FILTER_REMOVED, ['start_time', '>']);
+                        manifold.raise_event(scheduler2Instance.options.query_all_leases_uuid, FILTER_REMOVED, ['start_time', '<']);
 
                         // Add new date interval
-                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_ADDED, ['start_time', '>', SchedulerDateSelected.getTime()/1000]);
-                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, FILTER_ADDED, ['start_time', '<', tomorrow.getTime()/1000]);
+                        manifold.raise_event(scheduler2Instance.options.query_all_leases_uuid, FILTER_ADDED, ['start_time', '>', SchedulerDateSelected.getTime()/1000]);
+                        manifold.raise_event(scheduler2Instance.options.query_all_leases_uuid, FILTER_ADDED, ['start_time', '<', tomorrow.getTime()/1000]);
                     } else {
                         alert("Please select a date, so the scheduler can reserve leases.");
                     }
@@ -338,12 +338,14 @@ var tmpSchedulerLeases = [];
 
                 //btn Submit leases
                 $('#btnSchedulerSubmit').click(function () {
+                    console.log("click btnSchedulerSubmit");
                     var leasesForCommit = new Array();
-                    var newLeaseStarted = false;
                     var tmpDateTime = SchedulerDateSelected;
+                    console.log(SchedulerData);
                     for (var i = 0; i < SchedulerData.length; i++)
                     {
                         var tpmR = SchedulerData[i];
+                        var newLeaseStarted = false;
                         for (var j = 0; j < tpmR.leases.length; j++) {
                             var tpmL = tpmR.leases[j];
                             if (newLeaseStarted == false && tpmL.status == 'selected') {
@@ -353,13 +355,14 @@ var tmpSchedulerLeases = [];
                                 //add lease object
                                 leasesForCommit.push({
                                     resource: tpmR.id,
-                                    granularity: tpmR.granularity,
-                                    lease_type: null,
-                                    slice: null,
+                                    //granularity: tpmR.granularity,
+                                    //lease_type: null,
+                                    //slice: null,
                                     start_time: unixStartTime,
                                     end_time: null,
-                                    duration: null
+                                    //duration: null
                                 });
+                                console.log(tpmR.id);
                                 newLeaseStarted = true;
                             } else if (newLeaseStarted == true && tpmL.status != 'selected') {
                                 //get date of the slot
@@ -368,14 +371,14 @@ var tmpSchedulerLeases = [];
                                 //upate end_time
                                 var tmpCL = leasesForCommit[leasesForCommit.length - 1];
                                 tmpCL.end_time = unixEndTime;
-                                tmpCL.duration = schedulerFindDuration(tmpCL.start_time, tmpCL.end_time, tmpCL.granularity);
+                                //tmpCL.duration = schedulerFindDuration(tmpCL.start_time, tmpCL.end_time, tmpCL.granularity);
                                 newLeaseStarted = false;
                             }
                         }
                     }
-
+                    console.log(leasesForCommit);
                     for (var i = 0; i < leasesForCommit.length; i++) {
-                        //manifold.raise_event(scheduler.options.query_lease_uuid, SET_ADD, leasesForCommit[i]);
+                        manifold.raise_event(scheduler2Instance.options.query_lease_uuid, SET_ADD, leasesForCommit[i]);
                     }
                 });
                 //

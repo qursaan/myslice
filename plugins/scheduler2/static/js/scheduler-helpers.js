@@ -127,6 +127,7 @@ function schedulerFindDuration(startTime, endTime, granularity) {
 //
 // Set Select - Free Slots *******Start
 function schedulerSelectSlot(slotId, rowIndex, resourceIndex) {
+    console.log('timeslot selected');
     _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, 'selected');
 }
 function schedulerFreeSlot(slotId, rowIndex, resourceIndex) {
@@ -136,6 +137,7 @@ function schedulerFreeSlot(slotId, rowIndex, resourceIndex) {
 function _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, classText) {
     var tmpVS = SchedulerDataViewData[rowIndex].leases[slotId];  // for the display
     var tmpS = SchedulerData[resourceIndex].leases[slotId];     // for the data
+    console.log(SchedulerData[resourceIndex].id);
     tmpVS.status = classText;
     tmpS.status = classText;
     //select other from the group in the same granularity

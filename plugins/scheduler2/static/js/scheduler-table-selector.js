@@ -181,7 +181,6 @@ function selectRange(isTemp) {
     $("#tblReservation td:not([class='info'])").slice(dragStart, dragEnd).addClass('selected');
     }*/
 
-
     if (SchedulerData) console.timeEnd("mouse:---selectRange");
 }
 

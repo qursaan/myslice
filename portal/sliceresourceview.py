@@ -68,8 +68,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         lease_md = metadata.details_by_object('lease')
         lease_fields = [column['name'] for column in lease_md['column']]
 
-        query_all_lease = Query.get('lease').select(lease_fields)
-        page.enqueue_query(query_all_lease)
+        query_lease_all = Query.get('lease').select(lease_fields)
+        page.enqueue_query(query_lease_all)
 
         # --------------------------------------------------------------------------
         # ALL RESOURCES LIST
@@ -156,8 +156,9 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             title      = 'Scheduler',
             # this is the query at the core of the slice list
             query = sq_resource,
+            query_lease = sq_lease,
             query_all_resources = query_resource_all,
-            query_lease = query_all_lease,
+            query_all_leases = query_lease_all,
         )
 
         # --------------------------------------------------------------------------

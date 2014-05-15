@@ -5,12 +5,15 @@ from datetime import timedelta
 class Scheduler2 (Plugin):
 
 
-    def __init__ (self, query, query_all_resources, query_lease = None, **settings):
+    def __init__ (self, query, query_lease, query_all_resources, query_all_leases, **settings):
         Plugin.__init__ (self, **settings)
         
         self.query=query
         self.query_all_resources = query_all_resources
         self.query_all_resources_uuid = query_all_resources.query_uuid
+
+        self.query_all_leases = query_all_leases
+        self.query_all_leases_uuid = query_all_leases.query_uuid
 
         self.query_lease = query_lease
         self.query_lease_uuid = query_lease.query_uuid
@@ -51,7 +54,7 @@ class Scheduler2 (Plugin):
         # query_uuid will pass self.query results to the javascript
         # and will be available as "record" in :
         # on_new_record: function(record)
-        return ['plugin_uuid', 'domid', 'query_uuid', 'time_slots', 'nodes', 'query_lease_uuid', 'query_all_resources_uuid']
+        return ['plugin_uuid', 'domid', 'query_uuid', 'time_slots', 'nodes', 'query_lease_uuid', 'query_all_resources_uuid', 'query_all_leases_uuid']
     
 
     def export_json_settings (self):

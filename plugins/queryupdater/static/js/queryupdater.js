@@ -169,10 +169,13 @@
 
             var status = msg + status;
 
+            
+
             // find line
             // if no, create it, else replace it
             // XXX it's not just about adding lines, but sometimes removing some
             // XXX how do we handle status reset ?
+            data.value = JSON.stringify(data.value);
             row = this.find_row(data.value);
             newline = [
                 action,
