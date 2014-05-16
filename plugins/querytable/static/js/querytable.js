@@ -402,15 +402,10 @@
             switch(data.request) {
                 case FIELD_REQUEST_ADD:
                 case FIELD_REQUEST_ADD_RESET:
-                	// update pending number
-                	$("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
-                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, true);
                     break;
                 case FIELD_REQUEST_REMOVE:
                 case FIELD_REQUEST_REMOVE_RESET:
-                	$("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
-                	$("#badge-pending").text($("#badge-pending").data('number'));
                     this.set_checkbox_from_data(data.value, false);
                     break;
                 default:

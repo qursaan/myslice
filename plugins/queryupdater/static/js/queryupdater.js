@@ -142,6 +142,8 @@
                     row = this.find_row(data.value);
                     if (row)
                         this.table.fnDeleteRow(row.nTr);
+                        $("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
+                        $("#badge-pending").text($("#badge-pending").data('number'));
                     return;
                 case FIELD_REQUEST_CHANGE:
                     action = 'UPDATE';
@@ -188,6 +190,8 @@
                 // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);
                 row = this.find_row(data.value);
+                $("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
+                $("#badge-pending").text($("#badge-pending").data('number'));
             } else {
                 // Update row text...
                 this.table.fnUpdate(newline, row.nTr);
@@ -305,6 +309,7 @@
         on_added_record: function(record)
         {
             this.set_record_state(record, RECORD_STATE_ADDED);
+            // update pending number
         },
 
         on_removed_record: function(record_key)
