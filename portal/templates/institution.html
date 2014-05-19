@@ -63,7 +63,7 @@
 	                <th>slice_hrn</th>
 	                <th>users</th>
 	                <th>url</th>
-	                <th>nodes</th>
+	                <!-- <th>nodes</th> -->
 	                <th>expiration</th>
 	            </tr>
 	        </table>
@@ -78,9 +78,9 @@
 	</div>
 </div>
 <script>
-    $(document).ready(function() {
-        {% if person %}
-        {% if user_details.parent_authority %}
+$(document).ready(function() {
+    {% if person %}
+    {% if user_details.parent_authority %}
         
         $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
             var authority_data = [];
@@ -127,7 +127,7 @@
                 slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
                 slice_row += "<td>"+users_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
-                slice_row += "<td>"+nodes_length+"</td>";
+                //slice_row += "<td>"+nodes_length+"</td>";
                 slice_row += "<td>"+val.slice_expires+"</td>";
                 slice_row += "</tr>";
                 table_slices.push(slice_row);
@@ -158,34 +158,15 @@
 				 user_row += "<td>"+val.user_enabled+"</td>";
                  user_row += "</tr>";
                  table_users.push(user_row);
-//                 
              });
              $("table#user-tab tr:last").after(table_users.join( "" ));
              $("div#user-tab-loaded").css("display","block");
              $("div#user-tab-loading").css("display","none");
           });
 
- 		$('button#deleteusers').click(function() {
-     		$('input:checkbox.user').each(function (index) {
-         		if(this.checked){
-             		var record_id = this.id;
-             		$.post("/delete/user/",{'filters':{'user_hrn':this.id}}, function(data) {
-                 	if(data.success){
-                     	$('tr[id="'+record_id+'"]').fadeOut("slow");
-                     	$('tr[id="'+record_id+'"]').remove();
-                 	}else{
-                     	alert("Rest Error for "+record_id+": "+data.error);
-                 	}   
-             	});     
-         	} 
-     	}); 
- 	}); 
-		
-		
    {% endif %}
    {% endif %}
-});
 
-
+}); // end document.ready
 </script>
 {% endblock %}
