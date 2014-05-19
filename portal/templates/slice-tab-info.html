@@ -11,16 +11,17 @@
             var table_slices = [];
             /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "user", "slice_urn", "slice_expires" */
             $.each( data, function( key, val ) {
+                console.log(val);
                 if(val.nodes=="undefined" || val.nodes==null){
                     nodes_length=0;
                 }else{
                     nodes_length=val.nodes.length;
                 }
 
-                if(val.user=="undefined" || val.user==null){
+                if(val.users=="undefined" || val.users==null){
                     user_length=0;
                 }else{
-                    user_length=val.user.length;
+                    user_length=val.users.length;
                 }
 
                 if(val.slice_url=="undefined" || val.slice_url==null){
@@ -32,7 +33,7 @@
                 slice_row = "<tr><td>Description:</b></td><td>"+val.slice_description+"</td></tr>";
                 slice_row += "<tr><td>url:</td><td><a href='"+val.slice_url+" target='_blank'>"+val.slice_url+"</a></td></tr>";
                 slice_row += "<tr><td>users:</td><td>"+user_length+"</td></tr>";
-                slice_row += "<tr><td>resources:</td><td>"+nodes_length+"</td></tr>";
+                //slice_row += "<tr><td>resources:</td><td>"+nodes_length+"</td></tr>";
                 slice_row += "<tr><td>created:</td><td>"+val.created+"</td></tr>";
                 slice_row += "<tr><td>last update:</td><td>"+val.slice_last_updated+"</td></tr>";
                 slice_row += "<tr><td>expires:</td><td>"+val.slice_expires+"</td></tr>";
