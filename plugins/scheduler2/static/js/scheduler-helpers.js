@@ -195,7 +195,7 @@ function schedulerCompareOnDay(dateOne, dateTwo) {
     } else if (dateOne > dateTwo) {
         return -1;
     } else {
-        return 0;
+        return 1;
     }
 
 }

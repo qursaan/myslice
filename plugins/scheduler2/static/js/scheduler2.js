@@ -289,12 +289,12 @@ var tmpSchedulerLeases = [];
                         var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
                         tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
 
-                        console.log(SchedulerDateSelected);
-                        console.log(SchedulerDateSelected.getTime()/1000);
+                        //console.log(SchedulerDateSelected);
+                        //console.log(SchedulerDateSelected.getTime()/1000);
                         var tomorrow = new Date(SchedulerDateSelected);
                         tomorrow.setDate(SchedulerDateSelected.getDate()+1);
-                        console.log(tomorrow);
-                        console.log(tomorrow.getTime()/1000);
+                        //console.log(tomorrow);
+                        //console.log(tomorrow.getTime()/1000);
                         
                         // Remove previous date interval
                         manifold.raise_event(scheduler2Instance.options.query_all_leases_uuid, FILTER_REMOVED, ['start_time', '>']);
