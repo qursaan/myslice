@@ -148,7 +148,7 @@ function _schedulerSetStatusSlot(slotId, rowIndex, resourceIndex, classText) {
     for (var s = 0; s < maxg; s++) {
         if (tmpVS.groupIndex != s) {
             SchedulerDataViewData[rowIndex].leases[startSlotId].status = classText;
-            SchedulerData[rowIndex].leases[startSlotId].status = classText;
+            SchedulerData[resourceIndex].leases[startSlotId].status = classText;
         }
         startSlotId++;
     }

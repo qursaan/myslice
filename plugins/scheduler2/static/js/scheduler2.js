@@ -345,6 +345,7 @@ var tmpSchedulerLeases = [];
                     for (var i = 0; i < SchedulerData.length; i++)
                     {
                         var tpmR = SchedulerData[i];
+                        //for capturing start and end of the lease
                         var newLeaseStarted = false;
                         for (var j = 0; j < tpmR.leases.length; j++) {
                             var tpmL = tpmR.leases[j];
