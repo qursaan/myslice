@@ -70,7 +70,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
         # Page rendering
         page = Page(wsgi_request)
-        page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
             # The form has been submitted

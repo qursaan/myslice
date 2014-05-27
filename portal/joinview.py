@@ -45,7 +45,7 @@ class JoinView (FreeAccessView, ThemeView):
         page = Page(request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/join.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
-        page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
             # xxx tocheck - if authorities is empty, it's no use anyway
