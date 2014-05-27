@@ -1,0 +1,7 @@
+You have registered to {{current_site}}
+Please validate your email address by clicking the following link:
+
+{{validation_link}}
+
+
+
