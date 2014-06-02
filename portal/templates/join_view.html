@@ -5,19 +5,22 @@
 
 <div class="row">
 	<div class="col-md-12">
-	<h1><img src="{{ STATIC_URL }}icons/testbed-xs.png" alt="Join Federation" /> Join the OneLab Federation</h1>
+	<h1><img src="{{ STATIC_URL }}icons/testbed-xs.png" alt="Join Federation" /> Add organization</h1>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12">
+  		<h3>Questions? <a href="/portal/contact" >Contact us</a></h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
 	<h3>
-	OneLab welcomes companies, universities, and research laboratories to join the OneLab Federation of Testbeds. <br>
+	Please provide information about your organization and designate a manager (you or another person) from your organization. <br>
 	</h3>
 	<p>
-	We are supported by the European Commision through its 7th Framework Programs and FIRE initiative (Future Internet Research and Experimentation), as well as by other national and international funding initiatives.
-	</p>
-	<p>
-	If you wish to become a new member of OneLab Federation, you should first consult the Membership Agreement.
+	OneLab is open to enterprise, to scientific researchers, and to educators. We grant manager access to people in positions of responsibility (e.g., executives, professors, senior researchers), and delegate to these managers the right to grant standard user access to other people in their organizations.
 	</p>
 	</div>
 </div>
@@ -36,13 +39,12 @@
   
   {% csrf_token %}
   <div class="col-md-6">
-  	<h3>Site Information</h3>
+  	<h3>Organization</h3>
   	
   	<div class="form-group">
-  		<label for="site_name">Site name:</label>
-    	<input type="text" id="site_name" name="site_name" value="{{ site_name }}" maxlength="40" class="form-control" required>
+    	<input type="text" id="site_name" name="site_name" value="{{ site_name }}"  style="width:200px" placeholder="Name of organization"maxlength="40" class="form-control" required>
     </div>
-	<div class="form-group">
+	<!--<div class="form-group">
     	<label for="root_authority_hrn">Root authority:</label>
 	    <select id="root_authority_hrn" name="root_authority_hrn" class="form-control" required>
 		   {% if root_authorities %}
@@ -50,83 +52,36 @@
 		   <option>{{ root_auth.authority_hrn }}</option>
 		        {% endfor %}
 		   {% endif %}
-		</select>
-<!--
+		</select> 
                <div class="ui-widget">
                    <input id="root_authority_hrn" name="root_authority_hrn" class="form-control" value="{{ root_authority_hrn }}" required>
                </div>
--->
-	</div>
-	<div class="form-group">
-		<label for="site_authority">Site authority:</label>
-		<input type="text" id="site_authority" name="site_authority" value="{{ site_authority }}" maxlength="16" class="form-control" required>
-    </div>
-	<div class="form-group">  
-        <label for="site_abbreviated_name">Abbreviated name:</label>
-        <input type="text" id="site_abbreviated_name" name="site_abbreviated_name" value="{{ site_abbreviated_name }}" maxlength="40" class="form-control" required>
-    </div>
-	<div class="form-group">  
-        <label for="site_url">URL:</label>
-        <input type="text" id="site_url" name="site_url" value="{{ site_url }}" maxlength="128" class="form-control" required>
-    </div>
-	<div class="form-group"> 
-        <label for="site_latitude">Latitude:</label>
-        <input type="text" id="site_latitude" name="site_latitude" value="{{ site_latitude }}" maxlength="10" class="form-control" required>
-    </div>
-	<div class="form-group"> 
-        <label for="site_longitude">Longitude:</label>
-        <input type="text" id="site_longitude" name="site_longitude" value="{{ site_longitude }}" maxlength="10" class="form-control" required>
-    </div>
-  </div>
-  
-  <div class="col-md-6">
-  	<h3>Postal address</h3>
 
+	</div> -->
 	<div class="form-group">
-  		<label class="" for="address_line1">Address: </label>
-        <input type="text" id="address_line1" name="address_line1" value="{{ address_line1 }}" maxlength="40" class="form-control">
-    </div>
-	<div class="form-group"> 
-        <label class="" for="address_line2">Address (2): </label>
-        <input type="text" id="address_line2" name="address_line2" value="{{ address_line2 }}" maxlength="40" class="form-control">
-    </div>
-	<div class="form-group"> 
-        <label class="" for="address_line3">Address (3): </label>
-        <input type="text" id="address_line3" name="address_line3" value="{{ address_line3 }}" maxlength="40" class="form-control">
-    </div>
-	<div class="form-group"> 
-        <label class="" for="address_city">City: </label>
-        <input type="text" id="address_city" name="address_city" value="{{ address_city }}" maxlength="20" class="form-control">
-    </div>
-	<div class="form-group"> 
-        <label class="" for="address_postalcode">Postal Code: </label>
-        <input type="text" id="address_postalcode" name="address_postalcode" value="{{ address_postalcode }}" size="10" maxlength="10" class="form-control">
-    </div>
-	<div class="form-group">
-        <label class="" for="address_state">State: </label>
-        <input type="text" id="address_state" name="address_state" value="{{ address_state }}" maxlength="20" class="form-control">
-    </div>
+    	<input type="text" id="address_city" name="address_city" value="{{ address_city }}" style="width:200px" placeholder="City" maxlength="20" class="form-control">
+  	</div>
 	<div class="form-group">   
-        <label class="" for="address_country">Country: </label>
-        <input type="text" id="address_country" name="address_country" value="{{ address_country }}" maxlength="20" class="form-control">
-    </div>
-	
-  </div>
-</div>
+    	<input type="text" id="address_country" name="address_country" value="{{ address_country }}" style="width:200px" placeholder="Country" maxlength="20" class="form-control">
+	</div>
 
-<div class="row"> 
+	<div class="form-group">  
+        <input type="text" id="site_abbreviated_name" name="site_abbreviated_name" value="{{ site_abbreviated_name }}" style="width:200px" 
+		title="Maximum eight characters, joined, all lower case. Example: 'upmc' for Université Pierre et Marie Curie. This will be used by the system as an identifier for the organization." placeholder="Short name" maxlength="40" class="form-control" required>
+    </div>
+	<div class="form-group">  
+        <input type="text" id="site_url" name="site_url" value="{{ site_url }}" style="width:200px" placeholder="http://" maxlength="128" class="form-control" required>
+    </div>
+  </div>
   
   <div class="col-md-6">
-  	
-  	<h3>Principal Investigator Information</h3>
+  	<h3>Manager</h3>
 
 	<div class="form-group">
-	  	<label for="pi_first_name">PI First Name</label>
-    	<input type="text" id="pi_first_name" name="pi_first_name" value="{{ pi_first_name }}" maxlength="20" class="form-control" required>
+    	<input type="text" id="pi_first_name" name="pi_first_name" value="{{ pi_first_name }}" style="width:200px" placeholder="First name" maxlength="20" class="form-control" required>
     </div>
 	<div class="form-group">    
-    	<label for="pi_last_name">PI Last Name:</label>
-		<input type="text" id="pi_last_name" name="pi_last_name" value="{{ pi_last_name }}" maxlength="20" class="form-control" required>
+		<input type="text" id="pi_last_name" name="pi_last_name" value="{{ pi_last_name }}" style="width:200px" placeholder="Last name" maxlength="20" class="form-control" required>
 <!--
         <tr>
           <th><label class="" for="pi_title">PI Title: </label></th>
@@ -135,43 +90,27 @@
 -->
 	</div>
 	<div class="form-group">
-		<label for="pi_phone">PI Phone:</label>
-    	<input type="text" id="pi_phone" name="pi_phone" value="{{ pi_phone }}" maxlength="20" class="form-control" required>
+    	<input type="email" id="pi_email" name="pi_email" value="{{ pi_email }}" style="width:200px" 
+		title="We may e-mail the manager as part of the validation process, and in case any issues arise with the use of the system."
+		placeholder="Email" maxlength="40" class="form-control" required>
+	</div>
+	<div class="form-group">
+    	<input type="text" id="pi_phone" name="pi_phone" value="{{ pi_phone }}" 
+		title="We may phone the manager as part of the validation process, and in case any issues arise with the use of the system."
+		style="width:200px" placeholder="Phone number"  maxlength="20" class="form-control" required>
     </div>
 	<div class="form-group">
-    	<label for="pi_email">PI email:</label>
-    	<input type="text" id="pi_email" name="pi_email" value="{{ pi_email }}" maxlength="40" class="form-control" required>
-    </div>
+  		<input type="password"  id="password" name="pi_password"   class="form-control" style="width:200px" minlength="4" value="{{ password }}" placeholder="Password" required/>
+	</div>
 	<div class="form-group">
-    	<label for="pi_password">PI password:</label>
-    	<input type="password" id="pi_password" name="pi_password" value="" maxlength="20" class="form-control" required>
+    	<input type="password"  id="confirmpassword" name="confirmpassword" style="width:200px"  minlength="4" class="form-control" value="" placeholder="Confirm Password" required/>
 	</div>
-  	
-	</div>
-	<div class="col-md-6">
-		<h3>Site Registration Information</h3>
-	<p>
-		A membership agreement document will be sent to your email address as a PDF file.
-	</p><p>
-		Please print and sign a copy of the agreement and send it to:
-	</p><p>
-	Ciro Scognamiglio<br>
-	UPMC - LIP6<br>
-	Campus Jussieu<br>
-	Couloir 26-00, bureau 102<br>
-	Boite courrier 169<br>
-	4 place Jussieu<br>
-	F-75252 PARIS cedex 05 - FRANCE<br>
-	</p><p>
-	Once your membership has been processed we will contact you to welcome you as a member.
-	</p><p>
-	If you have any questions about membership, contact the <a href="/portal/contact" >OneLab Support team</a>.
-	</p>
+
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12" style="text-align:center;">
-		<button type="submit" class="btn btn-default">Send registration form</button>
+		<button type="submit" class="btn btn-default" style="left: 300px; position: absolute;">Submit</button>
 	</div>
 </div>
 </form>
