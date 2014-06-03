@@ -3,14 +3,10 @@
 {% block content %}        
 
 <div class="row">
-	<div class="col-md-12">
 	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" />User sign-up</h1>
-	</div>
 </div>
 <div class="row">
-	<div class="col-md-12">
   		<h3>Questions? <a href="/portal/contact" >Contact us</a></h3>
-	</div>
 </div>
 {% if errors %}
 <ul>
@@ -87,6 +83,7 @@
     </div>
 	</div>
 	</div>
+
 	<div class="form-group">
 		<input type="checkbox" name="agreement" value="agreement" required/> I agree to the 
 		<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal">terms and conditions</button> 
@@ -462,8 +459,7 @@
     <div class="form-group" id="register">
       <button class="submit btn btn-default" type="submit">Sign up</button>
     </div>
-  </form>  
-</div>
+</form>  
 <script>
 jQuery(document).ready(function(){
     var availableTags = [
