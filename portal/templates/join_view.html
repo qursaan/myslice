@@ -38,7 +38,7 @@
 <div class="row">
   
   {% csrf_token %}
-  <div class="col-md-6">
+  <div class="col-md-4">
   	<h3>Organization</h3>
   	
   	<div class="form-group">
@@ -67,14 +67,14 @@
 
 	<div class="form-group">  
         <input type="text" id="site_abbreviated_name" name="site_abbreviated_name" value="{{ site_abbreviated_name }}" style="width:200px" 
-		title="Maximum eight characters, joined, all lower case. Example: 'upmc' for Université Pierre et Marie Curie. This will be used by the system as an identifier for the organization." placeholder="Short name" maxlength="40" class="form-control" required>
+		title="Maximum eight characters, joined, all lower case. Example: 'upmc' for Université Pierre et Marie Curie. This will be used by the system as an identifier for the organization." placeholder="Short name" maxlength="8" class="form-control" required>
     </div>
 	<div class="form-group">  
         <input type="text" id="site_url" name="site_url" value="{{ site_url }}" style="width:200px" placeholder="http://" maxlength="128" class="form-control" required>
     </div>
   </div>
   
-  <div class="col-md-6">
+  <div class="col-md-4">
   	<h3>Manager</h3>
 
 	<div class="form-group">
@@ -108,11 +108,9 @@
 
 	</div>
 </div>
-<div class="row">
-	<div class="col-md-12" style="text-align:center;">
-		<button type="submit" class="btn btn-default" style="left: 300px; position: absolute;">Submit</button>
+	<div class="form-group" >
+		<button type="submit" class="btn btn-default">Submit</button>
 	</div>
-</div>
 </form>
 <script>
 /*
