@@ -1,11 +1,38 @@
 {% load portal_filters %}
-<div id="header">
-	<div class="wrapper">
-		<div class="logo">
-			<a href="/"><img src="{{ STATIC_URL }}img/onelab-portal.png" alt="OneLab - Future Internet Testbeds" /></a>
+<div class="header">
+<div class="container">
+	<div class="row">
+		<div class="col-sm-3 col-md-3 logo">
+			<a href="/"><img src="{{ STATIC_URL }}img/onelab-portal.png" alt="OneLab Portal - Future Internet Testbeds" /></a>
 		</div>
-		
-		<div id="secondary">
+		{% if username %}
+		<div id="navigation" class="col-sm-4 col-md-5 navigation">
+			<ul>
+				<li><a href="/portal/account/">{{ username }}</a></li>
+				<li>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	       				SLICES <span class="caret"></span>
+	    			</a>
+					
+					<div class="dropdown-menu" style="z-index:99;">
+							<ul id="dropdown-slice-list">
+								<li><a href="/portal/slice_request/">Request Slice</a></li>
+							</ul>
+					</div>
+					</li>
+				</li>
+				<li><a href="/portal/support/">SUPPORT</a></li>
+				<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
+				<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
+				<li id="nav-logout" style="margin-top: 10px;"><a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> LOGOUT</a></li>
+
+			</ul>
+		</div>
+		{% else %}
+		<div class="col-sm-5 col-md-5 navigation">
+		</div>
+		{% endif %}
+		<div class="col-sm-4 col-md-4" id="secondary">
 			<ul>
 				<li><a href="/news">News</a></li>
 				<li><a href="/portal/about">About</a></li>
@@ -14,38 +41,9 @@
 			</ul>
 		</div>
 	</div>
-	
-	{% if username %}
-	<div id="navigation">
-		<div class="wrapper">
-		<ul>
-			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
-			<li>|</li>
-			<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
-			<li class="slices">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-       				SLICES <span class="caret"></span>
-    			</a>
-				
-				<div class="dropdown-menu" style="z-index:99;">
-						<ul id="dropdown-slice-list">
-							<li><a href="/portal/slice_request/">Request Slice</a></li>
-						</ul>
-				</div>
-				</li>
-			<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
-			<li id="nav-support"><a href="/portal/support/">SUPPORT</a></li>
-			<li>|</li>
-			<li id="nav-logout" style="margin-top: 10px;"><a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> LOGOUT</a></li>
-		</ul>
-		</div>
-	</div>
-	{% else %}
-	<div id="navigation">
-		<div class="wrapper"></div>
-	</div>
-	{% endif %}
 </div>
+</div>
+
 <div class="row">
 {% widget '_widget-message.html' %}
 </div>
