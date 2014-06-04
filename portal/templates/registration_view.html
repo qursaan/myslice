@@ -6,7 +6,8 @@
 	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" />User sign-up</h1>
 </div>
 <div class="row">
-  		<h3>Questions? <a href="/portal/contact" >Contact us</a></h3>
+		<p></p>
+  		<p><strong>Questions? <a href="/portal/contact" >Contact us.</a></strong></p>
 </div>
 {% if errors %}
 <ul>
@@ -20,19 +21,23 @@
 {% csrf_token %}
 	<div class="form-group">
   		<label for="authority_hrn" class="control-label">Organization</label>
+		<p></p>
   		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" required>
-  		<p class="help-block">Start typing to find the name of your organization (company or university).<br> If it is not in the list, <a href="/portal/join">please add it.</a></p>
+  		<p class="help-block">Choose your organization (company/university) from the list that apears when you<br> click in the field above and start to type.
+		 Use the arrow keys to scroll through the list;<br>type part of the name to narrow down the list. If it is not in the list, 
+		<a href="/portal/join">please add it.</a></p>
 	</div>
 
 	<div class="row">
 	<div class="col-md-4">
 
     <div class="form-group">
-		<label for="firstname" class="control-label">Personal Information</label>
-		<input type="text" name="firstname" class="form-control" style="width:200px" minlength="2" value="{{ firstname }}" placeholder="First Name" required />
+		<label for="firstname" class="control-label">Personal information</label>
+		<p></p>
+		<input type="text" name="firstname" class="form-control" style="width:200px" minlength="2" value="{{ first_name }}" placeholder="First name" required />
     </div>
     <div class="form-group">
-		<input type="text" name="lastname" size="25" class="form-control" style="width:200px" minlength="2" value="{{ lastname }}" placeholder="Last Name" required />
+		<input type="text" name="lastname" size="25" class="form-control" style="width:200px" minlength="2" value="{{ last_name }}" placeholder="Last name" required />
     </div>
 	<div class="form-group">
     	<input type="email" name="email" size="25"  class="form-control" style="width:200px" value="{{ email }}" 
@@ -56,13 +61,14 @@
 <div class="col-md-4">
     <div class="form-group">
       <label for="password" class="control-label">Authentication</label>
+	  <p></p>	
       <input type="password"  id="password" name="password"   class="form-control" style="width:200px" minlength="4" value="{{ password }}" 
 		title="Your password allows you to log in to this portal."
 		placeholder="Password" required/>
     </div>
     <div class="form-group">
 		<input type="password"  id="confirmpassword" name="confirmpassword" style="width:200px"  minlength="4" class="form-control" value="" 
-			placeholder="Confirm Password" required/>
+			placeholder="Confirm password" required/>
     </div>
     <div class="form-group">
     	<!--<label for="question" class="control-label">Keys</label> -->
@@ -77,7 +83,7 @@
       	<input type="file" name="user_public_key" class="form-control" style="width:200px" id="user_public_key" required/>
       	<br />
 		<div class="alert alert-danger" id="pkey_del_msg">
-			In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to i
+			In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to 
 			<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your public key to the portal.</a>
 		</div>
     </div>
@@ -85,8 +91,9 @@
 	</div>
 
 	<div class="form-group">
+		<p></p>
 		<input type="checkbox" name="agreement" value="agreement" required/> I agree to the 
-		<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal">terms and conditions</button> 
+		<button class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">terms and conditions.</button> 
 	</div>
 	<!-- Modal - columns selector -->
 		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -457,7 +464,8 @@
 		</div>
 
     <div class="form-group" id="register">
-      <button class="submit btn btn-default" type="submit">Sign up</button>
+		<p></p>	
+    	<button class="submit btn btn-primary" type="submit">Sign up</button>
     </div>
 </form>  
 <script>
