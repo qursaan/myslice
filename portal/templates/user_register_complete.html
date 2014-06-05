@@ -3,13 +3,17 @@
 {% block content %}
 
 <div class="row">
-	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> Experimenter registration</h1>
+	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> User sign-up</h1>
 </div>
 <div class="row">
-  <h3>User registration complete !</h3>
-  <p>
-  	You will receive an email with further instructions.
-  </p>
- </div>
+  <h3>Sign up information received.</h3>
+  <p>You can now log in to the portal. You will have limited access. </p>
+  <p>To gain full access, two steps are required:</p>
+  <ul>
+	<li>1. You confirm your signup request by clicking on the link in the email that we have sent to your email address.</li>
+	<li>2. A manager from your organization validates your request. Upon confirmation of your signup request,<br> 
+		we will send an email to the managers at your organization with a validation request.</li>
+  </ul>		
+</div>
 
 {% endblock %}
