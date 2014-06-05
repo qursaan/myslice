@@ -69,21 +69,21 @@ def is_password_unusable(pw):
 #    cc_myself = forms.BooleanField(required=False)
 
 class ContactForm(forms.Form):
-    first_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
-                                regex=r'^[\w.@+-]+$',
-                                 max_length=30,
-                                 label=_("First name"),
-                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    last_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
-                                regex=r'^[\w.@+-]+$',
-                                 max_length=30,
-                                 label=_("Last name"),
-                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    authority = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
-                                regex=r'^[\w.@+-]+$',
-                                 max_length=30,
-                                 label=_("authority"),
-                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+   # first_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("First name"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+   # last_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("Last name"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+   # authority = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("authority"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
     subject = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
                                 regex=r'^[\w.@+-]+$',
