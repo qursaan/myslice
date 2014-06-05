@@ -29,10 +29,13 @@
     var QueryUpdater = Plugin.extend({
 
         init: function(options, element) {
-	    this.classname="queryupdater";
+	        this.classname="queryupdater";
             this._super(options, element);
 
             var self = this;
+
+            this.initial = Array();
+
             this.table = this.elmt('table').dataTable({
 // the original querytable layout was
 //                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
@@ -70,8 +73,15 @@
 
         do_update: function(e) {
             var self = e.data;
+
+            self.spin();
+            console.log("do_update");
+
             // XXX check that the query is not disabled
             manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+
+            // how to stop the spinning after the event? 
+            // this should be triggered by some on_updatequery_done ?
         },
 
 	// related buttons are also disabled in the html template
@@ -122,6 +132,7 @@
 
         set_state: function(data)
         {
+            console.log("function set_state");
             var action;
             var msg;
             var button = '';
@@ -214,11 +225,15 @@
 
         on_new_record: function(record)
         {
+            console.log("query_updater on_new_record");
+            console.log(record);
+
             // if (not and update) {
 
                 // initial['resource'], initial['lease'] ?
-                this.initial.push(record.urn);
+                this.initial.push(record);
 
+            //this.set_record_state(record, RECORD_STATE_ATTACHED);
                 // We simply add to the table
             // } else {
                 //                 \ this.initial_resources
@@ -279,7 +294,7 @@
 
         on_query_in_progress: function()
         {
-	    messages.debug("queryupdater.on_query_in_progress");
+	        messages.debug("queryupdater.on_query_in_progress");
             this.spin();
         },
 
@@ -295,12 +310,9 @@
             this.clear();
         },
 
-        on_new_record: function(record)
-        {
-        },
-
         on_query_done: function()
         {
+            console.log("on_query_done");
             this.unspin();
         },
 
@@ -308,12 +320,14 @@
         // NOTE: record_key could be sufficient 
         on_added_record: function(record)
         {
+            console.log("on_added_record = ",record);
             this.set_record_state(record, RECORD_STATE_ADDED);
             // update pending number
         },
 
         on_removed_record: function(record_key)
         {
+            console.log("on_removed_record = ",record_key);
             this.set_record_state(RECORD_STATE_REMOVED);
         },
 
@@ -329,6 +343,8 @@
 
         on_field_state_changed: function(result)
         {
+            console.log("on_field_state_changed");
+            console.log(result);
             messages.debug(result)
             /* this.set_state(result.request, result.key, result.value, result.status); */
             this.set_state(result);
@@ -375,7 +391,7 @@
              if (!change)
                 return;
              // ioi: Refubrished
-             var initial = this.initial_resources;
+             var initial = this.initial;
              //var r_removed  = []; //
              /*-----------------------------------------------------------------------
                 TODO: remove this dirty hack !!!
