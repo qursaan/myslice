@@ -5,6 +5,64 @@
 <!-- <div class="row">
 {% widget '_widget-news.html' %}
 </div> -->
+{% if username %}
+<div class="container dashboard">
+	<div class="row">
+		<div class="col-md-3">
+			<h3>
+				EXPERIMENT
+			</h3>
+			<div>
+				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			</div>
+			<div>	
+				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>MANAGEMENT</h3>
+			<div>
+				<a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>
+				SUPPORT
+			</h3>
+			<div>
+				<a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
+			</div>
+		</div>
+		
+		<div class="col-md-3">
+			<h3>
+				ACCOUNT
+			</h3>
+			<div>
+				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+			</div>
+			<div>
+				{% if person.last_name %}
+					{{person.first_name}} {{person.last_name}}<br />
+				{% endif %}
+    			<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
+	    	</div>
+		</div>
+	</div>
+</div>
+{% else %}
 <div class="container-fluid home">
 	<div class="">
 		<div class="col-sm-2"></div>
@@ -17,33 +75,15 @@
 			</h3>
 		</div>
 		<div class="col-sm-5 col-sm-offset-1">
-			{% if person %}
-			<div class="logged-in">
-				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-				<div>
-				{% if person.last_name %}
-					{{person.first_name}} {{person.last_name}}<br />
-				{% endif %}
-    				<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
-    			</div>
-    		</div>
-   			{% else %}
    			<div class="row">
 				{% widget '_widget-login-user.html' %}
 			</div>
-			{% endif %}
-			
-			{% if person %}
-				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
-				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-			{% else %}
-			{% endif %}
-			
-				<!-- <button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button> -->
 		</div>
 		<div class="col-sm-1"></div>
 	</div>
 </div>
+{% endif %}
+
 
 <script type="text/javascript">
 	$(document).ready(function() {
