@@ -19,6 +19,7 @@ from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
 from plugins.scheduler2              import Scheduler2
 from plugins.columns_editor          import ColumnsEditor
+from plugins.lists.simplelist        import SimpleList
 
 from myslice.theme import ThemeView
 
@@ -43,13 +44,16 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         user_fields = ['user_hrn'] # [column['name'] for column in user_md['column']]
 
         # TODO The query to run is embedded in the URL
+        # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
                 'slice_hrn',
                 'resource.urn', 
                 'resource.hostname', 'resource.type',
                 'resource.network_hrn',
-                'lease.urn',
+                'lease.resource',
+                'lease.start_time',
+                'lease.end_time',
                 #'user.user_hrn',
                 #'application.measurement_point.counter'
         )
@@ -95,20 +99,34 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # RESERVED RESOURCES LIST
         # resources as a list using datatable plugin
  
-        list_reserved_resources = QueryTable(
-            page       = page,
-            domid      = 'resources-reserved-list',
-            title      = 'List view',
-            query      = sq_resource,
-            query_all  = sq_resource,
-            init_key   = "urn",
-            checkboxes = True,
-            datatables_options = {
-                'iDisplayLength': 25,
-                'bLengthChange' : True,
-                'bAutoWidth'    : True,
-                },
+        list_reserved_resources = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'urn',
+            query = sq_resource,
         )
+
+        list_reserved_leases = SimpleList(
+            title = None,
+            page  = page,
+            key   = 'resource',
+            query = sq_lease,
+        )
+
+#        list_reserved_resources = QueryTable(
+#            page       = page,
+#            domid      = 'resources-reserved-list',
+#            title      = 'List view',
+#            query      = sq_resource,
+#            query_all  = sq_resource,
+#            init_key   = "urn",
+#            checkboxes = True,
+#            datatables_options = {
+#                'iDisplayLength': 25,
+#                'bLengthChange' : True,
+#                'bAutoWidth'    : True,
+#                },
+#        )
 
         # --------------------------------------------------------------------------
         # COLUMNS EDITOR
@@ -203,7 +221,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env = {}
         template_env['list_resources'] = list_resources.render(self.request)
-#         template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
+        template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
+        template_env['list_reserved_leases'] = list_reserved_leases.render(self.request)
 
         template_env['columns_editor'] = filter_column_editor.render(self.request)
 

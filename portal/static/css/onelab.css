@@ -74,34 +74,6 @@ span.label {
 }
 
 
-div#secondary {
-    
-}
-
-div#secondary ul {
-    position:absolute;
-    top:8px;
-    right:0;
-}
-
-div#secondary li {
-    font-size:9pt;
-    float:left;
-    list-style:none;
-    margin-right:30px;
-    color:gray;
-}
-div#secondary li a {
-    color:gray;
-}
-div#secondary li a:hover {
-    color:#270A5A;
-    text-decoration:none;
-}
-div#secondary li:last-child {
-    margin-right:0;
-}
-
 div#navigation {
     background-color:black;
     width:100%;
@@ -153,27 +125,25 @@ div#navigation li.slices {
     position:relative;
     cursor:pointer;
 }
-div#navigation .dropdown-menu {
-    color:white;
+div.navigation .dropdown-menu {
+    color:black;
     padding:0 15px 15px 15px;
     margin-top:5px;
     margin-left:-16px;
-    background-color:black;
 }
-div#navigation .dropdown-menu a {
-    color:white;
+div.navigation .dropdown-menu a {
+    color:black;
 }
 
-div#menu-slice-list{
+div.menu-slice-list {
     display:none;
     position:absolute;
-    background-color:black;
     padding:15px;
     left:-15px;
     z-index:10;
 }
 
-div#navigation .dropdown-menu li:first-child {
+div.navigation .dropdown-menu li:first-child {
     border-bottom:1px solid white;
     padding-bottom:5px;
      
@@ -479,6 +449,13 @@ div.dataTables_filter label{
 }
 
 /**/
+.header {
+  -moz-box-shadow:    0 0 1px rgba(82,82,82,0.6);
+  -webkit-box-shadow: 0 0 1px rgba(82,82,82,0.6);
+  box-shadow:         0 0 1px rgba(82,82,82,0.6);
+  height:61px;
+  background-color:white;
+}
 div.navigation {
     
 }
@@ -493,7 +470,7 @@ div.navigation ul {
 div.navigation li {
     color:#0C0047;
     font-family:open_sansbold, sans-serif;
-    font-size:10pt;
+    font-size:9pt;
     font-weight:normal;
     line-height:0.8em;
     letter-spacing:0.4pt;
@@ -516,6 +493,51 @@ div.navigation li a:hover, div.navigation li a.current {
 div.navigation li:last-child {
     margin-right:0;
 }
+div.secondary {
+    text-align:right;
+}
+
+div.secondary ul {
+   margin:6px 0 0 0;
+   padding:0;
+}
+
+div.secondary li {
+    font-size:9pt;
+    display:inline;
+    list-style:none;
+    margin:0px;
+    padding:0;
+    margin-right:15px;
+    color:#747474;
+    letter-spacing:0.4px;
+}
+div.secondary li:last-child {
+    margin-right:0;
+}
+div.secondary li a {
+    color:#747474;
+}
+div.secondary li a:hover {
+    text-decoration:none;
+}
+div.secondary .button {    
+    width:300px;
+    margin-top:15px;
+}
+div.secondary .account {
+    margin-top:10px;
+    padding:0;
+    font-size:9pt;
+    color:gray;
+    text-align:right;
+}
+div.secondary .account span {
+    font-size:8pt;
+}
+div.secondary .account a {
+    color:black;
+}
 div.home {
     font-size:11pt;
     line-height:1.2em;
@@ -536,6 +558,17 @@ div.home h2 {
 div.home h3 {
     color:white;
     line-height:1.4em;
+}
+div.dashboard {
+    text-align:center;
+}
+div.dashboard div {
+    margin:25px 0;
+}
+div.dashboard ul {
+    text-align:left;
+    margin-left:24px;
+    list-style:none;
 }
 div.registration-form {
     padding-top:150px;

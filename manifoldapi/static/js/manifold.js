@@ -475,15 +475,18 @@ var manifold = {
                 var key = manifold.metadata.get_key(method);
                 if (!key)
                     continue;
-                if (key.length > 1)
-                    continue;
-                key = key[0];
                 var sq_keys = [];
                 var subrecords = record[method];
                 if (!subrecords)
                     continue
                 $.each(subrecords, function (i, subrecord) {
-                    sq_keys.push(subrecord[key]);
+                    if (key.length == 1){
+                        key = key[0];
+                        sq_keys.push(subrecord[key]);
+                    }else{
+                        // more than what's necessary, but should work
+                        sq_keys.push(subrecord);
+                    }
                 });
                 update_query.params[method] = sq_keys;
                 update_query_orig.params[method] = sq_keys.slice();
