@@ -40,6 +40,11 @@
         	</div>
 <script>
     $(document).ready(function() {
+            // TODO: Add a filter based on the list of authorities
+        	$.post("/rest/authority/",{'fields':['authority_hrn']}, function( data ) {
+                console.log(data);
+            }); // post rest/authority
+
 			var slice_users = [];
         	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
             	var list_users = [];
@@ -72,33 +77,23 @@
                 	table_users.push(user_row);
                 
             	});
-				 console.log("slice users before");
-				 console.log(slice_users);
             
 				$("table#user-tab tr:last").after(table_users.join( "" ));
             	$("div#user-tab-loaded").css("display","block");
             	$("div#user-tab-loading").css("display","none");
                 $("input:checkbox.user").click(function() {
-                    console.log("user_hrn");
                     user_hrn = $(this).closest('tr').find('td:eq(2)').html();
-                    console.log(user_hrn);
-                    console.log(this.checked);
                     if(this.checked){
                         var record_id = this.id;
                         slice_users.push (user_hrn);
                     }else{
-                        console.log("not checked");
-                        slice_users = $.grep(slice_users, function( user, i ) {
-                            return user != user_hrn;
-                        });
+                        console.log(slice_users);
                     }
-                    console.log(slice_users);
                 });
            
          	}); // post rest/user
 	        $('button#addusers').click(function() {
                 $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
-                    console.log(data);
                 	if(data.success){
                     	// TODO: highlight row after success
                     	//$('tr[id="'+record_id+'"]').highlight();

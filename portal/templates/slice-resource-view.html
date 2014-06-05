@@ -79,7 +79,13 @@
 				<!-- <table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table> -->
 			</div>
 			<div id="reserved" class="panel" style="height:370px;display:none;">
-                {{list_reserved_resources}}
+                <table width="80%">
+                    <tr><th width="50%" style="text-align:center;">resources</th><th width="50%" style="text-align:center;">leases</th></tr>
+                    <tr>
+                        <td style="text-align:center">{{list_reserved_resources}}</td>
+                        <td style="text-align:center">{{list_reserved_leases}}</td>
+                    </tr>
+                </table>
 			</div>
 			<div id="pending" class="panel" style="height:370px;display:none;">
                 {{pending_resources}}
