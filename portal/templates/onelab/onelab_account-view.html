@@ -144,24 +144,7 @@
 							</td>
 						 {%endif%}		
 			  			</tr>
-						<tr class="odd">
-							{%if 'N/A' not in user_private_key%}
-							<td class="key">Identity</td> 
-    						<td>
-								<button type="submit" name="dl_identity" class="btn btn-default btn-xs" title="You will require it for using jfed" id="dl_pkey">
-    								<span class="glyphicon glyphicon-download"></span> Download 
-								</button>
-							</td>
-							{%else%}
-							<td class="key">Identity</td> 
-							<td>
-    							<button type="submit" name="dl_identity" class="btn btn-default btn-xs disabled" title="You will require it to use jfed" id="dl_pkey">
-        							<span class="glyphicon glyphicon-download"></span> Download 
-    							</button>
-							</td>
-							{%endif%} 
-						</tr>
-			  			<tr class="even">
+			  			<tr class="odd">
 			    			<td colspan="2">
 			      				<p class="message" id="pkey_del_msg"><b> Tradeoff:</b> Ease-of-use vs Security.<br>
 									<b>Ease-of-use:</b> Automatic account delegation. Don't delete private key.<br>

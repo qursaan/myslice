@@ -455,6 +455,29 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
+    
+    # download identity for jfed
+    elif 'dl_identity' in request.POST:
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        if 'user_private_key' in account_config:
+                            private_key = account_config['user_private_key']
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            registry = 'http://sfa-fed4fire.pl.sophia.inria.fr:12345/'
+                            jfed_identity = user_hrn + '\n' + registry + '\n' + private_key 
+                            response = HttpResponse(jfed_identity, content_type='text/plain')
+                            response['Content-Disposition'] = 'attachment; filename="jfed_identity.txt"'
+                            return response
+                        else:
+                            messages.error(request, 'Download error: Private key is not stored in the server')
+                            return HttpResponseRedirect("/portal/account/")
+
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            return HttpResponseRedirect("/portal/account/")
 
     #clear all creds
     elif 'clear_cred' in request.POST:
