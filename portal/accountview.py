@@ -24,7 +24,7 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
 
 
     def get_context_data(self, **kwargs):
-
+        self.template_name = self.template
         page = Page(self.request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
@@ -179,7 +179,6 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         # we could use zip. this one is used if columns have unequal rows 
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
-
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
         context['ref_acc'] = ref_acc_list
