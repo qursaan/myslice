@@ -30,7 +30,7 @@
 			  		<table class="profile">          
 			    		<tr>
 			      			<td colspan="2">
-								<div>Platforms: Myslice</div>
+								<div>Platform: Myslice</div>
 			      			</td>
 			    		</tr>
 			    		<tr>
@@ -127,7 +127,7 @@
 			    		<tr class="even" id="pkey_row">
 						 {%if 'N/A' not in user_private_key%}
 			      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
-			      			<td class="value">********<a href="#">
+			      			<td class="value">********<a href="#"></a>
 			      				<button type="submit" name="dl_pkey" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_pkey">
 									<span class="glyphicon glyphicon-download"></span> Download	
 								</button>
@@ -136,7 +136,7 @@
 			    			</td>
 						  {%else%}
 							<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
-		 					<td class="value">********<a href="#">
+		 					<td class="value">********<a href="#"></a>
 		     					<button type="submit" name="dl_pkey" class="btn btn-default btn-xs disabled" title="Download your privaye key" id="dl_pkey">
 		        					<span class="glyphicon glyphicon-download"></span> Download 
 		     					</button>
@@ -144,7 +144,24 @@
 							</td>
 						 {%endif%}		
 			  			</tr>
-			  			<tr class="odd">
+						<tr class="odd">
+							{%if 'N/A' not in user_private_key%}
+							<td class="key">Identity</td> 
+    						<td>
+								<button type="submit" name="dl_identity" class="btn btn-default btn-xs" title="You will require it to use jfed" id="dl_identity">
+    								<span class="glyphicon glyphicon-download"></span> Download 
+								</button>
+							</td>
+							{%else%}
+							<td class="key">Identity</td> 
+							<td>
+    							<button type="submit" name="dl_identity" class="btn btn-default btn-xs disabled" title="You will require it to use jfed" id="dl_identity">
+        							<span class="glyphicon glyphicon-download"></span> Download 
+    							</button>
+							</td>
+							{%endif%} 
+						</tr>
+			  			<tr class="even">
 			    			<td colspan="2">
 			      				<p class="message" id="pkey_del_msg"><b> Tradeoff:</b> Ease-of-use vs Security.<br>
 									<b>Ease-of-use:</b> Automatic account delegation. Don't delete private key.<br>
