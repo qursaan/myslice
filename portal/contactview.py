@@ -14,13 +14,14 @@ theme = ThemeView()
 # GET is for displaying the empty form
 # POST is to process it once filled - or show the form again if anything is missing
 class ContactView (FreeAccessView, ThemeView):
+    template_name = 'contact.html'
     def post (self, request):
         form = ContactForm(request.POST) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            authority = form.cleaned_data['authority']
+            #first_name = form.cleaned_data['first_name']
+            #last_name = form.cleaned_data['last_name']
+            #authority = form.cleaned_data['authority']
             subject = form.cleaned_data['subject']
             description = form.cleaned_data['description']
             email = form.cleaned_data['email'] # email of the sender
@@ -31,7 +32,7 @@ class ContactView (FreeAccessView, ThemeView):
             #theme.template_name = 'email_support.txt'
             #recipients = render_to_string(theme.template, form.cleaned_data)
             #recipients = subject.replace('\n', '')
-            recipients = ['support@myslice.info']
+            recipients = ['support@myslice.info','contact@fed4fire.eu']
             if cc_myself:
                 recipients.append(email)
             #recipients = ['support@myslice.info']
@@ -74,7 +75,7 @@ class ContactView (FreeAccessView, ThemeView):
             username = request.user.email
         else :
             username = None
-        return render(request, 'contact.html', {
+        return render(request, self.template, {
                 'form': form,
                 'topmenu_items': topmenu_items('Contact', request),
                 'theme' : self.theme,
