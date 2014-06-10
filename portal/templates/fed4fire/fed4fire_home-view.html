@@ -26,7 +26,10 @@
 				<span class="glyphicon glyphicon-globe"></span>Experiment now</button>
 			 </div>
 			<div>
-				<ul><li><a href="" title="Start experiment with jFed.">jFed</a></li></ul>
+				<ul><li>
+					<a class="button2" href='http://jfed.iminds.be/releases/r1306/webstart/experimenter/jfed-experimenter.jnlp' 
+					onclick="return  launchApplication('http://jfed.iminds.be/releases/r1306/webstart/experimenter/jfed-experimenter.jnlp');">jFed</a>
+				</li></ul>
 			</div>
 		</div>
 		<div class="col-md-3">
@@ -118,5 +121,19 @@ portal/templates/base.html
 This should go into session
 --------*/
 });
+</script>
+
+<script>
+	function launchApplication(jnlpfile) {
+     	dtjava.launch(
+        	{ url : jnlpfile },
+            {
+            	javafx : '2.2+',
+                toolkit: 'swing'
+            	},
+                {}
+        );
+        return false;
+     }
 </script>
 {% endblock %}
