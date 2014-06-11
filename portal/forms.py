@@ -86,12 +86,12 @@ class ContactForm(forms.Form):
    #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
     subject = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
-                                regex=r'^[\w.@+-]+$',
+                                regex=r'^[\w+\s\w+]+$',
                                  max_length=100,
                                  label=_("subject"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     description = forms.RegexField(widget=forms.Textarea(attrs={'class':'form-control'}),
-                                regex=r'^[\w.@+-]+$',
+                                regex=r'^[\w+\s\w+]+$',
                                  label=_("description"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
     cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
