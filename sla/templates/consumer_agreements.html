@@ -1,0 +1,26 @@
+<div id="agreements">
+
+{% for a in agreements %}
+    <div>
+        <span class="status-{{a.statusclass}}">{{a.statusclass}}</span>
+        <a data-toggle="collapse" data-parent="#agreements" href="#agreement-{{a.agreementId}}">{{a.context.service}}</a>
+        -
+        <a href="#" data-agreementid="{{a.agreementId}}">Detail</a>
+    </div>
+    <div id="agreement-{{a.agreementId}}" class="collapse">
+        <div>
+        {% for tname,t in a.guaranteeterms.items %}
+            <div>
+                <span class="status-{{t.statusclass}}">{{t.statusclass}}</span>
+                {{t.servicelevelobjective.kpiname}}
+                -
+                <a href="/violations/{{a.agreementId}}/{{t.name}}">Detail</a>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% empty %}
+{% endfor %}
+</div>
+
+

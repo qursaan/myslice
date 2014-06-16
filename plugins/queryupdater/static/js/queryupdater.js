@@ -70,8 +70,51 @@
 
         do_update: function(e) {
             var self = e.data;
+            var username = e.data.options.username;
+            var urn = data.value;
             // XXX check that the query is not disabled
-            manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+
+            console.log("DATA VALUE: " + data.value);
+
+            if (data.value.toLowerCase().indexOf("iminds") >= 0){
+
+                $('#sla_dialog').show();
+                $('#slamodal').modal('show');
+                
+                $(document).ready(function() {
+                    $("#accept_sla").click(function(){
+                        console.log("SLA ACCEPTED");
+                        console.log("With username: " + username);
+                        if(urn.toLowerCase().indexOf("wall2") >= 0){ 
+                            $.post("/sla/agreements/simplecreate", 
+                                { "template_id": "iMindsServiceVirtualwall",
+                                  "user": username,
+                                  "expiration_time": new Date() // jgarcia: FIXME
+                                });
+                        } else if(urn.toLowerCase().indexOf("wilab2") >= 0){
+                            $.post("/sla/agreements/simplecreate", 
+                                { "template_id":"iMindsServiceWiLab2",
+                                  "user":username,
+                                  "expiration_time": new Date() // jgarcia: FIXME
+                                });
+                        }
+                        $('#slamodal').modal('hide');
+                        console.log("Executing raise_event after sending SLA");
+                        // manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                    }); 
+                });
+
+                $(document).ready(function() {
+                    $("#dismiss_sla").click(function(){
+                        console.log("SLA NOT ACCEPTED");
+                        $('#slamodal').modal('hide');
+                    }); 
+                });
+
+            } else {
+                console.log("Executing raise_event");
+                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+            }
         },
 
 	// related buttons are also disabled in the html template

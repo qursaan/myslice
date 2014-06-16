@@ -2,6 +2,11 @@ from unfold.plugin import Plugin
 
 class QueryUpdater(Plugin):
 
+    def __init__ (self, query=None, **settings):
+        Plugin.__init__ (self, **settings)
+        self.query = query
+        self.username = str(settings['username'])
+
     def template_file (self):
         return "queryupdater.html"
 
@@ -13,5 +18,5 @@ class QueryUpdater(Plugin):
         return reqs
 
     def json_settings_list (self):
-        return ['plugin_uuid', 'domid', 'query_uuid']
+        return ['plugin_uuid', 'domid', 'query_uuid', 'username']
 

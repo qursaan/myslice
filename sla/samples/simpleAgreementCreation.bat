@@ -1,0 +1,1 @@
+curl -Umyuser:mypassword -H "Content-type: application/json" -d@simpleAgreementCreationParameters.json localhost:8000/sla/agreements/simplecreate -X POST

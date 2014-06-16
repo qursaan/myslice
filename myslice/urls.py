@@ -89,6 +89,9 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
     url(r'^portal/', include('portal.urls')),
+
+    # SLA
+    url(r'^sla/', include('sla.urls')),
 ]
 
 #this one would not match the convention

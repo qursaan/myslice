@@ -1,0 +1,140 @@
+
+<div class="col-md-2">
+</div>
+
+ <div class="col-md-8">
+   <div class="row" id="agreements">
+    <table class="table dataTable" id="sla_table" >
+        <thead>
+        <tr class="header">
+            <th colspan="2">Provider</th>
+            <!-- <th>Testbed</th>
+            <th>Slice_Id</th>
+            <th>Agreement</th>
+            <th>Metric</th>
+            <th>Violations</th>
+            <th>Result</th> -->
+        </tr>
+        </thead>
+        <tbody>
+        
+       <tr class="header">
+       		<td><span class="glyphicon glyphicon-chevron-down"></span></td>
+       		<td>iMinds</td>
+       </tr>
+       
+       
+        {% for a in agreements %}
+
+
+<!-- Modal - columns selector -->
+<div class="modal fade" id="agreementModal{{a.agreement_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			
+<style type="text/css" scoped>
+        .modal-lg {
+          width: 50%;
+        }
+</style>
+			
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+ 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+ 				<h4 class="modal-title" id="myModalAgreement">Agreement details</h4>
+			</div>
+			<div class="modal-body">
+
+                 <dt>Agreement Id</dt>
+                 <dd>{{ a.agreement_id|default:"&nbsp;" }}</dd>
+                 <dt>Provider</dt>
+                 <dd>{{ a.context.provider|default:"&nbsp;" }}</dd>
+                 <dt>Consumer</dt>
+                 <dd>{{ a.context.consumer|default:"&nbsp;" }}</dd>
+                 <dt>Service</dt>
+                 <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the resources during the sliver lifetime</dd>
+                 <dt>Testbed</dt>
+                 <dd>{{ a.context.testbed_formatted }}</dd>
+                 <dt>Accepted on:</dt>
+                 <dd>{{ a.context.expirationtime|default:"&nbsp;" }}</dd>
+			</div>
+			<div class="modal-footer">
+ 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+       
+       <tr>
+       		{% if a.guaranteestatus == "VIOLATED" %}
+       		<td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
+        	{% else %}
+        	<td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+        	{% endif %}
+    		<td>{{ a.context.template_id }}</td>
+            <td>{{ a.context.expirationtime }}</td>
+            <td>
+                {% with a.agreement_id as key %}
+                {% if enforcements.key == false %}
+                  Disabled
+                {% else %}
+                  Enabled
+                {% endif %}
+                {% endwith %}
+            </td>
+            <!-- <td>{{slicename}}</td> -->
+            <td>
+                <!-- <a class="agreement-detail" href="{% url "agreement_details" a.agreement_id %}" data-toggle="modal" data-target="#agreementModal">View Agreement</a> -->
+                <!-- <a class="agreement-detail" href="#" data-agreement="{{ a.agreement_id }}">View Agreement</a> -->
+                <a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{a.agreement_id}}">View Agreement</a>
+            </td>
+
+            {% for tname,t in a.guaranteeterms.items %}
+            <td> {{ t.servicelevelobjective.kpiname }}</td>
+            <td>
+                {% if t.status == "VIOLATED" %}
+
+                  <!-- <a class="violation-detail" href="{% url "agreement_term_violations" a.agreement_id t.name %}" data-toggle="modal" data-target="#violationModal">View Violations</a>
+                  <a class="violation-detail" href="#"
+                  			data-agreement="{{ a.agreement_id }}" 
+                  			data-violation="{{ t.name }}">View Violations</a> -->
+                  <a class="violation-detail" href="#" data-agreement="{{ a.agreement_id }}" data-violation="{{ t.name }}">View Violations</a>
+
+                {% endif %}
+            </td>
+            <td id="status" style="display:none;">
+                {{ a.statusclass }}
+            </td>
+            {% endfor %}
+        </tr>
+        
+        {% empty %}
+        {% endfor %}
+        </tbody>
+
+</table>
+</div>
+</div>
+<!-- <div class="row" style="float:right;">
+    <button id="showEvaluations" type="button" class="btn btn-default"  onclick="displayDate()"><span class="glyphicon"></span>Show Evaluations</button>
+</div> -->
+
+<script>
+$(document).ready(function() {
+	$('a.violation-detail').click(function () {
+		var a = $(this).data('agreement');
+		var v = $(this).data('violation');
+		$("#sla").load('/sla/agreements/' + a + '/guarantees/' + v + '/violations', {'slicename': '{{ slicename }}'});
+	});
+	
+	// $('a.agreement-detail').click(function () {
+	// 	var a = $(this).data('agreement');
+	// 	$("#sla").load('/sla/agreements/' + a + '/detail');
+	// });
+
+	$('tr.header').click(function(){
+		$(this).nextUntil('tr.header').toggle('fast');
+		$('.header .glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+	});
+});
+
+</script>

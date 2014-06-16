@@ -45,6 +45,8 @@ from portal.validationview          import ValidatePendingView
 
 from portal.univbrisview            import UnivbrisView
 
+from portal.servicedirectory         import ServiceDirectoryView
+
 from portal.documentationview       import DocumentationView
 from portal.supportview             import SupportView
 from portal.emailactivationview     import ActivateEmailView
@@ -117,7 +119,8 @@ urlpatterns = patterns('',
         'portal.django_passresetview.password_reset_complete'),
 
     url(r'^univbris/?$', UnivbrisView.as_view(), name='univbris'),
-    # ...
+    
+    url(r'^servicedirectory/?$', ServiceDirectoryView.as_view(), name='servicedirectory'),
 
 )
 # (r'^accounts/', include('registration.backends.default.urls')),

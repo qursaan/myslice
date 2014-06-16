@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsag:Agreement xmlns:wsag="http://www.ggf.org/namespaces/ws-agreement"
+	AgreementId="agreement03">
+
+	<wsag:Name>ExampleAgreement</wsag:Name>
+	<wsag:Context>
+		<wsag:AgreementInitiator>experimenter01</wsag:AgreementInitiator>
+		<wsag:AgreementResponder>virtualwall</wsag:AgreementResponder>
+		<wsag:ServiceProvider>AgreementResponder</wsag:ServiceProvider>
+		<wsag:ExpirationTime>2014-03-07T12:00:00</wsag:ExpirationTime>
+		<wsag:TemplateId>template</wsag:TemplateId>
+		<sla:Service xmlns:sla="http://sla.atos.eu">Testbed_guarantee_0.99_Uptime_rate_for_0.99_rate_of_the_resources_during_the_sliver</sla:Service>
+	</wsag:Context>
+	<wsag:Terms>
+		<wsag:All>
+			
+			<wsag:ServiceProperties Name="ServiceProperties" ServiceName="ServiceName">
+				<wsag:VariableSet>
+					<wsag:Variable Name="UpTime" Metric="xs:double">
+                        <wsag:Location>qos:UpTime</wsag:Location>
+                    </wsag:Variable>
+                    <wsag:Variable Name="Performance" Metric="xs:double">
+                        <wsag:Location>qos:Performance</wsag:Location>
+                    </wsag:Variable>
+				</wsag:VariableSet>
+			</wsag:ServiceProperties>
+
+			<!-- Uptime GuaranteTerm-->
+            <wsag:GuaranteeTerm Name="GT_UpTime">
+                <wsag:ServiceScope ServiceName="sla:virtualwall" />
+                <wsag:ServiceLevelObjective>
+                    <wsag:KPITarget>
+                        <wsag:KPIName>UpTime</wsag:KPIName>
+                        <wsag:CustomServiceLevel>
+                        	{"constraint" : "UpTime GT 0.99"}
+                        </wsag:CustomServiceLevel>
+                    </wsag:KPITarget>
+                </wsag:ServiceLevelObjective>
+            </wsag:GuaranteeTerm>
+
+            <!-- Resource Performance GuaranteTerm-->
+            <wsag:GuaranteeTerm Name="GT_Performance">
+                <wsag:ServiceScope ServiceName="sla:virtualwall" />
+                <wsag:ServiceLevelObjective>
+                    <wsag:KPITarget>
+                        <wsag:KPIName>Performance</wsag:KPIName>
+                        <wsag:CustomServiceLevel>
+                        	{"constraint" : "Performance GT 0.99"}
+                        </wsag:CustomServiceLevel>
+                    </wsag:KPITarget>
+                </wsag:ServiceLevelObjective>
+            </wsag:GuaranteeTerm>
+		</wsag:All>
+	</wsag:Terms>
+</wsag:Agreement>

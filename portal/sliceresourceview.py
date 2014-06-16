@@ -19,6 +19,7 @@ from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
 from plugins.scheduler2              import Scheduler2
 from plugins.columns_editor          import ColumnsEditor
+from plugins.sladialog               import SlaDialog
 
 from myslice.theme import ThemeView
 
@@ -173,6 +174,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             toggled             = False,
             domid               = 'pending',
             outline_complete    = True,
+            username            = request.user,
         )
 
         # --------------------------------------------------------------------------
@@ -201,6 +203,21 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 },
         )
 
+        # --------------------------------------------------------------------------
+        # SLA View and accept dialog
+        
+        sla_dialog = SlaDialog(
+            page                = page,
+            title               = 'sla dialog',
+            query               = main_query,
+            togglable           = False,
+            # start turned off, it will open up itself when stuff comes in
+            toggled             = True,
+            domid               = 'sla_dialog',
+            outline_complete    = True,
+            username            = request.user,
+        )
+
         template_env = {}
         template_env['list_resources'] = list_resources.render(self.request)
 #         template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
@@ -211,6 +228,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
         template_env['pending_resources'] = pending_resources.render(self.request)
+        template_env['sla_dialog'] = sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
         template_env["slice"] = slicename

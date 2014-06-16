@@ -7,7 +7,7 @@ from unfold.prelude import Prelude
 
 from ui.topmenu import topmenu_items, the_user
 # tmp
-from trash.trashutils import lorem, hard_wired_slice_names
+from trashutils import lorem, hard_wired_slice_names
 
 def scroll_view (request):
     return render_to_response ('view-scroll.html',
