@@ -47,15 +47,14 @@
 				SUPPORT
 			</h3>
 			<div>
-				<a href="http://doc.fed4fire.eu/support.html" target="_blank"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
+				<a href="http://doc.fed4fire.eu/support.html"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
 			</div>
 			<div>
 				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
 			</div>
+			<p></p>
 			<div>
-				<ul><li>
-    				<a href="https://flsmonitor.fed4fire.eu" target="_blank">Status of the testbeds</a>
-				</li></ul>
+    			<button id="statbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' status</button>
 			</div>
 		</div>
 		
@@ -84,13 +83,13 @@
 		<div class="col-sm-2"></div>
 		<div class="col-sm-4 slogan">
 			<h2>
-				Your Easy Access to Computer Networking Testbeds.
+				Fed4FIRE Portal
 			</h2>
 			<h3>
-				A wide variety of world class testbeds available through your one account.
+				Your easy access to Future Internet Research and Experimentation testbeds belonging to the Fed4FIRE federation.
 			</h3>
 			<h3>
-				 <a href='http://doc.fed4fire.eu' target="_blank">Want to learn more?</a>
+				 <a href='http://doc.fed4fire.eu'>Want to learn more?</a>
 			</h3>
 		</div>
 		<div class="col-sm-4 col-sm-offset-1" style="width:400px; top:16px; float:left;">
@@ -117,6 +116,9 @@
 		});
 		$('button#ticketbtn').click(function() {
 			window.location="/portal/contact/";
+		});
+		$('button#statbtn').click(function() {
+    		window.location="https://flsmonitor.fed4fire.eu";
 		});
 		$('button#signupbtn').click(function() {
 			window.location="/portal/register/";
