@@ -59,7 +59,7 @@
              });
             
             // XXX This should not be done at init...
-            this.elmt('update').click(this, this.do_update);
+            this.elmt('update').click(this, this.do_checksla);
             this.elmt('refresh').click(this, this.do_refresh);
             this.elmt('reset').click(this, this.do_reset);
             this.elmt('clear_annotations').click(this, this.do_clear_annotations);
@@ -70,6 +70,64 @@
         /*************************** PLUGIN EVENTS ****************************/
 
         /***************************** GUI EVENTS *****************************/
+
+        do_checksla: function(e) {
+            var username = e.data.options.username;
+            var urn = data.value;
+            // XXX check that the query is not disabled
+
+            console.log("DATA VALUE: " + data.value);
+
+            if (data.value.toLowerCase().indexOf("iminds") >= 0){
+
+                $('#sla_dialog').show();
+                $('#slamodal').modal('show');
+                
+                $(document).ready(function() {
+                    $("#accept_sla").click(function(){
+                        console.log("SLA ACCEPTED");
+                        console.log("With username: " + username);
+                        if(urn.toLowerCase().indexOf("wall2") >= 0){ 
+                            $.post("/sla/agreements/simplecreate", 
+                                { "template_id": "iMindsServiceVirtualwall",
+                                  "user": username,
+                                  "expiration_time": new Date() // jgarcia: FIXME
+                                });
+                        } else if(urn.toLowerCase().indexOf("wilab2") >= 0){
+                            $.post("/sla/agreements/simplecreate", 
+                                { "template_id":"iMindsServiceWiLab2",
+                                  "user":username,
+                                  "expiration_time": new Date() // jgarcia: FIXME
+                                });
+                        }
+                        $('#slamodal').modal('hide');
+                        self.spin();
+                        console.log("Executing do_update after sending SLA");
+                        // XXX check that the query is not disabled
+                        manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+
+                        // how to stop the spinning after the event? 
+                        // this should be triggered by some on_updatequery_done ?
+                    }); 
+                });
+
+                $(document).ready(function() {
+                    $("#dismiss_sla").click(function(){
+                        console.log("SLA NOT ACCEPTED");
+                        $('#slamodal').modal('hide');
+                    }); 
+                });
+
+            } else {
+                self.spin();
+                console.log("do_update");
+                // XXX check that the query is not disabled
+                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+
+                // how to stop the spinning after the event? 
+                // this should be triggered by some on_updatequery_done ?
+            }
+        },
 
         do_update: function(e) {
             var self = e.data;
