@@ -182,7 +182,7 @@
                                     $('#slamodal-wilab2').modal('hide');
                                 accepted_sla["wilab2"] = true;
                             
-                                //this.do_update(e);
+                                this.do_update(e);
                             }
                         }); 
                     
