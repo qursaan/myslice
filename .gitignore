@@ -21,3 +21,4 @@ myslice.ini*
 foo.*
 .project
 .pydevproject
+/sla/trashcan
