@@ -89,15 +89,15 @@ class JoinView (FreeAccessView, ThemeView):
                 errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
                 errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            if (re.search(r'^\w+$', reg_site_authority) == None):
-                errors.append('Site Authority may contain only letters or numbers.')
+            #if (re.search(r'^\w+$', reg_site_authority) == None):
+            #    errors.append('Site Authority may contain only letters or numbers.')
             # checking in django_db !!
             if PendingUser.objects.filter(email__iexact=reg_email):
                 errors.append('Email is pending for validation. Please provide a new email address.')
-            if PendingAuthority.objects.filter(site_authority__iexact=reg_auth):
+            if PendingAuthority.objects.filter(site_abbreviated_name__iexact=reg_site_abbreviated_name):
                 errors.append('This site is pending for validation.')
-            if PendingAuthority.objects.filter(site_name__iexact=reg_site_name):
-                errors.append('This site is pending for validation.')
+            #if PendingAuthority.objects.filter(site_name__iexact=reg_site_name):
+            #    errors.append('This site is pending for validation.')
 
             if UserModel._default_manager.filter(email__iexact=reg_email): 
                 errors.append('This email is not usable. Please contact the administrator or try with another email.')
@@ -117,12 +117,13 @@ class JoinView (FreeAccessView, ThemeView):
             account_config = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
             auth_type = 'managed'
             public_key = public_key.replace('"', '');
+            private_key = private_key.replace('"', '');
 
             if not errors:
                 reg_password = request.POST['pi_password']
                 a = PendingAuthority(
                     site_name             = reg_site_name,             
-                    site_authority        = reg_root_authority_hrn + '.' + reg_site_authority, 
+                    site_authority        = 'onelab.' + reg_site_abbreviated_name, 
                     site_abbreviated_name = reg_site_abbreviated_name, 
                     site_url              = reg_site_url,
                     site_latitude         = reg_site_latitude, 
@@ -145,8 +146,12 @@ class JoinView (FreeAccessView, ThemeView):
                     authority_hrn = reg_auth,
                     email         = reg_email, 
                     password      = reg_password,
-                    keypair       = account_config,
+                    public_key    = public_key,
+                    private_key   = private_key,
+                    user_hrn      = user_hrn,  
                     pi            = reg_auth,
+                    email_hash    = '',
+                    status        = 'True',
                 )
                 b.save()
 
@@ -154,13 +159,13 @@ class JoinView (FreeAccessView, ThemeView):
                 user = User.objects.create_user(reg_email, reg_email, reg_password)
 
                 #creating user to manifold local:user
-                user_config = '{"firstname":"'+ reg_fname + '", "lastname":"'+ reg_lname + '", "authority":"'+ reg_auth + '"}'
-                user_params = {'email': reg_email, 'password': reg_password, 'config': user_config, 'status': 1}
-                manifold_add_user(request,user_params)
+                #user_config = '{"first_name":"'+ reg_fname + '", "last_name":"'+ reg_lname + '", "authority_hrn":"'+ reg_auth + '"}'
+                #user_params = {'email': reg_email, 'password': reg_password, 'config': user_config, 'status': 1}
+                #manifold_add_user(request,user_params)
                 #creating local:account in manifold
-                user_id = user_detail['user_id']+1 # the user_id for the newly created user in local:user
-                account_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': account_config}
-                manifold_add_account(request,account_params)
+                #user_id = user_detail['user_id']+1 # the user_id for the newly created user in local:user
+                #account_params = {'platform_id': 5, 'user_id': user_id, 'auth_type': auth_type, 'config': account_config}
+                #manifold_add_account(request,account_params)
 
                 # Send email
                 try: 

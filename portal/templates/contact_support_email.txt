@@ -1,9 +1,6 @@
 User details: 
 
-First name      : {{first_name}}
-Last name 	: {{last_name}}
 email           : {{email}}
-Authority	: {{authority}}
 
 Query Details:
 

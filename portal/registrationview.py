@@ -57,7 +57,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = current_site.domain
 
             post_email = wsgi_request.POST.get('email','').lower()
-            email_hash = md5(post_email).digest().encode('base64')[:-1]
+            salt = randint(1,100000)
+            email_hash = md5(str(salt)+post_email).hexdigest()
+            #email_hash = md5(post_email).digest().encode('base64')[:-1]
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
                 'last_name'     : wsgi_request.POST.get('lastname',      ''),
@@ -66,7 +68,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
-                'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
+                'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             # Construct user_hrn from email (XXX Should use common code)

@@ -1,91 +1,109 @@
-{% extends "layout.html" %}
+{% extends "layout_base.html" %}
 {% load portal_filters %}
 
 {% block content %}
-<div class="row">
-{% widget '_widget_news.html' %}
-</div>
-<div class="row" id="home-dashboard">
-	<ul class="nav nav-tabs">
-	  <li class="active"><a class="home-tab" data-panel="user" href="#">USER</a></li>
-	  <li><a class="home-tab" data-panel="manager" href="#">MANAGER</a></li>
-	</ul>
-	<div class="home-panel" id="user">
-		<table>
-			<tr>
-				<td>ACCOUNT</td>
-				<td>SLICES</td>
-				<td>SUPPORT</td>
-			</tr>
-			<tr>
-				<td><a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a></td>
-				<td><a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
-				<td><a href="http://doc.fed4fire.eu/support.html" target="_blank"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a></td>
-			</tr>
-			<tr>
-				{% if person %}
-				<td class="logged-in">
-					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-					<div>
-					{% if person.last_name %}
-						{{person.first_name}} {{person.last_name}}<br />
-					{% endif %}
-	    				<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
-	    			</div>
-	   			{% else %}
-	   			<td>
-					{% widget '_widget-login-user.html' %}
+<!-- <div class="row">
+{% widget '_widget-news.html' %}
+</div> -->
+{% if username %}
+<div class="container dashboard">
+	<div class="row">
+		<div class="col-md-3">
+			<h3>
+				EXPERIMENT
+			</h3>
+			<div>
+				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
+			</div>
+			<div>	
+				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+			</div>
+			 <div>
+     			<button id="jfed" type="button" class="btn btn-default" title="Some tools do their own slice creation and management.">
+				<span class="glyphicon glyphicon-globe"></span>Experiment now</button>
+			 </div>
+			<div>
+				<ul><li>
+					<a class="button2" href='http://jfed.iminds.be/releases/r1306/webstart/experimenter/jfed-experimenter.jnlp'
+					title="Click here to start your experiment with jFed" 
+					onclick="return  launchApplication('http://jfed.iminds.be/releases/r1306/webstart/experimenter/jfed-experimenter.jnlp');">jFed</a>
+				</li></ul>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>MANAGEMENT</h3>
+			<div>
+				<a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>
+				SUPPORT
+			</h3>
+			<div>
+				<a href="http://doc.fed4fire.eu/support.html" target="_blank"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
+			</div>
+			<div>
+				<ul><li>
+    				<a href="https://flsmonitor.fed4fire.eu" target="_blank">Status of the testbeds</a>
+				</li></ul>
+			</div>
+		</div>
+		
+		<div class="col-md-3">
+			<h3>
+				ACCOUNT
+			</h3>
+			<div>
+				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+			</div>
+			<div>
+				{% if person.last_name %}
+					{{person.first_name}} {{person.last_name}}<br />
 				{% endif %}
-				</td>
-				<td>
-				{% if person %}
-					<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
-					<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-				{% else %}
-					<button id="signupbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-user"></span> Sign Up</button>
-				{% endif %}
-				</td>
-				<td class="support">
-					<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="home-panel" id="manager">
-		<table>
-			<tr>
-				<td>INSTITUTION</td>
-				<td>SLICES</td>
-				<td>REQUESTS</td>
-			</tr>
-			<tr>
-				<td><a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a></td>
-				<td><a href="/portal/institution#slices"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
-				<td><a href="/portal/validate"><img src="{{ STATIC_URL }}img/icon_testbed_color.png" alt="" /></a></td>
-			</tr>
-			<tr>
-				{% if person %}
-				<td class="logged-in">
-					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-	   			{% else %}
-	   			<td>
-					{% widget '_widget-login-manager.html' %}
-				{% endif %}
-				</td>
-				<td>
-					{% if person %}
-				    <button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Slice</button>
-					{% endif %}
-				</td>
-				<td class="support">
-					{% if person %}
-				    <button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
-					{% endif %}
-				</td>
-			</tr>
-		</table>
+    			<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
+	    	</div>
+		</div>
 	</div>
 </div>
+{% else %}
+<div class="container-fluid home">
+	<div class="">
+		<div class="col-sm-2"></div>
+		<div class="col-sm-4 slogan">
+			<h2>
+				Your Easy Access to Computer Networking Testbeds.
+			</h2>
+			<h3>
+				A wide variety of world class testbeds available through your one account.
+			</h3>
+			<h3>
+				 <a href='http://doc.fed4fire.eu' target="_blank">Want to learn more?</a>
+			</h3>
+		</div>
+		<div class="col-sm-4 col-sm-offset-1" style="width:400px; top:16px; float:left;">
+   			<div class="row">
+				{% widget '_widget-login-user.html' %}
+			</div>
+		</div>
+		<div class="col-sm-1"></div>
+	</div>
+</div>
+{% endif %}
+
+
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('a.home-tab').click(function() {
@@ -112,5 +130,19 @@ portal/templates/base.html
 This should go into session
 --------*/
 });
+</script>
+<script type="text/javascript" src="{{STATIC_URL}}js/fed4fire_dtjava_orig.js"></script>
+<script>
+	function launchApplication(jnlpfile) {
+     	dtjava.launch(
+        	{ url : jnlpfile },
+            {
+            	javafx : '2.2+',
+                toolkit: 'swing'
+            	},
+                {}
+        );
+        return false;
+     }
 </script>
 {% endblock %}

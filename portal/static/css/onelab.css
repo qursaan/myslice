@@ -1,3 +1,5 @@
+@import url("../fonts/opensans_bold_macroman/stylesheet.css");
+
 html { height: 100% }
 
 body {
@@ -37,8 +39,8 @@ div.wrapper {
     position:relative;
 }
 div.container {
-    width:980px;
-    margin:25px auto;
+    /*width:980px;
+    margin:25px auto;*/
 }
 div.wide {
     margin:25px auto;
@@ -61,37 +63,16 @@ span.label {
     text-align: center;
 }
 /* HEADER */
-div#header {
-    height:100px;
-    background-color:white;
+#header {
+  -moz-box-shadow:    0 0 1px rgba(82,82,82,0.6);
+  -webkit-box-shadow: 0 0 1px rgba(82,82,82,0.6);
+  box-shadow:         0 0 1px rgba(82,82,82,0.6);
+  
+  height:61px;
+  background-color:white;
+  z-index:2;
 }
 
-div#secondary {
-    
-}
-
-div#secondary ul {
-    position:absolute;
-    top:20px;
-    right:0;
-}
-
-div#secondary li {
-    font-size:10pt;
-    float:left;
-    list-style:none;
-    margin-right:30px;
-}
-div#secondary li a {
-    color:black;
-}
-div#secondary li a:hover {
-    color:#270A5A;
-    text-decoration:none;
-}
-div#secondary li:last-child {
-    margin-right:0;
-}
 
 div#navigation {
     background-color:black;
@@ -144,27 +125,25 @@ div#navigation li.slices {
     position:relative;
     cursor:pointer;
 }
-div#navigation .dropdown-menu {
-    color:white;
+div.navigation .dropdown-menu {
+    color:black;
     padding:0 15px 15px 15px;
     margin-top:5px;
     margin-left:-16px;
-    background-color:black;
 }
-div#navigation .dropdown-menu a {
-    color:white;
+div.navigation .dropdown-menu a {
+    color:black;
 }
 
-div#menu-slice-list{
+div.menu-slice-list {
     display:none;
     position:absolute;
-    background-color:black;
     padding:15px;
     left:-15px;
     z-index:10;
 }
 
-div#navigation .dropdown-menu li:first-child {
+div.navigation .dropdown-menu li:first-child {
     border-bottom:1px solid white;
     padding-bottom:5px;
      
@@ -242,24 +221,6 @@ div#home-dashboard div#home-slice-list li {
     
 }
 
-.login-submit {
-    vertical-align:middle;
-    padding:0;
-}
-.lost-password {
-    font-size:10pt;
-    color:#CCCCCC;
-    text-align:right;
-    padding:0px;
-}
-.lost-password a {
-}
-.login-signup {
-    border-top:1px solid #CCCCCC;
-    text-align:center;
-    margin-top:15px;
-    padding:5px 0 0 0;
-}
 /**/
 
 /**/
@@ -485,4 +446,199 @@ tr.active, tr.active td {
 div.dataTables_filter label{
     float:left;
     width:400px;
+}
+
+/**/
+.header {
+  -moz-box-shadow:    0 0 1px rgba(82,82,82,0.6);
+  -webkit-box-shadow: 0 0 1px rgba(82,82,82,0.6);
+  box-shadow:         0 0 1px rgba(82,82,82,0.6);
+  height:61px;
+  background-color:white;
+}
+div.navigation {
+    
+}
+div.navigation ul {
+    margin:26px 0 0 0;
+    padding:0;
+    display: inline-block;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+div.navigation li {
+    color:#0C0047;
+    font-family:open_sansbold, sans-serif;
+    font-size:9pt;
+    font-weight:normal;
+    line-height:0.8em;
+    letter-spacing:0.4pt;
+    list-style:none;
+    float:left;
+    padding:0 15px;
+    margin:0;
+    text-transform:uppercase;
+}
+div.navigation li:hover {
+}
+div.navigation li a {
+    color:#0C0047;
+}
+div.navigation li a:hover, div.navigation li a.current {
+    color:#760073;
+    text-decoration:none;
+}
+
+div.navigation li:last-child {
+    margin-right:0;
+}
+div.secondary {
+    text-align:right;
+}
+
+div.secondary ul {
+   margin:6px 0 0 0;
+   padding:0;
+}
+
+div.secondary li {
+    font-size:9pt;
+    display:inline;
+    list-style:none;
+    margin:0px;
+    padding:0;
+    margin-right:15px;
+    color:#747474;
+    letter-spacing:0.4px;
+}
+div.secondary li:last-child {
+    margin-right:0;
+}
+div.secondary li a {
+    color:#747474;
+}
+div.secondary li a:hover {
+    text-decoration:none;
+}
+div.secondary .button {    
+    width:300px;
+    margin-top:15px;
+}
+div.secondary .account {
+    margin-top:10px;
+    padding:0;
+    font-size:9pt;
+    color:gray;
+    text-align:right;
+}
+div.secondary .account span {
+    font-size:8pt;
+}
+div.secondary .account a {
+    color:black;
+}
+div.home {
+    font-size:11pt;
+    line-height:1.2em;
+    letter-spacing:0.3pt;
+    min-height:500px;
+    background-image: url('../img/bg-experiment.png');
+    background-repeat:no-repeat;
+    background-size:cover;
+    background-position:center top;
+    background-color:#086274;
+    padding:100px 0;
+}
+div.home h2 {
+    color:white;
+    line-height:1.2em;
+    font-size:18pt;
+}
+div.home h3 {
+    color:white;
+    line-height:1.4em;
+}
+div.dashboard {
+    text-align:center;
+}
+div.dashboard div {
+    margin:25px 0;
+}
+div.dashboard ul {
+    text-align:left;
+    margin-left:24px;
+    list-style:none;
+}
+div.registration-form {
+    padding-top:150px;
+    text-align:center;
+}
+div.login-form input[type=text] {
+    
+    
+
+}
+.login-form input {
+    font-size:12pt;
+    width:320px;
+    padding:8px;
+    border:1pt solid #22606D;
+}
+.login-form input[type=submit] {
+    border:0;
+    border-bottom:2px solid #540086;
+    background-color:#302562;
+    color:white;
+    width:100px;
+    border-radius:5px;
+    font-size:12pt;
+}
+
+.login-submit {
+    vertical-align:middle;
+    padding:0;
+}
+.lost-password {
+    font-size:10pt;
+    color:black;
+    text-align:right;
+    padding:0px;
+}
+.lost-password a {
+    color:white;
+    text-shadow:0.5px 0.5px black;
+}
+.login-signup {
+    font-size:12pt;
+    color:white;
+    text-shadow:0.5px 0.5px black;
+    margin-top:45px;
+    padding:5px 0 0 4px;
+    
+}
+.login-signup a {
+    color:white;
+    text-shadow:0.5px 0.5px black;
+    padding-bottom:2px;
+    border-bottom:2pt solid white;
+}
+.login-signup a:hover {
+    text-decoration:none;
+}
+.login-signup button {
+    padding:8px;
+    border:0;
+    border-bottom:2px solid #540086;
+    background-color:#302562;
+    color:white;
+    width:100px;
+    border-radius:5px;
+    font-size:12pt;
+}
+div.slogan {
+    text-align:center;
+    color:white;
+    padding-top:60px;
+    text-shadow: 1px 1px #013540;
 }

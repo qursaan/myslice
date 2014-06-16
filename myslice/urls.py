@@ -28,7 +28,8 @@ import portal.sliceresourceview
 import portal.slicetabexperiment
 import portal.slicetabinfo
 import portal.slicetabtestbeds
-import portal.slicetabusers 
+import portal.slicetabusers
+import portal.slicetabmeasurements 
 
 #### high level choices
 # main entry point (set to the / URL)
@@ -87,6 +88,7 @@ urls = [
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     (r'^info/(?P<slicename>[^/]+)/?$', portal.slicetabinfo.SliceInfoView.as_view()),
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
+    (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
     url(r'^portal/', include('portal.urls')),
 
