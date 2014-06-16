@@ -79,64 +79,7 @@
         // how to raise manifold events
         set_state: function(data, username)
         {
-            var action;
-            var msg;
-            var button = '';
-            var username = username;
-
-            var uncheck = false;
-
-            switch(data.request) {
-                case FIELD_REQUEST_ADD_RESET:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    $('#sla_dialog').hide();
-                    // find line and delete it                    
-                    // row = this.find_row(data.value);
-                    // if (row)
-                    //     this.table.fnDeleteRow(row.nTr);
-                        // $("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
-                        // $("#badge-pending").text($("#badge-pending").data('number'));
-                    return;
-                case FIELD_REQUEST_CHANGE:
-                    action = 'UPDATE';
-                    break;
-                case FIELD_REQUEST_ADD:
-                    action = 'ADD';
-
-                    if (data.value.toLowerCase().indexOf("iminds") >= 0){
-
-                        $('#sla_dialog').show();
-                        $('#slamodal').modal('show');
-                        
-                        $(document).ready(function() {
-                            $("#accept_sla").click(function(){
-                                console.log("SLA ACCEPTED");
-                                console.log("With username: " + username);
-                                $.post("/sla/agreements/simplecreate", {"template_id":"iMindsServiceTemplate","user":username});
-                                $('#slamodal').modal('hide');
-                            }); 
-                        });
-
-                        $(document).ready(function() {
-                            $("#dismiss_sla").click(function(){
-                                console.log("SLA NOT ACCEPTED");
-                                // FIX ME: This is not a good solution to prevent the checkbox click
-                                var chkbox = document.getElementById((data.value).replace(/"/g,''));
-                                if(chkbox.checked){
-                                    chkbox.click();
-                                }
-                                $('#slamodal').modal('hide');
-                                
-                            }); 
-                        });
-
-                    }
-
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                    action = 'REMOVE';
-                    break;
-            }
+            
         },
 
         post_agreement: function()

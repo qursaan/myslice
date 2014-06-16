@@ -344,8 +344,13 @@ class AgreementSimple(APIView):
             return self.build_response(400, 'Invalid user')
 
         try:
+            expiration_time = data['expiration_time']
+        except:
+            return self.build_response(400, 'Invalid expiration_time')
+
+        try:
             print "Calling createagreementsimplified with template_id:",template_id,"and user:",user
-            result = fed4fireservice.createagreementsimplified(template_id, user)
+            result = fed4fireservice.createagreementsimplified(template_id, user, expiration_time)
             print result
         except Exception, e:
             print traceback.format_exc()
