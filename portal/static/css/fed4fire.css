@@ -488,8 +488,8 @@ div#appservices div.row {
     padding: 15px 15px;
 }
 
-div.portfolio-item {
-    
+div.portfolio-item img{
+    width: 150px;
 }
 
 div.portfolio-item p[id*='name-'] {
