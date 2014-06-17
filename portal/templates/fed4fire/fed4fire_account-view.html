@@ -217,14 +217,17 @@
 		    			<td class="odd"> {{ row.cred_exp }} </td>
 						<td class="odd">
 							<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
-								<span class="glyphicon glyphicon-download"></span> Download
+								<span class="glyphicon glyphicon-download"></span> Credential
+							</button>
+							<button class="btn btn-default btn-xs" name= "dl_user_cert" type="submit" title="Download User Certificate">
+								<span class="glyphicon glyphicon-download"></span> Crertificate
 							</button>
 						</td>
 					</tr>
 					{%endfor%}
 				 </table>
 				<p></p>
-				<table class="mytable table table-bordered table-hover">
+				<table class="mytable table table-bordered table-hover" style="width:100px;">
 					<caption><b>Delegated Slice Credentials</b></caption>  
 		     		<tr class="odd"> 
 						<th>Slice Name</th> 
@@ -244,7 +247,7 @@
 		     		{%endfor%}
 		  		</table>
 				<p></p>
-				<table class="mytable table table-bordered table-hover">
+				<table class="mytable table table-bordered table-hover" style="width:100px;">
 		   			<caption><b>Delegated Authority Credentials</b></caption>
 		   			<tr class="odd"> 
 		       			<th>Authority Name</th> 

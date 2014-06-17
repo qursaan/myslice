@@ -1,5 +1,7 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
+from sfa.trust.credential               import Credential
+#
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, sfa_get_user
@@ -513,7 +515,30 @@ def account_process(request):
         else:
             messages.error(request, 'Download error: User credential  is not stored in the server')
             return HttpResponseRedirect("/portal/account/")
-        
+
+    # Download user_cert
+    elif 'dl_user_cert' in request.POST:
+        if 'user_credential' in account_config:
+            user_cred = account_config['user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+
+        elif 'delegated_user_credential' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+        else:
+            messages.error(request, 'Download error: User credential  is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+       
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")
