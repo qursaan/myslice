@@ -117,6 +117,7 @@ class Client(object):
         result = requests.get(url, **kwargs)
         print "GET {} {} {}".format(
             result.url, result.status_code, result.text[0:70])
+
         return result
     
     def post(self, path, data=None, **kwargs):
@@ -279,8 +280,19 @@ class Agreements(object):
         """
         path = _buildpath_(agreementid, "guaranteestatus")
         r = self.res.client.get(path, headers={'accept': 'application/json'})
+
+        print "---- JSON Response ----"
+        print r.text
+
         json_obj = r.json()
+        print "-- json_obj() --"
+        print type(json_obj)
+        print json_obj
+        
         status = wsag_model.AgreementStatus.json_decode(json_obj)
+
+        print "---- STATUS ----"
+        print status
 
         return status, r
     

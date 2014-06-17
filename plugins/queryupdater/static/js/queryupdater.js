@@ -93,12 +93,13 @@
             var flagVW = false;
             var  flagWi = false;
 
+            promt.append('<p>SLA description</p>');
+            
             var wilabForm = "";
-            var wimessage = '<p>SLA description</p><p>to be deployed</p>';
+            wilabForm += "<ul>";
             for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<p class="wi'+iter+'" name=wi"'+iter+'">'+arrayselectedresources[iter].toLowerCase()+'</p><br>';
+                var list = '<li class="wi'+iter+'" name=wi"'+iter+'">'+arrayselectedresources[iter].toLowerCase()+'</li>';
                 
-
                 if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
 
                     accepted_sla.push({"wilab2":false}); 
@@ -108,12 +109,14 @@
                 }
 
             }
+            wilabForm += "</ul>";
 
             //var wallmessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>';
 
             var wallForm = "";
+            wallForm += "<ul>";
             for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<class="wall'+iter+'" name=wall"'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'</p><br>';
+                var list = '<li class="wall'+iter+'" name=wall"'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'</li>';
                 
                 if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
 
@@ -124,18 +127,23 @@
                 }
 
             }
-            promt.append(wimessage);
+            wallForm += "</ul>";
+            
             var flagDouble = false;
             if(flagWi)
             {
                 flagDouble = true;
+                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>');
                 promt.append(wilabForm);
+                promt.append('<br />');
             }
             if(flagVW)
             {
                 //promt.append(wallmessage);
                 flagDouble = true;
+                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>');
                 promt.append(wallForm);
+                promt.append('<br />');
             }
 
                         
@@ -182,7 +190,7 @@
                                     $('#slamodal-wilab2').modal('hide');
                                 accepted_sla["wilab2"] = true;
                             
-                                //this.do_update(e);
+                                this.do_update(e);
                             }
                         }); 
                     
