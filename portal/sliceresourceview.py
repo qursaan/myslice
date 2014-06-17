@@ -202,8 +202,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
 
-        query_network = Query.get('network').select(network_fields)
-        page.enqueue_query(query_network)
+        #query_network = Query.get('network').select(network_fields)
+        #page.enqueue_query(query_network)
 
         filter_testbeds = TestbedsPlugin(
             page          = page,
@@ -211,7 +211,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             title         = 'Filter by testbeds',
             query         = sq_resource,
             query_all     = query_resource_all,
-            query_network = query_network,
+            #query_network = query_network,
             init_key      = "network_hrn",
             checkboxes    = True,
             datatables_options = {
