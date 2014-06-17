@@ -2,7 +2,7 @@
 <div class="col-md-2">
 </div>
 
- <div class="col-md-8">
+ <div class="col-md-9">
    <div class="row" id="agreements">
     <table class="table dataTable" id="sla_table" >
         <thead>
@@ -48,14 +48,14 @@
                  <dd>{{ a.agreement_id|default:"&nbsp;" }}</dd>
                  <dt>Provider</dt>
                  <dd>{{ a.context.provider|default:"&nbsp;" }}</dd>
-                 <dt>Consumer</dt>
+                 <dt>Experimenter</dt>
                  <dd>{{ a.context.consumer|default:"&nbsp;" }}</dd>
                  <dt>Service</dt>
                  <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the resources during the sliver lifetime</dd>
                  <dt>Testbed</dt>
                  <dd>{{ a.context.testbed_formatted }}</dd>
                  <dt>Accepted on:</dt>
-                 <dd>{{ a.context.expirationtime|default:"&nbsp;" }}</dd>
+                 <dd>{{ a.context.time_formatted|default:"&nbsp;" }}</dd>
 			</div>
 			<div class="modal-footer">
  				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -67,47 +67,89 @@
        <tr>
        		{% if a.guaranteestatus == "VIOLATED" %}
        		<td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
-        	{% else %}
+        	{% elif a.guaranteestatus == "FULFILLED" %}
         	<td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+          {% else %}
+          <td></td>
         	{% endif %}
-    		<td>{{ a.context.template_id }}</td>
-            <td>{{ a.context.expirationtime }}</td>
-            <td>
-                {% with a.agreement_id as key %}
-                {% if enforcements.key == false %}
-                  Disabled
-                {% else %}
-                  Enabled
-                {% endif %}
-                {% endwith %}
-            </td>
-            <!-- <td>{{slicename}}</td> -->
-            <td>
-                <!-- <a class="agreement-detail" href="{% url "agreement_details" a.agreement_id %}" data-toggle="modal" data-target="#agreementModal">View Agreement</a> -->
-                <!-- <a class="agreement-detail" href="#" data-agreement="{{ a.agreement_id }}">View Agreement</a> -->
-                <a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{a.agreement_id}}">View Agreement</a>
-            </td>
+    		  <td>{{ a.context.template_id }}</td>
+          <td>{{ a.context.time_formatted }}</td>
+          
+          {% with a.agreement_id as key %}
+          
+          <td>
+              <!-- <a class="agreement-detail" href="{% url "agreement_details" a.agreement_id %}" data-toggle="modal" data-target="#agreementModal">View Agreement</a> -->
+              <!-- <a class="agreement-detail" href="#" data-agreement="{{ a.agreement_id }}">View Agreement</a> -->
+              <a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{a.agreement_id}}">View Agreement</a>
+          </td>
 
-            {% for tname,t in a.guaranteeterms.items %}
+          {% for k,v in enforcements.items %}
+            {% if key == k %}
+              <td>
+              {% if v == "ACTIVE" %}
+                In progress
+              {% elif v == "UNACTIVE" %}
+                Disabled
+              {% endif %}
+              </td>
+
+              {% if a.guaranteestatus == "VIOLATED" and v == "UNACTIVE" %}
+              <td style="font-weight: bold">
+                Result: 99% uptime for
+                {% for vi, value in last_violation_list.items %}
+                  {% if a.agreement_id == vi %}
+                      {{ value }}%
+                  {% endif %}
+                {% endfor %}
+                resources
+              </td>
+              {% elif a.guaranteestatus == "FULFILLED" and v == "UNACTIVE" %}
+              <td style="font-weight: bold">
+                Result: 99% uptime for
+                {% for vi, value in last_violation_list.items %}
+                  {% if a.agreement_id == vi %}
+                      {{ value }}%
+                  {% endif %}
+                {% endfor %}
+                resources
+              </td>
+              {% endif %}
+            {% endif %}
+
+          {% endfor %}
+          
+          <!-- <td>{{slicename}}</td> -->
+
+          
+
+          
+              
+
+            {% endwith %}
+            <!-- {% for tname,t in a.guaranteeterms.items %}
             <td> {{ t.servicelevelobjective.kpiname }}</td>
             <td>
                 {% if t.status == "VIOLATED" %}
 
-                  <!-- <a class="violation-detail" href="{% url "agreement_term_violations" a.agreement_id t.name %}" data-toggle="modal" data-target="#violationModal">View Violations</a>
+                  <a class="violation-detail" href="{% url "agreement_term_violations" a.agreement_id t.name %}" data-toggle="modal" data-target="#violationModal">View Violations</a>
                   <a class="violation-detail" href="#"
                   			data-agreement="{{ a.agreement_id }}" 
-                  			data-violation="{{ t.name }}">View Violations</a> -->
-                  <a class="violation-detail" href="#" data-agreement="{{ a.agreement_id }}" data-violation="{{ t.name }}">View Violations</a>
+                  			data-violation="{{ t.name }}">View Violations</a>
+                  <a class="violation-detail" href="#" data-agreement="{{ a.agreement_id }}" data-violation="{{ t.name }}">{{last_violation_list}}</a>
+                  {{ t.name }}
 
                 {% endif %}
             </td>
             <td id="status" style="display:none;">
                 {{ a.statusclass }}
             </td>
-            {% endfor %}
+            {% endfor %} -->
+
+
+            
         </tr>
         
-        {% empty %}
+        
         {% endfor %}
         </tbody>
 

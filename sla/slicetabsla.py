@@ -92,6 +92,7 @@ class SLAView (FreeAccessView, ThemeView):
         consumer_id = None
         agreement_id = None
         enforcements = {}
+        violations = {}
 
         filter_ = None
         form = FilterForm(request.GET)
@@ -100,15 +101,21 @@ class SLAView (FreeAccessView, ThemeView):
              filter_ = _get_filter_from_form(form)
 
         consumer_id = _get_consumer_id(request)
-
+        
         agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
-
+        
         for agreement in agreements:
             enf = _get_enforcement(agreement.agreement_id)
-            enforcements[agreement.agreement_id] = enf.enabled
-        
-        for key, value in enforcements.items():
-            print key + ": " + value
+            if enf.enabled == 'true':
+                enforcements[agreement.agreement_id] = "ACTIVE"
+            else:
+                enforcements[agreement.agreement_id] = "UNACTIVE"
+            violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
+            
+            if len(violations_list):
+                violations[agreement.agreement_id] = float(violations_list[0]["actualValue"])*100
+            else:
+                violations[agreement.agreement_id] = 100
 
         template_env = {}
        # write something of our own instead
@@ -118,6 +125,7 @@ class SLAView (FreeAccessView, ThemeView):
         template_env['username'] = request.user
         template_env['slicename'] = slicename
         template_env['enforcements'] = enforcements
+        template_env['last_violation_list'] = violations
        
        # the prelude object in page contains a summary of the requirements() for all plugins
        # define {js,css}_{files,chunks}
@@ -224,12 +232,17 @@ def agreement_term_violations(request, agreement_id, guarantee_name):
         # If page is out of range (e.g. 9999), deliver first page.
         violation_page = paginator.page(1)
     
+    print "\n******************"
+    print violations[-1]
+    print "******************\n"
+
     context = {
         'agreement_id': agreement_id,
         'guarantee_term': agreement.guaranteeterms[guarantee_name],
         'violations': violation_page,
         'agreement': agreement,
         'slicename': slicename,
+        'last_violation': violations[-1].actual_value
     }
     
     context.update(prelude_env)

@@ -30,6 +30,11 @@ class Agreement(object):
         def testbed_formatted(self):
             return self.template_id.replace('Service', ' - ')
 
+        def time_formatted(self):
+            import dateutil.parser
+            time = dateutil.parser.parse(self.expirationtime)
+            return time.strftime('%d-%m-%Y at %H:%M:%S')
+
     class Property(object):
         def __init__(self):
             self.servicename = ""
@@ -187,7 +192,7 @@ class Violation(object):
         self.contract_uuid = ""
         self.service_scope = ""
         self.metric_name = ""
-        self.datetime = datetime.now()
+        self.datetime = datetime.utcnow()
         self.actual_value = 0
 
     def __repr__(self):
@@ -200,6 +205,11 @@ class Violation(object):
                 self.datetime,
                 self.actual_value)
         )
+
+    def format_time(self):
+        # return datetime.strptime(self.datetime.datetime.utcnow,'%Y-%m-%d %H:%M:%S')
+        # return str(datetime.fromtimestamp(self.datetime))
+        return str(self.datetime)
 
 
 class Provider(object):
