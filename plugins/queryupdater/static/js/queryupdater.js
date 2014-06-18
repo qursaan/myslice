@@ -79,6 +79,7 @@
 
             var accepted_sla = Array();
             var count = 0;
+            var self = e.data;
             // XXX check that the query is not disabled
 
             console.log("DATA VALUE: " + data.value);
@@ -149,9 +150,25 @@
                         
             // var wimessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>'
 
+            if(flagWi || flagVW){
                 $('#sla_dialog').show();
+
                     $('#slamodal-wilab2').modal('show');
-                    
+            }
+            else
+            {
+                
+
+                var username = e.data.options.username;
+                var urn = data.value;
+                // XXX check that the query is not disabled
+
+                self.spin();
+                console.log("do_update");
+                // XXX check that the query is not disabled
+                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                return;
+            }
                     
                         $("#accept_sla_wilab2").click(function(){
                             console.log("SLA ACCEPTED");
@@ -190,7 +207,7 @@
                                     $('#slamodal-wilab2').modal('hide');
                                 accepted_sla["wilab2"] = true;
                             
-                                this.do_update(e);
+                                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
                             }
                         }); 
                     
@@ -198,6 +215,10 @@
                             console.log("SLA NOT ACCEPTED");
                             $('#slamodal-wilab2').modal('hide');
                         }); 
+                
+            // } else {
+            //     this.do_update(e);
+            // }
 
             // for(var iter = 0; iter < arrayselectedresources.length; iter++){
             //     var list = '<input type="checkbox" name="'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'<br>';
