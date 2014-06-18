@@ -209,6 +209,7 @@
                             
                                 manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
                             }
+                            $('#modal-body').empty();
                         }); 
                     
                         $("#dismiss_sla_wilab2").click(function(){
