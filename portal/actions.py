@@ -551,7 +551,10 @@ def create_pending_user(wsgi_request, request, user_detail):
     theme.template_name = 'activate_user_email_subject.txt'
     subject = render_to_string(theme.template, request)
     subject = subject.replace('\n', '')
-    sender = 'support@myslice.info'
+    #sender = 'support@myslice.info'
+    theme.template_name = 'email_default_sender.txt'
+    sender =  render_to_string(theme.template, request)
+    sender = sender.replace('\n', '')
     recipient = [request['email']]
     #recipient = recipient.append(request['email'])
 
