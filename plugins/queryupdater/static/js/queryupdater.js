@@ -214,6 +214,7 @@
                         $("#dismiss_sla_wilab2").click(function(){
                             console.log("SLA NOT ACCEPTED");
                             $('#slamodal-wilab2').modal('hide');
+                            $('#modal-body').empty();
                         }); 
                 
             // } else {
