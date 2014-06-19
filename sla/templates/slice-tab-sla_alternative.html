@@ -1,0 +1,167 @@
+
+<div class="col-md-2">
+</div>
+
+
+<!-- Modal - columns selector -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Agreement details</h4>
+            </div>
+            <div class="modal-body">
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+                          <!-- Modal - columns selector -->
+<div class="modal fade" id="violationModal" tabindex="-1" role="dialog" aria-labelledby="myModalViolations" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalViolations">Violations</h4>
+            </div>
+            <div class="modal-body">
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <div class="col-md-8">
+    <div class="row" id="agreements">
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <dt>
+                            <span class="glyphicon glyphicon-chevron-down"></span> 
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Provider</a>
+                        </dt>
+                        <dd>{% with agreements|first as a %}{{ a.context.provider }}{% endwith %}</dd>
+                    </h4>
+                </div>
+
+           
+                {% for a in agreements %}
+
+                <div id="collapseOne" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <table class="table">
+                           <tr>
+                           		{% if a.guaranteestatus == "VIOLATED" %}
+                           		<td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
+                            	{% else %}
+                            	<td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+                            	{% endif %}
+                        		<td>{{ a.context.template_id }}</td>
+                                <!-- <td>{{slicename}}</td> -->
+                                <td>
+                                    <!-- <a class="agreement-detail" href="{% url "agreement_details" a.agreement_id %}" data-toggle="modal" data-target="#agreementModal">View Agreement</a> -->
+                                    <!-- <a class="agreement-detail" href="#" data-agreement="{{ a.agreement_id }}">View Agreement</a> -->
+                                    <a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{a.agreement_id}}">View Agreement</a>
+                                </td>
+
+                                {% for tname,t in a.guaranteeterms.items %}
+                                <td> {{ t.servicelevelobjective.kpiname }}</td>
+                                <td>
+                                    {% if t.status == "VIOLATED" %}
+
+                                      <!-- <a class="violation-detail" href="{% url "agreement_term_violations" a.agreement_id t.name %}" data-toggle="modal" data-target="#violationModal">View Violations</a>
+                                      <a class="violation-detail" href="#"
+                                      			data-agreement="{{ a.agreement_id }}" 
+                                      			data-violation="{{ t.name }}">View Violations</a> -->
+                                      <a class="violation-detail" href="#" data-agreement="{{ a.agreement_id }}" data-violation="{{ t.name }}">View Violations</a>
+
+                                    {% endif %}
+                                </td>
+                                <td id="status" style="display:none;">
+                                    {{ a.statusclass }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Modal - columns selector -->
+                <div class="modal fade" id="agreementModal{{a.agreement_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            
+                    <style type="text/css" scoped>
+                            .modal-lg {
+                              width: 50%;
+                            }
+                    </style>
+                            
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalAgreement">Agreement details</h4>
+                            </div>
+                            <div class="modal-body">
+
+                                 <dt>Agreement Id</dt>
+                                 <dd>{{ a.agreement_id|default:"&nbsp;" }}</dd>
+                                 <dt>Provider</dt>
+                                 <dd>{{ a.context.provider|default:"&nbsp;" }}</dd>
+                                 <dt>Consumer</dt>
+                                 <dd>{{ a.context.consumer|default:"&nbsp;" }}</dd>
+                                 <dt>Service</dt>
+                                 <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the resources during the sliver lifetime</dd>
+                                 <dt>Template identfier</dt>
+                                 <dd>{{ a.context.template_id }}</dd>
+                                 <dt>Expiration time</dt>
+                                 <dd>{{ a.context.expirationtime|default:"&nbsp;" }}</dd>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% empty %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div class="row" style="float:right;">
+    <button id="showEvaluations" type="button" class="btn btn-default"  onclick="displayDate()"><span class="glyphicon"></span>Show Evaluations</button>
+</div> -->
+
+<script>
+$(document).ready(function() {
+	$('a.violation-detail').click(function () {
+		var a = $(this).data('agreement');
+		var v = $(this).data('violation');
+		$("#sla").load('/sla/agreements/' + a + '/guarantees/' + v + '/violations', {'slicename': '{{ slicename }}'});
+	});
+	
+	// $('a.agreement-detail').click(function () {
+	// 	var a = $(this).data('agreement');
+	// 	$("#sla").load('/sla/agreements/' + a + '/detail');
+	// });
+
+	// $('tr.header').click(function(){
+	// 	$(this).nextUntil('tr.header').toggle('fast');
+	// 	$('.header .glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+	// });
+});
+
+</script>

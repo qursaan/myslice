@@ -19,6 +19,7 @@ from plugins.queryupdater            import QueryUpdater
 from plugins.testbeds                import TestbedsPlugin
 from plugins.scheduler2              import Scheduler2
 from plugins.columns_editor          import ColumnsEditor
+from plugins.sladialog               import SlaDialog
 from plugins.lists.simplelist        import SimpleList
 
 from myslice.theme import ThemeView
@@ -191,6 +192,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             toggled             = False,
             domid               = 'pending',
             outline_complete    = True,
+            username            = request.user,
         )
 
         # --------------------------------------------------------------------------
@@ -200,8 +202,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
 
-        query_network = Query.get('network').select(network_fields)
-        page.enqueue_query(query_network)
+        #query_network = Query.get('network').select(network_fields)
+        #page.enqueue_query(query_network)
 
         filter_testbeds = TestbedsPlugin(
             page          = page,
@@ -209,7 +211,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             title         = 'Filter by testbeds',
             query         = sq_resource,
             query_all     = query_resource_all,
-            query_network = query_network,
+            #query_network = query_network,
             init_key      = "network_hrn",
             checkboxes    = True,
             datatables_options = {
@@ -217,6 +219,21 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'bLengthChange' : True,
                 'bAutoWidth'    : True,
                 },
+        )
+
+        # --------------------------------------------------------------------------
+        # SLA View and accept dialog
+        
+        sla_dialog = SlaDialog(
+            page                = page,
+            title               = 'sla dialog',
+            query               = main_query,
+            togglable           = False,
+            # start turned off, it will open up itself when stuff comes in
+            toggled             = True,
+            domid               = 'sla_dialog',
+            outline_complete    = True,
+            username            = request.user,
         )
 
         template_env = {}
@@ -230,6 +247,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
         template_env['pending_resources'] = pending_resources.render(self.request)
+        template_env['sla_dialog'] = sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
         template_env["slice"] = slicename

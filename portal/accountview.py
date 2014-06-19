@@ -1,5 +1,8 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
+from sfa.trust.credential               import Credential
+from sfa.trust.certificate              import Keypair
+#
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, sfa_get_user
@@ -15,6 +18,8 @@ from myslice.theme import ThemeView
 
 #
 import json, os, re, itertools
+from OpenSSL import crypto
+from Crypto.PublicKey import RSA
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView, ThemeView):
@@ -326,7 +331,6 @@ def account_process(request):
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
-                        from Crypto.PublicKey import RSA
                         private = RSA.generate(1024)
                         private_key = json.dumps(private.exportKey())
                         public  = private.publickey()
@@ -511,9 +515,77 @@ def account_process(request):
             response['Content-Disposition'] = 'attachment; filename="user_cred.txt"'
             return response
         else:
-            messages.error(request, 'Download error: User credential  is not stored in the server')
+            messages.error(request, 'Download error: User credential is not stored in the server')
             return HttpResponseRedirect("/portal/account/")
-        
+
+    # Download user_cert
+    elif 'dl_user_cert' in request.POST:
+        if 'user_credential' in account_config:
+            user_cred = account_config['user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+
+        elif 'delegated_user_credential' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+        else:
+            messages.error(request, 'Download error: User credential is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+
+    # Download user p12 = private_key + Certificate
+    elif 'dl_user_p12' in request.POST:
+        if 'user_credential' in account_config and 'user_private_key' in account_config:
+            user_cred = account_config['user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+
+            user_private_key = account_config['user_private_key'].encode('ascii')
+            pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
+
+            p12 = crypto.PKCS12()
+            p12.set_privatekey(pkey)
+            p12.set_certificate(cert)       
+            pkcs12 = p12.export()
+
+            response = HttpResponse(pkcs12, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
+            return response
+
+        elif 'delegated_user_credential' in account_config and 'user_private_key' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+
+            user_private_key = account_config['user_private_key'].encode('ascii')
+            pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
+
+            p12 = crypto.PKCS12()
+            p12.set_privatekey(pkey)
+            p12.set_certificate(cert)       
+            pkcs12 = p12.export()
+
+            response = HttpResponse(pkcs12, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
+            return response
+        else:
+            messages.error(request, 'Download error: User private key or credential is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+
+
+
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")

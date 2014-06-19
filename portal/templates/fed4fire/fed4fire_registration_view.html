@@ -22,8 +22,11 @@
 	<div class="form-group">
   		<label for="authority_hrn" class="control-label">Authority</label>
 		<p></p>
-  		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" placeholder="fed4fire" required>
-  		<p class="help-block">If your organization does not deploy a Fed4FIRE authority itself,<br> you can use the default one called "fed4fire".</p> 
+  		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" placeholder="fed4fire.global" required>
+  		<p class="help-block">If your organization does not deploy a Fed4FIRE authority itself, you can use the<br> default one called "fed4fire.global".
+		If your organization however does provide a<br> Fed4FIRE authority itself, please make sure to select it here. If you start typing<br> your organization's
+		 name, it will pop up.
+		</p> 
 	</div>
 
 	<div class="row">
@@ -119,6 +122,10 @@
 </div>
 <script>
 jQuery(document).ready(function(){
+    //this .load is useless here
+    $("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+        $(this).attr("value", 'fed4fire.global');
+    });
     var availableTags = [
     {% if authorities %}
         {% for authority in authorities %}

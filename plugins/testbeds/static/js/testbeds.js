@@ -29,7 +29,7 @@
 
             /* Member variables */
             this.filters = Array();
-
+            this.testbeds = Array();
             /* Plugin events */
 
             /* Setup query and record handlers */
@@ -39,7 +39,6 @@
             // Some can be less efficient
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');
-            this.listen_query(options.query_network_uuid, 'network');
 
             /* GUI setup and event binding */
             // call function
@@ -114,17 +113,25 @@
         // ... be sure to list all events here
 
         /* RECORD HANDLERS */
-        on_network_new_record: function(record)
+        on_all_new_record: function(record)
         {
-            row  = '<a href="#" class="list-group-item sl-platform" id="testbeds-filter_'+record["network_hrn"]+'" data-platform="'+record["network_hrn"]+'">';
-            row += '<span class="list-group-item-heading">'+record["platform"]+'</span>';
-            //row += '<span class="list-group-item-heading">'+record["network_hrn"]+'</span></a>';
-            row += '<p class="list-group-item-text">'+record["network_hrn"]+'</p></a>';
-            $('#testbeds-filter').append(row);
+            var self = this;
+            // If the resource has a network_hrn
+            if(record["network_hrn"]!="None" && record["network_hrn"]!="" && record["network_hrn"]!=null){
+                // If this network_hrn is not listed yet
+                if(jQuery.inArray(record["network_hrn"],self.testbeds)==-1){
+                    row  = '<a href="#" class="list-group-item sl-platform" id="testbeds-filter_'+record["network_hrn"]+'" data-platform="'+record["network_hrn"]+'">';
+                    //row += '<span class="list-group-item-heading">'+record["platform"]+'</span>';
+                    //row += '<span class="list-group-item-heading">'+record["network_hrn"]+'</span></a>';
+                    row += '<p class="list-group-item-heading">'+record["network_hrn"]+'</p></a>';
+                    $('#testbeds-filter').append(row);
+                    self.testbeds.push(record["network_hrn"]);
+                }
+            }
         },
 
-        /* When the network query is done, add the click event to the elements  */
-        on_network_query_done: function() {
+        /* When the query is done, add the click event to the elements  */
+        on_all_query_done: function() {
             var self = this;
             console.log('query network DONE');
             $("[id^='testbeds-filter_']").on('click',function(e) {

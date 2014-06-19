@@ -35,6 +35,7 @@
             var self = this;
 
             this.initial = Array();
+            this.selected_resources = Array();
 
             this.table = this.elmt('table').dataTable({
 // the original querytable layout was
@@ -43,7 +44,7 @@
                 sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t>",
 // so this does not matter anymore now that the pagination area is turned off
 //                sPaginationType: 'bootstrap',
-		bAutoWidth: true,
+		      bAutoWidth: true,
 //                bJQueryUI      : true,
 //                bRetrieve      : true,
 //                sScrollX       : '100%',                 // Horizontal scrolling 
@@ -59,7 +60,7 @@
              });
             
             // XXX This should not be done at init...
-            this.elmt('update').click(this, this.do_update);
+            this.elmt('update').click(this, this.do_checksla);
             this.elmt('refresh').click(this, this.do_refresh);
             this.elmt('reset').click(this, this.do_reset);
             this.elmt('clear_annotations').click(this, this.do_clear_annotations);
@@ -71,17 +72,249 @@
 
         /***************************** GUI EVENTS *****************************/
 
+        do_checksla: function(e) {
+            var username = e.data.options.username;
+            var urn = data.value;
+            var arrayselectedresources = data.selected_resources;
+
+            var accepted_sla = Array();
+            var count = 0;
+            var self = e.data;
+            // XXX check that the query is not disabled
+
+            console.log("DATA VALUE: " + data.value);
+            
+            //<p>SLA description</p>
+            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>
+            //<p>SLA description</p>
+            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>
+            var promt = $('#modal-body');
+            
+            // id="myModalLabel"
+            var flagVW = false;
+            var  flagWi = false;
+
+            promt.append('<p>SLA description</p>');
+            
+            var wilabForm = "";
+            wilabForm += "<ul>";
+            for(var iter = 0; iter < arrayselectedresources.length; iter++){
+                var list = '<li class="wi'+iter+'" name=wi"'+iter+'">'+arrayselectedresources[iter].toLowerCase()+'</li>';
+                
+                if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
+
+                    accepted_sla.push({"wilab2":false}); 
+                    wilabForm += list;   
+                    flagWi = true;             
+
+                }
+
+            }
+            wilabForm += "</ul>";
+
+            //var wallmessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>';
+
+            var wallForm = "";
+            wallForm += "<ul>";
+            for(var iter = 0; iter < arrayselectedresources.length; iter++){
+                var list = '<li class="wall'+iter+'" name=wall"'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'</li>';
+                
+                if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
+
+                    accepted_sla.push({"wall2":false});
+                    wallForm += list;
+                    flagVW = true;
+                    
+                }
+
+            }
+            wallForm += "</ul>";
+            
+            var flagDouble = false;
+            if(flagWi)
+            {
+                flagDouble = true;
+                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>');
+                promt.append(wilabForm);
+                promt.append('<br />');
+            }
+            if(flagVW)
+            {
+                //promt.append(wallmessage);
+                flagDouble = true;
+                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>');
+                promt.append(wallForm);
+                promt.append('<br />');
+            }
+
+                        
+            // var wimessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>'
+
+            if(flagWi || flagVW){
+                $('#sla_dialog').show();
+
+                    $('#slamodal-wilab2').modal('show');
+            }
+            else
+            {
+                
+
+                var username = e.data.options.username;
+                var urn = data.value;
+                // XXX check that the query is not disabled
+
+                self.spin();
+                console.log("do_update");
+                // XXX check that the query is not disabled
+                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                return;
+            }
+                    
+                        $("#accept_sla_wilab2").click(function(){
+                            console.log("SLA ACCEPTED");
+                            console.log("With username: " + username);
+
+                            // var promt = $('#modal-body');
+                            // var notchecked = true;
+                            // for (var i=0;i<50;i++)
+                            // {
+                            //     var wielement = $('#wi'+i);
+                            //     var wallElement = $('#wall'+i);
+                            //     if(wielement != null && !wielement.checked)
+                            //     {
+                            //         notchecked = false;
+                            //     }
+                            //     if(wallElement!= null && !wallElement.checked)
+                            //     {
+                            //         notchecked = false;
+                            //     }
+                            // }
+            
+                                                       
+                                if(flagDouble)
+                                {
+                                    $.post("/sla/agreements/simplecreate", 
+                                        { "template_id": "iMindsServiceWiLab2",
+                                          "user": username,
+                                          "expiration_time": new Date().toISOString()
+                                       });
+                                     $.post("/sla/agreements/simplecreate", 
+                                        { "template_id": "iMindsServiceVirtualwall",
+                                          "user": username,
+                                          "expiration_time": new Date().toISOString()
+                                       });
+                            
+                                    $('#slamodal-wilab2').modal('hide');
+                                accepted_sla["wilab2"] = true;
+                            
+                                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                            }
+                            $('#modal-body').empty();
+                        }); 
+                    
+                        $("#dismiss_sla_wilab2").click(function(){
+                            console.log("SLA NOT ACCEPTED");
+                            $('#slamodal-wilab2').modal('hide');
+                            $('#modal-body').empty();
+                        }); 
+                
+            // } else {
+            //     this.do_update(e);
+            // }
+
+            // for(var iter = 0; iter < arrayselectedresources.length; iter++){
+            //     var list = '<input type="checkbox" name="'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'<br>';
+            //     promt.append(list);
+            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
+
+
+                    
+            //         accepted_sla.push({"wall2":false});
+
+            //         $('#sla_dialog').show();
+            //         $('#slamodal-virtualwall').modal('show');
+                    
+                    
+            //             $("#accept_sla_vwall").click(function(){
+            //                 console.log("SLA ACCEPTED");
+            //                 console.log("With username: " + username);
+                        
+            //                 $.post("/sla/agreements/simplecreate", 
+            //                     { "template_id": "iMindsServiceVirtualwall",
+            //                       "user": username,
+            //                       "expiration_time": new Date()
+            //                     });
+                        
+            //                 $('#slamodal-virtualwall').modal('hide');
+            //                 accepted_sla["wall2"] = true;
+            //             }); 
+
+            //             $("#dismiss_sla_vwall").click(function(){
+            //                 console.log("SLA NOT ACCEPTED");
+            //                 $('#slamodal-vir').modal('hide');
+            //             }); 
+                    
+            //     }
+
+            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
+
+            //         accepted_sla.push({"wilab2":false});
+
+            //         $('#sla_dialog').show();
+            //         $('#slamodal-wilab2').modal('show');
+                    
+                    
+            //             $("#accept_sla_wilab2").click(function(){
+            //                 console.log("SLA ACCEPTED");
+            //                 console.log("With username: " + username);
+                        
+            //                 $.post("/sla/agreements/simplecreate", 
+            //                     { "template_id": "iMindsServiceWiLab2",
+            //                       "user": username,
+            //                       "expiration_time": new Date()
+            //                     });
+                        
+            //                 $('#slamodal-wilab2').modal('hide');
+            //                 accepted_sla["wilab2"] = true;
+            //             }); 
+                    
+            //             $("#dismiss_sla_wilab2").click(function(){
+            //                 console.log("SLA NOT ACCEPTED");
+            //                 $('#slamodal-wilab2').modal('hide');
+            //             }); 
+                    
+
+            //     }
+
+            // }
+
+            // for(var sla in accepted_sla){
+            //     if(accepted_sla[sla] == true){
+            //         count += 1;
+            //     }
+            // }
+
+            // if(count == accepted_sla.length){
+            //     this.do_update(e);
+            // }
+        },
+
+     
         do_update: function(e) {
             var self = e.data;
 
+            var username = e.data.options.username;
+            var urn = data.value;
+            // XXX check that the query is not disabled
+
             self.spin();
             console.log("do_update");
-
             // XXX check that the query is not disabled
-            manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+            //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
 
             // how to stop the spinning after the event? 
             // this should be triggered by some on_updatequery_done ?
+
         },
 
 	// related buttons are also disabled in the html template
@@ -189,6 +422,7 @@
             // XXX it's not just about adding lines, but sometimes removing some
             // XXX how do we handle status reset ?
             data.value = JSON.stringify(data.value);
+            data.selected_resources = this.selected_resources;
             row = this.find_row(data.value);
             newline = [
                 action,
@@ -345,6 +579,15 @@
         {
             console.log("on_field_state_changed");
             console.log(result);
+            if(result.request == FIELD_REQUEST_ADD){
+                this.selected_resources.push(result.value);
+            } else if(result.request == FIELD_REQUEST_REMOVE_RESET){
+                var i = this.selected_resources.indexOf(result.value);
+                if(i != -1){
+                    this.selected_resources.splice(i,1);
+                }
+            }
+            console.log("Resources: " + self.selected_resources);
             messages.debug(result)
             /* this.set_state(result.request, result.key, result.value, result.status); */
             this.set_state(result);

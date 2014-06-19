@@ -15,7 +15,7 @@ from plugins.lists.slicelist import SliceList
 from plugins.querycode import QueryCode
 from plugins.quickfilter import QuickFilter
 
-from trash.trashutils import quickfilter_criterias
+from trashutils import quickfilter_criterias
 
 # 
 from ui.topmenu import topmenu_items_live, the_user

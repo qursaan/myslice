@@ -20,7 +20,7 @@ from plugins.messages                   import Messages
 from plugins.querytable                 import QueryTable
 
 from ui.topmenu                         import topmenu_items_live, the_user
-from trash.trashutils                   import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
+from trashutils                         import hard_wired_slice_names, hard_wired_list, lorem_p, lorem, quickfilter_criterias
 
 #might be useful or not depending on the context
 #@login_required

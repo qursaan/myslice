@@ -200,8 +200,14 @@
 		    			<td class="odd"> {{ row.cred_exp }} </td>
 						<td class="odd">
 							<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
-								<span class="glyphicon glyphicon-download"></span> Download
+								<span class="glyphicon glyphicon-download"></span> Credential
 							</button>
+							<button class="btn btn-default btn-xs" name= "dl_user_cert" type="submit" title="Download User Certificate">
+								<span class="glyphicon glyphicon-download"></span> Certificate
+							</button>
+                             <button class="btn btn-default btn-xs" name= "dl_user_p12" type="submit" title="Download User PKCS12">
+                                 <span class="glyphicon glyphicon-download"></span> PKCS p12
+                             </button>
 						</td>
 					</tr>
 					{%endfor%}
