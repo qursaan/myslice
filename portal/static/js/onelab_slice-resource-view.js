@@ -27,6 +27,8 @@ $(document).ready(function() {
        
     });
     
+    // Unused "List of testbeds" tab
+    /*
     $.get("/rest/network", function(data) {
 		var list = '<div class="list-group-item sl-platform"><span class="list-group-item-heading">Testbeds</span></div>';
 		for(i=0; i<data.length;i++) {
@@ -36,7 +38,8 @@ $(document).ready(function() {
 	}).done(function() {
 		
 	});
-	
+	*/
+
 	$('button#ApplyPendind').click(function() {
 		myslice.apply();
 		// $.each(myslice.pending, function(k, p) {

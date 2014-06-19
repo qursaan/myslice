@@ -103,7 +103,24 @@
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */
-                fnDrawCallback: function() { self._querytable_draw_callback.call(self); }
+                fnDrawCallback: function() { self._querytable_draw_callback.call(self); },
+                fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                    // This function is called on fnAddData to set the TR id. What about fnUpdate ?
+
+                    // Get the key from the raw data array aData
+                    var key = self.canonical_key;
+
+                    // Get the index of the key in the columns
+                    var cols = self.table.fnSettings().aoColumns;
+                    var index = self.getColIndex(key, cols);
+                    if (index != -1) {
+                        // The key is found in the table, set the TR id after the data
+                        $(nRow).attr('id', self.id_from_key(key, aData[index]));
+                    }
+
+                    // That's the usual return value
+                    return nRow;
+                }
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
@@ -453,7 +470,7 @@
 	    	if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
 	    	this.table.fnAddData (this.buffered_lines);
 	    	this.buffered_lines=[];
-	    
+
             var self = this;
 	    // if we've already received the slice query, we have not been able to set 
 	    // checkboxes on the fly at that time (dom not yet created)
