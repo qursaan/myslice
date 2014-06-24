@@ -42,7 +42,7 @@ from portal.joinview                import JoinView
 from portal.sliceviewold            import SliceView
 from portal.validationview          import ValidatePendingView
 #from portal.experimentview         import ExperimentView
-
+from portal.termsview               import TermsView
 from portal.univbrisview            import UnivbrisView
 
 from portal.servicedirectory         import ServiceDirectoryView
@@ -93,6 +93,7 @@ urlpatterns = patterns('',
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
+    url(r'^terms/?$', TermsView.as_view(), name='terms'),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
