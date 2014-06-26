@@ -45,8 +45,8 @@ class RegistrationView (FreeAccessView, ThemeView):
         
         # Page rendering
         page = Page(wsgi_request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/jquery.qtip.min.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
