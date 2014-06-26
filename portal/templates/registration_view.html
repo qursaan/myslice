@@ -22,10 +22,13 @@
 	<div class="form-group">
   		<label for="authority_hrn" class="control-label">Organization</label>
 		<p></p>
-  		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" required>
-  		<p class="help-block">Choose your organization (company/university) from the list that apears when you<br> click in the field above and start to type.
-		 Use the arrow keys to scroll through the list;<br>type part of the name to narrow down the list. If it is not in the list, 
-		<a href="/portal/join">please add it.</a></p>
+  		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" 
+  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
+		 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. If it is not in the list, 
+		please add it by clicking the add organization link below. We will send an email to the managers that we have on record for 
+		your organization, asking them to validate your sign-up request." required/>
+		<p></p>
+		<p>Organization not listed? <a href="/portal/join">Add organization now.</a></p>
 	</div>
 
 	<div class="row">
