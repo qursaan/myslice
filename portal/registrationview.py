@@ -56,6 +56,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
 
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+            authorities = execute_admin_query(wsgi_request, authorities_query)
+    
+            for authority in authorities:
+                if authority['name'] == wsgi_request.POST.get('org_name', ''):
+                    authority_hrn = authority['authority_hrn']     
+
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
             email_hash = md5(str(salt)+post_email).hexdigest()
@@ -63,7 +70,8 @@ class RegistrationView (FreeAccessView, ThemeView):
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
                 'last_name'     : wsgi_request.POST.get('lastname',      ''),
-                'authority_hrn' : wsgi_request.POST.get('authority_hrn', ''),
+                'organization'  : wsgi_request.POST.get('org_name', ''),
+                'authority_hrn' : authority_hrn, 
                 'email'         : post_email,
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
