@@ -22,6 +22,7 @@
 				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 			</div>
 		</div>
+		{%if 'is_pi'  in pi %}
 		<div class="col-md-3">
 			<h3>MANAGEMENT</h3>
 			<div>
@@ -31,6 +32,7 @@
 				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
 			</div>
 		</div>
+		 {%endif%}
 		<div class="col-md-3">
 			<h3>
 				SUPPORT
