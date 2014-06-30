@@ -47,11 +47,12 @@ $(document).ready(function() {
     if($.isEmptyObject(user)){
         $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
             if(data.length > 0){
-                slices = data[0].slices;  
+                drawSlices(data[0].slices);  
             }else{
+            	$("div#home-slice-list").html("<div>no slice</div>");
+        		$("ul#dropdown-slice-list").append("<li>no slice</li>");
                 slices.push("no slice");
             }
-            drawSlices(slices);
     	});
     }else{
         slices = user.slices;
