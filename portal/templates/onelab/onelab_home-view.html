@@ -18,6 +18,11 @@
 			<div>
 				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
 			</div>
+			<div>
+			<p title="A slice is a set of testbed resources on which you can conduct an experiment. 
+			Either ask your colleagues to give you access to an existing slice or request a new slice now.">
+			<strong>Your slices</strong></p>
+			</div>
 			<div>	
 				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 			</div>
@@ -59,7 +64,7 @@
 				{% if person.last_name %}
 					{{person.first_name}} {{person.last_name}}<br />
 				{% endif %}
-    			<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
+    			<span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
 	    	</div>
 		</div>
 	</div>

@@ -50,6 +50,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
+            reg_form = {}
             # The form has been submitted
             
             # get the domain url
@@ -152,6 +153,12 @@ class RegistrationView (FreeAccessView, ThemeView):
 
         else:
             user_request = {}
+            ## this is coming from onelab website onelab.eu
+            reg_form = {
+                'first_name':  wsgi_request.GET.get('first_name', ''),
+                'last_name': wsgi_request.GET.get('last_name', ''),
+                'email': wsgi_request.GET.get('email', ''),
+                }
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),
@@ -160,5 +167,6 @@ class RegistrationView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(user_request)
+        template_env.update(reg_form)
         template_env.update(page.prelude_env ())
         return render(wsgi_request, self.template,template_env)
