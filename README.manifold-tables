@@ -1,0 +1,1 @@
+manifold-tables -A -o authority -f \* -a R -j CACHE

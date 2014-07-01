@@ -5,6 +5,7 @@
       	{% if checkboxes %}<th class="checkbox">+/-</th>{% endif %}
         {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
         {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %}
+        <th class="checkbox">status</th>
       </tr>
     </thead> 
     <tbody>
@@ -14,6 +15,7 @@
       	{% if checkboxes %} <th>+/-</th> {% endif %}
         {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
         {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
+        <th class="checkbox">status</th>
       </tr>
     </tfoot> 
   </table>

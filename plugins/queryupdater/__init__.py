@@ -1,6 +1,6 @@
 from unfold.plugin import Plugin
 
-class QueryUpdater(Plugin):
+class QueryUpdaterPlugin(Plugin):
 
     def __init__ (self, query=None, **settings):
         Plugin.__init__ (self, **settings)

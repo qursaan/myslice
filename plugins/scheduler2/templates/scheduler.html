@@ -50,34 +50,55 @@
             <div id="tblSlider"></div>
         </div>
         <div class="table-responsive">
+
             <table id="scheduler-reservation-table" class="table table-bordered table-condensed">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th ng-repeat="slot in slots">
+                        <th ng-repeat="slot in slots | offset: from | limitTo: num_visible_cells ">
                             {[{ slot.time }]}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="resource in resources" ng-class-odd="''" ng-class-even="'even'">
-                        <th data-resourceid="{[{ resource.id }]}" data-rowindex="{[{ $index }]}" data-resourceindex="{[{ resource.index }]}" style="word-wrap: break-word; word-break: break-all; ">{[{ resource.name }]}</th>
-                        <td ng-repeat="lease in resource.leases" data-slotid="{[{ lease.id }]}" data-groupid="{[{ lease.groupid }]}" ng-class="{{ 'lease.status' }}"></td>
+                    <tr ng-repeat="resource in resources | filter: filter_visible | offset: (current_page-1) * items_per_page | limitTo: items_per_page" 
+						ng-class-odd="''" 
+						ng-class-even="'even'">
+                        <th data-resourceid="{[{ resource.urn }]}" 
+							data-rowindex="{[{ $index }]}" 
+							data-resourceindex="{[{ resource.index }]}" 
+							style="word-wrap: break-word; word-break: break-all; ">
+							{[{ resource.hostname }]}
+						</th>
+                        <td ng-repeat="lease in resource.leases | offset: from / lcm_colspan  | limitTo: num_visible_cells / lcm_colspan"
+							data-slotid="{[{ lease.id }]}" 
+							data-groupid="{[{ lease.groupid }]}" 
+							ng-class="{{ 'lease.status' }}"
+							colspan="{[{resource.granularity / granularity}]}"
+							ng-click="select(from+$index, lease, $parent.resource)">
+						</td>
                     </tr>
                 </tbody>
             </table>
+
             <div class="row">
                 <div class="col-xs-5">
                     <div id="resources-list__table_length" class="dataTables_length">
-                        <label>total Pages : {[{totalPages}]}</label>
+                        <label>Total pages : {[{page_count()}]}</label>
                     </div>
                 </div>
                 <div class="col-xs-7">
                     <div class="dataTables_paginate paging_bootstrap">
                         <ul class="pagination">
-                            <li class="prev disabled"><a href="#">← Previous</a></li>
-                            <li ng-cloak ng-repeat="t in getPageNumbers() track by $index" ng-class="{active: t==curPage+1}"><a href="#" ng-click="setPage(t-1)">{[{t}]}</a></li>
-                            <li class="next disabled"><a href="#">Next → </a></li>
+							<li ng-class="prevPageDisabled()">
+							  <a href ng-click="prevPage()">« Prev</a>
+							</li>
+                            <li ng-repeat="n in range()" 
+							    ng-class="{active: n==current_page}" 
+								ng-click="setPage(n)"><a href="#">{[{n}]}</a></li>
+							<li ng-class="nextPageDisabled()">
+				              <a href ng-click="nextPage()">Next »</a>
+				            </li>
                         </ul>
                     </div>
                 </div>

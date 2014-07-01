@@ -1,26 +1,29 @@
-from django.template                 import RequestContext
-from django.shortcuts                import render_to_response
+from django.template                    import RequestContext
+from django.shortcuts                   import render_to_response
 
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
+from manifold.core.query                import Query, AnalyzedQuery
+from manifoldapi.manifoldapi            import execute_query
 
-from django.views.generic.base      import TemplateView
+from django.views.generic.base          import TemplateView
 
-from unfold.loginrequired           import LoginRequiredView
+from unfold.loginrequired               import LoginRequiredView
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from unfold.page                     import Page
+from unfold.page                        import Page
 
-from myslice.configengine            import ConfigEngine
-from plugins.querytable              import QueryTable
-from plugins.googlemap               import GoogleMap
-from plugins.queryupdater            import QueryUpdater
-from plugins.testbeds                import TestbedsPlugin
-from plugins.scheduler2              import Scheduler2
-from plugins.columns_editor          import ColumnsEditor
-from plugins.sladialog               import SlaDialog
-from plugins.lists.simplelist        import SimpleList
+from myslice.configengine               import ConfigEngine
+
+from plugins.apply                      import ApplyPlugin
+from plugins.querytable                 import QueryTable
+from plugins.googlemap                  import GoogleMap
+#from plugins.queryupdater               import QueryUpdater
+from plugins.filter_status              import FilterStatusPlugin
+from plugins.testbeds                   import TestbedsPlugin
+from plugins.scheduler2                 import Scheduler2
+from plugins.columns_editor             import ColumnsEditor
+from plugins.sladialog                  import SlaDialog
+from plugins.lists.simplelist           import SimpleList
 
 from myslice.theme import ThemeView
 
@@ -48,6 +51,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
+                'slice_urn', # XXX We need the key otherwise the storage of records bugs !
                 'slice_hrn',
                 'resource.urn', 
                 'resource.hostname', 'resource.type',
@@ -67,7 +71,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         sq_lease       = aq.subquery('lease')
 
         query_resource_all = Query.get('resource').select(resource_fields)
-        page.enqueue_query(query_resource_all)
+        #page.enqueue_query(query_resource_all)
 
         # leases query
         lease_md = metadata.details_by_object('lease')
@@ -183,17 +187,17 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # --------------------------------------------------------------------------
         # QueryUpdater (Pending Operations)
  
-        pending_resources = QueryUpdater(
-            page                = page,
-            title               = 'Pending operations',
-            query               = main_query,
-            togglable           = False,
-            # start turned off, it will open up itself when stuff comes in
-            toggled             = False,
-            domid               = 'pending',
-            outline_complete    = True,
-            username            = request.user,
-        )
+#DEPRECATED|        pending_resources = QueryUpdater(
+#DEPRECATED|            page                = page,
+#DEPRECATED|            title               = 'Pending operations',
+#DEPRECATED|            query               = main_query,
+#DEPRECATED|            togglable           = False,
+#DEPRECATED|            # start turned off, it will open up itself when stuff comes in
+#DEPRECATED|            toggled             = False,
+#DEPRECATED|            domid               = 'pending',
+#DEPRECATED|            outline_complete    = True,
+#DEPRECATED|            username            = request.user,
+#DEPRECATED|        )
 
         # --------------------------------------------------------------------------
         # NETWORKS
@@ -206,20 +210,31 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         #page.enqueue_query(query_network)
 
         filter_testbeds = TestbedsPlugin(
-            page          = page,
-            domid         = 'testbeds-filter',
-            title         = 'Filter by testbeds',
-            query         = sq_resource,
-            query_all     = query_resource_all,
-            #query_network = query_network,
-            init_key      = "network_hrn",
-            checkboxes    = True,
+            page            = page,
+            domid           = 'testbeds-filter',
+            title           = 'Filter by testbeds',
+            query           = sq_resource,
+            #query_network  = query_network,
+            init_key        = "network_hrn",
+            checkboxes      = True,
             datatables_options = {
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
                 'bAutoWidth'    : True,
                 },
         )
+
+        filter_status = FilterStatusPlugin(
+            page            = page,
+            domid           = "filter-status",
+            query           = sq_resource,
+        )
+        apply = ApplyPlugin(
+            page            = page,
+            domid           = "apply",
+            query           = sq_resource,
+        )
+            
 
         # --------------------------------------------------------------------------
         # SLA View and accept dialog
@@ -244,9 +259,12 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['columns_editor'] = filter_column_editor.render(self.request)
 
         template_env['filter_testbeds'] = filter_testbeds.render(self.request)
+        template_env['filter_status'] = filter_status.render(self.request)
+        template_env['apply'] = apply.render(self.request)
+
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
-        template_env['pending_resources'] = pending_resources.render(self.request)
+#        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user

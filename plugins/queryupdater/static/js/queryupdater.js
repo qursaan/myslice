@@ -26,7 +26,7 @@
     // Record state through the query cycle
 
 
-    var QueryUpdater = Plugin.extend({
+    var QueryUpdaterPlugin = Plugin.extend({
 
         init: function(options, element) {
 	        this.classname="queryupdater";
@@ -164,7 +164,6 @@
                 // XXX check that the query is not disabled
 
                 self.spin();
-                console.log("do_update");
                 // XXX check that the query is not disabled
                 manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
                 return;
@@ -365,7 +364,6 @@
 
         set_state: function(data)
         {
-            console.log("function set_state");
             var action;
             var msg;
             var button = '';
@@ -378,50 +376,54 @@
 
         // XXX we don't want to show automaticaly the pending when a checkbox is checked
 	    //this.toggle_on();
-	    
-            switch(data.request) {
-                case FIELD_REQUEST_ADD_RESET:
-                case FIELD_REQUEST_REMOVE_RESET:
+
+            switch (data.status) {
+                case STATE_SET_IN_PENDING:
+                    action = 'ADD';
+                    msg   = 'PENDING';
+                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
+                    break;
+                case STATE_SET_OUT_PENDING:
+                    action = 'REMOVE';
+                    msg   = 'PENDING';
+                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
+                    break;
+                case STATE_SET_IN:
+                case STATE_SET_OUT:
                     // find line and delete it
+                    // XXX Naming is incorrect for badge-pending !!!!
+                    // XXX What is this badge ?
                     row = this.find_row(data.value);
                     if (row)
                         this.table.fnDeleteRow(row.nTr);
                         $("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
                         $("#badge-pending").text($("#badge-pending").data('number'));
                     return;
-                case FIELD_REQUEST_CHANGE:
-                    action = 'UPDATE';
-                    break;
-                case FIELD_REQUEST_ADD:
-                    action = 'ADD';
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                    action = 'REMOVE';
-                    break;
-            }
-
-            switch(data.status) {
-                case FIELD_REQUEST_PENDING:
-                    msg   = 'PENDING';
-                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
-                    break;
-                case FIELD_REQUEST_SUCCESS:
+                    break;  
+                case STATE_SET_IN_SUCCESS:
+                case STATE_SET_OUT_SUCCESS:
                     msg   = 'SUCCESS';
                     break;
-                case FIELD_REQUEST_FAILURE:
+                case STATE_SET_IN_FAILURE:
+                case STATE_SET_OUT_FAILURE:
                     msg   = 'FAILURE';
                     break;
+                case STATE_CHANGE:
+                    action = 'UPDATE';
+                    break;
+                
             }
 
             var status = msg + status;
-
-            
 
             // find line
             // if no, create it, else replace it
             // XXX it's not just about adding lines, but sometimes removing some
             // XXX how do we handle status reset ?
-            data.value = JSON.stringify(data.value);
+
+            // Jordan : I don't understand this. I added this test otherwise we have string = ""..."" double quoted twice.
+            if (typeof(data.value) !== "string")
+                data.value = JSON.stringify(data.value);
             data.selected_resources = this.selected_resources;
             row = this.find_row(data.value);
             newline = [
@@ -459,8 +461,6 @@
 
         on_new_record: function(record)
         {
-            console.log("query_updater on_new_record");
-            console.log(record);
 
             // if (not and update) {
 
@@ -546,7 +546,6 @@
 
         on_query_done: function()
         {
-            console.log("on_query_done");
             this.unspin();
         },
 
@@ -554,14 +553,12 @@
         // NOTE: record_key could be sufficient 
         on_added_record: function(record)
         {
-            console.log("on_added_record = ",record);
             this.set_record_state(record, RECORD_STATE_ADDED);
             // update pending number
         },
 
         on_removed_record: function(record_key)
         {
-            console.log("on_removed_record = ",record_key);
             this.set_record_state(RECORD_STATE_REMOVED);
         },
 
@@ -577,8 +574,6 @@
 
         on_field_state_changed: function(result)
         {
-            console.log("on_field_state_changed");
-            console.log(result);
             if(result.request == FIELD_REQUEST_ADD){
                 this.selected_resources.push(result.value);
             } else if(result.request == FIELD_REQUEST_REMOVE_RESET){
@@ -587,9 +582,8 @@
                     this.selected_resources.splice(i,1);
                 }
             }
-            console.log("Resources: " + self.selected_resources);
             messages.debug(result)
-            /* this.set_state(result.request, result.key, result.value, result.status); */
+
             this.set_state(result);
         },
 
@@ -719,6 +713,6 @@
 
     });
 
-    $.plugin('QueryUpdater', QueryUpdater);
+    $.plugin('QueryUpdaterPlugin', QueryUpdaterPlugin);
 
 })(jQuery);

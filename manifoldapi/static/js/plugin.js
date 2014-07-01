@@ -220,7 +220,7 @@ var Plugin = Class.extend({
 
     id_from_key: function(key_field, value) {
         
-        return key_field + manifold.separator + this.escape_id(value).replace(/\\/g, '');
+        return key_field + manifold.separator + this.escape_id(value); //.replace(/\\/g, '');
     },
 
     // NOTE

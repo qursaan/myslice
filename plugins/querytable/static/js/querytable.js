@@ -4,6 +4,10 @@
  * License: GPLv3
  */
 
+BGCOLOR_RESET   = 0;
+BGCOLOR_ADDED   = 1;
+BGCOLOR_REMOVED = 2;
+
 (function($){
 
     var debug=false;
@@ -60,7 +64,7 @@
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
-            this.listen_query(options.query_all_uuid, 'all');
+            //this.listen_query(options.query_all_uuid, 'all');
 
             /* GUI setup and event binding */
             this.initialize_table();
@@ -222,7 +226,7 @@
 	        }
 	        
             /* fill in stuff depending on the column name */
-            for (var j = 1; j < nb_col; j++) {
+            for (var j = 1; j < nb_col - 1; j++) { // nb_col includes status
                 if (typeof colnames[j] == 'undefined') {
                     line.push('...');
                 } else if (colnames[j] == 'hostname') {
@@ -254,12 +258,11 @@
                         line.push('');
                 }
             }
-    
-            
+            line.push('<span id="' + this.id_from_key('status', record[this.init_key]) + '"></span>'); // STATUS
     
     	    // adding an array in one call is *much* more efficient
 	        // this.table.fnAddData(line);
-	        this.buffered_lines.push(line);
+	        return line;
         },
 
         clear_table: function()
@@ -293,11 +296,16 @@
 	// this is used at init-time, at which point only init_key can make sense
 	// (because the argument record, if it comes from query, might not have canonical_key set
 	set_checkbox_from_record: function (record, checked) {
-            if (checked === undefined) checked = true;
+        if (checked === undefined) checked = true;
 	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("querytable.set_checkbox_from_record, init_id="+init_id);
+        this.set_checkbox_from_record_key(init_id, checked);
+	},
+
+	set_checkbox_from_record_key: function (record_key, checked) {
+        if (checked === undefined) checked = true;
+	    if (debug) messages.debug("querytable.set_checkbox_from_record, record_key="+record_key);
 	    // using table.$ to search inside elements that are not visible
-	    var element = this.table.$('[init_id="'+init_id+'"]');
+	    var element = this.table.$('[init_id="'+record_key+'"]');
 	    element.attr('checked',checked);
 	},
 
@@ -310,27 +318,131 @@
 	    element.attr('checked',checked);
 	},
 
+        /**
+         * Arguments
+         *
+         * key_value: the key from which we deduce the id
+         * request: STATUS_OKAY, etc.
+         * content: some HTML content
+         */
+        change_status: function(key_value, warnings)
+        {
+            var msg;
+            
+            if ($.isEmptyObject(warnings)) { 
+                var state = manifold.query_store.get_record_state(this.options.query_uuid, key_value, STATE_SET);
+                switch(state) {
+                    case STATE_SET_IN:
+                    case STATE_SET_IN_SUCCESS:
+                    case STATE_SET_OUT_FAILURE:
+                    case STATE_SET_IN_PENDING:
+                        // Checkmark sign if no warning for an object in the set
+                        msg = '&#10003;';
+                        break;
+                    default:
+                        // Nothing is the object is not in the set
+                        msg = '';
+                        break;
+                }
+            } else {
+                msg = '<ul class="nav nav-pills">';
+                msg += '<li class="dropdown">'
+                msg += '<a href="#" data-toggle="dropdown" class="dropdown-toggle nopadding"><b>&#9888</b></a>';
+                msg += '  <ul class="dropdown-menu dropdown-menu-right" id="menu1">';
+                $.each(warnings, function(i,warning) {
+                    msg += '<li><a href="#">' + warning + '</a></li>';
+                });
+                msg += '  </ul>';
+                msg += '</li>';
+                msg += '</ul>';
+            }
+
+            $(document.getElementById(this.id_from_key('status', key_value))).html(msg);
+            $('[data-toggle="tooltip"]').tooltip({'placement': 'bottom'});
+
+        },
+
+        set_bgcolor: function(key_value, class_name)
+        {
+            var elt = $(document.getElementById(this.id_from_key(this.canonical_key, key_value)))
+            if (class_name == BGCOLOR_RESET)
+                elt.removeClass('added removed');
+            else
+                elt.addClass((class_name == BGCOLOR_ADDED ? 'added' : 'removed'));
+        },
+
+        do_filter: function()
+        {
+            // Let's clear the table and only add lines that are visible
+            var self = this;
+            this.clear_table();
+
+            // XXX Here we have lost checkboxes
+            // set checkbox from record.
+            // only the current plugin known that we have an element in a set
+
+            lines = Array();
+            var record_keys = [];
+            manifold.query_store.iter_visible_records(this.options.query_uuid, function (record_key, record) {
+                lines.push(self.new_record(record));
+                record_keys.push(record_key);
+            });
+	    	this.table.fnAddData(lines);
+            $.each(record_keys, function(i, record_key) {
+                var state = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_SET);
+                var warnings = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_WARNINGS);
+                switch(state) {
+                    // XXX The row and checkbox still does not exists !!!!
+                    case STATE_SET_IN:
+                    case STATE_SET_IN_SUCCESS:
+                    case STATE_SET_OUT_FAILURE:
+                        self.set_checkbox_from_record_key(record_key, true);
+                        break;
+                    case STATE_SET_OUT:
+                    case STATE_SET_OUT_SUCCESS:
+                    case STATE_SET_IN_FAILURE:
+                        //self.set_checkbox_from_record_key(record_key, false);
+                        break;
+                    case STATE_SET_IN_PENDING:
+                        self.set_checkbox_from_record_key(record_key, true);
+                        self.set_bgcolor(record_key, BGCOLOR_ADDED);
+                        break;
+                    case STATE_SET_OUT_PENDING:
+                        //self.set_checkbox_from_record_key(record_key, false);
+                        self.set_bgcolor(record_key, BGCOLOR_REMOVED);
+                        break;
+                }
+                self.change_status(record_key, warnings); // XXX will retrieve status again
+            });
+        },
+
         /*************************** QUERY HANDLER ****************************/
 
         on_filter_added: function(filter)
         {
+            this.do_filter();
+
+            /*
             this.filters.push(filter);
             this.redraw_table();
+            */
         },
 
         on_filter_removed: function(filter)
         {
+            this.do_filter();
+            /*
             // Remove corresponding filters
             this.filters = $.grep(this.filters, function(x) {
                 return x == filter;
             });
             this.redraw_table();
+            */
         },
         
         on_filter_clear: function()
         {
-            // XXX
-            this.redraw_table();
+            this.do_filter();
         },
 
         on_field_added: function(field)
@@ -353,20 +465,17 @@
 
         on_all_filter_added: function(filter)
         {
-            // XXX
-            this.redraw_table();
+            this.do_filter();
         },
 
         on_all_filter_removed: function(filter)
         {
-            // XXX
-            this.redraw_table();
+            this.do_filter();
         },
         
         on_all_filter_clear: function()
         {
-            // XXX
-            this.redraw_table();
+            this.do_filter();
         },
 
         on_all_field_added: function(field)
@@ -409,82 +518,48 @@
 
         on_query_done: function()
         {
+            this.do_filter();
+/*
             this.received_query = true;
     	    // unspin once we have received both
             if (this.received_all_query && this.received_query) this.unspin();
+*/
         },
         
         on_field_state_changed: function(data)
         {
-            switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox_from_data(data.value, true);
+            var state = manifold.query_store.get_record_state(this.options.query_uuid, data.value, data.status);
+            switch(data.status) {
+                case STATE_SET:
+                    switch(state) {
+                        case STATE_SET_IN:
+                        case STATE_SET_IN_SUCCESS:
+                        case STATE_SET_OUT_FAILURE:
+                            this.set_checkbox_from_data(data.value, true);
+                            this.set_bgcolor(data.value, BGCOLOR_RESET);
+                            break;  
+                        case STATE_SET_OUT:
+                        case STATE_SET_OUT_SUCCESS:
+                        case STATE_SET_IN_FAILURE:
+                            this.set_checkbox_from_data(data.value, false);
+                            this.set_bgcolor(data.value, BGCOLOR_RESET);
+                            break;
+                        case STATE_SET_IN_PENDING:
+                            this.set_checkbox_from_data(data.value, true);
+                            this.set_bgcolor(data.value, BGCOLOR_ADDED);
+                            break;  
+                        case STATE_SET_OUT_PENDING:
+                            this.set_checkbox_from_data(data.value, false);
+                            this.set_bgcolor(data.value, BGCOLOR_REMOVED);
+                            break;
+                    }
                     break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox_from_data(data.value, false);
-                    break;
-                default:
+
+                case STATE_WARNINGS:
+                    this.change_status(data.value, state);
                     break;
             }
         },
-
-        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
-        // all
-        on_all_field_state_changed: function(data)
-        {
-            switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox_from_data(data.value, true);
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox_from_data(data.value, false);
-                    break;
-                default:
-                    break;
-            }
-        },
-
-        on_all_new_record: function(record)
-        {
-            this.new_record(record);
-        },
-
-        on_all_clear_records: function()
-        {
-            this.clear_table();
-
-        },
-
-        on_all_query_in_progress: function()
-        {
-            // XXX parent
-            this.spin();
-        }, // on_all_query_in_progress
-
-        on_all_query_done: function()
-        {
-	    	if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
-	    	this.table.fnAddData (this.buffered_lines);
-	    	this.buffered_lines=[];
-
-            var self = this;
-	    // if we've already received the slice query, we have not been able to set 
-	    // checkboxes on the fly at that time (dom not yet created)
-            $.each(this.buffered_records_to_check, function(i, record) {
-				if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
-                self.set_checkbox_from_record(record, true);
-            });
-	    	this.buffered_records_to_check = [];
-
-            this.received_all_query = true;
-	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
-
-        }, // on_all_query_done
 
         /************************** PRIVATE METHODS ***************************/
 

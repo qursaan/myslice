@@ -46,20 +46,6 @@ function schedulerCloneArray(originalArray) {
     return clonedArray;
 }
 
-function schedulerGetSlots(slotSpan) {
-    if (slotSpan == 0) slotSpan = 10;
-    var slots = [];
-    var d = new Date(2014, 1, 1, 0, 0, 0, 0);
-    var i = 0;
-    while (d.getDate() == 1) {
-        var tmpTime = schedulerPadStr(d.getHours()) + ':' + schedulerPadStr(d.getMinutes());
-        slots.push({ id: i, time: tmpTime });
-        d = schedulerAddMinutes(d, slotSpan);
-        i++;
-    }
-    return slots;
-}
-
 function schedulerGetLeases(slotSpan, granularity) {
     granularity = granularity / 60;
     if (slotSpan == 0) slotSpan = 10;
@@ -187,7 +173,16 @@ function schedulerAddMinutes(date, minutes) {
     return new Date(date.getTime() + minutes * 60000);
 }
 
-function schedulerCompareOnDay(dateOne, dateTwo) {
+/**
+ * Compares two dates
+ *
+ * Returns:
+ *   0 if they are equal
+ *   -1 if the first is less than the second
+ *   1 if the first is more than the second
+ */
+function schedulerCompareOnDay(dateOne, dateTwo)
+{
     if (dateOne.getYear() == dateTwo.getYear() &&
         dateOne.getMonth() == dateTwo.getMonth() &&
         dateOne.getDate() == dateTwo.getDate()) {
