@@ -80,9 +80,6 @@ class HomeView (FreeAccessView, ThemeView):
                     else:
                         pi = "is_pi"
 
-                    print "testing"
-                    print pi
- 
                     env['pi'] = pi                
                 else: 
                     env['person'] = None
