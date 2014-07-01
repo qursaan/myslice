@@ -256,7 +256,25 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
-                dest[auth_hrn].append(request) 
+                dest[auth_hrn].append(request)
+                
+                ## check user is pi or not
+                platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
+                account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+                platform_details = execute_query(self.request, platform_query)
+                account_details = execute_query(self.request, account_query)
+                for platform_detail in platform_details:
+                    for account_detail in account_details:
+                        if platform_detail['platform_id'] == account_detail['platform_id']:
+                            if 'config' in account_detail and account_detail['config'] is not '':
+                                account_config = json.loads(account_detail['config'])
+                                if 'myslice' in platform_detail['platform']:
+                                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                # assigning values
+                if acc_auth_cred == {}:
+                    pi = "is_not_pi"
+                else:
+                    pi = "is_pi" 
         
         context = super(ValidatePendingView, self).get_context_data(**kwargs)
         context['my_authorities']   = ctx_my_authorities
@@ -270,7 +288,7 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
         context['topmenu_items'] = topmenu_items_live('Validation', page) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
-        
+        context['pi'] = pi       
         context['theme'] = self.theme
         context['section'] = "Requests"
         # XXX We need to prepare the page for queries
