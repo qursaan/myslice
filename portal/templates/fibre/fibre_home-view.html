@@ -73,8 +73,9 @@
 					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
 	   			{% else %}
 	   			<td>
-					{% include 'fibre__widget-login-manager.html' %}
-					{% include 'fibre__widget-login-ldap-manager.html' %}
+                    {# include 'fibre__widget-login-user.html' #}
+					{# include 'fibre__widget-login-ldap-user.html' #}
+					{% include 'fibre__widget-login-fed-manager.html' %}
 				{% endif %}
 				</td>
 				<td>

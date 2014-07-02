@@ -133,6 +133,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 user_request['public_key']  = file_content
                 
             if not errors:
+                '''
                 try:
                     # verify if is a  LDAP 
                     mail = user_detail['email']
@@ -144,8 +145,10 @@ class RegistrationView (FreeAccessView, ThemeView):
                     if dc == 'br' or 'eu':
                         # LDAP insert directly - but with userEnable = FALSE
                         ldap_create_user(wsgi_request, user_request, user_detail)
+                   
                 except Exception, e:
                     print "LDAP: problem em access the LDAP with this credentail" 
+                '''
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
             

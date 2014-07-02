@@ -657,6 +657,7 @@ def create_user(wsgi_request, request):
 # Add the user to the SFA registry
     sfa_create_user(wsgi_request, request)
 
+    '''   
     # LDAP update user userEnabled = True
     try:
         mail = request['email']
@@ -669,7 +670,7 @@ def create_user(wsgi_request, request):
             ldap_modify_user(wsgi_request, request)
     except Exception, e:
         "LDAP create user failed"
-
+    '''
 def create_pending_user(wsgi_request, request, user_detail):
     """
     """
