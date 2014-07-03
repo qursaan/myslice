@@ -12,13 +12,14 @@
 				<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/authority-xs.png" alt="Institution" /> Institution {{user_details.parent_authority}}</a></li>
 				<li><a href="#users">Users</a></li>
 				<li><a href="#slices">Slices</a></li>
+				<li><a href="#requests">Requests</a></li>
 			</ul>
 	    </div>
 	</div>
 </div>
 <div class="container tab-content">
 	<div class="tab-pane active row" id="info">
-	  	<div class="col-md-12">
+	  	<div class="col-md-12 el">
 		  	<div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>
 		    <div id="authority-tab-loaded" style="display:none;">
 		        <div id="authority-data" style="float:left; width:50%;"></div>
@@ -31,54 +32,59 @@
 	</div>
 	
 	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
-		<div class="col-md-12">
+		<div class="col-md-12 el">
 			<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 				<div id="user-tab-loaded" style="display:none;">
-    				<table id="user-tab">
+    				<table id="user-tab" class="table">
         				<tr>
             				<th>+/-</th>
-            				<th>email</th>
-            				<th>user_hrn</th>
-            				<th>first name</th>
-            				<th>last name</th>
-            				<th>enabled</th>
+            				<th>Email</th>
+            				<th>User hrn</th>
+            				<th>First name</th>
+            				<th>Last name</th>
+            				<th>Enabled</th>
         				</tr>
     				</table>
-				{%if 'is_pi'  in pi %}	
-				<div>
-					<button id="deleteusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Users</button>
-				</div>
-				{%endif%}
+				
 			</div>
+			{%if 'is_pi'  in pi %}	
+			<div>
+				<button id="deleteusers" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected users</button>
+			</div>
+			{% endif %}
 		</div>
  	</div>
 
 	<div class="tab-pane row" id="slices">
-		{%if 'is_pi'  in pi %}
-	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> create slice</button>
-		{%else%}
-		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> request slice</button>
-		{%endif%}
+		<div class="col-md-12 el">
+		{% if 'is_pi'  in pi %}
+	  	<button id="createslice" type="button" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+		{% else %}
+		<button id="createslice" type="button" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
+		{% endif %}
+		<br /><br />
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 	    <div id="slice-tab-loaded" style="display:none;">
-	        <table id="slice-tab">
+	        <table id="slice-tab" class="table">
 	            <tr>
 	                <th>+/-</th>
-	                <th>slice_hrn</th>
-	                <th>users</th>
-	                <th>url</th>
+	                <th>Slice hrn</th>
+	                <th>Users</th>
+	                <th>Url</th>
 	                <!-- <th>nodes</th> -->
-	                <th>expiration</th>
+	                <th>Expiration</th>
 	            </tr>
-	        </table>
-	        <br>
-			{%if 'is_pi'  in pi %}
-	        <div>
-	            <button id="renewslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
-	            <button id="deleteslices" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
-	        </div>
-			{%endif%} 
+	        </table>			
 	    </div>
+    	{% if 'is_pi'  in pi %}
+        <div>
+            <button id="renewslices" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
+            <button id="deleteslices" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
+        </div>
+		{% endif %} 
+	   </div>
+	</div>
+	<div class="tab-pane row" id="requests">
 	</div>
 </div>
 <script>
@@ -213,5 +219,15 @@ $(document).ready(function() {
     {% endif %}
 
 }); // End document.ready
+
+$(document).ready(function() {
+	$('.nav-tabs a').click(function (e) {
+  		e.preventDefault();
+  		$(this).tab('show');
+    	var id = $(this).attr('href').substr(1);
+    	if (id == 'requests') 
+    		$("#" + id).load('/management/' + id);
+	});
+});
 </script>
 {% endblock %}

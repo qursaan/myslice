@@ -31,6 +31,8 @@ import portal.slicetabtestbeds
 import portal.slicetabusers
 import portal.slicetabmeasurements 
 
+import portal.managementtabrequests
+
 #### high level choices
 # main entry point (set to the / URL)
 # beware that if this view is broken you end up in an endless cycle...
@@ -90,6 +92,9 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
+    #
+    (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
+    #
     url(r'^portal/', include('portal.urls')),
 
     # SLA

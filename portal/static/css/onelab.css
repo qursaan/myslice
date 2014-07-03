@@ -32,26 +32,72 @@ h3 {
     font-size:13pt;
     color:#201E62;
 }
-
-div.wrapper {
-    width:980px;
-    margin:0 auto;
-    position:relative;
-}
-div.container {
-    /*width:980px;
-    margin:25px auto;*/
-}
-div.wide {
-    margin:25px auto;
-    padding:0 25px;
-}
-
 span.label {
     font-size:11pt;
     color:gray;
     font-weight:normal;
     padding:0;
+}
+div.el {
+    padding-bottom:15px;
+}
+/* buttons */
+button.btn {
+    padding:6px 10px;
+    border-radius:5px;
+    font-size:10pt;
+    font-weight:normal;
+}
+button.btn span.glyphicon {
+    margin-right:6px;
+}
+button.btn-default {
+    border-bottom:3px solid #cccccc;
+}
+button.btn-default:hover {
+    background-color:white;
+    border:1px solid #ADADAD;
+    border-bottom:3px solid #ADADAD;
+}
+button.btn-default:active {
+    background-color:white;
+    border:1px solid #ADADAD;
+    border-bottom:1px solid #ADADAD;
+    box-shadow:none;
+}
+button.btn-primary {
+    border-bottom:3px solid #3071A9;
+}
+button.btn-primary:hover {
+    border-bottom:3px solid #3071A9;
+}
+button.btn-primary:active {
+    box-shadow:none;
+}
+button.btn-danger {
+    border-bottom:2px solid #FF7394;
+}
+button.btn-danger:hover {
+    border-bottom:2px solid #D2322D;
+}
+button.btn-danger:active {
+    border:1px solid #D2322D;
+    box-shadow:none;
+}
+button.btn-onelab {
+    border:0;
+    border-bottom:2px solid #540086;
+    background-color:#302562;
+    color:white;
+}
+button.btn-onelab:hover {
+    border:0;
+    border-bottom:2px solid #540086;
+    background-color:#302562;
+    color:#FFFFCC;
+}
+button.btn-primary:active {
+    box-shadow:none;
 }
 /***** Notifications *****/
 .warning {
@@ -141,15 +187,6 @@ div#home-dashboard div#home-slice-list li {
 /**/
 /* WELL */
 div.well {
-}
-/**/
-/* BUTTON */
-.btn.btn-default {
-    font-weight: bold;
-}
-
-.btn.btn-default:hover {
-    font-weight: bold;
 }
 /**/
 /* TABLE */
@@ -371,6 +408,7 @@ div.dataTables_filter label{
   -webkit-box-shadow: 0 0 1px rgba(82,82,82,0.6);
   box-shadow:         0 0 1px rgba(82,82,82,0.6);
   height:61px;
+  margin-bottom:15px;
   background-color:white;
 }
 div.navigation {

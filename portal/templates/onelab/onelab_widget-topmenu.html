@@ -6,7 +6,7 @@
 			<a href="/"><img src="{{ STATIC_URL }}img/onelab-portal.png" alt="OneLab Portal - Future Internet Testbeds" /></a>
 		</div>
 		{% if username %}
-		<div class="col-sm-5 col-md-5 navigation">
+		<div class="col-sm-4 col-md-4 navigation">
 			<ul>
 				<li>
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -21,21 +21,16 @@
 				</li>
 				{%if 'is_pi'  in pi %}	
 				<li id="nav-institution" class=""><a href="/portal/institution">MANAGEMENT</a></li>
-				<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
 				 {%endif%}
 				<li><a href="/portal/support/">SUPPORT</a></li>
-				
-				
-
 			</ul>
 		</div>
 		{% else %}
-		<div class="col-sm-5 col-md-5 navigation">
+		<div class="col-sm-4 col-md-4 navigation">
 		</div>
 		{% endif %}
-		<div class="col-sm-4 col-md-4 secondary">
+		<div class="col-sm-5 col-md-5 secondary">
 			<ul>
-				
 				<li><a href="/news">News</a></li>
 				<li><a href="/portal/about">About</a></li>
 				<li><a target="_blank" href="http://www.onelab.eu">Public Website</a></li>
