@@ -16,7 +16,7 @@ a, a:active, a:focus {
 h1 {
     border-bottom:1px solid #DDDDDD;
     padding:0 0 0 0;
-    margin:0 0 0 0;
+    margin:15px 0 15px 0;
     font-size:14pt;
 }
 h1 img {
@@ -86,18 +86,19 @@ button.btn-danger:active {
 }
 button.btn-onelab {
     border:0;
-    border-bottom:2px solid #540086;
+    border-bottom:3px solid #540086;
     background-color:#302562;
     color:white;
 }
 button.btn-onelab:hover {
     border:0;
-    border-bottom:2px solid #540086;
+    border-bottom:3px solid #540086;
     background-color:#302562;
-    color:#FFFFCC;
+    color:white;
 }
-button.btn-primary:active {
+button.btn-onelab:active {
     box-shadow:none;
+    border-bottom:1px solid #540086;
 }
 /***** Notifications *****/
 .warning {
@@ -237,7 +238,9 @@ div#ticket-request p {
     margin:20px 0;
 }
 
-ul.nav-tabs {}
+ul.nav-tabs {
+    margin:15px 0;
+}
 ul.nav-tabs ul {}
 ul.nav-tabs li {}
 
@@ -408,9 +411,9 @@ div.dataTables_filter label{
   -webkit-box-shadow: 0 0 1px rgba(82,82,82,0.6);
   box-shadow:         0 0 1px rgba(82,82,82,0.6);
   height:61px;
-  margin-bottom:15px;
   background-color:white;
 }
+
 div.navigation {
     
 }

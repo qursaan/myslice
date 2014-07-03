@@ -3,14 +3,14 @@
 
 {% block content %}
 	<div class="row">
-		<div class="col-md-12 el">
+		<div class="col-md-12">
 			<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="Request a Slice" /> Request a new Slice</h1>
 		</div>
 	</div>
 
 	{% if errors %}
 	<div class="row">
-		<div class="col-md-12 el">
+		<div class="col-md-12">
 		<ul>
 		  {% for error in errors %}
 		  <li>{{ error }}</li>
@@ -21,7 +21,7 @@
 	{% endif %}
 	
 	<div class="row">
-		<div class="col-md-8 col-md-offset-2 el">
+		<div class="col-md-8 el">
 			<form role="form" method="post">
 			{% csrf_token %}
 			  <div class="form-group" style="display:none">
@@ -58,7 +58,7 @@
 jQuery(document).ready(function(){
 	
 	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
-		var jsonData = JSON.parse(data)
+		var jsonData = JSON.parse(data);
         $(this).attr("value", jsonData[0]['parent_authority']);
     });
     var availableTags = [
@@ -77,7 +77,7 @@ jQuery(document).ready(function(){
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
-      select: function( event, ui ) {console.log(jQuery(this))}
+      select: function( event, ui ) {console.log(jQuery(this));}
     });
 });
 </script>
