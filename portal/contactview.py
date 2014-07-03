@@ -35,7 +35,7 @@ class ContactView (FreeAccessView, ThemeView):
             #theme.template_name = 'email_support.txt'
             #recipients = render_to_string(theme.template, form.cleaned_data)
             #recipients = subject.replace('\n', '')
-            recipients = ['support@myslice.info','contact@fed4fire.eu']
+            recipients = ['support@myslice.info']
             if cc_myself:
                 recipients.append(email)
             #recipients = ['support@myslice.info']
@@ -89,7 +89,7 @@ class ContactView (FreeAccessView, ThemeView):
                             if 'myslice' in platform_detail['platform']:
                                 acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
             # assigning values
-            if acc_auth_cred == {}:
+            if acc_auth_cred == {} or acc_auth_cred == 'N/A':
                 pi = "is_not_pi"
             else:
                 pi = "is_pi"

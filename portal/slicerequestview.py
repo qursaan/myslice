@@ -8,7 +8,7 @@ from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
 from portal.actions             import is_pi, create_slice, create_pending_slice
-from portal.forms               import SliceRequestForm
+#from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
@@ -62,7 +62,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
 
         # checking if pi or not
-        if acc_auth_cred == {}:
+        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
             pi = "is_not_pi"
         else:
             pi = "is_pi"
