@@ -32,15 +32,18 @@ h3 {
     font-size:13pt;
     color:#201E62;
 }
-input[type=text], input[type=password], input[type=email], select, option {
+input[type=text], input[type=password], input[type=email],input[type=number], select, option {
     min-width:260px;
     padding:6px;
     border:1pt solid #22606D;
     vertical-align:bottom;
     border-radius:0;
 }
-input {
-    
+
+textarea {
+    padding:6px;
+    border:1pt solid #22606D !important;
+    border-radius:0 !important;
 }
 
 span.label {
@@ -92,13 +95,13 @@ button.btn-primary:active {
     margin-top:2px;
 }
 button.btn-danger {
-    border-bottom:3px solid #EEA236;
+    border-bottom:3px solid #A13F3A;
 }
 button.btn-danger:hover {
     box-shadow:none;
     background-color:#d9534f;
     border:1px solid #d43f3a;
-    border-bottom:3px solid #EEA236;
+    border-bottom:3px solid #A13F3A;
 }
 button.btn-danger:active {
     border:1px solid #d43f3a;

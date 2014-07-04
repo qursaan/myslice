@@ -58,9 +58,9 @@
 	<div class="tab-pane row" id="slices">
 		<div class="col-md-12 el">
 		{% if 'is_pi'  in pi %}
-	  	<button id="createslice" type="button" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+	  	<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
 		{% else %}
-		<button id="createslice" type="button" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
+		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
 		{% endif %}
 		<br /><br />
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
@@ -228,6 +228,10 @@ $(document).ready(function() {
     	if (id == 'requests') 
     		$("#" + id).load('/management/' + id);
 	});
+	var hash = window.location.hash;
+	if (hash) {
+		$('.nav-tabs a[href='+hash+']').click();
+	}
 });
 </script>
 {% endblock %}
