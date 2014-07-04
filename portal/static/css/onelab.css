@@ -32,6 +32,17 @@ h3 {
     font-size:13pt;
     color:#201E62;
 }
+input[type=text], input[type=password], input[type=email], select, option {
+    min-width:260px;
+    padding:6px;
+    border:1pt solid #22606D;
+    vertical-align:bottom;
+    border-radius:0;
+}
+input {
+    
+}
+
 span.label {
     font-size:11pt;
     color:gray;
@@ -42,7 +53,7 @@ div.el {
     padding-bottom:15px;
 }
 /* buttons */
-button.btn {
+button.btn, input.btn {
     padding:6px 10px;
     border-radius:5px;
     font-size:10pt;
@@ -70,38 +81,45 @@ button.btn-primary {
     border-bottom:3px solid #3071A9;
 }
 button.btn-primary:hover {
+    box-shadow:none;
+    background-color:#428bca;
+    border:1px solid #357ebd;
     border-bottom:3px solid #3071A9;
 }
 button.btn-primary:active {
     box-shadow:none;
+    border-bottom:1px solid #3071A9;
     margin-top:2px;
 }
 button.btn-danger {
-    border-bottom:2px solid #FF7394;
+    border-bottom:3px solid #EEA236;
 }
 button.btn-danger:hover {
-    border-bottom:2px solid #D2322D;
+    box-shadow:none;
+    background-color:#d9534f;
+    border:1px solid #d43f3a;
+    border-bottom:3px solid #EEA236;
 }
 button.btn-danger:active {
-    border:1px solid #D2322D;
+    border:1px solid #d43f3a;
     box-shadow:none;
     margin-top:2px;
 }
-button.btn-onelab {
+button.btn-onelab, input.btn-onelab {
     border:0;
-    border-bottom:3px solid #540086;
+    border-bottom:3px solid #760073;
     background-color:#302562;
     color:white;
 }
-button.btn-onelab:hover {
+button.btn-onelab:hover, input.btn-onelab:hover {
     border:0;
-    border-bottom:3px solid #540086;
+    border-bottom:3px solid #760073;
     background-color:#302562;
     color:white;
 }
-button.btn-onelab:active {
+button.btn-onelab:active, input.btn-onelab:active {
     box-shadow:none;
-    border-bottom:1px solid #540086;
+    border-bottom:1px solid #760073;
     margin-top:2px;
 }
 /***** Notifications *****/
@@ -580,25 +598,12 @@ div.registration-form {
     padding-top:150px;
     text-align:center;
 }
-div.login-form input[type=text] {
-    
-    
 
-}
 .login-form input {
-    font-size:12pt;
     width:320px;
-    padding:8px;
-    border:1pt solid #22606D;
 }
 .login-form input[type=submit] {
-    border:0;
-    border-bottom:2px solid #540086;
-    background-color:#302562;
-    color:white;
-    width:100px;
-    border-radius:5px;
-    font-size:12pt;
+    width:108px;
 }
 
 .login-submit {
