@@ -4,7 +4,7 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="Request a Slice" /> Request a new Slice</h1>
+			<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="Request a Slice" /> Request a new slice</h1>
 		</div>
 	</div>
 
@@ -28,7 +28,7 @@
 			    <input type="email" class="form-control" id="email" style="width:300px" value="{{ email }}" readonly="readonly">
 			  </div>
 			  <div class="form-group">
-			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice Name" 
+			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice name" 
 				title="Please enter a name for your slice"required="required">
 			  </div>
 			  <div class="form-group">
@@ -41,11 +41,11 @@
 				{%endif%}
 			  </div>
 			  <div class="form-group">
-			    <input type="number" class="form-control" name="number_of_nodes" id="number_of_nodes" style="width:300px" placeholder="Number of Nodes"
+			    <input type="number" class="form-control" name="number_of_nodes" id="number_of_nodes" style="width:300px" placeholder="Number of nodes"
 				title="Number of nodes you expect to request (informative)">
 			  </div>
 			  <div class="form-group">
-			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment Purpose" style="width:300px" 
+			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
 				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
 			  <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
