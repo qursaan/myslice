@@ -11,6 +11,7 @@ body {
 }
 a, a:active, a:focus {
     outline: 0;
+    text-decoration:none;
 }
 
 h1 {
@@ -54,6 +55,11 @@ span.label {
 }
 div.el {
     padding-bottom:15px;
+}
+div.breadcrumbs {
+    margin:15px 0;
+    color:gray;
+    font-size:10pt;
 }
 /* buttons */
 button.btn, input.btn {
@@ -264,27 +270,21 @@ div#ticket-request p {
 }
 
 ul.nav-tabs {
-    margin:15px 0;
+    margin:0 0 15px 0;
 }
 ul.nav-tabs ul {}
 ul.nav-tabs li {}
 
 ul.nav-section li a {
+    color:black;
     border-bottom:0;
 }
 ul.nav-section li:first-child {
     padding:0;
 }
 ul.nav-section li:first-child a {
-    font-weight:bold;
-    padding:6px 15px 4px 15px;
 }
 ul.nav-section li:first-child.active a {
-    padding:6px 15px 3px 15px;
-}
-ul.nav-section li:first-child img {
-    margin:0 4px 1px 0;
-    padding:0;
 }
 
 ul.nav-resources {

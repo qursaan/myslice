@@ -1,22 +1,29 @@
+<div class="row">
+	<div class="col-md-12">
+		 <div class="breadcrumbs">
+		 	 Experiment &nbsp;>&nbsp; {{ slice }}
+		 </div>
+	</div>
+</div>
 {% if section == "resources" %}
 <ul class="nav nav-tabs nav-section">
-	<li><a href="/slice/{{ slice }}#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" /> {{ slice }}</a></li>
+	<li><a href="/slice/{{ slice }}#info">Information</a></li>
 	<!-- <li><a href="/slice/{{ slice }}#testbeds">Testbeds</a></li> -->
 	<li class="active"><a class="link" href="/resources/{{ slice }}">Resources</a></li>
 	<li><a href="/slice/{{ slice }}#users">Users</a></li>
 	<!-- <li><a href="/slice/{{ slice }}#experiment">Statistics</a></li> -->
 	<!-- <li><a href="/slice/{{ slice }}#experiment">Measurements</a></li> -->
-	<li><a href="/slice/{{ slice }}#experiment">Experiment</a></li>
+	<li><a href="/slice/{{ slice }}#experiment">Tools</a></li>
 </ul>
 {% else %}
 <ul class="nav nav-tabs nav-section">
-	<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" /> {{ slice }}</a></li>
+	<li class="active"><a href="#info">Information</a></li>
 	<!-- <li class="testbeds"><a href="#testbeds">Testbeds</a></li> -->
 	<li><a class="link" href="/resources/{{ slice }}">Resources</a></li>
 	<li class="users"><a href="#users">Users</a></li>
 	<!-- <li class="statistics"><a href="#experiment">Statistics</a></li> -->
 	<!-- <li class="measurements"><a href="#experiment">Measurements</a></li> -->
-	<li class="experiment"><a href="#experiment">Experiment</a></li>
+	<li class="experiment"><a href="#experiment">Tools</a></li>
 </ul>
 <script>
 $(document).ready(function() {

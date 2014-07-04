@@ -8,8 +8,17 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
+			 <div class="breadcrumbs">
+			 	 Management &nbsp;>&nbsp; Institution: <span id="authority_name"></span>
+			 </div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
 			<ul class="nav nav-tabs nav-section">
-				<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/authority-xs.png" alt="Institution" /> Institution {{user_details.parent_authority}}</a></li>
+				<li class="active"><a href="#info">About</a></li>
 				<li><a href="#users">Users</a></li>
 				<li><a href="#slices">Slices</a></li>
 				<li><a href="#requests">Requests</a></li>
@@ -93,11 +102,13 @@ $(document).ready(function() {
     {% if user_details.parent_authority %}
         
         $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
+        	
             var authority_data = [];
             var onelab_data = [];
 			/* 'city','enabled','legal','longitude','onelab_membership','address','parent_authority','slice','user','country',
             'tech','abbreviated_name','url','postcode','description','scientific','authority_hrn','latitude','name'	*/
             $.each( data, function( key, val ) {
+            	$('#authority_name').text(val.name);
                 authority_row = "<img src='{{ STATIC_URL }}img/institutions/{{user_details.parent_authority}}.gif' alt='' /><br>";
                 authority_row += "<br>";
                 authority_row += "<b>authority:</b> "+val.authority_hrn+"<br>";
