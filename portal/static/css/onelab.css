@@ -63,6 +63,7 @@ button.btn-default:active {
     background-color:white;
     border:1px solid #ADADAD;
     border-bottom:1px solid #ADADAD;
+    margin-top:2px;
     box-shadow:none;
 }
 button.btn-primary {
@@ -73,6 +74,7 @@ button.btn-primary:hover {
 }
 button.btn-primary:active {
     box-shadow:none;
+    margin-top:2px;
 }
 button.btn-danger {
     border-bottom:2px solid #FF7394;
@@ -83,6 +85,7 @@ button.btn-danger:hover {
 button.btn-danger:active {
     border:1px solid #D2322D;
     box-shadow:none;
+    margin-top:2px;
 }
 button.btn-onelab {
     border:0;
@@ -99,6 +102,7 @@ button.btn-onelab:hover {
 button.btn-onelab:active {
     box-shadow:none;
     border-bottom:1px solid #540086;
+    margin-top:2px;
 }
 /***** Notifications *****/
 .warning {
