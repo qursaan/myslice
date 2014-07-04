@@ -396,8 +396,10 @@
                     row = this.find_row(data.value);
                     if (row)
                         this.table.fnDeleteRow(row.nTr);
+                        /* indent was wrong !!
                         $("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
                         $("#badge-pending").text($("#badge-pending").data('number'));
+                        */
                     return;
                     break;  
                 case STATE_SET_IN_SUCCESS:
@@ -437,8 +439,10 @@
                 // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);
                 row = this.find_row(data.value);
+                /*
                 $("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
                 $("#badge-pending").text($("#badge-pending").data('number'));
+                */
             } else {
                 // Update row text...
                 this.table.fnUpdate(newline, row.nTr);

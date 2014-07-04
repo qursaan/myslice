@@ -188,6 +188,10 @@ function QueryExt(query, parent_query_ext, main_query_ext, update_query_ext, dis
     // Filters that impact visibility in the local interface
     this.filters = [];
 
+    // XXX Until we find a better solution
+    this.num_pending = 0;
+    this.num_unconfigured = 0;
+
     // update_query null unless we are a main_query (aka parent_query == null); only main_query_fields can be updated...
 }
 
@@ -342,10 +346,15 @@ function QueryStore() {
 
     this.add_record = function(query_uuid, record, new_state)
     {
-        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        var query_ext, key, record_key;
+        query_ext = this.find_analyzed_query_ext(query_uuid);
         
-        var key = manifold.metadata.get_key(query_ext.query.object);
-        var record_key = manifold.record_get_value(record, key);
+        if (typeof(record) == 'object') {
+            key = manifold.metadata.get_key(query_ext.query.object);
+            record_key = manifold.record_get_value(record, key);
+        } else {
+            record_key = record;
+        }
 
         var record_entry = query_ext.records.get(record_key);
         if (!record_entry)
@@ -356,10 +365,15 @@ function QueryStore() {
 
     this.remove_record = function(query_uuid, record, new_state)
     {
-        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        var query_ext, key, record_key;
+        query_ext = this.find_analyzed_query_ext(query_uuid);
         
-        var key = manifold.metadata.get_key(query_ext.query.object);
-        var record_key = manifold.record_get_value(record, key);
+        if (typeof(record) == 'object') {
+            key = manifold.metadata.get_key(query_ext.query.object);
+            record_key = manifold.record_get_value(record, key);
+        } else {
+            record_key = record;
+        }
 
         manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
     }
@@ -440,18 +454,77 @@ function QueryStore() {
         return query_ext.filters;
     }
 
+    this.recount = function(query_uuid)
+    {
+        var query_ext;
+        var is_reserved, is_pending, in_set,  is_unconfigured;
+
+        query_ext = manifold.query_store.find_analyzed_query_ext(query_uuid);
+        query_ext.num_pending = 0;
+        query_ext.num_unconfigured = 0;
+
+        this.iter_records(query_uuid, function(record_key, record) {
+            var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
+            var record_warnings = manifold.query_store.get_record_state(query_uuid, record_key, STATE_WARNINGS);
+
+            is_reserved = (record_state == STATE_SET_IN) 
+                       || (record_state == STATE_SET_OUT_PENDING)
+                       || (record_state == STATE_SET_IN_SUCCESS)
+                       || (record_state == STATE_SET_OUT_FAILURE);
+
+            is_pending = (record_state == STATE_SET_IN_PENDING) 
+                      || (record_state == STATE_SET_OUT_PENDING);
+
+            in_set = (record_state == STATE_SET_IN) // should not have warnings
+                  || (record_state == STATE_SET_IN_PENDING)
+                  || (record_state == STATE_SET_IN_SUCCESS)
+                  || (record_state == STATE_SET_OUT_FAILURE); // should not have warnings
+
+            is_unconfigured = (in_set && !$.isEmptyObject(record_warnings));
+
+            /* Let's update num_pending and num_unconfigured at this stage */
+            if (is_pending)
+                query_ext.num_pending++;
+            if (is_unconfigured)
+                query_ext.num_unconfigured++;
+        });
+
+    }
+
     this.apply_filters = function(query_uuid)
     {
+        var start = new Date().getTime();
+
         // Toggle visibility of records according to the different filters.
 
         var self = this;
         var filters = this.get_filters(query_uuid);
         var col_value;
+        /* Let's update num_pending and num_unconfigured at this stage */
 
         // Adapted from querytable._querytable_filter()
 
         this.iter_records(query_uuid, function(record_key, record) {
+            var is_reserved, is_pending, in_set,  is_unconfigured;
             var visible = true;
+
+            var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
+            var record_warnings = manifold.query_store.get_record_state(query_uuid, record_key, STATE_WARNINGS);
+
+            is_reserved = (record_state == STATE_SET_IN) 
+                       || (record_state == STATE_SET_OUT_PENDING)
+                       || (record_state == STATE_SET_IN_SUCCESS)
+                       || (record_state == STATE_SET_OUT_FAILURE);
+
+            is_pending = (record_state == STATE_SET_IN_PENDING) 
+                      || (record_state == STATE_SET_OUT_PENDING);
+
+            in_set = (record_state == STATE_SET_IN) // should not have warnings
+                  || (record_state == STATE_SET_IN_PENDING)
+                  || (record_state == STATE_SET_IN_SUCCESS)
+                  || (record_state == STATE_SET_OUT_FAILURE); // should not have warnings
+
+            is_unconfigured = (in_set && !$.isEmptyObject(record_warnings));
 
             // We go through each filter and decide whether it affects the visibility of the record
             $.each(filters, function(index, filter) {
@@ -470,37 +543,24 @@ function QueryStore() {
                         return true; // ~ continue
                     }
 
-                    var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
-                    var record_warnings = manifold.query_store.get_record_state(query_uuid, record_key, STATE_WARNINGS);
-
                     switch (value) {
                         case 'reserved':
-                            visible = (record_state == STATE_SET_IN) 
-                                   || (record_state == STATE_SET_OUT_PENDING)
-                                   || (record_state == STATE_SET_IN_SUCCESS)
-                                   || (record_state == STATE_SET_OUT_FAILURE);
-                            // visible = true  => ~ continue
-                            // visible = false => ~ break
-                            return visible; 
-
+                            // true  => ~ continue
+                            // false => ~ break
+                            visible = is_reserved;
+                            return visible;
                         case 'unconfigured':
-                            var in_set = (record_state == STATE_SET_IN) // should not have warnings
-                                   || (record_state == STATE_SET_IN_PENDING)
-                                   || (record_state == STATE_SET_IN_SUCCESS)
-                                   || (record_state == STATE_SET_OUT_FAILURE); // should not have warnings
-                            visible = (in_set && !$.isEmptyObject(record_warnings));
-                            return visible; 
-
+                            visible = is_unconfigured;
+                            return visible;
                         case 'pending':
-                            visible = (record_state == STATE_SET_IN_PENDING) 
-                                   || (record_state == STATE_SET_OUT_PENDING);
-                            return visible; 
+                            visible = is_pending;
+                            return visible;
                     }
                     return false; // ~ break
                 }
 
                 /* Normal filtering behaviour (according to the record content) follows... */
-                col_value = manifold.record_get_value(record, record_key);
+                col_value = manifold.record_get_value(record, key);
 
                 // When the filter does not match, we hide the column by default
                 if (col_value === 'undefined') {
@@ -550,6 +610,9 @@ function QueryStore() {
             // Set the visibility status in the query store
             self.set_record_state(query_uuid, record_key, STATE_VISIBLE, visible);
         });
+
+        var end = new Date().getTime();
+        console.log("APPLY FILTERS took", end - start, "ms");
 
     }
 
@@ -775,7 +838,9 @@ var manifold = {
         manifold.query_store.insert(query);
 
         // Run
+        $(document).ready(function() {
         manifold.run_query(query);
+        });
 
         // FORMER API
         if (query.analyzed_query == null) {
@@ -1082,7 +1147,8 @@ var manifold = {
             switch (this.get_type(result_value)) {
                 case TYPE_RECORD:
                     var subobject = manifold.metadata.get_type(object, field);
-                    if (subobject)
+                    // if (subobject) XXX Bugs with fields declared string while they are not : network.version is a dict in fact
+                    if (subobject && subobject != 'string')
                         manifold.make_record(subobject, result_value);
                     break;
                 case TYPE_LIST_OF_RECORDS:
@@ -1390,6 +1456,8 @@ var manifold = {
 
 
     raise_event: function(query_uuid, event_type, value) {
+        var query, query_ext;
+
         // Query uuid has been updated with the key of a new element
         query_ext    = manifold.query_store.find_analyzed_query_ext(query_uuid);
         query = query_ext.query;
@@ -1457,7 +1525,9 @@ var manifold = {
                 });
                 value.key = value_key;
 
+                manifold.query_store.recount(cur_query.query_uuid);
                 manifold.raise_record_event(cur_query.query_uuid, event_type, value);
+
 
                 // XXX make this DOT a global variable... could be '/'
                 break;
@@ -1529,46 +1599,90 @@ var manifold = {
 
                 /* CONSTRAINTS */
 
-                // CONSTRAINT_RESERVABLE_LEASE
-                // 
-                // +) If a reservable node is added to the slice, then it should have a corresponding lease
-                var is_reservable = (record.exclusive == true);
-                if (is_reservable) {
-                    var warnings = manifold.query_store.get_record_state(query_uuid, resource_key, STATE_WARNINGS);
+                // XXX When we add a lease we must update the warnings
 
-                    if (event_type == SET_ADD) {
-                        // We should have a lease_query associated
-                        var lease_query = query_ext.parent_query_ext.query.subqueries['lease'];
-                        var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
-                        // Do we have lease records with this resource
-                        var lease_records = $.grep(lease_query_ext.records, function(lease_key, lease) {
-                            return lease['resource'] == value;
-                        });
-                        if (lease_records.length == 0) {
-                            // Sets a warning
-                            // XXX Need for a better function to manage warnings
-                            var warn = "No lease defined for this reservable resource.";
-                            warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
-                        } else {
-                            // Lease are defined, delete the warning in case it was set previously
-                            delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                switch(query.object) {
+
+                    case 'resource':
+                        // CONSTRAINT_RESERVABLE_LEASE
+                        // 
+                        // +) If a reservable node is added to the slice, then it should have a corresponding lease
+                        // XXX Not always a resource
+                        var is_reservable = (record.exclusive == true);
+                        if (is_reservable) {
+                            var warnings = manifold.query_store.get_record_state(query_uuid, resource_key, STATE_WARNINGS);
+
+                            if (event_type == SET_ADD) {
+                                // We should have a lease_query associated
+                                var lease_query = query_ext.parent_query_ext.query.subqueries['lease']; // in  options
+                                var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
+                                // Do we have lease records with this resource
+                                var lease_records = $.grep(lease_query_ext.records, function(lease_key, lease) {
+                                    return lease['resource'] == value;
+                                });
+                                if (lease_records.length == 0) {
+                                    // Sets a warning
+                                    // XXX Need for a better function to manage warnings
+                                    var warn = "No lease defined for this reservable resource.";
+                                    warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+                                } else {
+                                    // Lease are defined, delete the warning in case it was set previously
+                                    delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                                }
+                            } else {
+                                // Remove warnings attached to this resource
+                                delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                            }
+
+                            manifold.query_store.set_record_state(query_uuid, resource_key, STATE_WARNINGS, warnings);
+                            break;
                         }
-                    } else {
-                        // Remove warnings attached to this resource
-                        delete warnings[CONSTRAINT_RESERVABLE_LEASE];
-                    }
 
-                    manifold.query_store.set_record_state(query_uuid, resource_key, STATE_WARNINGS, warnings);
+                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                        data = {
+                            request: null,
+                            key   : null,
+                            value : resource_key,
+                            status: STATE_WARNINGS
+                        };
+                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
 
+                    case 'lease':
+                        var resource_key = record.resource;
+                        var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
+                        var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
+
+                        if (event_type == SET_ADD) {
+                             // A lease is added, it removes the constraint
+                            delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                        } else {
+                            // A lease is removed, it might trigger the warning
+                            var lease_records = $.grep(query_ext.records, function(lease_key, lease) {
+                                return lease['resource'] == value;
+                            });
+                            if (lease_records.length == 0) { // XXX redundant cases
+                                // Sets a warning
+                                // XXX Need for a better function to manage warnings
+                                var warn = "No lease defined for this reservable resource.";
+                                warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+                            } else {
+                                // Lease are defined, delete the warning in case it was set previously
+                                delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                            }
+                            
+                        }
+
+                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                        data = {
+                            request: null,
+                            key   : null,
+                            value : resource_key,
+                            status: STATE_WARNINGS
+                        };
+                        manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
+                        break;
                 }
-                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
-                data = {
-                    request: null,
-                    key   : null,
-                    value : resource_key,
-                    status: STATE_WARNINGS
-                };
-                manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
 
                 // -) When a lease is added, it might remove the warning associated to a reservable node
 

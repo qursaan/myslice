@@ -1,4 +1,6 @@
-
+tr.even {
+    background-color: #FAFAFA;
+}
 div .added {
 	background-color: #FFFF99;
 }

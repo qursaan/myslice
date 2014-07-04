@@ -33,6 +33,12 @@ Current implementation makes the following assumptions
   as we use 'aoColumnDefs' instead.
 """
 
+    MAP = {
+        'network_hrn'   :   'Testbed',
+        'hostname'      :   'Resource name',
+        'type'          :   'Type',
+    }
+
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
                   init_key=None,
@@ -43,20 +49,28 @@ Current implementation makes the following assumptions
         self.query_all      = query_all
         self.query_all_uuid = query_all.query_uuid if query_all else None
         self.checkboxes     = checkboxes
+
         # XXX We need to have some hidden columns until we properly handle dynamic queries
         if columns is not None:
-            self.columns=columns
-            self.hidden_columns = []
+            _columns = columns
+            _hidden_columns = []
         elif self.query:
-            self.columns = self.query.fields
+            _columns = [field for field in self.query.fields if not field == 'urn']
             if query_all:
                 # We need a list because sets are not JSON-serializable
-                self.hidden_columns = list(self.query_all.fields - self.query.fields)
+                _hidden_columns = list(self.query_all.fields - self.query.fields)
+                _hidden_columns.append('urn')
             else:
-                self.hidden_columns = []
+                _hidden_columns = []
         else:
-            self.columns = []
-            self.hidden_columns = []
+            _columns = []
+            _hidden_columns = []
+
+        print "_columns=", _columns
+        self.columns = { self.MAP.get(c, c) : c for c in _columns }
+        self.hidden_columns = { self.MAP.get(c, c) : c for c in _hidden_columns }
+        print "self.columns", self.columns
+
         self.init_key=init_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type

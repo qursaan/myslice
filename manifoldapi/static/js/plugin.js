@@ -1,3 +1,24 @@
+// Common parts for angularjs plugins
+// only one ng-app is allowed
+
+var ManifoldApp = angular.module('ManifoldApp', []);
+ManifoldApp.config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+});
+
+ManifoldApp.factory('$exceptionHandler', function () {
+    return function (exception, cause) {
+        console.log(exception.message);
+    };
+});
+
+ManifoldApp.filter('offset', function() {
+  return function(input, start) {
+    start = parseInt(start, 10);
+    return input.slice(start);
+  };
+});
+
 // INHERITANCE
 // http://alexsexton.com/blog/2010/02/using-inheritance-patterns-to-organize-large-jquery-applications/
 // We will use John Resig's proposal

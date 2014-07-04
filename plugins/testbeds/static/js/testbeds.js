@@ -10,8 +10,61 @@
  * License:     GPLv3
  */
 
-(function($){
+// XXX Inherit from an AngularPlugin class ?
+(function (ng, app) {
 
+    // Define our Controller constructor.
+    function Controller($scope) {
+        /* Contructor */
+
+        /* Plugin instance */
+        $scope.instance = null;
+
+        /* Models */
+        $scope.testbeds = Array();
+
+        /* Click event */
+        $scope.select = function(testbed)
+        {
+            var selected, prev_selected, num, num_selected, num_prev_selected, filter;
+
+            prev_selected = $.map($scope.testbeds, function(x, i) {
+                return x.active ? x.network_hrn : null;
+            });
+
+            testbed.active = !testbed.active;
+
+            selected = $.map($scope.testbeds, function(x, i) {
+                return x.active ? x.network_hrn : null;
+            });
+
+            num = $scope.testbeds.length;
+            prev_num_selected = prev_selected.length;
+            num_selected = selected.length;
+
+            
+            if ((prev_num_selected != 0) && (prev_num_selected != num)) {
+                // Remove previous filter
+                filter = ['network_hrn', 'included', prev_selected];
+                manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
+            }
+
+            if ((num_selected != 0) && (num_selected != num)) {
+                filter = ['network_hrn', 'included', selected];
+                manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
+            }
+        };
+
+        /* Return object reference */
+        return (this);
+    }
+
+    // Define the Controller as the constructor function.
+    app.controller("TestbedsCtrl", Controller);
+
+})(angular, ManifoldApp);
+
+(function($){
     var TestbedsPlugin = Plugin.extend({
 
         /** XXX to check
@@ -21,64 +74,24 @@
          * @return : a jQuery collection of objects on which the plugin is
          *     applied, which allows to maintain chainability of calls
          */
-        init: function(options, element) {
-	        // for debugging tools
-	        this.classname="testbedsplugin";
+        init: function(options, element) 
+        {
             // Call the parent constructor, see FAQ when forgotten
             this._super(options, element);
 
             /* Member variables */
             this.filters = Array();
             this.testbeds = Array();
-            /* Plugin events */
 
-            /* Setup query and record handlers */
+            this._get_scope().instance = this;
 
-            // Explain this will allow query events to be handled
-            // What happens when we don't define some events ?
-            // Some can be less efficient
+            /* Handlers */
             this.listen_query(options.query_uuid);
-            this.listen_query(options.query_all_uuid, 'all');
-
-            /* GUI setup and event binding */
-            // call function
-
+            this.listen_query(options.query_networks_uuid, 'networks');
         },
 
-        /* PLUGIN EVENTS */
-        // on_show like in querytable
 
-
-        /* GUI EVENTS */
-
-        // a function to bind events here: click change
-        // how to raise manifold events
-
-
-        /* GUI MANIPULATION */
-
-        // We advise you to write function to change behaviour of the GUI
-        // Will use naming helpers to access content _inside_ the plugin
-        // always refer to these functions in the remaining of the code
-
-        show_hide_button: function() 
-        {
-            // this.id, this.el, this.cl, this.elts
-            // same output as a jquery selector with some guarantees
-        },
-
-        /* TEMPLATES */
-
-        // see in the html template
-        // How to load a template, use of mustache
-
-        /* QUERY HANDLERS */
-
-        // How to make sure the plugin is not desynchronized
-        // He should manifest its interest in filters, fields or records
-        // functions triggered only if the proper listen is done
-
-        // no prefix
+        /* HANDLERS */
 
         /* When a filter is added/removed, update the list of filters local to the plugin */
         on_filter_added: function(filter)
@@ -92,6 +105,9 @@
                 }else if(filter[1]=='=' || filter[1]=='=='){
                     $("#testbeds-filter_"+filter[2]).addClass("active");
                 }
+                // XXX NAMING
+                // XXX How to display unsupported filters
+                // XXX Constants for operators
             }
         },
         on_filter_removed: function(filter)
@@ -112,26 +128,12 @@
 
         // ... be sure to list all events here
 
-        /* RECORD HANDLERS */
-        on_all_new_record: function(record)
+        on_networks_query_done: function()
         {
-            var self = this;
-            // If the resource has a network_hrn
-            if(record["network_hrn"]!="None" && record["network_hrn"]!="" && record["network_hrn"]!=null){
-                // If this network_hrn is not listed yet
-                if(jQuery.inArray(record["network_hrn"],self.testbeds)==-1){
-                    row  = '<a href="#" class="list-group-item sl-platform" id="testbeds-filter_'+record["network_hrn"]+'" data-platform="'+record["network_hrn"]+'">';
-                    //row += '<span class="list-group-item-heading">'+record["platform"]+'</span>';
-                    //row += '<span class="list-group-item-heading">'+record["network_hrn"]+'</span></a>';
-                    row += '<p class="list-group-item-heading">'+record["network_hrn"]+'</p></a>';
-                    $('#testbeds-filter').append(row);
-                    self.testbeds.push(record["network_hrn"]);
-                }
-            }
+             this.set_networks();
         },
 
-        /* When the query is done, add the click event to the elements  */
-        on_all_query_done: function() {
+/*
             var self = this;
             console.log('query network DONE');
             $("[id^='testbeds-filter_']").on('click',function(e) {
@@ -148,16 +150,26 @@
                 return $(this).hasClass('active') ? self._addFilter(key, op, value) : self._removeFilter(key, op, value);
             });
            
-        },
+        },*/
 
         /* INTERNAL FUNCTIONS */
-        _dummy: function() {
-            // only convention, not strictly enforced at the moment
+
+        set_networks: function()
+        {
+            var scope = this._get_scope();
+            var query_ext = manifold.query_store.find_analyzed_query_ext(this.options.query_networks_uuid);
+            scope.testbeds = query_ext.records.values();
+            $.each(scope.testbeds, function(i, testbed) { testbed.active = true });
+            scope.$apply();
         },
+
+        _get_scope : function()
+        {
+            return angular.element('[ng-controller=TestbedsCtrl]').scope()
+        },
+
         _addFilter: function(key, op, value)
         {
-            console.log("add "+value);
-            var self = this;
             values = Array();
             // get the previous list of values for this key, ex: [ple,nitos]
             // remove the previous filter
@@ -167,7 +179,6 @@
             if(network_filter.length > 0){
                 $.each(network_filter, function(i,f){
                     values = f[2];
-                    manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, [key, op, values]);
                 });
             }
             // Add the new value to list of values, ex: wilab

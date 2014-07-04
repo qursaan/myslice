@@ -53,7 +53,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         main_query.select(
                 'slice_urn', # XXX We need the key otherwise the storage of records bugs !
                 'slice_hrn',
-                'resource.urn', 
+                'resource.urn',
                 'resource.hostname', 'resource.type',
                 'resource.network_hrn',
                 'lease.resource',
@@ -180,8 +180,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             # this is the query at the core of the slice list
             query = sq_resource,
             query_lease = sq_lease,
-            query_all_resources = query_resource_all,
-            query_all_leases = query_lease_all,
         )
 
         # --------------------------------------------------------------------------
@@ -206,15 +204,15 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
 
-        #query_network = Query.get('network').select(network_fields)
-        #page.enqueue_query(query_network)
+        query_networks = Query.get('network').select(network_fields)
+        page.enqueue_query(query_networks)
 
         filter_testbeds = TestbedsPlugin(
             page            = page,
             domid           = 'testbeds-filter',
             title           = 'Filter by testbeds',
             query           = sq_resource,
-            #query_network  = query_network,
+            query_networks  = query_networks,
             init_key        = "network_hrn",
             checkboxes      = True,
             datatables_options = {
@@ -265,7 +263,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
 #        template_env['pending_resources'] = pending_resources.render(self.request)
-        template_env['sla_dialog'] = sla_dialog.render(self.request)
+        template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
         template_env["slice"] = slicename

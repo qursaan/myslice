@@ -83,6 +83,13 @@
 
 /** tables css **/
 
+#scheduler-reservation-table > tbody > tr > th {
+	font-weight: normal;
+}
+#scheduler-reservation-table > thead > tr > th {
+	font-weight: normal;
+}
+
 /*#ShedulerNodes-scroll-container {
     float: left;
     overflow-x: scroll;
@@ -189,12 +196,12 @@
     border: none !important;
 }
 #scheduler-reservation-table tbody tr td{
-    background-color: #A6C9E2 ;
-    border: 1px solid #111111;
+    background-color: #FFFFFF; /*#A6C9E2 ;*/
+/*    border: 1px solid #111111;*/
 }
 
 #scheduler-reservation-table tbody tr.even td{
-    background-color: #E0E0E0 ;
+    background-color: #FAFAFA; /*E0E0E0 ;*/
 }
 
 #scheduler-reservation-table tbody tr th::selection {color:	#000000;background:transparent;}
@@ -204,12 +211,21 @@
 }
 
 #scheduler-reservation-table tbody tr td.reserved {
-    background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50% #DD4444;
+    background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50%; /* #DD4444;*/
     cursor: not-allowed;
 }
 
 #scheduler-reservation-table tbody tr td.maintenance {
     background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
+}
+
+#scheduler-reservation-table tbody tr td.pendingin {
+    background: #FFFF99;
+}
+
+
+#scheduler-reservation-table tbody tr td.pendingout {
+    background: #E8E8E8;
 }
 
 #scheduler-reservation-table tbody tr td.free:hover ,#scheduler-reservation-table tbody tr td.selected, #scheduler-reservation-table tbody tr td.selected_tmp {

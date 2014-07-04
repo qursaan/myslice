@@ -43,10 +43,12 @@ $(document).ready(function() {
 					var el = $('*[data-key="'+myslice.pending[i]+'"]');
 					el.addClass("active");
 					el.find('input[type=checkbox]').prop('checked', true);
+                    /*
 					if (myslice.count() > 0) {
 						$('#badge-pending').text(myslice.count());
 						$('#badge-pending').show();
 					}
+                    */
 				}
 		    }
 		} );
@@ -60,18 +62,20 @@ $(document).ready(function() {
 				row.removeClass("active");
 				myslice.del(id);
 				cnt = myslice.count();
+                /*
 				$('#badge-pending').text(cnt);
 				if (cnt <= 0) {
 					$('#badge-pending').hide();
-				}
+				}*/
 			} else {
 				row.addClass("active");
 				myslice.add(id);
+                /*
 				cnt = myslice.count();
 				$('#badge-pending').text(cnt);
 				if (cnt > 0) {
 					$('#badge-pending').show();
-				}
+				}*/
 			}
 		});
 	});

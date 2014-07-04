@@ -10,6 +10,13 @@ BGCOLOR_REMOVED = 2;
 
 (function($){
 
+    
+    var QUERYTABLE_MAP = {
+        'Testbed': 'network_hrn',
+        'Resource name': 'hostname',
+        'Type': 'type',
+    };
+
     var debug=false;
 //    debug=true
 
@@ -24,16 +31,10 @@ BGCOLOR_REMOVED = 2;
 	    // query_uuid refers to a single object (typically a slice)
 	    // query_all_uuid refers to a list (typically resources or users)
 	    // these can return in any order so we keep track of which has been received yet
-            this.received_all_query = false;
             this.received_query = false;
 
             // We need to remember the active filter for datatables filtering
             this.filters = Array(); 
-
-            // an internal buffer for records that are 'in' and thus need to be checked 
-            this.buffered_records_to_check = [];
-	    // an internal buffer for keeping lines and display them in one call to fnAddData
-	    this.buffered_lines = [];
 
             /* Events */
 	    // xx somehow non of these triggers at all for now
@@ -115,7 +116,7 @@ BGCOLOR_REMOVED = 2;
                     var key = self.canonical_key;
 
                     // Get the index of the key in the columns
-                    var cols = self.table.fnSettings().aoColumns;
+                    var cols = self._get_columns();
                     var index = self.getColIndex(key, cols);
                     if (index != -1) {
                         // The key is found in the table, set the TR id after the data
@@ -177,7 +178,8 @@ BGCOLOR_REMOVED = 2;
          * @param cols
          */
         getColIndex: function(key, cols) {
-            var tabIndex = $.map(cols, function(x, i) { if (x.sTitle == key) return i; });
+            var self = this;
+            var tabIndex = $.map(cols, function(x, i) { if (self._get_map(x.sTitle) == key) return i; });
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
@@ -209,13 +211,15 @@ BGCOLOR_REMOVED = 2;
 
         new_record: function(record)
         {
+            var self = this;
+
             // this models a line in dataTables, each element in the line describes a cell
             line = new Array();
      
             // go through table headers to get column names we want
             // in order (we have temporarily hack some adjustments in names)
-            var cols = this.table.fnSettings().aoColumns;
-            var colnames = cols.map(function(x) {return x.sTitle})
+            var cols = this._get_columns();
+            var colnames = cols.map(function(x) {return self._get_map(x.sTitle)})
             var nb_col = cols.length;
             /* if we've requested checkboxes, then forget about the checkbox column for now */
             //if (this.options.checkboxes) nb_col -= 1;
@@ -224,9 +228,10 @@ BGCOLOR_REMOVED = 2;
                 // Use a key instead of hostname (hard coded...)
                 line.push(this.checkbox_html(record));
 	        }
+            line.push('<span id="' + this.id_from_key('status', record[this.init_key]) + '"></span>'); // STATUS
 	        
             /* fill in stuff depending on the column name */
-            for (var j = 1; j < nb_col - 1; j++) { // nb_col includes status
+            for (var j = 2; j < nb_col - 1; j++) { // nb_col includes status
                 if (typeof colnames[j] == 'undefined') {
                     line.push('...');
                 } else if (colnames[j] == 'hostname') {
@@ -258,7 +263,6 @@ BGCOLOR_REMOVED = 2;
                         line.push('');
                 }
             }
-            line.push('<span id="' + this.id_from_key('status', record[this.init_key]) + '"></span>'); // STATUS
     
     	    // adding an array in one call is *much* more efficient
 	        // this.table.fnAddData(line);
@@ -371,7 +375,7 @@ BGCOLOR_REMOVED = 2;
                 elt.addClass((class_name == BGCOLOR_ADDED ? 'added' : 'removed'));
         },
 
-        do_filter: function()
+        populate_table: function()
         {
             // Let's clear the table and only add lines that are visible
             var self = this;
@@ -383,7 +387,7 @@ BGCOLOR_REMOVED = 2;
 
             lines = Array();
             var record_keys = [];
-            manifold.query_store.iter_visible_records(this.options.query_uuid, function (record_key, record) {
+            manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
                 lines.push(self.new_record(record));
                 record_keys.push(record_key);
             });
@@ -420,29 +424,17 @@ BGCOLOR_REMOVED = 2;
 
         on_filter_added: function(filter)
         {
-            this.do_filter();
-
-            /*
-            this.filters.push(filter);
             this.redraw_table();
-            */
         },
 
         on_filter_removed: function(filter)
         {
-            this.do_filter();
-            /*
-            // Remove corresponding filters
-            this.filters = $.grep(this.filters, function(x) {
-                return x == filter;
-            });
             this.redraw_table();
-            */
         },
         
         on_filter_clear: function()
         {
-            this.do_filter();
+            this.redraw_table();
         },
 
         on_field_added: function(field)
@@ -460,55 +452,7 @@ BGCOLOR_REMOVED = 2;
             alert('QueryTable::clear_fields() not implemented');
         },
 
-        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
-        /*************************** ALL QUERY HANDLER ****************************/
-
-        on_all_filter_added: function(filter)
-        {
-            this.do_filter();
-        },
-
-        on_all_filter_removed: function(filter)
-        {
-            this.do_filter();
-        },
-        
-        on_all_filter_clear: function()
-        {
-            this.do_filter();
-        },
-
-        on_all_field_added: function(field)
-        {
-            this.show_column(field);
-        },
-
-        on_all_field_removed: function(field)
-        {
-            this.hide_column(field);
-        },
-
-        on_all_field_clear: function()
-        {
-            alert('QueryTable::clear_fields() not implemented');
-        },
-
-
         /*************************** RECORD HANDLER ***************************/
-
-        on_new_record: function(record)
-        {
-            if (this.received_all_query) {
-        	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this.set_checkbox_from_record(record, true);
-            } else {
-                this.buffered_records_to_check.push(record);
-            }
-        },
-
-        on_clear_records: function()
-        {
-        },
 
         // Could be the default in parent
         on_query_in_progress: function()
@@ -518,12 +462,8 @@ BGCOLOR_REMOVED = 2;
 
         on_query_done: function()
         {
-            this.do_filter();
-/*
-            this.received_query = true;
-    	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
-*/
+            this.populate_table();
+            this.spin(false);
         },
         
         on_field_state_changed: function(data)
@@ -563,62 +503,38 @@ BGCOLOR_REMOVED = 2;
 
         /************************** PRIVATE METHODS ***************************/
 
+        _get_columns: function()
+        {
+            return this.table.fnSettings().aoColumns;
+            // XXX return $.map(table.fnSettings().aoColumns, function(x, i) { return QUERYTABLE_MAP[x]; });
+        },
+
+        _get_map: function(column_title) {
+            return (column_title in QUERYTABLE_MAP) ? QUERYTABLE_MAP[column_title] : column_title;
+        },
         /** 
-         * @brief QueryTable filtering function
+         * @brief QueryTable filtering function, called for every line in the datatable.
+         * 
+         * Return value:
+         *   boolean determining whether the column is visible or not.
          */
         _querytable_filter: function(oSettings, aData, iDataIndex)
         {
-            var ret = true;
-            $.each (this.filters, function(index, filter) { 
-                /* XXX How to manage checkbox ? */
-                var key = filter[0]; 
-                var op = filter[1];
-                var value = filter[2];
+            var self = this;
+            var key_col, record_key_value;
 
-                /* Determine index of key in the table columns */
-                var col = $.map(oSettings.aoColumns, function(x, i) {if (x.sTitle == key) return i;})[0];
+            /* Determine index of key in the table columns */
+            key_col = $.map(oSettings.aoColumns, function(x, i) {if (self._get_map(x.sTitle) == self.canonical_key) return i;})[0];
 
-                /* Unknown key: no filtering */
-                if (typeof(col) == 'undefined')
-                    return;
+            /* Unknown key: no filtering */
+            if (typeof(key_col) == 'undefined') {
+                console.log("Unknown key");
+                return true;
+            }
 
-                col_value=unfold.get_value(aData[col]);
-                /* Test whether current filter is compatible with the column */
-                if (op == '=' || op == '==') {
-                    if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                }else if (op == 'included') {
-                    $.each(value, function(i,x) {
-                      if(x == col_value){
-                          ret = true;
-                          return false;
-                      }else{
-                          ret = false;
-                      }
-                    });
-                }else if (op == '!=') {
-                    if ( col_value == value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='<') {
-                    if ( parseFloat(col_value) >= value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='>') {
-                    if ( parseFloat(col_value) <= value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='<=' || op=='≤') {
-                    if ( parseFloat(col_value) > value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='>=' || op=='≥') {
-                    if ( parseFloat(col_value) < value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                }else{
-                    // How to break out of a loop ?
-                    alert("filter not supported");
-                    return false;
-                }
+            record_key_value = unfold.get_value(aData[key_col]);
 
-            });
-            return ret;
+            return manifold.query_store.get_record_state(this.options.query_uuid, record_key_value, STATE_VISIBLE);
         },
 
         _querytable_draw_callback: function()

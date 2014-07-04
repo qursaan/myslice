@@ -1,3 +1,16 @@
-<div id={{ domid }}>
+<div id={{ domid }} ng-controller="TestbedsCtrl">
+
 <div class="list-group-item sl-platform"><span class="list-group-item-heading">Testbeds</span></div>
+
+<div ng-repeat="testbed in testbeds"
+     ng-click="select(testbed)">
+	<a href="#" 
+	   class="list-group-item sl-platform"
+       ng-class="{active: testbed.active}"
+	   id="testbeds-filter_{[{ testbed.network_hrn }]}"
+	   data-platform="{[{ testbed.network_hrn }]}">
+	<span class="list-group-item-heading">{[{ testbed.platform }]}</span>
+	<p class="list-group-item-heading">{[{ testbed.network_hrn }]}</p></a>
+</div>
+
 </div>

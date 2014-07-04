@@ -33,6 +33,10 @@
             this.elts('list-group-item').click({'instance': this}, this._on_click);
 
             this.prev_filter_status = null;
+
+            /* Initialize tooltips */
+            $("[rel='tooltip']").tooltip();
+
         },
 
     /**************************************************************************
@@ -52,12 +56,42 @@
     // These functions are here to react on external filters, which we don't
     // use at the moment
 
-    on_filter_added: function(filter) {
+    on_filter_added: function(filter) 
+    {
         // XXX
     },
 
-    on_filter_removed: function(filter) {
+    on_filter_removed: function(filter) 
+    {
         // XXX
+    },
+
+    on_field_state_changed: function(data) 
+    {
+        var query_ext;
+        
+        switch (data.status) {
+            case STATE_SET:
+                /* Get the number of pending / unconfigured resources */
+                /* Let's store it in query_ext */
+                query_ext = manifold.query_store.find_analyzed_query_ext(this.options.query_uuid);
+
+                $('#badge-pending').text(query_ext.num_pending);
+                if (query_ext.num_pending > 0) {
+					$('#badge-pending').show();
+                } else {
+					$('#badge-pending').hide();
+                }
+
+                $('#badge-unconfigured').text(query_ext.num_unconfigured);
+                if (query_ext.num_unconfigured > 0) {
+					$('#badge-unconfigured').show();
+                } else {
+					$('#badge-unconfigured').hide();
+                }
+            default:
+                break;
+        }
     },
 
     /**************************************************************************
