@@ -199,7 +199,7 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
                         if 'myslice' in platform_detail['platform']:
                             acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
         # assigning values
-        if acc_auth_cred == {}:
+        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
             pi = "is_not_pi"
         else:
             pi = "is_pi"
