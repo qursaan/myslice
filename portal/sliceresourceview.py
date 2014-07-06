@@ -157,7 +157,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             # tab's sons preferably turn this off
             togglable  = False,
             query      = sq_resource,
-            query_all  = query_resource_all,
             # this key is the one issued by google
             googlemap_api_key = ConfigEngine().googlemap_api_key(),
             # the key to use at init-time

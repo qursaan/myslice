@@ -1648,6 +1648,7 @@ var manifold = {
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
 
                     case 'lease':
+                    /*
                         var resource_key = record.resource;
                         var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
                         var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
@@ -1681,6 +1682,7 @@ var manifold = {
                         };
                         manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
                         break;
+                    */
                 }
 
 
