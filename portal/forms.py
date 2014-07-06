@@ -99,7 +99,7 @@ class ContactForm(forms.Form):
 class PassResetForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
 
-class SliceRequestForm(forms.Form):
+#class SliceRequestForm(forms.Form):
 #    slice_name = forms.CharField()
 #    authority_hrn = forms.ChoiceField(choices=[(1, 'un')])
 #    number_of_nodes  = forms.DecimalField()
@@ -107,52 +107,52 @@ class SliceRequestForm(forms.Form):
 #    purpose = forms.CharField(widget=forms.Textarea)
 #    email = forms.EmailField()
 #    cc_myself = forms.BooleanField(required=False)
-
-    slice_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class':'form-control'}), 
-        help_text="The name for the slice you wish to create")
-    authority_hrn = forms.ChoiceField(
-        widget    = forms.Select(attrs={'class':'form-control'}),
-        choices   = [],
-        help_text = "An authority responsible for vetting your slice")
-    number_of_nodes = forms.DecimalField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "The number of nodes you expect to request (informative)")
-    type_of_nodes = forms.CharField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "The type of nodes you expect to request (informative)")
-    purpose = forms.CharField(
-        widget    = forms.Textarea(attrs={'class':'form-control'}),
-        help_text = "The purpose of your experiment (informative)")
-    email = forms.EmailField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "Your email address")
-    cc_myself = forms.BooleanField(
-        widget    = forms.CheckboxInput(attrs={'class':'form-control'}),
-        required  = False,
-        help_text = "If you'd like to be cc'ed on the request email")
-
-    def __init__(self, *args, **kwargs):
-        initial =  kwargs.get('initial', {})
-        authority_hrn = initial.get('authority_hrn', None)
-
-        # set just the initial value
-        # in the real form needs something like this {'authority_hrn':'a'}
-        # but in this case you want {'authority_hrn':('a', 'letter_a')}
-        if authority_hrn:
-            kwargs['initial']['authority_hrn'] = authority_hrn[0]
-
-        # create the form
-        super(SliceRequestForm, self).__init__(*args, **kwargs)
-
-        # self.fields only exist after, so a double validation is needed
-        if authority_hrn:# and authority_hrn[0] not in (c[0] for c in authority_hrn):
-            # XXX This does not work, the choicefield is not updated...
-            #self.fields['authority_hrn'].choices.extend(authority_hrn)
-            self.fields['authority_hrn'] = forms.ChoiceField(
-                widget    = forms.Select(attrs={'class':'form-control'}),
-                choices   = authority_hrn,
-                help_text = "An authority responsible for vetting your slice")
+#
+#    slice_name = forms.CharField(
+#        widget=forms.TextInput(attrs={'class':'form-control'}), 
+#        help_text="The name for the slice you wish to create")
+#    authority_hrn = forms.ChoiceField(
+#        widget    = forms.Select(attrs={'class':'form-control'}),
+#        choices   = [],
+#        help_text = "An authority responsible for vetting your slice")
+#    number_of_nodes = forms.DecimalField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "The number of nodes you expect to request (informative)")
+#    type_of_nodes = forms.CharField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "The type of nodes you expect to request (informative)")
+#    purpose = forms.CharField(
+#        widget    = forms.Textarea(attrs={'class':'form-control'}),
+#        help_text = "The purpose of your experiment (informative)")
+#    email = forms.EmailField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "Your email address")
+#    cc_myself = forms.BooleanField(
+#        widget    = forms.CheckboxInput(attrs={'class':'form-control'}),
+#        required  = False,
+#        help_text = "If you'd like to be cc'ed on the request email")
+#
+#    def __init__(self, *args, **kwargs):
+#        initial =  kwargs.get('initial', {})
+#        authority_hrn = initial.get('authority_hrn', None)
+#
+#        # set just the initial value
+#        # in the real form needs something like this {'authority_hrn':'a'}
+#        # but in this case you want {'authority_hrn':('a', 'letter_a')}
+#        if authority_hrn:
+#            kwargs['initial']['authority_hrn'] = authority_hrn[0]
+#
+#        # create the form
+#        super(SliceRequestForm, self).__init__(*args, **kwargs)
+#
+#        # self.fields only exist after, so a double validation is needed
+#        if authority_hrn:# and authority_hrn[0] not in (c[0] for c in authority_hrn):
+#            # XXX This does not work, the choicefield is not updated...
+#            #self.fields['authority_hrn'].choices.extend(authority_hrn)
+#            self.fields['authority_hrn'] = forms.ChoiceField(
+#                widget    = forms.Select(attrs={'class':'form-control'}),
+#                choices   = authority_hrn,
+#                help_text = "An authority responsible for vetting your slice")
 
 
 class PasswordResetForm(forms.Form):

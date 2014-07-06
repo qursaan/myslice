@@ -1,8 +1,28 @@
 <img src="https://onelab.eu/templates/onelab2/images/logo.png">
 <br>
-<h1>You have registered to {{current_site}}</h1>
-<br>
-<h1>Please validate your email address by clicking the following link</h1>
-<br>
-<a href={{validation_link}}>{{validation_link}}</a>
+<p>We have received a user signup request for your email address at {{current_site}}</p>
+<p>You have the following user details:</p>
 
+Organization: {{organization}}<br>
+First name: {{first_name}}<br>
+Last name: {{last_name}}<br>
+Email: {{email}}<br>
+
+<p></p>
+<p>
+You may now log in to the portal using your email address and the password that you provided, but your access will be limited. To gain full access, two steps are required:
+</p>
+
+<ul>
+<li>1. You confirm that you have indeed made this request by clicking on the following link: <br>
+ 	<a href={{validation_link}}>{{validation_link}}</a> 
+		<ul><li>If you did not make this request, we apologise. You may disregard this email or you may advise us the error by replying to this email.</li></ul>
+</li>
+<li>
+2. A manager from your organization validates your request. Upon confirmation of your signup request, we will send an email to the managers at your organization with a validation request.
+</li>
+</ul>
+<p>
+We look forward to welcoming you to OneLab. You will find answers to frequently asked questions <a href="http://{{current_site}}/portal/support/">here</a>. 
+Please don't hesitate to <a href="http://{{current_site}}/portal/contact/">contact us</a> with any additional questions that you might have.
+</p>

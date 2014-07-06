@@ -184,11 +184,32 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         # we could use zip. this one is used if columns have unequal rows 
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
+
+
+        ## check user is pi or not
+        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
+        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+        platform_details = execute_query(self.request, platform_query)
+        account_details = execute_query(self.request, account_query)
+        for platform_detail in platform_details:
+            for account_detail in account_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'config' in account_detail and account_detail['config'] is not '':
+                        account_config = json.loads(account_detail['config'])
+                        if 'myslice' in platform_detail['platform']:
+                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+        # assigning values
+        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
+            pi = "is_not_pi"
+        else:
+            pi = "is_pi"
+
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
         context['ref_acc'] = ref_acc_list
         context['platform_list'] = platform_list
         context['my_users'] = my_users
+        context['pi'] = pi
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
         context['user_status'] = user_status

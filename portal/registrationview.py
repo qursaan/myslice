@@ -45,16 +45,24 @@ class RegistrationView (FreeAccessView, ThemeView):
         
         # Page rendering
         page = Page(wsgi_request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/jquery.qtip.min.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
+            reg_form = {}
             # The form has been submitted
             
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
+
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+            authorities = execute_admin_query(wsgi_request, authorities_query)
+    
+            for authority in authorities:
+                if authority['name'] == wsgi_request.POST.get('org_name', ''):
+                    authority_hrn = authority['authority_hrn']     
 
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
@@ -63,12 +71,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
                 'last_name'     : wsgi_request.POST.get('lastname',      ''),
-                'authority_hrn' : wsgi_request.POST.get('authority_hrn', ''),
+                'organization'  : wsgi_request.POST.get('org_name', ''),
+                'authority_hrn' : authority_hrn, 
                 'email'         : post_email,
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
-                'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
+                'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             # Construct user_hrn from email (XXX Should use common code)
@@ -144,6 +153,12 @@ class RegistrationView (FreeAccessView, ThemeView):
 
         else:
             user_request = {}
+            ## this is coming from onelab website onelab.eu
+            reg_form = {
+                'first_name':  wsgi_request.GET.get('first_name', ''),
+                'last_name': wsgi_request.GET.get('last_name', ''),
+                'email': wsgi_request.GET.get('email', ''),
+                }
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),
@@ -152,5 +167,6 @@ class RegistrationView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(user_request)
+        template_env.update(reg_form)
         template_env.update(page.prelude_env ())
         return render(wsgi_request, self.template,template_env)

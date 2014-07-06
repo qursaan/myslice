@@ -1,22 +1,20 @@
-{% extends "layout_wide.html" %}
+{% extends "layout.html" %}
 
 {% block head %} 
 <script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
 {% endblock head %}
 
 {% block content %}
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-tabs nav-section">
-				<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/authority-xs.png" alt="Institution" /> Institution {{user_details.parent_authority}}</a></li>
-				<li><a href="#users">Users</a></li>
-				<li><a href="#slices">Slices</a></li>
-			</ul>
-	    </div>
-	</div>
+<div class="row">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs nav-section">
+			<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/authority-xs.png" alt="Institution" /> Institution {{user_details.parent_authority}}</a></li>
+			<li><a href="#users">Users</a></li>
+			<li><a href="#slices">Slices</a></li>
+		</ul>
+    </div>
 </div>
-<div class="container tab-content">
+<div class="tab-content">
 	<div class="tab-pane active row" id="info">
 	  	<div class="col-md-12">
 		  	<div id="authority-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Authority" /></div>

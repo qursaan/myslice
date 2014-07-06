@@ -43,8 +43,8 @@ class JoinView (FreeAccessView, ThemeView):
         root_authorities = sorted([a for a in authorities if '.' not in a['authority_hrn']])
 
         page = Page(request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/join.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/join.js", "js/jquery.qtip.min.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
@@ -216,8 +216,10 @@ class JoinView (FreeAccessView, ThemeView):
     
                 except Exception, e:
                     print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
-
-                return render(request, 'user_register_complete.html') 
+                
+                self.template_name = 'join_complete.html'
+                return render(request, self.template, {'theme': self.theme})
+                #return render(request, 'user_register_complete.html') 
 
         template_env = {
           'topmenu_items': topmenu_items_live('join', page),

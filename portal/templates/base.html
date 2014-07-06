@@ -8,6 +8,7 @@
 {% include 'messages-transient-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
 <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.qtip.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.datatables.js"></script>
 <!-- <script src="{{ STATIC_URL }}js/stash.min.js"></script> -->
 <script src="{{ STATIC_URL }}js/myslice.js"></script>
@@ -37,6 +38,8 @@
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.qtip.min.css">
+
 
 <script type="text/javascript">
 /*
@@ -53,11 +56,13 @@ $(document).ready(function() {
     if($.isEmptyObject(user)){
         $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
             if(data.length > 0){
-                slices = data[0].slices;  
+                drawSlices(data[0].slices);  
             }else{
+            	$("div#home-slice-list").html(
+					"<div>You do not yet have a slice</div>");
+        		$("ul#dropdown-slice-list").append("<li>no slice</li>");
                 slices.push("no slice");
             }
-            drawSlices(slices);
     	});
     }else{
         slices = user.slices;
@@ -65,13 +70,15 @@ $(document).ready(function() {
     }
     function drawSlices(slices){
         var items = [];
+		
         $.each( slices, function(i, val) {
-            items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+            items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
     {% endif %}
+	jQuery('[title!=""]').qtip();
 });
 </script>
 </head>

@@ -50,6 +50,7 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "validate_pending.html"
 
     def get_context_data(self, **kwargs):
+        pi = ""
         # We might have slices on different registries with different user accounts 
         # We note that this portal could be specific to a given registry, to which we register users, but i'm not sure that simplifies things
         # Different registries mean different identities, unless we identify via SFA HRN or have associated the user email to a single hrn
@@ -256,9 +257,11 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
-                dest[auth_hrn].append(request) 
+                dest[auth_hrn].append(request)
         
         context = super(ValidatePendingView, self).get_context_data(**kwargs)
+        print "testing"
+        print ctx_my_authorities
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities
@@ -270,7 +273,7 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
         context['topmenu_items'] = topmenu_items_live('Validation', page) 
         # so we can sho who is logged
         context['username'] = the_user(self.request) 
-        
+        context['pi'] = "is_pi"       
         context['theme'] = self.theme
         context['section'] = "Requests"
         # XXX We need to prepare the page for queries
