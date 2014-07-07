@@ -271,7 +271,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                  * be visible */
                 visible = false;
                 $.each(marker.keys, function(j, key) {
-                    visible = vislbe || manifold.query_store.get_record_state(self.options.query_uuid, key, STATE_VISIBLE);
+                    visible = visible || manifold.query_store.get_record_state(self.options.query_uuid, key, STATE_VISIBLE);
                 });
                 marker.setVisible(visible);
             });
