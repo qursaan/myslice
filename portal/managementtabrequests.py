@@ -22,7 +22,7 @@ import json
 class ManagementRequestsView (LoginRequiredView, ThemeView):
     template_name = "management-tab-requests.html"
     
-    def get(self, request):
+    def get_context_data(self, **kwargs):
        
         ctx_my_authorities = {}
         ctx_delegation_authorities = {}
@@ -31,7 +31,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 
 
         # The user need to be logged in
-        if (request.user):
+        if (self.request.user):
            
             user_query = Query().get('local:user').filter_by('email', '==', self.request.user.email).select('user_id')
             user, = execute_query(self.request, user_query)
@@ -138,22 +138,44 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
-                dest[auth_hrn].append(request)
+                dest[auth_hrn].append(r)
                 
               
-        env = {}
-        env['my_authorities']   = ctx_my_authorities
-        env['sub_authorities']   = ctx_sub_authorities
-        env['delegation_authorities'] = ctx_delegation_authorities
+#         env = {}
+#         env['my_authorities']   = ctx_my_authorities
+#         env['sub_authorities']   = ctx_sub_authorities
+#         env['delegation_authorities'] = ctx_delegation_authorities
+# 
+#         # XXX This is repeated in all pages
+#         # more general variables expected in the template
+#         # the menu items on the top
+#         #env['topmenu_items'] = topmenu_items_live('Validation', page) 
+#         # so we can sho who is logged
+#         env['username'] = request.user
+#         env['pi'] = "is_pi"       
+#         env['theme'] = self.theme
+#         env['section'] = "Requests"
+        
+        context = super(ManagementRequestsView, self).get_context_data(**kwargs)
+        print "testing"
+        print ctx_my_authorities
+        context['my_authorities']   = ctx_my_authorities
+        context['sub_authorities']   = ctx_sub_authorities
+        context['delegation_authorities'] = ctx_delegation_authorities
 
         # XXX This is repeated in all pages
         # more general variables expected in the template
+        context['title'] = 'Test view that combines various plugins'
         # the menu items on the top
-        #env['topmenu_items'] = topmenu_items_live('Validation', page) 
+        #context['topmenu_items'] = topmenu_items_live('Validation', page) 
         # so we can sho who is logged
-        env['username'] = request.user
-        env['pi'] = "is_pi"       
-        env['theme'] = self.theme
-        env['section'] = "Requests"
-        
-        return render_to_response(self.template, env, context_instance=RequestContext(request))
+        context['username'] = self.request.user 
+        context['pi'] = "is_pi"       
+        context['theme'] = self.theme
+        context['section'] = "Requests"
+        # XXX We need to prepare the page for queries
+        #context.update(page.prelude_env())
+
+        return context
+    
+        #return render_to_response(self.template, env, context_instance=RequestContext(request))
