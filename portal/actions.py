@@ -36,7 +36,7 @@ def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
     print "pi_users = %s" % pi_users
 
-    if any(d['pi_users'] == None for d in pi_users):
+    if any(pi['pi_users'] == None or not pi['pi_users']  for pi in pi_users):
         #theme.template_name = 'email_default_recipients.txt' 
         #default_email = render_to_string(theme.template, request)
         #default_email = default_email.replace('\n', '')
@@ -608,7 +608,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         
         theme.template_name = 'user_request_email.html'
         html_content = render_to_string(theme.template, request)
-    
+ 
         theme.template_name = 'user_request_email.txt'
         text_content = render_to_string(theme.template, request)
     
