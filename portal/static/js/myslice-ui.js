@@ -15,6 +15,9 @@ function mysliceAlert(msg, level, timeout) {
 };
 /* Table initialisation */
 $(document).ready(function() {
+	$('button[type=submit]').click(function() {
+		$('form').submit();
+	});
 	
 	var platformParameters = {};
 	
