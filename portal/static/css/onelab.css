@@ -310,11 +310,13 @@ ul.nav-resources a {
 }
 
 /* SLICE VIEW */
-div.container-resource {
+div.container-resource, div.container-slice {
     padding-right:15px;
     padding-left:15px;
 }
-
+.table th {
+    border-top:0 !important;
+}
 div#slice-view {
     margin:0;
 }
