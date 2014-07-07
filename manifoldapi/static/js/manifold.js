@@ -1570,8 +1570,8 @@ var manifold = {
                     manifold.query_store.set_record_state(query.query_uuid, resource_key, STATE_WARNINGS, warnings);
                 }
 
-                manifold.query_store.recount(query.query_uuid); 
-                manifold.query_store.recount(lease_query.query_uuid); 
+                /* This was redundant */
+                // manifold.query_store.recount(query.query_uuid); 
 
                 // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
                 data = {
@@ -1606,7 +1606,6 @@ var manifold = {
                     
                 }
 
-                manifold.query_store.recount(query.query_uuid); 
                 manifold.query_store.recount(resource_query.query_uuid); 
 
                 // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
