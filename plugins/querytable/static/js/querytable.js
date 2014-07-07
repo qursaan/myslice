@@ -450,35 +450,37 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
         
         on_field_state_changed: function(data)
         {
-            var state = manifold.query_store.get_record_state(this.options.query_uuid, data.value, data.status);
-            switch(data.status) {
+            // XXX We could get this from data.value
+            // var state = manifold.query_store.get_record_state(this.options.query_uuid, data.value, data.state);
+
+            switch(data.state) {
                 case STATE_SET:
-                    switch(state) {
+                    switch(data.value) {
                         case STATE_SET_IN:
                         case STATE_SET_IN_SUCCESS:
                         case STATE_SET_OUT_FAILURE:
-                            this.set_checkbox_from_data(data.value, true);
-                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                            this.set_checkbox_from_data(data.key, true);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_RESET);
                             break;  
                         case STATE_SET_OUT:
                         case STATE_SET_OUT_SUCCESS:
                         case STATE_SET_IN_FAILURE:
-                            this.set_checkbox_from_data(data.value, false);
-                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                            this.set_checkbox_from_data(data.key, false);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_RESET);
                             break;
                         case STATE_SET_IN_PENDING:
-                            this.set_checkbox_from_data(data.value, true);
-                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
+                            this.set_checkbox_from_data(data.key, true);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_ADDED);
                             break;  
                         case STATE_SET_OUT_PENDING:
-                            this.set_checkbox_from_data(data.value, false);
-                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
+                            this.set_checkbox_from_data(data.key, false);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_REMOVED);
                             break;
                     }
                     break;
 
                 case STATE_WARNINGS:
-                    this.change_status(data.value, state);
+                    this.change_status(data.key, data.value);
                     break;
             }
         },
@@ -551,14 +553,18 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
 
         _check_click: function(e) 
         {
+            var data;
+            var self = e.data;
+
             e.stopPropagation();
 
-            var self = e.data;
-        var id=this.id;
-
-            // this.id = key of object to be added... what about multiple keys ?
-        if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
-            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, id);
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : this.checked ? STATE_SET_ADD : STATE_SET_REMOVE,
+                value: this.id
+            }
+            manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },

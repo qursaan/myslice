@@ -176,7 +176,7 @@ var SCHEDULER_COLWIDTH = 50;
 
         $scope._create_new_lease = function(resource_urn, start_time, end_time)
         {
-            var lease_key, new_lease;
+            var lease_key, new_lease, data;
 
             lease_key = manifold.metadata.get_key('lease');
 
@@ -190,7 +190,13 @@ var SCHEDULER_COLWIDTH = 50;
             new_lease.hashCode = manifold.record_hashcode(lease_key.sort());
             new_lease.equals   = manifold.record_equals(lease_key);
 
-            manifold.raise_event($scope.instance.options.query_lease_uuid, SET_ADD, new_lease);
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : STATE_SET_ADD,
+                value: new_lease
+            }
+            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
             /* Add to local cache also, unless we listen to events from outside */
             if (!(resource_urn in $scope._leases_by_resource))
                 $scope._leases_by_resource[resource_urn] = [];
@@ -199,7 +205,7 @@ var SCHEDULER_COLWIDTH = 50;
 
         $scope._remove_lease = function(other)
         {
-            var lease_key, other_key;
+            var lease_key, other_key, data;
 
             lease_key = manifold.metadata.get_key('lease');
 
@@ -212,7 +218,13 @@ var SCHEDULER_COLWIDTH = 50;
             other_key.hashCode = manifold.record_hashcode(lease_key.sort());
             other_key.equals   = manifold.record_equals(lease_key);
 
-            manifold.raise_event($scope.instance.options.query_lease_uuid, SET_REMOVED, other_key);
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : STATE_SET_REMOVE,
+                value: other_key
+            }
+            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
             /* Remove from local cache also, unless we listen to events from outside */
             $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
 
@@ -220,6 +232,8 @@ var SCHEDULER_COLWIDTH = 50;
 
         $scope.select = function(index, model_lease, model_resource)
         {
+            var data;
+
             console.log("Selected", index, model_lease, model_resource);
 
             var day_timestamp = SchedulerDateSelected.getTime() / 1000;
@@ -256,7 +270,13 @@ var SCHEDULER_COLWIDTH = 50;
                             other_key.hashCode = manifold.record_hashcode(lease_key.sort());
                             other_key.equals   = manifold.record_equals(lease_key);
         
-                            manifold.raise_event($scope.instance.options.query_lease_uuid, SET_REMOVED, other_key);
+                            data = {
+                                state: STATE_SET,
+                                key  : null,
+                                op   : STATE_SET_REMOVE,
+                                value: other_key
+                            }
+                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
                             /* Remove from local cache also, unless we listen to events from outside */
                             $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
                             return false; // ~ break
@@ -270,7 +290,6 @@ var SCHEDULER_COLWIDTH = 50;
                             /* The lease 'other' is just after, and there should not exist
                              * any other lease after it */
                             end_time = other.end_time;
-                            // XXX SET_ADD and SET_REMOVE should accept full objects
                             other_key = {
                                 resource:   other.resource,
                                 start_time: other.start_time,
@@ -280,7 +299,13 @@ var SCHEDULER_COLWIDTH = 50;
                             other_key.hashCode = manifold.record_hashcode(lease_key.sort());
                             other_key.equals   = manifold.record_equals(lease_key);
         
-                            manifold.raise_event($scope.instance.options.query_lease_uuid, SET_REMOVED, other_key);
+                            data = {
+                                state: STATE_SET,
+                                key  : null,
+                                op   : STATE_SET_REMOVE,
+                                value: other_key
+                            }
+                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, other_key);
                             /* Remove from local cache also, unless we listen to events from outside */
                             $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
                             return false; // ~ break
@@ -337,7 +362,7 @@ var SCHEDULER_COLWIDTH = 50;
             }
             
 
-            //$scope._dump_leases();
+            $scope._dump_leases();
         };
   
         $scope._dump_leases = function()
@@ -686,54 +711,6 @@ var SCHEDULER_COLWIDTH = 50;
                 $("#plugin-scheduler").show();
             },
 
-        // GUI EVENTS
-
-        // TO BE REMOVED
-        _on_submit : function()
-        {
-            var leasesForCommit = new Array();
-            var tmpDateTime = SchedulerDateSelected;
-            for (var i = 0; i < SchedulerData.length; i++)
-            {
-                var tpmR = SchedulerData[i];
-                //for capturing start and end of the lease
-                var newLeaseStarted = false;
-                for (var j = 0; j < tpmR.leases.length; j++) {
-                    var tpmL = tpmR.leases[j];
-                    if (newLeaseStarted == false && tpmL.status == 'selected') {
-                        //get date of the slot
-                        tmpDateTime = schedulerGetDateTimeFromSlotId(tpmL.id, tmpDateTime);
-                        var unixStartTime = tmpDateTime.getTime() / 1000;
-                        //add lease object
-                        leasesForCommit.push({
-                            resource: tpmR.id,
-                            //granularity: tpmR.granularity,
-                            //lease_type: null,
-                            //slice: null,
-                            start_time: unixStartTime,
-                            end_time: null,
-                            //duration: null
-                        });
-                        console.log(tpmR.id);
-                        newLeaseStarted = true;
-                    } else if (newLeaseStarted == true && tpmL.status != 'selected') {
-                        //get date of the slot
-                        tmpDateTime = schedulerGetDateTimeFromSlotId(tpmL.id, tmpDateTime);
-                        var unixEndTime = tmpDateTime.getTime() / 1000;
-                        //upate end_time
-                        var tmpCL = leasesForCommit[leasesForCommit.length - 1];
-                        tmpCL.end_time = unixEndTime;
-                        //tmpCL.duration = schedulerFindDuration(tmpCL.start_time, tmpCL.end_time, tmpCL.granularity);
-                        newLeaseStarted = false;
-                    }
-                }
-            }
-            console.log(leasesForCommit);
-            for (var i = 0; i < leasesForCommit.length; i++) {
-                manifold.raise_event(scheduler2Instance.options.query_lease_uuid, SET_ADD, leasesForCommit[i]);
-            }
-        },
-        
         // PRIVATE METHODS
 
         /**

@@ -42,32 +42,12 @@
             this.selected_resources = Array();
 
             this.table = this.elmt('table').dataTable({
-// the original querytable layout was
-//                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-// however the bottom line with 'showing blabla...' and the navigation widget are not really helpful
                 sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t>",
-// so this does not matter anymore now that the pagination area is turned off
-//                sPaginationType: 'bootstrap',
-		      bAutoWidth: true,
-//                bJQueryUI      : true,
-//                bRetrieve      : true,
-//                sScrollX       : '100%',                 // Horizontal scrolling 
-//                bSortClasses   : false,              // Disable style for the sorted column
-//                aaSorting      : [[ 0, 'asc' ]],        // Default sorting on URN
-//                fnDrawCallback: function() {      // Reassociate close click every time the table is redrawn
-//                    /* Prevent to loop on click while redrawing table  */
-//                    $('.ResourceSelectedClose').unbind('click');
-//                    /* Handle clicks on close span */
-//                    /* Reassociate close click every time the table is redrawn */
-//                    $('.ResourceSelectedClose').bind('click', self, self._close_click);
-//                }
-             });
+		        bAutoWidth: true,
+            });
             
-            // XXX This should not be done at init...
-            this.elmt('update').click(this, this.do_checksla);
-            this.elmt('refresh').click(this, this.do_refresh);
-            this.elmt('reset').click(this, this.do_reset);
-            this.elmt('clear_annotations').click(this, this.do_clear_annotations);
+            this.elmt('update').click(this, this.do_ok);
+            this.elmt('refresh').click(this, this.do_cancel);
 
             this.listen_query(options.query_uuid);
         },
@@ -76,239 +56,16 @@
 
         /***************************** GUI EVENTS *****************************/
 
-        do_checksla: function(e) {
-            var username = e.data.options.username;
-            var urn = data.value;
-            var arrayselectedresources = data.selected_resources;
-
-            var accepted_sla = Array();
-            var count = 0;
-            var self = e.data;
-            // XXX check that the query is not disabled
-
-            console.log("DATA VALUE: " + data.value);
-            
-            //<p>SLA description</p>
-            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>
-            //<p>SLA description</p>
-            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>
-            var promt = $('#modal-body');
-            
-            // id="myModalLabel"
-            var flagVW = false;
-            var  flagWi = false;
-
-            promt.append('<p>SLA description</p>');
-            
-            var wilabForm = "";
-            wilabForm += "<ul>";
-            for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<li class="wi'+iter+'" name=wi"'+iter+'">'+arrayselectedresources[iter].toLowerCase()+'</li>';
-                
-                if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
-
-                    accepted_sla.push({"wilab2":false}); 
-                    wilabForm += list;   
-                    flagWi = true;             
-
-                }
-
-            }
-            wilabForm += "</ul>";
-
-            //var wallmessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>';
-
-            var wallForm = "";
-            wallForm += "<ul>";
-            for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<li class="wall'+iter+'" name=wall"'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'</li>';
-                
-                if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
-
-                    accepted_sla.push({"wall2":false});
-                    wallForm += list;
-                    flagVW = true;
-                    
-                }
-
-            }
-            wallForm += "</ul>";
-            
-            var flagDouble = false;
-            if(flagWi)
-            {
-                flagDouble = true;
-                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>');
-                promt.append(wilabForm);
-                promt.append('<br />');
-            }
-            if(flagVW)
-            {
-                //promt.append(wallmessage);
-                flagDouble = true;
-                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>');
-                promt.append(wallForm);
-                promt.append('<br />');
-            }
-
-                        
-            // var wimessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>'
-
-            if(flagWi || flagVW){
-                $('#sla_dialog').show();
-
-                    $('#slamodal-wilab2').modal('show');
-            }
-            else
-            {
-                
-
-                var username = e.data.options.username;
-                var urn = data.value;
-                // XXX check that the query is not disabled
-
-                self.spin();
-                // XXX check that the query is not disabled
-                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
-                return;
-            }
-                    
-                        $("#accept_sla_wilab2").click(function(){
-                            console.log("SLA ACCEPTED");
-                            console.log("With username: " + username);
-
-                            // var promt = $('#modal-body');
-                            // var notchecked = true;
-                            // for (var i=0;i<50;i++)
-                            // {
-                            //     var wielement = $('#wi'+i);
-                            //     var wallElement = $('#wall'+i);
-                            //     if(wielement != null && !wielement.checked)
-                            //     {
-                            //         notchecked = false;
-                            //     }
-                            //     if(wallElement!= null && !wallElement.checked)
-                            //     {
-                            //         notchecked = false;
-                            //     }
-                            // }
-            
-                                                       
-                                if(flagDouble)
-                                {
-                                    $.post("/sla/agreements/simplecreate", 
-                                        { "template_id": "iMindsServiceWiLab2",
-                                          "user": username,
-                                          "expiration_time": new Date().toISOString()
-                                       });
-                                     $.post("/sla/agreements/simplecreate", 
-                                        { "template_id": "iMindsServiceVirtualwall",
-                                          "user": username,
-                                          "expiration_time": new Date().toISOString()
-                                       });
-                            
-                                    $('#slamodal-wilab2').modal('hide');
-                                accepted_sla["wilab2"] = true;
-                            
-                                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
-                            }
-                            $('#modal-body').empty();
-                        }); 
-                    
-                        $("#dismiss_sla_wilab2").click(function(){
-                            console.log("SLA NOT ACCEPTED");
-                            $('#slamodal-wilab2').modal('hide');
-                            $('#modal-body').empty();
-                        }); 
-                
-            // } else {
-            //     this.do_update(e);
-            // }
-
-            // for(var iter = 0; iter < arrayselectedresources.length; iter++){
-            //     var list = '<input type="checkbox" name="'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'<br>';
-            //     promt.append(list);
-            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
-
-
-                    
-            //         accepted_sla.push({"wall2":false});
-
-            //         $('#sla_dialog').show();
-            //         $('#slamodal-virtualwall').modal('show');
-                    
-                    
-            //             $("#accept_sla_vwall").click(function(){
-            //                 console.log("SLA ACCEPTED");
-            //                 console.log("With username: " + username);
-                        
-            //                 $.post("/sla/agreements/simplecreate", 
-            //                     { "template_id": "iMindsServiceVirtualwall",
-            //                       "user": username,
-            //                       "expiration_time": new Date()
-            //                     });
-                        
-            //                 $('#slamodal-virtualwall').modal('hide');
-            //                 accepted_sla["wall2"] = true;
-            //             }); 
-
-            //             $("#dismiss_sla_vwall").click(function(){
-            //                 console.log("SLA NOT ACCEPTED");
-            //                 $('#slamodal-vir').modal('hide');
-            //             }); 
-                    
-            //     }
-
-            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
-
-            //         accepted_sla.push({"wilab2":false});
-
-            //         $('#sla_dialog').show();
-            //         $('#slamodal-wilab2').modal('show');
-                    
-                    
-            //             $("#accept_sla_wilab2").click(function(){
-            //                 console.log("SLA ACCEPTED");
-            //                 console.log("With username: " + username);
-                        
-            //                 $.post("/sla/agreements/simplecreate", 
-            //                     { "template_id": "iMindsServiceWiLab2",
-            //                       "user": username,
-            //                       "expiration_time": new Date()
-            //                     });
-                        
-            //                 $('#slamodal-wilab2').modal('hide');
-            //                 accepted_sla["wilab2"] = true;
-            //             }); 
-                    
-            //             $("#dismiss_sla_wilab2").click(function(){
-            //                 console.log("SLA NOT ACCEPTED");
-            //                 $('#slamodal-wilab2').modal('hide');
-            //             }); 
-                    
-
-            //     }
-
-            // }
-
-            // for(var sla in accepted_sla){
-            //     if(accepted_sla[sla] == true){
-            //         count += 1;
-            //     }
-            // }
-
-            // if(count == accepted_sla.length){
-            //     this.do_update(e);
-            // }
-        },
-
-     
         /************************** GUI MANIPULATION **************************/
 
         populate_table: function()
         {
+            var state;
+
             // Loop over records and display pending ones
             manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
+                state = manifold.query_store.get_record_state(this.options.query_uuid, null, STATE_SET);
+            
             });
         },
         
@@ -339,101 +96,6 @@
             return cols[0];
         },
 
-        set_state: function(data)
-        {
-            var action;
-            var msg;
-            var button = '';
-
-            var row;
-	    
-	    // make sure the change is visible : toggle on the whole plugin
-	    // this might have to be made an 'auto-toggle' option of this plugin..
-	    // also it might be needed to be a little finer-grained here
-
-        // XXX we don't want to show automaticaly the pending when a checkbox is checked
-	    //this.toggle_on();
-
-            switch (data.status) {
-                case STATE_SET_IN_PENDING:
-                    action = 'ADD';
-                    msg   = 'PENDING';
-                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
-                    break;
-                case STATE_SET_OUT_PENDING:
-                    action = 'REMOVE';
-                    msg   = 'PENDING';
-                    button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
-                    break;
-                case STATE_SET_IN:
-                case STATE_SET_OUT:
-                    // find line and delete it
-                    // XXX Naming is incorrect for badge-pending !!!!
-                    // XXX What is this badge ?
-                    row = this.find_row(data.value);
-                    if (row)
-                        this.table.fnDeleteRow(row.nTr);
-                        /* indent was wrong !!
-                        $("#badge-pending").data('number', $("#badge-pending").data('number') - 1 );
-                        $("#badge-pending").text($("#badge-pending").data('number'));
-                        */
-                    return;
-                    break;  
-                case STATE_SET_IN_SUCCESS:
-                case STATE_SET_OUT_SUCCESS:
-                    msg   = 'SUCCESS';
-                    break;
-                case STATE_SET_IN_FAILURE:
-                case STATE_SET_OUT_FAILURE:
-                    msg   = 'FAILURE';
-                    break;
-                case STATE_CHANGE:
-                    action = 'UPDATE';
-                    break;
-                
-            }
-
-            var status = msg + status;
-
-            // find line
-            // if no, create it, else replace it
-            // XXX it's not just about adding lines, but sometimes removing some
-            // XXX how do we handle status reset ?
-
-            // Jordan : I don't understand this. I added this test otherwise we have string = ""..."" double quoted twice.
-            if (typeof(data.value) !== "string")
-                data.value = JSON.stringify(data.value);
-            data.selected_resources = this.selected_resources;
-            row = this.find_row(data.value);
-            newline = [
-                action,
-                data.key,
-                data.value,
-                msg,
-                button
-            ];
-            if (!row) {
-                // XXX second parameter refresh = false can improve performance. todo in querytable also
-                this.table.fnAddData(newline);
-                row = this.find_row(data.value);
-                /*
-                $("#badge-pending").data('number', $("#badge-pending").data('number') + 1 );
-                $("#badge-pending").text($("#badge-pending").data('number'));
-                */
-            } else {
-                // Update row text...
-                this.table.fnUpdate(newline, row.nTr);
-            }
-
-            // Change cell color according to status
-            if (row) {
-                $(row.nTr).removeClass('add remove')
-                var cls = action.toLowerCase();
-                if (cls)
-                    $(row.nTr).addClass(cls);
-            }
-        },
-
         do_update: function(e) {
             var self = e.data;
 
@@ -451,18 +113,12 @@
 
         },
 
-        // related buttons are also disabled in the html template
-        do_refresh: function(e)
-        {
-            throw 'resource_selected.do_refresh Not implemented';
-        },
-
-        do_reset: function(e)
+        do_ok: function(e)
         {
             throw 'queryupdater.do_reset Not implemented';
         },
 
-        do_clear_annotations: function(e)
+        do_cancel: function(e)
         {
             throw 'queryupdater.do_clear_annotations Not implemented';
         },
@@ -543,6 +199,12 @@
             this.spin();
         },
 
+        on_query_done: function()
+        {
+            this.populate_table();
+            this.unspin();
+        },
+
         // D : Data present
         // - on_clear_records (Get)
         // - on_new_record (shared with AD) XXX
@@ -583,8 +245,9 @@
         // - Key and confirmation could be sufficient, or key and record state
         // XXX move record state to the manifold plugin API
 
-        on_field_state_changed: function(result)
+        on_field_state_changed: function(data)
         {
+            /*
             if(result.request == FIELD_REQUEST_ADD){
                 this.selected_resources.push(result.value);
             } else if(result.request == FIELD_REQUEST_REMOVE_RESET){
@@ -594,6 +257,88 @@
                 }
             }
             this.set_state(result);
+            */
+
+            var action, msg, row, status, button = '';
+
+            switch(data.state) {
+                case STATE_VALUE:
+                    switch(data.op) {
+                        // XXX other events missing !!
+                        case STATE_VALUE_CHANGE_PENDING:
+                            action = 'UPDATE';
+                            break;
+                    }
+                    break;
+
+                case STATE_SET:
+                    switch(data.op) {
+                        case STATE_SET_IN_PENDING:
+                            action = 'ADD';
+                            msg   = 'PENDING';
+                            button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
+                            break;  
+
+                        case STATE_SET_OUT_PENDING:
+                            action = 'REMOVE';
+                            msg   = 'PENDING';
+                            button = "<span class='glyphicon glyphicon-remove ResourceSelectedClose' id='" + data.key + "'/>";
+                            break;
+
+                        case STATE_SET_IN:
+                        case STATE_SET_OUT:
+                            // find line and delete it
+                            row = this.find_row(data.value);
+                            if (row)
+                                this.table.fnDeleteRow(row.nTr);
+                            return;
+
+                        case STATE_SET_IN_SUCCESS:
+                        case STATE_SET_OUT_SUCCESS:
+                            msg   = 'SUCCESS';
+                            break;
+
+                        case STATE_SET_IN_FAILURE:
+                        case STATE_SET_OUT_FAILURE:
+                            msg   = 'FAILURE';
+                            break;
+
+                    }
+                    break;
+
+                default:
+                    return;
+            }
+
+            status = msg + status;
+
+            // find line
+            // if no, create it, else replace it
+            // XXX it's not just about adding lines, but sometimes removing some
+            // XXX how do we handle status reset ?
+
+            // Jordan : I don't understand this. I added this test otherwise we have string = ""..."" double quoted twice.
+            if (typeof(data.value) !== "string")
+                data.value = JSON.stringify(data.value);
+            data.selected_resources = this.selected_resources;
+            row = this.find_row(data.value);
+            newline = [action, data.key, data.value, msg, button];
+            if (!row) {
+                // XXX second parameter refresh = false can improve performance. todo in querytable also
+                this.table.fnAddData(newline);
+                row = this.find_row(data.value);
+            } else {
+                // Update row text...
+                this.table.fnUpdate(newline, row.nTr);
+            }
+
+            // Change cell color according to status
+            if (row) {
+                $(row.nTr).removeClass('add remove')
+                var cls = action.toLowerCase();
+                if (cls)
+                    $(row.nTr).addClass(cls);
+            }
         },
 
         // XXX we will have the requests for change
