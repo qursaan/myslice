@@ -28,6 +28,10 @@
 
     var QueryUpdaterPlugin = Plugin.extend({
 
+        /**************************************************************************
+         *                          CONSTRUCTOR
+         **************************************************************************/
+
         init: function(options, element) {
 	        this.classname="queryupdater";
             this._super(options, element);
@@ -299,41 +303,14 @@
         },
 
      
-        do_update: function(e) {
-            var self = e.data;
-
-            var username = e.data.options.username;
-            var urn = data.value;
-            // XXX check that the query is not disabled
-
-            self.spin();
-            console.log("do_update");
-            // XXX check that the query is not disabled
-            //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
-
-            // how to stop the spinning after the event? 
-            // this should be triggered by some on_updatequery_done ?
-
-        },
-
-	// related buttons are also disabled in the html template
-        do_refresh: function(e)
-        {
-            throw 'resource_selected.do_refresh Not implemented';
-        },
-
-        do_reset: function(e)
-        {
-            throw 'queryupdater.do_reset Not implemented';
-        },
-
-        do_clear_annotations: function(e)
-        {
-            throw 'queryupdater.do_clear_annotations Not implemented';
-        },
-        
         /************************** GUI MANIPULATION **************************/
 
+        populate_table: function()
+        {
+            // Loop over records and display pending ones
+            manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
+            }
+        },
         
         set_button_state: function(name, state)
         {
@@ -457,11 +434,42 @@
             }
         },
 
-        /*************************** QUERY HANDLER ****************************/
+        do_update: function(e) {
+            var self = e.data;
 
-        // NONE
+            var username = e.data.options.username;
+            var urn = data.value;
+            // XXX check that the query is not disabled
 
-        /*************************** RECORD HANDLER ***************************/
+            self.spin();
+            console.log("do_update");
+            // XXX check that the query is not disabled
+            //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+
+            // how to stop the spinning after the event? 
+            // this should be triggered by some on_updatequery_done ?
+
+        },
+
+        // related buttons are also disabled in the html template
+        do_refresh: function(e)
+        {
+            throw 'resource_selected.do_refresh Not implemented';
+        },
+
+        do_reset: function(e)
+        {
+            throw 'queryupdater.do_reset Not implemented';
+        },
+
+        do_clear_annotations: function(e)
+        {
+            throw 'queryupdater.do_clear_annotations Not implemented';
+        },
+        
+       /**************************************************************************
+        *                           QUERY HANDLERS
+        **************************************************************************/ 
 
         on_new_record: function(record)
         {
@@ -532,7 +540,6 @@
 
         on_query_in_progress: function()
         {
-	        messages.debug("queryupdater.on_query_in_progress");
             this.spin();
         },
 
@@ -586,8 +593,6 @@
                     this.selected_resources.splice(i,1);
                 }
             }
-            messages.debug(result)
-
             this.set_state(result);
         },
 

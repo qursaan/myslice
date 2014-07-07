@@ -4,9 +4,9 @@
  * License: GPLv3
  */
 
-BGCOLOR_RESET   = 0;
-BGCOLOR_ADDED   = 1;
-BGCOLOR_REMOVED = 2;
+QUERYTABLE_BGCOLOR_RESET   = 0;
+QUERYTABLE_BGCOLOR_ADDED   = 1;
+QUERYTABLE_BGCOLOR_REMOVED = 2;
 
 (function($){
 
@@ -23,49 +23,42 @@ BGCOLOR_REMOVED = 2;
     var QueryTable = Plugin.extend({
 
         init: function(options, element) {
-	    this.classname="querytable";
+        this.classname="querytable";
             this._super(options, element);
 
             /* Member variables */
-	    // in general we expect 2 queries here
-	    // query_uuid refers to a single object (typically a slice)
-	    // query_all_uuid refers to a list (typically resources or users)
-	    // these can return in any order so we keep track of which has been received yet
-            this.received_query = false;
-
-            // We need to remember the active filter for datatables filtering
-            this.filters = Array(); 
+            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
+            this.object = query.object; // XXX
 
             /* Events */
-	    // xx somehow non of these triggers at all for now
             this.elmt().on('show', this, this.on_show);
             this.elmt().on('shown.bs.tab', this, this.on_show);
             this.elmt().on('resize', this, this.on_resize);
 
-            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
-            this.object = query.object;
+            //// we need 2 different keys
+            // * canonical_key is the primary key as derived from metadata (typically: urn)
+            //   and is used to communicate about a given record with the other plugins
+            // * init_key is a key that both kinds of records 
+            //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
+            //   in general query_all will return well populated records, but query
+            //   returns records with only the fields displayed on startup
+            var keys = manifold.metadata.get_key(this.object);
+            this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
+            // 
+            this.init_key = this.options.init_key;
+            // have init_key default to canonical_key
+            this.init_key = this.init_key || this.canonical_key;
 
-	    //// we need 2 different keys
-	    // * canonical_key is the primary key as derived from metadata (typically: urn)
-	    //   and is used to communicate about a given record with the other plugins
-	    // * init_key is a key that both kinds of records 
-	    //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
-	    //   in general query_all will return well populated records, but query
-	    //   returns records with only the fields displayed on startup
-	    var keys = manifold.metadata.get_key(this.object);
-	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
-	    // 
-	    this.init_key = this.options.init_key;
-	    // have init_key default to canonical_key
-	    this.init_key = this.init_key || this.canonical_key;
-	    // sanity check
-	    if ( ! this.init_key ) messages.warning ("QueryTable : cannot find init_key");
-	    if ( ! this.canonical_key ) messages.warning ("QueryTable : cannot find canonical_key");
-	    if (debug) messages.debug("querytable: canonical_key="+this.canonical_key+" init_key="+this.init_key);
+            /* sanity check */
+            if ( ! this.init_key ) 
+                messages.warning ("QueryTable : cannot find init_key");
+            if ( ! this.canonical_key ) 
+                messages.warning ("QueryTable : cannot find canonical_key");
+            if (debug)
+                messages.debug("querytable: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
-            //this.listen_query(options.query_all_uuid, 'all');
 
             /* GUI setup and event binding */
             this.initialize_table();
@@ -74,16 +67,16 @@ BGCOLOR_REMOVED = 2;
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("querytable.on_show");
+        if (debug) messages.debug("querytable.on_show");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
-	},        
+    },        
 
         on_resize: function(e) {
-	    if (debug) messages.debug("querytable.on_resize");
+        if (debug) messages.debug("querytable.on_resize");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
-	},        
+    },        
 
         /* GUI EVENTS */
 
@@ -98,9 +91,9 @@ BGCOLOR_REMOVED = 2;
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
                 //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
                 sDom: "<'row'<'col-xs-5'f><'col-xs-1'r><'col-xs-6 columns_selector'>>t<'row'<'col-xs-5'l><'col-xs-7'p>>",
-		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
-		// hopefully this would come with dataTables v1.10 ?
-		// in any case, search for 'sPaginationType' all over the code for more comments
+        // XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
+        // hopefully this would come with dataTables v1.10 ?
+        // in any case, search for 'sPaginationType' all over the code for more comments
                 sPaginationType: 'bootstrap',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
@@ -129,16 +122,16 @@ BGCOLOR_REMOVED = 2;
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
-	    // xxx DISABLED by jordan: was causing errors in datatables.js
-	    // xxx turned back on by Thierry - this is the code that takes python-provided options into account
-	    // check your datatables_options tag instead 
-	    // however, we have to accumulate in aoColumnDefs from here (above) 
-	    // and from the python wrapper (checkboxes management, plus any user-provided aoColumnDefs)
-	    if ( 'aoColumnDefs' in this.options.datatables_options) {
-		actual_options['aoColumnDefs']=this.options.datatables_options['aoColumnDefs'].concat(actual_options['aoColumnDefs']);
-		delete this.options.datatables_options['aoColumnDefs'];
-	    }
-	    $.extend(actual_options, this.options.datatables_options );
+        // xxx DISABLED by jordan: was causing errors in datatables.js
+        // xxx turned back on by Thierry - this is the code that takes python-provided options into account
+        // check your datatables_options tag instead 
+        // however, we have to accumulate in aoColumnDefs from here (above) 
+        // and from the python wrapper (checkboxes management, plus any user-provided aoColumnDefs)
+        if ( 'aoColumnDefs' in this.options.datatables_options) {
+        actual_options['aoColumnDefs']=this.options.datatables_options['aoColumnDefs'].concat(actual_options['aoColumnDefs']);
+        delete this.options.datatables_options['aoColumnDefs'];
+        }
+        $.extend(actual_options, this.options.datatables_options );
             this.table = this.elmt('table').dataTable(actual_options);
 
             /* Setup the SelectAll button in the dataTable header */
@@ -165,7 +158,6 @@ BGCOLOR_REMOVED = 2;
 
             /* Processing hidden_columns */
             $.each(this.options.hidden_columns, function(i, field) {
-                //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
                 self.hide_column(field);
             });
             $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
@@ -183,25 +175,25 @@ BGCOLOR_REMOVED = 2;
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
-	// create a checkbox <input> tag
-	// computes 'id' attribute from canonical_key
-	// computes 'init_id' from init_key for initialization phase
-	// no need to used convoluted ids with plugin-uuid or others, since
-	// we search using table.$ which looks only in this table
+    // create a checkbox <input> tag
+    // computes 'id' attribute from canonical_key
+    // computes 'init_id' from init_key for initialization phase
+    // no need to used convoluted ids with plugin-uuid or others, since
+    // we search using table.$ which looks only in this table
         checkbox_html : function (record) {
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='querytable-checkbox'";
-	 // compute id from canonical_key
-	    var id = record[this.canonical_key]
-	 // compute init_id form init_key
-	    var init_id=record[this.init_key];
-	 // set id - for retrieving from an id, or for posting events upon user's clicks
-	    result += " id='"+record[this.canonical_key]+"'";
-	 // set init_id
-	    result += "init_id='" + init_id + "'";
-	 // wrap up
+     // compute id from canonical_key
+        var id = record[this.canonical_key]
+     // compute init_id form init_key
+        var init_id=record[this.init_key];
+     // set id - for retrieving from an id, or for posting events upon user's clicks
+        result += " id='"+record[this.canonical_key]+"'";
+     // set init_id
+        result += "init_id='" + init_id + "'";
+     // wrap up
             result += " type='checkbox'";
             result += " autocomplete='off'";
             result += "></input>";
@@ -223,13 +215,13 @@ BGCOLOR_REMOVED = 2;
             var nb_col = cols.length;
             /* if we've requested checkboxes, then forget about the checkbox column for now */
             //if (this.options.checkboxes) nb_col -= 1;
-			// catch up with the last column if checkboxes were requested 
+            // catch up with the last column if checkboxes were requested 
             if (this.options.checkboxes) {
                 // Use a key instead of hostname (hard coded...)
                 line.push(this.checkbox_html(record));
-	        }
+            }
             line.push('<span id="' + this.id_from_key('status', record[this.init_key]) + '"></span>'); // STATUS
-	        
+            
             /* fill in stuff depending on the column name */
             for (var j = 2; j < nb_col - 1; j++) { // nb_col includes status
                 if (typeof colnames[j] == 'undefined') {
@@ -264,9 +256,9 @@ BGCOLOR_REMOVED = 2;
                 }
             }
     
-    	    // adding an array in one call is *much* more efficient
-	        // this.table.fnAddData(line);
-	        return line;
+            // adding an array in one call is *much* more efficient
+            // this.table.fnAddData(line);
+            return line;
         },
 
         clear_table: function()
@@ -297,30 +289,24 @@ BGCOLOR_REMOVED = 2;
                 this.table.fnSetColumnVis(index, false);
         },
 
-	// this is used at init-time, at which point only init_key can make sense
-	// (because the argument record, if it comes from query, might not have canonical_key set
-	set_checkbox_from_record: function (record, checked) {
-        if (checked === undefined) checked = true;
-	    var init_id = record[this.init_key];
-        this.set_checkbox_from_record_key(init_id, checked);
-	},
-
-	set_checkbox_from_record_key: function (record_key, checked) {
-        if (checked === undefined) checked = true;
-	    if (debug) messages.debug("querytable.set_checkbox_from_record, record_key="+record_key);
-	    // using table.$ to search inside elements that are not visible
-	    var element = this.table.$('[init_id="'+record_key+'"]');
-	    element.attr('checked',checked);
-	},
-
-	// id relates to canonical_key
-	set_checkbox_from_data: function (id, checked) {
+        set_checkbox_from_record_key: function (record_key, checked) 
+        {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("querytable.set_checkbox_from_data, id="+id);
-	    // using table.$ to search inside elements that are not visible
-	    var element = this.table.$("[id='"+id+"']");
-	    element.attr('checked',checked);
-	},
+
+            // using table.$ to search inside elements that are not visible
+            var element = this.table.$('[init_id="'+record_key+'"]');
+            element.attr('checked',checked);
+        },
+
+        // id relates to canonical_key
+        set_checkbox_from_data: function (id, checked) 
+        {
+            if (checked === undefined) checked = true;
+
+            // using table.$ to search inside elements that are not visible
+            var element = this.table.$("[id='"+id+"']");
+            element.attr('checked',checked);
+        },
 
         /**
          * Arguments
@@ -369,10 +355,10 @@ BGCOLOR_REMOVED = 2;
         set_bgcolor: function(key_value, class_name)
         {
             var elt = $(document.getElementById(this.id_from_key(this.canonical_key, key_value)))
-            if (class_name == BGCOLOR_RESET)
+            if (class_name == QUERYTABLE_BGCOLOR_RESET)
                 elt.removeClass('added removed');
             else
-                elt.addClass((class_name == BGCOLOR_ADDED ? 'added' : 'removed'));
+                elt.addClass((class_name == QUERYTABLE_BGCOLOR_ADDED ? 'added' : 'removed'));
         },
 
         populate_table: function()
@@ -381,17 +367,13 @@ BGCOLOR_REMOVED = 2;
             var self = this;
             this.clear_table();
 
-            // XXX Here we have lost checkboxes
-            // set checkbox from record.
-            // only the current plugin known that we have an element in a set
-
             lines = Array();
             var record_keys = [];
             manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
                 lines.push(self.new_record(record));
                 record_keys.push(record_key);
             });
-	    	this.table.fnAddData(lines);
+            this.table.fnAddData(lines);
             $.each(record_keys, function(i, record_key) {
                 var state = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_SET);
                 var warnings = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_WARNINGS);
@@ -409,11 +391,11 @@ BGCOLOR_REMOVED = 2;
                         break;
                     case STATE_SET_IN_PENDING:
                         self.set_checkbox_from_record_key(record_key, true);
-                        self.set_bgcolor(record_key, BGCOLOR_ADDED);
+                        self.set_bgcolor(record_key, QUERYTABLE_BGCOLOR_ADDED);
                         break;
                     case STATE_SET_OUT_PENDING:
                         //self.set_checkbox_from_record_key(record_key, false);
-                        self.set_bgcolor(record_key, BGCOLOR_REMOVED);
+                        self.set_bgcolor(record_key, QUERYTABLE_BGCOLOR_REMOVED);
                         break;
                 }
                 self.change_status(record_key, warnings); // XXX will retrieve status again
@@ -421,6 +403,7 @@ BGCOLOR_REMOVED = 2;
         },
 
         /*************************** QUERY HANDLER ****************************/
+                                    HANDLERS
 
         on_filter_added: function(filter)
         {
@@ -463,7 +446,7 @@ BGCOLOR_REMOVED = 2;
         on_query_done: function()
         {
             this.populate_table();
-            this.spin(false);
+            this.unspin();
         },
         
         on_field_state_changed: function(data)
@@ -476,21 +459,21 @@ BGCOLOR_REMOVED = 2;
                         case STATE_SET_IN_SUCCESS:
                         case STATE_SET_OUT_FAILURE:
                             this.set_checkbox_from_data(data.value, true);
-                            this.set_bgcolor(data.value, BGCOLOR_RESET);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
                             break;  
                         case STATE_SET_OUT:
                         case STATE_SET_OUT_SUCCESS:
                         case STATE_SET_IN_FAILURE:
                             this.set_checkbox_from_data(data.value, false);
-                            this.set_bgcolor(data.value, BGCOLOR_RESET);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
                             break;
                         case STATE_SET_IN_PENDING:
                             this.set_checkbox_from_data(data.value, true);
-                            this.set_bgcolor(data.value, BGCOLOR_ADDED);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
                             break;  
                         case STATE_SET_OUT_PENDING:
                             this.set_checkbox_from_data(data.value, false);
-                            this.set_bgcolor(data.value, BGCOLOR_REMOVED);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
                             break;
                     }
                     break;
@@ -572,10 +555,10 @@ BGCOLOR_REMOVED = 2;
             e.stopPropagation();
 
             var self = e.data;
-	    var id=this.id;
+        var id=this.id;
 
             // this.id = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
+        if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
             manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, id);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
@@ -611,9 +594,9 @@ BGCOLOR_REMOVED = 2;
      was in fact given as a third argument, and not second 
      as the various online resources had it - go figure */
     $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
-		return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
-		    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
-		});
+        return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
+            return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
+        });
     };
 
 })(jQuery);
