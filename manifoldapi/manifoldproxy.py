@@ -40,7 +40,7 @@ with the query passed using POST"""
     # format_out: how to serve the results
     if format != 'json':
         print "manifoldproxy.proxy: unexpected format %s -- exiting"%format
-        return
+        return HttpResponse ({"ret":0}, mimetype="application/json")
     try:
         # translate incoming POST request into a query object
         if debug: print 'manifoldproxy.proxy: request.POST',request.POST
@@ -84,6 +84,7 @@ with the query passed using POST"""
         print "** PROXY ERROR **",e
         import traceback
         traceback.print_exc()
+        return HttpResponse ({"ret":0}, mimetype="application/json")
 
 #################### 
 # see CSRF_FAILURE_VIEW in settings.py
