@@ -180,19 +180,23 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
             if (checked === undefined) checked = true;
 
             var checkbox = this.by_init_id [record_key];
-            if (!checkbox) 
+            if (!checkbox) {
                 console.log("googlemap.set_checkbox_from_record - not found " + record_key);
+                return;
+            }
 
-            checkbox.prop('checked', checked);
+            checkbox.attr('checked', checked);
         },
 
 
         set_checkbox_from_data: function(id, checked) 
         {
             var checkbox = this.by_id[id];
-            if (!checkbox)
+            if (!checkbox) {
                 console.log("googlemap.set_checkbox_from_data - id not found " + id);
-            checkbox.prop('checked', checked);
+                return;
+            }
+            checkbox.attr('checked', checked);
         }, 
 
         set_bgcolor: function(key_value, class_name)
@@ -232,7 +236,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
 
             /* Add key to the marker */
             record_key = manifold.record_get_value(record, this.canonical_key);
-            marker_s.keys.push(record_key);
+            marker_s.marker.keys.push(record_key);
 	    
     	    // now add a line for this resource in the marker
     	    // xxx should compute checked here ?
@@ -267,7 +271,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                  * be visible */
                 visible = false;
                 $.each(marker.keys, function(j, key) {
-                    visible |= manifold.query_store.get_record_state(self.options.query_uuid, key, STATE_VISIBLE);
+                    visible = vislbe || manifold.query_store.get_record_state(self.options.query_uuid, key, STATE_VISIBLE);
                 });
                 marker.setVisible(visible);
             });
@@ -285,12 +289,11 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 self.new_record(record);
                 record_keys.push(record_key);
             });
-            this.table.fnAddData(lines);
 
             /* Add markers to cluster */
             this.markers = Array();
             $.each(this.by_lat_lon, function (k, s) {
-                this.markers.push(s.marker); 
+                self.markers.push(s.marker); 
             });
 
             this.markerCluster = new MarkerClusterer(this.map, this.markers, {zoomOnClick: false});
@@ -333,7 +336,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                         self.set_bgcolor(record_key, GOOGLEMAP_BGCOLOR_REMOVED);
                         break;
                 }
-                self.change_status(record_key, warnings); // XXX will retrieve status again
+                //self.change_status(record_key, warnings); // XXX will retrieve status again
             });
         },
 
