@@ -1,10 +1,15 @@
-<div class="row">
-	<div class="col-md-12">
-		 <div class="breadcrumbs">
-		 	 Experiment &nbsp;>&nbsp; {{ slice }}
-		 </div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			 <div class="breadcrumbs">
+			 	 Experiment &nbsp;>&nbsp; {{ slice }}
+			 </div>
+		</div>
 	</div>
 </div>
+<div class="container">
+<div class="row">
+		<div class="col-md-12">
 {% if section == "resources" %}
 <ul class="nav nav-tabs nav-section">
 	<li><a href="/slice/{{ slice }}#info">Information</a></li>
@@ -25,6 +30,7 @@
 	<!-- <li class="measurements"><a href="#experiment">Measurements</a></li> -->
 	<li class="experiment"><a href="#experiment">Tools</a></li>
 </ul>
+
 <script>
 $(document).ready(function() {
 	$('.nav-tabs a').click(function (e) {
@@ -44,3 +50,6 @@ $(document).ready(function() {
 });
 </script>
 {% endif %}
+</div>
+</div>
+</div>

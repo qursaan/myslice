@@ -4,6 +4,7 @@ import copy, xmlrpclib
 from myslice.configengine import ConfigEngine
 
 from django.contrib import messages
+from django.shortcuts import redirect
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException
 from manifold.core.result_value import ResultValue
 
@@ -154,7 +155,7 @@ def execute_query(request, query):
         request.session.flush()
         #raise Exception, "User not authenticated"
         host = request.get_host()
-        return redirect(host)
+        return redirect('/')
     manifold_api_session_auth = request.session['manifold']['auth']
     return _execute_query(request, query, manifold_api_session_auth)
 

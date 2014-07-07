@@ -257,12 +257,19 @@ td.no-image {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6c9e2', endColorstr='#e0e0e0',GradientType=1 ); /* IE6-9 */
 
     padding: 3px 0 3px 30px;
-    width: 109px;
+    width: 150px;
 }
 
 .legend ol li.free{
 
 }
+.legend ol li.pendingin{
+background: #FFFF99;
+}
+.legend ol li.pendingout{
+background: #E8E8E8;
+}
+
 
 .legend ol li.closed{
     background: url("../img/closed-lock-15.png") no-repeat scroll 8px 50% #DD4444;

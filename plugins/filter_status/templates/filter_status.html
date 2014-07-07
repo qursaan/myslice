@@ -1,43 +1,43 @@
 <div id={{ domid }}>
-  <span class="list-group-item-heading">View:</span>
+  <span class="list-group-item-heading sl-resources">View:</span>
   
   <a href="#" 
-     class="list-group-item sl-platform active" 
+     class="list-group-item sl-resources active" 
      style='display: inline-block !important;' 
      id="{{ domid }}__all" 
      data-status="all"
 	 title="View resources that are available to be reserved."
 	 rel='tooltip'>
-  	<p class="list-group-item-heading">Available</p>
+  	Available
   </a>
   
   <a href="#"
-     class="list-group-item sl-platform" 
+     class="list-group-item sl-resources" 
      style='display: inline-block !important;' 
      id="{{ domid }}__reserved" 
      data-status="reserved"
      title="View resources that you have previously reserved for the slice."
 	 rel='tooltip'>
-  	<p class="list-group-item-heading">Reserved</p>
+  	Reserved
   </a>
   
-  <a href="#" class="list-group-item sl-platform"
+  <a href="#" class="list-group-item sl-resources"
      style='display: inline-block !important;' 
      id="{{ domid }}__unconfigured" 
      data-status="unconfigured"
      title="View resources that you have selected to add to your slice, that require configuration before they can be reserved. Hover you mouse over the symbol next to the checkbox for more details."
      rel='tooltip'>
-  	<p class="list-group-item-heading">Unconfigured</p>
+  	Unconfigured
   	<span class="badge" id="badge-unconfigured" style="display:none;"></span></a>
   </a>
   
-  <a href="#" class="list-group-item sl-platform" 
+  <a href="#" class="list-group-item sl-resources" 
      style='display: inline-block !important;' 
      id="{{ domid }}__pending" 
      data-status="pending"
      title="View pending changes to your slice: resources that you have selected to add, and resources that you have selected to remove. Click on the Apply button to apply those changes, or on the Cancel button to cancel them."
      rel='tooltip'>
-  	<p class="list-group-item-heading">Pending</p>
+  	Pending
   	<span class="badge" id="badge-pending" style="display:none;"></span></a>
   </a>
 </div> 

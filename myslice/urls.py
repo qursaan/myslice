@@ -16,7 +16,7 @@ import portal.platformsview
 import portal.dashboardview
 import portal.homeview
 import portal.newsview
-
+from portal.registrationview        import RegistrationView
 home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
 platforms_view=portal.platformsview.PlatformsView.as_view()
@@ -95,6 +95,7 @@ urls = [
     #
     (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
     #
+    url(r'^register/?$', RegistrationView.as_view(), name='registration'),	
     url(r'^portal/', include('portal.urls')),
 
     # SLA
