@@ -285,7 +285,7 @@ background: #E8E8E8;
 
 /* latest stuff */
 .sliderContainer {
-    margin: 10px 0;
+    margin:0;
 }
 .table-responsive{
     overflow: hidden !important;
