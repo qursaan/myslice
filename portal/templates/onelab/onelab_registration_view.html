@@ -483,7 +483,7 @@
 
     
 <script>
-jQuery(document).ready(function(){
+$(document).ready(function(){
     var availableTags = [
     {% if authorities %}
         {% for authority in authorities %}
@@ -510,7 +510,7 @@ jQuery(document).ready(function(){
 	return 0;
 	}); 
 	// auto-complete the form
-    jQuery( "#authority_hrn" ).autocomplete({
+    $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
       change: function (event, ui) {
@@ -524,9 +524,9 @@ jQuery(document).ready(function(){
       //select: function( event, ui ) {console.log(jQuery(this))}
     });
 	// for hover texts
-	jQuery('[title!=""]').qtip();
-	
-	$('form').submit(function() {
+	$('[title!=""]').qtip();
+	$("form").validate();
+	$("form").submit(function() {
 		if ($('select option:selected').val() == 'upload') {
 			if ($('input[name=user_public_key]').val() == '') {
 				alert('Please specify the key file to upload');
