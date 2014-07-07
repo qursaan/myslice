@@ -125,7 +125,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 title: object,
                 /* gmap can deal with a DOM element but not a jquery object */
                 content: dom.get(0),
-                keys = Array(),
+                keys: Array(),
             }); 
             //extend the bounds to include each marker's position
             this.bounds.extend(marker.position);
@@ -268,9 +268,9 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 visible = false;
                 $.each(marker.keys, function(j, key) {
                     visible |= manifold.query_store.get_record_state(self.options.query_uuid, key, STATE_VISIBLE);
-                }
+                });
                 marker.setVisible(visible);
-            }
+            });
         },
 
         redraw_map: function()

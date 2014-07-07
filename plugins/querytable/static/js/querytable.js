@@ -403,7 +403,6 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
         },
 
         /*************************** QUERY HANDLER ****************************/
-                                    HANDLERS
 
         on_filter_added: function(filter)
         {

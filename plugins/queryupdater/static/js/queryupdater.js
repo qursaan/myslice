@@ -309,7 +309,7 @@
         {
             // Loop over records and display pending ones
             manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
-            }
+            });
         },
         
         set_button_state: function(name, state)
