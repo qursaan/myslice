@@ -18,7 +18,7 @@ from myslice.configengine               import ConfigEngine
 from plugins.apply                      import ApplyPlugin
 from plugins.querytable                 import QueryTable
 from plugins.googlemap                  import GoogleMap
-#from plugins.queryupdater               import QueryUpdater
+# from plugins.queryupdater               import QueryUpdaterPlugin
 from plugins.filter_status              import FilterStatusPlugin
 from plugins.testbeds                   import TestbedsPlugin
 from plugins.scheduler2                 import Scheduler2
@@ -185,17 +185,17 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # --------------------------------------------------------------------------
         # QueryUpdater (Pending Operations)
  
-#DEPRECATED|        pending_resources = QueryUpdater(
-#DEPRECATED|            page                = page,
-#DEPRECATED|            title               = 'Pending operations',
-#DEPRECATED|            query               = main_query,
-#DEPRECATED|            togglable           = False,
-#DEPRECATED|            # start turned off, it will open up itself when stuff comes in
-#DEPRECATED|            toggled             = False,
-#DEPRECATED|            domid               = 'pending',
-#DEPRECATED|            outline_complete    = True,
-#DEPRECATED|            username            = request.user,
-#DEPRECATED|        )
+#         pending_resources = QueryUpdaterPlugin(
+#             page                = page,
+#             title               = 'Pending operations',
+#             query               = main_query,
+#             togglable           = False,
+#             # start turned off, it will open up itself when stuff comes in
+#             toggled             = False,
+#             domid               = 'pending',
+#             outline_complete    = True,
+#             username            = request.user,
+#         )
 
         # --------------------------------------------------------------------------
         # NETWORKS
