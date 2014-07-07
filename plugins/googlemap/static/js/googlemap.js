@@ -275,6 +275,29 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 });
                 marker.setVisible(visible);
             });
+
+            this.do_clustering();
+        },
+
+        do_clustering: function()
+        {
+            this.markerCluster = new MarkerClusterer(this.map, this.markers, {zoomOnClick: false});
+            this.markerCluster.setIgnoreHidden(true);
+            google.maps.event.addListener(this.markerCluster, "clusterclick", function (cluster) {
+                var cluster_markers = cluster.getMarkers();
+                var bounds  = new google.maps.LatLngBounds();
+                $.each(cluster_markers, function(i, marker){
+                    bounds.extend(marker.getPosition()); 
+                });
+                //map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
+                this.map.fitBounds(bounds);
+            });
+            //now fit the map to the bounds
+            this.map.fitBounds(this.bounds);
+            // Fix the zoom of fitBounds function, it's too close when there is only 1 marker
+            if (this.markers.length==1) {
+                this.map.setZoom(this.map.getZoom()-4);
+            }
         },
 
         redraw_map: function()
@@ -296,22 +319,8 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 self.markers.push(s.marker); 
             });
 
-            this.markerCluster = new MarkerClusterer(this.map, this.markers, {zoomOnClick: false});
-            google.maps.event.addListener(this.markerCluster, "clusterclick", function (cluster) {
-                var cluster_markers = cluster.getMarkers();
-                var bounds  = new google.maps.LatLngBounds();
-                $.each(cluster_markers, function(i, marker){
-                    bounds.extend(marker.getPosition()); 
-                });
-                //map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
-                this.map.fitBounds(bounds);
-            });
-            //now fit the map to the bounds
-            this.map.fitBounds(this.bounds);
-            // Fix the zoom of fitBounds function, it's too close when there is only 1 marker
-            if (this.markers.length==1) {
-                this.map.setZoom(this.map.getZoom()-4);
-            }
+            this.do_clustering();
+
 
             /* Set checkbox and background color */
             $.each(record_keys, function(i, record_key) {
