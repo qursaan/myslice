@@ -44,11 +44,10 @@ var CLEAR_RECORDS  = 8;
  *
  * Parameters:
  *   dict :
- *      .request    : ???? used to be FIELD_REQUEST_ADD / FIELD_REQUEST_REMOVE
+ *      .state      : ???? used to be FIELD_REQUEST_ADD / FIELD_REQUEST_REMOVE
  *      .key        : ??? the key fields of the record
- *      .value      : the key of the record who has received an update
- *      .status     : the new state of the record
- *        TODO rename to state, and use values from STATE_SET            
+ *      .op         : the key of the record who has received an update
+ *      .value      : the new state of the record
  */
 var FIELD_STATE_CHANGED = 9;
 
@@ -57,29 +56,19 @@ var DONE           = 102;
 
 /* Update requests related to subqueries */
 
-/**
- * event: SET_ADD
- *
- * Parameters:
- *    string : The key of the element being added
- */
+/*
 var SET_ADD        = 201;
-
-/**
- * event: SET_REMOVED
- *
- * Parameters:
- *    string : The key of the element being removed
- */
 var SET_REMOVED    = 202;
-
+*/
 
 // request
+/*
 var FIELD_REQUEST_CHANGE  = 301;
 var FIELD_REQUEST_ADD     = 302;
 var FIELD_REQUEST_REMOVE  = 303;
 var FIELD_REQUEST_ADD_RESET = 304;
 var FIELD_REQUEST_REMOVE_RESET = 305;
+*/
 // status (XXX Should be deprecated)
 var FIELD_REQUEST_PENDING = 401;
 var FIELD_REQUEST_SUCCESS = 402;
@@ -127,8 +116,15 @@ var QUERY_STATE_DONE        = 2;
  ******************************************************************************/
 
 var STATE_SET       = 0;
-var STATE_WARNINGS  = 1;
-var STATE_VISIBLE   = 2;
+var STATE_VALUE     = 1;
+var STATE_WARNINGS  = 2;
+var STATE_VISIBLE   = 3;
+
+// ACTIONS
+var STATE_SET_CHANGE = 0;
+var STATE_SET_ADD    = 1;
+var STATE_SET_REMOVE = 2;
+var STATE_SET_CLEAR  = 3;
 
 // STATE_SET : enum
 var STATE_SET_IN            = 0;
@@ -139,6 +135,9 @@ var STATE_SET_IN_SUCCESS    = 4;
 var STATE_SET_OUT_SUCCESS   = 5;
 var STATE_SET_IN_FAILURE    = 6;
 var STATE_SET_OUT_FAILURE   = 7;
+var STATE_VALUE_CHANGE_PENDING    = 8;
+var STATE_VALUE_CHANGE_SUCCESS    = 9;
+var STATE_VALUE_CHANGE_FAILURE    = 10;
 
 // STATE_WARNINGS : dict
 
@@ -149,6 +148,8 @@ var STATE_SET_OUT_FAILURE   = 7;
  ******************************************************************************/
 
 var CONSTRAINT_RESERVABLE_LEASE     = 0;
+
+var CONSTRAINT_RESERVABLE_LEASE_MSG = "Configuration required: this resource needs to be scheduled";
 
 // A structure for storing queries
 
@@ -1216,10 +1217,10 @@ var manifold = {
                         throw "Internal error";
 
                     data = {
-                        request: FIELD_REQUEST_CHANGE,
+                        state : STATE_SET,
                         key   : field,
-                        value : update_value,
-                        status: (update_value == result_value) ? FIELD_REQUEST_SUCCESS : FIELD_REQUEST_FAILURE,
+                        op    : update_value,
+                        value : (update_value == result_value) ? STATE_VALUE_CHANGE_SUCCESS : STATE_VALUE_CHANGE_FAILURE,
                     }
                     manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
 
@@ -1454,8 +1455,200 @@ var manifold = {
         manifold.raise_event_handler('record', query_uuid, event_type, value);
     },
 
+    /**
+     * Event handler helpers
+     */
+    _get_next_state_add: function(prev_state, event_type)
+    {
+        switch (prev_state) {
+            case STATE_SET_OUT:
+            case STATE_SET_OUT_SUCCESS:
+            case STATE_SET_IN_FAILURE:
+                new_state = STATE_SET_IN_PENDING;
+                break;
 
-    raise_event: function(query_uuid, event_type, value) {
+            case STATE_SET_OUT_PENDING:
+                new_state = STATE_SET_IN;
+                break;
+
+            case STATE_SET_IN:
+            case STATE_SET_IN_PENDING:
+            case STATE_SET_IN_SUCCESS:
+            case STATE_SET_OUT_FAILURE:
+                console.log("Inconsistent state: already in");
+                return;
+        }
+        return new_state;
+    },
+
+    _get_next_state_remove: function(prev_state, event_type)
+    {
+        switch (prev_state) {
+            case STATE_SET_IN:
+            case STATE_SET_IN_SUCCESS:
+            case STATE_SET_OUT_FAILURE:
+                new_state = STATE_SET_OUT_PENDING;
+                break;
+
+            case STATE_SET_IN_PENDING:
+                new_state = STATE_SET_OUT;
+                break;  
+
+            case STATE_SET_OUT:
+            case STATE_SET_OUT_PENDING:
+            case STATE_SET_OUT_SUCCESS:
+            case STATE_SET_IN_FAILURE:
+                console.log("Inconsistent state: already out");
+                return;
+        }
+        return new_state;
+    },
+
+    _grep_active_lease_callback: function(lease_query, resource_key) {
+        return function(lease_key_lease) {
+            var state, lease_key, lease;
+
+            lease_key = lease_key_lease[0];
+            lease = lease_key_lease[1];
+
+            if (lease['resource'] != resource_key)
+                return false;
+
+            state = manifold.query_store.get_record_state(lease_query.query_uuid, lease_key, STATE_SET);;
+            switch(state) {
+                case STATE_SET_IN:
+                case STATE_SET_IN_PENDING:
+                case STATE_SET_IN_SUCCESS:
+                case STATE_SET_OUT_FAILURE:
+                    return true;
+                case STATE_SET_OUT:
+                case STATE_SET_OUT_PENDING:
+                case STATE_SET_OUT_SUCCESS:
+                case STATE_SET_IN_FAILURE:
+                    return false;
+            }
+        }
+    },
+
+    _enforce_constraints: function(query_ext, record, resource_key, event_type)
+    {
+        var query, data;
+
+        query = query_ext.query;
+
+        switch(query.object) {
+
+            case 'resource':
+                // CONSTRAINT_RESERVABLE_LEASE
+                // 
+                // +) If a reservable node is added to the slice, then it should have a corresponding lease
+                // XXX Not always a resource
+                var is_reservable = (record.exclusive == true);
+                if (is_reservable) {
+                    var warnings = manifold.query_store.get_record_state(query.query_uuid, resource_key, STATE_WARNINGS);
+
+                    if (event_type == STATE_SET_ADD) {
+                        // We should have a lease_query associated
+                        var lease_query = query_ext.parent_query_ext.query.subqueries['lease']; // in  options
+                        var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
+                        // Do we have lease records (in) with this resource
+                        var lease_records = $.grep(lease_query_ext.records.entries(), this._grep_active_lease_callback(lease_query, resource_key));
+                        if (lease_records.length == 0) {
+                            // Sets a warning
+                            // XXX Need for a better function to manage warnings
+                            var warn = CONSTRAINT_RESERVABLE_LEASE_MSG;
+                            warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+                        } else {
+                            // Lease are defined, delete the warning in case it was set previously
+                            delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                        }
+                    } else {
+                        // Remove warnings attached to this resource
+                        delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                    }
+
+                    manifold.query_store.set_record_state(query.query_uuid, resource_key, STATE_WARNINGS, warnings);
+                }
+
+                /* This was redundant */
+                // manifold.query_store.recount(query.query_uuid); 
+
+                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                data = {
+                    state:  STATE_WARNINGS,
+                    key   : resource_key,
+                    op    : null,
+                    value : warnings
+                }
+                manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
+                break;
+
+            case 'lease':
+                var resource_key = record.resource;
+                var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
+                var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
+
+                if (event_type == STATE_SET_ADD) {
+                     // A lease is added, it removes the constraint
+                    delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                } else {
+                    // A lease is removed, it might trigger the warning
+                    var lease_records = $.grep(query_ext.records.entries(), this._grep_active_lease_callback(query, resource_key));
+                    if (lease_records.length == 0) { // XXX redundant cases
+                        // Sets a warning
+                        // XXX Need for a better function to manage warnings
+                        var warn = CONSTRAINT_RESERVABLE_LEASE_MSG;
+                        warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+                    } else {
+                        // Lease are defined, delete the warning in case it was set previously
+                        delete warnings[CONSTRAINT_RESERVABLE_LEASE];
+                    }
+                    
+                }
+
+                manifold.query_store.recount(resource_query.query_uuid); 
+
+                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                data = {
+                    state:  STATE_WARNINGS,
+                    key   : resource_key,
+                    op    : null,
+                    value : warnings
+                }
+                manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
+                break;
+        }
+
+        // -) When a lease is added, it might remove the warning associated to a reservable node
+
+        // If a NITOS node is reserved, then at least a NITOS channel should be reserved
+        // - When a NITOS channel is added, it might remove a warning associated to all NITOS nodes
+
+        // If a NITOS channel is reserved, then at least a NITOS node should be reserved
+        // - When a NITOS node is added, it might remove a warning associated to all NITOS channels
+
+        // A lease is present while the resource has been removed => Require warnings on nodes not in set !
+
+    },
+
+    _get_query_path: function(query_ext) {
+        var path = "";
+        var sq = query_ext;
+        while (sq.parent_query_ext) {
+            if (path != "")
+                path = '.' + path;
+            path = sq.query.object + path;
+            sq = sq.parent_query_ext;
+        }
+        return path;
+    },
+
+
+    /**
+     * Handling events raised by plugins
+     */
+    raise_event: function(query_uuid, event_type, data) 
+    {
         var query, query_ext;
 
         // Query uuid has been updated with the key of a new element
@@ -1464,7 +1657,9 @@ var manifold = {
 
         switch(event_type) {
 
+            // XXX At some point, should be renamed to RECORD_STATE_CHANGED
             case FIELD_STATE_CHANGED:
+
                 // value is an object (request, key, value, status)
                 // update is only possible is the query is not pending, etc
                 // SET_ADD is on a subquery, FIELD_STATE_CHANGED on the query itself
@@ -1476,269 +1671,132 @@ var manifold = {
                 update_query      = query_ext.main_query_ext.update_query_ext.query;
                 update_query_orig = query_ext.main_query_ext.update_query_orig_ext.query;
 
-                switch(value.request) {
-                    case FIELD_REQUEST_CHANGE:
-                        if (update_query.params[value.key] === undefined)
-                            update_query.params[value.key] = Array();
-                        update_query.params[value.key] = value.value;
-                        break;
-                    case FIELD_REQUEST_ADD:
-                        if ($.inArray(value.value, update_query_orig.params[value.key]) != -1)
-                            value.request = FIELD_REQUEST_ADD_RESET;
-                        if (update_query.params[value.key] === undefined)
-                            update_query.params[value.key] = Array();
-                        update_query.params[value.key].push(value.value);
-                        break;
-                    case FIELD_REQUEST_REMOVE:
-                        if ($.inArray(value.value, update_query_orig.params[value.key]) == -1)
-                            value.request = FIELD_REQUEST_REMOVE_RESET;
+                switch(data.state) {
+            
+                    case STATE_VALUE:
+                        switch(data.op) {
+                            case STATE_CHANGE:
+                                /* Set parameter data.key in the update_query to VALUE */
+                                if (update_query.params[data.key] === undefined)
+                                    update_query.params[data.key] = Array();
+                                update_query.params[data.key] = value.value;
+                                break;
 
-                        var arr = update_query.params[value.key];
-                        arr = $.grep(arr, function(x) { return x != value.value; });
-                        if (update_query.params[value.key] === undefined)
-                            update_query.params[value.key] = Array();
-                        update_query.params[value.key] = arr;
-
+                        }
                         break;
-                    case FIELD_REQUEST_ADD_RESET:
-                    case FIELD_REQUEST_REMOVE_RESET:
-                        // XXX We would need to keep track of the original query
-                        throw "Not implemented";
+
+                    case STATE_SET:
+
+                        switch(data.op) {
+                            case STATE_SET_ADD:
+                                if (!data.key) {
+                                    var prev_state, new_state;
+                                    var main_query, record, new_data;
+                    
+                                    prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
+                                    if (prev_state === null)
+                                        prev_state = STATE_SET_OUT;
+                                    new_state = this._get_next_state_add(prev_state, data.state);
+                    
+                                    /* data.value containts the resource key */
+                                    manifold.query_store.add_record(query_uuid, data.value, new_state);
+                                    record = manifold.query_store.get_record(query_uuid, data.value);
+                                    this._enforce_constraints(query_ext, record, data.value, STATE_SET_ADD);
+                    
+                                    /* Inform the parent query: important for update */
+                                    new_data = {
+                                        state : STATE_SET,
+                                        key   : this._get_query_path(query_ext),
+                                        op    : STATE_SET_IN_PENDING,
+                                        value : data.value,
+                                    };
+                                    main_query = query_ext.main_query_ext.query;
+                                    this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, new_data);
+                    
+                                    /*
+                                     * Propagate the event to other plugins subscribed to the query
+                                     */
+                                    manifold.raise_query_event(query_uuid, event_type, data);
+                                } else {
+                                    // mainquery: proceed to update
+
+                                    //if ($.inArray(data.value, update_query_orig.params[data.key]) != -1)
+                                    //    value.request = FIELD_REQUEST_ADD_RESET;
+
+                                    if (update_query.params[data.key] === undefined)
+                                        update_query.params[data.key] = Array();
+                                    update_query.params[data.key].push(data.value);
+                                }
+                                break;
+
+                            case STATE_SET_REMOVE:
+                                if (!data.key) {
+                                    var prev_state, new_state;
+                                    var main_query, record, new_data;
+                    
+                                    prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
+                                    if (prev_state === null)
+                                        prev_state = STATE_SET_OUT;
+                                    new_state = this._get_next_state_remove(prev_state, data.state);
+                    
+                                    /* data.value contains the resource key */
+                                    manifold.query_store.remove_record(query_uuid, data.value, new_state);
+                                    record = manifold.query_store.get_record(query_uuid, data.value);
+                                    this._enforce_constraints(query_ext, record, data.value, STATE_SET_REMOVE);
+                    
+                                    /* Inform the parent query: important for update */
+                                    new_data = {
+                                        state : STATE_SET,
+                                        key   : this._get_query_path(query_ext),
+                                        op    : STATE_SET_OUT_PENDING,
+                                        value : data.value,
+                                    };
+                                    main_query = query_ext.main_query_ext.query;
+                                    this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, new_data);
+                    
+                                    /* Propagate the event to other plugins subscribed to the query */
+                                    manifold.raise_query_event(query_uuid, event_type, data);
+                    
+                                } else {
+                                    // main query: proceed to update
+
+                                    //if ($.inArray(data.value, update_query_orig.params[data.key]) == -1)
+                                    //    value.request = FIELD_REQUEST_REMOVE_RESET;
+
+                                    var arr = update_query.params[data.key];
+                                    arr = $.grep(arr, function(x) { return x != data.value; });
+                                    if (update_query.params[data.key] === undefined)
+                                        update_query.params[data.key] = Array();
+                                    update_query.params[data.key] = arr;
+                                }
+                                break;
+                        }
                         break;
                 }
 
                 // 3. Inform others about the change
                 // a) the main query...
-                manifold.raise_record_event(query_uuid, event_type, value);
+                manifold.raise_record_event(query_uuid, event_type, data);
 
                 // b) subqueries eventually (dot in the key)
                 // Let's unfold 
-                var path_array = value.key.split('.');
-                var value_key = value.key.split('.');
 
                 var cur_query = query;
                 if (cur_query.analyzed_query)
                     cur_query = cur_query.analyzed_query;
-                $.each(path_array, function(i, method) {
-                    cur_query = cur_query.subqueries[method];
-                    value_key.shift(); // XXX check that method is indeed shifted
-                });
-                value.key = value_key;
+
+                if (data.key) {
+                    var path_array = data.key.split('.');
+                    var value_key = data.key.split('.');
+                    $.each(path_array, function(i, method) {
+                        cur_query = cur_query.subqueries[method];
+                        value_key.shift(); // XXX check that method is indeed shifted
+                    });
+                    data.key = value_key;
+                }
 
                 manifold.query_store.recount(cur_query.query_uuid);
-                manifold.raise_record_event(cur_query.query_uuid, event_type, value);
-
-
-                // XXX make this DOT a global variable... could be '/'
-                break;
-
-            case SET_ADD:
-            case SET_REMOVED:
-
-                /* An object has been added to / removed from a set : its
-                 * status become pending or reset to the original state. We
-                 * update the record status in the analyzed queries.
-                 *
-                 * XXX Shall we update something in the main_query ?
-                 */
-                var prev_state, new_state;
-
-                prev_state = manifold.query_store.get_record_state(query_uuid, value, STATE_SET);
-                if (prev_state === null)
-                    prev_state = STATE_SET_OUT;
-
-                if (event_type == SET_ADD) {
-                    switch (prev_state) {
-                        case STATE_SET_OUT:
-                        case STATE_SET_OUT_SUCCESS:
-                        case STATE_SET_IN_FAILURE:
-                            new_state = STATE_SET_IN_PENDING;
-                            break;
-
-                        case STATE_SET_OUT_PENDING:
-                            new_state = STATE_SET_IN;
-                            break;
-
-                        case STATE_SET_IN:
-                        case STATE_SET_IN_PENDING:
-                        case STATE_SET_IN_SUCCESS:
-                        case STATE_SET_OUT_FAILURE:
-                            console.log("Inconsistent state: already in");
-                            return;
-                    }
-                } else { // SET_REMOVE
-                    switch (prev_state) {
-                        case STATE_SET_IN:
-                        case STATE_SET_IN_SUCCESS:
-                        case STATE_SET_OUT_FAILURE:
-                            new_state = STATE_SET_OUT_PENDING;
-                            break;
-
-                        case STATE_SET_IN_PENDING:
-                            new_state = STATE_SET_OUT;
-                            break;  
-
-                        case STATE_SET_OUT:
-                        case STATE_SET_OUT_PENDING:
-                        case STATE_SET_OUT_SUCCESS:
-                        case STATE_SET_IN_FAILURE:
-                            console.log("Inconsistent state: already out");
-                            return;
-                    }
-                }
-
-                
-                var resource_key = value;
-
-                if (event_type == SET_ADD)
-                    manifold.query_store.add_record(query_uuid, resource_key, new_state);
-                else
-                    manifold.query_store.remove_record(query_uuid, resource_key, new_state);
-
-                var record = manifold.query_store.get_record(query_uuid, resource_key);
-
-                /* CONSTRAINTS */
-
-                // XXX When we add a lease we must update the warnings
-
-                switch(query.object) {
-
-                    case 'resource':
-                        // CONSTRAINT_RESERVABLE_LEASE
-                        // 
-                        // +) If a reservable node is added to the slice, then it should have a corresponding lease
-                        // XXX Not always a resource
-                        var is_reservable = (record.exclusive == true);
-                        if (is_reservable) {
-                            var warnings = manifold.query_store.get_record_state(query_uuid, resource_key, STATE_WARNINGS);
-
-                            if (event_type == SET_ADD) {
-                                // We should have a lease_query associated
-                                var lease_query = query_ext.parent_query_ext.query.subqueries['lease']; // in  options
-                                var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
-                                // Do we have lease records with this resource
-                                var lease_records = $.grep(lease_query_ext.records, function(lease_key, lease) {
-                                    return lease['resource'] == value;
-                                });
-                                if (lease_records.length == 0) {
-                                    // Sets a warning
-                                    // XXX Need for a better function to manage warnings
-                                    var warn = "No lease defined for this reservable resource.";
-                                    warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
-                                } else {
-                                    // Lease are defined, delete the warning in case it was set previously
-                                    delete warnings[CONSTRAINT_RESERVABLE_LEASE];
-                                }
-                            } else {
-                                // Remove warnings attached to this resource
-                                delete warnings[CONSTRAINT_RESERVABLE_LEASE];
-                            }
-
-                            manifold.query_store.set_record_state(query_uuid, resource_key, STATE_WARNINGS, warnings);
-                            break;
-                        }
-
-                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
-                        data = {
-                            request: null,
-                            key   : null,
-                            value : resource_key,
-                            status: STATE_WARNINGS
-                        };
-                        manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
-
-                    case 'lease':
-                    /*
-                        var resource_key = record.resource;
-                        var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
-                        var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
-
-                        if (event_type == SET_ADD) {
-                             // A lease is added, it removes the constraint
-                            delete warnings[CONSTRAINT_RESERVABLE_LEASE];
-                        } else {
-                            // A lease is removed, it might trigger the warning
-                            var lease_records = $.grep(query_ext.records, function(lease_key, lease) {
-                                return lease['resource'] == value;
-                            });
-                            if (lease_records.length == 0) { // XXX redundant cases
-                                // Sets a warning
-                                // XXX Need for a better function to manage warnings
-                                var warn = "No lease defined for this reservable resource.";
-                                warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
-                            } else {
-                                // Lease are defined, delete the warning in case it was set previously
-                                delete warnings[CONSTRAINT_RESERVABLE_LEASE];
-                            }
-                            
-                        }
-
-                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
-                        data = {
-                            request: null,
-                            key   : null,
-                            value : resource_key,
-                            status: STATE_WARNINGS
-                        };
-                        manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
-                        break;
-                    */
-                }
-
-
-                // -) When a lease is added, it might remove the warning associated to a reservable node
-
-                // If a NITOS node is reserved, then at least a NITOS channel should be reserved
-                // - When a NITOS channel is added, it might remove a warning associated to all NITOS nodes
-
-                // If a NITOS channel is reserved, then at least a NITOS node should be reserved
-                // - When a NITOS node is added, it might remove a warning associated to all NITOS channels
-
-                // A lease is present while the resource has been removed => Require warnings on nodes not in set !
-
-                /* END CONSTRAINTS */
-
-                // update is only possible is the query is not pending, etc
-                // CHECK status !
-
-                // XXX we can only update subqueries of the main query. Check !
-                // assert query_ext.parent_query == query_ext.main_query
-                // old // update_query = query_ext.main_query_ext.update_query_ext.query;
-
-                // This SET_ADD is called on a subquery, so we have to
-                // recontruct the path of the key in the main_query
-                // We then call FIELD_STATE_CHANGED which is the equivalent for the main query
-
-                var path = "";
-                var sq = query_ext;
-                while (sq.parent_query_ext) {
-                    if (path != "")
-                        path = '.' + path;
-                    path = sq.query.object + path;
-                    sq = sq.parent_query_ext;
-                }
-
-                main_query = query_ext.main_query_ext.query;
-                data = {
-                    request: (event_type == SET_ADD) ? FIELD_REQUEST_ADD : FIELD_REQUEST_REMOVE,
-                    key   : path,
-                    value : value,
-                    status: STATE_SET, // XXX used to be FIELD_REQUEST_PENDING, and not new_state
-                };
-                this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, data);
-
-                // old //update_query.params[path].push(value);
-                // old // console.log('Updated query params', update_query);
-                // NOTE: update might modify the fields in Get
-                // NOTE : we have to modify all child queries
-                // NOTE : parts of a query might not be started (eg slice.measurements, how to handle ?)
-
-                // if everything is done right, update_query should not be null. 
-                // It is updated when we received results from the get query
-                // object = the same as get
-                // filter = key : update a single object for now
-                // fields = the same as get
-                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_record_event(cur_query.query_uuid, event_type, data);
 
                 break;
 
@@ -1746,52 +1804,54 @@ var manifold = {
                 manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 
-            /* FILTERS */
+            /* QUERY STATE CHANGED */
+            
+            // FILTERS
 
             case FILTER_ADDED: 
                 /* Update internal record state */
-                manifold.query_store.add_filter(query_uuid, value);
+                manifold.query_store.add_filter(query_uuid, data);
 
                 /* Propagate the message to plugins */
-                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_query_event(query_uuid, event_type, data);
 
                 break;
 
             case FILTER_REMOVED:
                 /* Update internal record state */
-                manifold.query_store.remove_filter(query_uuid, value);
+                manifold.query_store.remove_filter(query_uuid, data);
 
                 /* Propagate the message to plugins */
-                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_query_event(query_uuid, event_type, data);
 
                 break;
 
             case FIELD_ADDED:
                 main_query = query_ext.main_query_ext.query;
                 main_update_query = query_ext.main_query_ext.update_query;
-                query.select(value);
+                query.select(data);
 
                 // Here we need the full path through all subqueries
                 path = ""
                 // XXX We might need the query name in the QueryExt structure
-                main_query.select(value);
+                main_query.select(data);
 
                 // XXX When is an update query associated ?
                 // XXX main_update_query.select(value);
 
-                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_query_event(query_uuid, event_type, data);
                 break;
 
             case FIELD_REMOVED:
                 query = query_ext.query;
                 main_query = query_ext.main_query_ext.query;
                 main_update_query = query_ext.main_query_ext.update_query;
-                query.unselect(value);
-                main_query.unselect(value);
+                query.unselect(data);
+                main_query.unselect(data);
 
                 // We need to inform about changes in these queries to the respective plugins
                 // Note: query & main_query have the same UUID
-                manifold.raise_query_event(query_uuid, event_type, value);
+                manifold.raise_query_event(query_uuid, event_type, data);
                 break;
         }
         // We need to inform about changes in these queries to the respective plugins

@@ -138,7 +138,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
          */
         create_record_checkbox: function (record, ul, checked)
         {
-            var key, key_value;
+            var key, key_value, data;
 
             var checkbox = $("<input>", {type:'checkbox', checked:checked, class:'geo'});
             var id = record[this.canonical_key];
@@ -170,7 +170,13 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
              */
             var self=this;
             checkbox.change( function (e) {
-                manifold.raise_event (self.options.query_uuid, this.checked ? SET_ADD : SET_REMOVED, id);
+                data = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : this.checked ? SET_ADD : SET_REMOVED,
+                    value: id
+                }
+                manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);
             });
             return checkbox;
         },
@@ -381,16 +387,34 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
 
         on_field_state_changed: function(data)
         {
-            switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox_from_data(data.value, true);
+            switch(data.state) {
+                case STATE_SET:
+                    switch(data.value) {
+                        case STATE_SET_IN:
+                        case STATE_SET_IN_SUCCESS:
+                        case STATE_SET_OUT_FAILURE:
+                            this.set_checkbox_from_data(data.key, true);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_RESET);
+                            break;  
+                        case STATE_SET_OUT:
+                        case STATE_SET_OUT_SUCCESS:
+                        case STATE_SET_IN_FAILURE:
+                            this.set_checkbox_from_data(data.key, false);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_RESET);
+                            break;
+                        case STATE_SET_IN_PENDING:
+                            this.set_checkbox_from_data(data.key, true);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_ADDED);
+                            break;  
+                        case STATE_SET_OUT_PENDING:
+                            this.set_checkbox_from_data(data.key, false);
+                            this.set_bgcolor(data.key, QUERYTABLE_BGCOLOR_REMOVED);
+                            break;
+                    }
                     break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox_from_data(data.value, false);
-                    break;
-                default:
+
+                case STATE_WARNINGS:
+                    //this.change_status(data.key, data.value);
                     break;
             }
         },

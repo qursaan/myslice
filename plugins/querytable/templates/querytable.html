@@ -3,7 +3,7 @@
     <thead>
       <tr>
       	{% if checkboxes %}<th class="checkbox"><input type="checkbox" disabled/></th>{% endif %}
-        <th></th>
+        <th>&#9888;</th>
         {% for column, field in columns.items %} <th>{{ column }}</th> {% endfor %} 
         {% for column, field in hidden_columns.items %} <th>{{ column }}</th> {% endfor %}
       </tr>
@@ -13,7 +13,7 @@
     <tfoot>
       <tr>
       	{% if checkboxes %} <th><input type="checkbox" disabled/></th> {% endif %}
-        <th></th>
+        <th>&#9888;</th>
         {% for column, field in columns.items %} <th>{{ column }}</th> {% endfor %} 
         {% for column, field in hidden_columns.items %} <th>{{ column }}</th> {% endfor %} 
       </tr>

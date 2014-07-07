@@ -70,8 +70,9 @@
     {
         var query_ext;
         
-        switch (data.status) {
+        switch (data.state) {
             case STATE_SET:
+            case STATE_WARNINGS:
                 /* Get the number of pending / unconfigured resources */
                 /* Let's store it in query_ext */
                 query_ext = manifold.query_store.find_analyzed_query_ext(this.options.query_uuid);
