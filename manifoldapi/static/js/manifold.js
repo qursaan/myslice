@@ -1697,7 +1697,7 @@ var manifold = {
                                     /* Inform the parent query: important for update */
                                     new_data = {
                                         state : STATE_SET,
-                                        key   : this._get_query_path(query_ext),
+                                        key   : '', //this._get_query_path(query_ext),
                                         op    : STATE_SET_ADD,
                                         value : data.value,
                                     };
@@ -1748,7 +1748,7 @@ var manifold = {
                                     /* Inform the parent query: important for update */
                                     new_data = {
                                         state : STATE_SET,
-                                        key   : this._get_query_path(query_ext),
+                                        key   : '', //this._get_query_path(query_ext),
                                         op    : STATE_SET_REMOVE,
                                         value : data.value,
                                     };
