@@ -103,6 +103,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'email'             : user_email,
                 'timestamp'         : time.time(),
                 'authority_hrn'     : authority_hrn,
+                'organization'      : wsgi_request.POST.get('org_name', ''),
                 'slice_name'        : wsgi_request.POST.get('slice_name', ''),
                 'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
