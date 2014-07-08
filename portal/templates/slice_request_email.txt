@@ -4,5 +4,6 @@ slice name      : {{slice_name}}
 number of nodes : {{number_of_nodes}}
 purpose         : {{purpose}}
 email           : {{email}}
+organization	: {{organization}}
 Portal url		: {{current_site}}
 

@@ -38,10 +38,19 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         if authorities is not None:
             authorities = sorted(authorities)
 
-        # Get user_hrn (XXX Would deserve to be simplified)
-        user_query  = Query().get('local:user').select('email')
-        user_emails = execute_query(wsgi_request, user_query)
-        user_email = user_emails[0].get('email')
+        # Get user_email (XXX Would deserve to be simplified)
+        user_query  = Query().get('local:user').select('email','config')
+        user_details = execute_query(wsgi_request, user_query)
+        user_email = user_details[0].get('email')
+        # getting user_hrn
+        for user_detail in user_details:
+            user_config = json.loads(user_detail['config'])
+            user_authority = user_config.get('authority','N/A')              
+        # getting the org from authority        
+        for authority in authorities:
+            if authority['authority_hrn'] == user_authority:
+                authority_name = authority['name']
+
         #
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         account_details = execute_query(wsgi_request, account_query)
@@ -79,6 +88,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
+            
+            # getting the authority_hrn from the selected organization           
+            for authority in authorities:
+                if authority['name'] == wsgi_request.POST.get('org_name', ''):
+                    authority_hrn = authority['authority_hrn']
+
+            
 
             slice_request = {
                 'type'              : 'slice',
@@ -86,7 +102,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'user_hrn'          : user_hrn,
                 'email'             : user_email,
                 'timestamp'         : time.time(),
-                'authority_hrn'     : wsgi_request.POST.get('authority_hrn', ''),
+                'authority_hrn'     : authority_hrn,
+                'organization'      : wsgi_request.POST.get('org_name', ''),
                 'slice_name'        : wsgi_request.POST.get('slice_name', ''),
                 'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
@@ -126,7 +143,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'errors': errors,
             'email': user_email,
             'user_hrn': user_hrn,
-            'pi': pi,        
+            'pi': pi,
+            'authority_name': authority_name,        
             'cc_myself': True,
             'authorities': authorities,
             'theme': self.theme,

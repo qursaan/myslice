@@ -35,11 +35,11 @@
 			  </div>
 			  <div class="form-group">
 				{%if 'is_pi'  in pi %}
-				<input type="text" class="form-control" id="authority_hrn" name="authority_hrn" style="width:300px" placeholder="Authority" 
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
 				title="An authority responsible for vetting your slice" required="required">
 				{%else%}
-			    <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" placeholder="Authority" style="width:300px; display:none;" 
-				title="An authority responsible for vetting your slice" required="required" readonly="readonly">
+			    <input type="text" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
+				title="An authority responsible for vetting your slice" required="required" readonly>
 				{%endif%}
 			  </div>
 			  <div class="form-group">
@@ -61,21 +61,34 @@ jQuery(document).ready(function(){
 	
 	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
-        $(this).attr("value", jsonData[0]['parent_authority']);
+		// getting the authority from the view not rest
+        $(this).attr("value", "{{authority_name}}");
     });
-    var availableTags = [
-     {% if authorities %}
-         {% for authority in authorities %}
-             {% if authority.name %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
-             {% else %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
-             {% endif %}
-         {% endfor %}    
-     {% else %}
-         {value:"",label:"No authority found !!!"}
-     {% endif %}
+	var availableTags = [
+    {% if authorities %}
+        {% for authority in authorities %}
+            {% if authority.name %}
+                {value:"{{ authority.name }}",label:"{{authority.name}}"},
+			// to show only full name
+           // {% else %}
+           //     {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+            {% endif %}
+        {% endfor %}    
+    {% else %}
+        {value:"",label:"No authority found !!!"}
+    {% endif %}
     ];
+	// sorting the list
+	availableTags.sort(function(a,b){
+		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
+		if (nameA < nameB) {
+    		return -1;
+		}
+		if (nameA > nameB) {
+    		return 1;
+		}
+	return 0;
+	}); 
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
