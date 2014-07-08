@@ -52,7 +52,7 @@ var CLEAR_RECORDS  = 8;
 var FIELD_STATE_CHANGED = 9;
 
 var IN_PROGRESS    = 101;
-var DONE           = 102;
+var DONE           = 102; //XXX Should be harmonized with query state
 
 /* Update requests related to subqueries */
 
@@ -1080,7 +1080,6 @@ var manifold = {
 
         var update_query_ext = query_ext.update_query_ext;
 
-        console.log("Update case not handled yet!");
         if (!update_query_ext)
             return;
 
@@ -1176,21 +1175,6 @@ var manifold = {
      * previous 'process_get_query_records' function.
      */
     process_update_query_records: function(query, records) {
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
-        // XXX XXX XXX XXX
         // First issue: we request everything, and not only what we modify, so will will have to ignore some fields
         var query_uuid        = query.query_uuid;
         var query_ext         = manifold.query_store.find_analyzed_query_ext(query_uuid);
@@ -1304,17 +1288,17 @@ var manifold = {
                     $.each(added_keys, function(i, key) {
                         if ($.inArray(key, result_keys) == -1) {
                             data = {
-                                request: FIELD_REQUEST_ADD,
-                                key   : field,
-                                value : key,
-                                status: FIELD_REQUEST_FAILURE,
+                                state: STATE_SET,
+                                key  : field,
+                                op   : STATE_SET_IN_FAILURE,
+                                value: key
                             }
                         } else {
                             data = {
-                                request: FIELD_REQUEST_ADD,
-                                key   : field,
-                                value : key,
-                                status: FIELD_REQUEST_SUCCESS,
+                                state: STATE_SET,
+                                key  : field,
+                                op   : STATE_SET_IN_SUCCESS,
+                                value: key
                             }
                         }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
@@ -1322,17 +1306,17 @@ var manifold = {
                     $.each(removed_keys, function(i, key) {
                         if ($.inArray(key, result_keys) == -1) {
                             data = {
-                                request: FIELD_REQUEST_REMOVE,
-                                key   : field,
-                                value : key,
-                                status: FIELD_REQUEST_SUCCESS,
+                                state: STATE_SET,
+                                key  : field,
+                                op   : STATE_SET_OUT_SUCCESS,
+                                value: key
                             }
                         } else {
                             data = {
-                                request: FIELD_REQUEST_REMOVE,
-                                key   : field,
-                                value : key,
-                                status: FIELD_REQUEST_FAILURE,
+                                state: STATE_SET,
+                                key  : field,
+                                op   : STATE_SET_OUT_FAILURE,
+                                value: key
                             }
                         }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
@@ -1345,6 +1329,13 @@ var manifold = {
         
         // XXX Now we need to adapt 'update' and 'update_orig' queries as if we had done a get
         this.setup_update_query(query, records);
+
+        var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
+        query_ext.query_state = QUERY_STATE_DONE;
+
+        // Send DONE message to plugins
+        manifold.raise_record_event(query.query_uuid, DONE);
+
     },
 
     process_query_records: function(query, records) {
@@ -1707,7 +1698,7 @@ var manifold = {
                                     new_data = {
                                         state : STATE_SET,
                                         key   : this._get_query_path(query_ext),
-                                        op    : new_state,
+                                        op    : STATE_SET_ADD,
                                         value : data.value,
                                     };
                                     main_query = query_ext.main_query_ext.query;
@@ -1716,7 +1707,8 @@ var manifold = {
                                     /*
                                      * Propagate the event to other plugins subscribed to the query
                                      */
-                                    manifold.raise_query_event(query_uuid, event_type, data);
+                                    new_data.op = new_state;
+                                    manifold.raise_query_event(query_uuid, event_type, new_data);
                                 } else {
                                     // mainquery: proceed to update
 
@@ -1748,14 +1740,15 @@ var manifold = {
                                     new_data = {
                                         state : STATE_SET,
                                         key   : this._get_query_path(query_ext),
-                                        op    : new_state,
+                                        op    : STATE_SET_REMOVE,
                                         value : data.value,
                                     };
                                     main_query = query_ext.main_query_ext.query;
                                     this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, new_data);
                     
                                     /* Propagate the event to other plugins subscribed to the query */
-                                    manifold.raise_query_event(query_uuid, event_type, data);
+                                    new_data.op = new_state
+                                    manifold.raise_query_event(query_uuid, event_type, new_data);
                     
                                 } else {
                                     // main query: proceed to update
