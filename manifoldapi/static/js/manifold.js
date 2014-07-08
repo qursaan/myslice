@@ -1680,15 +1680,15 @@ var manifold = {
 
                         switch(data.op) {
                             case STATE_SET_ADD:
+                                var prev_state, new_state;
+                                var main_query, record, new_data;
+                
+                                prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
+                                if (prev_state === null)
+                                    prev_state = STATE_SET_OUT;
+                                new_state = this._get_next_state_add(prev_state, data.state);
+                    
                                 if (!data.key) {
-                                    var prev_state, new_state;
-                                    var main_query, record, new_data;
-                    
-                                    prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
-                                    if (prev_state === null)
-                                        prev_state = STATE_SET_OUT;
-                                    new_state = this._get_next_state_add(prev_state, data.state);
-                    
                                     /* data.value containts the resource key */
                                     manifold.query_store.add_record(query_uuid, data.value, new_state);
                                     record = manifold.query_store.get_record(query_uuid, data.value);
@@ -1703,12 +1703,9 @@ var manifold = {
                                     };
                                     main_query = query_ext.main_query_ext.query;
                                     this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, new_data);
-                    
-                                    /*
-                                     * Propagate the event to other plugins subscribed to the query
-                                     */
+
                                     new_data.op = new_state;
-                                    manifold.raise_query_event(query_uuid, event_type, new_data);
+                    
                                 } else {
                                     // mainquery: proceed to update
 
@@ -1718,19 +1715,30 @@ var manifold = {
                                     if (update_query.params[data.key] === undefined)
                                         update_query.params[data.key] = Array();
                                     update_query.params[data.key].push(data.value);
+
+                                    new_data = {
+                                        state : STATE_SET,
+                                        key   : this._get_query_path(query_ext),// null???
+                                        op    : new_state,
+                                        value : data.value,
+                                    }
                                 }
+
+                                /* Propagate the event to other plugins subscribed to the query */
+                                manifold.raise_query_event(query_uuid, event_type, new_data);
+
                                 break;
 
                             case STATE_SET_REMOVE:
+                                var prev_state, new_state;
+                                var main_query, record, new_data;
+                
+                                prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
+                                if (prev_state === null)
+                                    prev_state = STATE_SET_OUT;
+                                new_state = this._get_next_state_remove(prev_state, data.state);
+                    
                                 if (!data.key) {
-                                    var prev_state, new_state;
-                                    var main_query, record, new_data;
-                    
-                                    prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
-                                    if (prev_state === null)
-                                        prev_state = STATE_SET_OUT;
-                                    new_state = this._get_next_state_remove(prev_state, data.state);
-                    
                                     /* data.value contains the resource key */
                                     manifold.query_store.remove_record(query_uuid, data.value, new_state);
                                     record = manifold.query_store.get_record(query_uuid, data.value);
@@ -1746,9 +1754,7 @@ var manifold = {
                                     main_query = query_ext.main_query_ext.query;
                                     this.raise_event(main_query.query_uuid, FIELD_STATE_CHANGED, new_data);
                     
-                                    /* Propagate the event to other plugins subscribed to the query */
                                     new_data.op = new_state
-                                    manifold.raise_query_event(query_uuid, event_type, new_data);
                     
                                 } else {
                                     // main query: proceed to update
@@ -1761,7 +1767,17 @@ var manifold = {
                                     if (update_query.params[data.key] === undefined)
                                         update_query.params[data.key] = Array();
                                     update_query.params[data.key] = arr;
+
+                                    new_data = {
+                                        state : STATE_SET,
+                                        key   : this._get_query_path(query_ext),// null???
+                                        op    : new_state,
+                                        value : data.value,
+                                    }
                                 }
+
+                                /* Propagate the event to other plugins subscribed to the query */
+                                manifold.raise_query_event(query_uuid, event_type, new_data);
                                 break;
                         }
                         break;
