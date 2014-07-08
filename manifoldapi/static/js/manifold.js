@@ -1296,6 +1296,9 @@ var manifold = {
                         // Update record state for children queries
                         manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
 
+                        // XXX This could be optimized
+                        manifold.query_store.recount(cur_query_uuid); 
+
                         data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
@@ -1305,15 +1308,12 @@ var manifold = {
                         // Update record state for children queries
                         manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
 
+                        // XXX This could be optimized
+                        manifold.query_store.recount(cur_query_uuid); 
+
                         data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
-
-                    
-                    
-                    // Send events related to children queries
-                    // XXX
-
 
                     break;
             }
