@@ -1214,7 +1214,8 @@ var manifold = {
                     throw "Not implemented";
                     break;
 
-                case TYPE_LIST_OF_VALUES:
+                /*
+case TYPE_LIST_OF_VALUES:
                     // Same as list of records, but we don't have to extract keys
                     
                     // The rest of exactly the same (XXX factorize)
@@ -1263,6 +1264,8 @@ var manifold = {
 
 
                     break;
+                */
+                case TYPE_LIST_OF_VALUES: // XXX Until fixed
                 case TYPE_LIST_OF_RECORDS:
                     var new_state,cur_query_uuid;
 
