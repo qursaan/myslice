@@ -1294,7 +1294,7 @@ var manifold = {
                         new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_IN_FAILURE : STATE_SET_IN_SUCCESS;
 
                         // Update record state for children queries
-                        manifold.query_store.set_record_state(cur_query_uuid, field, STATE_SET, new_state);
+                        manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
@@ -1303,7 +1303,7 @@ var manifold = {
                         new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_OUT_SUCCESS : STATE_SET_OUT_FAILURE;
 
                         // Update record state for children queries
-                        manifold.query_store.set_record_state(cur_query_uuid, field, STATE_SET, new_state);
+                        manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
