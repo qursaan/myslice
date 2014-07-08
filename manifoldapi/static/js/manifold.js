@@ -1707,7 +1707,7 @@ var manifold = {
                                     new_data = {
                                         state : STATE_SET,
                                         key   : this._get_query_path(query_ext),
-                                        op    : STATE_SET_IN_PENDING,
+                                        op    : new_state,
                                         value : data.value,
                                     };
                                     main_query = query_ext.main_query_ext.query;
@@ -1748,7 +1748,7 @@ var manifold = {
                                     new_data = {
                                         state : STATE_SET,
                                         key   : this._get_query_path(query_ext),
-                                        op    : STATE_SET_OUT_PENDING,
+                                        op    : new_state,
                                         value : data.value,
                                     };
                                     main_query = query_ext.main_query_ext.query;

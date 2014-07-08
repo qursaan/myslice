@@ -230,7 +230,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         apply = ApplyPlugin(
             page            = page,
             domid           = "apply",
-            query           = main_query #sq_resource,
+            query           = main_query,
+            username            = request.user,
         )
             
 

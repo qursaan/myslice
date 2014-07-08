@@ -6,33 +6,36 @@ class ApplyPlugin(Plugin):
     def __init__ (self, query=None, **settings):
         Plugin.__init__ (self, **settings)
         self.query              = query
+        self.username = str(settings['username'])
 
     def template_file (self):
         return "apply.html"
-
-    def template_env(self, request):
-        query_updater = QueryUpdaterPlugin(
-            page                = self.page,
-            title               = 'Pending operations',
-            query               = self.query,
-            togglable           = False,
-            # start turned off, it will open up itself when stuff comes in
-            toggled             = True,
-            domid               = 'pending',
-            outline_complete    = True,
-            username            = request.user, # XXX ???
-        )
-
-        env = Plugin.template_env(self, request)
-        env.update({'query_updater': query_updater.render(request)})
-        return env
+#
+#    def template_env(self, request):
+#        query_updater = QueryUpdaterPlugin(
+#            page                = self.page,
+#            title               = 'Pending operations',
+#            query               = self.query,
+#            togglable           = False,
+#            # start turned off, it will open up itself when stuff comes in
+#            toggled             = True,
+#            domid               = 'pending',
+#            outline_complete    = True,
+#            username            = request.user, # XXX ???
+#        )
+#
+#        env = Plugin.template_env(self, request)
+#        env.update({'query_updater': query_updater.render(request)})
+#        return env
 
     def requirements (self):
         reqs = {
             'js_files' : [
+                'js/dataTables.js',
                 'js/apply.js'
             ],
             'css_files' : [
+                'css/dataTables.bootstrap.css',
                 'css/apply.css'
             ],
         }
@@ -42,7 +45,7 @@ class ApplyPlugin(Plugin):
         # query_uuid will pass self.query results to the javascript
         # and will be available as "record" in :
         # on_new_record: function(record)
-        return ['plugin_uuid', 'domid', 'query_uuid']
+        return ['plugin_uuid', 'domid', 'query_uuid', 'username']
 
     def export_json_settings (self):
         return True

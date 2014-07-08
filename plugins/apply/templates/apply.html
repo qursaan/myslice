@@ -5,10 +5,27 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="{{domid}}__apply__label">Apply pending changes</h4>
+            <h4 class="modal-title" id="{{domid}}__apply__label">Applying pending changes...</h4>
         </div>
         <div class="modal-body">
-          {{query_updater}}
+<div class='resources-selected-spacer'>
+<table class='resources-selected' id='{{domid}}__table'>
+  <thead class="resources-selected">
+    <tr> <th>action</th> <th>key</th> <th>value</th> <th>status</th> </tr>
+  </thead>
+  <tbody></tbody>
+<!--<tfoot class="resources-selected">
+<tr> <th>action</th> <th>key</th> <th>value</th> <th>status</th></tr>
+</tfoot>-->
+</table>
+</div>
+<!--not all buttons are expected to work for now, hence the disabled mark-->
+<!--
+<button type="button" id="{{domid}}__update"  class="btn btn-onelab">Update</button>
+<button type="button" id="{{domid}}__refresh"  class="btn btn-primary" disabled>Refresh</button>
+<button type="button" id="{{domid}}__reset"  class="btn btn-danger" disabled>Reset</button>
+<button type="button" id="{{domid}}__clear_annotations"  class="btn btn-danger" disabled>Clear Annotations</button>
+-->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
