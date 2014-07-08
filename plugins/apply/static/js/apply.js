@@ -310,7 +310,7 @@
 
                         case STATE_SET_OUT_SUCCESS:
                             action = 'REMOVE';
-                            msg   = 'FAILURE';
+                            msg   = 'SUCCESS';
                             break;
                         case STATE_SET_OUT_FAILURE:
                             action = 'REMOVE';

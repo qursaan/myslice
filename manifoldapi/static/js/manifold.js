@@ -1070,7 +1070,8 @@ var manifold = {
             messages.debug ("<<<<< publish_result_rec " + query.object);
     },
 
-    setup_update_query: function(query, records) {
+    setup_update_query: function(query, records) 
+    {
         // We don't prepare an update query if the result has more than 1 entry
         if (records.length != 1)
             return;
@@ -1263,6 +1264,10 @@ var manifold = {
 
                     break;
                 case TYPE_LIST_OF_RECORDS:
+                    var new_state,cur_query_uuid;
+
+                    cur_query_uuid = query.analyzed_query.subqueries['resource'].query_uuid;
+
                     // example: slice.resource
                     //  - update_query_orig.params.resource = resources in slice before update
                     //  - update_query.params.resource = resource requested in slice
@@ -1284,43 +1289,30 @@ var manifold = {
                     var added_keys   = $.grep(query_keys, function (x) { return $.inArray(x, update_keys) == -1 });
                     var removed_keys = $.grep(update_keys, function (x) { return $.inArray(x, query_keys) == -1 });
 
-
+                    // Send events related to parent query
                     $.each(added_keys, function(i, key) {
-                        if ($.inArray(key, result_keys) == -1) {
-                            data = {
-                                state: STATE_SET,
-                                key  : field,
-                                op   : STATE_SET_IN_FAILURE,
-                                value: key
-                            }
-                        } else {
-                            data = {
-                                state: STATE_SET,
-                                key  : field,
-                                op   : STATE_SET_IN_SUCCESS,
-                                value: key
-                            }
-                        }
+                        new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_IN_FAILURE : STATE_SET_IN_SUCCESS;
+
+                        // Update record state for children queries
+                        manifold.query_store.set_record_state(cur_query_uuid, field, STATE_SET, new_state);
+
+                        data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
                     $.each(removed_keys, function(i, key) {
-                        if ($.inArray(key, result_keys) == -1) {
-                            data = {
-                                state: STATE_SET,
-                                key  : field,
-                                op   : STATE_SET_OUT_SUCCESS,
-                                value: key
-                            }
-                        } else {
-                            data = {
-                                state: STATE_SET,
-                                key  : field,
-                                op   : STATE_SET_OUT_FAILURE,
-                                value: key
-                            }
-                        }
+                        new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_OUT_SUCCESS : STATE_SET_OUT_FAILURE;
+
+                        // Update record state for children queries
+                        manifold.query_store.set_record_state(cur_query_uuid, field, STATE_SET, new_state);
+
+                        data = { state: STATE_SET, key  : field, op   : new_state, value: key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
+
+                    
+                    
+                    // Send events related to children queries
+                    // XXX
 
 
                     break;
@@ -1334,7 +1326,9 @@ var manifold = {
         query_ext.query_state = QUERY_STATE_DONE;
 
         // Send DONE message to plugins
-        manifold.raise_record_event(query.query_uuid, DONE);
+        query.iter_subqueries(function(sq, data, parent_query) {
+            manifold.raise_record_event(sq.query_uuid, DONE);
+        });
 
     },
 
@@ -1684,10 +1678,11 @@ var manifold = {
                         prev_state = manifold.query_store.get_record_state(query_uuid, data.value, STATE_SET);
                         if (prev_state === null)
                             prev_state = STATE_SET_OUT;
-                        new_state = this._get_next_state_add(prev_state);
 
                         switch(data.op) {
                             case STATE_SET_ADD:
+                                new_state = this._get_next_state_add(prev_state);
+
                                 /* data.value containts the resource key */
                                 manifold.query_store.add_record(query_uuid, data.value, new_state);
                                 record = manifold.query_store.get_record(query_uuid, data.value);
@@ -1702,6 +1697,8 @@ var manifold = {
                                 break;
 
                             case STATE_SET_REMOVE:
+                                new_state = this._get_next_state_remove(prev_state);
+
                                 /* data.value contains the resource key */
                                 manifold.query_store.remove_record(query_uuid, data.value, new_state);
                                 record = manifold.query_store.get_record(query_uuid, data.value);
@@ -1709,7 +1706,7 @@ var manifold = {
                     
                                 /* Process update query in parent */
                                 path =  this._get_query_path(query_ext);
-                                arr = update_query.params[data.key];
+                                arr = update_query.params[path];
                                 arr = $.grep(arr, function(x) { return x != data.value; });
                                 if (update_query.params[path] === undefined)
                                     update_query.params[path] = Array();
