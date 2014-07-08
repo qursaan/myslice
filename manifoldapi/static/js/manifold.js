@@ -1725,7 +1725,8 @@ var manifold = {
                                 }
 
                                 /* Propagate the event to other plugins subscribed to the query */
-                                manifold.raise_query_event(query_uuid, event_type, new_data);
+                                manifold.query_store.recount(query_uuid);
+                                manifold.raise_record_event(query_uuid, event_type, new_data);
 
                                 break;
 
@@ -1777,12 +1778,13 @@ var manifold = {
                                 }
 
                                 /* Propagate the event to other plugins subscribed to the query */
+                                manifold.query_store.recount(query_uuid);
                                 manifold.raise_query_event(query_uuid, event_type, new_data);
                                 break;
                         }
                         break;
                 }
-
+/*
                 // 3. Inform others about the change
                 // a) the main query...
                 manifold.raise_record_event(query_uuid, event_type, data);
@@ -1803,9 +1805,8 @@ var manifold = {
                     });
                     data.key = value_key;
                 }
-
-                manifold.query_store.recount(cur_query.query_uuid);
                 manifold.raise_record_event(cur_query.query_uuid, event_type, data);
+*/
 
                 break;
 

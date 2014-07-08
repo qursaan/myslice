@@ -300,12 +300,20 @@
                             return;
 
                         case STATE_SET_IN_SUCCESS:
-                        case STATE_SET_OUT_SUCCESS:
+                            action = 'ADD';
                             msg   = 'SUCCESS';
                             break;
-
                         case STATE_SET_IN_FAILURE:
+                            action = 'ADD';
+                            msg   = 'FAILURE';
+                            break;
+
+                        case STATE_SET_OUT_SUCCESS:
+                            action = 'REMOVE';
+                            msg   = 'FAILURE';
+                            break;
                         case STATE_SET_OUT_FAILURE:
+                            action = 'REMOVE';
                             msg   = 'FAILURE';
                             break;
 
