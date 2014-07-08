@@ -97,7 +97,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 sPaginationType: 'bootstrap',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
-                aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
+                aoColumnDefs: [{sDefaultContent: '', aTargets: [ '_all' ]}],
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */

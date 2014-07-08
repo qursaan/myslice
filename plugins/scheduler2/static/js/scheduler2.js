@@ -226,7 +226,7 @@ var SCHEDULER_COLWIDTH = 50;
             }
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
             /* Remove from local cache also, unless we listen to events from outside */
-            $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
+            $scope._leases_by_resource[other.resource] = $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
 
         }
 
@@ -278,7 +278,7 @@ var SCHEDULER_COLWIDTH = 50;
                             }
                             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
                             /* Remove from local cache also, unless we listen to events from outside */
-                            $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
+                            $scope._leases_by_resource[model_resource.urn] = $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
                             return false; // ~ break
                         });
         
@@ -305,9 +305,9 @@ var SCHEDULER_COLWIDTH = 50;
                                 op   : STATE_SET_REMOVE,
                                 value: other_key
                             }
-                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, other_key);
+                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
                             /* Remove from local cache also, unless we listen to events from outside */
-                            $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
+                            $scope._leases_by_resource[model_resource.urn] = $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
                             return false; // ~ break
                         });
                     }
