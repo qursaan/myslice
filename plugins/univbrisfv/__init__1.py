@@ -1,14 +1,15 @@
 from unfold.plugin import Plugin
 
 class UnivbrisFv (Plugin):
-"""
-////////////////////////////////////////
-modified querytable for univbris foam
-///////////////////////////////////////"""
+    """
+    ////////////////////////////////////////
+    modified querytable for univbris foam
+    ///////////////////////////////////////
+    """
 
     def __init__ (self, init_key=None,datatables_options={}, **settings):
-	Plugin.__init__ (self, **settings)
-	self.columns = list (['switch dpid','port no<->peer dpid/port no.','selected'])
+        Plugin.__init__ (self, **settings)
+        self.columns = list (['switch dpid','port no<->peer dpid/port no.','selected'])
         self.init_key=init_key
         self.datatables_options=datatables_options
 
