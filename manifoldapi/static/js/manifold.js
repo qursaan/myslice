@@ -710,43 +710,59 @@ var manifold = {
         };
     },
 
+    _record_equals: function(self, other, key_fields)
+    {
+        for (i=0; i < key_fields.length; i++) {
+            var this_value  = self[key_fields[i]];
+            var other_value = other[key_fields[i]];
+
+            var this_type = manifold.get_type(this_value);
+            var other_type = manifold.get_type(other_value);
+            if (this_type != other_type)
+                return false;
+
+            switch (this_type) {
+                case TYPE_VALUE:
+                case TYPE_LIST_OF_VALUES:
+                    if (this_value != other_value)
+                        return false;
+                    break;
+                case TYPE_RECORD:
+                    if (!(_record_equals(this_value, other_value, key_fields)))
+                        return false;
+                    break;
+                case TYPE_LIST_OF_RECORDS:
+                    if (this_value.length != other_value.length)
+                        return false;
+                    for (i = 0; i < this_value.length; i++)
+                        if (!(_record_equals(this_value, other_value, key_fields)))
+                            return false;
+                    break;
+            }
+        }
+        return true;
+    },
+
     record_equals: function(key_fields)
     {
-        var self = this;
-
-        return function(other) {
-            for (i=0; i < key_fields.length; i++) {
-                var this_value  = this[key_fields[i]];
-                var other_value = other[key_fields[i]];
-
-                var this_type = self.get_type(this_value);
-                var other_type = self.get_type(other_value);
-                if (this_type != other_type)
-                    return false;
-
-                switch (this_type) {
-                    case TYPE_VALUE:
-                    case TYPE_LIST_OF_VALUES:
-                        if (this_value != other_value)
-                            return false;
-                        break;
-                    case TYPE_RECORD:
-                        if (!(record_equals(this_value, other_value)))
-                            return false;
-                        break;
-                    case TYPE_LIST_OF_RECORDS:
-                        if (this_value.length != other_value.length)
-                            return false;
-                        for (i = 0; i < this_value.length; i++)
-                            if (!(record_equals(this_value, other_value)))
-                                return false;
-                        break;
-                }
-            }
-            return true;
+        return function(other) { 
+            return manifold._record_equals(this, other, key_fields); 
         };
     },
 
+    _in_array: function(element, array, key_fields)
+    {
+        if (key_fields.length > 1) {
+            for (i = 0; i < array.length; i++) {
+                if (manifold._record_equals(element, array[i], key_fields))
+                    return true;
+            }
+            return false;
+        } else {
+            // XXX TODO If we have a dict, extract the key first
+            return ($.inArray(element, array) != -1);
+        }
+    },
 
     /************************************************************************** 
      * Metadata management
@@ -1138,8 +1154,8 @@ var manifold = {
     {
         // To make an object a record, we just add the hash function
         var key = manifold.metadata.get_key(object);
-        record.hashCode = manifold.record_hashcode(key.sort());
-        record.equals   = manifold.record_equals(key);
+        record.hashCode = manifold.record_hashcode(record, key.sort());
+        record.equals   = manifold.record_equals(record, key);
 
         // Looking after subrecords
         for (var field in record) {
@@ -1269,7 +1285,7 @@ case TYPE_LIST_OF_VALUES:
                 case TYPE_LIST_OF_RECORDS:
                     var new_state,cur_query_uuid;
 
-                    cur_query_uuid = query.analyzed_query.subqueries['resource'].query_uuid;
+                    cur_query_uuid = query.analyzed_query.subqueries[field].query_uuid;
 
                     // example: slice.resource
                     //  - update_query_orig.params.resource = resources in slice before update
@@ -1278,43 +1294,49 @@ case TYPE_LIST_OF_VALUES:
                     var key = manifold.metadata.get_key(field);
                     if (!key)
                         continue;
+                    /*
                     if (key.length > 1) {
                         throw "Not implemented";
                         continue;
                     }
                     key = key[0];
+                    */
 
                     /* XXX should be modified for multiple keys */
                     var result_keys  = $.map(record[field], function(x) { return manifold.record_get_value(x, key); });
 
+                    // XXX All this could be deduced from record state : STATE_IN_PENDING and STATE_OUT_PENDING
+                    // what we had at the begining
                     var update_keys  = update_query_orig.params[field];
+                    // what we asked
                     var query_keys   = update_query.params[field];
-                    var added_keys   = $.grep(query_keys, function (x) { return $.inArray(x, update_keys) == -1 });
-                    var removed_keys = $.grep(update_keys, function (x) { return $.inArray(x, query_keys) == -1 });
+                    // what we added and removed
+                    var added_keys   = $.grep(query_keys,  function (x) { return (!(manifold._in_array(x, update_keys, key))); });
+                    var removed_keys = $.grep(update_keys, function (x) { return (!(manifold._in_array(x, query_keys,  key))); });
 
                     // Send events related to parent query
-                    $.each(added_keys, function(i, key) {
-                        new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_IN_FAILURE : STATE_SET_IN_SUCCESS;
+                    $.each(added_keys, function(i, added_key) {
+                        new_state = (manifold._in_array(added_key, result_keys, key)) ? STATE_SET_IN_SUCCESS : STATE_SET_IN_FAILURE;
 
                         // Update record state for children queries
-                        manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
+                        manifold.query_store.set_record_state(cur_query_uuid, added_key, STATE_SET, new_state);
 
                         // XXX This could be optimized
                         manifold.query_store.recount(cur_query_uuid); 
 
-                        data = { state: STATE_SET, key  : field, op   : new_state, value: key }
+                        data = { state: STATE_SET, key  : field, op   : new_state, value: added_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
-                    $.each(removed_keys, function(i, key) {
-                        new_state = ($.inArray(key, result_keys) == -1) ? STATE_SET_OUT_SUCCESS : STATE_SET_OUT_FAILURE;
+                    $.each(removed_keys, function(i, removed_key) {
+                        new_state = (manifold._in_array(removed_key, result_keys, key)) ? STATE_SET_OUT_FAILURE : STATE_SET_OUT_SUCCESS;
 
                         // Update record state for children queries
-                        manifold.query_store.set_record_state(cur_query_uuid, key, STATE_SET, new_state);
+                        manifold.query_store.set_record_state(cur_query_uuid, removed_key, STATE_SET, new_state);
 
                         // XXX This could be optimized
                         manifold.query_store.recount(cur_query_uuid); 
 
-                        data = { state: STATE_SET, key  : field, op   : new_state, value: key }
+                        data = { state: STATE_SET, key  : field, op   : new_state, value: removed_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
                     });
 
