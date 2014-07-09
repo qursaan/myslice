@@ -83,13 +83,25 @@
 
         },
 
-        find_row: function(key)
+        find_row: function(value)
         {
+            var KEY_POS, VALUE_POS, data, object_type, object_key;
+
+            TYPE_POS = 1;
             // key in third position, column id = 2
-            var KEY_POS = 2;
+            VALUE_POS = 2;
 
             var cols = $.grep(this.table.fnSettings().aoData, function(col) {
-                return (col._aData[KEY_POS] == key);
+                cur_value = col._aData[VALUE_POS];
+                object_type = col._aData[TYPE_POS];
+                object_key = manifold.metadata.get_key(object_type);
+
+                if (cur_value[0] == '{') {
+                    cur_value = JSON.parse(cur_value);
+                    return manifold._record_equals(cur_value, value, object_key);_
+                } else {
+                    return (cur_value == value);
+                }
             } );
 
             if (cols.length == 0)

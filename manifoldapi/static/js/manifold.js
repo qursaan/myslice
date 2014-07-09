@@ -1732,7 +1732,9 @@ case TYPE_LIST_OF_VALUES:
                                 /* Process update query in parent */
                                 path =  this._get_query_path(query_ext);
                                 arr = update_query.params[path];
-                                arr = $.grep(arr, function(x) { return x != data.value; });
+                                
+                                var key = manifold.metadata.get_key(query.object);
+                                arr = $.grep(arr, function(x) { return (!(manifold._record_equals(x, data.value, key))); });
                                 if (update_query.params[path] === undefined)
                                     update_query.params[path] = Array();
                                 update_query.params[path] = arr;
