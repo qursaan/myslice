@@ -605,10 +605,13 @@ var SCHEDULER_COLWIDTH = 50;
                     var day_timestamp = SchedulerDateSelected.getTime() / 1000;
 
                     var id_start = (lease.start_time - day_timestamp) / resource.granularity;
-                    if (id_start < 0) {
-                        /* Some leases might be in the past */
+
+                    /* Some leases might be in the past */
+                    if (id_start < 0)
                         id_start = 0;
-                    }
+                    /* Leases in the future: ignore */
+                    if (id_start >= self._all_slots.length)
+                        return true; // ~ continue
     
                     var id_end   = (lease.end_time   - day_timestamp) / resource.granularity - 1;
                     var colspan_lease = resource.granularity / self._granularity; //eg. 3600 / 1800 => 2 cells
