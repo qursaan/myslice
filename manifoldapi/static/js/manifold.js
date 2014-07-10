@@ -704,7 +704,7 @@ var manifold = {
     {
         return function() {
             ret = "";
-            for (i=0; i < key_fields.length; i++)
+            for (var i=0; i < key_fields.length; i++)
                 ret += "@@" + this[key_fields[i]];
             return ret;
         };
@@ -712,7 +712,7 @@ var manifold = {
 
     _record_equals: function(self, other, key_fields)
     {
-        for (i=0; i < key_fields.length; i++) {
+        for (var i=0; i < key_fields.length; i++) {
             var this_value  = self[key_fields[i]];
             var other_value = other[key_fields[i]];
 
@@ -734,8 +734,8 @@ var manifold = {
                 case TYPE_LIST_OF_RECORDS:
                     if (this_value.length != other_value.length)
                         return false;
-                    for (i = 0; i < this_value.length; i++)
-                        if (!(_record_equals(this_value, other_value, key_fields)))
+                    for (var j = 0; j < this_value.length; j++)
+                        if (!(_record_equals(this_value[j], other_value[j], key_fields)))
                             return false;
                     break;
             }
@@ -753,7 +753,7 @@ var manifold = {
     _in_array: function(element, array, key_fields)
     {
         if (key_fields.length > 1) {
-            for (i = 0; i < array.length; i++) {
+            for (var i = 0; i < array.length; i++) {
                 if (manifold._record_equals(element, array[i], key_fields))
                     return true;
             }
