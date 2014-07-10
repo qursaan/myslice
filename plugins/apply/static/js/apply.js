@@ -98,7 +98,7 @@
 
                 if (cur_value[0] == '{') {
                     cur_value = JSON.parse(cur_value);
-                    return manifold._record_equals(cur_value, value, object_key);_
+                    return manifold._record_equals(cur_value, value, object_key);
                 } else {
                     return (cur_value == value);
                 }
