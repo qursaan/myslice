@@ -549,6 +549,7 @@ def account_process(request):
             obj_gid = obj_cred.get_gid_object()
             str_cert = obj_gid.save_to_string()
             cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+            #ca = cert.get_issuer()
 
             user_private_key = account_config['user_private_key'].encode('ascii')
             pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
@@ -556,7 +557,10 @@ def account_process(request):
             p12 = crypto.PKCS12()
             p12.set_privatekey(pkey)
             p12.set_certificate(cert)       
+            #p12.set_ca_certificates(ca)       
             pkcs12 = p12.export()
+
+            pkcs12 = p12.get_ca_certificates() 
 
             response = HttpResponse(pkcs12, content_type='text/plain')
             response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
@@ -568,6 +572,7 @@ def account_process(request):
             obj_gid = obj_cred.get_gid_object()
             str_cert = obj_gid.save_to_string()
             cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+            #ca = cert.get_issuer()
 
             user_private_key = account_config['user_private_key'].encode('ascii')
             pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
@@ -575,7 +580,9 @@ def account_process(request):
             p12 = crypto.PKCS12()
             p12.set_privatekey(pkey)
             p12.set_certificate(cert)       
+            #p12.set_ca_certificates(ca)       
             pkcs12 = p12.export()
+            pkcs12 = p12.get_ca_certificates() 
 
             response = HttpResponse(pkcs12, content_type='text/plain')
             response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
