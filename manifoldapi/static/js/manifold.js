@@ -1018,16 +1018,25 @@ var manifold = {
         if (query_ext.set_query_ext) {
             // We have a domain query
             // The results are stored in the corresponding set_query
-            manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records)
+            if (query.object == 'lease') {
+                // temp fix for leases_all
+                manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records, STATE_SET_IN);
+            } else {
+                manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records);
+            }
             
         } else if (query_ext.domain_query_ext) {
             // We have a set query, it is only used to determine which objects are in the set, we should only retrieve the key
             // Has it a domain query, and has it completed ?
-            $.each(records, function(i, record) {
-                var key = manifold.metadata.get_key(query.object);
-                var record_key = manifold.record_get_value(record, key);
-                manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
-            });
+            if (query.object == 'lease') {
+                $.noop(); // slice leases should be included in the results from the domain query lease_all
+            } else {
+                $.each(records, function(i, record) {
+                    var key = manifold.metadata.get_key(query.object);
+                    var record_key = manifold.record_get_value(record, key);
+                    manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
+                });
+            }
 
         } else {
             // We have a normal query
@@ -1154,8 +1163,8 @@ var manifold = {
     {
         // To make an object a record, we just add the hash function
         var key = manifold.metadata.get_key(object);
-        record.hashCode = manifold.record_hashcode(record, key.sort());
-        record.equals   = manifold.record_equals(record, key);
+        record.hashCode = manifold.record_hashcode(key.sort());
+        record.equals   = manifold.record_equals(key);
 
         // Looking after subrecords
         for (var field in record) {
