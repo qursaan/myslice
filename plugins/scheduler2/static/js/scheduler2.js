@@ -682,7 +682,7 @@ var SCHEDULER_COLWIDTH = 50;
 
                 resource = this.scope_resources_by_key[lease.resource];
                 day_timestamp = SchedulerDateSelected.getTime() / 1000;
-                id_start = (lease.start_time - day_timestamp) / resource.granularity;
+                id_start = Math.floor((lease.start_time - day_timestamp) / resource.granularity);
 
                 /* Some leases might be in the past */
                 if (id_start < 0)
@@ -691,14 +691,14 @@ var SCHEDULER_COLWIDTH = 50;
                 if (id_start >= this._all_slots.length)
                     return true; // ~ continue
 
-                id_end   = (lease.end_time   - day_timestamp) / resource.granularity - 1;
+                id_end   = Math.ceil((lease.end_time   - day_timestamp) / resource.granularity);
                 colspan_lease = resource.granularity / this._granularity; //eg. 3600 / 1800 => 2 cells
                 if (id_end >= this._all_slots.length / colspan_lease) {
                     /* Limit the display to the current day */
                     id_end = this._all_slots.length / colspan_lease
                 }
 
-                for (i = id_start; i <= id_end; i++) {
+                for (i = id_start; i < id_end; i++) {
                     // the same slots might be affected multiple times.
                     // PENDING_IN + PENDING_OUT => IN 
                     //
