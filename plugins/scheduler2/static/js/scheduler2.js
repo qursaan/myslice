@@ -589,11 +589,9 @@ var SCHEDULER_COLWIDTH = 50;
                 var self = this;
                 var scope = this._get_scope();
             
-                var leases = manifold.query_store.get_records(this.options.query_lease_uuid);
-                $.each(leases, function(i, lease) {
+                manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
 
-                    console.log("SET LEASES", new Date(lease.start_time* 1000));
-                    console.log("          ", new Date(lease.end_time* 1000));
+                    console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
                     // XXX We should ensure leases are correctly merged, otherwise our algorithm won't work
 
                     // Populate leases by resource array: this will help us merging leases later
@@ -601,33 +599,8 @@ var SCHEDULER_COLWIDTH = 50;
                         scope._leases_by_resource[lease.resource] = [];
                     scope._leases_by_resource[lease.resource].push(lease);
 
-                    var resource = self.scope_resources_by_key[lease.resource];
-                    var day_timestamp = SchedulerDateSelected.getTime() / 1000;
+                    self._set_lease_slots(lease_key, lease);
 
-                    var id_start = (lease.start_time - day_timestamp) / resource.granularity;
-
-                    /* Some leases might be in the past */
-                    if (id_start < 0)
-                        id_start = 0;
-                    /* Leases in the future: ignore */
-                    if (id_start >= self._all_slots.length)
-                        return true; // ~ continue
-    
-                    var id_end   = (lease.end_time   - day_timestamp) / resource.granularity - 1;
-                    var colspan_lease = resource.granularity / self._granularity; //eg. 3600 / 1800 => 2 cells
-                    if (id_end >= self._all_slots.length / colspan_lease) {
-                        /* Limit the display to the current day */
-                        id_end = self._all_slots.length / colspan_lease
-                    }
-
-                    for (i = id_start; i <= id_end; i++)
-                        // the same slots might be affected multiple times.
-                        // PENDING_IN + PENDING_OUT => IN 
-                        //
-                        // RESERVED vs SELECTED !
-                        //
-                        // PENDING !!
-                        resource.leases[i].status = 'selected'; 
                 });
             },
 
@@ -661,7 +634,116 @@ var SCHEDULER_COLWIDTH = 50;
             on_leases_filter_removed:    function(filter) { this._get_scope().$apply(); },
             on_leases_filter_clear:      function()       { this._get_scope().$apply(); },
 
+            on_field_state_changed: function(data)
+            {
+                /*
+                this._set_lease_slots(lease_key, lease);
+
+                switch(data.state) {
+                    case STATE_SET:
+                        switch(data.op) {
+                            case STATE_SET_IN:
+                            case STATE_SET_IN_SUCCESS:
+                            case STATE_SET_OUT_FAILURE:
+                                this.set_checkbox_from_data(data.value, true);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                break;  
+                            case STATE_SET_OUT:
+                            case STATE_SET_OUT_SUCCESS:
+                            case STATE_SET_IN_FAILURE:
+                                this.set_checkbox_from_data(data.value, false);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                break;
+                            case STATE_SET_IN_PENDING:
+                                this.set_checkbox_from_data(data.key, true);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
+                                break;  
+                            case STATE_SET_OUT_PENDING:
+                                this.set_checkbox_from_data(data.key, false);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
+                                break;
+                        }
+                        break;
+
+                    case STATE_WARNINGS:
+                        this.change_status(data.key, data.value);
+                        break;
+                }
+                */
+            },
+
+
             /* INTERNAL FUNCTIONS */
+
+            _set_lease_slots: function(lease_key, lease)
+            {
+                var resource, lease_status, lease_class;
+                var day_timestamp, id_start, id_end, colspan_lease;
+
+                resource = this.scope_resources_by_key[lease.resource];
+                day_timestamp = SchedulerDateSelected.getTime() / 1000;
+                id_start = (lease.start_time - day_timestamp) / resource.granularity;
+
+                /* Some leases might be in the past */
+                if (id_start < 0)
+                    id_start = 0;
+                /* Leases in the future: ignore */
+                if (id_start >= this._all_slots.length)
+                    return true; // ~ continue
+
+                id_end   = (lease.end_time   - day_timestamp) / resource.granularity - 1;
+                colspan_lease = resource.granularity / this._granularity; //eg. 3600 / 1800 => 2 cells
+                if (id_end >= this._all_slots.length / colspan_lease) {
+                    /* Limit the display to the current day */
+                    id_end = this._all_slots.length / colspan_lease
+                }
+
+                for (i = id_start; i <= id_end; i++) {
+                    // the same slots might be affected multiple times.
+                    // PENDING_IN + PENDING_OUT => IN 
+                    //
+                    // RESERVED vs SELECTED !
+                    //
+                    // PENDING !!
+                    lease_status = manifold.query_store.get_record_state(this.options.query_lease_uuid, lease_key, STATE_SET);
+                    switch(lease_status) {
+                        case STATE_SET_IN:
+                            lease_class = 'selected'; // my leases
+                            lease_success = '';
+                            break;
+                        case STATE_SET_IN_SUCCESS:
+                            lease_class = 'selected'; // my leases
+                            lease_success = 'success';
+                        case STATE_SET_OUT_FAILURE:
+                            lease_class = 'selected'; // my leases
+                            lease_success = 'failure';
+                            break;
+                        case STATE_SET_OUT:
+                            lease_class = 'reserved'; // other leases
+                            lease_success = '';
+                            break;
+                        case STATE_SET_OUT_SUCCESS:
+                            lease_class = 'reserved'; // other leases
+                            lease_success = 'success';
+                            break;
+                        case STATE_SET_IN_FAILURE:
+                            lease_class = 'reserved'; // other leases
+                            lease_success = 'failure';
+                            break;
+                        case STATE_SET_IN_PENDING:
+                            lease_class = 'pendingin';
+                            lease_success = '';
+                            break;
+                        case STATE_SET_OUT_PENDING:
+                            lease_class = 'pendingout';
+                            lease_success = '';
+                            break;
+                    
+                    }
+                    resource.leases[i].status = lease_class;
+                    resource.leases[i].success = lease_success;
+                }
+            },
 
 /* XXX IN TEMPLATE XXX
                 if (SchedulerDataViewData.length == 0) {

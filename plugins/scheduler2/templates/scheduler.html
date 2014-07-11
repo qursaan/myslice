@@ -53,6 +53,7 @@
 							data-slotid="{[{ lease.id }]}" 
 							data-groupid="{[{ lease.groupid }]}" 
 							ng-class="{{ 'lease.status' }}"
+							ng-class="{{ 'lease.success' }}"
 							colspan="{[{resource.granularity / granularity}]}"
 							ng-click="select(from+$index, lease, $parent.resource)">
 						</td>

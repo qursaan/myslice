@@ -345,6 +345,12 @@ function QueryStore() {
         return query_ext.records.get(record_key);
     }
 
+    this.del_record = function(query_uuid, record_key)
+    {
+        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        return query_ext.records.remove(record_key);
+    }
+
     this.add_record = function(query_uuid, record, new_state)
     {
         var query_ext, key, record_key;
@@ -375,8 +381,14 @@ function QueryStore() {
         } else {
             record_key = record;
         }
-
-        manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
+        
+        if ((query_ext.query.object == 'lease') && (new_state == STATE_SET_OUT)) {
+            // Leases that are marked out are in fact leases from other slices
+            // We need to _remove_ leases that we mark as OUT
+            manifold.query_store.del_record(query_uuid, record_key);
+        } else {
+            manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
+        }
     }
 
     this.iter_records = function(query_uuid, callback)
@@ -1018,25 +1030,16 @@ var manifold = {
         if (query_ext.set_query_ext) {
             // We have a domain query
             // The results are stored in the corresponding set_query
-            if (query.object == 'lease') {
-                // temp fix for leases_all
-                manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records, STATE_SET_IN);
-            } else {
-                manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records);
-            }
+            manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records);
             
         } else if (query_ext.domain_query_ext) {
             // We have a set query, it is only used to determine which objects are in the set, we should only retrieve the key
             // Has it a domain query, and has it completed ?
-            if (query.object == 'lease') {
-                $.noop(); // slice leases should be included in the results from the domain query lease_all
-            } else {
-                $.each(records, function(i, record) {
-                    var key = manifold.metadata.get_key(query.object);
-                    var record_key = manifold.record_get_value(record, key);
-                    manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
-                });
-            }
+            $.each(records, function(i, record) {
+                var key = manifold.metadata.get_key(query.object);
+                var record_key = manifold.record_get_value(record, key);
+                manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
+            });
 
         } else {
             // We have a normal query
@@ -1335,6 +1338,14 @@ case TYPE_LIST_OF_VALUES:
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: added_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+                        // Inform subquery also
+                        data.key = '';
+                        manifold.raise_record_event(cur_query_uuid, FIELD_STATE_CHANGED, data);
+                        // XXX Passing no parameters so that they can redraw everything would
+                        // be more efficient but is currently not supported
+                        // XXX We could also need to inform plugins about nodes IN (not pending) that are no more, etc.
+                        // XXX refactor all this when suppressing update_queries, and relying on state instead !
                     });
                     $.each(removed_keys, function(i, removed_key) {
                         new_state = (manifold._in_array(removed_key, result_keys, key)) ? STATE_SET_OUT_FAILURE : STATE_SET_OUT_SUCCESS;
@@ -1347,6 +1358,10 @@ case TYPE_LIST_OF_VALUES:
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: removed_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+                        // Inform subquery also
+                        data.key = '';
+                        manifold.raise_record_event(cur_query_uuid, FIELD_STATE_CHANGED, data);
                     });
 
                     break;
@@ -1358,6 +1373,7 @@ case TYPE_LIST_OF_VALUES:
 
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
         query_ext.query_state = QUERY_STATE_DONE;
+
 
         // Send DONE message to plugins
         query.iter_subqueries(function(sq, data, parent_query) {
@@ -1549,7 +1565,7 @@ case TYPE_LIST_OF_VALUES:
         }
     },
 
-    _enforce_constraints: function(query_ext, record, resource_key, event_type)
+    _enforce_constraints: function(query_ext, record, record_key, event_type)
     {
         var query, data;
 
@@ -1564,14 +1580,14 @@ case TYPE_LIST_OF_VALUES:
                 // XXX Not always a resource
                 var is_reservable = (record.exclusive == true);
                 if (is_reservable) {
-                    var warnings = manifold.query_store.get_record_state(query.query_uuid, resource_key, STATE_WARNINGS);
+                    var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
 
                     if (event_type == STATE_SET_ADD) {
                         // We should have a lease_query associated
                         var lease_query = query_ext.parent_query_ext.query.subqueries['lease']; // in  options
                         var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
                         // Do we have lease records (in) with this resource
-                        var lease_records = $.grep(lease_query_ext.records.entries(), this._grep_active_lease_callback(lease_query, resource_key));
+                        var lease_records = $.grep(lease_query_ext.records.entries(), this._grep_active_lease_callback(lease_query, record_key));
                         if (lease_records.length == 0) {
                             // Sets a warning
                             // XXX Need for a better function to manage warnings
@@ -1586,7 +1602,7 @@ case TYPE_LIST_OF_VALUES:
                         delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                     }
 
-                    manifold.query_store.set_record_state(query.query_uuid, resource_key, STATE_WARNINGS, warnings);
+                    manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
                 }
 
                 /* This was redundant */
@@ -1595,7 +1611,7 @@ case TYPE_LIST_OF_VALUES:
                 // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
                 data = {
                     state:  STATE_WARNINGS,
-                    key   : resource_key,
+                    key   : record_key,
                     op    : null,
                     value : warnings
                 }
@@ -1603,7 +1619,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case 'lease':
-                var resource_key = record.resource;
+                var resource_key = record_key.resource;
                 var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
                 var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
 
