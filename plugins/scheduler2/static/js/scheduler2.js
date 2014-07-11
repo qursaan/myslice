@@ -313,7 +313,7 @@ var SCHEDULER_COLWIDTH = 50;
                     }
         
                     $scope._create_new_lease(model_resource.urn, start_time, end_time);
-                    model_lease.status = 'pendingin'; 
+                    model_lease.status = (model_lease.status == 'free') ? 'pendingin' : 'in';
                     // unless the exact same lease already existed (pending_out status for the lease, not the cell !!)
 
                     break;
@@ -351,7 +351,7 @@ var SCHEDULER_COLWIDTH = 50;
                     }
                 
                     // cf comment in previous switch case
-                    model_lease.status = 'pendingout'; 
+                    model_lease.status = (model_lease.status == 'selected') ? 'pendingout' : 'free';
 
                     break;
 
@@ -735,7 +735,11 @@ var SCHEDULER_COLWIDTH = 50;
                             lease_success = '';
                             break;
                         case STATE_SET_OUT_PENDING:
-                            lease_class = 'pendingout';
+                            // pending_in & pending_out == IN == replacement
+                            if (resource.leases[i].status == 'pendingin')
+                                lease_class = 'pendingin'
+                            else
+                                lease_class = 'pendingout';
                             lease_success = '';
                             break;
                     

@@ -351,6 +351,12 @@ function QueryStore() {
         return query_ext.records.remove(record_key);
     }
 
+    this.del_state = function(query_uuid, record_key)
+    {
+        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        return query_ext.state.remove(record_key);
+    }
+
     this.add_record = function(query_uuid, record, new_state)
     {
         var query_ext, key, record_key;
@@ -386,6 +392,7 @@ function QueryStore() {
             // Leases that are marked out are in fact leases from other slices
             // We need to _remove_ leases that we mark as OUT
             manifold.query_store.del_record(query_uuid, record_key);
+            manifold.query_store.del_state(query_uuid, record_key);
         } else {
             manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
         }
