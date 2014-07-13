@@ -313,7 +313,7 @@ var SCHEDULER_COLWIDTH = 50;
                     }
         
                     $scope._create_new_lease(model_resource.urn, start_time, end_time);
-                    model_lease.status = (model_lease.status == 'free') ? 'pendingin' : 'in';
+                    model_lease.status = (model_lease.status == 'free') ? 'pendingin' : 'selected';
                     // unless the exact same lease already existed (pending_out status for the lease, not the cell !!)
 
                     break;
@@ -599,8 +599,17 @@ var SCHEDULER_COLWIDTH = 50;
                         scope._leases_by_resource[lease.resource] = [];
                     scope._leases_by_resource[lease.resource].push(lease);
 
-                    self._set_lease_slots(lease_key, lease);
+                });
 
+                this._set_all_lease_slots();
+            },
+
+            _set_all_lease_slots: function()
+            {
+                var self = this;
+            
+                manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
+                    self._set_lease_slots(lease_key, lease);
                 });
             },
 
@@ -780,7 +789,7 @@ var SCHEDULER_COLWIDTH = 50;
                     $('#tblSlider').slider('setValue', 0); // XXX
                     // Refresh leases
                     self._scope_clear_leases();
-                    self._scope_set_leases();
+                    self._set_all_lease_slots();
                     // Refresh display
                     self._get_scope().$apply();
                 }).datepicker('setValue', SchedulerDateSelected); //.data('datepicker');
