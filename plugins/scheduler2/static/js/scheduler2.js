@@ -798,7 +798,7 @@ var SCHEDULER_COLWIDTH = 50;
                     SchedulerDateSelected = new Date(ev.date);
                     SchedulerDateSelected.setHours(0,0,0,0);
                     // Set slider to origin
-                    $('#tblSlider').slider('setValue', 0); // XXX
+                    //$('#tblSlider').slider('setValue', 0); // XXX
                     // Refresh leases
                     self._scope_clear_leases();
                     self._set_all_lease_slots();
