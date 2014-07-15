@@ -59,11 +59,11 @@
 <script>
 jQuery(document).ready(function(){
 	
-	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+	/*$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
-		// getting the authority from the view not rest
-        $(this).attr("value", "{{authority_name}}");
-    });
+        $(this).attr("value", "{{jsonData}}");
+    });*/
+	$("#authority_hrn").val("{{authority_name}}");
 	var availableTags = [
     {% if authorities %}
         {% for authority in authorities %}
