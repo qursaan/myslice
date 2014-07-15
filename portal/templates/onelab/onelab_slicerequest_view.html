@@ -61,7 +61,7 @@ jQuery(document).ready(function(){
 	
 	/*$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
-        $(this).attr("value", "{{jsonData}}");
+        $(this).attr("value", jsonData[0]['parent_authority']);
     });*/
 	$("#authority_hrn").val("{{authority_name}}");
 	var availableTags = [
