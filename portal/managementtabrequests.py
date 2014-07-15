@@ -7,13 +7,13 @@ from manifoldapi.manifoldapi         import execute_query
 from django.views.generic.base      import TemplateView
 
 from unfold.loginrequired           import LoginRequiredView
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http                    import HttpResponse
+from django.shortcuts               import render
 
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
+from manifold.core.query            import Query, AnalyzedQuery
+from manifoldapi.manifoldapi        import execute_query
 
-from portal.actions             import get_requests
+from portal.actions                 import get_requests
 
 from myslice.theme import ThemeView
 
