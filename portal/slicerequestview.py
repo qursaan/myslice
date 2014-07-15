@@ -91,7 +91,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
             
-            # getting the authority_hrn from the selected organization           
+            # getting the authority_hrn from the selected organization
+            authority_hrn = ''           
             for authority in authorities:
                 if authority['name'] == wsgi_request.POST.get('org_name', ''):
                     authority_hrn = authority['authority_hrn']
@@ -122,10 +123,6 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 if _slice['slice_hrn'] == req_slice_hrn:
                     errors.append('Slice already exists. Please use a different slice name.')
             
-            exp_url = slice_request['exp_url']
-           
-            if (authority_hrn is None or authority_hrn == ''):
-                errors.append('Please, select an organization')
 
             # What kind of slice name is valid?
             if (slice_name is None or slice_name == ''):
@@ -133,11 +130,18 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             
             if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
+            
+            organization = slice_request['organization']    
+            if (organization is None or organization == ''):
+                errors.append('Organization is mandatory')
+
 
     
             purpose = slice_request['purpose']
             if (purpose is None or purpose == ''):
-                errors.append('Purpose is mandatory')
+                errors.append('Experiment purpose is mandatory')
+
+            exp_url = slice_request['exp_url']
 
             if not errors:
                 if is_pi(wsgi_request, user_hrn, authority_hrn):
