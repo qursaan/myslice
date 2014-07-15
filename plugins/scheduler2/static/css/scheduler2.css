@@ -215,6 +215,11 @@
     cursor: not-allowed;
 }
 
+#scheduler-reservation-table tbody tr td.disabled {
+    background: url("../img/forbidden.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
 #scheduler-reservation-table tbody tr td.success {
 	content: "✓";
 }

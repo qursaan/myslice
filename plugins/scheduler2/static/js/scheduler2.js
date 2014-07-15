@@ -495,6 +495,7 @@ var SCHEDULER_COLWIDTH = 50;
             do_resize: function()
             {
                 var scope = this._get_scope();
+                var num_hidden_cells, new_max;
 
                 $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", SCHEDULER_FIRST_COLWIDTH);
                 //self get width might need fix depending on the template 
@@ -511,11 +512,14 @@ var SCHEDULER_COLWIDTH = 50;
                 scope.lcm_colspan = this._lcm_colspan;
 
                 // Slider max value
-
                 if ($('#tblSlider').data('slider') != undefined) {
-                    var new_max = (this._all_slots.length - this._num_visible_cells) / this._lcm_colspan;
-                    $('#tblSlider').slider('setAttribute', 'max', new_max);
+                    num_hidden_cells = this._all_slots.length - this._num_visible_cells;
+
+                    $('#tblSlider').slider('setAttribute', 'max', num_hidden_cells);
+                    $('#tblSlider').slider('setValue', scope.from, true);
+                    this._get_scope().$apply();
                 }
+
 
             },
 
@@ -567,18 +571,23 @@ var SCHEDULER_COLWIDTH = 50;
 
             _scope_clear_leases: function()
             {
+                var time, now;
                 var self = this;
                 var scope = this._get_scope();
+
+                now = new Date().getTime();
 
                 // Setup leases with a default free status...
                 $.each(this.scope_resources_by_key, function(resource_key, resource) {
                     resource.leases = [];
                     var colspan_lease = resource.granularity / self._granularity; //eg. 3600 / 1800 => 2 cells
+                    time = SchedulerDateSelected.getTime();
                     for (i=0; i < self._all_slots.length / colspan_lease; i++) { // divide by granularity
                         resource.leases.push({
                             id:     'coucou',
-                            status: 'free', // 'selected', 'reserved', 'maintenance' XXX pending ??
+                            status: (time < now) ? 'disabled':  'free', // 'selected', 'reserved', 'maintenance' XXX pending ??
                         });
+                        time += resource.granularity * 1000;
                     }
                 });
 
@@ -586,15 +595,20 @@ var SCHEDULER_COLWIDTH = 50;
 
             _scope_set_leases: function()
             {
+                    var status;
                 var self = this;
                 var scope = this._get_scope();
             
                 manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
-
                     console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
                     // XXX We should ensure leases are correctly merged, otherwise our algorithm won't work
 
                     // Populate leases by resource array: this will help us merging leases later
+
+                    // let's only put _our_ leases
+                    lease_status = manifold.query_store.get_record_state(self.options.query_lease_uuid, lease_key, STATE_SET);
+                    if (lease_status != STATE_SET_IN)
+                        return true; // ~continue
                     if (!(lease.resource in scope._leases_by_resource))
                         scope._leases_by_resource[lease.resource] = [];
                     scope._leases_by_resource[lease.resource].push(lease);
@@ -732,11 +746,11 @@ var SCHEDULER_COLWIDTH = 50;
                             lease_success = '';
                             break;
                         case STATE_SET_OUT_SUCCESS:
-                            lease_class = 'reserved'; // other leases
+                            lease_class = 'free'; // other leases
                             lease_success = 'success';
                             break;
                         case STATE_SET_IN_FAILURE:
-                            lease_class = 'reserved'; // other leases
+                            lease_class = 'free'; // other leases
                             lease_success = 'failure';
                             break;
                         case STATE_SET_IN_PENDING:
@@ -777,6 +791,9 @@ var SCHEDULER_COLWIDTH = 50;
             _initUI: function() 
             {
                 var self = this;
+                var scope = self._get_scope();
+
+                var num_hidden_cells;
 
                 $("#DateToRes").datepicker({
                     onRender: function(date) {
@@ -786,7 +803,7 @@ var SCHEDULER_COLWIDTH = 50;
                     SchedulerDateSelected = new Date(ev.date);
                     SchedulerDateSelected.setHours(0,0,0,0);
                     // Set slider to origin
-                    $('#tblSlider').slider('setValue', 0); // XXX
+                    //$('#tblSlider').slider('setValue', 0); // XXX
                     // Refresh leases
                     self._scope_clear_leases();
                     self._set_all_lease_slots();
@@ -795,15 +812,22 @@ var SCHEDULER_COLWIDTH = 50;
                 }).datepicker('setValue', SchedulerDateSelected); //.data('datepicker');
 
                 //init Slider
+                num_hidden_cells = self._all_slots.length - self._num_visible_cells;
+                init_cell = (new Date().getHours() - 1) * 3600 / self._granularity;
+                if (init_cell > num_hidden_cells)
+                    init_cell = num_hidden_cells;
+                
                 $('#tblSlider').slider({
                     min: 0,
-                    max: (self._all_slots.length - self._num_visible_cells) / self._lcm_colspan,
-                    value: 0,
+                    max: num_hidden_cells, // / self._lcm_colspan,
+                    value: init_cell,
                 }).on('slide', function(ev) {
                     var scope = self._get_scope();
                     scope.from = ev.value * self._lcm_colspan;
                     scope.$apply();
                 });
+                scope.from = init_cell;
+                scope.$apply();
 
                 $("#plugin-scheduler-loader").hide();
                 $("#plugin-scheduler").show();

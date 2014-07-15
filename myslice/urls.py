@@ -34,6 +34,7 @@ import portal.slicetabtestbeds
 import portal.slicetabusers
 import portal.slicetabmeasurements 
 
+import portal.managementtababout
 import portal.managementtabrequests
 
 #### high level choices
@@ -97,6 +98,7 @@ urls = [
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
     #
     (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
+    (r'^management/about/?$', portal.managementtababout.ManagementAboutView.as_view()),
     #
     url(r'^register/?$', RegistrationView.as_view(), name='registration'),	
     url(r'^terms/?$', TermsView.as_view(), name='terms'),

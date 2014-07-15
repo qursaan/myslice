@@ -1,0 +1,41 @@
+{% load portal_filters %}
+<div class="col-md-6">
+	<div>
+		<img src="{{ STATIC_URL|add:'img/institutions/'|add:authority.authority_hrn|add:'.gif'|file_exists }}" alt="{{authority.name}}">
+	</div>
+	<br />
+	<h3><a href="{{authority.url}}">{{authority.name}}</a></h3>
+	<p>
+		{{authority.address}} <br />
+		{{authority.postcode}} {{authority.city}} <br />
+		{{authority.country}}
+	</p>
+	<br />
+	<h4>Onelab membership</h4> 
+	<p>
+		{{ authority.onelab_membership }}
+	</p>
+</div>
+<div class="col-md-6">
+	<h4>Legal Contact:</h4>
+	<p>
+	{% for c in authority_contacts.legal %}
+		 {{ c }} <br />
+	{% endfor %}
+	</p>
+	<br />
+	<h4>Scientific Contact:</h4>
+	<p>
+	{% for c in authority_contacts.scientific %}
+		{{ c }} <br />
+	{% endfor %}
+	</p>
+	<br />
+	<h4>Technical Contact:</h4>
+	<p>
+	{% for c in authority_contacts.technical %}
+		{{ c }} <br />
+	{% endfor %}
+	</p>
+</div>
+<script>$(document).ready(function() {$('#authority_name').text('{{authority.name}}')});</script>
