@@ -112,14 +112,22 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'current_site'      : current_site
             }
             
+            # create slice_hrn based on authority_hrn and slice_name
+            slice_name = slice_request['slice_name']
+            req_slice_hrn = authority_hrn + '.' + slice_name
+            # comparing requested slice_hrn with the existing slice_hrn 
+            slice_query  = Query().get('slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
+            slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
+            for _slice in slice_details_sfa:
+                if _slice['slice_hrn'] == req_slice_hrn:
+                    errors.append('Slice already exists. Please use a different slice name.')
+            
             exp_url = slice_request['exp_url']
            
-            authority_hrn = slice_request['authority_hrn']
             if (authority_hrn is None or authority_hrn == ''):
-                errors.append('Please, select an authority')
+                errors.append('Please, select an organization')
 
             # What kind of slice name is valid?
-            slice_name = slice_request['slice_name']
             if (slice_name is None or slice_name == ''):
                 errors.append('Slice name is mandatory')
             
