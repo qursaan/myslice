@@ -1,5 +1,6 @@
 from django import template
 from django.template.loader_tags import do_include
+from django.core.files.storage import default_storage
 from myslice.settings import theme
 
 register = template.Library()
@@ -38,3 +39,12 @@ def widget(parser, token):
             "%r tag requires a single argument" % token.contents.split()[0]
 
     return IncludeNode(template_name[1:-1])
+
+@register.filter(name='file_exists')
+def file_exists(filepath):
+    if default_storage.exists('portal' + filepath):
+        return filepath
+    else:
+        index = filepath.rfind('/')
+        new_filepath = filepath[:index] + '/image.png'
+        return new_filepath

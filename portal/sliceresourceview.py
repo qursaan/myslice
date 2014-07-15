@@ -60,6 +60,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'lease.resource',
                 'lease.start_time',
                 'lease.end_time',
+                'lease.lease_id', # Important for NITOS identify already existing leases
                 #'user.user_hrn',
                 #'application.measurement_point.counter'
         )

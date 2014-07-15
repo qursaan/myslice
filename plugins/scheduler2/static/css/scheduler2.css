@@ -215,6 +215,18 @@
     cursor: not-allowed;
 }
 
+#scheduler-reservation-table tbody tr td.disabled {
+    background: url("../img/forbidden.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.success {
+	content: "✓";
+}
+#scheduler-reservation-table tbody tr td.failure {
+	content: "✗";
+}
+
 #scheduler-reservation-table tbody tr td.maintenance {
     background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
 }

@@ -98,7 +98,7 @@
 
                 if (cur_value[0] == '{') {
                     cur_value = JSON.parse(cur_value);
-                    return manifold._record_equals(cur_value, value, object_key);_
+                    return manifold._record_equals(cur_value, value, object_key);
                 } else {
                     return (cur_value == value);
                 }
@@ -344,11 +344,12 @@
             // XXX how do we handle status reset ?
 
             // Jordan : I don't understand this. I added this test otherwise we have string = ""..."" double quoted twice.
-            if (typeof(data.value) !== "string")
-                data.value = JSON.stringify(data.value);
             data.selected_resources = this.selected_resources;
             row = this.find_row(data.value);
-            newline = [action, data.key, data.value, msg, button];
+            if (typeof(data.value) !== "string")
+                newline = [action, data.key, JSON.stringify(data.value), msg, button];
+            else
+                newline = [action, data.key, data.value, msg, button];
             if (!row) {
                 // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);

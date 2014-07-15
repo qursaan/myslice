@@ -14,9 +14,7 @@
 		});
 		if (ids.length > 0) {
 			var id_str = ids.join('/');
-
 			// XXX spinner
-
 			$.getJSON('/portal/validate_action/' + id_str,
 				function(status) {
 					$.each(status, function(request_type__id, request_status) {
@@ -98,7 +96,6 @@
 
     {% endfor %}
 	</table>
-	</div>
 	{% endfor %}
 
 {% else %}
@@ -106,7 +103,7 @@
 		<i>There is no pending request waiting for validation.</i>
 	</div>
 {% endif %}
-
+<div>nnllknjkn<br /><br /></div>
 <div class="col-md-12">
 	<h2>Sub-Authorities</h2>
 </div>
@@ -114,8 +111,10 @@
 	
 	{% for authority, requests in sub_authorities.items %}
 	<div class="col-md-12">
-	<h3>{{authority}}</h3>
-	    <table class="table">
+		<h2>{{authority}}</h2>
+	</div>
+	
+	<table class="table">
 	      <th>
 	        <td>Type</td>
 	        <td>Id</td>
@@ -156,8 +155,7 @@
 	    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
 		  </tr>
 	    {% endfor %}
-	    </table>
-	</div>
+	</table>
 	{% endfor %}
 {% else %}
 <div class="col-md-12">
@@ -174,7 +172,8 @@
 	{% for authority, requests in delegation_authorities.items %}
 	<div class="col-md-12">
 		<h3>{{authority}}</h3>
-		    <table class="table">
+	</div>
+	<table class="table">
 		      <th>
 		        <td>Type</td>
 		        <td>Id</td>
@@ -215,8 +214,7 @@
 		    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
 			  </tr>
 		    {% endfor %}
-		    </table>
-		</div>
+	</table>
 		{% endfor %}
 {% else %}
 <div class="col-md-12">
