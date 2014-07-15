@@ -595,15 +595,20 @@ var SCHEDULER_COLWIDTH = 50;
 
             _scope_set_leases: function()
             {
+                    var status;
                 var self = this;
                 var scope = this._get_scope();
             
                 manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
-
                     console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
                     // XXX We should ensure leases are correctly merged, otherwise our algorithm won't work
 
                     // Populate leases by resource array: this will help us merging leases later
+
+                    // let's only put _our_ leases
+                    lease_status = manifold.query_store.get_record_state(self.options.query_lease_uuid, lease_key, STATE_SET);
+                    if (lease_status != STATE_SET_IN)
+                        return true; // ~continue
                     if (!(lease.resource in scope._leases_by_resource))
                         scope._leases_by_resource[lease.resource] = [];
                     scope._leases_by_resource[lease.resource].push(lease);
@@ -741,11 +746,11 @@ var SCHEDULER_COLWIDTH = 50;
                             lease_success = '';
                             break;
                         case STATE_SET_OUT_SUCCESS:
-                            lease_class = 'reserved'; // other leases
+                            lease_class = 'free'; // other leases
                             lease_success = 'success';
                             break;
                         case STATE_SET_IN_FAILURE:
-                            lease_class = 'reserved'; // other leases
+                            lease_class = 'free'; // other leases
                             lease_success = 'failure';
                             break;
                         case STATE_SET_IN_PENDING:
