@@ -402,7 +402,7 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['number_of_nodes'],
+        number_of_nodes = request['exp_url'],
         purpose         = request['purpose'],
     )
     s.save()
