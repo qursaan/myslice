@@ -89,9 +89,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Validate input
             UserModel = get_user_model()
             if (re.search(r'^[\w+\s.@+-]+$', user_request['first_name']) == None):
-                errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+                errors.append('First name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', user_request['last_name']) == None):
-                errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+                errors.append('Last name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             # checking in django_db !!
             if PendingUser.objects.filter(email__iexact = user_request['email']):
                 errors.append('Email is pending for validation. Please provide a new email address.')

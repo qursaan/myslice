@@ -14,7 +14,7 @@ from ui.topmenu                 import topmenu_items_live, the_user
 
 from myslice.theme import ThemeView
 
-import json, time
+import json, time, re
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
@@ -31,7 +31,9 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         """
         """
         errors = []
-
+        slice_name =''
+        purpose=''
+        exp_url=''
         # Retrieve the list of authorities
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
@@ -105,11 +107,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'authority_hrn'     : authority_hrn,
                 'organization'      : wsgi_request.POST.get('org_name', ''),
                 'slice_name'        : wsgi_request.POST.get('slice_name', ''),
-                'number_of_nodes'   : wsgi_request.POST.get('number_of_nodes', ''),
+                'exp_url'           : wsgi_request.POST.get('exp_url', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
                 'current_site'      : current_site
             }
             
+            exp_url = slice_request['exp_url']
+           
             authority_hrn = slice_request['authority_hrn']
             if (authority_hrn is None or authority_hrn == ''):
                 errors.append('Please, select an authority')
@@ -117,7 +121,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # What kind of slice name is valid?
             slice_name = slice_request['slice_name']
             if (slice_name is None or slice_name == ''):
-                errors.append('Slice Name is mandatory')
+                errors.append('Slice name is mandatory')
+            
+            if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
+                errors.append('Slice name may contain only letters, numbers, and underscore.')
+
     
             purpose = slice_request['purpose']
             if (purpose is None or purpose == ''):
@@ -141,8 +149,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'username': wsgi_request.user.email,
             'topmenu_items': topmenu_items_live('Request a slice', page),
             'errors': errors,
+            'slice_name': slice_name,
+            'purpose': purpose,
             'email': user_email,
             'user_hrn': user_hrn,
+            'exp_url': exp_url,
             'pi': pi,
             'authority_name': authority_name,        
             'cc_myself': True,
