@@ -7,7 +7,9 @@
 {# This is where insert_str will end up #}{% media_container prelude %}
 {% include 'messages-transient-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
+<!--<script src="{{ STATIC_URL }}js/jquery-ui.js"></script>-->
 <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.qtip.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.datatables.js"></script>
 <!-- <script src="{{ STATIC_URL }}js/stash.min.js"></script> -->
 <script src="{{ STATIC_URL }}js/myslice.js"></script>
@@ -17,20 +19,28 @@
 {% block head %} {% endblock head %}
 {# let's add these ones no matter what #}
 {% insert_str prelude "js/jquery.min.js" %}
+{% insert_str prelude "js/angular/angular.min.js" %}
 {% insert_str prelude "js/jquery.html5storage.min.js" %}
 {% insert_str prelude "js/messages-runtime.js" %}
 {% insert_str prelude "js/class.js" %}
 {% insert_str prelude "js/plugin-helper.js" %}
 {% insert_str prelude "js/mustache.js" %}
+{% insert_str prelude "js/hashtable.js" %}
 {% insert_str prelude "js/plugin.js" %}
 {% insert_str prelude "js/manifold.js" %}
 {% insert_str prelude "css/manifold.css" %}
 {% insert_str prelude "css/plugin.css" %}
 {% insert_str prelude "js/bootstrap.js" %}
 {% insert_str prelude "css/bootstrap.css" %}
+{% insert_str prelude "js/bootstrap-datepicker.js" %}
+{% insert_str prelude "css/datepicker.css" %}
+{% insert_str prelude "js/bootstrap-slider.js" %}
+{% insert_str prelude "css/slider.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.qtip.min.css">
+
 
 <script type="text/javascript">
 /*
@@ -47,11 +57,13 @@ $(document).ready(function() {
     if($.isEmptyObject(user)){
         $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
             if(data.length > 0){
-                slices = data[0].slices;  
+                drawSlices(data[0].slices);  
             }else{
+            	$("div#home-slice-list").html(
+					"<div>You do not yet have a slice</div>");
+        		$("ul#dropdown-slice-list").append("<li>no slice</li>");
                 slices.push("no slice");
             }
-            drawSlices(slices);
     	});
     }else{
         slices = user.slices;
@@ -59,17 +71,19 @@ $(document).ready(function() {
     }
     function drawSlices(slices){
         var items = [];
+		
         $.each( slices, function(i, val) {
-            items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
+            items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
     {% endif %}
+	jQuery('[title!=""]').qtip();
 });
 </script>
 </head>
-<body>
+<body ng-app="ManifoldApp">
 {% block container %}
   	{% block topmenu %}
   	{% widget "__widget-topmenu.html" %}

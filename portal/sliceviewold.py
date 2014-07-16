@@ -15,7 +15,7 @@ from plugins.stack                   import Stack
 from plugins.tabs                    import Tabs
 from plugins.querytable              import QueryTable 
 from plugins.querygrid               import QueryGrid
-from plugins.queryupdater            import QueryUpdater
+#DEPRECATED|from plugins.queryupdater            import QueryUpdater
 from plugins.googlemap               import GoogleMap
 from plugins.senslabmap              import SensLabMap
 from plugins.scheduler               import Scheduler
@@ -146,18 +146,18 @@ class SliceView (LoginRequiredAutoLogoutView, ThemeView):
         )
     
         # --------------------------------------------------------------------------
-        # QueryUpdater (Pending Operations)
-
-        main_stack.insert(QueryUpdater(
-            page                = page,
-            title               = 'Pending operations',
-            query               = main_query,
-            togglable           = True,
-            # start turned off, it will open up itself when stuff comes in
-            toggled             = False, 
-            domid               = 'pending',
-            outline_complete    = True,
-        ))
+#DEPRECATED|        # QueryUpdater (Pending Operations)
+#DEPRECATED|
+#DEPRECATED|        main_stack.insert(QueryUpdater(
+#DEPRECATED|            page                = page,
+#DEPRECATED|            title               = 'Pending operations',
+#DEPRECATED|            query               = main_query,
+#DEPRECATED|            togglable           = True,
+#DEPRECATED|            # start turned off, it will open up itself when stuff comes in
+#DEPRECATED|            toggled             = False, 
+#DEPRECATED|            domid               = 'pending',
+#DEPRECATED|            outline_complete    = True,
+#DEPRECATED|        ))
 
         # --------------------------------------------------------------------------
         # Filter Resources

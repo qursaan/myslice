@@ -83,6 +83,13 @@
 
 /** tables css **/
 
+#scheduler-reservation-table > tbody > tr > th {
+	font-weight: normal;
+}
+#scheduler-reservation-table > thead > tr > th {
+	font-weight: normal;
+}
+
 /*#ShedulerNodes-scroll-container {
     float: left;
     overflow-x: scroll;
@@ -189,12 +196,12 @@
     border: none !important;
 }
 #scheduler-reservation-table tbody tr td{
-    background-color: #A6C9E2 ;
-    border: 1px solid #111111;
+    background-color: #FFFFFF; /*#A6C9E2 ;*/
+/*    border: 1px solid #111111;*/
 }
 
 #scheduler-reservation-table tbody tr.even td{
-    background-color: #E0E0E0 ;
+    background-color: #FAFAFA; /*E0E0E0 ;*/
 }
 
 #scheduler-reservation-table tbody tr th::selection {color:	#000000;background:transparent;}
@@ -204,12 +211,33 @@
 }
 
 #scheduler-reservation-table tbody tr td.reserved {
-    background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50% #DD4444;
+    background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50%; /* #DD4444;*/
     cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.disabled {
+    background: url("../img/forbidden.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.success {
+	content: "✓";
+}
+#scheduler-reservation-table tbody tr td.failure {
+	content: "✗";
 }
 
 #scheduler-reservation-table tbody tr td.maintenance {
     background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
+}
+
+#scheduler-reservation-table tbody tr td.pendingin {
+    background: #FFFF99;
+}
+
+
+#scheduler-reservation-table tbody tr td.pendingout {
+    background: #E8E8E8;
 }
 
 #scheduler-reservation-table tbody tr td.free:hover ,#scheduler-reservation-table tbody tr td.selected, #scheduler-reservation-table tbody tr td.selected_tmp {
@@ -241,12 +269,19 @@ td.no-image {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6c9e2', endColorstr='#e0e0e0',GradientType=1 ); /* IE6-9 */
 
     padding: 3px 0 3px 30px;
-    width: 109px;
+    width: 150px;
 }
 
 .legend ol li.free{
 
 }
+.legend ol li.pendingin{
+background: #FFFF99;
+}
+.legend ol li.pendingout{
+background: #E8E8E8;
+}
+
 
 .legend ol li.closed{
     background: url("../img/closed-lock-15.png") no-repeat scroll 8px 50% #DD4444;
@@ -262,8 +297,17 @@ td.no-image {
 
 /* latest stuff */
 .sliderContainer {
-    margin: 10px 0;
+	margin-left: -15px;
+	margin-right: 15px;
 }
 .table-responsive{
     overflow: hidden !important;
+}
+input {
+    min-width: 150px !important;
+	margin-left: 5px;
+}
+
+.slider.slider-horizontal {
+	width: 100%;
 }

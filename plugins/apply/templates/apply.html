@@ -1,0 +1,41 @@
+<div id={{ domid }}>
+  <!-- Modal - columns selector -->
+  <div class="modal fade" id="{{domid}}__apply" tabindex="-1" role="dialog" aria-labelledby="{{domid}}__apply__label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-large">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="{{domid}}__apply__label">Applying pending changes...</h4>
+        </div>
+        <div class="modal-body">
+<div class='resources-selected-spacer'>
+<table class='resources-selected' id='{{domid}}__table'>
+  <thead class="resources-selected">
+    <tr> <th>action</th> <th>key</th> <th>value</th> <th>status</th> </tr>
+  </thead>
+  <tbody></tbody>
+<!--<tfoot class="resources-selected">
+<tr> <th>action</th> <th>key</th> <th>value</th> <th>status</th></tr>
+</tfoot>-->
+</table>
+</div>
+<!--not all buttons are expected to work for now, hence the disabled mark-->
+<!--
+<button type="button" id="{{domid}}__update"  class="btn btn-onelab">Update</button>
+<button type="button" id="{{domid}}__refresh"  class="btn btn-primary" disabled>Refresh</button>
+<button type="button" id="{{domid}}__reset"  class="btn btn-danger" disabled>Reset</button>
+<button type="button" id="{{domid}}__clear_annotations"  class="btn btn-danger" disabled>Clear Annotations</button>
+-->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Button toolbar -->
+  <button class="btn btn-onelab btn-sm" data-toggle="modal" data-target="#{{domid}}__apply">Apply</button>
+  <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{domid}}__cancel">Cancel</button>
+</div> 

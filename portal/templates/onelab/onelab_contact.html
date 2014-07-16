@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		 <div class="breadcrumbs">
+		 	 Support &nbsp;>&nbsp; Contact
+		 </div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+	<p>Please check our <a href="/portal/support/">FAQ</a> section. Most of the basic problems are explained there.</p>
+	<p>
+	If you haven't find your answes in the FAQ, please contact us by filling the form below.<br />
+	You can also <a href="mailto:support@myslice.info">e-mail</a> us directly.
+	</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-4">
+		<form role="form" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+	    <div class="form-group">
+	      	<label for="{{ field.html_name }}" class="control-label">{{ field.label }}</label>
+	      	{{ field.errors }} {{ field }}
+	    </div>
+	    {% endfor %}
+		<button type="submit" class="btn btn-onelab">Create ticket</button>
+		</form>
+	</div>
+</div>
+{% endblock %}
+

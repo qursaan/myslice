@@ -1,6 +1,7 @@
 import os.path, re
 import json
-from random import randint
+from random     import randint
+from hashlib    import md5
 
 from django.views.generic       import View
 from django.template.loader     import render_to_string
@@ -46,24 +47,39 @@ class RegistrationView (FreeAccessView, ThemeView):
         
         # Page rendering
         page = Page(wsgi_request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/registration.css" ] )
-        page.add_css_files ( [ "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/jquery.qtip.min.js","js/jquery-ui.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
+        page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
 
         if method == 'POST':
+            reg_form = {}
             # The form has been submitted
             
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
 
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+            authorities = execute_admin_query(wsgi_request, authorities_query)
+    
+            for authority in authorities:
+                if authority['name'] == wsgi_request.POST.get('org_name', ''):
+                    authority_hrn = authority['authority_hrn']     
+
+            post_email = wsgi_request.POST.get('email','').lower()
+            salt = randint(1,100000)
+            email_hash = md5(str(salt)+post_email).hexdigest()
+            #email_hash = md5(post_email).digest().encode('base64')[:-1]
             user_request = {
                 'first_name'    : wsgi_request.POST.get('firstname',     ''),
                 'last_name'     : wsgi_request.POST.get('lastname',      ''),
-                'authority_hrn' : wsgi_request.POST.get('authority_hrn', ''),
-                'email'         : wsgi_request.POST.get('email',         '').lower(),
+                'organization'  : wsgi_request.POST.get('org_name', ''),
+                'authority_hrn' : authority_hrn, 
+                'email'         : post_email,
                 'password'      : wsgi_request.POST.get('password',      ''),
-                'current_site'  : current_site
+                'current_site'  : current_site,
+                'email_hash'    : email_hash,
+                'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             # Construct user_hrn from email (XXX Should use common code)
@@ -75,9 +91,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Validate input
             UserModel = get_user_model()
             if (re.search(r'^[\w+\s.@+-]+$', user_request['first_name']) == None):
-                errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+                errors.append('First name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', user_request['last_name']) == None):
-                errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+                errors.append('Last name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             # checking in django_db !!
             if PendingUser.objects.filter(email__iexact = user_request['email']):
                 errors.append('Email is pending for validation. Please provide a new email address.')
@@ -156,6 +172,12 @@ class RegistrationView (FreeAccessView, ThemeView):
 
         else:
             user_request = {}
+            ## this is coming from onelab website onelab.eu
+            reg_form = {
+                'first_name':  wsgi_request.GET.get('first_name', ''),
+                'last_name': wsgi_request.GET.get('last_name', ''),
+                'email': wsgi_request.GET.get('email', ''),
+                }
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),
@@ -164,5 +186,6 @@ class RegistrationView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(user_request)
+        template_env.update(reg_form)
         template_env.update(page.prelude_env ())
         return render(wsgi_request, self.template,template_env)

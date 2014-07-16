@@ -1,45 +1,61 @@
 {% extends "layout.html" %}
 
 {% block content %}
-	<div class="row">
-		<h1><img src="{{ STATIC_URL }}icons/support-xs.png" alt="Support" /> Fed4Fire Portal Support</h1>
-	</div>
+<div class="row">
+    <div class="col-md-12">
+    <h1><img src="{{ STATIC_URL }}icons/support-xs.png" alt="Open a Ticket" />Frequently Asked Questions (FAQs)</h1>
+    </div>
+</div>
 
-	
-	<div class="row">
-		<h2>Report a Bug</h2>
-		<p>If you have found a bug or having difficulties accesing some features or found some anomalies, please report it using our ticketing system.</p>
-		<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
-	</div>
-	
-	<div class="row">
-	
-		<h2><a href="/portal/support/documentation">FAQ</a></h2>
-		<h2>Contact Us</h2>
-		
-		<h3>Mailing List</h3>
-		<p>You can subscribe to our mailing list by sending a request to: <b>support</b> AT <b>myslice</b> DOT <b>info</b></p>
-		<p>Also you can adress any issues in the same email address.</p>
-		
-		<h3>Mailing Address</h3>
-		<p>
-		UPMC - LIP6<br> 
-		Boîte courrier 16 <br>
-		Couloir 26-00, Etage 01, Bureau 102<br>
-		4 place Jussieu<br>
-		75252 PARIS CEDEX 05<br>
-		France<br> 
-		</p>
-	</div>
+	  	<div class="col-md-12">
+			<h3>Users</h3>
+			<ul>
+			<li><h4>Who is a user?</h4></li>
+			<p>A user is an experimenter who registers to the OneLab portal and able to use all the facilites that the portal has to offer. However, a user does not
+			have the right to do any admin operation such as managing slices, users and resources.</p>
+			
+			
+			<li><h4>How do I register?</h4></li>
+			<p>In order to register you must go to the <a href="/portal/register">Registration</a> page. You have to choose your corresponding institution (authority). After registration you have to wait until the PI validates your account. However upon registration, you will be able login to the portal with a limited access. Do not try to re-register with the same email address.</p>
+			
+			<li><h4>Why can't I register with my email?</h4></li>
+			<p>If you have already registered then you won't be able to register again with the same email address. However, if you have never registered and still you are not able to use your email then please 
+			<a href="/portal/contact">Contact Support</a> and mention the error message that you are getting while trying to register.</p>
+			
+			<li><h4>In registration, in "My keys" option, what should i choose?</h4></li>
+			<p>There are two choices.</p> 
+				<p class="text-justify"><b>1. Generate Key Pairs:</b> This option is for users who have no knowledge about SFA and MySlice i.e., new users. We offer convenience to the new users in order to avoid addtional efforts to delegate keys manually. If you choose this option, the portal will automatically handle your credentials and you would be able use the portal as soon as the PI validates your account. However, you can delete your private key from the portal if you are concerned about privacy issues. In that case once your current credentials expire, you have to delegate your credentials manually using <a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">SFA</a>. As this needs advance knowledge about SFA and Myslice, we highly recommend to the new users to keep both private and public keys in the portal in order to keep the process automatic. </p>
+				<p class="text-justify"><b>2. Upload My Public Key:</b> This option is for users who have experience with MySlice and SFA. If you choose this option, once the PI validates your account, you have to delegate your credentials manually using <a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">SFA</a>. You have to repeat the same process everytime your credentials expire. Normally, credentials expire every one month. You can see the expiration date in your Account page. </p>
+			
+			<li><h4>Who is responsible for validating my account?</h4></li>
+			<p>When you register, you choose an authority fromt he list of authorities. For each authority there is a Principal Investigator (PI). PI of your authority will verify your identity and if he finds that you are from his institution, he will validate your account otherwise he will reject your account.</p>
+			
+			<li><h4>How long I have to wait for validation?</h4></li>
+			<p>It depends on the PI of your authority. In general, it should not take more than a week. If you are waiting more than usual, please <a href="/portal/contact">Contact Support</a> and explain your problem.</p>
+			<li><h4>I just registered. Why can't I see any slices and resources?</h4></li>
+			<p>Once you register, you can login to your account with limited access. It means that you can view your account details, modify your name and password. You can also view other pages. However, you will not be able to see any slices as well as resources before your account validation. But you can <a href="/portal/slice_request/">Request Slice</a> before being validated. Therefore, the PI will validate your account as well as your requested slice. Once validated, you will be able to see your slice and if you click on your slice, you will be able to see resources in that slice and you can reserve nodes and start your experiment.</p>
+			
+			<li><h4>How can I get access to a slice?</h4></li>
+			<p>If you are a completely new user, you have to <a href="/portal/slice_request/">Request Slice</a>. It is upto the PI of your authority to accept/reject your slice request. </br>On the other hand, if you are a new user to the portal but you already have an account in OneLab SFA registry and you have access to slices, you will be able to see all your slices once your account is validated by the PI.</p> 
+			
+			<li><h4>I forgot my password, how to recover it?</h4></li>
+			<p>If you have an account in the portal but you forgot the password, you can always <a href="/portal/pass_reset/">Reset your password</a>.</p></ul>
+			
+			<h3>Managers</h3>
+			<ul>
+			<li><h4>Who is a manager?</h4></li>
+			<p>A manager is the Principal Investigator (PI) of the institution. Each PI has authority over his own institution. A PI can add, delete, validate users/ 
+			slices that belong to his institution.</p>
+			
+			<li><h4>What is pending users/slices?</h4></li>
+			<p>In <a href="/portal/validate">Requests</a> page you will be able to see all the users that registered under your authority and the slices that users of your authority has requested. Therefore, pending users/slices are those users and slices that are yet to be validated. You can validate/reject these requests based on the policy of your institution.</p>
+			
+			<li><h4>How can I manage the users/slices that belong to my institution?</h4></li>
+			<p>In <a href="/portal/institution">Instution</a> page, under "Users" tab, you will be able to see all the users that belong to your authority. You can delete the users that you don't want anymore. Under "Slices" tab, you will be able to see all the slices that belong to your authority. You can renew/delete the slices based on your requirements. As a PI you can also <a href="/portal/slice_request/">Create Slice</a>. Just fill the form of request slice and the slice will be automatically validated if it is requested by a PI. </p>
+			
+			</ul>
+	  </div>
 
-<script>
-    $(document).ready(function() {
-		$('li#nav-support').addClass("active");
-        $('button#ticketbtn').click(function() {
-            window.location="/portal/contact/";
-        });
-    });
-</script>
 
 
 {% endblock %}

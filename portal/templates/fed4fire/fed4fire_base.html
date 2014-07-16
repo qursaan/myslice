@@ -15,22 +15,28 @@
 {% block head %} {% endblock head %}
 {# let's add these ones no matter what #}
 {% insert_str prelude "js/jquery.min.js" %}
+{% insert_str prelude "js/angular/angular.min.js" %}
 {% insert_str prelude "js/jquery.html5storage.min.js" %}
 {% insert_str prelude "js/messages-runtime.js" %}
 {% insert_str prelude "js/class.js" %}
 {% insert_str prelude "js/plugin-helper.js" %}
 {% insert_str prelude "js/mustache.js" %}
+{% insert_str prelude "js/hashtable.js" %}
 {% insert_str prelude "js/plugin.js" %}
 {% insert_str prelude "js/manifold.js" %}
 {% insert_str prelude "css/manifold.css" %}
 {% insert_str prelude "css/plugin.css" %}
 {% insert_str prelude "js/bootstrap.js" %}
 {% insert_str prelude "css/bootstrap.css" %}
+{% insert_str prelude "js/bootstrap-datepicker.js" %}
+{% insert_str prelude "css/datepicker.css" %}
+{% insert_str prelude "js/bootstrap-slider.js" %}
+{% insert_str prelude "css/slider.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
 </head>
-<body>
+<body ng-app="ManifoldApp">
 {% block container %}
   	{% block topmenu %}
   	{% include theme|add:"__widget-topmenu.html" %}

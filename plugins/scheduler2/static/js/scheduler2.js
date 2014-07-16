@@ -26,255 +26,866 @@
 #
 */
 
+// XXX groupid = all slots those that go with a min granularity
+
 /* some params */
+var scheduler2;
+var scheduler2Instance;
 //is ctrl keyboard button pressed
 var schedulerCtrlPressed = false;
 //table Id
 var schedulerTblId = "scheduler-reservation-table";
-var schedulerTblFirstColWidth = 150;
-//Some Data
+var SCHEDULER_FIRST_COLWIDTH = 200;
+
+
+/* Number of scheduler slots per hour. Used to define granularity. Should be inferred from resources XXX */
 var schedulerSlotsPerHour = 6;
-var schedulerMaxRows = 25;
+var RESOURCE_DEFAULT_GRANULARITY    = 1800 /* s */; // should be computed automatically from resource information
+var DEFAULT_GRANULARITY             = 1800 /* s */; // should be computed automatically from resource information. Test with 600
+var DEFAULT_PAGE_RANGE = 5;
+
+var schedulerMaxRows = 12;
+
+/* All resources */
 var SchedulerData = [];
+
+/* ??? */
 var SchedulerSlots = [];
+
+var SchedulerDateSelected = new Date();
+// Round to midnight
+SchedulerDateSelected.setHours(0,0,0,0);
+
+/* Filtered resources */
 var SchedulerDataViewData = [];
+
 var SchedulerSlotsViewData = [];
-var SchedulerTotalCells;
-var SchedulerTotalVisibleCells;
 //Help Variables
 var _schedulerCurrentCellPosition = 0;
-var _leasesDone = false;
-var _resourcesDone = false;
 //Enable Debug
-var schedulerDebug = false;
+var schedulerDebug = true;
 //tmp to delete
 var tmpSchedulerLeases = [];
 
-(function ($) {
-    var scheduler2 = Plugin.extend({
+var SCHEDULER_COLWIDTH = 50;
 
-        /** XXX to check
+
+/******************************************************************************
+ *                             ANGULAR CONTROLLER                             *
+ ******************************************************************************/
+
+// Create a private execution space for our controller. When
+// executing this function expression, we're going to pass in
+// the Angular reference and our application module.
+(function (ng, app) {
+
+    // Define our Controller constructor.
+    function Controller($scope) {
+
+        // Store the scope so we can reference it in our
+        // class methods
+        this.scope = $scope;
+
+        // Set up the default scope value.
+        this.scope.errorMessage = null;
+        this.scope.name = "";
+
+        //Pagin
+        $scope.current_page = 1;
+        this.scope.items_per_page = 10;
+        $scope.from = 0; // JORDAN
+
+        $scope.instance = null;
+        $scope.resources = new Array();
+        $scope.slots = SchedulerSlotsViewData;
+        $scope.granularity = DEFAULT_GRANULARITY; /* Will be setup */
+        //$scope.msg = "hello";
+
+        angular.element(document).ready(function() {
+            //console.log('Hello World');
+            //alert('Hello World');
+            //afterAngularRendered();
+        });
+
+        // Pagination
+
+        $scope.range = function() {
+            var range_size = $scope.page_count() > DEFAULT_PAGE_RANGE ? DEFAULT_PAGE_RANGE : $scope.page_count();
+            var ret = [];
+            var start;
+
+            start = $scope.current_page;
+            if ( start > $scope.page_count()-range_size ) {
+              start = $scope.page_count()-range_size+1;
+            }
+
+            for (var i=start; i<start+range_size; i++) {
+              ret.push(i);
+            }
+            return ret;
+        };
+
+        $scope.prevPage = function() {
+          if ($scope.current_page > 1) {
+            $scope.current_page--;
+          }
+        };
+
+        $scope.prevPageDisabled = function() {
+          return $scope.current_page === 1 ? "disabled" : "";
+        };
+  
+        $scope.page_count = function()
+        {
+            // XXX need visible resources only
+            var query_ext, visible_resources_length;
+            if (!$scope.instance)
+                return 0;
+            query_ext = manifold.query_store.find_analyzed_query_ext($scope.instance.options.query_uuid);
+            var visible_resources_length = 0;
+            query_ext.state.each(function(i, state) {
+                if (state[STATE_VISIBLE])
+                    visible_resources_length++;
+            });
+            return Math.ceil(visible_resources_length/$scope.items_per_page);
+        };
+  
+        $scope.nextPage = function() {
+          if ($scope.current_page < $scope.page_count()) {
+            $scope.current_page++;
+          }
+        };
+  
+        $scope.nextPageDisabled = function() {
+          return $scope.current_page === $scope.page_count() ? "disabled" : "";
+        }; 
+
+        $scope.setPage = function(n) {
+            $scope.current_page = n;
+        };
+        // END pagination
+
+        // FILTER
+
+        $scope.filter_visible = function(resource)
+        {
+            return manifold.query_store.get_record_state($scope.instance.options.query_uuid, resource['urn'], STATE_VISIBLE);
+        };
+
+        // SELECTION
+
+        $scope._create_new_lease = function(resource_urn, start_time, end_time)
+        {
+            var lease_key, new_lease, data;
+
+            lease_key = manifold.metadata.get_key('lease');
+
+            new_lease = {
+                resource:   resource_urn,
+                start_time: start_time,
+                end_time:   end_time,
+            };
+
+            // This is needed to create a hashable object
+            new_lease.hashCode = manifold.record_hashcode(lease_key.sort());
+            new_lease.equals   = manifold.record_equals(lease_key);
+
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : STATE_SET_ADD,
+                value: new_lease
+            }
+            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+            /* Add to local cache also, unless we listen to events from outside */
+            if (!(resource_urn in $scope._leases_by_resource))
+                $scope._leases_by_resource[resource_urn] = [];
+            $scope._leases_by_resource[resource_urn].push(new_lease);
+        }
+
+        $scope._remove_lease = function(other)
+        {
+            var lease_key, other_key, data;
+
+            lease_key = manifold.metadata.get_key('lease');
+
+            // XXX This could be a manifold.record_get_value
+            other_key = {
+                resource:   other.resource,
+                start_time: other.start_time,
+                end_time:   other.end_time
+            }
+            other_key.hashCode = manifold.record_hashcode(lease_key.sort());
+            other_key.equals   = manifold.record_equals(lease_key);
+
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : STATE_SET_REMOVE,
+                value: other_key
+            }
+            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+            /* Remove from local cache also, unless we listen to events from outside */
+            $scope._leases_by_resource[other.resource] = $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
+
+        }
+
+        $scope.select = function(index, model_lease, model_resource)
+        {
+            var data;
+
+            console.log("Selected", index, model_lease, model_resource);
+
+            var day_timestamp = SchedulerDateSelected.getTime() / 1000;
+            var start_time = day_timestamp + index       * model_resource.granularity;
+            var end_time   = day_timestamp + (index + 1) * model_resource.granularity;
+            var start_date = new Date(start_time * 1000);
+            var end_date   = new Date(end_time   * 1000);
+
+            var lease_key = manifold.metadata.get_key('lease');
+
+            // We search for leases in the cache we previously constructed
+            var resource_leases = $scope._leases_by_resource[model_resource.urn];
+
+            switch (model_lease.status)
+            {
+                case 'free': // out
+                case 'pendingout':
+                    if (resource_leases) {
+                        /* Search for leases before */
+                        $.each(resource_leases, function(i, other) {
+                            if (other.end_time != start_time)
+                                return true; // ~ continue
+        
+                            /* The lease 'other' is just before, and there should not exist
+                             * any other lease before it */
+                            start_time = other.start_time;
+        
+                            other_key = {
+                                resource:   other.resource,
+                                start_time: other.start_time,
+                                end_time:   other.end_time
+                            }
+                            // This is needed to create a hashable object
+                            other_key.hashCode = manifold.record_hashcode(lease_key.sort());
+                            other_key.equals   = manifold.record_equals(lease_key);
+        
+                            data = {
+                                state: STATE_SET,
+                                key  : null,
+                                op   : STATE_SET_REMOVE,
+                                value: other_key
+                            }
+                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+                            /* Remove from local cache also, unless we listen to events from outside */
+                            $scope._leases_by_resource[model_resource.urn] = $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
+                            return false; // ~ break
+                        });
+        
+                        /* Search for leases after */
+                        $.each(resource_leases, function(i, other) {
+                            if (other.start_time != end_time)
+                                return true; // ~ continue
+        
+                            /* The lease 'other' is just after, and there should not exist
+                             * any other lease after it */
+                            end_time = other.end_time;
+                            other_key = {
+                                resource:   other.resource,
+                                start_time: other.start_time,
+                                end_time:   other.end_time
+                            }
+                            // This is needed to create a hashable object
+                            other_key.hashCode = manifold.record_hashcode(lease_key.sort());
+                            other_key.equals   = manifold.record_equals(lease_key);
+        
+                            data = {
+                                state: STATE_SET,
+                                key  : null,
+                                op   : STATE_SET_REMOVE,
+                                value: other_key
+                            }
+                            manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+                            /* Remove from local cache also, unless we listen to events from outside */
+                            $scope._leases_by_resource[model_resource.urn] = $.grep($scope._leases_by_resource[model_resource.urn], function(x) { return x != other; });
+                            return false; // ~ break
+                        });
+                    }
+        
+                    $scope._create_new_lease(model_resource.urn, start_time, end_time);
+                    model_lease.status = (model_lease.status == 'free') ? 'pendingin' : 'selected';
+                    // unless the exact same lease already existed (pending_out status for the lease, not the cell !!)
+
+                    break;
+
+                case 'selected':
+                case 'pendingin':
+                    // We remove the cell
+
+                    /* We search for leases including this cell. Either 0, 1 or 2.
+                     * 0 : NOT POSSIBLE, should be checked.
+                     * 1 : either IN or OUT, we have make no change in the session
+                     * 2 : both will be pending, since we have made a change in the session
+                    * /!\ need to properly remove pending_in leases when removed again
+                     */
+                    if (resource_leases) {
+                        $.each(resource_leases, function(i, other) {
+                            if ((other.start_time <= start_time) && (other.end_time >= end_time)) {
+                                // The cell is part of this lease.
+
+                                // If the cell is not at the beginning of the lease, we recreate a lease with cells before
+                                if (start_time > other.start_time) {
+                                    $scope._create_new_lease(model_resource.urn, other.start_time, start_time);
+                                }
+
+                                // If the cell is not at the end of the lease, we recreate a lease with cells after
+                                if (end_time < other.end_time) {
+                                    $scope._create_new_lease(model_resource.urn, end_time, other.end_time);
+                                }
+                                
+                                // The other lease will be removed
+                                $scope._remove_lease(other);
+                            }
+                            // NOTE: We can interrupt the search if we know that there is a single lease (depending on the status).
+                        });
+                    }
+                
+                    // cf comment in previous switch case
+                    model_lease.status = (model_lease.status == 'selected') ? 'pendingout' : 'free';
+
+                    break;
+
+                case 'reserved':
+                case 'maintainance':
+                    // Do nothing
+                    break;
+            }
+            
+
+            $scope._dump_leases();
+        };
+  
+        $scope._dump_leases = function()
+        {
+            // DEBUG: display all leases and their status in the log
+            var leases = manifold.query_store.get_records($scope.instance.options.query_lease_uuid);
+            console.log("--------------------");
+            $.each(leases, function(i, lease) {
+                var key = manifold.metadata.get_key('lease');
+                var lease_key = manifold.record_get_value(lease, key);
+                var state = manifold.query_store.get_record_state($scope.instance.options.query_lease_uuid, lease_key, STATE_SET);
+                var state_str;
+                switch(state) {
+                    case STATE_SET_IN:
+                        state_str = 'STATE_SET_IN';
+                        break;
+                    case STATE_SET_OUT:
+                        state_str = 'STATE_SET_OUT';
+                        break;
+                    case STATE_SET_IN_PENDING:
+                        state_str = 'STATE_SET_IN_PENDING';
+                        break;
+                    case STATE_SET_OUT_PENDING:
+                        state_str = 'STATE_SET_OUT_PENDING';
+                        break;
+                    case STATE_SET_IN_SUCCESS:
+                        state_str = 'STATE_SET_IN_SUCCESS';
+                        break;
+                    case STATE_SET_OUT_SUCCESS:
+                        state_str = 'STATE_SET_OUT_SUCCESS';
+                        break;
+                    case STATE_SET_IN_FAILURE:
+                        state_str = 'STATE_SET_IN_FAILURE';
+                        break;
+                    case STATE_SET_OUT_FAILURE:
+                        state_str = 'STATE_SET_OUT_FAILURE';
+                        break;
+                }
+                console.log("LEASE", new Date(lease.start_time * 1000), new Date(lease.end_time * 1000), lease.resource, state_str);
+            });
+        };
+
+        // Return this object reference.
+        return (this);
+
+    }
+
+    // Define the Controller as the constructor function.
+    app.controller("SchedulerCtrl", Controller);
+
+})(angular, ManifoldApp);
+
+/******************************************************************************
+ *                              MANIFOLD PLUGIN                               *
+ ******************************************************************************/
+
+(function($) {
+        scheduler2 = Plugin.extend({
+
+            /** XXX to check
          * @brief Plugin constructor
          * @param options : an associative array of setting values
          * @param element : 
          * @return : a jQuery collection of objects on which the plugin is
          *     applied, which allows to maintain chainability of calls
          */
-        init: function (options, element) {
-            this.classname="scheduler2";
-            // Call the parent constructor, see FAQ when forgotten
-            this._super(options, element);
+            init: function(options, element) {
+                // Call the parent constructor, see FAQ when forgotten
+                this._super(options, element);
 
-            SchedulerSlots = schedulerGetSlots(60/schedulerSlotsPerHour);
-            //selection from table 
-            $(window).keydown(function (evt) {
-                if (evt.which == 17) { // ctrl
-                    schedulerCtrlPressed = true;
-                }
-            }).keyup(function (evt) {
-                if (evt.which == 17) { // ctrl
-                    schedulerCtrlPressed = false;
-                }
-            });
-            $("#" + schedulerTblId).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
+                var scope = this._get_scope()
+                scope.instance = this;
 
-            // Explain this will allow query events to be handled
-            // What happens when we don't define some events ?
-            // Some can be less efficient
+                // XXX not needed
+                scheduler2Instance = this;
 
-            if (schedulerDebug) console.time("Listening_to_queries");
-            /* Listening to queries */
-            this.listen_query(options.query_uuid, 'all_ev');
-            this.listen_query(options.query_all_resources_uuid, 'all_resources');
-            this.listen_query(options.query_lease_uuid, 'lease');
-            //this.listen_query(options.query_lease_uuid, 'lease');
-            if (schedulerDebug) console.timeEnd("Listening_to_queries");
+                // We need to remember the active filter for datatables filtering
+                // XXX not needed
+                this.filters = Array();
 
-        },
+                // XXX BETTER !!!!
+                $(window).delegate('*', 'keypress', function (evt){
+                        alert("erm");
+                      });
 
-        /* Handlers */
+                $(window).keydown(function(evt) {
+                    if (evt.which == 17) { // ctrl
+                        schedulerCtrlPressed = true;
+                    }
+                }).keyup(function(evt) {
+                    if (evt.which == 17) { // ctrl
+                        schedulerCtrlPressed = false;
+                    }
+                });
 
-        /* all_ev QUERY HANDLERS Start */
-        on_all_ev_clear_records: function (data) {
-            //alert('all_ev clear_records');
-        },
-        on_all_ev_query_in_progress: function (data) {
-           // alert('all_ev query_in_progress');
-        },
-        on_all_ev_new_record: function (data) {
-            //alert('all_ev new_record');
-        },
-        on_all_ev_query_done: function (data) {
-            //alert('all_ev query_done');
-        },
-        //another plugin has modified something, that requires you to update your display. 
-        on_all_ev_field_state_changed: function (data) {
-            //alert('all_ev query_done');
-        },
-        /* all_ev QUERY HANDLERS End */
-        /* all_resources QUERY HANDLERS Start */
-        on_all_resources_clear_records: function (data) {
-            //data is empty on load
-        },
-        on_all_resources_query_in_progress: function (data) {
-            //data is empty on load
-        },
-        on_all_resources_new_record: function (data) {
-            //alert(data.toSource());
-            if (SchedulerData.length < schedulerMaxRows)
-                SchedulerData.push({ id: data.urn, index: SchedulerData.length, name: data.hrn, granularity: data.granularity, leases: schedulerGetLeases(60 / schedulerSlotsPerHour), type: data.type });
-            //alert(data.toSource());
+                // XXX naming
+                //$("#" + schedulerTblId).on('mousedown', 'td', rangeMouseDown).on('mouseup', 'td', rangeMouseUp).on('mousemove', 'td', rangeMouseMove);
 
-        },
-        on_all_resources_query_done: function (data) {
-            _resourcesDone = true;
-            this._initScheduler();
-        },
-        //another plugin has modified something, that requires you to update your display. 
-        on_all_resources_field_state_changed: function (data) {
-            //alert('all_resources query_done');
-        },
-        /* all_resources QUERY HANDLERS End */
-        /* lease QUERY HANDLERS Start */
-        on_lease_clear_records: function (data) { console.log('clear_records'); },
-        on_lease_query_in_progress: function (data) { console.log('lease_query_in_progress'); },
-        on_lease_new_record: function (data) {
-            tmpSchedulerLeases.push({
-                id: schedulerGetSlotId(data.start_time, data.duration, data.granularity),
-                slice: data.slice,
-                status: 'reserved',
-                resource: data.resource,
-                network: data.network,
-                start_time: data.start_time,
-                lease_type: data.lease_type,
-                granularity: data.granularity,
-                duration: data.duration
-            });
-            //console.log(data.toSource()); console.log('lease_new_record');
-        },
-        on_lease_query_done: function (data) {
-            _leasesDone = true;
-            this._initScheduler();
-            // console.log('lease_query_done');
-        },
-        //another plugin has modified something, that requires you to update your display. 
-        on_lease_field_state_changed: function (data) { console.log('lease_field_state_changed'); },
-        /* lease QUERY HANDLERS End */
+                this._resources_received = false;
+                this._leases_received = false;
+                
+                scope._leases_by_resource = {};
 
+                /* Listening to queries */
+                this.listen_query(options.query_uuid, 'resources');
+                this.listen_query(options.query_lease_uuid, 'leases');
 
-        // no prefix
-        on_filter_added: function (filter) {
-            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.SetSchedulerResources(0, schedulerMaxRows, filter);
-        },
+                this.elmt().on('show', this, this.on_show);
+                this.elmt().on('shown.bs.tab', this, this.on_show);
+                this.elmt().on('resize', this, this.on_resize);
 
-        // ... be sure to list all events here
+                /* Generate slots according to the default granularity. Should
+                 * be updated when resources arrive.  Should be the pgcd in fact XXX */
+                this._granularity = DEFAULT_GRANULARITY;
+                scope.granularity = this._granularity;
+                this._all_slots = this._generate_all_slots();
 
-        /* RECORD HANDLERS */
-        on_all_new_record: function (record) {
-            //alert('on_all_new_record');
-        },
+                // A list of {id, time} dictionaries representing the slots for the given day
+                scope.slots = this._all_slots;
+                this.scope_resources_by_key = {};
 
-        debug : function (logTxt) {
-            if (typeof window.console != 'undefined') {
-                console.debug(logTxt);
-            }
-        },
+                this.do_resize();
+    
+                scope.from = 0;
 
-        /* INTERNAL FUNCTIONS */
-        _initScheduler: function () {
-            if (_resourcesDone && _leasesDone)
-            {
-                /* GUI setup and event binding */
-                this._FixLeases();
                 this._initUI();
-            }
-        },
 
-        _initUI: function () {
-            //alert(1);
-            if (schedulerDebug) console.time("_initUI");
-            //init DatePicker Start
-            $("#DateToRes").datepicker({
-                dateFormat: "yy-mm-dd",
-                minDate: 0,
-                numberOfMonths: 3
-            }).change(function () {
-                //Scheduler2.loadWithDate();
-            }).click(function () {
-                $("#ui-datepicker-div").css("z-index", 5);
-            });
-            //End init DatePicker
+            },
+
+            do_resize: function()
+            {
+                var scope = this._get_scope();
+                var num_hidden_cells, new_max;
+
+                $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", SCHEDULER_FIRST_COLWIDTH);
+                //self get width might need fix depending on the template 
+                var tblwidth = $('#scheduler-reservation-table').parent().outerWidth();
+
+                /* Number of visible cells...*/
+                this._num_visible_cells = parseInt((tblwidth - SCHEDULER_FIRST_COLWIDTH) / SCHEDULER_COLWIDTH);
+                /* ...should be a multiple of the lcm of all encountered granularities. */
+                // XXX Should be updated everytime a new resource is added
+                this._lcm_colspan = this._lcm(this._granularity, RESOURCE_DEFAULT_GRANULARITY) / this._granularity;
+                this._num_visible_cells = this._num_visible_cells - this._num_visible_cells % this._lcm_colspan;
+                /* scope also needs this value */
+                scope.num_visible_cells = this._num_visible_cells;
+                scope.lcm_colspan = this._lcm_colspan;
+
+                // Slider max value
+                if ($('#tblSlider').data('slider') != undefined) {
+                    num_hidden_cells = this._all_slots.length - this._num_visible_cells;
+
+                    $('#tblSlider').slider('setAttribute', 'max', num_hidden_cells);
+                    $('#tblSlider').slider('setValue', scope.from, true);
+                    this._get_scope().$apply();
+                }
+
+
+            },
+
+            on_show: function(e)
+            {
+                var self = e.data;
+                self.do_resize();
+                self._get_scope().$apply();
+            },
+
+            on_resize: function(e)
+            {
+                var self = e.data;
+                self.do_resize();
+                self._get_scope().$apply();
+            },
+
+            /* Handlers */
+
+            _get_scope : function()
+            {
+                return angular.element(document.getElementById('SchedulerCtrl')).scope();
+            },
             
-            //init Table
-            this._FixTable();
-            //End init Table
+            _scope_set_resources : function()
+            {
+                var self = this;
+                var scope = this._get_scope();
 
-            //init Slider
-            $('#tblSlider').slider({
-                min: 0,
-                max: SchedulerTotalCells - SchedulerTotalVisibleCells - 1,
-                value: 0,
-                slide: function (event, ui) {
-                    //$("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
-                    //console.log(ui.value);
-                    if (_schedulerCurrentCellPosition > ui.value)
-                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveBackSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
-                    else if (_schedulerCurrentCellPosition < ui.value)
-                        angular.element(document.getElementById('SchedulerCtrl')).scope().moveFrontSlot(ui.value, ui.value + SchedulerTotalVisibleCells);
-                    _schedulerCurrentCellPosition = ui.value;
+                var records = manifold.query_store.get_records(this.options.query_uuid);
+
+                scope.resources = [];
+
+                $.each(records, function(i, record) {
+                    if (!record.exclusive)
+                        return true; // ~ continue
+
+                    // copy not to modify original record
+                    var resource = jQuery.extend(true, {}, record);
+
+                    // Fix granularity
+                    resource.granularity = typeof(resource.granularity) == "number" ? resource.granularity : RESOURCE_DEFAULT_GRANULARITY;
+                    resource.leases = []; // a list of occupied timeslots
+
+                    self.scope_resources_by_key[resource['urn']] = resource;
+                    scope.resources.push(resource);
+                });
+            },
+
+            _scope_clear_leases: function()
+            {
+                var time, now;
+                var self = this;
+                var scope = this._get_scope();
+
+                now = new Date().getTime();
+
+                // Setup leases with a default free status...
+                $.each(this.scope_resources_by_key, function(resource_key, resource) {
+                    resource.leases = [];
+                    var colspan_lease = resource.granularity / self._granularity; //eg. 3600 / 1800 => 2 cells
+                    time = SchedulerDateSelected.getTime();
+                    for (i=0; i < self._all_slots.length / colspan_lease; i++) { // divide by granularity
+                        resource.leases.push({
+                            id:     'coucou',
+                            status: (time < now) ? 'disabled':  'free', // 'selected', 'reserved', 'maintenance' XXX pending ??
+                        });
+                        time += resource.granularity * 1000;
+                    }
+                });
+
+            },
+
+            _scope_set_leases: function()
+            {
+                    var status;
+                var self = this;
+                var scope = this._get_scope();
+            
+                manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
+                    console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
+                    // XXX We should ensure leases are correctly merged, otherwise our algorithm won't work
+
+                    // Populate leases by resource array: this will help us merging leases later
+
+                    // let's only put _our_ leases
+                    lease_status = manifold.query_store.get_record_state(self.options.query_lease_uuid, lease_key, STATE_SET);
+                    if (lease_status != STATE_SET_IN)
+                        return true; // ~continue
+                    if (!(lease.resource in scope._leases_by_resource))
+                        scope._leases_by_resource[lease.resource] = [];
+                    scope._leases_by_resource[lease.resource].push(lease);
+
+                });
+
+                this._set_all_lease_slots();
+            },
+
+            _set_all_lease_slots: function()
+            {
+                var self = this;
+            
+                manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
+                    self._set_lease_slots(lease_key, lease);
+                });
+            },
+
+            on_resources_query_done: function(data)
+            {
+                this._resources_received = true;
+                this._scope_set_resources();
+                this._scope_clear_leases();
+                if (this._leases_received)
+                    this._scope_set_leases();
+                    
+                this._get_scope().$apply();
+            },
+
+            on_leases_query_done: function(data)
+            {
+                this._leases_received = true;
+                if (this._resources_received) {
+                    this._scope_set_leases();
+                    this._get_scope().$apply();
                 }
-            });
-            //End init Slider
+            },
 
-            //other stuff
-            $("#plugin-scheduler-loader").hide();
-            $("#plugin-scheduler").show();
-            //fixOddEvenClasses();
-            //$("#" + schedulerTblId + " td:not([class])").addClass("free");
-            if (schedulerDebug) console.timeEnd("_initUI");
+            /* Filters on resources */
+            on_resources_filter_added:   function(filter) { this._get_scope().$apply(); },
+            on_resources_filter_removed: function(filter) { this._get_scope().$apply(); },
+            on_resources_filter_clear:   function()       { this._get_scope().$apply(); },
+
+            /* Filters on leases ? */
+            on_leases_filter_added:      function(filter) { this._get_scope().$apply(); },
+            on_leases_filter_removed:    function(filter) { this._get_scope().$apply(); },
+            on_leases_filter_clear:      function()       { this._get_scope().$apply(); },
+
+            on_field_state_changed: function(data)
+            {
+                /*
+                this._set_lease_slots(lease_key, lease);
+
+                switch(data.state) {
+                    case STATE_SET:
+                        switch(data.op) {
+                            case STATE_SET_IN:
+                            case STATE_SET_IN_SUCCESS:
+                            case STATE_SET_OUT_FAILURE:
+                                this.set_checkbox_from_data(data.value, true);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                break;  
+                            case STATE_SET_OUT:
+                            case STATE_SET_OUT_SUCCESS:
+                            case STATE_SET_IN_FAILURE:
+                                this.set_checkbox_from_data(data.value, false);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                break;
+                            case STATE_SET_IN_PENDING:
+                                this.set_checkbox_from_data(data.key, true);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
+                                break;  
+                            case STATE_SET_OUT_PENDING:
+                                this.set_checkbox_from_data(data.key, false);
+                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
+                                break;
+                        }
+                        break;
+
+                    case STATE_WARNINGS:
+                        this.change_status(data.key, data.value);
+                        break;
+                }
+                */
+            },
+
+
+            /* INTERNAL FUNCTIONS */
+
+            _set_lease_slots: function(lease_key, lease)
+            {
+                var resource, lease_status, lease_class;
+                var day_timestamp, id_start, id_end, colspan_lease;
+
+                resource = this.scope_resources_by_key[lease.resource];
+                day_timestamp = SchedulerDateSelected.getTime() / 1000;
+                id_start = Math.floor((lease.start_time - day_timestamp) / resource.granularity);
+
+                /* Some leases might be in the past */
+                if (id_start < 0)
+                    id_start = 0;
+                /* Leases in the future: ignore */
+                if (id_start >= this._all_slots.length)
+                    return true; // ~ continue
+
+                id_end   = Math.ceil((lease.end_time   - day_timestamp) / resource.granularity);
+                colspan_lease = resource.granularity / this._granularity; //eg. 3600 / 1800 => 2 cells
+                if (id_end >= this._all_slots.length / colspan_lease) {
+                    /* Limit the display to the current day */
+                    id_end = this._all_slots.length / colspan_lease
+                }
+
+                for (i = id_start; i < id_end; i++) {
+                    // the same slots might be affected multiple times.
+                    // PENDING_IN + PENDING_OUT => IN 
+                    //
+                    // RESERVED vs SELECTED !
+                    //
+                    // PENDING !!
+                    lease_status = manifold.query_store.get_record_state(this.options.query_lease_uuid, lease_key, STATE_SET);
+                    switch(lease_status) {
+                        case STATE_SET_IN:
+                            lease_class = 'selected'; // my leases
+                            lease_success = '';
+                            break;
+                        case STATE_SET_IN_SUCCESS:
+                            lease_class = 'selected'; // my leases
+                            lease_success = 'success';
+                        case STATE_SET_OUT_FAILURE:
+                            lease_class = 'selected'; // my leases
+                            lease_success = 'failure';
+                            break;
+                        case STATE_SET_OUT:
+                            lease_class = 'reserved'; // other leases
+                            lease_success = '';
+                            break;
+                        case STATE_SET_OUT_SUCCESS:
+                            lease_class = 'free'; // other leases
+                            lease_success = 'success';
+                            break;
+                        case STATE_SET_IN_FAILURE:
+                            lease_class = 'free'; // other leases
+                            lease_success = 'failure';
+                            break;
+                        case STATE_SET_IN_PENDING:
+                            lease_class = 'pendingin';
+                            lease_success = '';
+                            break;
+                        case STATE_SET_OUT_PENDING:
+                            // pending_in & pending_out == IN == replacement
+                            if (resource.leases[i].status == 'pendingin')
+                                lease_class = 'pendingin'
+                            else
+                                lease_class = 'pendingout';
+                            lease_success = '';
+                            break;
+                    
+                    }
+                    resource.leases[i].status = lease_class;
+                    resource.leases[i].success = lease_success;
+                }
+            },
+
+/* XXX IN TEMPLATE XXX
+                if (SchedulerDataViewData.length == 0) {
+                    $("#plugin-scheduler").hide();
+                    $("#plugin-scheduler-empty").show();
+                    tmpScope.clearStuff();
+                } else {
+                    $("#plugin-scheduler-empty").hide();
+                    $("#plugin-scheduler").show();
+                    // initSchedulerResources
+                    tmpScope.initSchedulerResources(schedulerMaxRows < SchedulerDataViewData.length ? schedulerMaxRows : SchedulerDataViewData.length);
+                }
+*/
+
+            /**
+             * Initialize the date picker, the table, the slider and the buttons. Once done, display scheduler.
+             */
+            _initUI: function() 
+            {
+                var self = this;
+                var scope = self._get_scope();
+
+                var num_hidden_cells;
+
+                $("#DateToRes").datepicker({
+                    onRender: function(date) {
+                        return date.valueOf() < now.valueOf() ? 'disabled' : '';
+                    }
+                }).on('changeDate', function(ev) {
+                    SchedulerDateSelected = new Date(ev.date);
+                    SchedulerDateSelected.setHours(0,0,0,0);
+                    // Set slider to origin
+                    //$('#tblSlider').slider('setValue', 0); // XXX
+                    // Refresh leases
+                    self._scope_clear_leases();
+                    self._set_all_lease_slots();
+                    // Refresh display
+                    self._get_scope().$apply();
+                }).datepicker('setValue', SchedulerDateSelected); //.data('datepicker');
+
+                //init Slider
+                num_hidden_cells = self._all_slots.length - self._num_visible_cells;
+                init_cell = (new Date().getHours() - 1) * 3600 / self._granularity;
+                if (init_cell > num_hidden_cells)
+                    init_cell = num_hidden_cells;
+                
+                $('#tblSlider').slider({
+                    min: 0,
+                    max: num_hidden_cells, // / self._lcm_colspan,
+                    value: init_cell,
+                }).on('slide', function(ev) {
+                    var scope = self._get_scope();
+                    scope.from = ev.value * self._lcm_colspan;
+                    scope.$apply();
+                });
+                scope.from = init_cell;
+                scope.$apply();
+
+                $("#plugin-scheduler-loader").hide();
+                $("#plugin-scheduler").show();
+            },
+
+        // PRIVATE METHODS
+
+        /**
+         * Greatest common divisor
+         */
+        _gcd : function(x, y)
+        {
+            return (y==0) ? x : this._gcd(y, x % y);
         },
 
-        _FixLeases  : function () {
-            for (var i = 0; i < tmpSchedulerLeases.length; i++) {
-                var tmpLea = tmpSchedulerLeases[i];
-                var tmpRes = schedulerFindResourceById(SchedulerData, tmpLea.resource);
-                if (tmpRes != null) {
-                    //alert(tmpLea.id + '-' + tmpLea.start_time);
-                    tmpRes.leases[tmpLea.id] = tmpLea;
-                }
+        /**
+         * Least common multiple
+         */
+        _lcm : function(x, y)
+        {
+            return x * y / this._gcd(x, y);
+        },
+    
+        _pad_str : function(i)
+        {
+            return (i < 10) ? "0" + i : "" + i;
+        },
+
+        /**
+         * Member variables used:
+         *   _granularity
+         * 
+         * Returns:
+         *   A list of {id, time} dictionaries.
+         */
+        _generate_all_slots: function()
+        {
+            var slots = [];
+            // Start with a random date (a first of a month), only time will matter
+            var d = new Date(2014, 1, 1, 0, 0, 0, 0);
+            var i = 0;
+            // Loop until we change the day
+            while (d.getDate() == 1) {
+                // Nicely format the time...
+                var tmpTime = this._pad_str(d.getHours()) + ':' + this._pad_str(d.getMinutes());
+                /// ...and add the slot to the list of results
+                slots.push({ id: i, time: tmpTime });
+                // Increment the date with the granularity
+                d = new Date(d.getTime() + this._granularity * 1000);
+                i++;
             }
-        },
+            return slots;
 
-        _FixTable: function () {
-            var colWidth = 50;
-            SchedulerTotalCells = SchedulerSlots.length;
-            $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", schedulerTblFirstColWidth);
-            //this get width might need fix depending on the template 
-            var tblwidth = $('#scheduler-tab').parent().outerWidth();
-            SchedulerTotalVisibleCells = parseInt((tblwidth - schedulerTblFirstColWidth) / colWidth);
-
-            //if (SchedulerData.length == 0) {
-            //    //puth some test data
-            //    SchedulerData.push({ name: 'xyz+aaa', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+aaa', type: 'node' });
-            //    SchedulerData.push({ name: 'xyz+bbb', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+bbb', type: 'node' });
-            //    SchedulerData.push({ name: 'xyz+ccc', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'xyz+ccc', type: 'node' });
-            //    SchedulerData.push({ name: 'nitos1', leases: schedulerGetLeases(60 / schedulerSlotsPerHour), urn: 'nitos1', type: 'node' });
-            //}
-            var tmpScope = angular.element(document.getElementById('SchedulerCtrl')).scope();
-            tmpScope.SetSchedulerResources(0, schedulerMaxRows, null);
         },
-        _SetPeriodInPage: function (start, end) {
-        }
     });
-
-    //Sched2 = new Scheduler2();
 
     /* Plugin registration */
     $.plugin('Scheduler2', scheduler2);
-
-    // TODO Here use cases for instanciating plugins in different ways like in the pastie.
-
 
 })(jQuery);
 

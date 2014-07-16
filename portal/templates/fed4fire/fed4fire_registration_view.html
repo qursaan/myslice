@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block content %}        
+
+<div class="row">
+	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" />User sign-up</h1>
+</div>
+<div class="row">
+		<p></p>
+  		<p><strong>Questions? <a href="/portal/contact" >Contact us.</a></strong></p>
+</div>
+{% if errors %}
+<ul>
+  {% for error in errors %}
+  <li>{{ error }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+<div class="row"><div class="col-sm-12">
+<form class="cmxform form-horizontal" id="registrationForm" method="post" enctype="multipart/form-data" role="form">
+{% csrf_token %}
+	<div class="form-group">
+  		<label for="authority_hrn" class="control-label">Authority</label>
+		<p></p>
+  		<input id="authority_hrn" name="authority_hrn" class="form-control" style="width:530px" value="{{ authority_hrn }}" placeholder="fed4fire.global" required>
+  		<p class="help-block">If your organization does not deploy a Fed4FIRE authority itself, you can use the<br> default one called "fed4fire.global".
+		If your organization however does provide a<br> Fed4FIRE authority itself, please make sure to select it here. If you start typing<br> your organization's
+		 name, it will pop up.
+		</p> 
+	</div>
+
+	<div class="row">
+	<div class="col-md-4">
+	
+	    <div class="form-group">
+			<label for="firstname" class="control-label">Personal information</label>
+			<p></p>
+			<input type="text" name="firstname" class="form-control" style="width:200px" minlength="2" value="{{ first_name }}" placeholder="First name" required />
+	    </div>
+	    <div class="form-group">
+			<input type="text" name="lastname" size="25" class="form-control" style="width:200px" minlength="2" value="{{ last_name }}" placeholder="Last name" required />
+	    </div>
+		<div class="form-group">
+	    	<input type="email" name="email" size="25"  class="form-control" style="width:200px" value="{{ email }}" 
+			title="Your e-mail address will be your identifier for logging in. We contact you to verify your account and then, occasionally, for important issues."
+			placeholder="Email" required/>
+		</div>
+	</div>	
+
+	<!-- LOGIN
+	TODO: Login should be suggested from user email or first/last name, and
+	checked for existence. In addition, the full HRN should be shown to the
+	user.
+    <div class="form-group">
+      <label for="login" class="col-xs-2 control-label">Login</label>
+      <div class="col-xs-4">
+	  <input type="text" name="login" size="25" class="form-control" minlength="2" value="{{ login }}" placeholder="Login" required />
+      </div>
+      <div class="col-xs-6"><p class="form-hint">Enter your login</p></div>
+    </div>
+	-->
+	<div class="col-md-4">
+	    <div class="form-group">
+	      <label for="password" class="control-label">Authentication</label>
+		  <p></p>	
+	      <input type="password"  id="password" name="password"   class="form-control" style="width:200px" minlength="4" value="{{ password }}" 
+			title="Your password allows you to log in to this portal."
+			placeholder="Password" required/>
+	    </div>
+	    <div class="form-group">
+			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:200px"  minlength="4" class="form-control" value="" 
+				placeholder="Confirm password" required/>
+	    </div>
+	    <div class="form-group">
+	    	<!--<label for="question" class="control-label">Keys</label> -->
+			<select name="question" class="form-control" style="width:200px" id="key-policy" 
+				title="Your public/private key pair allows you to access the testbeds." required>        
+		  		<option value="generate">Generate my keys for me (recommended)</option>
+		  		<option value="upload">Upload my public key (advanced users only)</option>
+			</select>
+	    </div>
+	    <div class="form-group" style="display:none;" id="upload_key">
+	      	<label for="file" class="control-label">Upload public key</label>
+	      	<input type="file" name="user_public_key" class="form-control" style="width:200px" id="user_public_key" required/>
+	      	<br />
+			<div class="alert alert-danger" id="pkey_del_msg">
+				In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to 
+				<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your public key to the portal.</a>
+			</div>
+	    </div>
+	</div>
+	</div>
+
+	<div class="form-group">
+		<p></p>
+		<input type="checkbox" name="agreement" value="agreement" required/> I agree to the 
+		<button class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">terms and conditions.</button> 
+	</div>
+	<!-- Modal - columns selector -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			<div class="modal-dialog">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        					<h4 class="modal-title" id="myModalLabel">Terms & Conditions</h4>
+      				</div>
+      				<div class="modal-body">
+						<p>The exact terms and conditions for Fed4FIRE are currently under development.</p>						
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      				</div>
+    			</div>
+  			</div>
+		</div>
+
+    <div class="form-group" id="register">
+		<p></p>	
+    	<button class="submit btn btn-primary" type="submit">Sign up</button>
+    </div>
+</form>  
+</div>
+<script>
+jQuery(document).ready(function(){
+    //this .load is useless here
+    $("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+        $(this).attr("value", 'fed4fire.global');
+    });
+    var availableTags = [
+    {% if authorities %}
+        {% for authority in authorities %}
+            {% if authority.name %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+            {% endif %}
+        {% endfor %}    
+    {% else %}
+        {value:"",label:"No authority found !!!"}
+    {% endif %}
+    ];
+    jQuery( "#authority_hrn" ).autocomplete({
+      source: availableTags,
+      minLength: 0,
+      change: function (event, ui) {
+          if(!ui.item){
+              //http://api.jqueryui.com/autocomplete/#event-change -
+              // The item selected from the menu, if any. Otherwise the property is null
+              //so clear the item for force selection
+              jQuery("#authority_hrn").val("");
+          }
+      }
+      //select: function( event, ui ) {console.log(jQuery(this))}
+    });
+});
+</script>
+{% endblock %}
+

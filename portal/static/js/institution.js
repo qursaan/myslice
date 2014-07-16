@@ -16,6 +16,24 @@ $(document).ready(function() {
 		
 	});
 
+    $('button#deleteusers').click(function() {
+        $('input:checkbox.user').each(function (index) {
+            if(this.checked){
+                var record_id = this.id;
+                $.post("/delete/user/",{'filters':{'user_hrn':this.id}}, function(data) {
+                    if(data.success){
+                        $('tr[id="'+record_id+'"]').fadeOut("slow");
+                        $('tr[id="'+record_id+'"]').remove();
+                        mysliceAlert('Success: user deleted','success', true);
+                    }else{
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
+                    }   
+                });     
+            } 
+        });
+    });
+
     /* TODO: factorize into functions */
     $('button#deleteslices').click(function() {
         $('input:checkbox.slice').each(function (index) {
@@ -25,11 +43,12 @@ $(document).ready(function() {
                     if(data.success){
                         $('tr[id="'+record_id+'"]').fadeOut("slow");
                         $('tr[id="'+record_id+'"]').remove();
+                        mysliceAlert('Success: slice deleted','success', true);
                     }else{
-                        alert("Rest Error for "+record_id+": "+data.error);
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
                     }
                 });
-                
             }
         });
     });
@@ -46,8 +65,10 @@ $(document).ready(function() {
                     if(data.success){
                         // TODO: highlight row after success
                         //$('tr[id="'+record_id+'"]').highlight();
+                        mysliceAlert('Success: slice renewed','success', true);
                     }else{
-                        alert("Rest Error for "+record_id+": "+data.error);
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
                     }
                 });
                 

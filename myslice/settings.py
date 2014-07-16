@@ -237,6 +237,8 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    # SLA
+    'sla',
 ]
 # this app won't load in a build environment
 if not building: INSTALLED_APPS.append ('rest')
@@ -291,3 +293,8 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 
+####SLA#####
+
+SLA_MANAGER_URL = "http://157.193.215.125:4000/sla-service"
+SLA_MANAGER_USER = "normal_user"
+SLA_MANAGER_PASSWORD = "password"

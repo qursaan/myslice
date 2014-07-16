@@ -65,6 +65,8 @@ class PendingUser(models.Model):
     authority_hrn = models.TextField()
     login         = models.TextField()
     pi            = models.TextField()
+    email_hash    = models.TextField()
+    status        = models.TextField()  
     created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 

@@ -106,7 +106,11 @@ var myslice = {
 	user: function() {
 		if ($.isEmptyObject(this.user)) {
 			//this.login(function() { return this.user; });
-			this.user = JSON.parse(localStorage.getItem('user'));
+            if(localStorage.getItem('user')!='undefined'){
+			    this.user = JSON.parse(localStorage.getItem('user'));
+            }else{
+                return false;
+            }
 		}
 		return this.user;
 	},

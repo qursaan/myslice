@@ -1,5 +1,7 @@
 jQuery(document).ready(function(){
 
+    jQuery('[title!=""]').qtip();
+    
     jQuery("#joinForm").validate({
         rules: {
           pi_password: {

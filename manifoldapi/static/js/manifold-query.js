@@ -1,3 +1,15 @@
+var guid = (function() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1);
+  }
+  return function() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+           s4() + '-' + s4() + s4() + s4();
+  };
+})();
+
 function ManifoldQuery(action, object, timestamp, filters, params, fields, unique, query_uuid, aq, sq) {  
     // get, update, delete, create
     var action;
@@ -131,7 +143,7 @@ INSERT INTO object VALUES(field=value)
             });
         };
 
-        if (this.analyzed_query !== undefined)
+        if (!!this.analyzed_query)
             query = this.analyzed_query;
         else
             query = this;
@@ -257,7 +269,10 @@ INSERT INTO object VALUES(field=value)
     else
         this.unique = unique;
 
-    this.query_uuid = query_uuid;
+    if (typeof unique == "undefined")
+        this.query_uuid = guid();
+    else
+        this.query_uuid = query_uuid;
 
     if (typeof aq == "undefined")
         this.analyzed_query = null;

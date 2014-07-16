@@ -6,9 +6,9 @@ import json
 
 from django.contrib.auth.models import User
 from django.template.loader     import render_to_string
-from django.core.mail           import EmailMultiAlternatives
+from django.core.mail           import EmailMultiAlternatives, send_mail
 
-from myslice.theme                      import ThemeView
+from myslice.theme              import ThemeView
 
 theme = ThemeView()
 
@@ -36,11 +36,13 @@ def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
     print "pi_users = %s" % pi_users
 
-    if any(d['pi_users'] == None for d in pi_users):
-        theme.template_name = 'email_default_recipients.txt' 
-        default_email = render_to_string(theme.template, request)
-        default_email = default_email.replace('\n', '')
-        return default_email
+    if any(pi['pi_users'] == None or not pi['pi_users']  for pi in pi_users):
+        #theme.template_name = 'email_default_recipients.txt' 
+        #default_email = render_to_string(theme.template, request)
+        #default_email = default_email.replace('\n', '')
+        #return default_email
+        # the above doesn't work
+        return ['support@myslice.info']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
         query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
@@ -250,7 +252,8 @@ def get_request_by_id(ids):
 def get_requests(authority_hrns=None):
     print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
-        pending_users  = PendingUser.objects.all()
+        ## get those pending users who have validated their emails
+        pending_users  = PendingUser.objects.filter(status__iexact = 'True')
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
     else:
@@ -399,7 +402,7 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['number_of_nodes'],
+        number_of_nodes = request['exp_url'],
         purpose         = request['purpose'],
     )
     s.save()
@@ -686,9 +689,29 @@ def create_pending_user(wsgi_request, request, user_detail):
         private_key   = request['private_key'],
         user_hrn      = request['user_hrn'],
         pi            = '',                         # XXX Why not None ?
+        email_hash    = request['email_hash'],
+        status        = 'False',
     )
     b.save()
+    # sends email to user to activate the email
+    theme.template_name = 'activate_user.html'
+    html_content = render_to_string(theme.template, request)
+    theme.template_name = 'activate_user.txt'
+    text_content = render_to_string(theme.template, request)
+    theme.template_name = 'activate_user_email_subject.txt'
+    subject = render_to_string(theme.template, request)
+    subject = subject.replace('\n', '')
+    #sender = 'support@myslice.info'
+    theme.template_name = 'email_default_sender.txt'
+    sender =  render_to_string(theme.template, request)
+    sender = sender.replace('\n', '')
+    recipient = [request['email']]
+    #recipient = recipient.append(request['email'])
 
+    msg = EmailMultiAlternatives(subject, text_content, sender, recipient)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+   
     # saves the user to django auth_user table [needed for password reset]
     user = User.objects.create_user(request['email'], request['email'], request['password'])
 
@@ -738,7 +761,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         
         theme.template_name = 'user_request_email.html'
         html_content = render_to_string(theme.template, request)
-    
+ 
         theme.template_name = 'user_request_email.txt'
         text_content = render_to_string(theme.template, request)
     

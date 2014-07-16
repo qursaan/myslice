@@ -19,6 +19,9 @@ import portal.newsview
 
 import plugins.cafe.edelberto
 
+from portal.registrationview        import RegistrationView
+from portal.termsview               import TermsView
+
 home_view=portal.homeview.HomeView.as_view()
 dashboard_view=portal.dashboardview.DashboardView.as_view()
 platforms_view=portal.platformsview.PlatformsView.as_view()
@@ -30,7 +33,11 @@ import portal.sliceresourceview
 import portal.slicetabexperiment
 import portal.slicetabinfo
 import portal.slicetabtestbeds
-import portal.slicetabusers 
+import portal.slicetabusers
+import portal.slicetabmeasurements 
+
+import portal.managementtababout
+import portal.managementtabrequests
 
 #### high level choices
 # main entry point (set to the / URL)
@@ -89,8 +96,19 @@ urls = [
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     (r'^info/(?P<slicename>[^/]+)/?$', portal.slicetabinfo.SliceInfoView.as_view()),
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
+    (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
+    #
+    (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
+    (r'^management/about/?$', portal.managementtababout.ManagementAboutView.as_view()),
+    #
+    url(r'^register/?$', RegistrationView.as_view(), name='registration'),	
+    url(r'^terms/?$', TermsView.as_view(), name='terms'),
+    #
     url(r'^portal/', include('portal.urls')),
+
+    # SLA
+    url(r'^sla/', include('sla.urls')),
 ]
 
 #this one would not match the convention

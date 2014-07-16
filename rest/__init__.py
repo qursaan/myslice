@@ -40,21 +40,33 @@ class ObjectRequest(object):
             self.filters['disabled'] = '0'
             self.filters['gateway_type'] = 'sfa'
             self.filters['platform'] = '!myslice'
-        elif(self.type.startswith('local:')):
-            # XXX TODO: find a generic Query to get the fields like 
-            # select column.name from local:object where table == local:user
+        #elif(self.type.startswith('local:')):
+        elif ':' in self.type:
             table = self.type.split(':')
+            prefix = table[0]
             table = table[1]
-            if table == "user":
-                self.id = table + '_id'
-                self.fields = ['user_id', 'email', 'password', 'config','status'];
-            elif table == "account":
-                # XXX TODO: Multiple key for account = (platform_id, user_id)
-                self.id = "platform_id, user_id"
-                self.fields = ['platform_id', 'user_id', 'auth_type', 'config'];
-            elif table == "platform":
-                self.id = 'platform'
-                self.fields = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
+
+            if prefix is 'local':
+                # XXX TODO: find a generic Query to get the fields like 
+                # select column.name from local:object where table == local:user
+                table = self.type.split(':')
+                table = table[1]
+                if table == "user":
+                    self.id = table + '_id'
+                    self.fields = ['user_id', 'email', 'password', 'config','status'];
+                elif table == "account":
+                    # XXX TODO: Multiple key for account = (platform_id, user_id)
+                    self.id = "platform_id, user_id"
+                    self.fields = ['platform_id', 'user_id', 'auth_type', 'config'];
+                elif table == "platform":
+                    self.id = 'platform'
+                    self.fields = ['platform', 'platform_longname', 'platform_url', 'platform_description','gateway_type'];
+            else:
+                # If we use prefix, set the key without the prefix then add it again
+                self.type = table
+                self.setKey()
+                self.setLocalFields()
+                self.type = prefix + ':' + table
         else :
             self.setKey()
             self.setLocalFields()
@@ -153,7 +165,7 @@ class ObjectRequest(object):
         if self.filters :
             query.set(self.filters)
         else:
-            raise Exception, "Filters are required for update"
+            raise Exception, "Filters are required for delete"
         return execute_query(self.request, query)
     
     def json(self):

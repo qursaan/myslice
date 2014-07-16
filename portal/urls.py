@@ -4,7 +4,10 @@
 # This file is part of the Manifold project.
 #
 # Authors:
-#   Jordan Augé <jordan.auge@lip6.fr>
+#   Jordan Augé <jordan.auge@lip6.fr
+#   Loic Baron  <loic.baron@lip6.fr>
+#   Mohammed Yasin Rahman <mohammed-yasin.rahman@lip6.fr>
+#   Ciro Scognamiglio   <ciro.scognamiglio@lip6.fr>
 # Copyright 2013, UPMC Sorbonne Universités / LIP6
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -20,28 +23,33 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from django.views.generic.base   import TemplateView
-from django.conf.urls           import patterns, include, url
+from django.views.generic.base      import TemplateView
+from django.conf.urls               import patterns, include, url
 
-from portal.about               import AboutView
-from portal.institution         import InstitutionView
-from portal.usersview           import UsersView
-from portal.manageuserview      import UserView, user_process    
-from portal.platformsview       import PlatformsView
-from portal.platformview        import PlatformView
-from portal.resourceview        import ResourceView
-from portal.dashboardview       import DashboardView
-from portal.accountview         import AccountView, account_process
-from portal.contactview         import ContactView
-from portal.slicerequestview    import SliceRequestView
-from portal.registrationview    import RegistrationView
-from portal.joinview            import JoinView
-from portal.sliceviewold           import SliceView
-from portal.validationview      import ValidatePendingView
-#from portal.experimentview      import ExperimentView
-from portal.documentationview   import DocumentationView
-from portal.supportview         import SupportView
+from portal.about                   import AboutView
+from portal.institution             import InstitutionView
+from portal.usersview               import UsersView
+from portal.manageuserview          import UserView, user_process    
+from portal.platformsview           import PlatformsView
+from portal.platformview            import PlatformView
+from portal.resourceview            import ResourceView
+from portal.dashboardview           import DashboardView
+from portal.accountview             import AccountView, account_process
+from portal.contactview             import ContactView
+from portal.slicerequestview        import SliceRequestView
+from portal.registrationview        import RegistrationView
+from portal.joinview                import JoinView
+from portal.sliceviewold            import SliceView
+from portal.validationview          import ValidatePendingView
+#from portal.experimentview         import ExperimentView
+from portal.termsview               import TermsView
+from portal.univbrisview            import UnivbrisView
 
+from portal.servicedirectory         import ServiceDirectoryView
+
+from portal.documentationview       import DocumentationView
+from portal.supportview             import SupportView
+from portal.emailactivationview     import ActivateEmailView
 # hopefully these should move in dedicated source files too
 from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
 from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
@@ -85,6 +93,7 @@ urlpatterns = patterns('',
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
+    url(r'^terms/?$', TermsView.as_view(), name='terms'),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
@@ -98,6 +107,7 @@ urlpatterns = patterns('',
     #url(r'^slice/request/?$',  views.slice_request,  name='slice_request'),
     # Slice confirmation
     #url(r'^slice/validate/?$', views.slice_validate, name='slice_validate'),
+    url(r'^email_activation/(?P<hash_code>[\w\W\-]+)/?$', ActivateEmailView.as_view(), name='email_activate'), 
     url(r'^pass_reset/$', 
         'portal.django_passresetview.password_reset', 
         {'post_reset_redirect' : '/portal/password/reset/done/'}),
@@ -108,7 +118,10 @@ urlpatterns = patterns('',
         {'post_reset_redirect' : '/portal/password/done/'}),
     (r'^password/done/$', 
         'portal.django_passresetview.password_reset_complete'),
-    # ...
+
+    url(r'^univbris/?$', UnivbrisView.as_view(), name='univbris'),
+    
+    url(r'^servicedirectory/?$', ServiceDirectoryView.as_view(), name='servicedirectory'),
 
 )
 # (r'^accounts/', include('registration.backends.default.urls')),

@@ -11,7 +11,9 @@ See the devel/ subdir for more devel-oriented doc.
 ** see devel/django-install.txt in case of trouble
 $ apt-get install python-django
 $ apt-get install python-django-south
-
+$ apt-get install python-pip
+$ pip install requests
+$ pip install djangorestframework
 * git clone git://git.onelab.eu/myslice.git
 -- or --
 * git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
@@ -246,19 +248,11 @@ $python manage.py migrate
 
 As south is already installed , you just have to do:
 
-$./manage.py migrate
-
-if it fails:
-
-1. go to myslice directory
-2. do sqlite3 myslice.sqlite3 [if sqlite3: command not found, do $apt-get install sqlite3]
-3. check the list of tables with sqlite> .tables
-4. if you find those tables that was mentioned in the failure message while running $./manage.py migrate
-	do sqlite> DROP TABLE mentioned_table 
-	[mentioned_table = the tables that was explicity mentioned in the failure message of $./manage.py migrate]
-5. sqlite> .quit
-6. $./manage.py migrate  
-
-
-
-
+# ./manage.py schemamigration portal --initial
+# sqlite3 /var/unfold/unfold.sqlite3
+	sqlite> DROP TABLE "portal_institution";
+	sqlite> DROP TABLE "portal_pendinguser";
+	sqlite> DROP TABLE "portal_pendingauthority";
+	sqlite> DROP TABLE "portal_pendingslice";
+	sqlite> .quit
+# ./manage.py migrate portal

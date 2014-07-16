@@ -1,5 +1,8 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
+from sfa.trust.credential               import Credential
+from sfa.trust.certificate              import Keypair
+#
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, sfa_get_user
@@ -15,6 +18,8 @@ from myslice.theme import ThemeView
 
 #
 import json, os, re, itertools
+from OpenSSL import crypto
+from Crypto.PublicKey import RSA
 
 # requires login
 class AccountView(LoginRequiredAutoLogoutView, ThemeView):
@@ -24,9 +29,9 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
 
 
     def get_context_data(self, **kwargs):
-
+        self.template_name = self.template
         page = Page(self.request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
 
@@ -180,11 +185,31 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
 
+
+        ## check user is pi or not
+        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
+        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+        platform_details = execute_query(self.request, platform_query)
+        account_details = execute_query(self.request, account_query)
+        for platform_detail in platform_details:
+            for account_detail in account_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'config' in account_detail and account_detail['config'] is not '':
+                        account_config = json.loads(account_detail['config'])
+                        if 'myslice' in platform_detail['platform']:
+                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+        # assigning values
+        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
+            pi = "is_not_pi"
+        else:
+            pi = "is_pi"
+
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
         context['ref_acc'] = ref_acc_list
         context['platform_list'] = platform_list
         context['my_users'] = my_users
+        context['pi'] = pi
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
         context['user_status'] = user_status
@@ -327,7 +352,6 @@ def account_process(request):
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
-                        from Crypto.PublicKey import RSA
                         private = RSA.generate(1024)
                         private_key = json.dumps(private.exportKey())
                         public  = private.publickey()
@@ -455,6 +479,29 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")
+    
+    # download identity for jfed
+    elif 'dl_identity' in request.POST:
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        if 'user_private_key' in account_config:
+                            private_key = account_config['user_private_key']
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            registry = 'http://sfa-fed4fire.pl.sophia.inria.fr:12345/'
+                            jfed_identity = user_hrn + '\n' + registry + '\n' + private_key 
+                            response = HttpResponse(jfed_identity, content_type='text/plain')
+                            response['Content-Disposition'] = 'attachment; filename="jfed_identity.txt"'
+                            return response
+                        else:
+                            messages.error(request, 'Download error: Private key is not stored in the server')
+                            return HttpResponseRedirect("/portal/account/")
+
+        else:
+            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            return HttpResponseRedirect("/portal/account/")
 
     #clear all creds
     elif 'clear_cred' in request.POST:
@@ -489,9 +536,77 @@ def account_process(request):
             response['Content-Disposition'] = 'attachment; filename="user_cred.txt"'
             return response
         else:
-            messages.error(request, 'Download error: User credential  is not stored in the server')
+            messages.error(request, 'Download error: User credential is not stored in the server')
             return HttpResponseRedirect("/portal/account/")
-        
+
+    # Download user_cert
+    elif 'dl_user_cert' in request.POST:
+        if 'user_credential' in account_config:
+            user_cred = account_config['user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+
+        elif 'delegated_user_credential' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            response = HttpResponse(str_cert, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_certificate.pem"'
+            return response
+        else:
+            messages.error(request, 'Download error: User credential is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+
+    # Download user p12 = private_key + Certificate
+    elif 'dl_user_p12' in request.POST:
+        if 'user_credential' in account_config and 'user_private_key' in account_config:
+            user_cred = account_config['user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+
+            user_private_key = account_config['user_private_key'].encode('ascii')
+            pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
+
+            p12 = crypto.PKCS12()
+            p12.set_privatekey(pkey)
+            p12.set_certificate(cert)       
+            pkcs12 = p12.export()
+
+            response = HttpResponse(pkcs12, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
+            return response
+
+        elif 'delegated_user_credential' in account_config and 'user_private_key' in account_config:
+            user_cred = account_config['delegated_user_credential']
+            obj_cred = Credential(string=user_cred)
+            obj_gid = obj_cred.get_gid_object()
+            str_cert = obj_gid.save_to_string()
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, str_cert)
+
+            user_private_key = account_config['user_private_key'].encode('ascii')
+            pkey = crypto.load_privatekey(crypto.FILETYPE_PEM, user_private_key)
+
+            p12 = crypto.PKCS12()
+            p12.set_privatekey(pkey)
+            p12.set_certificate(cert)       
+            pkcs12 = p12.export()
+
+            response = HttpResponse(pkcs12, content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename="user_pkcs.p12"'
+            return response
+        else:
+            messages.error(request, 'Download error: User private key or credential is not stored in the server')
+            return HttpResponseRedirect("/portal/account/")
+
+
+
     else:
         messages.info(request, 'Under Construction. Please try again later!')
         return HttpResponseRedirect("/portal/account/")
