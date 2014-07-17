@@ -71,15 +71,8 @@
 				$( "#auth_list" ).autocomplete({
       				source: list_authorities,
       				minLength: 0,
-      				change: function (event, ui) {
-		  				get_users_in_slice(this.value);	
-          				if(!ui.item){
-              			//http://api.jqueryui.com/autocomplete/#event-change -
-              			//The item selected from the menu, if any. Otherwise the property is null
-              			//so clear the item for force selection
-              				jQuery("#auth_list").val("");
-							alert("Please select an authority from the given list.")
-          				}
+      				select: function (event, ui) {
+		  				get_users_in_slice(ui.item.value);
       				}
       				//select: function( event, ui ) {console.log(jQuery(this))}
     			});
