@@ -1,3 +1,7 @@
+<script type="text/javascript" src="{{STATIC_URL}}/js/jquery-ui.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}/js/jquery.qtip.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.qtip.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui.css">
 <script>
     function get_users_in_slice(authority_hrn){
         console.log(authority_hrn);
@@ -58,13 +62,26 @@
                     // Keep only the sub authorities, remove root auth
                     if(auth_hrn.indexOf(".") > -1){
                         list_authorities.push(auth_hrn);
+						list_authorities.sort();
                         if(auth_hrn=="{{user_details.parent_authority}}"){
-                            $("#auth_list").append("<option value='"+auth_hrn+"' selected='selected'>"+auth_hrn+"</option>");
-                        }else{
-                            $("#auth_list").append("<option value='"+auth_hrn+"'>"+auth_hrn+"</option>");
-                        }
+							$('#auth_list').val(auth_hrn);
+						}
                     }
                 });
+				$( "#auth_list" ).autocomplete({
+      				source: list_authorities,
+      				minLength: 0,
+      				change: function (event, ui) {
+		  				get_users_in_slice(this.value);	
+          				if(!ui.item){
+              			//http://api.jqueryui.com/autocomplete/#event-change -
+              			//The item selected from the menu, if any. Otherwise the property is null
+              			//so clear the item for force selection
+              				jQuery("#auth_list").val("");
+          				}
+      				}
+      				//select: function( event, ui ) {console.log(jQuery(this))}
+    			});
             }); // post rest/authority
 
             get_users_in_slice("{{user_details.parent_authority}}");
@@ -84,7 +101,7 @@
             	//window.location="/portal/institution#slices";
 
             }); // button#addusers click
-
+	$('[title!=""]').qtip();
     }); // document ready
 </script>
 
@@ -93,11 +110,11 @@
 		</div>
 			
 		<ul class="list-group">
-		  <li class="list-group-item">Authority:<b> {{user_details.parent_authority}}</b>
-		  </li>
+		  <li class="list-group-item">Authority</li>
 		  <li class="list-group-item" style="padding-left:5px;">
-			<select id="auth_list" onchange="get_users_in_slice(this.value);" style ="min-width:190px;">
-            </select>
+			<input type="text" id="auth_list"  style ="min-width:190px;" 
+			title="This is the authority that you belong to. You can view users of other authorities (organization) from the list that apears when you click in the field and start to type.
+				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list."/>
           </li>
 		</ul>
 	
