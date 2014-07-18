@@ -77,6 +77,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
+                'pi'            : '',
                 'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
