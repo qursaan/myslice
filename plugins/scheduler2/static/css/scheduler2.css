@@ -220,10 +220,10 @@
     cursor: not-allowed;
 }
 
-#scheduler-reservation-table tbody tr td.success {
+#scheduler-reservation-table tbody tr td.success:after {
 	content: "✓";
 }
-#scheduler-reservation-table tbody tr td.failure {
+#scheduler-reservation-table tbody tr td.failure:after {
 	content: "✗";
 }
 
