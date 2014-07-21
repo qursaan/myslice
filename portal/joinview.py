@@ -2,12 +2,14 @@ import os.path, re
 import json
 from random import randint
 
+from hashlib                    import md5
 from django.core.mail           import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from django.views.generic       import View
 from django.template.loader     import render_to_string
 from django.shortcuts           import render
 from django.contrib.auth        import get_user_model
+from django.contrib.sites.models import Site
 
 from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
@@ -17,7 +19,7 @@ from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser,PendingAuthority
-from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account
+from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account, create_pending_user
 
 from myslice.theme import ThemeView
 
@@ -59,20 +61,20 @@ class JoinView (FreeAccessView, ThemeView):
 
             reg_site_name = request.POST.get('site_name', '')
             reg_site_authority = request.POST.get('site_authority', '').lower()
-            reg_site_abbreviated_name = request.POST.get('site_abbreviated_name', '')
+            reg_site_abbreviated_name = request.POST.get('site_abbreviated_name', '').lower()
             reg_site_url = request.POST.get('site_url', '')
             reg_site_latitude = request.POST.get('site_latitude', '')
             reg_site_longitude = request.POST.get('site_longitude', '')
 
             reg_fname  = request.POST.get('pi_first_name', '')
             reg_lname  = request.POST.get('pi_last_name', '')
-            reg_auth   = reg_root_authority_hrn + "." + reg_site_authority 
+            reg_auth   = 'onelab.' + reg_site_abbreviated_name   
             reg_email  = request.POST.get('pi_email','').lower()
             reg_phone  = request.POST.get('pi_phone','')
             #prepare user_hrn 
             split_email = reg_email.split("@")[0] 
             split_email = split_email.replace(".", "_")
-            user_hrn = reg_auth + '.' + split_email+ str(randint(1,1000000))
+            user_hrn = reg_auth + '.' + split_email
             
             UserModel = get_user_model()
             
@@ -123,7 +125,7 @@ class JoinView (FreeAccessView, ThemeView):
                 reg_password = request.POST['pi_password']
                 a = PendingAuthority(
                     site_name             = reg_site_name,             
-                    site_authority        = 'onelab.' + reg_site_abbreviated_name, 
+                    site_authority        = reg_auth, 
                     site_abbreviated_name = reg_site_abbreviated_name, 
                     site_url              = reg_site_url,
                     site_latitude         = reg_site_latitude, 
@@ -140,23 +142,33 @@ class JoinView (FreeAccessView, ThemeView):
                 a.save()
  
                 reg_password = request.POST['pi_password']
-                b = PendingUser(
-                    first_name    = reg_fname, 
-                    last_name     = reg_lname, 
-                    authority_hrn = reg_auth,
-                    email         = reg_email, 
-                    password      = reg_password,
-                    public_key    = public_key,
-                    private_key   = private_key,
-                    user_hrn      = user_hrn,  
-                    pi            = reg_auth,
-                    email_hash    = '',
-                    status        = 'True',
-                )
-                b.save()
+                salt = randint(1,100000)
+                # get the domain url
+                current_site = Site.objects.get_current()
+                current_site = current_site.domain
 
+                email_hash = md5(str(salt)+reg_email).hexdigest()
+                user_request = {
+                    'first_name'    : reg_fname,
+                    'last_name'     : reg_lname,
+                    'organization'  : reg_site_name,
+                    'authority_hrn' : reg_auth,
+                    'email'         : reg_email,
+                    'password'      : reg_password,
+                    'public_key'    : public_key,
+                    'private_key'   : private_key,
+                    'current_site'  : current_site,
+                    'email_hash'    : email_hash,
+                    'user_hrn'      : user_hrn,
+                    'pi'            : [reg_auth],
+                    'auth_type'     : 'managed',
+                    'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
+                }
+
+                
+                create_pending_user(request, user_request, user_detail)
                 # saves the user to django auth_user table [needed for password reset]
-                user = User.objects.create_user(reg_email, reg_email, reg_password)
+                #user = User.objects.create_user(reg_email, reg_email, reg_password)
 
                 #creating user to manifold local:user
                 #user_config = '{"first_name":"'+ reg_fname + '", "last_name":"'+ reg_lname + '", "authority_hrn":"'+ reg_auth + '"}'

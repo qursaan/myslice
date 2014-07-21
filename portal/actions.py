@@ -538,7 +538,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         public_key    = request['public_key'],
         private_key   = request['private_key'],
         user_hrn      = request['user_hrn'],
-        pi            = '',                         # XXX Why not None ?
+        pi            = request['pi'],
         email_hash    = request['email_hash'],
         status        = 'False',
     )
