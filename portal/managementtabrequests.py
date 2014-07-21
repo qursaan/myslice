@@ -133,8 +133,9 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
                 if auth_hrn in pi_expired_credential_authorities:
                     r['allowed'] = 'expired'
                 if 'allowed' not in r:
-                    r['allowed'] = 'denied'
-
+                    ## TEMP FIX for allowing new authority registration
+                    #r['allowed'] = 'denied'
+                    r['allowed'] = 'allowed'
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
