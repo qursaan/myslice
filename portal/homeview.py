@@ -108,6 +108,7 @@ class HomeView (FreeAccessView, ThemeView):
             ## check user is pi or not
             platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
             account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+            # XXX Something like an invalid session seems to make the execute fail sometimes, and thus gives an error on the main page
             platform_details = execute_query(self.request, platform_query)
             account_details = execute_query(self.request, account_query)
             for platform_detail in platform_details:

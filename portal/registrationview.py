@@ -79,6 +79,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
+                'pi'            : '',
                 'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
@@ -144,8 +145,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                 ALLOWED_EXTENSIONS =  ['.pub','.txt']
                 if file_extension not in ALLOWED_EXTENSIONS or not re.search(r'ssh-rsa',file_content):
                     errors.append('Please upload a valid RSA public key.')
-
-                user_request['private_key'] = None
+                # user_request['private_key'] can't be Null because all db fields are set as NOT NULL
+                user_request['private_key'] = ""
                 user_request['public_key']  = file_content
                 
             if not errors:

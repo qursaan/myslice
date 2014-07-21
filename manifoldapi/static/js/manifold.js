@@ -1302,7 +1302,7 @@ case TYPE_LIST_OF_VALUES:
                 */
                 case TYPE_LIST_OF_VALUES: // XXX Until fixed
                 case TYPE_LIST_OF_RECORDS:
-                    var new_state,cur_query_uuid;
+                    var key, new_state, cur_query_uuid;
 
                     cur_query_uuid = query.analyzed_query.subqueries[field].query_uuid;
 
@@ -1310,7 +1310,15 @@ case TYPE_LIST_OF_VALUES:
                     //  - update_query_orig.params.resource = resources in slice before update
                     //  - update_query.params.resource = resource requested in slice
                     //  - keys from field = resources obtained
-                    var key = manifold.metadata.get_key(field);
+                
+                    if (field == 'lease') {
+                         // lease_id has been added to be repeated when
+                         // constructing request rspec. We don't want it for
+                         // comparisons
+                        key = ['start_time', 'end_time', 'resource'];
+                    } else {
+                        key = manifold.metadata.get_key(field);
+                    }
                     if (!key)
                         continue;
                     /*

@@ -256,6 +256,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         platform_details = execute_query(self.request, platform_query)
         account_details = execute_query(self.request, account_query)
+
+        # XXX When session has expired, this is None and thus not iterable
         for platform_detail in platform_details:
             for account_detail in account_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
