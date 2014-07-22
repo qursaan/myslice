@@ -1,101 +1,160 @@
-{% extends "layout.html" %}
+{% extends "layout_base.html" %}
+{% load portal_filters %}
 
 {% block content %}
-<div class="row" id="home-dashboard">
-	<ul class="nav nav-tabs">
-	  <li class="active"><a class="home-tab" data-panel="user" href="#">USER</a></li>
-	  <li><a class="home-tab" data-panel="manager" href="#">MANAGER</a></li>
-	</ul>
-	<div class="home-panel" id="user">
-		<table>
-			<tr>
-				<td>ACCOUNT</td>
-				<td>SLICES</td>
-				<td>SUPPORT</td>
-			</tr>
-			<tr>
-				<td><a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a></td>
-				<td><a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
-				<td><a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a></td>
-			</tr>
-			<tr>
-				{% if person %}
-				<td class="logged-in">
-					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-					<div>
-					{% if person.last_name %}
-						{{person.first_name}} {{person.last_name}}<br />
-					{% endif %}
-	    				<span class="label">Email:</span> <a href='/portal/account/'>{{person.email}}</a>
-	    			</div>
-	   			{% else %}
-	   			<td>
-                    {# include 'fibre__widget-login-user.html' #}
-					{# include 'fibre__widget-login-ldap-user.html' #}
-					{% include 'fibre__widget-login-fed-manager.html' %}
-				    <a href="/cafe"><img src="{{ STATIC_URL }}img/fibre/cafe.jpg" alt="CAFe authentication" /></a>
+<!-- <div class="row">
+{% widget '_widget-news.html' %}
+</div> -->
+{% if username %}
+<div class="container dashboard">
+	<div class="row">
+		{%if 'is_pi'  in pi %}
+		<div class="col-md-3">
+			<h3>
+				EXPERIMENT
+			</h3>
+			<div>
+				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			</div>
+			<div>
+				<p><strong>Your slices </strong>
+					<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
+					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'."
+					class="glyphicon glyphicon-info-sign">
+				</span>
+
+  				</p>
+			</div>
+			<div>	
+				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>MANAGEMENT</h3>
+			<div>
+				<a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<h3>
+				SUPPORT
+			</h3>
+			<div>
+				<a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
+			</div>
+		</div>
+		
+		<div class="col-md-3">
+			<h3>
+				ACCOUNT
+			</h3>
+			<div>
+				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+			</div>
+			<div>
+				{% if person.last_name %}
+					{{person.first_name}} {{person.last_name}}<br />
 				{% endif %}
-				</td>
-				<td>
-				{% if person %}
-					<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request a Slice</button>
-					<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-				{% else %}
-				{% endif %}
-				</td>
-				<td class="support">
-					<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
-					<div>
-						<a href="/portal/contact">Contact</a> <br />
-						<a href="/portal/support/documentation">Documentation</a>
-					</div>
-				</td>
-			</tr>
-		</table>
+    			<span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
+	    	</div>
+		</div>
 	</div>
-	<div class="home-panel" id="manager">
-		<table>
-			<tr>
-				<td>INSTITUTION</td>
-				<td>SLICES</td>
-				<td>REQUESTS</td>
-			</tr>
-			<tr>
-				<td><a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a></td>
-				<td><a href="/portal/institution#slices"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a></td>
-				<td><a href="/portal/validate"><img src="{{ STATIC_URL }}img/icon_testbed_color.png" alt="" /></a></td>
-			</tr>
-        </table>
-        <table>
-			<tr class="bar1">
-				{% if person %}
-				<td class="logged-in">
-					<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-	   			{% else %}
-	   			<td>
-                    {# include 'fibre__widget-login-user.html' #}
-					{# include 'fibre__widget-login-ldap-user.html' #}
-					{% include 'fibre__widget-login-fed-manager.html' %}
+	{%else%}
+	<div class="row">
+		<div class="col-md-4">
+			<h3>
+				EXPERIMENT
+			</h3>
+			<div>
+				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			</div>
+			<div>
+				<p><strong>Your slices </strong>
+				<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
+					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
+					However, on the OneLab portal, you will only see slices that you have created through OneLab. If you have created slices elsewhere, 
+					such as on the PlanetLab Europe portal, those slices will not appear here."
+					class="glyphicon glyphicon-info-sign">
+				</span>
+				</p>
+			</div>
+			<div>	
+				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<h3>
+				SUPPORT
+			</h3>
+			<div>
+				<a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
+			</div>
+		</div>
+		
+		<div class="col-md-4">
+			<h3>
+				ACCOUNT
+			</h3>
+			<div>
+				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
+			</div>
+			<div>
+				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+			</div>
+			<div>
+				{% if person.last_name %}
+					{{person.first_name}} {{person.last_name}}<br />
 				{% endif %}
-				</td>
-				<td>
-					{% if person %}
-				    <button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create a Slice</button>
-					{% endif %}
-				</td>
-				<td class="support">
-					{% if person %}
-				    <button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
-					{% endif %}
-				</td>
-			</tr>
-		</table>
+    			<span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
+	    	</div>
+		</div>
+	</div>
+	{%endif%}
+
+</div>
+{% else %}
+<div class="container-fluid home">
+	<div class="">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-5 slogan">
+			<h2>
+				FIBRE: Future Internet testbeds experimentation between Brazil and Europe
+			</h2>
+			<h3>
+				Access variety of testbeds through your account
+			</h3>
+		</div>
+		<div class="col-sm-5 col-sm-offset-1">
+   			<div class="row">
+			    {% include 'fibre__widget-login-fed-manager.html' %}
+				<a href="/cafe" style="margin-left:80px;"><img src="{{ STATIC_URL }}img/fibre/cafe.jpg" alt="CAFe authentication" /></a>
+			</div>
+		</div>
+		<div class="col-sm-1"></div>
 	</div>
 </div>
-<div id="footer">
-    FIBRE - Future Internet testbeds / experimentation between BRazil and Europe
-</div>
-<script>
+{% endif %}
+
+
+<script type="text/javascript">
 	$(document).ready(function() {
 		$('a.home-tab').click(function() {
 			$('ul.nav-tabs li').removeClass('active');
@@ -104,26 +163,22 @@
 			$('div#'+$(this).data('panel')).show();
 		});
 		$('button#validaterequestbtn').click(function() {
-			window.location="/portal/validate/";
+			window.location="/portal/institution#requests";
 		});
 		$('button#ticketbtn').click(function() {
 			window.location="/portal/contact/";
 		});
+		$('button#signupbtn').click(function() {
+			window.location="/portal/register/";
+		});
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-		
-		{% if person %}
-        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-		  var items = [];
-		  $.each( data[0].slices, function(i, val) {
-		  	items.push( "<li><a href=\"/slice/"+val+"\">" + val + "</a></li>" );
-		  });
-		  
-		  $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
-		  
-		});
-		{% endif %}
-	});
+/*-------
+List of slices has been moved in 
+portal/templates/base.html
+This should go into session
+--------*/
+});
 </script>
 {% endblock %}

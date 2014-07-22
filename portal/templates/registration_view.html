@@ -494,15 +494,17 @@ jQuery(document).ready(function(){
         {% for authority in authorities %}
             {% if authority.name %}
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
-			// to show only full name
-           // {% else %}
-           //     {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
             {% endif %}
         {% endfor %}    
     {% else %}
         {value:"",label:"No authority found !!!"}
     {% endif %}
     ];
+
+    console.log(availableTags);
+
 	// sorting the list
 	availableTags.sort(function(a,b){
 		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();

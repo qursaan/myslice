@@ -1,4 +1,4 @@
-<div class="well">
+<div class="well login-widget" style="background:none;border:none;width:400px;">
 	{% if state %}
 	<span class="help-block">{{ state }}</span>
 	{% endif %}
@@ -7,16 +7,17 @@
 	  {% if next %}
 	  <input type="hidden" name="next" value="{{ next }}" />
 	  {% endif %}
-	<div class="form-group">
+	<div class="form-group" style="color:white;">
     	<label for="fed"></label>
     	<input type="radio" name="base" value="br" checked>
 	        <img src="{{ STATIC_URL }}img/fibre/br.png" alt="Brazil" height="32" width="40" />
     	<input type="radio" name="base" value="eu">
 	        <img src="{{ STATIC_URL }}img/fibre/eu.png" alt="Europe Union" height="32" width="32" />
-    	<input type="radio" name="base" value="local">Local User
+    	<input type="radio" name="base" value="local">&nbsp;Local User
   	</div>
+
 	<div class="form-group">
-    	<label for="username">Username </label>
+    	<label for="username">Email address / Username</label>
     	<input type="email" class="form-control" name="username" placeholder="Enter Email / username">
   	</div>
   	<div class="form-group">
@@ -28,7 +29,7 @@
 		<span class="lost-password">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/portal/pass_reset/">Can't access your account?</a></span>
 	</div>
 	<div class="login-signup">
-		<a href="/portal/register">Try</a>, <a href="/portal/register">Sign Up</a> or <a href="/portal/join">Join</a>
+		Don't have an account? <a href="/portal/register">Sign up now</a>
 	</div>
 	</form>
 </div>

@@ -22,6 +22,12 @@ from plugins.googlemap                  import GoogleMap
 from plugins.filter_status              import FilterStatusPlugin
 from plugins.testbeds                   import TestbedsPlugin
 from plugins.scheduler2                 import Scheduler2
+
+# Bristol plugin
+from plugins.univbrisfoam       import UnivbrisFoam
+from plugins.univbrisfv         import UnivbrisFv
+from plugins.univbrisfvf        import UnivbrisFvf
+
 from plugins.columns_editor             import ColumnsEditor
 from plugins.sladialog                  import SlaDialog
 from plugins.lists.simplelist           import SimpleList
@@ -41,6 +47,11 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         page = Page(request)
         metadata = page.get_metadata()
         page.expose_js_metadata()
+
+        # Bristol
+        univbrisfoam_query=Query().get('ofelia-bristol-of:resource').select('urn')
+        page.enqueue_query(univbrisfoam_query)
+
 
         resource_md = metadata.details_by_object('resource')
         resource_fields = [column['name'] for column in resource_md['column']]
@@ -234,6 +245,50 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             query           = main_query,
             username            = request.user,
         )
+
+        # Bristol plugin
+        univbrisfoamlist = UnivbrisFoam(
+            page  = page,
+            title = 'univbris_foam_ports_selection',
+            domid = 'univbris_foam_ports_selection',
+            query = univbrisfoam_query,
+            query_all = univbrisfoam_query,
+            checkboxes = False,
+            datatables_options = {
+                'iDisplayLength': 10,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+        #plugin which manages the different flowspaces that the user creates, and also sends flowspaces to manifold
+        univbrisfvlist = UnivbrisFv(
+                page  = page,
+                title = 'univbris_flowspace_selection',
+                domid = 'univbris_flowspace_selection',
+                query = None,
+                query_all = None,
+                datatables_options = {
+                    'iDisplayLength': 5,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+            )
+
+        #plugin which allows the definition of a single flowspace
+        univbrisfvform = UnivbrisFvf(
+                page  = page,
+                title = 'univbris_flowspace_form',
+                domid = 'univbris_flowspace_form',
+                query = None,
+                query_all = None,
+                datatables_options = {
+                    'iDisplayLength': 3,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+            )
+
             
 
         # --------------------------------------------------------------------------
@@ -284,6 +339,13 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
+
+        # Bristol plugin
+        template_env['resources'] = univbrisfoamlist.render(self.request)
+        template_env['flowspaces']= univbrisfvlist.render(self.request)
+        template_env['flowspaces_form']= univbrisfvform.render(self.request)
+
+
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme

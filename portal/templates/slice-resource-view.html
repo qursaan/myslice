@@ -68,6 +68,7 @@ $(document).ready(function() {
 			<ul class="nav nav-tabs">
 			  <li class="active"><a href="#resourcelist" role="tab" data-toggle="tab">Table</a></li>
 			  <li> <a href="#resourcemap" role="tab" data-toggle="tab">Map</a></li>
+			  <li> <a href="#resourceflowspace" role="tab" data-toggle="tab">Flowspace</a></li>
 			  <li> <a href="#resourcescheduler" role="tab" data-toggle="tab">Scheduler</a></li>
 			</ul>
 			</div>
@@ -105,7 +106,12 @@ $(document).ready(function() {
 	                {{map_resources}}
 				</div>
 				<div class="tab-pane" id="resourcescheduler">
-	                {{scheduler}}
+                    {{scheduler}}
+				</div>
+				<div class="tab-pane" id="resourceflowspace">
+                        {{resources}}
+                        {{flowspaces}}
+                        {{flowspaces_form}}
 				</div>
 	
 				<!--

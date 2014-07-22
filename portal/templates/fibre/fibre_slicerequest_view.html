@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			 <div class="breadcrumbs">
+			 	 Experiment &nbsp;>&nbsp; Request a new Slice
+			 </div>
+		</div>
+	</div>
+
+	{% if errors %}
+	<div class="row">
+		<div class="col-md-12">
+		<ul>
+		  {% for error in errors %}
+		  <li>{{ error }}</li>
+		  {% endfor %}
+		</ul>
+		</div>
+	</div>
+	{% endif %}
+	
+	<div class="row">
+		<div class="col-md-8 el">
+			<form role="form" method="post">
+			{% csrf_token %}
+			  <div class="form-group" style="display:none">
+			    <input type="email" class="form-control" id="email" style="width:300px" value="{{ email }}" readonly="readonly">
+			  </div>
+			  <div class="form-group">
+			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice name" value="{{slice_name}}" 
+				title="Please enter a name for your slice"required="required">
+			  </div>
+			  <div class="form-group">
+				{%if 'is_pi'  in pi %}
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
+				title="An authority responsible for vetting your slice" required="required">
+				{%else%}
+			    <input type="text" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
+				title="An authority responsible for vetting your slice" required="required" readonly>
+				{%endif%}
+			  </div>
+			  <div class="form-group">
+			    <input type="text" class="form-control" name="exp_url" id="exp_url" style="width:300px" placeholder="Experiment URL (if one exists)"
+				title="Please provide the url of your experiment if you have one." value="{{exp_url}}">
+			  </div>
+			  <div class="form-group">
+			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
+				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
+			  </div>
+			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			</form>
+	
+		</div>
+	</div>
+		
+<script>
+jQuery(document).ready(function(){
+	
+	/*$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+		var jsonData = JSON.parse(data);
+        $(this).attr("value", jsonData[0]['parent_authority']);
+    });*/
+    console.log("test");
+    test = "{{authority.name}}";
+    if(test){
+        console.log("true");
+	    $("#authority_hrn").val("{{authority_name}}");
+    }else{
+        console.log("false");
+	    $("#authority_hrn").val("{{authority_hrn}}");
+    }
+
+	var availableTags = [
+    {% if authorities %}
+        {% for authority in authorities %}
+            {% if authority.name %}
+                {value:"{{ authority.name }}",label:"{{authority.name}}"},
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+            {% endif %}
+        {% endfor %}    
+    {% else %}
+        {value:"",label:"No authority found !!!"}
+    {% endif %}
+    ];
+	// sorting the list
+	availableTags.sort(function(a,b){
+		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
+		if (nameA < nameB) {
+    		return -1;
+		}
+		if (nameA > nameB) {
+    		return 1;
+		}
+	return 0;
+	}); 
+    $( "#authority_hrn" ).autocomplete({
+      source: availableTags,
+      minLength: 0,
+      select: function( event, ui ) {console.log(jQuery(this));}
+    });
+});
+</script>
+{% endblock %}
+

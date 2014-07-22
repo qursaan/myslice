@@ -1,55 +1,49 @@
-
-<div id="header">
-	<div class="wrapper">
-		<div class="logo">
+{% load portal_filters %}
+<div class="header">
+<div class="container">
+	<div class="row">
+		<div class="col-sm-3 col-md-3 logo">
 			<a href="/"><img src="{{ STATIC_URL }}img/fibre-logo.gif" alt="FIBRE - Future Internet Testbeds Experimentation Between Brazil and Europe" width="150px" height="75px" /></a>
 		</div>
-		
-		<div id="secondary">
+		{% if username %}
+		<div class="col-sm-4 col-md-4 navigation">
 			<ul>
-				<li>News</li>
-				<li><a href="/portal/about">About</a></li>
-				<li><a target="_blank" href="http://www.fibre-ict.eu/">Public Website</a></li>
-				<li><a target="_blank" href="#">Intranet</a></li>
+				<li>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	       				EXPERIMENT <span class="caret"></span>
+	    			</a>
+					
+					<div class="dropdown-menu" style="z-index:99;">
+							<ul id="dropdown-slice-list">
+								<li class="title"><a href="/portal/slice_request/">Request Slice</a></li>
+							</ul>
+					</div>
+				</li>
+				{%if 'is_pi'  in pi %}	
+				<li id="nav-institution" class=""><a href="/portal/institution">MANAGEMENT</a></li>
+				 {%endif%}
+				<li><a href="/portal/support/">SUPPORT</a></li>
 			</ul>
 		</div>
-	</div>
-	
-	{% if username %}
-	<div id="navigation">
-		<div class="wrapper">
-		<ul>
-			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
-			<li>|</li>
-			<li id="nav-institution" class=""><a href="/portal/institution">INSTITUTION</a></li>
-			<li class="slices">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-       				SLICES <span class="caret"></span>
-    			</a>
-				
-				<div class="dropdown-menu">
-						<ul>
-							<li><a href="/portal/slice_request/">Request Slice</a></li>
-							<li><a href="/slice/ple.upmc.agent3/">ple.upmc.agent3</a></li>
-						    <li><a href="/slice/ple.upmc.agent/">ple.upmc.agent</a></li>
-						    <li><a href="/slice/ple.upmc.myslicedemo/">ple.upmc.myslicedemo</a></li>
-						    <li><a href="/slice/ple.upmc.slicestat/">ple.upmc.slicestat</a></li>
-						    <li><a href="/slice/ple.upmc.agent2/">ple.upmc.agent2</a></li>
-						</ul>
-				</div>
-				</li>
-			<li id="nav-request"><a href="/portal/validate">REQUESTS</a></li>
-			<li id="nav-support"><a href="/portal/support/">SUPPORT</a></li>
-			<li>|</li>
-			<li id="nav-logout" style="margin-top: 10px;"><a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> LOGOUT</a></li>
-		</ul>
+		{% else %}
+		<div class="col-sm-4 col-md-4 navigation">
+		</div>
+		{% endif %}
+		<div class="col-sm-5 col-md-5 secondary">
+			<ul>
+				<li><a href="/portal/about">About</a></li>
+				<li><a target="_blank" href="http://www.fibre-ict.eu/">Public Website</a></li>
+			</ul>
+			{% if username %}
+			<div class="account">You are logged in as &nbsp;<a href="/portal/account/">{{ username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+			{% endif %}
 		</div>
 	</div>
-	{% else %}
-	<div id="navigation">
-		<div class="wrapper"></div>
-	</div>
-	{% endif %}
+</div>
+</div>
+
+<div class="row">
+{% widget '_widget-message.html' %}
 </div>
 <script>
 	$(document).ready(function() {

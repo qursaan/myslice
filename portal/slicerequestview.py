@@ -83,6 +83,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         page = Page(wsgi_request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/jquery-ui.js" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.expose_js_metadata()
 
         if method == 'POST':
             # The form has been submitted
@@ -92,12 +93,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             current_site = current_site.domain
             
             # getting the authority_hrn from the selected organization
-            authority_hrn = ''           
             for authority in authorities:
                 if authority['name'] == wsgi_request.POST.get('org_name', ''):
                     authority_hrn = authority['authority_hrn']
 
-            
+            # Handle the case when the template uses only hrn and not name
+            if not authority_hrn:
+                authority_hrn = wsgi_request.POST.get('org_name', '')
 
             slice_request = {
                 'type'              : 'slice',
@@ -168,6 +170,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'exp_url': exp_url,
             'pi': pi,
             'authority_name': authority_name,        
+            'authority_hrn': user_authority,
             'cc_myself': True,
             'authorities': authorities,
             'theme': self.theme,

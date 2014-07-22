@@ -4,13 +4,13 @@
 
 <div class="row">
 	<div class="col-md-12">
-	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> FIBRE Experimenter Registration</h1>
+	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" />User sign-up</h1>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12">
-  		<h3>For First Line Support please <a href="/portal/contact" >Contact Support</a></h3>
-	</div>
+  		<p><strong>Questions? <a href="/portal/contact" >Contact us.</a></strong></p>
+  </div>
 </div>
 {% if errors %}
 <ul>
@@ -19,80 +19,150 @@
   {% endfor %}
 </ul>
 {% endif %}
-   
+
+
+<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
 <div class="row">
-	<div class="col-md-2"></div>
-	<div class="col-md-8">
-	<form class="cmxform form-horizontal" id="registrationForm" method="post" enctype="multipart/form-data" role="form">
-    {% csrf_token %}
-    <div class="form-group">
-    	<label for="firstname" class="control-label">First Name</label>
-		<input type="text" name="firstname" class="form-control" minlength="2" value="{{ firstname }}" placeholder="First Name" required />
-    </div>
-    <div class="form-group">
-    	<label for="lastname" class="control-label">Last Name</label>
-		<input type="text" name="lastname" size="25" class="form-control" minlength="2" value="{{ lastname }}" placeholder="Last Name" required />
-    </div>
-    <div class="form-group">
-      <label for="authority_hrn" class="control-label">Authority</label>
-      <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" required>
-      <p class="help-block">An authority responsible for vetting your account</p>
-    </div>
-
-	<!-- LOGIN
-	TODO: Login should be suggested from user email or first/last name, and
-	checked for existence. In addition, the full HRN should be shown to the
-	user.
-    <div class="form-group">
-      <label for="login" class="col-xs-2 control-label">Login</label>
-      <div class="col-xs-4">
-	  <input type="text" name="login" size="25" class="form-control" minlength="2" value="{{ login }}" placeholder="Login" required />
-      </div>
-      <div class="col-xs-6"><p class="form-hint">Enter your login</p></div>
-    </div>
-	-->
-
-    <div class="form-group">
-    	<label for="email" class="control-label">Email</label>
-    	<input type="email" name="email" size="25"  class="form-control" value="{{ email }}" required/>
-    </div>
-    <div class="form-group">
-      <label for="password" class="control-label">Password</label>
-      <input type="password"  id="password" name="password"   class="form-control" minlength="4" value="{{ password }}" required/>
-    </div>
-    <div class="form-group">
-    	<label for="password" class="control-label">Confirm Password</label>
-		<input type="password"  id="confirmpassword" name="confirmpassword"   minlength="4" class="form-control" value="" placeholder="Confirm Password" required/>
-    </div>
-    <div class="form-group">
-    	<label for="question" class="control-label">My Keys</label>
-		<select name="question" class="form-control" id="key-policy" required>        
-	  		<option value="generate">Generate key pairs for me </option>
-	  		<option value="upload">Upload my public key </option>
-		</select>
-      	<p class="help-block">Genkey: Account Delegation Automatic (Recommended)</p>
-    </div>
-    <div class="form-group" style="display:none;" id="upload_key">
-      	<label for="file" class="control-label">Upload public key</label>
-      	<input type="file" name="user_public_key" class="form-control" id="user_public_key" required>
-      	<br />
-		<div class="alert alert-danger" id="pkey_del_msg">
-			Once your account is validated, you will have to delegate your credentials manually using SFA [Advanced users only]
-		</div>
-      	<p class="help-block">Account Delegation: Manual (Advanced Users)</p>
-    </div>
-    <div class="form-group" id="register">
-      <button class="submit btn btn-default" type="submit">Register</button>
-    </div>
-  </form>  
+	
+	<div class="col-md-12">
+			
+			<div class="form-group">
+				{% csrf_token %}
+		  		<label for="authority_hrn" class="control-label">Organization</label>
+				<p></p>
+		  		<input id="authority_hrn" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
+		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
+				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. If it is not in the list, 
+				please request its addition by clicking the link below. We will send an email to the managers that we have on record for 
+				your organization, asking them to validate your sign-up request." required />
+				<p></p>
+				<p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p>
+			</div>
+	</div>
 </div>
+
+<div class="row">
+	<div class="col-md-6">
+	
+	    <div class="form-group">
+			<label for="firstname" class="control-label">Personal information</label>
+			<p></p>
+			<input type="text" name="firstname" class="form-control" style="width:350px" minlength="2" value="{{ first_name }}" placeholder="First name" required />
+	    </div>
+	    <div class="form-group">
+			<input type="text" name="lastname" size="25" class="form-control" style="width:350px" minlength="2" value="{{ last_name }}" placeholder="Last name" required />
+	    </div>
+		<div class="form-group">
+	    	<input type="email" name="email" size="25"  class="form-control" style="width:350px" value="{{ email }}" 
+			title="Your e-mail address will be your identifier for logging in. We contact you to verify your account and then, occasionally, for important issues."
+			placeholder="Email" required />
+		</div>
+	</div>	
+
+	<div class="col-md-6">
+	    <div class="form-group">
+	      <label for="password" class="control-label">Authentication</label>
+		  <p></p>	
+	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" 
+			title="Your password allows you to log in to this portal."
+			placeholder="Password" required />
+	    </div>
+	    <div class="form-group">
+			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="4" class="form-control" value="" 
+				placeholder="Confirm password" required />
+	    </div>
+	    <div class="form-group">
+			<select name="question" class="form-control" style="width:350px" id="key-policy" 
+				title="Your public/private key pair allows you to access the testbeds." required >        
+		  		<option value="generate">Generate my keys for me (recommended)</option>
+		  		<option value="upload">Upload my public key (advanced users only)</option>
+			</select>
+	    </div>
+	    <div class="form-group" style="display:none;" id="upload_key">
+	      	<label for="file" class="control-label">Upload public key</label>
+	      	<input type="file" name="user_public_key" class="form-control" style="width:200px" id="user_public_key" />
+	      	<br />
+			<div class="alert alert-danger" id="pkey_del_msg">
+				In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to 
+				<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your public key to the portal.</a>
+			</div>
+	    </div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group">
+			<p></p>
+			<input type="checkbox" name="agreement" value="agreement" required />&nbsp;&nbsp; I agree to the 
+			<a href="#" data-toggle="modal" data-target="#myModal">terms and conditions.</a> 
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group" id="register">
+			<p></p>	
+	    	<input class="submit btn btn-onelab" type="submit" value="Sign up" />
+
+	    </div>
+	</div>
+</div>
+</form>
+
+	<!-- Modal - columns selector -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			<div class="modal-dialog">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        					<h4 class="modal-title" id="myModalLabel">Terms & Conditions</h4>
+      				</div>
+      				<div class="modal-body">
+						<p align="left">
+    					Fibre: Future Internet testbeds experimentation between Brazil and Europe
+    					<br/>
+						<a href="/portal/terms" target="_blank">[Printable format]</a>
+						</p>
+					<h1 align="left">1 Context</h1>
+					<p align="left">
+                    The main goal of the FIBRE project is the design, implementation and validation of a shared Future Internet research facility, supporting the joint experimentation of European and Brazilian researchers. In order to achieve this goal the project will carry out four main activities:
+                    </p>
+					<p align="left">
+                    The development and operation of a new experimental facility in Brazil, including the setup of equipment to support experimentation with various technologies (fixed layer 2 and layer 3, wireless, optical) as well as the design and implementation of a control framework to automate the use and operation of the testbed.
+                    </p>
+					<p align="left">
+                    The development and operation of a Future Internet facility in Europe based on enhancements and the federation of two existing infrastructures: OFELIA and OneLab. Two OFELIA islands (i2CAT and University of Bristol (UNIVBRIS)) and the UTH's NITOS testbed will be enhanced by i) adding more physical resources (servers, OpenFlow-enabled switches and access points) to be able to cope with a bigger number ofusers and different use cases, ii) improving its respective control frameworks (based on the OFELIA control framework and OMF) and iii) adding more manpower to operate the facilities.
+                    </p>
+					<p align="left">
+                    The federation of the Brazilian and European experimental facilities, both at the physical connectivity and control framework level, to support the provisioning of slices using resources from both testbeds.
+                    </p>
+<h2>PROCEDURE OVERVIEW</h2>
+<p>If your institution is willing to join the FIBRE Consortium, you are kindly requested to follow the steps below:<br></p>
+<p>1. <a mce_href="http://www.fibre-ict.eu/images/stories/docs/fibre_mou_v0.3.doc" href="http://www.fibre-ict.eu/images/stories/docs/fibre_mou_v0.3.doc">Download the MoU model</a>  to understand the framework of collaboration between your institution and FIBRE project. The content of the MoU shall be discussed in case-by-case basis between the two parties.&nbsp;<span style="line-height: 1.3em;" mce_style="line-height: 1.3em;">&nbsp;</span></p>
+<p>2. Contact the Project office at <a href="mailto:info@fibre.org.br">info@fibre.org.br</a> to schedule a call to clarify all your questions concerning the duties, responsibilities and advantages of joining the FIBRE project.</p>
+<p>3. If your institution understand and agree on the commitment stated in the MoU, please submit the application by editing the <a href="http://www.fibre-ict.eu/images/fibre_mou_v0.2_ff.doc" mce_href="http://www.fibre-ict.eu/images/fibre_mou_v0.2_ff.doc" style="style" mce_style="style">MoU template</a> and sending it to 
+ <a href="mailto:info@fibre.org.br">info@fibre.org.br</a></p>
+<p>4. Application Approval: the FIBRE General Assembly will decide based on the application and information gathered during the call. The approval process will normally take around one month.</p><p>5. By mutual agreement of both parties, MoU will be prepared and signed.</p>
+<p><span style="line-height: 1.3em;" mce_style="line-height: 1.3em;">6. Testbed usage / island installation: FIBRE will provide instructions and support to help your institution to carry out the activities described in the MoU.</span></p>
+<p><br></p>
+<p><span style="line-height: 1.3em;" mce_style="line-height: 1.3em;"><a mce_href="http://webconf2.rnp.br/p27egdf20y7/" href="http://webconf2.rnp.br/p27egdf20y7/">Watch the webconference meeting about the MoU details</a><br> (Held on 5/July 2013, in Portuguese)<br></span></p>
+<p><br></p>
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      				</div>
+    			</div>
+  			</div>
+</div>
+
+    
 <script>
-jQuery(document).ready(function(){
+$(document).ready(function(){
     var availableTags = [
     {% if authorities %}
         {% for authority in authorities %}
             {% if authority.name %}
-                {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
+                {value:"{{ authority.name }}",label:"{{authority.name}}"},
             {% else %}
                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
             {% endif %}
@@ -101,7 +171,19 @@ jQuery(document).ready(function(){
         {value:"",label:"No authority found !!!"}
     {% endif %}
     ];
-    jQuery( "#authority_hrn" ).autocomplete({
+	// sorting the list
+	availableTags.sort(function(a,b){
+		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
+		if (nameA < nameB) {
+    		return -1;
+		}
+		if (nameA > nameB) {
+    		return 1;
+		}
+	return 0;
+	}); 
+	// auto-complete the form
+    $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
       change: function (event, ui) {
@@ -114,6 +196,17 @@ jQuery(document).ready(function(){
       }
       //select: function( event, ui ) {console.log(jQuery(this))}
     });
+	// for hover texts
+	$('[title!=""]').qtip();
+	$("form").validate();
+	$("form").submit(function() {
+		if ($('select option:selected').val() == 'upload') {
+			if ($('input[name=user_public_key]').val() == '') {
+				alert('Please specify the key file to upload');
+				return false;
+			}
+		}
+	});
 });
 </script>
 {% endblock %}

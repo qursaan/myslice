@@ -320,12 +320,13 @@ function QueryStore() {
         var self = this;
         var query_ext = this.find_analyzed_query_ext(query_uuid);
         var record_key = manifold.metadata.get_key(query_ext.query.object);
+
         $.each(records, function(i, record) {
-            var key = manifold.metadata.get_key(query_ext.query.object);
+            //var key = manifold.metadata.get_key(query_ext.query.object);
             // ["start_time", "resource", "end_time"]
             // ["urn"]
-            
             var record_key_value = manifold.record_get_value(record, record_key);
+            
             query_ext.records.put(record_key_value, record);
 
             if (!(query_ext.state.get(record_key_value)))

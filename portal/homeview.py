@@ -111,13 +111,14 @@ class HomeView (FreeAccessView, ThemeView):
             # XXX Something like an invalid session seems to make the execute fail sometimes, and thus gives an error on the main page
             platform_details = execute_query(self.request, platform_query)
             account_details = execute_query(self.request, account_query)
-            for platform_detail in platform_details:
-                for account_detail in account_details:
-                    if platform_detail['platform_id'] == account_detail['platform_id']:
-                        if 'config' in account_detail and account_detail['config'] is not '':
-                            account_config = json.loads(account_detail['config'])
-                            if 'myslice' in platform_detail['platform']:
-                                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+            if platform_details:
+                for platform_detail in platform_details:
+                    for account_detail in account_details:
+                        if platform_detail['platform_id'] == account_detail['platform_id']:
+                            if 'config' in account_detail and account_detail['config'] is not '':
+                                account_config = json.loads(account_detail['config'])
+                                if 'myslice' in platform_detail['platform']:
+                                    acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
             # assigning values
             if acc_auth_cred=={} or acc_auth_cred=='N/A':
                 pi = "is_not_pi"
