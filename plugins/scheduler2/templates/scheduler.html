@@ -49,12 +49,12 @@
 							style="word-wrap: break-word; word-break: break-all; ">
 							{[{ resource.hostname }]}
 						</th>
-                        <td ng-repeat="lease in resource.leases | offset: from / lcm_colspan  | limitTo: num_visible_cells / lcm_colspan"
+                        <td ng-repeat="lease in resource.leases | offset: from / (resource.granularity / slot_length)  | limitTo: num_visible_cells / (resource.granularity / slot_length)"
 							data-slotid="{[{ lease.id }]}" 
 							data-groupid="{[{ lease.groupid }]}" 
 							ng-class="{{ 'lease.status' }}"
 							ng-class="{{ 'lease.success' }}"
-							colspan="{[{resource.granularity / granularity}]}"
+							colspan="{[{resource.granularity / slot_length}]}"
 							ng-click="select(from+$index, lease, $parent.resource)">
 						</td>
                     </tr>
