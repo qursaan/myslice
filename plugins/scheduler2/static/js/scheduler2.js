@@ -478,10 +478,6 @@ var SCHEDULER_COLWIDTH = 50;
                  * be updated when resources arrive.  Should be the pgcd in fact XXX */
                 this._granularity = DEFAULT_GRANULARITY;
                 scope.granularity = this._granularity;
-                this._all_slots = this._generate_all_slots();
-
-                // A list of {id, time} dictionaries representing the slots for the given day
-                scope.slots = this._all_slots;
                 this.scope_resources_by_key = {};
 
                 this.do_resize();
@@ -495,7 +491,16 @@ var SCHEDULER_COLWIDTH = 50;
             do_resize: function()
             {
                 var scope = this._get_scope();
-                var num_hidden_cells, new_max;
+                var num_hidden_cells, new_max, lcm;
+
+                // do_resize has to be called when the window is resized, or one parameter changes
+                // e.g. when new resources have been received
+                //
+                this.resource_granularities = [3600, 1800]; //, 2400]; /* s */
+
+                /* Compute the slot length to accommodate all resources. This
+                 * is the GCD of all resource granularities. */
+                this._slot_length = this._gcdn(this.resource_granularities);
 
                 $('#' + schedulerTblId + ' thead tr th:eq(0)').css("width", SCHEDULER_FIRST_COLWIDTH);
                 //self get width might need fix depending on the template 
@@ -503,13 +508,23 @@ var SCHEDULER_COLWIDTH = 50;
 
                 /* Number of visible cells...*/
                 this._num_visible_cells = parseInt((tblwidth - SCHEDULER_FIRST_COLWIDTH) / SCHEDULER_COLWIDTH);
+
                 /* ...should be a multiple of the lcm of all encountered granularities. */
-                // XXX Should be updated everytime a new resource is added
-                this._lcm_colspan = this._lcm(this._granularity, RESOURCE_DEFAULT_GRANULARITY) / this._granularity;
-                this._num_visible_cells = this._num_visible_cells - this._num_visible_cells % this._lcm_colspan;
+                lcm = this._lcmn(this.resource_granularities) / this._slot_length;
+                this._num_visible_cells = this._num_visible_cells - this._num_visible_cells % lcm;
+
+                // A list of {id, time} dictionaries representing the slots for the given day
+                this._all_slots = this._generate_all_slots();
+
                 /* scope also needs this value */
+                scope.slots = this._all_slots;
+                scope.slot_length = this._slot_length;
                 scope.num_visible_cells = this._num_visible_cells;
-                scope.lcm_colspan = this._lcm_colspan;
+                scope.lcm_colspan = this._lcmn(this.resource_granularities); // XXX WHY ?
+
+                /* Redraw... */
+                this._scope_clear_leases();
+                this._set_all_lease_slots();
 
                 // Slider max value
                 if ($('#tblSlider').data('slider') != undefined) {
@@ -517,8 +532,8 @@ var SCHEDULER_COLWIDTH = 50;
 
                     $('#tblSlider').slider('setAttribute', 'max', num_hidden_cells);
                     $('#tblSlider').slider('setValue', scope.from, true);
-                    this._get_scope().$apply();
                 }
+                this._get_scope().$apply();
 
 
             },
@@ -580,7 +595,7 @@ var SCHEDULER_COLWIDTH = 50;
                 // Setup leases with a default free status...
                 $.each(this.scope_resources_by_key, function(resource_key, resource) {
                     resource.leases = [];
-                    var colspan_lease = resource.granularity / self._granularity; //eg. 3600 / 1800 => 2 cells
+                    var colspan_lease = resource.granularity / self._slot_length; //eg. 3600 / 1800 => 2 cells
                     time = SchedulerDateSelected.getTime();
                     for (i=0; i < self._all_slots.length / colspan_lease; i++) { // divide by granularity
                         resource.leases.push({
@@ -715,7 +730,7 @@ var SCHEDULER_COLWIDTH = 50;
                     return true; // ~ continue
 
                 id_end   = Math.ceil((lease.end_time   - day_timestamp) / resource.granularity);
-                colspan_lease = resource.granularity / this._granularity; //eg. 3600 / 1800 => 2 cells
+                colspan_lease = resource.granularity / this._slot_length; //eg. 3600 / 1800 => 2 cells
                 if (id_end >= this._all_slots.length / colspan_lease) {
                     /* Limit the display to the current day */
                     id_end = this._all_slots.length / colspan_lease
@@ -819,11 +834,11 @@ var SCHEDULER_COLWIDTH = 50;
                 
                 $('#tblSlider').slider({
                     min: 0,
-                    max: num_hidden_cells, // / self._lcm_colspan,
+                    max: num_hidden_cells,
                     value: init_cell,
                 }).on('slide', function(ev) {
                     var scope = self._get_scope();
-                    scope.from = ev.value * self._lcm_colspan;
+                    scope.from = ev.value;
                     scope.$apply();
                 });
                 scope.from = init_cell;
@@ -843,12 +858,24 @@ var SCHEDULER_COLWIDTH = 50;
             return (y==0) ? x : this._gcd(y, x % y);
         },
 
+        _gcdn : function(array)
+        {
+            var self = this;
+            return array.reduce(function(prev, cur, idx, arr) { return self._gcd(prev, cur); });
+        },
+
         /**
          * Least common multiple
          */
         _lcm : function(x, y)
         {
             return x * y / this._gcd(x, y);
+        },
+
+        _lcmn : function(array)
+        {
+            var self = this;
+            return array.reduce(function(prev, cur, idx, arr) { return self._lcm(prev, cur); });
         },
     
         _pad_str : function(i)
@@ -876,7 +903,7 @@ var SCHEDULER_COLWIDTH = 50;
                 /// ...and add the slot to the list of results
                 slots.push({ id: i, time: tmpTime });
                 // Increment the date with the granularity
-                d = new Date(d.getTime() + this._granularity * 1000);
+                d = new Date(d.getTime() + this._slot_length * 1000);
                 i++;
             }
             return slots;
