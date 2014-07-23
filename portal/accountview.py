@@ -31,9 +31,11 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
     def get_context_data(self, **kwargs):
         self.template_name = self.template
         page = Page(self.request)
+        metadata = page.get_metadata()
+        page.expose_js_metadata()
+
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
-
 
         user_query  = Query().get('local:user').select('config','email','status')
         user_details = execute_query(self.request, user_query)
