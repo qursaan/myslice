@@ -38,8 +38,12 @@
 	{% endfor %}
 	</p>
 </div>
-<script>
-$(document).ready(function() {
-    $('#authority_name').text("{{ authority.name|default:authority.authority_hrn }}");
+<script>$(document).ready(function() {
+{% if authority.name %}
+    auth_name = "{{authority.name}}";
+{% else %}
+    auth_name = "{{authority.authority_hrn}}";
+{% endif %}
+    $('#authority_name').text(auth_name);
 });
 </script>
