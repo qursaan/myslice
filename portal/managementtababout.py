@@ -16,10 +16,15 @@ from myslice.configengine import ConfigEngine
 from myslice.theme import ThemeView
 import json
 
+import activity
+
 class ManagementAboutView (FreeAccessView, ThemeView):
     template_name = 'management-tab-about.html'
 
     def get (self, request):
+        
+        activity.userLogin(request)
+        
         if request.user.is_authenticated(): 
             user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
             user_details = execute_query(self.request, user_query)
@@ -34,17 +39,16 @@ class ManagementAboutView (FreeAccessView, ThemeView):
                                                               'postcode').filter_by('authority_hrn','==',user_authority)
             authority_details = execute_query(self.request, authority_query)
             
-            authority_contacts = {}
-            authority_contacts['scientific'] = [ x.strip()[1:-1] for x in authority_details[0]['scientific'][1:-1].split(',') ]
-            authority_contacts['technical'] = [ x.strip()[1:-1] for x in authority_details[0]['tech'][1:-1].split(',') ]
+            if authority_details :
+                authority_contacts = {}
+                authority_contacts['scientific'] = [ x.strip()[1:-1] for x in authority_details[0]['scientific'][1:-1].split(',') ]
+                authority_contacts['technical'] = [ x.strip()[1:-1] for x in authority_details[0]['tech'][1:-1].split(',') ]
             
-            authority_contacts['legal'] = [ x.strip().replace('"','') for x in authority_details[0]['legal'][1:-1].split(',') ]
-            print authority_contacts['legal']
+                authority_contacts['legal'] = [ x.strip().replace('"','') for x in authority_details[0]['legal'][1:-1].split(',') ]
+                authority = authority_details[0]
+            else :
+                authority_contacts = None
+                authority = None
             
-            
-            print "#######",authority_contacts
-            print "$$$$$$$",user_local_details
-            print "@@@@@@@",authority_details
-            
-        return render_to_response(self.template, { 'theme' : self.theme, 'authority' : authority_details[0], 'authority_contacts' : authority_contacts }, context_instance=RequestContext(request))
+        return render_to_response(self.template, { 'theme' : self.theme, 'authority' : authority, 'authority_contacts' : authority_contacts }, context_instance=RequestContext(request))
 
