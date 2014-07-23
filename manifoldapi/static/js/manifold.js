@@ -1832,6 +1832,7 @@ case TYPE_LIST_OF_VALUES:
             // FILTERS
 
             case FILTER_ADDED: 
+                console.log("FILTER ADDED", data);
                 /* Update internal record state */
                 manifold.query_store.add_filter(query_uuid, data);
 
@@ -1841,6 +1842,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case FILTER_REMOVED:
+                console.log("FILTER REMOVED", data);
                 /* Update internal record state */
                 manifold.query_store.remove_filter(query_uuid, data);
 
