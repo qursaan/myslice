@@ -232,13 +232,15 @@ var SCHEDULER_COLWIDTH = 50;
 
         $scope.select = function(index, model_lease, model_resource)
         {
-            var data;
+            var data, resource_granularity;
+
+            //resource_granularity = model_resource.granularity === undefined ? RESOURCE_DEFAULT_GRANULARITY : model_resource.granularity;
 
             console.log("Selected", index, model_lease, model_resource);
 
             var day_timestamp = SchedulerDateSelected.getTime() / 1000;
-            var start_time = day_timestamp + index       * model_resource.granularity;
-            var end_time   = day_timestamp + (index + 1) * model_resource.granularity;
+            var start_time = day_timestamp + index       * model_resource.granularity; // XXX resource_granularity
+            var end_time   = day_timestamp + (index + 1) * model_resource.granularity; //
             var start_date = new Date(start_time * 1000);
             var end_date   = new Date(end_time   * 1000);
 
@@ -576,7 +578,9 @@ var SCHEDULER_COLWIDTH = 50;
                     var resource = jQuery.extend(true, {}, record);
 
                     // Fix granularity
-                    resource.granularity = typeof(resource.granularity) == "number" ? resource.granularity : RESOURCE_DEFAULT_GRANULARITY;
+                    //resource_granularity = ((resource.granularity === undefined) || (typeof(resource.granularity) != "number")) ? RESOURCE_DEFAULT_GRANULARITY : resource.granularity;
+                    if (typeof(resource.granularity) != "number")
+                        resource.granularity = RESOURCE_DEFAULT_GRANULARITY;
                     resource.leases = []; // a list of occupied timeslots
 
                     self.scope_resources_by_key[resource['urn']] = resource;
@@ -735,53 +739,53 @@ var SCHEDULER_COLWIDTH = 50;
                     /* Limit the display to the current day */
                     id_end = this._all_slots.length / colspan_lease
                 }
+                lease_status = manifold.query_store.get_record_state(this.options.query_lease_uuid, lease_key, STATE_SET);
+                // the same slots might be affected multiple times.
+                // PENDING_IN + PENDING_OUT => IN 
+                //
+                // RESERVED vs SELECTED !
+                //
+                // PENDING !!
+                switch(lease_status) {
+                    case STATE_SET_IN:
+                        lease_class = 'selected'; // my leases
+                        lease_success = '';
+                        break;
+                    case STATE_SET_IN_SUCCESS:
+                        lease_class = 'selected'; // my leases
+                        lease_success = 'success';
+                    case STATE_SET_OUT_FAILURE:
+                        lease_class = 'selected'; // my leases
+                        lease_success = 'failure';
+                        break;
+                    case STATE_SET_OUT:
+                        lease_class = 'reserved'; // other leases
+                        lease_success = '';
+                        break;
+                    case STATE_SET_OUT_SUCCESS:
+                        lease_class = 'free'; // other leases
+                        lease_success = 'success';
+                        break;
+                    case STATE_SET_IN_FAILURE:
+                        lease_class = 'free'; // other leases
+                        lease_success = 'failure';
+                        break;
+                    case STATE_SET_IN_PENDING:
+                        lease_class = 'pendingin';
+                        lease_success = '';
+                        break;
+                    case STATE_SET_OUT_PENDING:
+                        // pending_in & pending_out == IN == replacement
+                        if (resource.leases[i].status == 'pendingin')
+                            lease_class = 'pendingin'
+                        else
+                            lease_class = 'pendingout';
+                        lease_success = '';
+                        break;
+                
+                }
 
                 for (i = id_start; i < id_end; i++) {
-                    // the same slots might be affected multiple times.
-                    // PENDING_IN + PENDING_OUT => IN 
-                    //
-                    // RESERVED vs SELECTED !
-                    //
-                    // PENDING !!
-                    lease_status = manifold.query_store.get_record_state(this.options.query_lease_uuid, lease_key, STATE_SET);
-                    switch(lease_status) {
-                        case STATE_SET_IN:
-                            lease_class = 'selected'; // my leases
-                            lease_success = '';
-                            break;
-                        case STATE_SET_IN_SUCCESS:
-                            lease_class = 'selected'; // my leases
-                            lease_success = 'success';
-                        case STATE_SET_OUT_FAILURE:
-                            lease_class = 'selected'; // my leases
-                            lease_success = 'failure';
-                            break;
-                        case STATE_SET_OUT:
-                            lease_class = 'reserved'; // other leases
-                            lease_success = '';
-                            break;
-                        case STATE_SET_OUT_SUCCESS:
-                            lease_class = 'free'; // other leases
-                            lease_success = 'success';
-                            break;
-                        case STATE_SET_IN_FAILURE:
-                            lease_class = 'free'; // other leases
-                            lease_success = 'failure';
-                            break;
-                        case STATE_SET_IN_PENDING:
-                            lease_class = 'pendingin';
-                            lease_success = '';
-                            break;
-                        case STATE_SET_OUT_PENDING:
-                            // pending_in & pending_out == IN == replacement
-                            if (resource.leases[i].status == 'pendingin')
-                                lease_class = 'pendingin'
-                            else
-                                lease_class = 'pendingout';
-                            lease_success = '';
-                            break;
-                    
-                    }
                     resource.leases[i].status = lease_class;
                     resource.leases[i].success = lease_success;
                 }
@@ -831,7 +835,7 @@ var SCHEDULER_COLWIDTH = 50;
                 init_cell = (new Date().getHours() - 1) * 3600 / self._granularity;
                 if (init_cell > num_hidden_cells)
                     init_cell = num_hidden_cells;
-                
+
                 $('#tblSlider').slider({
                     min: 0,
                     max: num_hidden_cells,

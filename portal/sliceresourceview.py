@@ -87,11 +87,11 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         #page.enqueue_query(query_resource_all)
 
         # leases query
-        lease_md = metadata.details_by_object('lease')
-        lease_fields = [column['name'] for column in lease_md['column']]
+        #lease_md = metadata.details_by_object('lease')
+        #lease_fields = [column['name'] for column in lease_md['column']]
 
-        query_lease_all = Query.get('lease').select(lease_fields)
-        page.enqueue_query(query_lease_all)
+        #query_lease_all = Query.get('lease').select(lease_fields)
+        #page.enqueue_query(query_lease_all)
 
         # --------------------------------------------------------------------------
         # ALL RESOURCES LIST
