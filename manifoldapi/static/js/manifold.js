@@ -462,7 +462,7 @@ function QueryStore() {
     {
         var query_ext = this.find_analyzed_query_ext(query_uuid);
         query_ext.filters = $.grep(query_ext.filters, function(x) {
-            return x == filter;
+            return x != filter;
         });
 
         this.apply_filters(query_uuid);
