@@ -57,12 +57,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
 
-            authorities_query = Query.get('authority').select('name', 'authority_hrn')
-            authorities = execute_admin_query(wsgi_request, authorities_query)
-    
             for authority in authorities:
                 if authority['name'] == wsgi_request.POST.get('org_name', ''):
                     authority_hrn = authority['authority_hrn']     
+
+            # Handle the case when the template uses only hrn and not name
+            if not authority_hrn:
+                authority_hrn = wsgi_request.POST.get('org_name', '')
 
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
