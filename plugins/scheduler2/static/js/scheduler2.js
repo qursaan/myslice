@@ -232,13 +232,15 @@ var SCHEDULER_COLWIDTH = 50;
 
         $scope.select = function(index, model_lease, model_resource)
         {
-            var data;
+            var data, resource_granularity;
+
+            resource_granularity = model_resource.granularity === undefined ? RESOURCE_DEFAULT_GRANULARITY : model_resource.granularity;
 
             console.log("Selected", index, model_lease, model_resource);
 
             var day_timestamp = SchedulerDateSelected.getTime() / 1000;
-            var start_time = day_timestamp + index       * model_resource.granularity;
-            var end_time   = day_timestamp + (index + 1) * model_resource.granularity;
+            var start_time = day_timestamp + index       * resource_granularity;
+            var end_time   = day_timestamp + (index + 1) * resource_granularity;
             var start_date = new Date(start_time * 1000);
             var end_date   = new Date(end_time   * 1000);
 
@@ -576,7 +578,7 @@ var SCHEDULER_COLWIDTH = 50;
                     var resource = jQuery.extend(true, {}, record);
 
                     // Fix granularity
-                    resource.granularity = typeof(resource.granularity) == "number" ? resource.granularity : RESOURCE_DEFAULT_GRANULARITY;
+                    resource_granularity = ((resource.granularity === undefined) || (typeof(resource.granularity) != "number")) ? RESOURCE_DEFAULT_GRANULARITY : resource.granularity;
                     resource.leases = []; // a list of occupied timeslots
 
                     self.scope_resources_by_key[resource['urn']] = resource;
@@ -831,7 +833,7 @@ var SCHEDULER_COLWIDTH = 50;
                 init_cell = (new Date().getHours() - 1) * 3600 / self._granularity;
                 if (init_cell > num_hidden_cells)
                     init_cell = num_hidden_cells;
-                
+
                 $('#tblSlider').slider({
                     min: 0,
                     max: num_hidden_cells,
