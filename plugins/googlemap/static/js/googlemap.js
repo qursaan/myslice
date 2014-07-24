@@ -173,7 +173,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 data = {
                     state: STATE_SET,
                     key  : null,
-                    op   : this.checked ? SET_ADD : SET_REMOVED,
+                    op   : this.checked ? STATE_SET_ADD : STATE_SET_REMOVED,
                     value: id
                 }
                 manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);
