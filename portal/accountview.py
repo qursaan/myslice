@@ -348,6 +348,8 @@ def account_process(request):
         return HttpResponseRedirect("/portal/account/")
 
 # XXX TODO: Factorize with portal/registrationview.py
+# XXX TODO: Factorize with portal/registrationview.py
+# XXX TODO: Factorize with portal/joinview.py
 
     elif 'generate' in request.POST:
         for account_detail in account_details:
