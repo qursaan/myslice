@@ -117,9 +117,10 @@
 
             // ... and communicate the appropriate filters to the manager
             // NOTE: we use the manifold namespace for internal filters 
-            if (self.prev_filter_status)
-                manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, self.prev_filter_status);
-
+            if (self.prev_filter_status) {
+                var filter = ['manifold:status', '==', self.prev_filter_status];
+                manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, filter);
+            }
             // XXX The datatables will be refreshed twice !
             if (filter_status != 'all') {
                 // No filter for 'all'

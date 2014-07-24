@@ -50,8 +50,24 @@
                     console.log(slice_users);
                 }
             });
-     	}); // post rest/user
-    }
+     	}); // post rest/use
+
+	 	$('button#addusers').click(function() {
+     		$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+         		if(data.success){
+             		// TODO: highlight row after success
+             		//$('tr[id="'+record_id+'"]').highlight();
+             		mysliceAlert('Success: slice updated','success', true);
+         		}else{
+             		mysliceAlert('Rest Error for: '+data.error,'warning', true);
+         		}
+     		}); // post update slice
+ 
+     		// TODO: refresh table
+     		//window.location="/portal/institution#slices";
+ 		}); // button#addusers click
+
+    } // get_users_in_slice
 
     $(document).ready(function() {
             // TODO: Add a filter based on the list of authorities
@@ -80,21 +96,6 @@
 
             get_users_in_slice("{{user_details.parent_authority}}");
 
-	        $('button#addusers').click(function() {
-                $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
-                	if(data.success){
-                    	// TODO: highlight row after success
-                    	//$('tr[id="'+record_id+'"]').highlight();
-                    	mysliceAlert('Success: slice updated','success', true);
-                	}else{
-                    	mysliceAlert('Rest Error for: '+data.error,'warning', true);
-                	}
-                }); // post update slice
-            
-            	// TODO: refresh table
-            	//window.location="/portal/institution#slices";
-
-            }); // button#addusers click
 	$('[title!=""]').qtip();
     }); // document ready
 </script>
