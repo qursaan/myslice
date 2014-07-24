@@ -12,6 +12,7 @@ body {
 a, a:active, a:focus {
     outline: 0;
     text-decoration:none;
+    color:#201E62;
 }
 
 h1 {
@@ -26,12 +27,19 @@ h1 img {
     margin-right:10px;
 }
 h2 {
+    margin:0 0 15px 0;
     font-size:14pt;
     color:#333333;
 }
 h3 {
+    margin:0 0 5px 0;
     font-size:13pt;
     color:#201E62;
+}
+h4 {
+    margin:0 0 5px 0;
+    font-size:12pt;
+    color:#333333;
 }
 input[type=text], input[type=password], input[type=email], input[type=tel], input[type=number], select, option {
     min-width:260px;
@@ -60,6 +68,9 @@ div.breadcrumbs {
     margin:15px 0;
     color:gray;
     font-size:10pt;
+}
+.tab-pane {
+    padding-top:15px;
 }
 /* buttons */
 button.btn, input.btn {

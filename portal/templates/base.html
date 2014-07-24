@@ -92,5 +92,14 @@ $(document).ready(function() {
 	{% block base_content %}
 	{% endblock %}
 {% endblock container %}
+<div class="loading">
+	<div class="row">
+		<div class="col-xs-11">Loading...</div>
+		<div class="col-xs-1"><img src="{{ STATIC_URL }}/img/loading.gif" /></div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 message"></div>
+	</div>
+</div>
 </body>
 </html>
