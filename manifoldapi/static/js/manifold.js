@@ -463,7 +463,7 @@ function QueryStore() {
     {
         var query_ext = this.find_analyzed_query_ext(query_uuid);
         query_ext.filters = $.grep(query_ext.filters, function(x) {
-            return x == filter;
+            return x != filter;
         });
 
         this.apply_filters(query_uuid);
@@ -1833,6 +1833,7 @@ case TYPE_LIST_OF_VALUES:
             // FILTERS
 
             case FILTER_ADDED: 
+                console.log("FILTER ADDED", data);
                 /* Update internal record state */
                 manifold.query_store.add_filter(query_uuid, data);
 
@@ -1842,6 +1843,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case FILTER_REMOVED:
+                console.log("FILTER REMOVED", data);
                 /* Update internal record state */
                 manifold.query_store.remove_filter(query_uuid, data);
 
