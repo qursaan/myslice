@@ -85,6 +85,7 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Construct user_hrn from email (XXX Should use common code)
             split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
+            split_email = split_email.replace("+", "_")
             user_request['user_hrn'] = user_request['authority_hrn'] \
                      + '.' + split_email
             
