@@ -316,15 +316,18 @@ var Plugin = Class.extend({
     // use spin() to get our default spin settings (called presets)
     // use spin(true) to get spin's builtin defaults
     // you can also call spin_presets() yourself and tweak what you need to, like topmenuvalidation does
-    spin: function (presets) {
-	var presets = ( presets === undefined ) ? spin_presets() : presets;
-	try { this.$element.spin(presets); }
-	catch (err) { messages.debug("Cannot turn on spin " + err); }
+    spin: function (message) {
+    	if (!message) {
+    		message = 'Please be patient, this can take a few seconds.';
+    	}
+    	$('div.loading').fadeIn('fast');
+    	$('div.loading').find('.message').text(message);
+
     },
 
     unspin: function() {
-	try { this.$element.spin(false); }
-	catch (err) { messages.debug("Cannot turn off spin " + err); }
+    	$('div.loading').fadeOut('fast');
+
     },
 
     /* TEMPLATE */
