@@ -46,10 +46,10 @@
 		        bAutoWidth: true,
             });
             
-            //this.elmt('update').click(this, this.do_ok);
-            //this.elmt('refresh').click(this, this.do_cancel);
+            this.elmt('close').click(this, this.do_close);
+            //this.elmt('apply_cancel').click(this, this.do_cancel);
 
-            this.elmt('apply').on('shown.bs.modal', function() {
+            this.elmt('apply__window').on('shown.bs.modal', function() {
                 self.do_update();
             })
 
@@ -80,7 +80,6 @@
 
         clear: function()
         {
-
         },
 
         find_row: function(value)
@@ -131,11 +130,13 @@
 
         },
 
-        do_ok: function(e)
+        do_close: function(e)
         {
-            throw 'queryupdater.do_reset Not implemented';
+            var self = e.data;
+            self.table.fnClearTable();
         },
 
+        // Not used today
         do_cancel: function(e)
         {
             throw 'queryupdater.do_clear_annotations Not implemented';
