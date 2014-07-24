@@ -67,8 +67,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                     authority_hrn = authority['authority_hrn']     
 
             # Handle the case when the template uses only hrn and not name
-            if not authority_hrn:
-                authority_hrn = wsgi_request.POST.get('org_name', '')
+            #if not authority_hrn:
+            authority_hrn = wsgi_request.POST.get('org_name', '')
 
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
@@ -88,11 +88,18 @@ class RegistrationView (FreeAccessView, ThemeView):
             }
 
             # Construct user_hrn from email (XXX Should use common code)
+            # split_email = user_request['email'].split("@")[0] 
+            # split_email = split_email.replace(".", "_")
+            # user_request['user_hrn'] = user_request['authority_hrn'] \
+            #         + '.' + split_email
+            
             split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
-            user_request['user_hrn'] = user_request['authority_hrn'] \
-                     + '.' + split_email
-            
+            split_authority = user_request['authority_hrn'].split(".")[1]
+            username = split_email + '@' + split_authority
+            split_authority = user_request['authority_hrn'].split(".")[0]
+            user_request['user_hrn'] = split_authority + '.' + username
+
             # Validate input
             UserModel = get_user_model()
             if (re.search(r'^[\w+\s.@+-]+$', user_request['first_name']) == None):

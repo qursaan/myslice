@@ -118,7 +118,7 @@ def manifold_add_user(wsgi_request, request):
     USER_CONFIG = '{"firstname": "%(first_name)s", "lastname": "%(last_name)s", "authority": "%(authority_hrn)s"}'
 
     user_params = {
-        'email'     : request['email'],
+        'email'     : request['username'],
         'password'  : request['password'],
         'config'    : USER_CONFIG % request,
         'status'    : 1,
@@ -283,6 +283,10 @@ def portal_validate_request(wsgi_request, request_ids):
         if request['type'] == 'user':
 
             try:
+                split_email = request['email'].split("@")[0] 
+                split_email = split_email.replace(".", "_")
+                split_authority = request['authority_hrn'].split(".")[1]
+                request['username'] = split_email + '@' + split_authority
                 create_user(wsgi_request, request)
                 request_status['SFA user'] = {'status': True }
                 PendingUser.objects.get(id=request['id']).delete()
@@ -440,7 +444,7 @@ def manifold_add_reference_user_accounts(wsgi_request, request):
     # Retrieve user information
     user_query  = Query().get('local:user')             \
         .select('user_id', 'config', 'email', 'status') \
-        .filter_by('email', '==', request['email'])
+        .filter_by('email', '==', request['username'])
     user_details = execute_admin_query(wsgi_request, user_query)
 
     # USER MAIN ACCOUNT != reference
@@ -652,7 +656,7 @@ def create_user(wsgi_request, request):
     #sfa_create_user(wsgi_request, request)
 
     # Update Manifold user status
-    manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})
+    manifold_update_user(wsgi_request, request['username'], {'status': USER_STATUS_ENABLED})
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
@@ -693,6 +697,12 @@ def create_pending_user(wsgi_request, request, user_detail):
         status        = 'False',
     )
     b.save()
+
+    split_email = request['email'].split("@")[0] 
+    split_email = split_email.replace(".", "_")
+    split_authority = request['authority_hrn'].split(".")[1]
+    request['username'] = split_email + '@' + split_authority
+
     # sends email to user to activate the email
     theme.template_name = 'activate_user.html'
     html_content = render_to_string(theme.template, request)
@@ -713,7 +723,7 @@ def create_pending_user(wsgi_request, request, user_detail):
     msg.send()
    
     # saves the user to django auth_user table [needed for password reset]
-    user = User.objects.create_user(request['email'], request['email'], request['password'])
+    user = User.objects.create_user(request['username'], request['email'], request['password'])
 
     # Creating a manifold user
     user_id = manifold_add_user(wsgi_request, request)
