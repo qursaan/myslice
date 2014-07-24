@@ -39,7 +39,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         """
         """
         errors = []
-
+        authority_hrn = None
         authorities_query = Query.get('authority').select('name','authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
@@ -67,8 +67,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                     authority_hrn = authority['authority_hrn']     
 
             # Handle the case when the template uses only hrn and not name
-            #if not authority_hrn:
-            authority_hrn = wsgi_request.POST.get('org_name', '')
+            if authority_hrn is None:
+                authority_hrn = wsgi_request.POST.get('org_name', '')
 
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
@@ -95,6 +95,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             
             split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
+            # Replace + by _ => more convenient for testing and validate with a real email
+            split_email = split_email.replace("+", "_")
+
             split_authority = user_request['authority_hrn'].split(".")[1]
             username = split_email + '@' + split_authority
             split_authority = user_request['authority_hrn'].split(".")[0]
@@ -132,6 +135,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                             + '.' + split_email + str(randint(1,1000000))
                 
             # XXX TODO: Factorize with portal/accountview.py
+            # XXX TODO: Factorize with portal/registrationview.py
+            # XXX TODO: Factorize with portal/joinview.py
             if 'generate' in wsgi_request.POST['question']:
                 user_request['auth_type'] = 'managed'
 

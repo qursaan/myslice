@@ -34,6 +34,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         slice_name =''
         purpose=''
         exp_url=''
+        authority_hrn = None
+        authority_name = None
         # Retrieve the list of authorities
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
@@ -53,6 +55,9 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if authority['authority_hrn'] == user_authority:
                 authority_name = authority['name']
 
+        # Handle the case when we use only hrn and not name
+        if authority_name is None:
+            authority_name = user_authority
         #
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         account_details = execute_query(wsgi_request, account_query)
@@ -97,8 +102,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 if authority['name'] == wsgi_request.POST.get('org_name', ''):
                     authority_hrn = authority['authority_hrn']
 
-            # Handle the case when the template uses only hrn and not name
-            if not authority_hrn:
+            # Handle the case when we use only hrn and not name
+            if authority_hrn is None:
                 authority_hrn = wsgi_request.POST.get('org_name', '')
 
             slice_request = {

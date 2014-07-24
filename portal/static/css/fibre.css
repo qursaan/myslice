@@ -369,6 +369,8 @@ a.sl-resources, a.sl-resources:hover {
     padding:2px 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+    width:125px;
+    text-align: center;
 }
 a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus {
     border:0;
