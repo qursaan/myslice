@@ -135,7 +135,7 @@
             {
                 flagDouble = true;
                 promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>');
-                promt.append(wilabForm);
+                //promt.append(wilabForm);
                 promt.append('<br />');
             }
             if(flagVW)
@@ -143,7 +143,7 @@
                 //promt.append(wallmessage);
                 flagDouble = true;
                 promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>');
-                promt.append(wallForm);
+                //promt.append(wallForm);
                 promt.append('<br />');
             }
 
@@ -203,11 +203,11 @@
                                           "user": username,
                                           "expiration_time": new Date().toISOString()
                                        });
-                            
+                                       
                                     $('#slamodal-wilab2').modal('hide');
                                 accepted_sla["wilab2"] = true;
                             
-                                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                                //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
                             }
                             $('#modal-body').empty();
                         }); 

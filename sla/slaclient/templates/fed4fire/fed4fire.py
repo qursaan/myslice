@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Template system for xifi project.
+"""Template system for fed4fire project.
 
 The specific template system is configured with the factory module variable.
 
@@ -32,7 +32,7 @@ Usage:
     data = sla.slaclient.templates.fed4fire.TemplateInput(template_id="template-test")
     slatemplate_xml = sla.slaclient.templates.fed4fire.render_slatemplate(data)
 
-Notes about agreements in XiFi:
+Notes about agreements in fed4fire:
     The ws-agreement specification does not address where to place the name/id
     of the service (as known outside SLA) being defined in the
     agreement/template xml. So, it has been defined an element
@@ -43,7 +43,7 @@ Notes about agreements in XiFi:
     The guarantee terms, service description terms, etc, use the attribute
     serviceName to reference (internally in the xml) the service. So, there
     could be more than one serviceName in a xml (as opposed to the former
-    serviceId). In Xifi, there is only one service per agreement, so we
+    serviceId). In fed4fire, there is only one service per agreement, so we
     can give serviceId and serviceName the same value.
 
     A ServiceReference defines how a serviceName is known externally: a
@@ -68,7 +68,7 @@ Notes about agreements in XiFi:
     (they are used to describe the service to be instantiated), so we can
     extrapolate the location as the "abstract location of the metric".
 
-    In summary, in XiFi, the service properties will hold the metrics being
+    In summary, in fed4fire, the service properties will hold the metrics being
     monitored for a service.
 
     And the guarantee terms hold the constraints that are being enforced for
@@ -88,11 +88,11 @@ Notes about agreements in XiFi:
             </wsag:ServiceLevelObjective>
         </wsag:GuaranteeTerm>
 
-    * Name is a name for the guarantee term. In Xifi, the name will have the
+    * Name is a name for the guarantee term. In fed4fire, the name will have the
       value "GT_<metric_name>"
     * ServiceName is an internal reference in the agreement to the service
       being enforced, as an agreement can created for more than one service.
-      In Xifi, to my knowledge, one service: one agreement, so this service
+      In fed4fire, to my knowledge, one service: one agreement, so this service
       name is not really important.
     * KpiName is a name given to the constraint, and I am using the same name
       as the service property used in the constraint. This makes more sense
@@ -133,7 +133,7 @@ def render_slaagreement(data):
     print "render_slaagreement"
     template = _getfactory().slaagreement()
     #pdb.set_trace()
-    rendered = template.render(data) 
+    rendered = template.render(data)
     return rendered
 
 
@@ -248,7 +248,7 @@ class AgreementInput(object):
         self.template_id = template_id
         self.expiration_time = expiration_time
         self.expiration_time_iso = \
-            expiration_time.isoformat() if expiration_time else None
+            expiration_time if expiration_time else None
         self.service_properties = service_properties
         self.guarantee_terms = guarantee_terms
 

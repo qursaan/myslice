@@ -20,6 +20,7 @@ from django.http import HttpResponse
 
 import json
 import traceback
+from math import ceil
 
 
 class Rol:
@@ -93,29 +94,66 @@ class SLAView (FreeAccessView, ThemeView):
         agreement_id = None
         enforcements = {}
         violations = {}
+        keys = ['provider','agreement','date','status','result','ok']
+        ag_info = []
 
         filter_ = None
         form = FilterForm(request.GET)
         if form.is_valid():
-             print "IS VALID"
-             filter_ = _get_filter_from_form(form)
+            filter_ = _get_filter_from_form(form)
 
         consumer_id = _get_consumer_id(request)
-        
+
         agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
-        
+
         for agreement in agreements:
+            row = []
+            row.append(agreement.context.provider) # Provider
+            row.append(agreement) # Agreement
+            row.append(agreement.context.time_formatted()) # Date
+
             enf = _get_enforcement(agreement.agreement_id)
+
             if enf.enabled == 'true':
-                enforcements[agreement.agreement_id] = "ACTIVE"
+                row.append('Evaluating') # Status
+                row.append('') # Result
+                row('') # Ok
             else:
-                enforcements[agreement.agreement_id] = "UNACTIVE"
-            violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
-            
-            if len(violations_list):
-                violations[agreement.agreement_id] = float(violations_list[0]["actualValue"])*100
-            else:
-                violations[agreement.agreement_id] = 100
+                if agreement.guaranteestatus == "NON_DETERMINED":
+                    row.append('Provisioned') # Status
+                    row.append('') # Result
+                    row.append('') # Ok
+                
+                else:
+                    row.append('Finished') # Status
+
+                    violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
+                    
+                    if len(violations_list) > 0:
+                        value = '%.2f'%float(violations_list[0].actual_value)
+                        row.append('%d'%(float(value)*100)) # Result
+                    else:
+                        row.append('100') # Result
+
+                    if agreement.guaranteestatus == "VIOLATED":
+                        row.append('false') # Ok
+
+                    if agreement.guaranteestatus == "FULFILLED":
+                        row.append('true') # Ok
+
+            ag_info.append(dict(zip(keys,row)))
+
+            # enf = _get_enforcement(agreement.agreement_id)
+            # if enf.enabled == 'true':
+            #     enforcements[agreement.agreement_id] = "ACTIVE"
+            # else:
+            #     enforcements[agreement.agreement_id] = "UNACTIVE"
+            # violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
+
+            # if len(violations_list):
+            #     violations[agreement.agreement_id] = float(violations_list[0]["actualValue"])*100
+            # else:
+            #     violations[agreement.agreement_id] = 100
 
         template_env = {}
        # write something of our own instead
@@ -126,13 +164,15 @@ class SLAView (FreeAccessView, ThemeView):
         template_env['slicename'] = slicename
         template_env['enforcements'] = enforcements
         template_env['last_violation_list'] = violations
-       
+        template_env['ag_info'] = ag_info
+
+
        # the prelude object in page contains a summary of the requirements() for all plugins
        # define {js,css}_{files,chunks}
         prelude_env = page.prelude_env()
         template_env.update(prelude_env)
-        
-        return render_to_response (self.template_name, template_env, context_instance=RequestContext(request))
+
+        return render_to_response(self.template_name, template_env, context_instance=RequestContext(request))
 
 
 class AgreementsFilter(object):
@@ -231,11 +271,7 @@ def agreement_term_violations(request, agreement_id, guarantee_name):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver first page.
         violation_page = paginator.page(1)
-    
-    print "\n******************"
-    print violations[-1]
-    print "******************\n"
-
+ 
     context = {
         'agreement_id': agreement_id,
         'guarantee_term': agreement.guaranteeterms[guarantee_name],
@@ -342,7 +378,7 @@ class AgreementSimple(APIView):
         #import pdb; pdb.set_trace()
         print "------------------------------------------------1"
         data = {}
-        for key, value in request.DATA.items():
+        for key, value in request.DATA.items(): # jgarcia review this
             new_key = key
             data[new_key] = value
         

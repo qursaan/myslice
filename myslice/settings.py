@@ -278,7 +278,8 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend','django.contrib.auth.backends.ModelBackend' )
+AUTHENTICATION_BACKENDS = ('auth.manifoldbackend.ManifoldBackend',
+                           'django.contrib.auth.backends.ModelBackend')
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
@@ -292,6 +293,9 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 ####SLA#####
 
-SLA_MANAGER_URL = "http://157.193.215.125:4000/sla-service"
-SLA_MANAGER_USER = "normal_user"
-SLA_MANAGER_PASSWORD = "password"
+#SLA_MANAGER_URL = "http://157.193.215.125:4000/sla-service"
+# SLA_MANAGER_USER = "normal_user"
+# SLA_MANAGER_PASSWORD = "password"
+SLA_MANAGER_URL = "http://172.24.76.98:8080/sla"
+SLA_MANAGER_USER = ""
+SLA_MANAGER_PASSWORD = ""

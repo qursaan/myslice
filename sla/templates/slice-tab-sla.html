@@ -4,31 +4,12 @@
 
  <div class="col-md-9">
    <div class="row" id="agreements">
-    <table class="table dataTable" id="sla_table" >
-        <thead>
-        <tr class="header">
-            <th colspan="2">Provider</th>
-            <!-- <th>Testbed</th>
-            <th>Slice_Id</th>
-            <th>Agreement</th>
-            <th>Metric</th>
-            <th>Violations</th>
-            <th>Result</th> -->
-        </tr>
-        </thead>
-        <tbody>
+    
         
-       <tr class="header">
-       		<td><span class="glyphicon glyphicon-chevron-down"></span></td>
-       		<td>iMinds</td>
-       </tr>
-       
-       
-        {% for a in agreements %}
-
+{% for row in ag_info %}
 
 <!-- Modal - columns selector -->
-<div class="modal fade" id="agreementModal{{a.agreement_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="agreementModal{{row.agreement.agreement_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   			
 <style type="text/css" scoped>
         .modal-lg {
@@ -44,18 +25,18 @@
 			</div>
 			<div class="modal-body">
 
-                 <dt>Agreement Id</dt>
-                 <dd>{{ a.agreement_id|default:"&nbsp;" }}</dd>
-                 <dt>Provider</dt>
-                 <dd>{{ a.context.provider|default:"&nbsp;" }}</dd>
-                 <dt>Experimenter</dt>
-                 <dd>{{ a.context.consumer|default:"&nbsp;" }}</dd>
-                 <dt>Service</dt>
-                 <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the resources during the sliver lifetime</dd>
-                 <dt>Testbed</dt>
-                 <dd>{{ a.context.testbed_formatted }}</dd>
-                 <dt>Accepted on:</dt>
-                 <dd>{{ a.context.time_formatted|default:"&nbsp;" }}</dd>
+                <dt>Agreement Id</dt>
+                <dd>{{ row.agreement.agreement_id|default:"&nbsp;" }}</dd>
+                <dt>Provider</dt>
+                <dd>{{ row.provider|default:"&nbsp;" }}</dd>
+                <dt>Experimenter</dt>
+                <dd>{{ row.agreement.context.consumer|default:"&nbsp;" }}</dd>
+                <dt>Service</dt>
+                <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the resources during the sliver lifetime</dd>
+                <dt>Testbed</dt>
+                <dd>{{ row.agreement.context.testbed_formatted }}</dd>
+                <dt>Accepted on:</dt>
+                <dd>{{ row.date|default:"&nbsp;" }}</dd>
 			</div>
 			<div class="modal-footer">
  				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -63,92 +44,49 @@
 		</div>
 	</div>
 </div>
-       
-       <tr>
-       		{% if a.guaranteestatus == "VIOLATED" %}
-       		<td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
-        	{% elif a.guaranteestatus == "FULFILLED" %}
-        	<td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+
+{% endfor %}
+
+      <table class="display table table-bordered row-border" id="sla_table">
+      
+        <thead>
+          <tr> 
+            <th>Provider</th>
+            <th>Agreement</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for row in ag_info %}
+
+        <tr>
+        	
+          <td>{{ row.provider }}</td>
+
+          <td><a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{row.agreement.agreement_id}}">{{ row.agreement.context.template_id }}</a></td>
+    		  
+          <td>{{ row.date }}</td>
+          <td>{{ row.status }}</td>
+          {% if row.ok == "true" %}
+          <td class="success">99% uptime for {{ row.result }}% resources</td>
+          {% elif row.ok == "false" %}
+          <td class="danger">99% uptime for {{ row.result }}% resources</td>
           {% else %}
           <td></td>
-        	{% endif %}
-    		  <td>{{ a.context.template_id }}</td>
-          <td>{{ a.context.time_formatted }}</td>
-          
-          {% with a.agreement_id as key %}
-          
-          <td>
-              <!-- <a class="agreement-detail" href="{% url "agreement_details" a.agreement_id %}" data-toggle="modal" data-target="#agreementModal">View Agreement</a> -->
-              <!-- <a class="agreement-detail" href="#" data-agreement="{{ a.agreement_id }}">View Agreement</a> -->
-              <a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{a.agreement_id}}">View Agreement</a>
-          </td>
-
-          {% for k,v in enforcements.items %}
-            {% if key == k %}
-              <td>
-              {% if v == "ACTIVE" %}
-                In progress
-              {% elif v == "UNACTIVE" %}
-                Disabled
-              {% endif %}
-              </td>
-
-              {% if a.guaranteestatus == "VIOLATED" and v == "UNACTIVE" %}
-              <td style="font-weight: bold">
-                Result: 99% uptime for
-                {% for vi, value in last_violation_list.items %}
-                  {% if a.agreement_id == vi %}
-                      {{ value }}%
-                  {% endif %}
-                {% endfor %}
-                resources
-              </td>
-              {% elif a.guaranteestatus == "FULFILLED" and v == "UNACTIVE" %}
-              <td style="font-weight: bold">
-                Result: 99% uptime for
-                {% for vi, value in last_violation_list.items %}
-                  {% if a.agreement_id == vi %}
-                      {{ value }}%
-                  {% endif %}
-                {% endfor %}
-                resources
-              </td>
-              {% endif %}
-            {% endif %}
-
-          {% endfor %}
-          
-          <!-- <td>{{slicename}}</td> -->
+          {% endif %}
+          <!-- {% if row.ok == "false" %}
+          <td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
+          {% elif row.ok == "true" %}
+          <td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+          {% else %}
+          <td></td>
+          {% endif %} -->
 
           
-
-          
-              
-
-            {% endwith %}
-            <!-- {% for tname,t in a.guaranteeterms.items %}
-            <td> {{ t.servicelevelobjective.kpiname }}</td>
-            <td>
-                {% if t.status == "VIOLATED" %}
-
-                  <a class="violation-detail" href="{% url "agreement_term_violations" a.agreement_id t.name %}" data-toggle="modal" data-target="#violationModal">View Violations</a>
-                  <a class="violation-detail" href="#"
-                  			data-agreement="{{ a.agreement_id }}" 
-                  			data-violation="{{ t.name }}">View Violations</a>
-                  <a class="violation-detail" href="#" data-agreement="{{ a.agreement_id }}" data-violation="{{ t.name }}">{{last_violation_list}}</a>
-                  {{ t.name }}
-
-                {% endif %}
-            </td>
-            <td id="status" style="display:none;">
-                {{ a.statusclass }}
-            </td>
-            {% endfor %} -->
-
-
-            
         </tr>
-        
         
         {% endfor %}
         </tbody>
@@ -162,6 +100,17 @@
 
 <script>
 $(document).ready(function() {
+
+  $('#sla_table').dataTable({
+        "aoColumns": [
+            null,
+            null,
+            null,
+            null,
+            { "orderSequence": [ "desc", "asc" ] }
+        ]
+    });
+
 	$('a.violation-detail').click(function () {
 		var a = $(this).data('agreement');
 		var v = $(this).data('violation');

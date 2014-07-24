@@ -5,9 +5,9 @@ to sla manager.
 It is intended as backend service for a rest interface.
 
 The json input must work together with the templates to form a valid template
- or agreement for Xifi (be careful!)
+ or agreement for fed4fire (be careful!)
 
-This (very simple) service is coupled to the way xifi is interpreting
+This (very simple) service is coupled to the way fed4fire is interpreting
 ws-agreement.
 
 
@@ -18,10 +18,13 @@ from sla.slaclient import wsag_model
 from sla.slaclient import restclient
 from sla.slaclient.templates.fed4fire.django.factory import Factory as TemplateFactory
 import sla.slaclient.templates.fed4fire as fed4fire
-from time import localtime, strftime
+#from time import localtime, strftime
 import uuid
+import dateutil.parser
+
+
 class ServiceContext(object):
-    def __init__(self, restfactory = None, templatefactory=None):
+    def __init__(self, restfactory=None, templatefactory=None):
         """
         :type restfactory: restclient.Factory
         """
@@ -109,30 +112,36 @@ def createagreement(json_data, context):
 
     client_agreements = context.restfactory.agreements()
     return client_agreements.create(slaagreement)
-    
+
 
 def createagreementsimplified(template_id, user, expiration_time):
-        context = ServiceContext(
-            restclient.Factory(),
-            TemplateFactory()
-        )
-        
-        agreement = {
-            "agreement_id": str(uuid.uuid4()),
-            "template_id": template_id,
-            "expiration_time": expiration_time,
-            "consumer": user,
-        }
-    
-        json_data = json.dumps(agreement)
+    context = ServiceContext(
+        restclient.Factory(),
+        TemplateFactory()
+    )
 
-        return createagreement(json_data, context)
-    
+    print "Expiration time: ", expiration_time
+
+    time = dateutil.parser.parse(expiration_time)
+    print "ISO FORMAT: ", time.strftime('%Y-%m-%dT%H:%M:%S%Z')
+
+    agreement = {
+        "agreement_id": str(uuid.uuid4()),
+        "template_id": template_id,
+        "expiration_time": time.strftime('%Y-%m-%dT%H:%M:%S%Z'),
+        "consumer": user,
+    }
+
+    json_data = json.dumps(agreement)
+
+    return createagreement(json_data, context)
+
+
 def main():
-    createagreementsimplified("iMindsServiceWiLab2", "virtualwall", "2014-04-34T23:12:12")
+    createagreementsimplified("iMindsServiceWiLab2",
+                              "virtualwall",
+                              "2014-04-34T23:12:12")
 
 
 if __name__ == "__main__":
     main()
-      
-        

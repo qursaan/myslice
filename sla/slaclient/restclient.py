@@ -12,13 +12,13 @@ from django.conf import settings
 
 """REST client to SLA Manager.
 
-Contains a generic rest client and wrappers over this generic client 
+Contains a generic rest client and wrappers over this generic client
 for each resource.
 
 Each resource client implements business-like() functions, but
 returns a tuple (output, requests.Response)
 
-The resource clients are initialized with the rooturl and a path, which 
+The resource clients are initialized with the rooturl and a path, which
 are combined to build the resource url. The path is defaulted to the known
 resource path. So, for example, to create a agreements client:
 
@@ -32,21 +32,19 @@ c = restclient.Factory.agreements()
 
 """
 
-_PROVIDERS_PATH = "providerso"
-_AGREEMENTS_PATH = "agreementso"
-_TEMPLATES_PATH = "templateso"
-_VIOLATIONS_PATH = "violationso"
+_PROVIDERS_PATH = "providers"
+_AGREEMENTS_PATH = "agreements"
+_TEMPLATES_PATH = "templates"
+_VIOLATIONS_PATH = "violations"
 _ENFORCEMENTJOBS_PATH = "enforcements"
 
 rooturl = settings.SLA_MANAGER_URL
 
-# SLA_MANAGER_USER = "normal_user"
-# SLA_MANAGER_PASSWORD = "password"
 
 class Factory(object):
     @staticmethod
     def agreements():
-        """Returns aREST client for Agreements
+        """Returns a REST client for Agreements
 
         :rtype : Agreements
          """
@@ -54,7 +52,7 @@ class Factory(object):
 
     @staticmethod
     def providers():
-        """Returns aREST client for Providers
+        """Returns a REST client for Providers
 
         :rtype : Providers
         """
@@ -62,7 +60,7 @@ class Factory(object):
 
     @staticmethod
     def violations():
-        """Returns aREST client for Violations
+        """Returns a REST client for Violations
 
         :rtype : Violations
         """
@@ -70,7 +68,7 @@ class Factory(object):
 
     @staticmethod
     def templates():
-        """Returns aREST client for Violations
+        """Returns a REST client for Violations
 
         :rtype : Violations
         """
@@ -78,11 +76,12 @@ class Factory(object):
 
     @staticmethod
     def enforcements():
-        """Returns aREST client for Enforcements jobs
+        """Returns a REST client for Enforcements jobs
 
         :rtype : Enforcements
         """
         return Enforcements(rooturl)
+
 
 class Client(object):
 
@@ -104,22 +103,28 @@ class Client(object):
         Returns a requests.Response
 
         :rtype : request.Response
-        :param str path: remaining path from root url; 
+        :param str path: remaining path from root url;
             empty if desired path equal to rooturl.
         :param kwargs: arguments to requests.get
-        
-        Example: 
+
+        Example:
             c = Client("http://localhost:8080/service")
             c.get("/resource", headers = { "accept": "application/json" })
         """
         url = _buildpath_(self.rooturl, path)
-        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER, settings.SLA_MANAGER_PASSWORD)
+        url = url + "?testbed=iminds"  # TODO remove hardcoded string
+        #kwargs['params']['testbed'] = 'iminds'
+
+        if "headers" not in kwargs:
+            kwargs["headers"] = {"accept": "application/xml"}
+        # kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
+        #                                settings.SLA_MANAGER_PASSWORD)
         result = requests.get(url, **kwargs)
-        print "GET {} {} {}".format(
-            result.url, result.status_code, result.text[0:70])
+        #print "GET {} {} {}".format(
+        #    result.url, result.status_code, result.text[0:70])
 
         return result
-    
+
     def post(self, path, data=None, **kwargs):
         """Just a wrapper over request.post, just in case
 
@@ -140,7 +145,12 @@ class Client(object):
             )
         """
         url = _buildpath_(self.rooturl, path)
-        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER, settings.SLA_MANAGER_PASSWORD)
+        url = url + "?testbed=iminds"  # TODO remove hardcoded string
+        # kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
+        #                                settings.SLA_MANAGER_PASSWORD)
+        if "headers" not in kwargs:
+            kwargs = {"accept": "application/xml",
+                      "content-type": "application/xml"}
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
             if "location" in result.headers else "<null>"
@@ -148,7 +158,6 @@ class Client(object):
             result.url, result.status_code, location)
         return result
 
-    
 
 class _Resource(object):
 
@@ -184,7 +193,7 @@ class _Resource(object):
 
         content_type = r.headers.get('content-type', '')
 
-        print("content-type = " + content_type)
+        #print("content-type = " + content_type)
         if content_type == 'application/json':
             result = r.json()
         elif content_type == 'application/xml':
@@ -282,17 +291,18 @@ class Agreements(object):
         r = self.res.client.get(path, headers={'accept': 'application/json'})
 
         json_obj = r.json()
-        
+
         status = wsag_model.AgreementStatus.json_decode(json_obj)
 
         return status, r
-    
+
     def create(self, agreement):
         """Create a new agreement
 
         :param str agreement: sla template in ws-agreement format.
         """
         return self.res.create(agreement)
+
 
 class Templates(object):
 
@@ -327,6 +337,7 @@ class Templates(object):
         :param str template: sla template in ws-agreement format.
         """
         self.res.create(template)
+
 
 class Providers(object):
 
@@ -363,6 +374,7 @@ class Providers(object):
         body = provider.to_xml()
         return self.res.create(body)
 
+
 class Violations(object):
 
     def __init__(self, root_url, path=_VIOLATIONS_PATH):
@@ -397,6 +409,7 @@ class Violations(object):
             violations from all terms will be returned
         :rtype: list[wsag_model.Violation]
         """
+
         return self.res.get(
             {"agreementId": agreement_id, "guaranteeTerm": term})
 
@@ -424,10 +437,10 @@ class Enforcements(object):
         """Get the enforcement of an agreement.
 
         :param str agreement_id:
-        
+
         :rtype: list[wsag_model.Enforcement]
         """
-        return self.res.getbyid(agreement_id)    
+        return self.res.getbyid(agreement_id)
 
 
 def _buildpath_(*paths):
@@ -440,7 +453,6 @@ def main():
     #
     global rooturl
     rooturl = "http://127.0.0.1:8080/sla-service"
-    
 
     c = Factory.templates()
     #r = c.getall()
@@ -450,12 +462,9 @@ def main():
 
     #r = c.getbyconsumer('RandomClient')
     r = c.getbyid("template02")
-    
 
     print r
 
 
 if __name__ == "__main__":
     main()
-
-

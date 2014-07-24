@@ -69,8 +69,6 @@ def agreementinput_from_json(json_data):
     }
     """
     d = json.loads(json_data)
-    if "expiration_time" in d:
-        d["expiration_time"] = dateutil.parser.parse(d["expiration_time"])
 
     t = AgreementInput(
         agreement_id=d.get("agreement_id", None),
