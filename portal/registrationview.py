@@ -37,7 +37,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         """
         """
         errors = []
-
+        authority_hrn = None
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
@@ -62,7 +62,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                     authority_hrn = authority['authority_hrn']     
 
             # Handle the case when the template uses only hrn and not name
-            if not authority_hrn:
+            if authority_hrn is None:
                 authority_hrn = wsgi_request.POST.get('org_name', '')
 
             post_email = wsgi_request.POST.get('email','').lower()
