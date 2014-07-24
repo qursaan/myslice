@@ -2,3 +2,18 @@
 	visibility: hidden;
 	position: absolute;
 }
+
+.loading {
+    background-color:white;
+    color:black;
+    position:fixed;
+    top:160px;
+    left:50%;
+    width:30%;
+    margin: 0 0 0 -15%;
+    padding:25px 50px;
+    box-shadow: 4px 4px 5px #888;
+    border:1pt solid #30196D;
+    display:none;
+    z-index:100;
+}
