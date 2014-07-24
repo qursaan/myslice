@@ -115,6 +115,10 @@ def manifold_add_user(wsgi_request, request):
         ?
     
     """
+
+    authority_hrn = request['authority_hrn']
+    request['authority_hrn'] = authority_hrn.split(".")[0]
+
     USER_CONFIG = '{"firstname": "%(first_name)s", "lastname": "%(last_name)s", "authority": "%(authority_hrn)s"}'
 
     user_params = {
@@ -123,6 +127,8 @@ def manifold_add_user(wsgi_request, request):
         'config'    : USER_CONFIG % request,
         'status'    : 1,
     }
+
+    request['authority_hrn'] = authority_hrn
 
     query = Query.create('local:user').set(user_params).select('email')
     results = execute_admin_query(request, query)
@@ -435,7 +441,11 @@ def create_pending_slice(wsgi_request, request, email):
         subject = render_to_string(theme.template, request)
         subject = subject.replace('\n', '')
     
-        sender = email
+        theme.template_name = 'email_default_sender.txt'
+        sender =  render_to_string(theme.template, request)
+        sender = sender.replace('\n', '')
+
+        #sender = email
         msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
@@ -781,7 +791,10 @@ def create_pending_user(wsgi_request, request, user_detail):
     try:
         # Send an email: the recipients are the PI of the authority
         # If No PI is defined for this Authority, send to a default email (different for each theme)
-        recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+
+        split_authority_hrn = request['authority_hrn'].split(".")[0]
+
+        recipients = authority_get_pi_emails(wsgi_request, split_authority_hrn)
         
         theme.template_name = 'user_request_email.html'
         html_content = render_to_string(theme.template, request)

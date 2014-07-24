@@ -33,7 +33,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
         # The user need to be logged in
         if (self.request.user):
            
-            user_query = Query().get('local:user').filter_by('email', '==', self.request.user.email).select('user_id')
+            user_query = Query().get('local:user').filter_by('email', '==', self.request.user.username).select('user_id')
             user, = execute_query(self.request, user_query)
             user_id = user['user_id']
 
