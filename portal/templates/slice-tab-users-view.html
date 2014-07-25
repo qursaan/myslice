@@ -6,7 +6,10 @@
     function get_users_in_slice(authority_hrn){
         console.log(authority_hrn);
         $("table#user-tab").html("<tr><th>+/-</th><th>Email</th><th>User hrn</th></tr>");
-    	var slice_users = [];
+     	var slice_users = [];
+    	var slice_users_removed = [];
+ 	  	var slice_users_emails = [];
+    	var slice_users_emails_removed = [];
     	$.post("/rest/user/",{'filters':{'parent_authority': authority_hrn}}, function( data ) {
         	var list_users = [];
         	var table_users = [];
@@ -43,11 +46,24 @@
         	$("div#user-tab-loading").css("display","none");
             $("input:checkbox.user").click(function() {
                 user_hrn = $(this).closest('tr').find('td:eq(2)').html();
+                user_email = $(this).closest('tr').find('td:eq(1)').html();
                 if(this.checked){
                     var record_id = this.id;
                     slice_users.push (user_hrn);
+					slice_users_removed.splice($.inArray(user_hrn, slice_users_removed),1);
+                    slice_users_emails.push (user_email);
+					slice_users_emails_removed.splice($.inArray(user_email, slice_users_emails_removed),1);	
+	
                 }else{
-                    console.log(slice_users);
+                    slice_users_removed.push (user_hrn);
+					slice_users.splice($.inArray(user_hrn, slice_users),1);
+                    slice_users_emails_removed.push (user_email);
+					// this one is removing from the list wrong user when u uncheck
+					//slice_users_emails.splice($.inArray(user_email, slice_users_emails),1);
+					//this one is still buggy cz it still keeps users in both arrays
+					// but it's ok for the moment
+					slice_users_emails;
+	
                 }
             });
      	}); // post rest/use
@@ -62,9 +78,10 @@
              		mysliceAlert('Rest Error for: '+data.error,'warning', true);
          		}
      		}); // post update slice
- 
-     		// TODO: refresh table
-     		//window.location="/portal/institution#slices";
+			emails = slice_users_emails.concat(slice_users_emails_removed);
+     		$.post("/credentials/clear/",{'emails':emails}, function(data) {
+     		}); // post credentials clear
+
  		}); // button#addusers click
 
     } // get_users_in_slice
