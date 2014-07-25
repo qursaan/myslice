@@ -99,7 +99,6 @@ class HomeView (FreeAccessView, ThemeView):
         env = self.default_env()
         acc_auth_cred={}
         if request.user.is_authenticated():
-            acc_auth_cred='N/A'
             ## check user is pi or not
             platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
             account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')

@@ -120,7 +120,6 @@
 
             var username = this.options.username;
 
-            this.spin();
             console.log("do_update in progress");
 
             manifold.raise_event(this.options.query_uuid, RUN_UPDATE);
@@ -215,13 +214,11 @@
 
         on_query_in_progress: function()
         {
-            this.spin();
         },
 
         on_query_done: function()
         {
             this.populate_table();
-            this.unspin();
         },
 
         // D : Data present
@@ -233,12 +230,13 @@
 
         on_clear_records: function()
         {
+        	 $('#applyloading').hide();
             this.clear();
         },
 
         on_query_done: function()
         {
-            this.unspin();
+            $('#applyloading').hide();
         },
 
         // PC : Pending changes
