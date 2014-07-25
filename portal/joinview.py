@@ -74,6 +74,8 @@ class JoinView (FreeAccessView, ThemeView):
             #prepare user_hrn 
             split_email = reg_email.split("@")[0] 
             split_email = split_email.replace(".", "_")
+            # Replace + by _ => more convenient for testing and validate with a real email
+            split_email = split_email.replace("+", "_")
             user_hrn = reg_auth + '.' + split_email
             
             UserModel = get_user_model()
@@ -108,18 +110,15 @@ class JoinView (FreeAccessView, ThemeView):
                     errors.append('Email already registered in Manifold. Please provide a new email address.')
 
 # XXX TODO: Factorize with portal/accountview.py
+# XXX TODO: Factorize with portal/registrationview.py
+# XXX TODO: Factorize with portal/joinview.py
 #            if 'generate' in request.POST['question']:
             from Crypto.PublicKey import RSA
             private = RSA.generate(1024)
-            private_key = json.dumps(private.exportKey())
-            public  = private.publickey()
-            public_key = json.dumps(public.exportKey(format='OpenSSH'))
-
+            private_key = private.exportKey()
+            public_key = private.publickey().exportKey(format='OpenSSH')
             # Saving to DB
-            account_config = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
             auth_type = 'managed'
-            public_key = public_key.replace('"', '');
-            private_key = private_key.replace('"', '');
 
             if not errors:
                 reg_password = request.POST['pi_password']
