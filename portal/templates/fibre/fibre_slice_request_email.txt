@@ -1,0 +1,9 @@
+NEW SLICE REQUEST
+
+Slice name      : {{slice_name}}
+URL 			: {{exp_url}}
+Purpose         : {{purpose}}
+Email           : {{email}}
+Organization	: {{organization}}
+Portal url		: {{current_site}}
+

@@ -164,7 +164,11 @@ $(document).ready(function(){
             {% if authority.name %}
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
             {% else %}
-                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+		{% if authority.authority_hrn == "fibre.ufrj" %}
+			{value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO RIO DE JANEIRO"},
+		{% else %}
+			{value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+		{% endif %}
             {% endif %}
         {% endfor %}    
     {% else %}
