@@ -321,13 +321,14 @@ def portal_validate_request(wsgi_request, request_ids):
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
-
+                
+                # Only hrn is required for Manifold Query 
                 sfa_authority_params = {
-                    'hrn'        : hrn,
-                    'urn'        : urn,
-                    'type'       : request['type'],
+                    'authority_hrn'        : hrn,
+                    #'authority_urn'        : urn,
+                    #'type'       : request['type'],
                     #'pi'        : None,
-                    'enabled'    : True
+                    #'enabled'    : True
                 }
                 print "ADD Authority"
                 sfa_add_authority(wsgi_request, sfa_authority_params)

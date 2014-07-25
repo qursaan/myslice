@@ -85,6 +85,8 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Construct user_hrn from email (XXX Should use common code)
             split_email = user_request['email'].split("@")[0] 
             split_email = split_email.replace(".", "_")
+            # Replace + by _ => more convenient for testing and validate with a real email
+            split_email = split_email.replace("+", "_")
             user_request['user_hrn'] = user_request['authority_hrn'] \
                      + '.' + split_email
             
@@ -120,6 +122,8 @@ class RegistrationView (FreeAccessView, ThemeView):
                             + '.' + split_email + str(randint(1,1000000))
                 
             # XXX TODO: Factorize with portal/accountview.py
+            # XXX TODO: Factorize with portal/registrationview.py
+            # XXX TODO: Factorize with portal/joinview.py
             if 'generate' in wsgi_request.POST['question']:
                 user_request['auth_type'] = 'managed'
 
