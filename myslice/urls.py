@@ -80,10 +80,10 @@ urls = [
     (r'^update/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.update.dispatch'),
     (r'^create/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.create.dispatch'),
     (r'^delete/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.delete.dispatch'),
-    (r'^credentials/(?P<action>[^/]+)/(?P<object>[^/]+)?/?$', 'rest.credentials.dispatch'),
+    (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
     #
     # REST monitoring
-    (r'^monitor/sfa/getversion/?$', 'rest.monitor.sfaGetVersion'),
+    #(r'^monitor/sfa/getversion/?$', 'rest.monitor.sfaGetVersion'),
     #
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices')
