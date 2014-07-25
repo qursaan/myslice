@@ -107,7 +107,7 @@ class HomeView (FreeAccessView, ThemeView):
             account_details = execute_query(self.request, account_query)
             for platform_detail in platform_details:
                 for account_detail in account_details:
-                    if 'platform_id' in platform_details:
+                    if 'platform_id' in platform_detail:
                         if platform_detail['platform_id'] == account_detail['platform_id']:
                             if 'config' in account_detail and account_detail['config'] is not '':
                                 account_config = json.loads(account_detail['config'])
