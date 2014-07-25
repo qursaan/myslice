@@ -399,7 +399,7 @@ def user_process(request, **kwargs):
                             return HttpResponseRedirect(redirect_url)
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
 
     elif 'dl_pubkey' in request.POST:
         for account_detail in account_details:
@@ -433,7 +433,7 @@ def user_process(request, **kwargs):
 
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
     
 #    elif 'delete' in request.POST:
 #        for account_detail in account_details:
@@ -476,7 +476,7 @@ def user_process(request, **kwargs):
                             user_params = { 'config': updated_config}
                             manifold_update_account(request, user_id,user_params)
                             messages.success(request, 'All Credentials cleared')
-                            return HttpResponseRedirect("/portal/account/")
+                            return HttpResponseRedirect(redirect_url)
                         else:
                             messages.error(request, 'Delete error: Credentials are not stored in the server')
                             return HttpResponseRedirect(redirect_url)
