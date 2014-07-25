@@ -84,7 +84,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
                 'pi'            : '',
-                'validation_link': 'http://' + current_site + '/portal/email_activation/'+ email_hash
+                'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             # Construct user_hrn from email (XXX Should use common code)
