@@ -758,6 +758,9 @@ var manifold = {
 
     _record_equals: function(self, other, key_fields)
     {
+        if ((typeof self === "string") && (typeof other === "string")) {
+            return self == other;
+        }
         for (var i=0; i < key_fields.length; i++) {
             var this_value  = self[key_fields[i]];
             var other_value = other[key_fields[i]];

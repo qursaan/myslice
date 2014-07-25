@@ -104,6 +104,7 @@ class HomeView (FreeAccessView, ThemeView):
 
     def get (self, request, state=None):
         env = self.default_env()
+        acc_auth_cred={}
         if request.user.is_authenticated():
             ## check user is pi or not
             platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
@@ -111,9 +112,9 @@ class HomeView (FreeAccessView, ThemeView):
             # XXX Something like an invalid session seems to make the execute fail sometimes, and thus gives an error on the main page
             platform_details = execute_query(self.request, platform_query)
             account_details = execute_query(self.request, account_query)
-            if platform_details:
-                for platform_detail in platform_details:
-                    for account_detail in account_details:
+            for platform_detail in platform_details:
+                for account_detail in account_details:
+                    if 'platform_id' in platform_detail:
                         if platform_detail['platform_id'] == account_detail['platform_id']:
                             if 'config' in account_detail and account_detail['config'] is not '':
                                 account_config = json.loads(account_detail['config'])

@@ -7,7 +7,7 @@ from unfold.page                import Page
 from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
-from portal.actions             import is_pi, create_slice, create_pending_slice
+from portal.actions             import is_pi, create_slice, create_pending_slice, clear_user_creds
 #from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
@@ -154,6 +154,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 if is_pi(wsgi_request, user_hrn, authority_hrn):
                     # PIs can directly create slices in their own authority...
                     create_slice(wsgi_request, slice_request)
+                    clear_user_creds(wsgi_request, user_email)
                     self.template_name = 'slice-request-done-view.html'
                 else:
                     # Otherwise a wsgi_request is sent to the PI

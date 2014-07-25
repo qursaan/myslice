@@ -93,6 +93,16 @@ class JoinView (FreeAccessView, ThemeView):
                 errors.append('First Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', reg_lname) == None):
                 errors.append('Last Name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+            if (re.search(r'^[A-Za-z0-9_ ]*$', reg_site_name) == None):
+                errors.append('Name of organization  may contain only letters, numbers, and underscore.')
+            if (re.search(r'^[A-Za-z ]*$', reg_address_city) == None):
+                errors.append('City may contain only letters.')
+            if (re.search(r'^[A-Za-z ]*$', reg_address_country) == None):
+                errors.append('Country may contain only letters.')
+            if (re.search(r'^[A-Za-z0-9]*$', reg_site_abbreviated_name) == None):
+                errors.append('Shortname  may contain only letters and numbers')
+            if (re.search(r'^[0-9]*$', reg_phone) == None):
+                errors.append('Phone number may contain only numbers.')
             #if (re.search(r'^\w+$', reg_site_authority) == None):
             #    errors.append('Site Authority may contain only letters or numbers.')
             # checking in django_db !!

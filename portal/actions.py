@@ -49,6 +49,44 @@ def authority_get_pi_emails(request, authority_hrn):
         results = execute_admin_query(request, query)
         return [result['user_email'] for result in results]
 
+#clear user credentials
+def clear_user_creds(request, user_email):
+    try:
+        user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
+        user_details = execute_admin_query(request, user_query)
+    
+        # getting the user_id from the session
+        for user_detail in user_details:
+            user_id = user_detail['user_id']
+            user_email = user_detail['email']
+    
+        account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
+        account_details = execute_admin_query(request, account_query)
+    
+        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_details = execute_admin_query(request, platform_query)
+    
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_cred = account_config.get('delegated_user_credential','N/A')
+                        if 'N/A' not in user_cred:
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            user_pub_key = json.dumps(account_config.get('user_public_key','N/A'))
+                            user_priv_key = json.dumps(account_config.get('user_private_key','N/A'))
+                            updated_config = '{"user_public_key":'+ user_pub_key + ', "user_private_key":'+ user_priv_key + ', "user_hrn":"'+ user_hrn + '"}'
+                            user_params = { 'config': updated_config}
+                            manifold_update_account(request, user_id,user_params)
+                            return user_email
+                        else:
+                            return None
+
+    except Exception,e:
+        print "Exception in actions.py in clear_user_creds %s" % e
+        return None
+
 def is_pi(wsgi_request, user_hrn, authority_hrn):
     # XXX could be done in a single query !
 

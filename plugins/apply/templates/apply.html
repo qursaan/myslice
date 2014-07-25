@@ -1,11 +1,18 @@
 <div id={{ domid }}>
   <!-- Modal - columns selector -->
-  <div class="modal fade" id="{{domid}}__apply" tabindex="-1" role="dialog" aria-labelledby="{{domid}}__apply__label" aria-hidden="true">
+  <div class="modal fade" id="{{domid}}__apply__window" tabindex="-1" role="dialog" aria-labelledby="{{domid}}__apply__label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-large">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="{{domid}}__apply__label">Applying pending changes...</h4>
+            <h4 class="modal-title" id="{{domid}}__apply__label">
+            	Applying pending changes...
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            	<img id="applyloading" src="/static/img/loading.gif" />
+            </h4>
+            <div>
+            	Please be patient, this operation can take a minute or two.
+            </div>
         </div>
         <div class="modal-body">
 <div class='resources-selected-spacer'>
@@ -28,7 +35,7 @@
 -->
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button id="{{domid}}__close" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -36,6 +43,6 @@
 
   
   <!-- Button toolbar -->
-  <button class="btn btn-onelab btn-sm" data-toggle="modal" data-target="#{{domid}}__apply">Apply</button>
-  <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{domid}}__cancel">Cancel</button>
+  <button class="btn btn-onelab btn-sm"  id="{{domid}}__apply" data-toggle="modal" data-target="#{{domid}}__apply__window">Apply</button>
+  <!-- <button class="btn btn-default btn-sm" id="{{domid}}__cancel">Cancel</button> -->
 </div> 
