@@ -532,7 +532,7 @@ def sfa_create_user(wsgi_request, request):
     else:
         subject = 'User validated'
         msg = 'A manager of your institution has validated your account. You have now full user access to the portal.'
-        send_mail(subject, msg, 'support@onelab.eu',[request['email']], fail_silently=False)       
+        send_mail(subject, msg, 'support@fibre.org.br',[request['email']], fail_silently=False)       
     return results
 
 def ldap_create_user(wsgi_request, request, user_detail):
