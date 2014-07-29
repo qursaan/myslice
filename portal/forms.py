@@ -94,7 +94,7 @@ class ContactForm(forms.Form):
                                 regex=r'^[\w+\s\w+]+$',
                                  label=_("description"),
                                  error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
-    cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
+    #cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class PassResetForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
