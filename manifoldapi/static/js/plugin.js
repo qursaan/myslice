@@ -318,7 +318,7 @@ var Plugin = Class.extend({
     // you can also call spin_presets() yourself and tweak what you need to, like topmenuvalidation does
     spin: function (message) {
     	if (!message) {
-    		message = 'Please be patient, this can take a minute or two.';
+    		message = 'Please be patient, this operation can take a minute or two.';
     	}
     	$('div.loading').fadeIn('fast');
     	$('div.loading').find('.message').text(message);
