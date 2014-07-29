@@ -35,7 +35,7 @@ class ContactView (FreeAccessView, ThemeView):
             #theme.template_name = 'email_support.txt'
             #recipients = render_to_string(theme.template, form.cleaned_data)
             #recipients = subject.replace('\n', '')
-            recipients = ['support@myslice.info']
+            recipients = ['support@onelab.eu']
             if cc_myself:
                 recipients.append(email)
             #recipients = ['support@myslice.info']
