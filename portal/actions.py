@@ -416,7 +416,12 @@ def create_slice(wsgi_request, request):
     user_hrn = request.get('user_hrn', None)
     user_hrns = list([user_hrn]) if user_hrn else list()
     
-    user_email = request.get
+    user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    user_details_sfa = execute_admin_query(wsgi_request, user_query)
+    if not user_details_sfa:
+        raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
+    for user in user_details_sfa:
+        user_email = user['user_email']
 
     # XXX We should create a slice with Manifold terminology
     slice_params = {
@@ -432,12 +437,11 @@ def create_slice(wsgi_request, request):
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
-    ## We do not store the email in pendingslice table. As a result receiver's email is unknown ##
-    ## Need modification in pendingslice table ###
-    #else:
-    #    subject = 'Slice created'
-    #    msg = 'A manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.'
-    #    send_mail(subject, msg, 'support@onelab.eu',['yasin.upmc@gmail.com'], fail_silently=False)
+    else:
+        clear_user_creds(wsgi_request,user_email)
+        subject = 'Slice created'
+        msg = 'A manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.'
+        send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
        
     return results
 
