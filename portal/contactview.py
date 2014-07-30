@@ -28,16 +28,18 @@ class ContactView (FreeAccessView, ThemeView):
             subject = form.cleaned_data['subject']
             description = form.cleaned_data['description']
             email = form.cleaned_data['email'] # email of the sender
-            cc_myself = form.cleaned_data['cc_myself']
+            #cc_myself = form.cleaned_data['cc_myself']
 
             #try:
                 # Send an email: the support recipients
-            #theme.template_name = 'email_support.txt'
-            #recipients = render_to_string(theme.template, form.cleaned_data)
-            #recipients = subject.replace('\n', '')
-            recipients = ['support@onelab.eu']
-            if cc_myself:
-                recipients.append(email)
+            theme.template_name = 'email_default_recipients.txt'
+            recipients = render_to_string(theme.template, form.cleaned_data)
+            recipients = recipients.replace('\n', '')
+            #recipients = ['support@onelab.eu']
+            ## removed it cz recipients is not a list so append doesn't work ###
+            ## we don't need it cz the new ticketing systems sends a confirmation email ###
+            #if cc_myself:
+            #    recipients.append(email)
             #recipients = ['support@myslice.info']
             theme.template_name = 'contact_support_email.html'
             html_content = render_to_string(theme.template, form.cleaned_data)
@@ -56,7 +58,7 @@ class ContactView (FreeAccessView, ThemeView):
             #    else:
             sender = email
         
-            msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+            msg = EmailMultiAlternatives(subject, text_content, sender, [recipients])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             #except Exception, e:
