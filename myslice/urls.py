@@ -18,6 +18,8 @@ import portal.homeview
 import portal.newsview
 
 from portal.registrationview        import RegistrationView
+from portal.contactview             import ContactView
+
 from portal.termsview               import TermsView
 
 home_view=portal.homeview.HomeView.as_view()
@@ -103,7 +105,8 @@ urls = [
     (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
     (r'^management/about/?$', portal.managementtababout.ManagementAboutView.as_view()),
     #
-    url(r'^register/?$', RegistrationView.as_view(), name='registration'),	
+    url(r'^register/?$', RegistrationView.as_view(), name='registration'),
+    url(r'^contact/?$', ContactView.as_view(), name='contact'),
     url(r'^terms/?$', TermsView.as_view(), name='terms'),
     #
     url(r'^portal/', include('portal.urls')),

@@ -344,12 +344,20 @@ function QueryStore() {
         default_set = (default_set === undefined) ? STATE_SET_OUT : default_set;
 
         var self = this;
-        var query_ext = this.find_analyzed_query_ext(query_uuid);
-        var record_key = manifold.metadata.get_key(query_ext.query.object);
+        var key, object, query_ext, record_key;
+
+        query_ext = this.find_analyzed_query_ext(query_uuid);
+        object = query_ext.query.object;
+        if (object.indexOf(':') != -1) {
+            object = object.split(':')[1];
+        }
+        record_key = manifold.metadata.get_key(object);
+
+        // ["start_time", "resource", "end_time"]
+        // ["urn"]
+        
         $.each(records, function(i, record) {
-            var key = manifold.metadata.get_key(query_ext.query.object);
-            // ["start_time", "resource", "end_time"]
-            // ["urn"]
+            //var key = manifold.metadata.get_key(query_ext.query.object);
             
             var record_key_value = manifold.record_get_value(record, record_key);
             query_ext.records.put(record_key_value, record);
@@ -1201,7 +1209,15 @@ var manifold = {
     make_record: function(object, record)
     {
         // To make an object a record, we just add the hash function
-        var key = manifold.metadata.get_key(object);
+        var key, new_object;
+
+        if (object.indexOf(':') != -1) {
+            new_object = object.split(':')[1];
+        } else {
+            new_object = object;
+        }
+
+        key = manifold.metadata.get_key(new_object);
         record.hashCode = manifold.record_hashcode(key.sort());
         record.equals   = manifold.record_equals(key);
 
