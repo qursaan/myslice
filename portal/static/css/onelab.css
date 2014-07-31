@@ -12,7 +12,10 @@ body {
 a, a:active, a:focus {
     outline: 0;
     text-decoration:none;
-    color:#201E62;
+    color:#760073;
+}
+a:hover {
+    color:#0D0049;
 }
 
 h1 {
