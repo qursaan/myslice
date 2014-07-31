@@ -106,8 +106,6 @@ class SLAView (FreeAccessView, ThemeView):
 
         #agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
         agreements = _get_agreements(agreement_id, slice=slicename)
-        print "--- AGREEMENTS ---"
-        print agreements
 
         for agreement in agreements:
             row = []

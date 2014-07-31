@@ -346,7 +346,7 @@ class Templates(object):
 
         :rtype: wsag_model.Template
         """
-        return self.res.getbyid(provider_id)
+        return self.res.getbyid(provider_id, None)
 
     def create(self, template):
         """Create a new template
@@ -426,8 +426,9 @@ class Violations(object):
             violations from all terms will be returned
         :rtype: list[wsag_model.Violation]
         """
-        path = _buildpath_(agreement_id, term)
-        return self.res.get(path, params={"testbed": testbed})
+        return self.res.get("", params={"agreementId": agreement_id,
+                                        "guaranteeTerm": term,
+                                        "testbed": testbed})
 
 
 class Enforcements(object):
