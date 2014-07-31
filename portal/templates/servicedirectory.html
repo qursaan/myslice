@@ -82,24 +82,11 @@ loadedTabs = [];
             async: "false",
             url: "{{ servdirurl }}appservices/",
             success: function(data, status, jqXHR){
-                // console.log(data);
-                // $.each(data, function(i, item){
-                //     console.log(item);
-                //     var tr = $('<tr>').append(
-                //         $('<td id="name">').text(item.name),
-                //         $('<td>').text(item.provider),
-                //         $('<td>').append('<a href="' + item.endPoint + '">' + item.endPoint + "</a>"),
-                //         $('<td>').text(item.protocol),
-                //         $('<td>').text(item.APIBasic),
-                //         $('<td>').text(item.briefDescription)
-                //     );
-                //     $("#appservices-tab > tbody:last").append(tr);
-                //     $("td#name").click(function(){
-                //         window.location.href = data.endPoint;
-                //     });
-                // });
+
                   function createToggle(name){
                       return function(){
+                        var icon = $('p#name-' + name + ' span');
+                        icon.toggleClass("glyphicon-chevron-down");
                         var el = $('p#expandable-' + name);
                         if(!el.is(':animated')){
                           $(el).toggle(300);
@@ -121,21 +108,23 @@ loadedTabs = [];
 
                     var row = $('<div class="row">').append(
                       $('<div>').addClass("col-md-3 portfolio-item").append(
-                        $('<img>').attr('src', "{{ STATIC_URL }}img/servicedirectory/" + imgsrc)
+                        $('<a href="' + item.APILink + '">').append(
+                          $('<img>').attr('src', "{{ STATIC_URL }}img/servicedirectory/" + imgsrc)
+                        )
                      ),
                       $('<div>').addClass("col-md-6 portfolio-item").append(
-                        $('<p id="name-' + item.name.replace(/ /g,'') + '">').text(item.name),
+                        $('<p id="name-' + item.name.replace(/ /g,'') + '">').append(
+                          $('<span class="glyphicon glyphicon-chevron-right">'), " " + item.name),
                         $('<p>').text(item.briefDescription),
                         $('<p>').text("Provider: " + item.provider),
                         $('<p>').append('Endpoint: <a href="' + item.endPoint + '">' + item.endPoint + "</a>"),
                         $('<p id="expandable-' + item.name.replace(/ /g,'') + '">').text(item.fullDescription).hide(),
                         $('<p id="expandable-' + item.name.replace(/ /g,'') + '">').text("Protocol: " + item.protocol).hide(),
                         $('<p id="expandable-' + item.name.replace(/ /g,'') + '">')
-                              .append('API documentation: <a href="' + item.APILink + '">' + item.APILink + "</a>").hide(),
-                        $('<p id="expandable-' + item.name.replace(/ /g,'') + '">').text(item.APIBasic).hide()
+                              .append('API documentation: <a href="' + item.APILink + '">' + item.APILink + "</a>").hide()
                       )
                     );
-                    $("#appservices-tab").append(row);
+                    $('#appservices-tab').append(row);
                     $('p#name-' + item.name.replace(/ /g,'')).click(createToggle(item.name.replace(/ /g,'')));
                 });
 
@@ -173,88 +162,6 @@ loadedTabs = [];
                 console.log("ERROR: " + status);
             }
         });
-        
-  //       $.post("/rest/authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
-  //           var authority_data = [];
-  //           var onelab_data = [];
-		// 	/* 'city','enabled','legal','longitude','onelab_membership','address','parent_authority','slice','user','country',
-  //           'tech','abbreviated_name','url','postcode','description','scientific','authority_hrn','latitude','name'	*/
-  //           $.each( data, function( key, val ) {
-  //               authority_row = "<img src='{{ STATIC_URL }}img/institutions/{{user_details.parent_authority}}.gif' alt='' /><br>";
-  //               authority_row += "<br>";
-  //               authority_row += "<b>authority:</b> "+val.authority_hrn+"<br>";
-  //               authority_data.push(authority_row);
-  //           });
-  //           $("div#authority-data").html(authority_data.join( "" ));
-  //           $("div#onelab-data").html(onelab_data.join( "" ));
-  //           $("div#authority-tab-loaded").css("display","block");
-  //           $("div#authority-tab-loading").css("display","none");
-  //        });
-
-  //       $.post("/rest/slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
-  //           var list_slices = [];
-  //           var table_slices = [];
-  //           /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "users", "slice_urn", "slice_expires" */
-  //           $.each( data, function( key, val ) {
-  //               list_slices.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
-  //               if(val.nodes=="undefined" || val.nodes==null){
-  //                   nodes_length=0;
-  //               }else{
-  //                   nodes_length=val.nodes.length;
-  //               }
-  //               if(val.users=="undefined" || val.users==null){
-  //                   users_length=0;
-  //               }else{
-  //                   users_length=val.users.length;
-  //               }
-
-  //               if(val.slice_url=="undefined" || val.slice_url==null){
-  //                   slice_url="";
-  //               }else{
-  //                   slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
-  //               }
-                
-  //               slice_row = "<tr id='"+val.slice_hrn+"'>";
-  //               slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
-  //               slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
-  //               slice_row += "<td>"+users_length+"</td>";
-  //               slice_row += "<td>"+slice_url+"</td>";
-  //               //slice_row += "<td>"+nodes_length+"</td>";
-  //               slice_row += "<td>"+val.slice_expires+"</td>";
-  //               slice_row += "</tr>";
-  //               table_slices.push(slice_row);
-                
-  //           });
-           
-  //           /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */
-  //           $("table#slice-tab tr:last").after(table_slices.join( "" ));
-  //           $("div#slice-tab-loaded").css("display","block");
-  //           $("div#slice-tab-loading").css("display","none");
-  //       });
-
-		// $.post("/rest/user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
-  //            var list_users = [];
-  //            var table_users = [];
-		// 	 /* Available fields
-		// 	 user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
-		// 	 user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
-		// 	 */
-  //            $.each( data, function( key, val ) {
-  //                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-  //                user_row = "<tr id='"+val.user_hrn+"'>";
-  //                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
-  //                user_row += "<td>"+val.user_email+"</td>";
-  //                user_row += "<td>"+val.user_hrn+"</td>";
-  //                user_row += "<td>"+val.user_first_name+"</td>";
-  //                user_row += "<td>"+val.user_last_name+"</td>";
-		// 		 user_row += "<td>"+val.user_enabled+"</td>";
-  //                user_row += "</tr>";
-  //                table_users.push(user_row);
-  //            });
-  //            $("table#user-tab tr:last").after(table_users.join( "" ));
-  //            $("div#user-tab-loaded").css("display","block");
-  //            $("div#user-tab-loading").css("display","none");
-  //         });
 
    {% endif %}
 
