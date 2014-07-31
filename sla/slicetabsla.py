@@ -104,15 +104,19 @@ class SLAView (FreeAccessView, ThemeView):
 
         consumer_id = _get_consumer_id(request)
 
-        agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
+        #agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
+        agreements = _get_agreements(agreement_id, slice=slicename)
+        print "--- AGREEMENTS ---"
+        print agreements
 
         for agreement in agreements:
             row = []
-            row.append(agreement.context.provider) # Provider
+            provider = agreement.context.provider
+            row.append(provider) # Provider
             row.append(agreement) # Agreement
             row.append(agreement.context.time_formatted()) # Date
 
-            enf = _get_enforcement(agreement.agreement_id)
+            enf = _get_enforcement(agreement.agreement_id, provider)
 
             if enf.enabled == 'true':
                 row.append('Evaluating') # Status
@@ -127,7 +131,7 @@ class SLAView (FreeAccessView, ThemeView):
                 else:
                     row.append('Finished') # Status
 
-                    violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
+                    violations_list = _get_agreement_violations(agreement.agreement_id, provider, "GT_Performance")
                     
                     if len(violations_list) > 0:
                         value = '%.2f'%float(violations_list[0].actual_value)
@@ -142,18 +146,6 @@ class SLAView (FreeAccessView, ThemeView):
                         row.append('true') # Ok
 
             ag_info.append(dict(zip(keys,row)))
-
-            # enf = _get_enforcement(agreement.agreement_id)
-            # if enf.enabled == 'true':
-            #     enforcements[agreement.agreement_id] = "ACTIVE"
-            # else:
-            #     enforcements[agreement.agreement_id] = "UNACTIVE"
-            # violations_list = _get_agreement_violations(agreement.agreement_id, "GT_Performance")
-
-            # if len(violations_list):
-            #     violations[agreement.agreement_id] = float(violations_list[0]["actualValue"])*100
-            # else:
-            #     violations[agreement.agreement_id] = 100
 
         template_env = {}
        # write something of our own instead
@@ -215,8 +207,8 @@ class ContactForm(forms.Form):
     cc_myself = forms.BooleanField(required=False)
 
 
-def _get_agreements_client():
-    return restclient.Factory.agreements()
+def _get_agreements_client(path=""):
+    return restclient.Factory.agreements(path)
 
 
 def _get_violations_client():
@@ -235,10 +227,10 @@ def _get_agreement(agreement_id):
     agreement, response = agreements_client.getbyid(agreement_id)
     return agreement
 
-def _get_enforcement(agreement_id):
+def _get_enforcement(agreement_id, testbed):
 
     enforcements_client = _get_enforcements_client()
-    enforcement, response = enforcements_client.getbyagreement(agreement_id)
+    enforcement, response = enforcements_client.getbyagreement(agreement_id, testbed)
     return enforcement
 
 def _get_filter_from_form(form):
@@ -310,18 +302,13 @@ def agreement_details(request, agreement_id):
     return render_to_response ('violations_template.html', context, context_instance=RequestContext(request))
     #return render(request, 'agreement_detail.html', context)
 
-
-def _get_agreements_client():
-    return restclient.Factory.agreements()
-
-
 def _get_agreement(agreement_id):
 
     agreements_client = _get_agreements_client()
     agreement, response = agreements_client.getbyid(agreement_id)
     return agreement
 
-def _get_agreements(agreement_id, provider_id=None, consumer_id=None, filter_=None):
+def _get_agreements(agreement_id, slice=None, provider_id=None, consumer_id=None, filter_=None):
 
     agreements_client = _get_agreements_client()
     if agreement_id is None:
@@ -329,6 +316,9 @@ def _get_agreements(agreement_id, provider_id=None, consumer_id=None, filter_=No
             agreements, response = agreements_client.getbyconsumer(consumer_id)
         elif provider_id is not None:
             agreements, response = agreements_client.getbyprovider(provider_id)
+        elif slice is not None:
+            agreements_client = _get_agreements_client("slice")
+            agreements, response = agreements_client.getbyslice(slice)
         else:
             raise ValueError(
                 "Invalid values: consumer_id and provider_id are None")
@@ -339,7 +329,8 @@ def _get_agreements(agreement_id, provider_id=None, consumer_id=None, filter_=No
     annotator = wsag_helper.AgreementAnnotator()
     for agreement in agreements:
         id_ = agreement.agreement_id
-        status = _get_agreement_status(id_)
+        testbed = agreement.context.provider
+        status = _get_agreement_status(id_, testbed)
         annotator.annotate_agreement(agreement, status)
 
     if filter_ is not None:
@@ -356,16 +347,16 @@ def _get_agreements_by_consumer(consumer_id):
     agreements, response = agreements_client.getbyconsumer(consumer_id)
     return agreements
 
-def _get_agreement_status(agreement_id):
+def _get_agreement_status(agreement_id, testbed):
 
     agreements_client = _get_agreements_client()
-    status, response = agreements_client.getstatus(agreement_id)
+    status, response = agreements_client.getstatus(agreement_id, testbed)
     return status
 
-def _get_agreement_violations(agreement_id, term=None):
+def _get_agreement_violations(agreement_id, testbed, term=None):
 
     violations_client = _get_violations_client()
-    violations, response = violations_client.getbyagreement(agreement_id, term)
+    violations, response = violations_client.getbyagreement(agreement_id, testbed, term)
     return violations
 
 

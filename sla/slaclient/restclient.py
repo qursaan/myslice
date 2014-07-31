@@ -43,12 +43,12 @@ rooturl = settings.SLA_MANAGER_URL
 
 class Factory(object):
     @staticmethod
-    def agreements():
+    def agreements(path):
         """Returns a REST client for Agreements
 
         :rtype : Agreements
          """
-        return Agreements(rooturl)
+        return Agreements(rooturl, path)
 
     @staticmethod
     def providers():
@@ -112,16 +112,22 @@ class Client(object):
             c.get("/resource", headers = { "accept": "application/json" })
         """
         url = _buildpath_(self.rooturl, path)
-        url = url + "?testbed=iminds"  # TODO remove hardcoded string
+        if "testbed" in kwargs:
+            url = url + "?testbed=" + kwargs["testbed"]
         #kwargs['params']['testbed'] = 'iminds'
 
         if "headers" not in kwargs:
             kwargs["headers"] = {"accept": "application/xml"}
         # kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
         #                                settings.SLA_MANAGER_PASSWORD)
+
+        for key, values in kwargs.iteritems():
+            print key, values
+
         result = requests.get(url, **kwargs)
-        #print "GET {} {} {}".format(
-        #    result.url, result.status_code, result.text[0:70])
+        print "GET {} {} {}".format(
+            result.url, result.status_code, result.text[0:70])
+        print result.encoding
 
         return result
 
@@ -211,18 +217,21 @@ class _Resource(object):
         resources = self._processresult(r, self.listconverter)
         return resources, r
 
-    def getbyid(self, id):
+    def getbyid(self, id, params):
         """Get resource 'id'"""
-        r = self.client.get(id)
+        r = self.client.get(id, params=params)
         resource = _Resource._processresult(r, self.converter)
         return resource, r
 
-    def get(self, params):
+    def get(self, path, params):
         """Generic query over resource: GET /resource?q1=v1&q2=v2...
 
         :param dict[str,str] params: values to pass as get parameters
         """
-        r = self.client.get("", params=params)
+        if path is None:
+            path = ""
+
+        r = self.client.get(path, params=params)
         resources = self._processresult(r, self.listconverter)
         return resources, r
 
@@ -281,20 +290,28 @@ class Agreements(object):
         """
         return self.res.get(dict(providerId=providerid))
 
-    def getstatus(self, agreementid):
+    def getstatus(self, agreementid, testbed):
         """Get guarantee status of an agreement
 
         :param str agreementid :
         :rtype : wsag_model.AgreementStatus
         """
-        path = _buildpath_(agreementid, "guaranteestatus")
-        r = self.res.client.get(path, headers={'accept': 'application/json'})
+        path = _buildpath_(_AGREEMENTS_PATH, agreementid, "guaranteestatus")
+        r = self.res.client.get(path, headers={'accept': 'application/json'},
+                                params={'testbed': testbed})
 
         json_obj = r.json()
 
         status = wsag_model.AgreementStatus.json_decode(json_obj)
 
         return status, r
+
+    def getbyslice(self, slicename):
+        """Get the agreements corresponding to a slice
+
+        :rtype : list[wsag_model.Agreement]
+        """
+        return self.res.get(slicename, dict())
 
     def create(self, agreement):
         """Create a new agreement
@@ -401,7 +418,7 @@ class Violations(object):
         """
         return self.res.getbyid(violationid)
 
-    def getbyagreement(self, agreement_id, term=None):
+    def getbyagreement(self, agreement_id, testbed, term=None):
         """Get the violations of an agreement.
 
         :param str agreement_id:
@@ -409,9 +426,8 @@ class Violations(object):
             violations from all terms will be returned
         :rtype: list[wsag_model.Violation]
         """
-
-        return self.res.get(
-            {"agreementId": agreement_id, "guaranteeTerm": term})
+        path = _buildpath_(agreement_id, term)
+        return self.res.get(path, params={"testbed": testbed})
 
 
 class Enforcements(object):
@@ -433,17 +449,20 @@ class Enforcements(object):
         """
         return self.res.getall()
 
-    def getbyagreement(self, agreement_id):
+    def getbyagreement(self, agreement_id, testbed):
         """Get the enforcement of an agreement.
 
         :param str agreement_id:
 
         :rtype: list[wsag_model.Enforcement]
         """
-        return self.res.getbyid(agreement_id)
+        return self.res.getbyid(agreement_id, params={"testbed": testbed})
 
 
 def _buildpath_(*paths):
+    if "" in paths:
+        paths = [path for path in paths if path != ""]
+
     return "/".join(paths)
 
 
