@@ -120,8 +120,8 @@ class Client(object):
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
                                        settings.SLA_MANAGER_PASSWORD)
 
-        for key, values in kwargs.iteritems():
-            print key, values
+        # for key, values in kwargs.iteritems():
+        #     print key, values
 
         result = requests.get(url, **kwargs)
         print "GET {} {} {}".format(

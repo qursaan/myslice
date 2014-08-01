@@ -7,7 +7,7 @@
 {% include 'messages-transient-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
 <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
-<script src="{{ STATIC_URL }}js/bootstrap.datatables.js"></script>
+<script src="{{ STATIC_URL }}js/dataTables.bootstrap.js"></script>
 <script src="{{ STATIC_URL }}js/myslice.js"></script>
 <script src="{{ STATIC_URL }}js/myslice-ui.js"></script>
 <style type="text/css">{# In case we need to add raw css code #}{% container prelude_css %}</style>
@@ -28,6 +28,7 @@
 {% insert_str prelude "css/bootstrap.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTable.bootstrap.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
 </head>
 <body>
