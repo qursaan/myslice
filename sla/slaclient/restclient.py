@@ -114,12 +114,11 @@ class Client(object):
         url = _buildpath_(self.rooturl, path)
         if "testbed" in kwargs:
             url = url + "?testbed=" + kwargs["testbed"]
-        #kwargs['params']['testbed'] = 'iminds'
 
         if "headers" not in kwargs:
             kwargs["headers"] = {"accept": "application/xml"}
-        # kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-        #                                settings.SLA_MANAGER_PASSWORD)
+        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
+                                       settings.SLA_MANAGER_PASSWORD)
 
         for key, values in kwargs.iteritems():
             print key, values
@@ -152,8 +151,8 @@ class Client(object):
         """
         url = _buildpath_(self.rooturl, path)
         url = url + "?testbed=iminds"  # TODO remove hardcoded string
-        # kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-        #                                settings.SLA_MANAGER_PASSWORD)
+        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
+                                       settings.SLA_MANAGER_PASSWORD)
         if "headers" not in kwargs:
             kwargs = {"accept": "application/xml",
                       "content-type": "application/xml"}
