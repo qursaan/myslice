@@ -389,7 +389,9 @@ a.sl-resources, a.sl-resources:hover {
     padding:2px 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    width:125px;
+    width:105px;
+    margin-left:4px;
+    margin-bottom:8px;
     text-align: center;
 }
 a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus {
@@ -397,7 +399,13 @@ a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus 
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
-
+a.sl-resources:first-child {
+    margin-left:12px;
+}
+button.btn-apply {
+    font-size:13px;
+    padding:2px 8px;
+}
 div#slice-info {
     margin-top:25px;
 }
@@ -476,6 +484,8 @@ div#slice-info td {
     padding:3px 5px;
 }
 .slice-pending button.apply {
+    font-size:14px;
+    padding:2px 5px;
 }
 .slice-pending button.clear {
 }
@@ -714,4 +724,11 @@ div.slogan {
     color:white;
     padding-top:60px;
     text-shadow: 1px 1px #013540;
+}
+
+th {
+    border:0 !important;
+}
+th.checkbox {
+    
 }

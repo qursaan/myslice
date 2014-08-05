@@ -14,12 +14,12 @@ class ThemeView (object):
     def template(self):
         # Load a template from the theme directory if it exists
         # else load it from the common templates dir
-        print "THEME = ",self.theme
-        print "TEMPLATE = ",self.template_name
-        print "TEMPLATE_DIRS = ",TEMPLATE_DIRS
+        #print "THEME = ",self.theme
+        #print "TEMPLATE = ",self.template_name
+        #print "TEMPLATE_DIRS = ",TEMPLATE_DIRS
         filename = self.theme + '_' + self.template_name
-        print any(os.path.exists(os.path.join(d,filename)) for d in TEMPLATE_DIRS)
-        print (os.path.exists(os.path.join(d,filename)) for d in TEMPLATE_DIRS)
+        #print any(os.path.exists(os.path.join(d,filename)) for d in TEMPLATE_DIRS)
+        #print (os.path.exists(os.path.join(d,filename)) for d in TEMPLATE_DIRS)
         if any(os.path.exists(os.path.join(d,filename)) for d in TEMPLATE_DIRS):
             return filename
         else:

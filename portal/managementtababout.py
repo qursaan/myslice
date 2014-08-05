@@ -16,14 +16,10 @@ from myslice.configengine import ConfigEngine
 from myslice.theme import ThemeView
 import json
 
-import activity
-
 class ManagementAboutView (FreeAccessView, ThemeView):
     template_name = 'management-tab-about.html'
 
     def get (self, request):
-        
-        activity.userLogin(request)
         
         if request.user.is_authenticated(): 
             user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')

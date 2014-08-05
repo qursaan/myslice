@@ -2,7 +2,7 @@
   <table class="table dataTable" id="{{domid}}__table" width="100%">
     <thead>
       <tr>
-      	{% if checkboxes %}<th class="checkbox"><input type="checkbox" disabled/></th>{% endif %}
+      	{% if checkboxes %}<th><input type="checkbox" disabled/></th>{% endif %}
         <th>&#9888;</th>
         {% for column, field in columns.items %} <th>{{ column }}</th> {% endfor %} 
         {% for column, field in hidden_columns.items %} <th>{{ column }}</th> {% endfor %}
