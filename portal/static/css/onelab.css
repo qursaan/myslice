@@ -634,6 +634,45 @@ div.secondary .account span {
 div.secondary .account a {
     color:black;
 }
+
+
+div.footer {
+    padding-top:15px;
+    
+}
+div.footer div.bottom {
+    position:absolute;
+    bottom:0;
+}
+div.footer ul {
+   margin:6px 0 0 0;
+   padding:0;
+}
+
+div.footer li {
+    font-size:9pt;
+    display:inline;
+    list-style:none;
+    margin:0px;
+    padding:0;
+    margin-right:15px;
+    color:#747474;
+    letter-spacing:0.4px;
+}
+
+div.footer li a {
+    color:#747474;
+}
+div.footer li a:hover {
+    text-decoration:underline;
+}
+div.copy {
+    font-size:8pt;
+    color:gray;
+    padding-top:15px;
+    padding-bottom:15px;
+}
+
 div.home {
     font-size:11pt;
     line-height:1.2em;
@@ -728,7 +767,4 @@ div.slogan {
 
 th {
     border:0 !important;
-}
-th.checkbox {
-    
 }
