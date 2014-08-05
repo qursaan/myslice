@@ -164,10 +164,11 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             # the key to use at init-time
             init_key   = main_query_init_key,
             checkboxes = True,
-            # center on Paris
-            latitude   = 49.,
-            longitude  = 9,
-            zoom       = 8,
+            
+            # To center around Europe : 53,9 / 3
+            latitude   = 53.,
+            longitude  = 9.,
+            zoom       = 3,
         )
 
         # --------------------------------------------------------------------------

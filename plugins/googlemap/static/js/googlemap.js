@@ -83,8 +83,11 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
 
         on_show: function(e) {
 	        if (debug) messages.debug("googlemap.on_show");
-            var googlemap = e.data;
-            google.maps.event.trigger(googlemap.map, 'resize');
+            var self = e.data;
+            var center = new google.maps.LatLng(self.options.latitude, self.options.longitude);
+
+            google.maps.event.trigger(self.map, 'resize');
+            self.map.setCenter(center);
         }, 
 
         /**************************************************************************
