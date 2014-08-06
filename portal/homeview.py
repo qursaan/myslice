@@ -32,7 +32,7 @@ class HomeView (FreeAccessView, ThemeView):
         env['theme'] = self.theme
         env['section'] = "Dashboard"
         
-        username = request.POST.get('username')
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
        
         # LDAP form - If FIBRE, then get the possibilite to authenticate using usernameldap

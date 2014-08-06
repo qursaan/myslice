@@ -35,10 +35,10 @@
 			  </div>
 			  <div class="form-group">
 				{%if 'is_pi'  in pi %}
-				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
-				title="An authority responsible for vetting your slice" required="required">
+				<input style='display:none' type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
+				title="An authority responsible for vetting your slice" required="required" readonly>
 				{%else%}
-			    <input type="text" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
+			    <input style='display:none' type="text" class="form-control" display=none  id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
 				title="An authority responsible for vetting your slice" required="required" readonly>
 				{%endif%}
 			  </div>
@@ -51,6 +51,7 @@
 				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
 			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			  <button type="button" class="btn btn-onelab" onclick="window.location.href='/'">Home</button>
 			</form>
 	
 		</div>

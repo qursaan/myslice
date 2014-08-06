@@ -230,6 +230,7 @@ def make_request_user(user):
     request['user_hrn']      = user.user_hrn
     request['public_key']    = user.public_key
     request['private_key']   = user.private_key
+    request['username']	     = user.login
     return request
 
 def make_request_slice(slice):
@@ -327,10 +328,6 @@ def portal_validate_request(wsgi_request, request_ids):
         if request['type'] == 'user':
 
             try:
-                split_email = request['email'].split("@")[0] 
-                split_email = split_email.replace(".", "_")
-                split_authority = request['authority_hrn'].split(".")[1]
-                request['username'] = split_email + '@' + split_authority
                 create_user(wsgi_request, request)
                 request_status['SFA user'] = {'status': True }
                 PendingUser.objects.get(id=request['id']).delete()
@@ -750,6 +747,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         last_name     = request['last_name'],
         authority_hrn = request['authority_hrn'],
         email         = request['email'],
+        login         = request['username'],
         password      = request['password'],
         public_key    = request['public_key'],
         private_key   = request['private_key'],
@@ -759,11 +757,6 @@ def create_pending_user(wsgi_request, request, user_detail):
         status        = 'False',
     )
     b.save()
-
-    split_email = request['email'].split("@")[0] 
-    split_email = split_email.replace(".", "_")
-    split_authority = request['authority_hrn'].split(".")[1]
-    request['username'] = split_email + '@' + split_authority
 
     # sends email to user to activate the email
     theme.template_name = 'activate_user.html'
@@ -833,7 +826,20 @@ def create_pending_user(wsgi_request, request, user_detail):
         split_authority_hrn = request['authority_hrn'].split(".")[0]
 
         recipients = authority_get_pi_emails(wsgi_request, split_authority_hrn)
-        
+
+        pis = authority_get_pis(request, split_authority_hrn)
+        pi_emails = []
+        for x in pis:
+            for e in x['pi_users']:
+                try:
+                    u = e.split(".")[1]
+                    y = User.objects.get(username = u)
+                    if y.username.count("@") != 0:
+                        if y.username.split("@")[1] == request['username'].split("@")[1]:
+                            pi_emails += [y.email]
+                except:
+                    print "fail"
+
         theme.template_name = 'user_request_email.html'
         html_content = render_to_string(theme.template, request)
  
@@ -848,7 +854,8 @@ def create_pending_user(wsgi_request, request, user_detail):
         sender =  render_to_string(theme.template, request)
         sender = sender.replace('\n', '')
     
-        msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+        msg = EmailMultiAlternatives(subject, text_content, sender, pi_emails)
+
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:

@@ -63,9 +63,12 @@
 	    <div class="form-group">
 	      <label for="password" class="control-label">Authentication</label>
 		  <p></p>	
-	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" 
+			<input type="text" name="username" size="25" class="form-control" style="width:350px" minlength="5" value="{{ username }}" placeholder="Username" required />
+	    </div>
+            <div class="form-group">
+			<input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" 
 			title="Your password allows you to log in to this portal."
-			placeholder="Password" required />
+			placeholder="Password" required />	
 	    </div>
 	    <div class="form-group">
 			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="4" class="form-control" value="" 
@@ -165,10 +168,54 @@ $(document).ready(function(){
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
             {% else %}
 		{% if authority.authority_hrn == "fibre.ufrj" %}
-			{value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO RIO DE JANEIRO"},
-		{% else %}
-			{value:"{{ authority.authority_hrn }}",label:"FIBRE"},
-		{% endif %}
+                        {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO RIO DE JANEIRO"},
+                {% else %}
+                      {% if authority.authority_hrn == "fibre.ufg" %}
+                              {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE GOIAS"},
+                      {% else %}
+                              {% if authority.authority_hrn == "fibre.uff" %}
+                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL FLUMINENSE"},
+                              {% else %}
+                                     {% if authority.authority_hrn == "fibre.ufpa" %}
+                                             {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO PARA"},
+                                     {% else %}
+                                             {% if authority.authority_hrn == "fibre.ufpe" %}
+                                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE PERNAMBUCO"},
+                                             {% else %}
+                                                     {% if authority.authority_hrn == "fibre.ufscar" %}
+                                                            {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE SAO CARLOS"},
+                                                     {% else %}
+                                                            {% if authority.authority_hrn == "fibre.unifacs" %}
+                                                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE SALVADOR"},
+                                                            {% else %}
+                                                                     {% if authority.authority_hrn == "fibre.usp" %}
+                                                                            {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE DE SAO PAULO"},
+                                                                     {% else %}
+                                                                            {% if authority.authority_hrn == "fibre.cpqd" %}
+                                                                                    {value:"{{ authority.authority_hrn }}",label:"CENTRO DE PESQUISA E DESENVOLVIMENTO EM TELECOMUNICACOES"},
+                                                                            {% else %}
+										{% if authority.authority_hrn == "fibre.i2cat" %}
+											{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
+										{% else %}
+											{% if authority.authority_hrn == "fibre.uth" %}
+                                                                                        	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
+											{% else %}
+												{% if authority.authority_hrn == "fibre.bristol" %}
+                                                                                                	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
+												{% else %}
+                                                                                   		 	{value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+												{% endif %}
+											{% endif %}
+										{% endif %}
+                                                                            {% endif %}
+                                                                     {% endif %}
+                                                            {% endif %}
+                                                    {% endif %}
+                                             {% endif %}
+                                    {% endif %}
+                              {% endif %}
+                      {% endif %}
+                {% endif %}
             {% endif %}
         {% endfor %}    
     {% else %}
