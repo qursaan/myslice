@@ -1,44 +1,35 @@
-{% extends "layout.html" %}
+{% extends "layout_wide.html" %}
 
 {% block content %}
-<div class="row">
-	<div class="col-md-12">
-		 <div class="breadcrumbs">
-		 </div>
-	</div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <ul class="nav nav-tabs nav-section">
-            <li class="active"><a href="#about">About</a></li>
-            <li><a href="#components">Underlying technologies</a></li>
-        </ul>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        	<h1><img src="{{ STATIC_URL }}icons/support-xs.png" alt="About" />About</h1>
+        </div>
     </div>
-</div>
-
-
-<div class="tab-content">
-    <div class="tab-pane active row" id="about">
-		<div class="col-md-12">
+ 
+	<div class="row">
+        <div class="col-md-12">
 			<p>
-				OneLab Portal is a central place to get acess to all OneLab testbeds.In order to get access to the portal,
-				an experimenter needs to  <a href="/portal/register">register</a> to the portal. The portal administrative body
+				OneLab Portal is a central place to get acess to all OneLab testbeds. In order to get access to the portal,
+				an experimenter needs to  <a href="/register">register</a> to the portal. The portal administrative body
 				is responsible to accept or reject newly registered users.   
 			</p>
 			<p>
-				To learn more about OneLab visit:  <a href="http://onelab.eu/" target="_blank">http://onelab.eu/</a> 			
+				To learn more about OneLab visit:  <a href="http://onelab.eu" target="_blank">onelab.eu</a> 			
 			</p>
 			<p>
-				If you have any questions regarding using the portal visit: <a href="/portal/support">OneLab support</a>
+				If you have any questions regarding using the portal visit: <a href="/support">OneLab support</a>
 			</p>
 			<p>
 				OneLab portal is a community effot. To get more information about OneLab portal team visit: 
-				<a href="http://myslice.info/community" target="_blank">http://myslice.info/community</a>
+				<a href="http://myslice.info/community" target="_blank">myslice.info/community</a>
 			</p>
 		</div>
 	</div>
-	<div class="tab-pane row" id="components">
+	<div class="row">
 		<div class="col-md-12">
+			<br />
  			<h3>A ready-made and easily customisable user interface for your testbed.</h3>
 				<p>
 					MySlice is an ambitious project aiming to support researchers throughout the lifecycle of experiments that can run on a variety 
@@ -63,6 +54,7 @@
 				</p>
 		</div>
 		<div class="col-md-12">
+			<br />
 			<h3>Portal Components</h3>
 				<h5>Myslice (Web Frontend)</h5>
 					<p>
@@ -90,15 +82,4 @@
      	</div>
    </div>
 </div>
-
-<script>
-$(document).ready(function() {
-    $('.nav-tabs a').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-    });
-});
-</script>
-
-
 {% endblock %}

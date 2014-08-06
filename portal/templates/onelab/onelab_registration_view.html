@@ -17,7 +17,7 @@
 	<div class="col-md-12">
 		<ul>
 		  {% for error in errors %}
-		  <li>{{ error }}</li>
+		  <li style="color:white;">{{ error }}</li>
 		  {% endfor %}
 		</ul>
 	</div>
@@ -489,9 +489,6 @@ $(document).ready(function(){
         {% for authority in authorities %}
             {% if authority.name %}
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
-			// to show only full name
-           // {% else %}
-           //     {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
             {% endif %}
         {% endfor %}    
     {% else %}
@@ -515,15 +512,10 @@ $(document).ready(function(){
       minLength: 0,
       change: function (event, ui) {
           if(!ui.item){
-              //http://api.jqueryui.com/autocomplete/#event-change -
-              // The item selected from the menu, if any. Otherwise the property is null
-              //so clear the item for force selection
               jQuery("#authority_hrn").val("");
           }
       }
-      //select: function( event, ui ) {console.log(jQuery(this))}
     });
-	// for hover texts
 	$('[title!=""]').qtip();
 	$("form").validate();
 	$("form").submit(function() {

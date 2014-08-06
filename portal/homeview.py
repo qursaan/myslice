@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.shortcuts import render
+
 import json
 
 from unfold.loginrequired import FreeAccessView
@@ -17,6 +18,8 @@ from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
 from myslice.theme import ThemeView
+
+import activity.user
 
 class HomeView (FreeAccessView, ThemeView):
     template_name = 'home-view.html'
@@ -61,6 +64,9 @@ class HomeView (FreeAccessView, ThemeView):
                 if request.user.is_authenticated(): 
                     env['person'] = self.request.user
                     env['username'] = self.request.user
+                    
+                    # log user activity
+                    activity.user.login(self.request)
                     
                     ## check user is pi or not
                     platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
