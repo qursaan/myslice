@@ -49,7 +49,7 @@
                 manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
             }
 
-            if ((num_selected != 0) && (num_selected != num)) {
+            if (num_selected != num) {
                 filter = ['network_hrn', 'included', selected];
                 manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
             }
@@ -133,25 +133,6 @@
              this.set_networks();
         },
 
-/*
-            var self = this;
-            console.log('query network DONE');
-            $("[id^='testbeds-filter_']").on('click',function(e) {
-                $(this).toggleClass("active");
-
-                // avoid multiple calls when an event is raised to manifold.js
-                e.stopPropagation();
-
-                value = this.dataset['platform'];
-                // handle the hrn that include . in their name (has to be in sync with the data from SFA)
-                //value = value.replace(/\./g,"\\.");
-                key = "network_hrn";
-                op = "included";
-                return $(this).hasClass('active') ? self._addFilter(key, op, value) : self._removeFilter(key, op, value);
-            });
-           
-        },*/
-
         /* INTERNAL FUNCTIONS */
 
         set_networks: function()
@@ -168,6 +149,7 @@
             return angular.element('[ng-controller=TestbedsCtrl]').scope()
         },
 
+/*
         _addFilter: function(key, op, value)
         {
             values = Array();
@@ -187,6 +169,7 @@
             // Update the filter with the new list of values, ex: [ple,nitos,wilab]
             manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
         },
+
         _removeFilter: function(key, op, value)
         {
             console.log("remove "+value);
@@ -213,7 +196,7 @@
                 manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
             }
         }
-
+*/
     });
 
     /* Plugin registration */

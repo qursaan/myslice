@@ -560,6 +560,8 @@ function QueryStore() {
 
         this.iter_records(query_uuid, function(record_key, record) {
             var is_reserved, is_pending, in_set,  is_unconfigured;
+
+            /* By default, a record is visible unless a filter says the opposite */
             var visible = true;
 
             var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
@@ -629,13 +631,16 @@ function QueryStore() {
                 if (op == '=' || op == '==') {
                     if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
                         visible = false;
+
                 }else if (op == 'included') {
+                    /* By default, the filter returns false unless the record
+                     * field match at least one value of the included statement
+                     */
+                    visible = false;
                     $.each(value, function(i,x) {
                       if(x == col_value){
                           visible = true;
                           return false; // ~ break
-                      }else{
-                          visible = false;
                       }
                     });
                 }else if (op == '!=') {
