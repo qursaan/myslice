@@ -8,6 +8,7 @@ body {
     margin:0;
     padding:0;
     height: 100%;
+    letter-spacing:0.6px;
 }
 a, a:active, a:focus {
     outline: 0;
@@ -43,6 +44,16 @@ h4 {
     margin:0 0 5px 0;
     font-size:12pt;
     color:#333333;
+}
+span.subtitle {
+    color:#454545;
+    font-size:9pt;
+    font-weight:normal;
+    text-transform:uppercase;
+}
+span.version {
+    font-size:8pt;
+    color:#888888;
 }
 input[type=text], input[type=password], input[type=email], input[type=tel], input[type=number], select, option {
     min-width:260px;
@@ -615,7 +626,7 @@ div.secondary li a {
     color:#747474;
 }
 div.secondary li a:hover {
-    text-decoration:none;
+    text-decoration:underline;
 }
 div.secondary .button {    
     width:300px;
@@ -638,7 +649,6 @@ div.secondary .account a {
 
 div.footer {
     padding-top:15px;
-    
 }
 div.footer div.bottom {
     position:absolute;
@@ -767,4 +777,14 @@ div.slogan {
 
 th {
     border:0 !important;
+}
+
+div.monitor {
+    padding:40px 0 25px 0;
+}
+div.monitor h1 {
+    margin-bottom:25px;
+}
+div.s-monitor {
+    padding-bottom:25px;
 }
