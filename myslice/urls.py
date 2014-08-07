@@ -90,7 +90,7 @@ urls = [
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
     #
     # REST monitoring
-    #(r'^monitor/sfa/getversion/?$', 'rest.monitor.sfaGetVersion'),
+    (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
     #
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices')
