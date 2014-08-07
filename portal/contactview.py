@@ -102,5 +102,6 @@ class ContactView (FreeAccessView, ThemeView):
                 'theme' : self.theme,
                 'username': username,
                 'pi': pi,
-                'section': "Contact"
+                'section': "Contact",
+                'email': request.user.username
                 })

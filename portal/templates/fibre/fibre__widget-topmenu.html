@@ -35,7 +35,11 @@
 				<li><a target="_blank" href="http://www.fibre-ict.eu/">Public Website</a></li>
 			</ul>
 			{% if username %}
-			<div class="account">You are logged in as &nbsp;<a href="/portal/account/">{{ username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+				{% if person.username %}
+					<div class="account">You are logged in as &nbsp;<a href="/portal/account/">{{ person.username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ person.username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+				{% else %}
+					<div class="account"> You are logged in as &nbsp;<a href="/portal/account/">{{ email }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ email }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+				{% endif %}
 			{% endif %}
 		</div>
 	</div>

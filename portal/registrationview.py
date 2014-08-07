@@ -17,6 +17,7 @@ from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser
+from django.contrib.auth.models import User   #Pedro
 #from portal.actions             import create_pending_user
 # Edelberto - LDAP
 from portal.actions             import create_pending_user, ldap_create_user
@@ -80,6 +81,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'organization'  : wsgi_request.POST.get('org_name', ''),
                 'authority_hrn' : authority_hrn, 
                 'email'         : post_email,
+		'username'	: wsgi_request.POST.get('username','').lower(),
                 'password'      : wsgi_request.POST.get('password',      ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
@@ -93,15 +95,16 @@ class RegistrationView (FreeAccessView, ThemeView):
             # user_request['user_hrn'] = user_request['authority_hrn'] \
             #         + '.' + split_email
             
-            split_email = user_request['email'].split("@")[0] 
-            split_email = split_email.replace(".", "_")
-            # Replace + by _ => more convenient for testing and validate with a real email
-            split_email = split_email.replace("+", "_")
+	    username = user_request['username']
 
-            split_authority = user_request['authority_hrn'].split(".")[1]
-            username = split_email + '@' + split_authority
-            split_authority = user_request['authority_hrn'].split(".")[0]
-            user_request['user_hrn'] = split_authority + '.' + username
+            if user_request['authority_hrn'] == "fibre" :
+                user_request['username'] = user_request['username'] + "@" + "" # to be defined
+            else :
+                split_authority = user_request['authority_hrn'].split(".")[1]
+                user_request['username'] = user_request['username'] + '@' + split_authority
+                split_authority = user_request['authority_hrn'].split(".")[0]
+
+            user_request['user_hrn'] = split_authority + '.' + user_request['username']
 
             # Validate input
             UserModel = get_user_model()
@@ -109,11 +112,15 @@ class RegistrationView (FreeAccessView, ThemeView):
                 errors.append('First name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', user_request['last_name']) == None):
                 errors.append('Last name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
+	    if (re.search(r'^[\w,]+$' , username) == None):
+		errors.append('Username may contain only letters,numbers and -/_ characters.')
             # checking in django_db !!
             if PendingUser.objects.filter(email__iexact = user_request['email']):
                 errors.append('Email is pending for validation. Please provide a new email address.')
-            if UserModel._default_manager.filter(email__iexact = user_request['email']): 
-                errors.append('This email is not usable. Please contact the administrator or try with another email.')
+            # if UserModel._default_manager.filter(email__iexact = user_request['email']): 
+            #     errors.append('This email is not usable. Please contact the administrator or try with another email.')
+	    if User.objects.filter(username__iexact = user_request['username']): 
+		errors.append('This username is already in use, try another one')
             # Does the user exist in Manifold?
             user_query  = Query().get('local:user').select('user_id','email')
             user_details = execute_admin_query(wsgi_request, user_query)
@@ -126,13 +133,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_request['user_hrn'])
             user_details_sfa = execute_admin_query(wsgi_request, user_query)
 
-            for user in user_details_sfa:
-                if user['user_email'] == user_request['email']:
-                    errors.append('Email already registered in SFA registry. Please use another email.')
-                if user['user_hrn'] == user_request['user_hrn']:
-                    # add random number if user_hrn already exists in the registry
-                    user_request['user_hrn'] = user_request['authority_hrn'] \
-                            + '.' + split_email + str(randint(1,1000000))
+            # for user in user_details_sfa:
+            #     if user['user_email'] == user_request['email']:
+            #         errors.append('Email already registered in SFA registry. Please use another email.')
+            #     if user['user_hrn'] == user_request['user_hrn']:
+            #         # add random number if user_hrn already exists in the registry
+            #         user_request['user_hrn'] = user_request['authority_hrn'] \
+            #                 + '.' + split_email + str(randint(1,1000000))
                 
             # XXX TODO: Factorize with portal/accountview.py
             # XXX TODO: Factorize with portal/registrationview.py
