@@ -19,6 +19,10 @@ a:hover {
     color:#0D0049;
 }
 
+a.current {
+    text-decoration:underline;
+    color:#333333;
+}
 h1 {
     border-bottom:1px solid #DDDDDD;
     padding:0 0 0 0;
@@ -50,6 +54,11 @@ span.subtitle {
     font-size:9pt;
     font-weight:normal;
     text-transform:uppercase;
+}
+span.htitle {
+    color:#454545;
+    font-size:9pt;
+    font-weight:normal;
 }
 span.version {
     font-size:8pt;

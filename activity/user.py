@@ -11,7 +11,7 @@ def logout(request):
     activity.log(request, "user.logout", "User log out")
 
 def signup(request):
-    activity.log(request, "user.signup", "User sign up")
+    activity.log(request, "user.signup.view", "User sign up")
 
 def register(request):
-    activity.log(request, "user.register", "User registered")
+    activity.log(request, "user.signup", "User registered")
