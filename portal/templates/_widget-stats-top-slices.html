@@ -28,8 +28,8 @@ function drawChart(orderby) {
 				data.addColumn('string', 'Slice');
 				data.addColumn('number', 'CPU (%)');
 				data.addColumn('number', 'MEM (%)');
-				data.addColumn('number', 'SND (Kb)');
-				data.addColumn('number', 'RCV (Kb)');
+				data.addColumn('number', 'SND (Kbps)');
+				data.addColumn('number', 'RCV (Kbps)');
 				
 				$.each(ret, function() {
                 	result.push([this[0] + " | number of nodes: " + this[1], this[2], this[3], this[4], this[5]]);
@@ -63,12 +63,12 @@ function drawChart(orderby) {
         </div>
     </div>
  	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-8">
 			Order by: 
 			<a class="stats-orderby current" data-orderby="cpu" href="#">CPU usage</a> -
 			<a class="stats-orderby" data-orderby="mem" href="#">Memory usage</a> -
-			<a class="stats-orderby" data-orderby="snd" href="#">Sent traffic</a> -
-			<a class="stats-orderby" data-orderby="rcv" href="#">Received traffic</a>
+			<a class="stats-orderby" data-orderby="snd" href="#">Sending bandwidth</a> -
+			<a class="stats-orderby" data-orderby="rcv" href="#">Receiving bandwidth</a>
 		</div>
 	</div>
 	<div class="row">
