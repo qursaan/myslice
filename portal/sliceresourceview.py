@@ -60,7 +60,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 # RESOURCES
                 'resource.urn',
                 'resource.hostname', 'resource.type',
-                'resource.network_hrn',
                 # - The facility_name and testbed_name are required for the
                 #   testbeds plugin to properly work.
                 'resource.facility_name', 
