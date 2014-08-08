@@ -1,0 +1,80 @@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load("visualization", "1.0", {packages:["corechart"]});
+google.setOnLoadCallback(function() {
+	drawChart("cpu");
+});
+function drawChart(orderby) {
+  	var options = {
+ 		'height':280,
+	
+		series: {
+                0: { type: "bar", targetAxisIndex: 0},
+                1: { type: "bar", targetAxisIndex: 0},
+                2: { type: "bar", targetAxisIndex: 1},
+                3: { type: "bar", targetAxisIndex: 1},
+            }
+		};
+	
+   	var jsonData = $.ajax({
+            type: 'GET',
+  	    	url: "http://slicestat.onelab.eu/top/slices",
+  	    	dataType: "json",
+        	async: false,
+        	data: { orderby: orderby },
+            success: function(ret) {
+            	var result = [];
+            	var data = new google.visualization.DataTable();
+				data.addColumn('string', 'Slice');
+				data.addColumn('number', 'CPU (%)');
+				data.addColumn('number', 'MEM (%)');
+				data.addColumn('number', 'SND (Kb)');
+				data.addColumn('number', 'RCV (Kb)');
+				
+				$.each(ret, function() {
+                	result.push([this[0] + " | number of nodes: " + this[1], this[2], this[3], this[4], this[5]]);
+                });
+                data.addRows(result);
+
+				var chart = new google.visualization.ColumnChart(document.getElementById('graph'));
+				chart.draw(data, options);
+            }
+        }).responseText;
+
+    //	var data = google.visualization.arrayToDataTable(obj, false);
+	
+	
+  }
+  $(document).ready(function () {
+  	$('a.stats-orderby').click(function(event) {
+  		$('a.stats-orderby').removeClass('current');
+  		event.preventDefault();
+  		drawChart($(this).data('orderby'));
+  		$(this).addClass('current');
+  	});
+  });
+</script>
+<style>div#graph {margin:0;padding:0;border:0;}</style>
+<div class="stats">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        	<h1>Statistics <span class="htitle">top experiments per resource usage in the last 24 hours</span></h1>
+        </div>
+    </div>
+ 	<div class="row">
+		<div class="col-md-6">
+			Order by: 
+			<a class="stats-orderby current" data-orderby="cpu" href="#">CPU usage</a> -
+			<a class="stats-orderby" data-orderby="mem" href="#">Memory usage</a> -
+			<a class="stats-orderby" data-orderby="snd" href="#">Sent traffic</a> -
+			<a class="stats-orderby" data-orderby="rcv" href="#">Received traffic</a>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div id="graph"></div>
+		</div>
+	</div>
+</div>
+</div>
