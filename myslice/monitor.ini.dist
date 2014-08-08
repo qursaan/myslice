@@ -1,0 +1,29 @@
+[onelab]
+name = OneLab
+url = http://portal.onelab.eu:12345
+type = registry
+
+[ple]
+name=PlanetLab Europe
+url = http://sfa3.planet-lab.eu:12346
+type = am
+
+[nitos] 
+name = NITOS
+url = https://nitlab.inf.uth.gr:8001/RPC2
+type = am
+
+[iotlab]
+name = FIT-IoTLab
+url = http://194.199.16.169:52347
+type = am
+
+#[virtualwall] 
+#name = VirtualWall
+#url = http://www.wall2.ilabt.iminds.be:12369/protogeni/xmlrpc/am/3.0
+#type = am
+
+#[w-ilab.t]
+#name = w-ilab.t
+#url = http://www.wilab2.ilabt.iminds.be:12369/protogeni/xmlrpc/am/3.0
+#type = am
