@@ -52,15 +52,27 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
-                'slice_urn', # XXX We need the key otherwise the storage of records bugs !
+                # SLICE
                 'slice_hrn',
+                # - The record key is needed otherwise the storage of records
+                #   bugs !
+                'slice_urn',
+                # RESOURCES
                 'resource.urn',
                 'resource.hostname', 'resource.type',
                 'resource.network_hrn',
+                # - The facility_name and testbed_name are required for the
+                #   testbeds plugin to properly work.
+                'resource.facility_name', 
+                'resource.testbed_name',
+                # LEASES
                 'lease.resource',
                 'lease.start_time',
                 'lease.end_time',
-                'lease.lease_id', # Important for NITOS identify already existing leases
+                # - The lease_id is important for NITOS identify already existing
+                #   leases
+                'lease.lease_id', 
+
                 #'user.user_hrn',
                 #'application.measurement_point.counter'
         )
@@ -206,22 +218,22 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
 
-        query_networks = Query.get('network').select(network_fields)
-        page.enqueue_query(query_networks)
+        #query_networks = Query.get('network').select(network_fields)
+        #page.enqueue_query(query_networks)
 
         filter_testbeds = TestbedsPlugin(
             page            = page,
             domid           = 'testbeds-filter',
             title           = 'Filter by testbeds',
             query           = sq_resource,
-            query_networks  = query_networks,
-            init_key        = "network_hrn",
-            checkboxes      = True,
-            datatables_options = {
-                'iDisplayLength': 25,
-                'bLengthChange' : True,
-                'bAutoWidth'    : True,
-                },
+            #query_networks  = query_networks,
+            #init_key        = "network_hrn",
+            #checkboxes      = True,
+            #datatables_options = {
+            #    'iDisplayLength': 25,
+            #    'bLengthChange' : True,
+            #    'bAutoWidth'    : True,
+            #    },
         )
 
         filter_status = FilterStatusPlugin(

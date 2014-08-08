@@ -671,7 +671,7 @@ function QueryStore() {
         });
 
         var end = new Date().getTime();
-        console.log("APPLY FILTERS took", end - start, "ms");
+        console.log("APPLY FILTERS [", filters, "] took", end - start, "ms");
 
     }
 
