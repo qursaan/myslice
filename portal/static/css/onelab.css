@@ -797,3 +797,6 @@ div.monitor h1 {
 div.s-monitor {
     padding-bottom:25px;
 }
+span#stats-period-txt {
+    text-transform:lowercase;
+}
