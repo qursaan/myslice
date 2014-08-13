@@ -51,11 +51,8 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 if pending_users:
                     pending_user = pending_users[0]
                     pending_user_request = make_request_user(pending_user)
-                    pending_user_hrn = pending_users[0].user_hrn
-                    print "pending_user_hrn = %s" % pending_user_hrn
-                    # XXX Let's assume for the moment that the user_hrn registered in OneLab portal is the same as in PLE
-                    ple_user_hrn = pending_user_hrn.replace("onelab","ple")
-                    query = Query.get('ple_registry:user').filter_by('user_hrn', '==', ple_user_hrn).select('user_enabled')
+                    pending_user_email = pending_users[0].user_email
+                    query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
                     results = execute_admin_query(self.request, query)
                     for result in results:
                         # User is enabled in PLE
