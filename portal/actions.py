@@ -526,7 +526,7 @@ def manifold_add_reference_user_accounts(wsgi_request, request):
         }
         manifold_add_account(wsgi_request, manifold_account_params)
 
-def sfa_create_user(wsgi_request, request):
+def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     """
     Arguments:
         wsgi_request (~ WSGIRequest) : 
@@ -553,8 +553,15 @@ def sfa_create_user(wsgi_request, request):
         'user_enabled'      : True
     }
 
-    query = Query.create('user').set(sfa_user_params).select('user_hrn')
-    results = execute_query(wsgi_request, query)
+    if namespace is not None:
+        query = Query.create('%s:user' % namespace).set(sfa_user_params).select('user_hrn')
+    else:
+        query = Query.create('user').set(sfa_user_params).select('user_hrn')
+    if as_admin:
+        results = execute_query(wsgi_request, query)
+    else:
+        results = execute_admin_query(wsgi_request, query)
+
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     else:
@@ -563,7 +570,7 @@ def sfa_create_user(wsgi_request, request):
         send_mail(subject, msg, 'support@onelab.eu',[request['email']], fail_silently=False)       
     return results
 
-def create_user(wsgi_request, request):
+def create_user(wsgi_request, request, namespace = None, as_admin = False):
     
     # XXX This has to be stored centrally
     USER_STATUS_ENABLED = 2
@@ -572,7 +579,7 @@ def create_user(wsgi_request, request):
     # we would have to perform the steps in create_pending_user too
 
     # Add the user to the SFA registry
-    sfa_create_user(wsgi_request, request)
+    sfa_create_user(wsgi_request, request, namespace, as_admin)
 
     # Update Manifold user status
     manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})

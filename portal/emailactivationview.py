@@ -2,7 +2,7 @@ from unfold.loginrequired               import FreeAccessView
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails, make_request_user, create_user
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -18,12 +18,15 @@ from django.contrib.sites.models        import Site
 #
 import json, os, re, itertools
 
+def ValuesQuerySetToDict(vqs):
+    return [item for item in vqs]
+
+
 # requires login
 class ActivateEmailView(FreeAccessView, ThemeView):
     template_name = "email_activation.html"
     def dispatch(self, *args, **kwargs):
         return super(ActivateEmailView, self).dispatch(*args, **kwargs)
-
 
     def get_context_data(self, **kwargs):
 
@@ -36,8 +39,39 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             if key == "hash_code":
                 hash_code=value
        
-        if PendingUser.objects.filter(email_hash__iexact = hash_code):           
-            #get_user = PendingUser.objects.filter(email_hash__iexact = hash_code)
+        if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
+            # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
+            if self.theme == "onelab":
+                # Auto-Validation of pending user, which is enabled in a trusted SFA Registry (example: PLE)
+                # We could check in the Registry based on email, but it takes too long 
+                # as we currently need to do a Resolve on each user_hrn of the Registry in order to get its email
+                # TODO in SFA XXX We need a Resolve based on email
+                # TODO maybe we can use MyPLC API for PLE
+                pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
+                if pending_users:
+                    pending_user = pending_users[0]
+                    pending_user_request = make_request_user(pending_user)
+                    pending_user_hrn = pending_users[0].user_hrn
+                    print "pending_user_hrn = %s" % pending_user_hrn
+                    # XXX Let's assume for the moment that the user_hrn registered in OneLab portal is the same as in PLE
+                    ple_user_hrn = pending_user_hrn.replace("onelab","ple")
+                    query = Query.get('ple_registry:user').filter_by('user_hrn', '==', ple_user_hrn).select('user_enabled')
+                    results = execute_admin_query(self.request, query)
+                    for result in results:
+                        # User is enabled in PLE
+                        if 'user_enabled' in result and result['user_enabled']==True:
+                            ple_user_enabled = True
+                            break
+                        else:
+                            ple_user_enabled = False
+
+                    # Auto Validation 
+                    if ple_user_enabled:
+                        # Create user in SFA and Update in Manifold
+                        create_user(self.request, pending_user_request, namespace = 'myslice', as_admin = True)
+                        # Delete pending user
+                        PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
+
             #get_user.status= 'True'
             #get_user.save()
             #for user in PendingUser.objects.all():
