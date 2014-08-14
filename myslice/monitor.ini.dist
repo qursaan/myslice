@@ -18,7 +18,7 @@ url = https://nitlab.inf.uth.gr:8001/RPC2
 type = am
 
 [iotlab]
-name = FIT-IoTLab
+name = FIT IoT-Lab
 url = http://194.199.16.169:52347
 type = am
 

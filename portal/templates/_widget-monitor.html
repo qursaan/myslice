@@ -13,7 +13,6 @@
 <script>
 	$(document).ready(function() {
 		$.get('/monitor/services', function(result) {
-			console.log(result);
 			for (var r in result) {
 				html = '<div class="col-xs-6 col-sm-4 col-md-3 s-monitor"><div class="row">';
 				html += '<div class="col-md-2"><img src="{{ STATIC_URL }}icons/'+result[r].status+'.png"></div>';
