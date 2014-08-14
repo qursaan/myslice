@@ -106,17 +106,13 @@ class RegistrationView (FreeAccessView, ThemeView):
                 errors.append('First name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
             if (re.search(r'^[\w+\s.@+-]+$', user_request['last_name']) == None):
                 errors.append('Last name may contain only letters, numbers, spaces and @/./+/-/_ characters.')
-            # checking in django_db !!
-            if PendingUser.objects.filter(email__iexact = user_request['email']):
-                errors.append('Email is pending for validation. Please provide a new email address.')
-            if UserModel._default_manager.filter(email__iexact = user_request['email']): 
-                errors.append('This email is not usable. Please contact the administrator or try with another email.')
             # Does the user exist in Manifold?
             user_query  = Query().get('local:user').select('user_id','email')
             user_details = execute_admin_query(wsgi_request, user_query)
             for user_detail in user_details:
                 if user_detail['email'] == user_request['email']:
-                    errors.append('Email already registered in Manifold. Please provide a new email address.')
+                    errors.append('Email already registered. <a href="/">Login</a> with your existing account. <a href="/portal/pass_reset/">Forgot your password?</a>')
+
             # Does the user exist in sfa? [query is very slow!!]
             #user_query  = Query().get('user').select('user_hrn','user_email')
             # XXX Test based on the user_hrn is quick
@@ -125,12 +121,24 @@ class RegistrationView (FreeAccessView, ThemeView):
 
             for user in user_details_sfa:
                 if user['user_email'] == user_request['email']:
-                    errors.append('Email already registered in SFA registry. Please use another email.')
+                    errors.append('Email already registered in OneLab registry. <a href="/contact">Contact OneLab support</a> or use another email.')
                 if user['user_hrn'] == user_request['user_hrn']:
                     # add random number if user_hrn already exists in the registry
                     user_request['user_hrn'] = user_request['authority_hrn'] \
                             + '.' + split_email + str(randint(1,1000000))
-                
+
+            # checking in django unfold db portal application pending users
+            # sqlite3 /var/unfold/unfold.sqlite3
+            # select email from portal_pendinguser;
+            if PendingUser.objects.filter(email__iexact = user_request['email']):
+                errors.append('Account pending for validation. Please wait till your account is validated or contact OneLab support.')
+
+            # checking in django_db !!
+            # sqlite3 /var/unfold/unfold.sqlite3
+            # select email from auth_user;
+            if UserModel._default_manager.filter(email__iexact = user_request['email']): 
+                errors.append('<a href="/contact">Contact OneLab support</a> or try with another email.')
+
             # XXX TODO: Factorize with portal/accountview.py
             # XXX TODO: Factorize with portal/registrationview.py
             # XXX TODO: Factorize with portal/joinview.py

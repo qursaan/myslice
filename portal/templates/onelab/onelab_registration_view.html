@@ -15,9 +15,9 @@
 {% if errors %}
 <div class="row">
 	<div class="col-md-12">
-		<ul>
+		<ul class="error">
 		  {% for error in errors %}
-		  <li style="color:white;">{{ error }}</li>
+		  <li>{{ error | safe }}</li>
 		  {% endfor %}
 		</ul>
 	</div>

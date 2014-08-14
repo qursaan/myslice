@@ -38,8 +38,10 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             #print "%s = %s" % (key, value)
             if key == "hash_code":
                 hash_code=value
-       
         if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
+            activation = 'success'
+            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
+
             # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
             if self.theme == "onelab":
                 # Auto-Validation of pending user, which is enabled in a trusted SFA Registry (example: PLE)
@@ -51,12 +53,12 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 if pending_users:
                     pending_user = pending_users[0]
                     pending_user_request = make_request_user(pending_user)
-                    pending_user_email = pending_users[0].user_email
+                    pending_user_email = pending_users[0].email
                     query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
                     results = execute_admin_query(self.request, query)
                     for result in results:
                         # User is enabled in PLE
-                        if 'user_enabled' in result and result['user_enabled']==True:
+                        if 'enabled' in result and result['enabled']==True:
                             ple_user_enabled = True
                             break
                         else:
@@ -67,42 +69,33 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         # Create user in SFA and Update in Manifold
                         create_user(self.request, pending_user_request, namespace = 'myslice', as_admin = True)
                         # Delete pending user
-                        PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
+                        #PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
 
-            #get_user.status= 'True'
-            #get_user.save()
-            #for user in PendingUser.objects.all():
-            #    first_name = user.first_name
-            #    last_name = user.last_name
-            #    authority_hrn = user.authority_hrn
-            #    public_key = user.public_key
-            #    email = user.email
-            #    user_hrn = user.user_hrn
-            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
-            activation = 'success'
-            # sending email after activation success
-            #try:
-                # Send an email: the recipients are the PI of the authority
-                # If No PI is defined for this Authority, send to a default email (different for each theme)
-             #   recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
-             #   theme.template_name = 'user_request_email.html'
-             #   html_content = render_to_string(theme.template, request)
-             #   theme.template_name = 'user_request_email.txt'
-             #   text_content = render_to_string(theme.template, request)
-             #   theme.template_name = 'user_request_email_subject.txt'
-             #   subject = render_to_string(theme.template, request)
-             #   subject = subject.replace('\n', '')
-             #   theme.template_name = 'email_default_sender.txt'
-             #   sender =  render_to_string(theme.template, request)
-             #   sender = sender.replace('\n', '')
-             #   msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
-             #   msg.attach_alternative(html_content, "text/html")
-             #   msg.send()
-           # except Exception, e:
-             #   print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
-             #   import traceback
-             #   traceback.print_exc()
+                        # template user auto validated
+                        activation = 'validated'
 
+                        # sending email after activation success
+                        #try:
+                        #    # Send an email: the recipient is the user
+                        #    recipients = pending_user_eamil 
+                        #    theme.template_name = 'user_request_email.html'
+                        #    html_content = render_to_string(theme.template, request)
+                        #    theme.template_name = 'user_request_email.txt'
+                        #    text_content = render_to_string(theme.template, request)
+                        #    theme.template_name = 'user_request_email_subject.txt'
+                        #    subject = render_to_string(theme.template, request)
+                        #    subject = subject.replace('\n', '')
+                        #    theme.template_name = 'email_default_sender.txt'
+                        #    sender =  render_to_string(theme.template, request)
+                        #    sender = sender.replace('\n', '')
+                        #    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+                        #    msg.attach_alternative(html_content, "text/html")
+                        #    msg.send()
+                        #except Exception, e:
+                        #    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                        #    import traceback
+                        #    traceback.print_exc()
+            
         else:
             activation = 'failed'
         

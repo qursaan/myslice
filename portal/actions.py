@@ -71,7 +71,8 @@ def clear_user_creds(request, user_email):
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
-                        user_cred = account_config.get('delegated_user_credential','N/A')
+                        #user_cred = account_config.get('delegated_user_credential','N/A')
+                        user_cred = account_config.get('user_credential','N/A')
                         if 'N/A' not in user_cred:
                             user_hrn = account_config.get('user_hrn','N/A')
                             user_pub_key = json.dumps(account_config.get('user_public_key','N/A'))
@@ -557,10 +558,11 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
         query = Query.create('%s:user' % namespace).set(sfa_user_params).select('user_hrn')
     else:
         query = Query.create('user').set(sfa_user_params).select('user_hrn')
+
     if as_admin:
-        results = execute_query(wsgi_request, query)
-    else:
         results = execute_admin_query(wsgi_request, query)
+    else:
+        results = execute_query(wsgi_request, query)
 
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
@@ -571,7 +573,6 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     return results
 
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
-    
     # XXX This has to be stored centrally
     USER_STATUS_ENABLED = 2
 

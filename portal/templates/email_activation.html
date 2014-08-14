@@ -6,10 +6,14 @@
 	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" />User sign-up</h1>
 </div>
 <div class="row">
-	{%if activation_status == 'success'%}
+	{% if activation_status == 'success' %}
   		<h3>Signup request confirmed.</h3>
 		<p>You are currently able to log in to the portal using your email address and the password that you provided, but your access is still limited.</p> 
 		<p>You will have full access as soon as your account is validated by a manager at your organization. We have sent an email to the managers with a validation request.</p>
+    {% elif activation_status == 'validated' %}
+  		<h3>Account validated.</h3>
+		<p>We have identified you as a valid PLE user. Your OneLab account has automatically been approved.</p>
+        <p>You have a full access to OneLab testbeds.</p>
 	{%else%}
 		<h3>Signup confirmation failed.</h3>
 		<p>You have probably arrived at this page by clicking a confirmation link in an email that we have sent to you. However, 

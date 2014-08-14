@@ -55,9 +55,12 @@ with the query passed using POST"""
             admin_user, admin_password = ConfigEngine().manifold_admin_user_password()
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
-            print request.session['manifold']
-            manifold_api_session_auth = request.session['manifold']['auth']
-
+            if 'manifold' in request.session:
+                manifold_api_session_auth = request.session['manifold']['auth']
+            else:
+                json_answer=json.dumps({'code':0,'value':[]})
+                return HttpResponse (json_answer, mimetype="application/json")
+                
         if debug_empty and manifold_query.action.lower()=='get':
             json_answer=json.dumps({'code':0,'value':[]})
             print "By-passing : debug_empty & 'get' request : returning a fake empty list"
