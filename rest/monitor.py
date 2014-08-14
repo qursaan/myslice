@@ -3,19 +3,7 @@ from sfa.client.return_value import ReturnValue
 from django.http import HttpResponse
 from rest import error
 import os,json
-import ConfigParser
-
-def sfaGetVersion(url):
-    cert = os.getcwd() + "/myslice/sfa.cert"
-    pkey = os.getcwd() + "/myslice/sfa.pkey"
-
-    server = SfaServerProxy(url, pkey, cert)
-    try:
-        version = server.GetVersion()
-    except Exception, e:
-        return False
-    
-    return version
+import ConfigParser    
 
 def servicesStatus(request):
     Config = ConfigParser.ConfigParser()
@@ -23,8 +11,27 @@ def servicesStatus(request):
     
     result = {}
     
+    if not Config.has_option('monitor', 'cert') :
+        return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+    
+    cert = os.path.abspath(Config.get('monitor', 'cert'))
+    if not os.path.isfile(cert) :
+         return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+     
+     
+    if not Config.has_option('monitor', 'pkey') :
+        return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+    
+    pkey = os.path.abspath(Config.get('monitor', 'pkey'))
+    if not os.path.isfile(pkey) :
+         return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+    
     services = Config.sections()
     for s in services :
+        
+        if s == 'monitor' : 
+            continue
+        
         if Config.has_option(s, 'url') :
             result[s] = {}
 
@@ -37,17 +44,19 @@ def servicesStatus(request):
             if Config.has_option(s, 'type') :
                 result[s]['type'] = Config.get(s, 'type')
                 
-            ret = sfaGetVersion(Config.get(s, 'url'))
-            
-            if ret :
+            server = SfaServerProxy(Config.get(s, 'url'), pkey, cert)
+            try:
+                version = server.GetVersion()
+
                 result[s]['status'] = 'ok'
                 
-                if 'interface' in ret : # registry
-                    result[s]['version'] = ret['sfa']
+                if 'interface' in version : # registry
+                    result[s]['version'] = version['sfa']
                 else :
-                    result[s]['version'] = ret['geni_api']
-            else :
+                    result[s]['version'] = version['geni_api']
+
+            except Exception, e:
                 result[s]['status'] = 'ko'
-                
+
         
     return HttpResponse(json.dumps(result), content_type="application/json")
