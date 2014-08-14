@@ -429,6 +429,7 @@ def create_slice(wsgi_request, request):
         'slice_hrn'        : hrn, 
         'slice_urn'        : urn,
         'slice_type'       : request['type'],
+        'url'              : request['number_of_nodes'],
         'users'            : user_hrns,
         'slice_enabled'    : True
     }
@@ -455,7 +456,7 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['exp_url'],
+        number_of_nodes = request['url'],
         purpose         = request['purpose'],
     )
     s.save()

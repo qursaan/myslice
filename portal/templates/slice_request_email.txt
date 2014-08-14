@@ -1,7 +1,7 @@
 NEW SLICE REQUEST
 
 Slice name      : {{slice_name}}
-URL 			: {{exp_url}}
+URL 			: {{url}}
 Purpose         : {{purpose}}
 Email           : {{email}}
 Organization	: {{organization}}
