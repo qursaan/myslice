@@ -1,8 +1,77 @@
 <div class="col-md-2">
 </div>
 <div class="col-md-8">
-	<h2>Secure Shell (SSH)</h2>
-	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"></p>
+	<h2>How to access your slice</h2>
+	<h3>PlanetLab Europe</h3>
+	
+	<p>
+		PlanetLab Europe resources are accessible directly via SSH. Your SSH public key is deployed automatically
+		on the reserved nodes. To access your slice on a resource just type the following command:
+	</p>
+	<p class="command">
+		$ ssh your_slice_name@planetlab-resource.hostname.com
+	</p>
+	<p>
+		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
+		after witch you will be able to access the resource.
+	</p>
+	
+	<h3>FIT IoT-Lab</h3>
+	
+	<h3>NITOS</h3>
+	
+	<p>
+	 NITOS resources are not directly accessible. You will need to log in on a gateway server and from there access the node.
+	 The NITO server address is nitlab.inf.uth.gr, so to connect to the NITOS server:
+	</p>
+	<p class="command">
+	$ ssh your_slice_name@nitlab.inf.uth.gr
+	</p>
+	
+	<p>
+	<!-- In order to connect to NITOS server he has to upload his public key on the server. 
+	For now we do it this way: http://nitlab.inf.uth.gr/NITlab/index.php/your-ssh-keys. 
+	I think this is a procedure that needs to be done at the registration phase of the user, 
+	through myslice, Broker etc. but I will answer you in a couple of days for sure. -->
+	</p>
+
+	<p>
+		You will then need to prepare the resource by loading an OMF image on it:
+	</p>
+	
+	<p class="command">
+		$ omf load -i baseline_grid.ndz -t omf.nitos.node016
+	</p>
+
+	<p>
+		Turn on the node:
+	</p>
+	
+	<p class="command">
+		$ omf tell -a on -t omf.nitos.node016
+	</p>
+	<p>
+		And finally ssh on the node:
+	</p>
+	<p class="command">
+		$ ssh root@node016
+	</p>
+	<p>
+		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml according to your slice settings and then
+		restart the OMF Resource Controller and finally execute the experiment:
+	</p>
+	<p class="command">
+		$ omf exec --slice slice_name your_exp.rb
+	</p>
+	<p>
+	The complete tutorial is available at the following address:
+	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
+	</p>
+	
+	<br />
+	
+	<h2>Available Tools</h2>
+	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"> <b>SSH</b></p>
 	<p>
 	Secure Shell (SSH) is a cryptographic network protocol for secure data communication, remote command-line login, remote command execution, and other secure network services between two networked computers that connects, via a secure channel over an insecure network, a server and a client (running SSH server and SSH client programs, respectively). The protocol specification distinguishes between two major versions that are referred to as SSH-1 and SSH-2.
 	</p>

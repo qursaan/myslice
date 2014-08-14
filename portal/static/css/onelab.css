@@ -23,6 +23,13 @@ a.current {
     text-decoration:underline;
     color:#333333;
 }
+p.command {
+    padding:15px;
+    margin:15px 0;
+    color:#890000;
+    background-color:#E0E0E0;
+    font-family:Courier, monospace;
+}
 h1 {
     border-bottom:1px solid #DDDDDD;
     padding:0 0 0 0;
