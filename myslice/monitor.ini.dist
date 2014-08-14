@@ -1,3 +1,7 @@
+[monitor]
+cert = myslice/sfa.cert
+pkey = myslice/sfa.pkey
+
 [onelab]
 name = OneLab
 url = http://portal.onelab.eu:12345
