@@ -23,6 +23,8 @@ from portal.actions             import authority_get_pi_emails, manifold_add_use
 
 from myslice.theme import ThemeView
 
+import activity.institution
+
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
 #
@@ -239,6 +241,8 @@ class JoinView (FreeAccessView, ThemeView):
                     print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
                 
                 self.template_name = 'join_complete.html'
+                # log institution activity
+                activity.institution.joined(self.request)
                 return render(request, self.template, {'theme': self.theme})
                 #return render(request, 'user_register_complete.html') 
 
@@ -269,4 +273,6 @@ class JoinView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(page.prelude_env ())
+        # log institution activity
+        activity.institution.join(self.request)
         return render(request, 'join_view.html',template_env)

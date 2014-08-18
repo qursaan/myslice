@@ -174,7 +174,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
                 # log user activity
-                activity.user.register(self.request)
+                activity.user.registered(self.request)
                 return render(wsgi_request, self.template, {'theme': self.theme}) 
 
         else:
