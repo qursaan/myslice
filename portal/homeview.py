@@ -91,12 +91,16 @@ class HomeView (FreeAccessView, ThemeView):
                     env['person'] = None
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
             else:
+                # log user activity
+                activity.user.login(self.request, "notactive")
                 env['state'] = "Your account is not active, please contact the site admin."
                 env['layout_1_or_2']="layout-unfold2.html"
                 
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
         # otherwise
         else:
+            # log user activity
+            activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
             
             return render_to_response(self.template, env, context_instance=RequestContext(request))

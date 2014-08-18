@@ -11,6 +11,9 @@ from manifoldapi.manifoldapi            import execute_query
 import json
 
 from myslice.theme import ThemeView
+
+import activity.user
+
 theme = ThemeView()
 
 # splitting the 2 functions done here
@@ -68,6 +71,8 @@ class ContactView (FreeAccessView, ThemeView):
                 username = request.user.email
             else :
                 username = None
+            # log user activity
+            activity.user.contact(self.request)
             return render(request,'contact_sent.html', { 'theme' : self.theme,  'username': username}) # Redirect after POST
         else:
             return self._display (request, form)
