@@ -32,7 +32,7 @@ if config.activity and config.activity.server :
     server = config.activity.server
 else :
     # default log server
-    server = "http://athos.ipv6.lip6.fr/log"
+    server = "http://athos.ipv6.lip6.fr/activity/push/log"
 
 def logWrite(request, action, message):
     
@@ -60,7 +60,7 @@ def logWrite(request, action, message):
         result = urllib2.urlopen(server, urllib.urlencode(log))
         content = result.read()
     except urllib2.URLError as e:
-        print "===============>> activity: connection to " + url + " impossible, could not log action"
+        print "===============>> activity: connection to " + server + " impossible, could not log action"
 
 def log(request, action, message):
     # Create a new thread in Daemon mode to send the log entry
