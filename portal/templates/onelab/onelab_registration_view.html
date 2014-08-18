@@ -489,6 +489,9 @@ $(document).ready(function(){
         {% for authority in authorities %}
             {% if authority.name %}
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
+			// show hrn if we don't have the name
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
             {% endif %}
         {% endfor %}    
     {% else %}
