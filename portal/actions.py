@@ -424,6 +424,10 @@ def create_slice(wsgi_request, request):
     for user in user_details_sfa:
         user_email = user['user_email']
 
+    # XXX LOIC Quick fix because this is totally inconsistent
+    if not 'number_of_nodes' in request:
+        request['number_of_nodes']=""
+
     # XXX We should create a slice with Manifold terminology
     slice_params = {
         'slice_hrn'        : hrn, 
