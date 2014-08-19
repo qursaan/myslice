@@ -74,7 +74,7 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         # Create user in SFA and Update in Manifold
                         create_user(self.request, pending_user_request, namespace = 'myslice', as_admin = True)
                         # Delete pending user
-                        #PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
+                        PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
 
                         # template user auto validated
                         activation = 'validated'
