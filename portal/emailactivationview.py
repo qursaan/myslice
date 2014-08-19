@@ -40,7 +40,6 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 hash_code=value
         if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
             activation = 'success'
-            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
 
             # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
             if self.theme == "onelab":
@@ -50,6 +49,10 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 # TODO in SFA XXX We need a Resolve based on email
                 # TODO maybe we can use MyPLC API for PLE
                 pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
+
+                # by default user is not in PLE
+                ple_user_enabled = False
+
                 if pending_users:
                     pending_user = pending_users[0]
                     pending_user_request = make_request_user(pending_user)
@@ -61,8 +64,6 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         if 'enabled' in result and result['enabled']==True:
                             ple_user_enabled = True
                             break
-                        else:
-                            ple_user_enabled = False
 
                     # Auto Validation 
                     if ple_user_enabled:
@@ -96,6 +97,7 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         #    import traceback
                         #    traceback.print_exc()
             
+            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
         else:
             activation = 'failed'
         
