@@ -11,7 +11,7 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 from myslice.theme                      import ThemeView
-from portal.models                      import PendingUser
+from portal.models                      import PendingUser, PendingAuthority
 from django.core.mail                   import EmailMultiAlternatives, send_mail
 from django.contrib.sites.models        import Site
 
@@ -21,10 +21,22 @@ import json, os, re, itertools
 def ValuesQuerySetToDict(vqs):
     return [item for item in vqs]
 
-
 # requires login
 class ActivateEmailView(FreeAccessView, ThemeView):
     template_name = "email_activation.html"
+    def is_ple_enabled(self, pending_user):
+        pending_authorities = PendingAuthority.objects.filter(site_authority__iexact = pending_user.authority_hrn)
+        if pending_authorities:
+            return False                        
+        pending_user_email = pending_user.email
+        query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
+        results = execute_admin_query(self.request, query)
+        for result in results:
+            # User is enabled in PLE
+            if 'enabled' in result and result['enabled']==True:
+                return True
+        return False
+
     def dispatch(self, *args, **kwargs):
         return super(ActivateEmailView, self).dispatch(*args, **kwargs)
 
@@ -40,7 +52,6 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 hash_code=value
         if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
             activation = 'success'
-            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
 
             # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
             if self.theme == "onelab":
@@ -50,26 +61,20 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 # TODO in SFA XXX We need a Resolve based on email
                 # TODO maybe we can use MyPLC API for PLE
                 pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
+
+                # by default user is not in PLE
+                ple_user_enabled = False
+
                 if pending_users:
                     pending_user = pending_users[0]
-                    pending_user_request = make_request_user(pending_user)
-                    pending_user_email = pending_users[0].email
-                    query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
-                    results = execute_admin_query(self.request, query)
-                    for result in results:
-                        # User is enabled in PLE
-                        if 'enabled' in result and result['enabled']==True:
-                            ple_user_enabled = True
-                            break
-                        else:
-                            ple_user_enabled = False
-
+                    
                     # Auto Validation 
-                    if ple_user_enabled:
+                    if self.is_ple_enabled(pending_user):
+                        pending_user_request = make_request_user(pending_user)
                         # Create user in SFA and Update in Manifold
                         create_user(self.request, pending_user_request, namespace = 'myslice', as_admin = True)
                         # Delete pending user
-                        #PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
+                        PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
 
                         # template user auto validated
                         activation = 'validated'
@@ -96,6 +101,7 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         #    import traceback
                         #    traceback.print_exc()
             
+            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
         else:
             activation = 'failed'
         
