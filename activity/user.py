@@ -21,3 +21,9 @@ def registered(request):
 
 def contact(request):
     activity.log(request, "user.contact", "User sent a contact request")
+    
+def slice(request):
+    activity.log(request, "user.slice", "User requested a slice")
+
+def resource(request):
+    activity.log(request, "user.resource", "User added a resource to a slice")

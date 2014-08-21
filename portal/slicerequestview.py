@@ -16,6 +16,8 @@ from myslice.theme import ThemeView
 
 import json, time, re
 
+import activity.user
+
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
     
@@ -160,6 +162,9 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     # Otherwise a wsgi_request is sent to the PI
                     create_pending_slice(wsgi_request, slice_request, user_email)
                     self.template_name = 'slice-request-ack-view.html'
+                
+                # log user activity
+                activity.user.slice(self.request)
                 
                 return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
         else:
