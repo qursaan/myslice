@@ -164,7 +164,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     self.template_name = 'slice-request-ack-view.html'
                 
                 # log user activity
-                activity.user.slice(self.request)
+                activity.user.slice(wsgi_request)
                 
                 return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
         else:
