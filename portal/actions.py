@@ -383,12 +383,48 @@ def portal_validate_request(wsgi_request, request_ids):
 
     return status
 
-
 def validate_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
     status = portal_validate_request(request, ids)
     json_answer = json.dumps(status)
     return HttpResponse (json_answer, mimetype="application/json")
+
+
+def reject_action(request, **kwargs):
+    ids = filter(None, kwargs['id'].split('/'))
+    status = portal_reject_request(request, ids)
+    json_answer = json.dumps(status)
+    return HttpResponse (json_answer, mimetype="application/json")
+
+
+def portal_reject_request(wsgi_request, request_ids):
+    status = {}
+
+    if not isinstance(request_ids, list):
+        request_ids = [request_ids]
+
+    requests = get_request_by_id(request_ids)
+    for request in requests:
+        # type, id, timestamp, details, allowed -- MISSING: authority_hrn
+        # CAREFUL about details
+        # user  : first name, last name, email, password, keypair
+        # slice : number of nodes, type of nodes, purpose
+        
+        request_status = {}
+
+        if request['type'] == 'user':
+            request_status['SFA user'] = {'status': True }
+            PendingUser.objects.get(id=request['id']).delete()
+        elif request['type'] == 'slice':
+            request_status['SFA slice'] = {'status': True }           
+            PendingSlice.objects.get(id=request['id']).delete()
+        elif request['type'] == 'authority':
+            request_status['SFA authority'] = {'status': True }           
+            PendingAuthority.objects.get(id=request['id']).delete()
+
+        status['%s__%s' % (request['type'], request['id'])] = request_status
+
+    return status
 
 # Django and ajax
 # http://djangosnippets.org/snippets/942/
