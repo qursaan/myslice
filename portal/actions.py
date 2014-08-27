@@ -5,6 +5,7 @@ from portal.models              import PendingUser, PendingSlice, PendingAuthori
 import json
 
 from django.contrib.auth.models import User
+from django.contrib.auth        import get_user_model
 from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
 
@@ -198,6 +199,11 @@ def manifold_update_account(request,user_id,account_params):
 #explicitly mention the platform_id
 def manifold_delete_account(request, platform_id, user_id, account_params):
     query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).filter_by('user_id', '==', user_id).set(account_params).select('user_id')
+    results = execute_admin_query(request,query)
+    return results
+
+def manifold_delete_user(request, user_id, user_params):
+    query = Query.delete('local:user').filter_by('user_id', '==', user_id).set(user_params).select('user_id')
     results = execute_admin_query(request,query)
     return results
 
@@ -413,8 +419,42 @@ def portal_reject_request(wsgi_request, request_ids):
         request_status = {}
 
         if request['type'] == 'user':
-            request_status['SFA user'] = {'status': True }
-            PendingUser.objects.get(id=request['id']).delete()
+            try:
+                request_status['SFA user'] = {'status': True }
+                # getting user email based on id 
+                ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+                for user in PendingUser.objects.raw('SELECT id,email FROM portal_pendinguser WHERE id = %s', [request['id']]):
+                    user_email= user.email
+                subject = 'User validation denied.'
+                msg = 'You have recently registered to OneLab portal. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact your manager or contact us for further information.'
+                send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+                # removing from Django auth_user
+                UserModel = get_user_model()
+                UserModel._default_manager.filter(email__iexact = user_email).delete()
+                # removing from Django portal_pendinguser
+                PendingUser.objects.get(id=request['id']).delete()
+                # removing from manifold
+                # removing manifold account
+                user_query = Query().get('local:user') \
+                    .filter_by('email', '==', user_email)           \
+                    .select('user_id')
+                user = execute_admin_query(wsgi_request, user_query)
+                user_id = user[0]['user_id']
+        
+                platform_query = Query().get('local:platform') \
+                    .filter_by('platform', '==', 'myslice')           \
+                    .select('platform_id')
+                platform = execute_admin_query(wsgi_request, platform_query)
+                platform_id = platform[0]['platform_id']
+                account_params = {'user_id':user_id}
+                manifold_delete_account(request, platform_id, user_id, account_params)           
+             
+                # removing manifold user
+                user_params = {'user_id':user_id}
+                manifold_delete_user(request, user_id, user_params)
+            except Exception, e:
+                request_status['SFA authority'] = {'status': False, 'description': str(e)}
+                      
         elif request['type'] == 'slice':
             request_status['SFA slice'] = {'status': True }           
             PendingSlice.objects.get(id=request['id']).delete()
