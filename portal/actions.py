@@ -4,7 +4,8 @@ from manifoldapi.manifoldapi    import execute_query,execute_admin_query
 from portal.models              import PendingUser, PendingSlice, PendingAuthority
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models  import User
+from django.contrib.sites.models import Site
 from django.contrib.auth        import get_user_model
 from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
@@ -425,8 +426,13 @@ def portal_reject_request(wsgi_request, request_ids):
                 ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
                 for user in PendingUser.objects.raw('SELECT id,email FROM portal_pendinguser WHERE id = %s', [request['id']]):
                     user_email= user.email
+
+                # get the domain url
+                current_site = Site.objects.get_current()
+                current_site = current_site.domain
+
                 subject = 'User validation denied.'
-                msg = 'You have recently registered to OneLab portal. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact your manager or contact us for further information.'
+                msg = 'You have recently registered to ' + current_site + '. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact your manager or contact us for further information.'
                 send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
                 # removing from Django auth_user
                 UserModel = get_user_model()
