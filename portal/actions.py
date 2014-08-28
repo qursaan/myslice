@@ -432,7 +432,7 @@ def portal_reject_request(wsgi_request, request_ids):
                 current_site = current_site.domain
 
                 subject = 'User validation denied.'
-                msg = 'You have recently registered to ' + current_site + '. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact your manager or contact us for further information.'
+                msg = 'You have recently registered to ' + current_site + '. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact the manager of your institution for further information. For any other queries, contact us by replying to this email.'
                 send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
                 # removing from Django auth_user
                 UserModel = get_user_model()
