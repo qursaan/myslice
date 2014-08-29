@@ -548,9 +548,24 @@ def create_slice(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
-        subject = 'Slice created'
-        msg = 'A manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.'
-        send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+
+        try:
+            theme.template_name = 'slice_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'slice_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+            subject = 'Slice request validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
        
     return results
 
