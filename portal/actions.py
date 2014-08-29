@@ -424,16 +424,37 @@ def portal_reject_request(wsgi_request, request_ids):
                 request_status['SFA user'] = {'status': True }
                 # getting user email based on id 
                 ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
-                for user in PendingUser.objects.raw('SELECT id,email FROM portal_pendinguser WHERE id = %s', [request['id']]):
+                for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE id = %s', [request['id']]):
                     user_email= user.email
+                    first_name = user.first_name
+                    last_name = user.last_name
 
                 # get the domain url
                 current_site = Site.objects.get_current()
                 current_site = current_site.domain
 
-                subject = 'User validation denied.'
-                msg = 'You have recently registered to ' + current_site + '. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact the manager of your institution for further information. For any other queries, contact us by replying to this email.'
-                send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+                ctx = {
+                    'first_name'    : first_name, 
+                    'last_name'     : last_name, 
+                    'portal_url'    : current_site,
+                    }
+                try:
+                    theme.template_name = 'user_request_denied.txt'
+                    text_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'user_request_denied.html'
+                    html_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'email_default_sender.txt'
+                    sender =  render_to_string(theme.template, ctx)
+                    sender = sender.replace('\n', '')
+                               
+                    subject = 'User validation denied.'
+
+                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                except Exception, e:
+                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
+            
                 # removing from Django auth_user
                 UserModel = get_user_model()
                 UserModel._default_manager.filter(email__iexact = user_email).delete()
