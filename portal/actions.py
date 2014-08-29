@@ -654,9 +654,25 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     else:
-        subject = 'User validated'
-        msg = 'A manager of your institution has validated your account. You have now full user access to the portal.'
-        send_mail(subject, msg, 'support@onelab.eu',[request['email']], fail_silently=False)       
+        try:
+            theme.template_name = 'user_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'user_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+
+            subject = 'User validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [request['email']])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
     return results
 
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
