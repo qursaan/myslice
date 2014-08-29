@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wsag:Agreement xmlns:wsag="http://www.ggf.org/namespaces/ws-agreement"
-    {% if data.agreement_id %}AgreementId="{{data.agreement_id}}"{% endif %}>
+    {% if data.agreement_id %}wsag:AgreementId="{{data.agreement_id}}"{% endif %}>
     {% if data.agreement_name %}<wsag:Name>{{data.agreement_name}}</wsag:Name>{% endif %}
 
     <wsag:Context>
@@ -26,10 +26,10 @@
                 {% endfor %}</wsag:Variables>
             </wsag:ServiceProperties>
             {% for term in data.guarantee_terms %}
-            <wsag:GuaranteeTerm Name="{{term.name}}">
+            <wsag:GuaranteeTerm wsag:Name="{{term.name}}">
                 {# do not need servicescope #}
 	            {% for scope in term.scopes %}
-                <wsag:ServiceScope ServiceName="{{scope.servicename}}"/>
+                <wsag:ServiceScope wsag:ServiceName="{{scope.servicename}}"/>
                 {% endfor %}
                 <wsag:ServiceLevelObjective>
                     <wsag:KPITarget>

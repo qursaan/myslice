@@ -75,228 +75,104 @@
         do_checksla: function(e) {
             var username = e.data.options.username;
             var urn = data.value;
-            var arrayselectedresources = data.selected_resources;
+            var arraySelectedResources = data.selected_resources;
 
-            var accepted_sla = Array();
+            var accepted_sla = [];
             var count = 0;
             var self = e.data;
-            // XXX check that the query is not disabled
-
-            console.log("DATA VALUE: " + data.value);
+            // var testbedsWithSLA = ["iminds", "fuseco", "netmode"];
+            var testbedsWithSLA;
             
-            //<p>SLA description</p>
-            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>
-            //<p>SLA description</p>
-            //<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>
-            var promt = $('#modal-body');
+            var sliverPattern = /IDN\+(.+)\+(node|channel)\+/;
+            var list = [];
+
+            var promt = $('#sla-table-body');
             
-            // id="myModalLabel"
-            var flagVW = false;
-            var  flagWi = false;
+            $.get("/sla/testbeds/", function(data) {
+                testbedsWithSLA = data;
 
-            promt.append('<p>SLA description</p>');
-            
-            var wilabForm = "";
-            wilabForm += "<ul>";
-            for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<li class="wi'+iter+'" name=wi"'+iter+'">'+arrayselectedresources[iter].toLowerCase()+'</li>';
-                
-                if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
+                console.log("Testbeds with SLA: " + testbedsWithSLA);
 
-                    accepted_sla.push({"wilab2":false}); 
-                    wilabForm += list;   
-                    flagWi = true;             
-
-                }
-
-            }
-            wilabForm += "</ul>";
-
-            //var wallmessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>';
-
-            var wallForm = "";
-            wallForm += "<ul>";
-            for(var iter = 0; iter < arrayselectedresources.length; iter++){
-                var list = '<li class="wall'+iter+'" name=wall"'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'</li>';
-                
-                if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
-
-                    accepted_sla.push({"wall2":false});
-                    wallForm += list;
-                    flagVW = true;
-                    
-                }
-
-            }
-            wallForm += "</ul>";
-            
-            var flagDouble = false;
-            if(flagWi)
-            {
-                flagDouble = true;
-                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p>');
-                //promt.append(wilabForm);
-                promt.append('<br />');
-            }
-            if(flagVW)
-            {
-                //promt.append(wallmessage);
-                flagDouble = true;
-                promt.append('<p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>');
-                //promt.append(wallForm);
-                promt.append('<br />');
-            }
-
-                        
-            // var wimessage = '<p>SLA description</p><p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>'
-
-            if(flagWi || flagVW){
-                $('#sla_dialog').show();
-
-                    $('#slamodal-wilab2').modal('show');
-            }
-            else
-            {
-                
-
-                var username = e.data.options.username;
-                var urn = data.value;
-                // XXX check that the query is not disabled
-
-                self.spin();
-                console.log("do_update");
-                // XXX check that the query is not disabled
-                manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
-                return;
-            }
-                    
-                        $("#accept_sla_wilab2").click(function(){
-                            console.log("SLA ACCEPTED");
-                            console.log("With username: " + username);
-
-                            // var promt = $('#modal-body');
-                            // var notchecked = true;
-                            // for (var i=0;i<50;i++)
-                            // {
-                            //     var wielement = $('#wi'+i);
-                            //     var wallElement = $('#wall'+i);
-                            //     if(wielement != null && !wielement.checked)
-                            //     {
-                            //         notchecked = false;
-                            //     }
-                            //     if(wallElement!= null && !wallElement.checked)
-                            //     {
-                            //         notchecked = false;
-                            //     }
-                            // }
-            
-                                                       
-                                if(flagDouble)
-                                {
-                                    $.post("/sla/agreements/simplecreate", 
-                                        { "template_id": "iMindsServiceWiLab2",
-                                          "user": username,
-                                          "expiration_time": new Date().toISOString()
-                                       });
-                                     $.post("/sla/agreements/simplecreate", 
-                                        { "template_id": "iMindsServiceVirtualwall",
-                                          "user": username,
-                                          "expiration_time": new Date().toISOString()
-                                       });
-                                       
-                                    $('#slamodal-wilab2').modal('hide');
-                                accepted_sla["wilab2"] = true;
-                            
-                                //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                $(arraySelectedResources).each(function () {
+                    var sliverMatch = sliverPattern.exec(this);
+                    var sliverId = sliverMatch[1];
+                    for (var i = 0; i < testbedsWithSLA.length; i++) {
+                        if(this.indexOf(testbedsWithSLA[i].toLowerCase()) >= 0){ // If it has SLA
+                            if (list.indexOf(sliverId) == -1) { // If it is not in the list
+                                list.push(sliverId);
                             }
-                            $('#modal-body').empty();
-                        }); 
+                        }
+                    }
+                });
+
+                if (list.length > 0) {
+                    for (var i = 0; i < list.length; i++) {
+                        var element = $('<tr>');
+                        element.append(
+                            $('<td>').append(list[i]),
+                            $('<td>').append('99% of Uptime for 99% of resources'),
+                            $('<td align="center">').append('<input type="checkbox" name="slaaccept" value="' + list[i] + '"/> <br />')
+                        );
+                        promt.append(element);
+                    }
+
+                    $('#sla_dialog').show();
+                    $('#slamodal').modal('show');
+                } else {
+                    //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                }
+            
+            });
                     
-                        $("#dismiss_sla_wilab2").click(function(){
-                            console.log("SLA NOT ACCEPTED");
-                            $('#slamodal-wilab2').modal('hide');
-                            $('#modal-body').empty();
-                        }); 
+            $("#submit_sla").unbind().click(function(){
+                console.log("With username: " + username);
+
+                var notChecked = $("input[name='slaaccept']:not(:checked)");
                 
-            // } else {
-            //     this.do_update(e);
-            // }
+                if (notChecked.length > 0) {
+                    for (var i = 0; i < notChecked.length; i++) {
+                         console.log("SLA not accepted: " + notChecked[i].value);
+                    }    
 
-            // for(var iter = 0; iter < arrayselectedresources.length; iter++){
-            //     var list = '<input type="checkbox" name="'+iter+'" >'+arrayselectedresources[iter].toLowerCase()+'<br>';
-            //     promt.append(list);
-            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wall2") >= 0){
+                    alert("All SLAs have to be accepted to continue with the reservation");
 
+                } else {
+                    // $(list).each(function () {
+                    //     var date = new Date();
+                    //     date.setYear(date.getFullYear() + 1);
 
-                    
-            //         accepted_sla.push({"wall2":false});
+                    //     $.post("/sla/agreements/simplecreate", 
+                    //         { "template_id": this.toString(),
+                    //           "user": username,
+                    //           "expiration_time": date.toISOString()
+                    //         });
 
-            //         $('#sla_dialog').show();
-            //         $('#slamodal-virtualwall').modal('show');
-                    
-                    
-            //             $("#accept_sla_vwall").click(function(){
-            //                 console.log("SLA ACCEPTED");
-            //                 console.log("With username: " + username);
                         
-            //                 $.post("/sla/agreements/simplecreate", 
-            //                     { "template_id": "iMindsServiceVirtualwall",
-            //                       "user": username,
-            //                       "expiration_time": new Date()
-            //                     });
-                        
-            //                 $('#slamodal-virtualwall').modal('hide');
-            //                 accepted_sla["wall2"] = true;
-            //             }); 
+                    // });
 
-            //             $("#dismiss_sla_vwall").click(function(){
-            //                 console.log("SLA NOT ACCEPTED");
-            //                 $('#slamodal-vir').modal('hide');
-            //             }); 
-                    
-            //     }
+                    $.ajax({
+                        url: "/sla/agreements/simplecreate", 
+                        data: { testbeds: list,
+                          user: username,
+                          resources: arraySelectedResources,
+                          slice: main_query.filters.slice()[0][2]
+                        },
+                        type: "post",
+                        traditional: true
+                    });
 
-            //     if (arrayselectedresources[iter].toLowerCase().indexOf("wilab2") >= 0){
-
-            //         accepted_sla.push({"wilab2":false});
-
-            //         $('#sla_dialog').show();
-            //         $('#slamodal-wilab2').modal('show');
-                    
-                    
-            //             $("#accept_sla_wilab2").click(function(){
-            //                 console.log("SLA ACCEPTED");
-            //                 console.log("With username: " + username);
-                        
-            //                 $.post("/sla/agreements/simplecreate", 
-            //                     { "template_id": "iMindsServiceWiLab2",
-            //                       "user": username,
-            //                       "expiration_time": new Date()
-            //                     });
-                        
-            //                 $('#slamodal-wilab2').modal('hide');
-            //                 accepted_sla["wilab2"] = true;
-            //             }); 
-                    
-            //             $("#dismiss_sla_wilab2").click(function(){
-            //                 console.log("SLA NOT ACCEPTED");
-            //                 $('#slamodal-wilab2').modal('hide');
-            //             }); 
-                    
-
-            //     }
-
-            // }
-
-            // for(var sla in accepted_sla){
-            //     if(accepted_sla[sla] == true){
-            //         count += 1;
-            //     }
-            // }
-
-            // if(count == accepted_sla.length){
-            //     this.do_update(e);
-            // }
+                    console.log(main_query.filters.slice()[0][2]);
+                      
+                    $('#slamodal').modal('hide');
+                    $('#sla-table-body').empty();
+                    //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                }
+            }); 
+        
+            $("#cancel_sla").unbind().click(function(){
+                $('#slamodal').modal('hide');
+                $('#sla-table-body').empty();
+            }); 
         },
 
      

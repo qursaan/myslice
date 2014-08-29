@@ -105,16 +105,16 @@ def createagreement(json_data, context):
     # Builds AgreementInput from json
     data = jsonparser.agreementinput_from_json(json_data)
     # Read template from manager
-    slatemplate, request = client_templates.getbyid(data.template_id)
+    slatemplate, request = client_templates.getbyid(data.template_id, data.template_id)
     # Copy (overriding if necessary) from template to AgreementInput
     final_data = data.from_template(slatemplate)
     slaagreement = fed4fire.render_slaagreement(final_data)
 
     client_agreements = context.restfactory.agreements()
-    return client_agreements.create(slaagreement)
+    return client_agreements.create(slaagreement, data.template_id)
 
 
-def createagreementsimplified(template_id, user, expiration_time):
+def createagreementsimplified(template_id, user, expiration_time, resources):
     context = ServiceContext(
         restclient.Factory(),
         TemplateFactory()
@@ -122,26 +122,18 @@ def createagreementsimplified(template_id, user, expiration_time):
 
     print "Expiration time: ", expiration_time
 
-    time = dateutil.parser.parse(expiration_time)
-    print "ISO FORMAT: ", time.strftime('%Y-%m-%dT%H:%M:%S%Z')
+    # time = dateutil.parser.parse(expiration_time)
+    # print "ISO FORMAT: ", time.strftime('%Y-%m-%dT%H:%M:%S%Z')
+    print "ISO FORMAT: ", expiration_time.strftime('%Y-%m-%dT%H:%M:%S%Z')
 
     agreement = {
         "agreement_id": str(uuid.uuid4()),
         "template_id": template_id,
-        "expiration_time": time.strftime('%Y-%m-%dT%H:%M:%S%Z'),
+        "expiration_time": expiration_time.strftime('%Y-%m-%dT%H:%M:%S%Z'),
         "consumer": user,
     }
 
     json_data = json.dumps(agreement)
 
     return createagreement(json_data, context)
-
-
-def main():
-    createagreementsimplified("iMindsServiceWiLab2",
-                              "virtualwall",
-                              "2014-04-34T23:12:12")
-
-
-if __name__ == "__main__":
-    main()
+    

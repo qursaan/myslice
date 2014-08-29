@@ -28,6 +28,8 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
+from xml.etree.ElementTree import QName
+
 import dateutil.parser
 
 from wsag_model import Agreement
@@ -198,12 +200,17 @@ class AgreementConverter(Converter):
         :param Element xmlroot: root element of xml to convert.
         :rtype: wsag_model.Agreement
         """
+        for name, value in xmlroot.attrib.items():
+            print '{0}="{1}"'.format(name, value)
+
         if xmlroot.tag in self.agreement_tags:
             result = Agreement()
-            result.agreement_id = xmlroot.attrib["AgreementId"]
+            agreementId = str(QName(self._namespaces["wsag"], "AgreementId"))
+            result.agreement_id = xmlroot.attrib[agreementId]
         elif xmlroot.tag in self.template_tags:
             result = Template()
-            result.template_id = xmlroot.attrib["TemplateId"]
+            templateId = str(QName(self._namespaces["wsag"], "TemplateId"))
+            result.template_id = xmlroot.attrib[templateId]
         else:
             raise ValueError("Not valid root element name: " + xmlroot.tag)
 
@@ -311,7 +318,6 @@ class AgreementConverter(Converter):
         return name, result
 
     def _parse_guarantees(self, elements):
-
         result = {}
         for element in elements:
             key, value = self._parse_guarantee(element)

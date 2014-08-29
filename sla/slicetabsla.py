@@ -20,7 +20,12 @@ from django.http import HttpResponse
 
 import json
 import traceback
+import re
 from math import ceil
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from dateutil.tz import tzlocal
+from django.conf import settings
 
 
 class Rol:
@@ -359,41 +364,80 @@ def _get_agreement_violations(agreement_id, testbed, term=None):
 
 
 class AgreementSimple(APIView):
+
+    regex = r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+
     def build_response(self, code, text):
         response = HttpResponse(text, content_type="text/plain", status=code)
         return response 
 
-    def post( self, request, **kwargs):
+    def post(self, request, **kwargs):
         #import pdb; pdb.set_trace()
         print "------------------------------------------------1"
-        data = {}
-        for key, value in request.DATA.items(): # jgarcia review this
-            new_key = key
-            data[new_key] = value
+        data = request.POST
+
+        url = settings.SLA_MANAGER_URL
+        c = restclient.Client(url)
+        # for key, value in request.DATA.items(): # jgarcia review this
+        #     data[key] = value
         
-        try:
-            template_id = data['template_id']
-        except:
-            return self.build_response(400, 'Invalid template_id')
+        # print "---- DATA: ----"
+        # print "Data type: ", type(data)
+        # for key in data:
+        #     print key, data.getlist(key)
 
         try:
-            user = data['user']
+            # template_id = data['template_id']
+            testbeds = data.getlist("testbeds")
+            user = data["user"]
+            resources = data.getlist("resources")
+            slice_id = data["slice"]
         except:
-            return self.build_response(400, 'Invalid user')
+            print "FAIL!"
+            return self.build_response(400, 'Invalid data')
 
-        try:
-            expiration_time = data['expiration_time']
-        except:
-            return self.build_response(400, 'Invalid expiration_time')
+        selected_resources = {}
 
-        try:
-            print "Calling createagreementsimplified with template_id:",template_id,"and user:",user
-            result = fed4fireservice.createagreementsimplified(template_id, user, expiration_time)
-            print result
-        except Exception, e:
-            print traceback.format_exc()
-            print '%s (%s)' % (e, type(e))
-            
-            return self.build_response(400, 'Problem creating agreement')
+        now = datetime.now(tzlocal())
+        expiration_time = now + relativedelta(years=1)
+
+        for testbed in testbeds:
+            selected_resources[testbed] = [r for r in resources if testbed in r]
+            template_id = testbed
+            try:
+                print "Calling createagreementsimplified with template_id:",template_id,"and user:",user
+                result = fed4fireservice.createagreementsimplified(
+                            template_id, user, expiration_time, selected_resources)
+                print result
+            except Exception, e:
+                print traceback.format_exc()
+                print '%s (%s)' % (e, type(e))
+                return self.build_response(400, 'Problem creating agreement')
+
+            agreement_id = re.compile(self.regex).search(result.text).group(0)
+         
+            data = '{{ "id": "{}", \
+                      "slice": "{}", \
+                      "testbed": "{}" }}'.format(agreement_id, slice_id, testbed)
+
+            c.post(
+                "sliver",
+                data,
+                headers = {
+                    "content-type": "application/json",
+                    "accept": "application/xml"
+                }
+            )   
 
         return self.build_response(200, result)            
+
+class Testbeds(APIView):
+    def get(self, request, **kwargs):
+        c = restclient.Client("http://157.193.215.125:4001/sla-collector")
+        #url = settings.SLA_MANAGER_URL.replace("/sla","")
+        #c = restclient.Client(url)
+        print "**** URL ******", url
+        SLAtestbeds = c.get("testbeds")
+        # Future work: get SLA description for each testbed
+
+        return HttpResponse(SLAtestbeds.text, content_type="application/json", status=SLAtestbeds.status_code)

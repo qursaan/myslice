@@ -43,7 +43,7 @@ rooturl = settings.SLA_MANAGER_URL
 
 class Factory(object):
     @staticmethod
-    def agreements(path):
+    def agreements(path=_AGREEMENTS_PATH):
         """Returns a REST client for Agreements
 
         :rtype : Agreements
@@ -117,6 +117,7 @@ class Client(object):
 
         if "headers" not in kwargs:
             kwargs["headers"] = {"accept": "application/xml"}
+
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
                                        settings.SLA_MANAGER_PASSWORD)
 
@@ -150,12 +151,17 @@ class Client(object):
             )
         """
         url = _buildpath_(self.rooturl, path)
-        url = url + "?testbed=iminds"  # TODO remove hardcoded string
-        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-                                       settings.SLA_MANAGER_PASSWORD)
+        
+        if "testbed" in kwargs:
+            url = url + "?testbed=" + kwargs["testbed"]
+
         if "headers" not in kwargs:
-            kwargs = {"accept": "application/xml",
-                      "content-type": "application/xml"}
+            kwargs["headers"] = {"accept": "application/xml",
+                                 "content-type": "application/xml"}
+
+        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
+                               settings.SLA_MANAGER_PASSWORD)
+
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
             if "location" in result.headers else "<null>"
@@ -312,12 +318,12 @@ class Agreements(object):
         """
         return self.res.get(slicename, dict())
 
-    def create(self, agreement):
+    def create(self, agreement, testbed):
         """Create a new agreement
 
         :param str agreement: sla template in ws-agreement format.
         """
-        return self.res.create(agreement)
+        return self.res.create(agreement, params={'testbed': testbed})
 
 
 class Templates(object):
@@ -340,12 +346,12 @@ class Templates(object):
         """
         return self.res.getall()
 
-    def getbyid(self, provider_id):
+    def getbyid(self, provider_id, testbed):
         """Get a template
 
         :rtype: wsag_model.Template
         """
-        return self.res.getbyid(provider_id, None)
+        return self.res.getbyid(provider_id, {"testbed": testbed})
 
     def create(self, template):
         """Create a new template
