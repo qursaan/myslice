@@ -10,6 +10,9 @@ from django.core.mail           import EmailMultiAlternatives, send_mail
 
 from myslice.theme              import ThemeView
 
+# LS Client - By Bruno Soares (UFG)
+from lsapiclient                import LaboraSchedulerClient
+
 theme = ThemeView()
 
 # Thierry: moving this right into the code so 
@@ -163,7 +166,7 @@ def manifold_add_user(wsgi_request, request):
         'email'     : request['username'],
         'password'  : request['password'],
         'config'    : USER_CONFIG % request,
-        'status'    : 1,
+        'status'    : 1
     }
 
     request['authority_hrn'] = authority_hrn
@@ -570,137 +573,44 @@ def sfa_create_user(wsgi_request, request):
         send_mail(subject, msg, 'support@fibre.org.br',[request['email']], fail_silently=False)       
     return results
 
-def ldap_create_user(wsgi_request, request, user_detail):
-    """
-    Populating LDAP withuser data - Edelberto 10/03/2014
-    """
-    # import needed modules
-    import ldap
-    import ldap.modlist as modlist
+def ls_create_user(wsgi_request, request, user_detail):
+    organization = request['username'].split('@')[1]
+    lsClient = LaboraSchedulerClient( organization )
 
-    # Open a connection
-    # XXX We need to create this in settings
-    # ldap.open is deprecated!
-    #l = ldap.open("127.0.0.1")
-    l = ldap.initialize('ldap://127.0.0.1:389')
+    org_gidnumber = lsClient.get_testbed_info()['gidnumber']
+    user_homedirectory = "/home/" + organization + "/" + request['username'].split('@')[0]
+    user_homedirectory = user_homedirectory.encode('utf-8')
+    
+    user_data = {
+        'username'      : request['username'],
+        'email'         : request['email'].encode('utf-8'),
+        'password'      : request['password'].encode('utf-8'),
+        'name'          : str( request['first_name'].encode('latin1') ) + ' ' + str( request['last_name'].encode('latin1') ),
+        'gidnumber'     : org_gidnumber,
+        'homedirectory' : user_homedirectory
+    }
+    
+    # Add user in the island:
+    add_user = lsClient.add_user( user_data )
+    
+    return add_user
 
-    # you should  set this to ldap.VERSION2 if you're using a v2 directory
-    l.protocol_version = ldap.VERSION3
-
-    # Bind/authenticate with a user with apropriate rights to add objects
-    # XXX Now we set the force rootd but after we need to set this in settings file for could change the dn and password of root
-    l.simple_bind_s("cn=Manager,dc=br","fibre")
-
-    # The dn of our new entry/object
-    #dn="uid=addtest@uff.br,ou=people,o=uff,dc=br"
-
-    # we need to create the dn entry
-    # Receiving an email address, how can we split and mount it in DN format?
-    #mail = "debora@uff.br"
-    mail = request['email']
-    login = mail.split('@')[0]
-    org = mail.split('@')[1]
-    o = org.split('.')[-2]
-    dc = org.split('.')[-1]
-
-    # DN format to authenticate - IMPORTANT!
-    #FIBRE-BR format
-    dn = "uid="+mail+",ou=people,o="+o+",dc="+dc
-
-    # DEBUG
-    print "dn:"+dn
-    print request['password']
-
-    # Creating a unique uidNumber - Necessary for experiments
-    # Was defined to began in 100000
-    unique = int(user_detail['user_id']) + 100000
-    #unique = int(unique)
-    print unique
-
-    # A dict to help build the "body" of the object
-    attrs = {}
-    attrs['objectclass'] = ['person','inetOrgPerson','posixAccount','eduPerson','brPerson','schacPersonalCharacteristics','fibre', 'ldapPublicKey']
-    # XXX Converting all unicodes to string
-    attrs['uid'] = mail.encode('utf-8')
-    attrs['cn'] = request['first_name'].encode('latin1')
-    attrs['sn'] = request['last_name'].encode('latin1')
-    # XXX we need to set a unique uidNumber. How?
-    attrs['uidNumber'] = str(unique)
-    attrs['gidNumber'] = '500'
-    attrs['homeDirectory'] = "/home/"+org+"/"+mail
-    attrs['homeDirectory'] = attrs['homeDirectory'].encode('utf-8')
-    attrs['mail'] = mail.encode('utf-8')
-    attrs['eppn'] = mail.encode('utf8')
-    attrs['userPassword'] = request['password'].encode('utf-8')
-    attrs['sshPublicKey'] = request['public_key'].encode('utf-8')
-    # XXX We really set TRUE for those attributes? 
-    #attrs['userEnable'] = 'TRUE'
-    # set FALSE and change after when the user is validated
-    attrs['userEnable'] = 'FALSE'
-    attrs['omfAdmin'] = 'TRUE'
-
-    # Convert our dict to nice syntax for the add-function using modlist-module
-    ldif = modlist.addModlist(attrs)
-
-    # DEBUG
-    print attrs['userPassword']
-    print attrs['cn']
-    print attrs['sn']
-    print attrs['homeDirectory']
-    #print ldif
-
-    # Do the actual synchronous add-operation to the ldapserver
-    l.add_s(dn,ldif)
-
-    # Its nice to the server to disconnect and free resources when done
-    l.unbind_s()
-
-    return ldif
-
-def ldap_modify_user(wsgi_request, request):
-    #Modify entries in an LDAP Directory
-
-    #Synchrounous modify
-    # import needed modules
-    import ldap
-    import ldap.modlist as modlist
-
-    # Open a connection
-    l = ldap.initialize("ldap://localhost:389/")
-
-    # Bind/authenticate with a user with apropriate rights to add objects
-    l.simple_bind_s("cn=Manager,dc=br","fibre")
-
-    # we need to create the dn entry
-    # Receiving an email address, how can we split and mount it in DN format?
-    #mail = "debora@uff.br"
-    mail = request['email']
-    login = mail.split('@')[0]
-    org = mail.split('@')[1]
-    o = org.split('.')[-2]
-    dc = org.split('.')[-1]
-
-    # DN format to authenticate - IMPORTANT!
-    #FIBRE-BR format
-    dn = "uid="+mail+",ou=people,o="+o+",dc="+dc
-
-    # The dn of our existing entry/object
-    #dn="uid=mario@uff.br,ou=people,o=uff,dc=br"
-
-    # Some place-holders for old and new values
-    old = {'userEnable':'FALSE'}
-    new = {'userEnable':'TRUE'}
-
-    # Convert place-holders for modify-operation using modlist-module
-    ldif = modlist.modifyModlist(old,new)
-
-    # Do the actual modification
-    l.modify_s(dn,ldif)
-
-    # Its nice to the server to disconnect and free resources when done
-    l.unbind_s()
-
-    return ldif
+def ls_validate_user(wsgi_request, request):
+    organization = request['username'].split('@')[1]
+    lsClient = LaboraSchedulerClient( organization )
+    
+    user_id = lsClient.get_user_id_by_username( { 'username': str(request['username']) } )
+    
+    validate = False
+    if user_id:
+        user_data = {
+            'user_id'       : user_id,
+            'new_user_data' : { 'enable': 'TRUE' }
+        }
+        
+        validate = lsClient.update_user( user_data )
+        
+    return validate
 
 def create_user(wsgi_request, request):
     
@@ -720,23 +630,15 @@ def create_user(wsgi_request, request):
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
     
-# Add the user to the SFA registry
+    # Add the user to the SFA registry
     sfa_create_user(wsgi_request, request)
-
-    '''   
-    # LDAP update user userEnabled = True
+  
+    # Validate the user using the LS API ( By Bruno - UFG ):
     try:
-        mail = request['email']
-        login = mail.split('@')[0]
-        org = mail.split('@')[1]
-        o = org.split('.')[-2]
-        dc = org.split('.')[-1]
-        # To know if user is a LDAP user - Need to has a 'dc' identifier
-        if dc == 'br' or 'eu':
-            ldap_modify_user(wsgi_request, request)
+        ls_validate_user( wsgi_request, request )
     except Exception, e:
-        "LDAP create user failed"
-    '''
+        "Error to validate the user in Labora Scheduler."
+    
 def create_pending_user(wsgi_request, request, user_detail):
     """
     """
@@ -815,9 +717,8 @@ def create_pending_user(wsgi_request, request, user_detail):
     except Exception, e:
        print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
 
-    # Add user to LDAP userEnabled = False
-    # Not more here. Create before directly to the registrationview.py
-    # After we change userEnable = TRUE when validate the user
+    # Add user to island using LS API ( By Bruno - UFG )
+    ls_user_create = ls_create_user( wsgi_request, request, user_detail )
 
     try:
         # Send an email: the recipients are the PI of the authority

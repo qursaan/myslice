@@ -18,9 +18,8 @@ from manifold.core.query        import Query
 
 from portal.models              import PendingUser
 from django.contrib.auth.models import User   #Pedro
-#from portal.actions             import create_pending_user
-# Edelberto - LDAP
-from portal.actions             import create_pending_user, ldap_create_user
+
+from portal.actions             import create_pending_user
 
 from myslice.theme import ThemeView
 
@@ -76,16 +75,16 @@ class RegistrationView (FreeAccessView, ThemeView):
             email_hash = md5(str(salt)+post_email).hexdigest()
             #email_hash = md5(post_email).digest().encode('base64')[:-1]
             user_request = {
-                'first_name'    : wsgi_request.POST.get('firstname',     ''),
-                'last_name'     : wsgi_request.POST.get('lastname',      ''),
-                'organization'  : wsgi_request.POST.get('org_name', ''),
-                'authority_hrn' : authority_hrn, 
-                'email'         : post_email,
-		'username'	: wsgi_request.POST.get('username','').lower(),
-                'password'      : wsgi_request.POST.get('password',      ''),
-                'current_site'  : current_site,
-                'email_hash'    : email_hash,
-                'pi'            : '',
+                'first_name'     : wsgi_request.POST.get('firstname',     ''),
+                'last_name'      : wsgi_request.POST.get('lastname',      ''),
+                'organization'   : wsgi_request.POST.get('org_name', ''),
+                'authority_hrn'  : authority_hrn, 
+                'email'          : post_email,
+                'username'       : wsgi_request.POST.get('username','').lower(),
+                'password'       : wsgi_request.POST.get('password',      ''),
+                'current_site'   : current_site,
+                'email_hash'     : email_hash,
+                'pi'             : '',
                 'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
@@ -173,22 +172,6 @@ class RegistrationView (FreeAccessView, ThemeView):
                 user_request['public_key']  = file_content
                 
             if not errors:
-                '''
-                try:
-                    # verify if is a  LDAP 
-                    mail = user_detail['email']
-                    login = mail.split('@')[0]
-                    org = mail.split('@')[1]
-                    o = org.split('.')[-2]
-                    dc = org.split('.')[-1]
-                    # To know if user is a LDAP user - Need to has a 'dc' identifier
-                    if dc == 'br' or 'eu':
-                        # LDAP insert directly - but with userEnable = FALSE
-                        ldap_create_user(wsgi_request, user_request, user_detail)
-                   
-                except Exception, e:
-                    print "LDAP: problem em access the LDAP with this credentail" 
-                '''
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
             
