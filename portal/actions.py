@@ -406,6 +406,10 @@ def reject_action(request, **kwargs):
 
 def portal_reject_request(wsgi_request, request_ids):
     status = {}
+    # get the domain url    
+    current_site = Site.objects.get_current()
+    current_site = current_site.domain
+
 
     if not isinstance(request_ids, list):
         request_ids = [request_ids]
@@ -429,10 +433,6 @@ def portal_reject_request(wsgi_request, request_ids):
                     first_name = user.first_name
                     last_name = user.last_name
 
-                # get the domain url
-                current_site = Site.objects.get_current()
-                current_site = current_site.domain
-
                 ctx = {
                     'first_name'    : first_name, 
                     'last_name'     : last_name, 
@@ -447,7 +447,7 @@ def portal_reject_request(wsgi_request, request_ids):
                     sender =  render_to_string(theme.template, ctx)
                     sender = sender.replace('\n', '')
                                
-                    subject = 'User validation denied.'
+                    subject = 'User request denied.'
 
                     msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
                     msg.attach_alternative(html_content, "text/html")
@@ -487,36 +487,74 @@ def portal_reject_request(wsgi_request, request_ids):
 
             # getting user email based on id 
             ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
-            for user in PendingUser.objects.raw('SELECT * FROM portal_pendingslice WHERE id = %s', [request['id']]):
-                user_email= user.type_of_nodes # XXX type_of_nodes field contains the email [shd be renamed]
+            for user in PendingSlice.objects.raw('SELECT * FROM portal_pendingslice WHERE id = %s', [request['id']]):
+                user_email= user.type_of_nodes # XXX type_of_nodes field contains the email [shd be renamed in DB]
+                slice_name = user.slice_name
+                purpose = user.purpose
+                url = user.number_of_nodes
 
-                # get the domain url
-                current_site = Site.objects.get_current()
-                current_site = current_site.domain
-
-                ctx = {
-                    'portal_url'    : current_site,
-                    }
-                try:
-                    theme.template_name = 'slice_request_denied.txt'
-                    text_content = render_to_string(theme.template, ctx)
-                    theme.template_name = 'slice_request_denied.html'
-                    html_content = render_to_string(theme.template, ctx)
-                    theme.template_name = 'email_default_sender.txt'
-                    sender =  render_to_string(theme.template, ctx)
-                    sender = sender.replace('\n', '')
+            ctx = {
+                'slice_name': slice_name,
+                'purpose': purpose,
+                'url': url,
+                'portal_url': current_site,
+                }
+            try:
+                theme.template_name = 'slice_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'slice_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
                                
-                    subject = 'Slice request denied.'
+                subject = 'Slice request denied.'
 
-                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
-                    msg.attach_alternative(html_content, "text/html")
-                    msg.send()
-                except Exception, e:
-                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
                       
             PendingSlice.objects.get(id=request['id']).delete()
+
         elif request['type'] == 'authority':
-            request_status['SFA authority'] = {'status': True }           
+            request_status['SFA authority'] = {'status': True }
+            
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingAuthority.objects.raw('SELECT * FROM portal_pendingauthority WHERE id = %s', [request['id']]):
+                user_email= user.address_line1 # XXX address_line1 field contains the email [shd be renamed in DB]
+                site_name = user.site_name
+                city = user.address_city
+                country = user.address_country
+                short_name = user.site_abbreviated_name
+                url = user.site_url
+
+            ctx = { 
+                'site_name': site_name,
+                'short_name': short_name,
+                'url': url,
+                'city': city,
+                'country': country,                          
+                'portal_url'    : current_site,
+                }
+                
+            try:
+                theme.template_name = 'authority_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'authority_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
+                subject = 'Authority request denied.'
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
             PendingAuthority.objects.get(id=request['id']).delete()
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
