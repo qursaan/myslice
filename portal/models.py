@@ -66,7 +66,8 @@ class PendingUser(models.Model):
     login         = models.TextField()
     pi            = models.TextField()
     email_hash    = models.TextField()
-    status        = models.TextField()  
+    status        = models.TextField()
+    reasons       = models.TextField()  
     created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 

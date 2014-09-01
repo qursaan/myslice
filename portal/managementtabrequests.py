@@ -18,6 +18,7 @@ from portal.actions                 import get_requests
 from myslice.theme import ThemeView
 
 import json
+import ast
 
 class ManagementRequestsView (LoginRequiredView, ThemeView):
     template_name = "management-tab-requests.html"
@@ -28,7 +29,8 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
         ctx_delegation_authorities = {}
         ctx_sub_authorities = {}
         dest = {}
-
+	user_username = ''
+	user_authority = ''
 
         # The user need to be logged in
         if (self.request.user):
@@ -36,7 +38,12 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
             user_query = Query().get('local:user').filter_by('email', '==', self.request.user.username).select('user_id')
             user, = execute_query(self.request, user_query)
             user_id = user['user_id']
-
+	    user_query = Query().get('local:user').filter_by('email', '==', self.request.user.username).select('config')
+	    user, = execute_query(self.request, user_query)
+	    user_config = user['config']
+	    user_config = ast.literal_eval(user_config)
+	    user_authority = user_config['authority']	
+	    user_username = self.request.user.username
             # Query manifold to learn about available SFA platforms for more information
             # In general we will at least have the portal
             # For now we are considering all registries
@@ -120,8 +127,9 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
             # iterate on the requests and check if the authority matches a prefix 
             # startswith an authority on which the user is PI
             requests = get_requests()
-            for r in requests:
-                auth_hrn = r['authority_hrn']
+	    auth_hrn = ''
+	    for r in requests:
+		auth_hrn = r['authority_hrn']
                 for my_auth in pi_my_authorities: 
                     if auth_hrn.startswith(my_auth):
                         dest = ctx_my_authorities
@@ -156,10 +164,14 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 #         env['pi'] = "is_pi"       
 #         env['theme'] = self.theme
 #         env['section'] = "Requests"
-        
+#        auth_hrn = user_authority + '.' + user_username.split("@")[1]
+        auth_hrn = user_username.split("@")[1]
         context = super(ManagementRequestsView, self).get_context_data(**kwargs)
         print "testing"
         print ctx_my_authorities
+	print auth_hrn
+	print user_username
+	print user_authority
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities
@@ -174,6 +186,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
         context['pi'] = "is_pi"       
         context['theme'] = self.theme
         context['section'] = "Requests"
+	context['auth_hrn'] = auth_hrn
         # XXX We need to prepare the page for queries
         #context.update(page.prelude_env())
 

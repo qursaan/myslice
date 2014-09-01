@@ -83,6 +83,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'email'         : post_email,
 		'username'	: wsgi_request.POST.get('username','').lower(),
                 'password'      : wsgi_request.POST.get('password',      ''),
+		'reasons'       : wsgi_request.POST.get('reasons', ''),
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
                 'pi'            : '',
@@ -98,7 +99,8 @@ class RegistrationView (FreeAccessView, ThemeView):
 	    username = user_request['username']
 
             if user_request['authority_hrn'] == "fibre" :
-                user_request['username'] = user_request['username'] + "@" + "" # to be defined
+                user_request['username'] = user_request['username'] + "@" + "rnp" # catch-all island
+		split_authority = user_request['authority_hrn']
             else :
                 split_authority = user_request['authority_hrn'].split(".")[1]
                 user_request['username'] = user_request['username'] + '@' + split_authority
@@ -192,7 +194,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
             
-                return render(wsgi_request, self.template, {'theme': self.theme}) 
+                return render(wsgi_request, self.template, {'theme': self.theme, 'REQINST':wsgi_request.POST.get('org_name', '').split(".")[1].upper()}) 
 
         else:
             user_request = {}

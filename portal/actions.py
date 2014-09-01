@@ -754,6 +754,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         user_hrn      = request['user_hrn'],
         pi            = request['pi'],
         email_hash    = request['email_hash'],
+	reasons       = request['reasons'],
         status        = 'False',
     )
     b.save()
@@ -858,6 +859,7 @@ def create_pending_user(wsgi_request, request, user_detail):
 
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+	print pi_emails
     except Exception, e:
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
         import traceback
