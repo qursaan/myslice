@@ -122,7 +122,7 @@
         Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
         {% else %}
             {% if request.type == 'slice' %}
-        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+        Slice name: {{request.slice_name}} -- Url: {{request.number_of_nodes}} -- Email: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
             {% else %} {# authority #}
         Authority name: {{request.site_name}} -- authority_hrn: {{request.site_authority}} -- City: {{request.address_city}} -- Country: {{request.address_country}}
             {% endif %}

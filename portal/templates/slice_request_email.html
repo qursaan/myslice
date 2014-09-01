@@ -1,6 +1,9 @@
-<img src="https://onelab.eu/templates/onelab2/images/logo.png">
+<img src="{{ STATIC_URL }}img/onelab.png">
 <br>
 <h1>NEW SLICE REQUEST</h1>
+<br>
+<p>You are receiving this request because we have you listed as a manager at an organization that uses OneLab.</p>
+<p>A user from your organization has requested the creation of a new slice, which will allow him or her to reserve testbed resources to conduct an experiment.</p>
 <br>
 <b>Slice name      :</b> {{slice_name}}</br>
 <b>URL 			   :</b> {{url}}</br>
@@ -8,4 +11,13 @@
 <b>Organization	   :</b> {{organization}}</br>
 <b>Email           :</b> {{email}}</br>
 <b>Portal url	   :</b> {{current_site}}</br> 
+<p></p>
+<p>You can see new slice request <a href="http://{{current_site}}/portal/validate">in the portal.</a><p>
+<p>Please be sure that you know the user who is requesting this slice, as you are responsible for his or her actions, as described in the 
+<a href="http://{{current_site}}/terms">OneLab terms and conditions.</a></p>
+<p>And kindly ensure that the stated experiment purpose is clear, and, if there is a website that explains the website, that a URL is provided.</p>
+<p>OneLab and its affiliated testbeds exist purely to support useful and interesting work. To ensure the future of these environments, we need to know what work is actually being done.</p>
+<p></p>
+<p>If you believe that you have received this message in error, or if you have any questions, kindly contact support@onelab.eu.</p>
+
 

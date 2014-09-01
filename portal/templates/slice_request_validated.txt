@@ -1,0 +1,18 @@
+Dear OneLab user,
+
+You have recently requested a slice in the OneLab portal.
+
+Slice name      : {{slice_name}}
+URL             : {{number_of_nodes}}
+Purpose         : {{purpose}}
+
+We are glad to inform you that, a manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.
+
+On behalf of the entire team, I wish you a fruitful user experience on OneLab.
+
+Yours sincerely,
+
+Timur Friedman
+Executive Director
+
+

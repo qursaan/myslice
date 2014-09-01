@@ -424,16 +424,37 @@ def portal_reject_request(wsgi_request, request_ids):
                 request_status['SFA user'] = {'status': True }
                 # getting user email based on id 
                 ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
-                for user in PendingUser.objects.raw('SELECT id,email FROM portal_pendinguser WHERE id = %s', [request['id']]):
+                for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE id = %s', [request['id']]):
                     user_email= user.email
+                    first_name = user.first_name
+                    last_name = user.last_name
 
                 # get the domain url
                 current_site = Site.objects.get_current()
                 current_site = current_site.domain
 
-                subject = 'User validation denied.'
-                msg = 'You have recently registered to ' + current_site + '. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact the manager of your institution for further information. For any other queries, contact us by replying to this email.'
-                send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+                ctx = {
+                    'first_name'    : first_name, 
+                    'last_name'     : last_name, 
+                    'portal_url'    : current_site,
+                    }
+                try:
+                    theme.template_name = 'user_request_denied.txt'
+                    text_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'user_request_denied.html'
+                    html_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'email_default_sender.txt'
+                    sender =  render_to_string(theme.template, ctx)
+                    sender = sender.replace('\n', '')
+                               
+                    subject = 'User validation denied.'
+
+                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                except Exception, e:
+                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
+            
                 # removing from Django auth_user
                 UserModel = get_user_model()
                 UserModel._default_manager.filter(email__iexact = user_email).delete()
@@ -462,7 +483,37 @@ def portal_reject_request(wsgi_request, request_ids):
                 request_status['SFA authority'] = {'status': False, 'description': str(e)}
                       
         elif request['type'] == 'slice':
-            request_status['SFA slice'] = {'status': True }           
+            request_status['SFA slice'] = {'status': True } 
+
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingUser.objects.raw('SELECT * FROM portal_pendingslice WHERE id = %s', [request['id']]):
+                user_email= user.type_of_nodes # XXX type_of_nodes field contains the email [shd be renamed]
+
+                # get the domain url
+                current_site = Site.objects.get_current()
+                current_site = current_site.domain
+
+                ctx = {
+                    'portal_url'    : current_site,
+                    }
+                try:
+                    theme.template_name = 'slice_request_denied.txt'
+                    text_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'slice_request_denied.html'
+                    html_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'email_default_sender.txt'
+                    sender =  render_to_string(theme.template, ctx)
+                    sender = sender.replace('\n', '')
+                               
+                    subject = 'Slice request denied.'
+
+                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                except Exception, e:
+                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                      
             PendingSlice.objects.get(id=request['id']).delete()
         elif request['type'] == 'authority':
             request_status['SFA authority'] = {'status': True }           
@@ -527,9 +578,24 @@ def create_slice(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
-        subject = 'Slice created'
-        msg = 'A manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.'
-        send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+
+        try:
+            theme.template_name = 'slice_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'slice_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+            subject = 'Slice request validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
        
     return results
 
@@ -542,8 +608,9 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['url'],
+        number_of_nodes = request['url'], # field needs to be renamed
         purpose         = request['purpose'],
+        type_of_nodes   = request['email'] # field needs to be renamed 
     )
     s.save()
 
@@ -654,9 +721,25 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     else:
-        subject = 'User validated'
-        msg = 'A manager of your institution has validated your account. You have now full user access to the portal.'
-        send_mail(subject, msg, 'support@onelab.eu',[request['email']], fail_silently=False)       
+        try:
+            theme.template_name = 'user_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'user_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+
+            subject = 'User validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [request['email']])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
     return results
 
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
