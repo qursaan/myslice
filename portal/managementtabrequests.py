@@ -165,13 +165,23 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 #         env['theme'] = self.theme
 #         env['section'] = "Requests"
 #        auth_hrn = user_authority + '.' + user_username.split("@")[1]
-        auth_hrn = user_username.split("@")[1]
+	    ctx_list = [ctx_my_authorities, ctx_sub_authorities, ctx_delegation_authorities]
+	    for ctx in ctx_list:
+	        if ctx:
+	            for authorities in ctx:
+	                for requests in ctx[authorities]:
+		            try:
+		                requests['object_auth'] = requests['user_hrn'].split('.')[0] + '.' + requests['user_hrn'].split('@')[1]
+		            except:
+		                print "This object has no user_hrn"
+
+        pi_authority = user_authority + '.' + user_username.split("@")[1]
         context = super(ManagementRequestsView, self).get_context_data(**kwargs)
         print "testing"
         print ctx_my_authorities
 	print auth_hrn
 	print user_username
-	print user_authority
+	print pi_authority
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities
@@ -186,7 +196,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
         context['pi'] = "is_pi"       
         context['theme'] = self.theme
         context['section'] = "Requests"
-	context['auth_hrn'] = auth_hrn
+	context['pi_authority'] = pi_authority
         # XXX We need to prepare the page for queries
         #context.update(page.prelude_env())
 

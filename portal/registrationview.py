@@ -192,7 +192,8 @@ class RegistrationView (FreeAccessView, ThemeView):
           'topmenu_items': topmenu_items_live('Register', page),
           'errors': errors,
           'authorities': authorities,
-          'theme': self.theme
+          'theme': self.theme,
+	  'section':'Registration'
           }
         template_env.update(user_request)
         template_env.update(reg_form)

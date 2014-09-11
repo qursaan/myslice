@@ -2,7 +2,7 @@ from unfold.loginrequired               import FreeAccessView
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails, authority_get_pis
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -14,7 +14,7 @@ from myslice.theme                      import ThemeView
 from portal.models                      import PendingUser
 from django.core.mail                   import EmailMultiAlternatives, send_mail
 from django.contrib.sites.models        import Site
-
+from django.contrib.auth.models         import User
 #
 import json, os, re, itertools
 
@@ -50,6 +50,23 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
             activation = 'success'
             # sending email after activation success
+            try:
+                request = PendingUser.objects.filter(email_hash= hash_code)
+		split_authority_hrn = request[0].authority_hrn.split('.')[0]
+		pis = authority_get_pis(request, split_authority_hrn)
+		pi_emails = []
+		for x in pis:
+		    for e in x['pi_users']:
+		        u = e.split('.')[1]
+			y = User.Objects.get(username = u)
+			if y.username.count("@") != 0:
+			    if y.username.split("@")[1] == request[0].user_hrn.split("@")[1]:
+			        pi_emails += [y.email]
+		subject = 'User email activated'
+		msg = 'The user %s has validated his/her email. Now you can validate his/her account' % (request[0].login)
+		send_mail(subject, msg, 'support@fibre.org.br', pi_emails, fail_silently = False)
+	    except:
+	        print "error sending the email!"    
             #try:
                 # Send an email: the recipients are the PI of the authority
                 # If No PI is defined for this Authority, send to a default email (different for each theme)
