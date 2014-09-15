@@ -1,7 +1,18 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("li#nav-request").addClass("active");
-		$('table.requests').dataTable();
+		$('table.requests').dataTable({
+		    "sDom": "frtiS",
+            "bScrollCollapse": true,
+            "bStateSave": true,
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": true,
+            "bAutoHeight": false,
+		});
 	});
 	function on_click_event() {
 		var ids = []; 
@@ -98,7 +109,7 @@
             <th>Authority</th>
             <th>Info</th>
             <th>Date</th>
-            <th>Statu</th>
+            <th>Status</th>
         </tr>
         </thead>
         <tbody>
