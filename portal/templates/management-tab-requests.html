@@ -86,11 +86,9 @@
 	<h2>From your authorities</h2>
 </div>
 {% if my_authorities %}
-	
+	<table class="table">
 	{% for authority, requests in my_authorities.items %}
 	
-        <table class="table">
-          
         {% for request in requests %}
     
     	  <tr>
@@ -121,9 +119,9 @@
     	  </tr>
     
         {% endfor %}
-    	</table>
+    	
 	{% endfor %}
-
+    </table>
 {% else %}
 	<div class="col-md-12">
 		<i>There is no pending request waiting for validation.</i>
