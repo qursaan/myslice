@@ -88,6 +88,7 @@
 	<h2>From your authorities</h2>
 </div>
 {% if my_authorities %}
+<div class="col-md-12">
 	<table class="table-responsive requests">
 	    <thead>
         <tr>
@@ -97,6 +98,7 @@
             <th>Authority</th>
             <th>Info</th>
             <th>Date</th>
+            <th>Statu</th>
         </tr>
         </thead>
         <tbody>
@@ -142,6 +144,7 @@
 	{% endfor %}
 	   </tbody>
     </table>
+   </div>
 {% else %}
 	<div class="col-md-12">
 		<i>There is no pending request waiting for validation.</i>
