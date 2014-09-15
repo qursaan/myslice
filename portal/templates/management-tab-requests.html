@@ -1,6 +1,18 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("li#nav-request").addClass("active");
+		$('table.requests').dataTable( {
+            "sDom": "frtiS",
+            "bScrollCollapse": true,
+            "bStateSave": true,
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": true,
+            "bAutoHeight": false,
+        } );
 	});
 	function on_click_event() {
 		var ids = []; 
@@ -82,20 +94,20 @@
 	}
 </script>
 
-<div class="container">
+<div class="container-fluid">
 <div class="col-md-12">
 	<h2>From your authorities</h2>
 </div>
 {% if my_authorities %}
-	<table class="table">
+	<table class="table-responsive requests">
 	{% for authority, requests in my_authorities.items %}
 	
         {% for request in requests %}
         
         {% if request.type == 'user' %}
-    	<tr class="info">
-    	{% elif request.type == 'slice' %}
     	<tr>
+    	{% elif request.type == 'slice' %}
+    	<tr class="info">
     	{% else %}
     	<tr class="active">
     	{% endif %}
