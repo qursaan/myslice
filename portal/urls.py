@@ -99,7 +99,7 @@ urlpatterns = patterns('',
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
     # (r'^validate_action/(?P<constraints>[^/]+)/(?P<id>\w+)/?$', 'portal.views.pres_view_static'),
     url(r'^validate_action(?P<id>(?:/\w+)+)/?$', 'portal.actions.validate_action'),
-
+    url(r'^reject_action(?P<id>(?:/\w+)+)/?$', 'portal.actions.reject_action'),
     url(r'^pres_view/?$', PresViewView.as_view(), name='pres_view'),
     (r'^methods/(?P<type>\w+)/?$', 'portal.views.pres_view_methods'),
     (r'^animation/(?P<constraints>[^/]+)/(?P<id>\w+)/?$', 'portal.views.pres_view_animation'),

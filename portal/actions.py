@@ -4,7 +4,9 @@ from manifoldapi.manifoldapi    import execute_query,execute_admin_query
 from portal.models              import PendingUser, PendingSlice, PendingAuthority
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models  import User
+from django.contrib.sites.models import Site
+from django.contrib.auth        import get_user_model
 from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
 
@@ -201,6 +203,11 @@ def manifold_delete_account(request, platform_id, user_id, account_params):
     results = execute_admin_query(request,query)
     return results
 
+def manifold_delete_user(request, user_id, user_params):
+    query = Query.delete('local:user').filter_by('user_id', '==', user_id).set(user_params).select('user_id')
+    results = execute_admin_query(request,query)
+    return results
+
 
 #not tested
 def manifold_add_platform(request, platform_params):
@@ -383,12 +390,176 @@ def portal_validate_request(wsgi_request, request_ids):
 
     return status
 
-
 def validate_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
     status = portal_validate_request(request, ids)
     json_answer = json.dumps(status)
     return HttpResponse (json_answer, mimetype="application/json")
+
+
+def reject_action(request, **kwargs):
+    ids = filter(None, kwargs['id'].split('/'))
+    status = portal_reject_request(request, ids)
+    json_answer = json.dumps(status)
+    return HttpResponse (json_answer, mimetype="application/json")
+
+
+def portal_reject_request(wsgi_request, request_ids):
+    status = {}
+    # get the domain url    
+    current_site = Site.objects.get_current()
+    current_site = current_site.domain
+
+
+    if not isinstance(request_ids, list):
+        request_ids = [request_ids]
+
+    requests = get_request_by_id(request_ids)
+    for request in requests:
+        # type, id, timestamp, details, allowed -- MISSING: authority_hrn
+        # CAREFUL about details
+        # user  : first name, last name, email, password, keypair
+        # slice : number of nodes, type of nodes, purpose
+        
+        request_status = {}
+
+        if request['type'] == 'user':
+            try:
+                request_status['SFA user'] = {'status': True }
+                # getting user email based on id 
+                ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+                for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE id = %s', [request['id']]):
+                    user_email= user.email
+                    first_name = user.first_name
+                    last_name = user.last_name
+
+                ctx = {
+                    'first_name'    : first_name, 
+                    'last_name'     : last_name, 
+                    'portal_url'    : current_site,
+                    }
+                try:
+                    theme.template_name = 'user_request_denied.txt'
+                    text_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'user_request_denied.html'
+                    html_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'email_default_sender.txt'
+                    sender =  render_to_string(theme.template, ctx)
+                    sender = sender.replace('\n', '')
+                               
+                    subject = 'User request denied.'
+
+                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                except Exception, e:
+                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
+            
+                # removing from Django auth_user
+                UserModel = get_user_model()
+                UserModel._default_manager.filter(email__iexact = user_email).delete()
+                # removing from Django portal_pendinguser
+                PendingUser.objects.get(id=request['id']).delete()
+                # removing from manifold
+                # removing manifold account
+                user_query = Query().get('local:user') \
+                    .filter_by('email', '==', user_email)           \
+                    .select('user_id')
+                user = execute_admin_query(wsgi_request, user_query)
+                user_id = user[0]['user_id']
+        
+                platform_query = Query().get('local:platform') \
+                    .filter_by('platform', '==', 'myslice')           \
+                    .select('platform_id')
+                platform = execute_admin_query(wsgi_request, platform_query)
+                platform_id = platform[0]['platform_id']
+                account_params = {'user_id':user_id}
+                manifold_delete_account(request, platform_id, user_id, account_params)           
+             
+                # removing manifold user
+                user_params = {'user_id':user_id}
+                manifold_delete_user(request, user_id, user_params)
+            except Exception, e:
+                request_status['SFA authority'] = {'status': False, 'description': str(e)}
+                      
+        elif request['type'] == 'slice':
+            request_status['SFA slice'] = {'status': True } 
+
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingSlice.objects.raw('SELECT * FROM portal_pendingslice WHERE id = %s', [request['id']]):
+                user_email= user.type_of_nodes # XXX type_of_nodes field contains the email [shd be renamed in DB]
+                slice_name = user.slice_name
+                purpose = user.purpose
+                url = user.number_of_nodes
+
+            ctx = {
+                'slice_name': slice_name,
+                'purpose': purpose,
+                'url': url,
+                'portal_url': current_site,
+                }
+            try:
+                theme.template_name = 'slice_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'slice_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
+                               
+                subject = 'Slice request denied.'
+
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                      
+            PendingSlice.objects.get(id=request['id']).delete()
+
+        elif request['type'] == 'authority':
+            request_status['SFA authority'] = {'status': True }
+            
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingAuthority.objects.raw('SELECT * FROM portal_pendingauthority WHERE id = %s', [request['id']]):
+                user_email= user.address_line1 # XXX address_line1 field contains the email [shd be renamed in DB]
+                site_name = user.site_name
+                city = user.address_city
+                country = user.address_country
+                short_name = user.site_abbreviated_name
+                url = user.site_url
+
+            ctx = { 
+                'site_name': site_name,
+                'short_name': short_name,
+                'url': url,
+                'city': city,
+                'country': country,                          
+                'portal_url'    : current_site,
+                }
+                
+            try:
+                theme.template_name = 'authority_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'authority_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
+                subject = 'Authority request denied.'
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
+            PendingAuthority.objects.get(id=request['id']).delete()
+
+        status['%s__%s' % (request['type'], request['id'])] = request_status
+
+    return status
 
 # Django and ajax
 # http://djangosnippets.org/snippets/942/
@@ -445,9 +616,24 @@ def create_slice(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
-        subject = 'Slice created'
-        msg = 'A manager of your institution has validated your slice request. You can now add resources to the slice and start experimenting.'
-        send_mail(subject, msg, 'support@onelab.eu',[user_email], fail_silently=False)
+
+        try:
+            theme.template_name = 'slice_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'slice_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+            subject = 'Slice request validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
        
     return results
 
@@ -460,8 +646,9 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['url'],
+        number_of_nodes = request['url'], # field needs to be renamed
         purpose         = request['purpose'],
+        type_of_nodes   = request['email'] # field needs to be renamed 
     )
     s.save()
 
@@ -572,9 +759,25 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     else:
-        subject = 'User validated'
-        msg = 'A manager of your institution has validated your account. You have now full user access to the portal.'
-        send_mail(subject, msg, 'support@onelab.eu',[request['email']], fail_silently=False)       
+        try:
+            theme.template_name = 'user_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'user_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+
+            subject = 'User validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [request['email']])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
     return results
 
 def create_user(wsgi_request, request, namespace = None, as_admin = False):

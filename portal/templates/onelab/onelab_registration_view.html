@@ -23,11 +23,10 @@
 	</div>
 </div>
 {% endif %}
+				<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
 <div class="row">
 	<div class="col-md-12">
 			<div class="form-group">
-				<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
-
 				{% csrf_token %}
 		  		<label for="authority_hrn" class="control-label">Organization</label>
 				<p></p>
@@ -84,7 +83,7 @@
 	      	<br />
 			<div class="alert alert-danger" id="pkey_del_msg">
 				In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to 
-				<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your public key to the portal.</a>
+				<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your credentials to the portal.</a>
 			</div>
 	    </div>
 	</div>

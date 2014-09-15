@@ -1,3 +1,5 @@
+This email is only for OneLab admins.
+
 NEW AUTHORITY REQUEST
 
 Site             : {{site_name}}             
@@ -6,15 +8,8 @@ Authority hrn    : {{authority_hrn}}
 Abreviated name  : {{site_abbreviated_name}} 
 URL              : {{site_url}}              
 
-latitude         : {{site_latitude}}         
-longitude        : {{site_longitude}}        
 
-Address          : {{address_line1}}
-                   {{address_line2}}     
-                   {{address_line3}}         
 City             : {{address_city}}          
-Postcode         : {{address_postalcode}}    
-State            : {{address_state}}         
 Country          : {{address_country}}  
 
 

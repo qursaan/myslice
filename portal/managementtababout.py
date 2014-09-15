@@ -28,8 +28,9 @@ class ManagementAboutView (FreeAccessView, ThemeView):
             user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(self.request.user))
             user_local_details = execute_query(self.request, user_local_query)
             user_authority = json.loads(user_local_details[0]['config']).get('authority')
-            
-            authority_query = Query().get('authority').select('description', 'authority_hrn', 'legal', 'address', 'abbreviated_name', 
+            # XXX Should be done using Metadata
+            # select column.name from local:object where table=='authority'
+            authority_query = Query().get('authority').select('authority_hrn', 'name', 'address', 'enabled','description', 
                                                               'scientific', 'city', 'name', 'url', 'country', 'enabled', 'longitude', 
                                                               'tech', 'latitude', 'pi_users', 'parent_authority', 'onelab_membership', 
                                                               'postcode').filter_by('authority_hrn','==',user_authority)
@@ -37,11 +38,13 @@ class ManagementAboutView (FreeAccessView, ThemeView):
             
             if authority_details :
                 authority_contacts = {}
-                authority_contacts['scientific'] = [ x.strip()[1:-1] for x in authority_details[0]['scientific'][1:-1].split(',') ]
-                authority_contacts['technical'] = [ x.strip()[1:-1] for x in authority_details[0]['tech'][1:-1].split(',') ]
-            
-                authority_contacts['legal'] = [ x.strip().replace('"','') for x in authority_details[0]['legal'][1:-1].split(',') ]
                 authority = authority_details[0]
+                if 'scientific' in authority and authority['scientific'] is not None:
+                    authority_contacts['scientific'] = [ x.strip()[1:-1] for x in authority['scientific'][1:-1].split(',') ]
+                if 'technical' in authority and authority['technical'] is not None:
+                    authority_contacts['technical'] = [ x.strip()[1:-1] for x in authority['tech'][1:-1].split(',') ]
+                if 'legal' in authority and authority['legal'] is not None:
+                    authority_contacts['legal'] = [ x.strip().replace('"','') for x in authority['legal'][1:-1].split(',') ]
             else :
                 authority_contacts = None
                 authority = None

@@ -194,6 +194,9 @@
 	  	<div class="col-md-12">
 		<h3>Credentials <small>Delegated to Principal Account</small></h3>
 		        <table class="table">
+					 {%if 'no_creds'  in user_cred %}
+						<p><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+					{%endif%}	
 					<caption><b>Delegated User Credential</b></caption> 
 		            <tr class="odd"> 
 		                <th>Expiration Date</th>
@@ -264,6 +267,39 @@
 				{%endif%}
 		</div>
 	</div>
+<!-- Modal- No credentials -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
+                    </div>
+                    <div class="modal-body">
+					<p>You may get this message for several reasons.</p>
+					<h3>Account Delegation: Automatic</h3>
+					<ul>
+						<li>If you press the "Clear Credentials" button</li>
+						<li>If you "Generate a new key pair"</li>
+						<li>If a new slice is added to your account</li>
+					</ul>
+					<p>In all the above mentioned cases, it is sufficient to refresh the page or go back to home page. The portal will regenrate your credentials.
+					 In some cases it may take more time than usual. If nothing works, then please logout and login again to the portal.</p>
+					<h3>Account Delegation: Manual</h3>
+						<p>As you have uploaded your own public key, the portal can no longer generate your credentials automatically.</p>
+						<p>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
+						<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your credentials to the portal.</a>
+					</p>
+					<h5>Contact support</h5>
+					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
+
 
 	<div class="tab-pane row" id="access">
 	  	<div class="col-md-12">

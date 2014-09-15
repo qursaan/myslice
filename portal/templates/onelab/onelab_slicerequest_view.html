@@ -50,7 +50,11 @@
 			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
 				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
-			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			  {%if 'is_pi'  in pi %}	
+			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+			  {%else%}
+			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
+			  {%endif%}	
 			</form>
 	
 		</div>
@@ -94,6 +98,10 @@ jQuery(document).ready(function(){
       minLength: 0,
       select: function( event, ui ) {console.log(jQuery(this));}
     });
+
+	$("#submit_pi").click(function() {
+		localStorage.clear();
+	});
 });
 </script>
 {% endblock %}
