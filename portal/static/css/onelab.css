@@ -818,7 +818,3 @@ div.s-monitor {
 span#stats-period-txt {
     text-transform:lowercase;
 }
-
-table.requests td {
-    padding:4px 6px;
-}
