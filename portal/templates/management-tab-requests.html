@@ -87,57 +87,21 @@
 </div>
 {% if my_authorities %}
 	
-	{% for authority in my_authorities.items %}
-    
-    <div class="col-md-12">
-        <h2>Authorities</h2>
-    </div>
-    <div class="col-md-12">
-        <table class="table">
-        {% for request in requests %}
-    
-          <tr>
-            <td>{{authority}}</td>
-            <td>
-            {% if request.allowed == 'allowed' %}
-            <input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
-            {% else %}
-                {% if request.allowed == 'expired' %}expired{% else %}denied{% endif %}
-            {% endif %}
-            </td>
-            <td>{{ request.type }}</td>
-            <td>{{ request.id }}</td>
-            <td>
-            {% if request.type == 'user' %}
-                <b>{{request.first_name}} {{request.last_name}}</b> <a href="mailto:{{request.email}}">{{request.email}}</a>
-            {% else %}
-                {% if request.type == 'slice' %}
-                <b>{{request.slice_name}}</b> -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
-                {% else %} {# authority #}
-                <b>{{request.site_name}}</b> ({{request.site_authority}}) -- {{request.address_city}}, {{request.address_country}}
-                {% endif %}
-            {% endif %}
-            </td>
-            <td>{{ request.timestamp }}</td>
-            
-            <td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
-    
-        <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
-          </tr>
-    
-        {% endfor %}
-        </table>
-    </div>
-    {% endfor %}
-    
-    
-	{% for requests in my_authorities.items %}
+	{% for authority, requests in my_authorities.items %}
 	
 	<div class="col-md-12">
-		<h2>{{authority}}</h2>
+		<h2>{{authority|default:"Authorities"}}</h2>
 	</div>
 	<div class="col-md-12">
         <table class="table">
+          <th>
+            <td>Authority</td>
+            <td>Type</td>
+            <td>Id</td>
+            <td>Details</td>
+            <td>Timestamp</td>
+            <td>Status</td>
+          </th>
         {% for request in requests %}
     
     	  <tr>
