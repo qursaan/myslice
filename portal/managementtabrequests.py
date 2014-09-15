@@ -159,7 +159,9 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
         
         context = super(ManagementRequestsView, self).get_context_data(**kwargs)
         print "testing"
-        print ctx_my_authorities
+        for s in ctx_my_authorities :
+            print s
+            
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities
