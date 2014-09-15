@@ -62,6 +62,16 @@ span.subtitle {
     font-weight:normal;
     text-transform:uppercase;
 }
+span.small {
+    font-size:9pt;
+}
+span.gray {
+    color:gray;
+}
+span.type {
+    color:#201E62;
+    font-weight:bold;
+}
 span.htitle {
     color:#454545;
     font-size:9pt;

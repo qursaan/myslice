@@ -82,6 +82,7 @@
 	}
 </script>
 
+<div class="container">
 <div class="col-md-12">
 	<h2>From your authorities</h2>
 </div>
@@ -90,8 +91,14 @@
 	{% for authority, requests in my_authorities.items %}
 	
         {% for request in requests %}
-    
-    	  <tr>
+        
+        {% if request.type == 'user' %}
+    	<tr class="info">
+    	{% elif request.type == 'slice' %}
+    	<tr>
+    	{% else %}
+    	<tr class="active">
+    	{% endif %}
     	    <td><span class="gray small">{{ request.id }}</span></td>
     	    <td>
             {% if request.allowed == 'allowed' %}
@@ -127,6 +134,9 @@
 		<i>There is no pending request waiting for validation.</i>
 	</div>
 {% endif %}
+</div>
+
+
 <br />
 <div class="col-md-12">
 	<h2>From your sub-authorities</h2>
