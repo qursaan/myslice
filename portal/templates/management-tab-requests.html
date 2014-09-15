@@ -1,18 +1,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("li#nav-request").addClass("active");
-		$('table.requests').dataTable( {
-            "sDom": "frtiS",
-            "bScrollCollapse": true,
-            "bStateSave": true,
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": false,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": true,
-            "bAutoHeight": false,
-        } );
+		$('table.requests').dataTable();
 	});
 	function on_click_event() {
 		var ids = []; 
@@ -100,6 +89,17 @@
 </div>
 {% if my_authorities %}
 	<table class="table-responsive requests">
+	    <thead>
+        <tr>
+            <th>ID</th>
+            <th></th>
+            <th>Type</th>
+            <th>Authority</th>
+            <th>Info</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
 	{% for authority, requests in my_authorities.items %}
 	
         {% for request in requests %}
@@ -140,6 +140,7 @@
         {% endfor %}
     	
 	{% endfor %}
+	   </tbody>
     </table>
 {% else %}
 	<div class="col-md-12">
