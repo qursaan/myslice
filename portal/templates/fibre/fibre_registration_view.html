@@ -33,10 +33,10 @@
 		  		<input id="authority_hrn" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. If it is not in the list, 
-				please request its addition by clicking the link below. We will send an email to the managers that we have on record for 
+				please choose the FIBRE organization. We will send an email to the managers that we have on record for
 				your organization, asking them to validate your sign-up request." required />
 				<p></p>
-				<p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p>
+				<!-- <p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p> -->
 			</div>
 	</div>
 </div>
@@ -56,6 +56,11 @@
 	    	<input type="email" name="email" size="25"  class="form-control" style="width:350px" value="{{ email }}" 
 			title="Your e-mail address will be your identifier for logging in. We contact you to verify your account and then, occasionally, for important issues."
 			placeholder="Email" required />
+		</div>
+		<div class="form-group">
+			<label for="Reasons" class="control-label" >Reasons for Applying</label>
+                	<p></p>
+			<textarea type="text" rows="4" cols="70" name="reasons" size="25" class="form-control" style="width:350px;height:60px"  minlength="5" maxlength="250" value="{{reasons}}" placeholder="Reasons for applying" title="Identify yourself and tell us more about your expectations to use the testbed." required ></textarea>
 		</div>
 	</div>	
 
@@ -105,7 +110,7 @@
 	<div class="col-md-12">
 		<div class="form-group" id="register">
 			<p></p>	
-	    	<input class="submit btn btn-onelab" type="submit" value="Sign up" />
+	    	<input class="submit btn btn-onelab" type="submit" value="Request My Account" />
 
 	    </div>
 	</div>
@@ -194,20 +199,24 @@ $(document).ready(function(){
                                                                             {% if authority.authority_hrn == "fibre.cpqd" %}
                                                                                     {value:"{{ authority.authority_hrn }}",label:"CENTRO DE PESQUISA E DESENVOLVIMENTO EM TELECOMUNICACOES"},
                                                                             {% else %}
-										{% if authority.authority_hrn == "fibre.i2cat" %}
-											{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
-										{% else %}
-											{% if authority.authority_hrn == "fibre.uth" %}
-                                                                                        	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
-											{% else %}
-												{% if authority.authority_hrn == "fibre.bristol" %}
-                                                                                                	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
-												{% else %}
-                                                                                   		 	{value:"{{ authority.authority_hrn }}",label:"FIBRE"},
-												{% endif %}
+                                                                                    {% if authority.authority_hrn == "fibre.rnp" %}
+                                                                                             {value:"{{ authority.authority_hrn }}",label:"REDE NACIONAL DE ENSINO E PESQUISA"},
+                                                                                    {% else %}
+		                 						    	{% if authority.authority_hrn == "fibre.i2cat" %}
+										        	{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
+										        {% else %}
+											        {% if authority.authority_hrn == "fibre.uth" %}
+                                                                                        	         {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
+											        {% else %}
+												      {% if authority.authority_hrn == "fibre.bristol" %}
+                                                                                                	     {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
+												       {% else %}
+                                                                                   		 	     {value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+  												{% endif %}
 											{% endif %}
 										{% endif %}
                                                                             {% endif %}
+                                                                         {% endif %}
                                                                      {% endif %}
                                                             {% endif %}
                                                     {% endif %}

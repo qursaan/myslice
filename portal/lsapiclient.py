@@ -16,8 +16,7 @@ class LaboraSchedulerClient:
                      'get_user_id_by_username', 'add_user_public_key', 'delete_user_public_key' ]
 
     def __init__ ( self, organization ):
-        self.url, self.key = self.getOrganizationConfigs( organization )
-
+       self.url, self.key = self.getOrganizationConfigs( organization )
 
     def __getattr__(self, name):
         
@@ -92,7 +91,7 @@ class LaboraSchedulerClient:
         databaseConfig = {
             'dbHost'        : '10.128.11.200',
             'dbUser'        : 'postgres',
-            'dbPassword'    : '5e6b70f2e9dc',
+            'dbPassword'    : '',
             'dbName'        : 'LaboraSchedulerNOC'
         }
         

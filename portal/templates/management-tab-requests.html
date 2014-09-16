@@ -40,7 +40,20 @@
 				}
 			);
 		}
-	}
+        };
+        function showMore(buttonId, divId){
+          var element = document.getElementById(buttonId);
+          var div_element = document.getElementById(divId);
+          if (element.value === '(+)'){
+            element.value = '(-)';
+            $('#'+divId).slideDown('fast');
+          }
+          else {
+            element.value = '(+)';
+            $('#'+divId).slideUp('fast');
+          }
+          return false;
+        }
 </script>
 
 <div class="col-md-12">
@@ -49,56 +62,57 @@
 {% if my_authorities %}
 	
 	{% for authority, requests in my_authorities.items %}
-	
+	{% if authority == pi_authority or 'fibre'%}
 	<div class="col-md-12">
 		<h2>{{authority}}</h2>
+		<table class="table">
+			      <th>
+			        <td>Type</td>
+			        <td>Id</td>
+			        <td>Details</td>
+			        <td>Timestamp</td>
+			        <td>Status</td>
+			      </th>
+			{% for request in requests %} 
+				<tr>
+					{% if request.object_auth == pi_authority %}
+						<td>
+						{% if request.allowed == 'allowed' %}
+						<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
+						{% else %}
+							{% if request.allowed == 'expired' %}
+								expired
+							{% else %} {# denied #}
+								denied
+							{% endif %}
+						{% endif %}
+						</td>
+						<td>{{ request.type }}</td>
+						<td>{{ request.id }}</td>
+						<td>
+				        	{% if request.type == 'user' %}
+				       		 	Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
+							<input type = "button" id = "moreBtn_{{request.id}}" value = "(+)" onclick = "showMore('moreBtn_{{request.id}}','reasons_{{request.id}}')" style="color:blue; padding:0; border:none; background:none">
+                					<div id="reasons_{{request.id}}" style="display:none"> Reasons for Applying:<br> {{request.reasons}} </div> 
+				       		{% else %}
+				            	{% if request.type == 'slice' %}
+				        			Slice name: {{request.slice_name}} -- User_hrn: {{ request.user_hrn }} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+				           		{% else %} {# authority #}
+				        			Authority name: {{request.site_name}} -- authority_hrn: {{request.site_authority}} -- City: {{request.address_city}} -- Country: {{request.address_country}}
+				            	{% endif %}
+				        	{% endif %}
+						</td>
+						<td>{{ request.timestamp }}</td>
+					
+						<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
+
+			    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+		    		{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
 	</div>
-	
-    <table class="table">
-      <th>
-        <td>Type</td>
-        <td>Id</td>
-        <td>Details</td>
-        <td>Timestamp</td>
-        <td>Status</td>
-      </th>
-    {% for request in requests %}
-
-	  <tr>
-		<td>
-		{% if request.allowed == 'allowed' %}
-		<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
-		{% else %}
-			{% if request.allowed == 'expired' %}
-				expired
-			{% else %} {# denied #}
-				denied
-			{% endif %}
-		{% endif %}
-		</td>
-		<td>{{ request.type }}</td>
-		<td>{{ request.id }}</td>
-		<td>
-        {% if request.type == 'user' %}
-        Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
-        {% else %}
-            {% if request.type == 'slice' %}
-        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
-            {% else %} {# authority #}
-        Authority name: {{request.site_name}} -- authority_hrn: {{request.site_authority}} -- City: {{request.address_city}} -- Country: {{request.address_country}}
-            {% endif %}
-        {% endif %}
-		</td>
-		<td>{{ request.timestamp }}</td>
-		
-		<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
-
-    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
-	  </tr>
-
-    {% endfor %}
-	</table>
-	</div>
+	{% endif %}
 	{% endfor %}
 
 {% else %}
@@ -113,51 +127,55 @@
 {% if sub_authorities %}
 	
 	{% for authority, requests in sub_authorities.items %}
-	<div class="col-md-12">
-	<h3>{{authority}}</h3>
-	    <table class="table">
-	      <th>
-	        <td>Type</td>
-	        <td>Id</td>
-	        <td>Details</td>
-	        <td>Timestamp</td>
-	        <td>Status</td>
-	      </th>
-	    {% for request in requests %}
-		  <tr>
-			<td>
-			{% if request.allowed == 'allowed' %}
-			<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
-			{% else %}
-				{% if request.allowed == 'expired' %}
-					expired
-				{% else %} {# denied #}
-					denied
+	{% if authority == pi_authority or 'fibre'%}
+		<div class="col-md-12">
+		<h3>{{authority}}</h3>
+		    <table class="table">
+		      <th>
+		        <td>Type</td>
+		        <td>Id</td>
+		        <td>Details</td>
+		        <td>Timestamp</td>
+		        <td>Status</td>
+		      </th>
+		    {% for request in requests %}
+			  <tr>
+			  	{% if request.object_auth == pi_authority %}
+				<td>
+				{% if request.allowed == 'allowed' %}
+				<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
+				{% else %}
+					{% if request.allowed == 'expired' %}
+						expired
+					{% else %} {# denied #}
+						denied
+					{% endif %}
 				{% endif %}
-			{% endif %}
-			</td>
-			<td>{{ request.type }}</td>
-			<td>{{ request.id }}</td>
-			<td>
-	        {% if request.type == 'user' %}
-	        Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
-	        {% else %}
-	            {% if request.type == 'slice' %}
-	        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
-	            {% else %} {# authority #}
-	        Authority name: {{request.site_name}} -- authority_hrn: {{request.site_authority}} -- City: {{request.address_city}} -- Country: {{request.address_country}}
-	            {% endif %}
-	        {% endif %}
-			</td>
-			<td>{{ request.timestamp }}</td>
-			
-			<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
-	
+				</td>		
+				<td>{{ request.type }}</td>
+				<td>{{ request.id }}</td>
+				<td>
+		        {% if request.type == 'user' %}
+		        Login: {{request.login}} -- First name: {{request.first_name}} -- Last name: {{request.last_name}} -- Email: {{request.email}}
+		        {% else %}
+		            {% if request.type == 'slice' %}
+		        Slice name: {{request.slice_name}} -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+		            {% else %} {# authority #}
+		        Authority name: {{request.site_name}} -- authority_hrn: {{request.site_authority}} -- City: {{request.address_city}} -- Country: {{request.address_country}}
+		            {% endif %}
+		        {% endif %}
+				</td>
+				<td>{{ request.timestamp }}</td>
+				
+				<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
+		
 	    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
-		  </tr>
-	    {% endfor %}
-	    </table>
-	</div>
+	    		{% endif %}
+			  </tr>
+		    {% endfor %}
+		    </table>
+		</div>
+	{% endif %}
 	{% endfor %}
 {% else %}
 <div class="col-md-12">
@@ -172,6 +190,7 @@
 {% if delegation_authorities %}
 	
 	{% for authority, requests in delegation_authorities.items %}
+	{% if authority == pi_authority  or 'fibre'%}
 	<div class="col-md-12">
 		<h3>{{authority}}</h3>
 		    <table class="table">
@@ -184,6 +203,7 @@
 		      </th>
 		    {% for request in requests %}
 			  <tr>
+			  	{% if request.object_auth == pi_authority %}
 				<td>
 				{% if request.allowed == 'allowed' %}
 				<input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
@@ -209,15 +229,17 @@
 		       {% endif %}
 				</td>
 				<td>{{ request.timestamp }}</td>
-				
+			
 				<td><span id='portal__status__{{request.type}}__{{request.id}}'></span></td>
-		
-		    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+	
+	    <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+	    		{% endif %}
 			  </tr>
 		    {% endfor %}
 		    </table>
-		</div>
-		{% endfor %}
+	</div>
+	{% endif %}
+	{% endfor %}
 {% else %}
 <div class="col-md-12">
 	<i>There is no pending request waiting for validation.</i>

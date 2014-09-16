@@ -57,7 +57,7 @@ def clear_user_creds(request, user_email):
     try:
         user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
         user_details = execute_admin_query(request, user_query)
-    
+
         # getting the user_id from the session
         for user_detail in user_details:
             user_id = user_detail['user_id']
@@ -565,6 +565,7 @@ def sfa_create_user(wsgi_request, request):
 
     query = Query.create('user').set(sfa_user_params).select('user_hrn')
     results = execute_query(wsgi_request, query)
+
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
     else:
@@ -615,7 +616,7 @@ def ls_validate_user(wsgi_request, request):
         
         validate = lsClient.update_user( userData )
         
-    return validate
+    return validate and addUserPublicKey
 
 def ls_update_public_key( wsgi_request, request, lsClient, userId ):
     userPbKey = {
@@ -653,7 +654,99 @@ def create_user(wsgi_request, request):
         ls_validate_user( wsgi_request, request )
     except Exception, e:
         "Error to validate the user in Labora Scheduler."
+
+def create_user_in_ldap(wsgi_request, request, user_detail):
+    """
+    """
+   
+    # saves the user to django auth_user table [needed for password reset]
+    user = User.objects.create_user(request['username'], request['email'], request['password'])
+
+    # Creating a manifold user
+    user_id = manifold_add_user(wsgi_request, request)
+
+    # Creating a Manifold account on the MySlice platform
+    # Note the JSON representation of public and private keys already includes quotes
+    account_config = {
+        'user_hrn'          : request['user_hrn'],
+        'user_public_key'   : request['public_key'],
+    }
+    if request['private_key']:
+        account_config['user_private_key'] = request['private_key']
+
+    user_id = user_detail['user_id'] + 1 # the user_id for the newly created user in local:user
+
+    # XXX TODO: Require a myslice platform
+    # ALERT: this will disapear with ROUTERV2 of Manifold
+    # We have to consider the case where several registries can be used
+    # Removed hardcoded platform = 5
+    # This platform == 'myslice' is a TMP FIX !!
+    try:
+        reg_platform_query = Query().get('local:platform') \
+            .filter_by('platform', '==', 'myslice')           \
+            .select('platform_id')
+        reg_platform = execute_admin_query(wsgi_request, reg_platform_query)
+        reg_platform_id = reg_platform[0]['platform_id']
+        account_params = {
+            'platform_id'   : reg_platform_id, # XXX ALERT !!
+            'user_id'       : user_id, 
+            'auth_type'     : request['auth_type'], 
+            'config'        : json.dumps(account_config),
+        }
+        manifold_add_account(wsgi_request, account_params)
+    except Exception, e:
+       print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
+
+    # XXX This has to be stored centrally
+    USER_STATUS_ENABLED = 2
+
+    # Update Manifold user status
+    manifold_update_user(wsgi_request, request['username'], {'status': USER_STATUS_ENABLED})
+
+    # Add reference accounts for platforms
+    manifold_add_reference_user_accounts(wsgi_request, request)
     
+    from sfa.util.xrn import Xrn 
+
+    auth_pi = request.get('pi', None)
+    auth_pi = list([auth_pi]) if auth_pi else list()
+
+    # We create a user request with Manifold terminology
+    sfa_user_params = {
+        'user_hrn'          : request['user_hrn'],
+        'user_email'        : request['email'],
+        'user_urn'          : Xrn(request['user_hrn'], request['type']).get_urn(),
+        'user_type'         : request['type'],
+        'keys'              : request['public_key'],
+        'user_first_name'   : request['first_name'],
+        'user_last_name'    : request['last_name'],
+        'pi_authorities'    : auth_pi,
+        'user_enabled'      : True
+    }
+
+    print request['user_hrn']
+    print request['email']
+    print request['first_name']
+    print request['last_name']
+    print request['type']
+    print request['public_key']
+
+    query = Query.create('user').set(sfa_user_params).select('user_hrn')
+
+    print query
+
+    results = execute_admin_query(wsgi_request, query)
+
+    print results
+
+    if not results:
+        raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
+    else:
+        subject = 'User validated'
+        msg = 'A manager of your institution has validated your account. You have now full user access to the portal.'
+        send_mail(subject, msg, 'support@fibre.org.br',[request['email']], fail_silently=False)       
+    return results
+
 def create_pending_user(wsgi_request, request, user_detail):
     """
     """
@@ -671,6 +764,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         user_hrn      = request['user_hrn'],
         pi            = request['pi'],
         email_hash    = request['email_hash'],
+	reasons       = request['reasons'],
         status        = 'False',
     )
     b.save()
@@ -774,6 +868,7 @@ def create_pending_user(wsgi_request, request, user_detail):
 
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+	print pi_emails
     except Exception, e:
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
         import traceback

@@ -75,16 +75,17 @@ class RegistrationView (FreeAccessView, ThemeView):
             email_hash = md5(str(salt)+post_email).hexdigest()
             #email_hash = md5(post_email).digest().encode('base64')[:-1]
             user_request = {
-                'first_name'     : wsgi_request.POST.get('firstname',     ''),
-                'last_name'      : wsgi_request.POST.get('lastname',      ''),
-                'organization'   : wsgi_request.POST.get('org_name', ''),
-                'authority_hrn'  : authority_hrn, 
-                'email'          : post_email,
-                'username'       : wsgi_request.POST.get('username','').lower(),
-                'password'       : wsgi_request.POST.get('password',      ''),
-                'current_site'   : current_site,
-                'email_hash'     : email_hash,
-                'pi'             : '',
+                'first_name'    : wsgi_request.POST.get('firstname',     ''),
+                'last_name'     : wsgi_request.POST.get('lastname',      ''),
+                'organization'  : wsgi_request.POST.get('org_name', ''),
+                'authority_hrn' : authority_hrn, 
+                'email'         : post_email,
+		'username'	: wsgi_request.POST.get('username','').lower(),
+                'password'      : wsgi_request.POST.get('password',      ''),
+		'reasons'       : wsgi_request.POST.get('reasons', ''),
+                'current_site'  : current_site,
+                'email_hash'    : email_hash,
+                'pi'            : '',
                 'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
@@ -97,7 +98,8 @@ class RegistrationView (FreeAccessView, ThemeView):
 	    username = user_request['username']
 
             if user_request['authority_hrn'] == "fibre" :
-                user_request['username'] = user_request['username'] + "@" + "" # to be defined
+                user_request['username'] = user_request['username'] + "@" + "rnp" # catch-all island
+		split_authority = user_request['authority_hrn']
             else :
                 split_authority = user_request['authority_hrn'].split(".")[1]
                 user_request['username'] = user_request['username'] + '@' + split_authority
@@ -175,7 +177,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
             
-                return render(wsgi_request, self.template, {'theme': self.theme}) 
+                return render(wsgi_request, self.template, {'theme': self.theme, 'REQINST':wsgi_request.POST.get('org_name', '').split(".")[1].upper()}) 
 
         else:
             user_request = {}
@@ -190,7 +192,8 @@ class RegistrationView (FreeAccessView, ThemeView):
           'topmenu_items': topmenu_items_live('Register', page),
           'errors': errors,
           'authorities': authorities,
-          'theme': self.theme
+          'theme': self.theme,
+	  'section':'Registration'
           }
         template_env.update(user_request)
         template_env.update(reg_form)
