@@ -11,7 +11,7 @@
 		In order to delegate your credentials to the OneLab portal, you need to install SFA tools.<br>
 	</p>
 	<p>
-		<strong>Requirement: python 2.7</strong>
+		<strong>[Requirement: python 2.7 or higher]</strong>
 	</p>
 	<h4>For Mac and Linux</h4>
 	<p class="command">
@@ -19,8 +19,9 @@
 		$ sudo pip install sfa
 	</p>
 	<h4>For Windows</h4>
+	<p>Please download <a target="_blank" href="https://bootstrap.pypa.io/get-pip.py">get-pip.py</a></p>
 	<p class="command">
-    	$ python get-pip.py<br>
+		$ python get-pip.py<br>
 		$ pip install sfa
 	</p>
 
@@ -61,8 +62,6 @@
 		user = onelab.upmc.mohammed-yasin_rahman<br>
 		registry = http://portal.onelab.eu:12345/<br>
 		sm = http://sfa3.planet-lab.eu:12346/<br>
-		<br>
-		[sface]
 	</p>
 
 	<p>
@@ -74,10 +73,10 @@
 	<p class="command">
 		[myslice]<br>
 		<br>
-		backend = http://portal.onelab.eu:7080<br>
-		delegate  = onelab.myslice<br>
-		platform  = myslice<br>
-		username = [OneLab portal's username]  e.g., mohammed-yasin.rahman@lip6.fr
+		backend  = http://portal.onelab.eu:7080<br>
+		delegate = onelab.myslice<br>
+		platform = myslice<br>
+		username = mohammed-yasin.rahman@lip6.fr
 	</p>
 	<p>
 		Test the SFA layer:
