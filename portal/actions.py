@@ -577,40 +577,55 @@ def ls_create_user(wsgi_request, request, user_detail):
     organization = request['username'].split('@')[1]
     lsClient = LaboraSchedulerClient( organization )
 
-    org_gidnumber = lsClient.get_testbed_info()['gidnumber']
-    user_homedirectory = "/home/" + organization + "/" + request['username'].split('@')[0]
-    user_homedirectory = user_homedirectory.encode('utf-8')
+    orgGIDNumber = lsClient.get_testbed_info()['gidnumber']
+    userHomeDirectory = "/home/" + organization + "/" + request['username'].split('@')[0]
+    userHomeDirectory = userHomeDirectory.encode('utf-8')
     
-    user_data = {
+    userData = {
         'username'      : request['username'],
         'email'         : request['email'].encode('utf-8'),
         'password'      : request['password'].encode('utf-8'),
         'name'          : str( request['first_name'].encode('latin1') ) + ' ' + str( request['last_name'].encode('latin1') ),
-        'gidnumber'     : org_gidnumber,
-        'homedirectory' : user_homedirectory
+        'gidnumber'     : orgGIDNumber,
+        'homedirectory' : userHomeDirectory,
+        'created_by'    : "myslice"
     }
     
-    # Add user in the island:
-    add_user = lsClient.add_user( user_data )
+    # Add user in the island.
+    addUser = lsClient.add_user( userData )
     
-    return add_user
+    # User successfully created, upload user public key.
+    if addUser:
+        ls_update_public_key( wsgi_request, request, lsClient, addUser )
+    
+    return addUser
 
 def ls_validate_user(wsgi_request, request):
     organization = request['username'].split('@')[1]
     lsClient = LaboraSchedulerClient( organization )
     
-    user_id = lsClient.get_user_id_by_username( { 'username': str(request['username']) } )
+    userId = lsClient.get_user_id_by_username( { 'username': str( request['username'] ) } )
     
     validate = False
-    if user_id:
-        user_data = {
-            'user_id'       : user_id,
+    if userId:
+        userData = {
+            'user_id'       : userId,
             'new_user_data' : { 'enable': 'TRUE' }
         }
         
-        validate = lsClient.update_user( user_data )
+        validate = lsClient.update_user( userData )
         
     return validate
+
+def ls_update_public_key( wsgi_request, request, lsClient, userId ):
+    userPbKey = {
+        'user_id'       : userId,
+        'public_key'    : request['public_key']
+    }
+    
+    addUserPublicKey = lsClient.add_user_public_key( userPbKey )
+    
+    return addUserPublicKey
 
 def create_user(wsgi_request, request):
     
