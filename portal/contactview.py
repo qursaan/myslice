@@ -43,7 +43,6 @@ class ContactView (FreeAccessView, ThemeView):
             ## we don't need it cz the new ticketing systems sends a confirmation email ###
             #if cc_myself:
             #    recipients.append(email)
-            #recipients = ['support@myslice.info']
             theme.template_name = 'contact_support_email.html'
             html_content = render_to_string(theme.template, form.cleaned_data)
         

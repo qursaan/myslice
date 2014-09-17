@@ -44,7 +44,7 @@ def authority_get_pi_emails(request, authority_hrn):
         #default_email = default_email.replace('\n', '')
         #return default_email
         # the above doesn't work
-        return ['support@myslice.info']
+        return ['support@onelab.eu']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
         query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
@@ -823,7 +823,6 @@ def create_pending_user(wsgi_request, request, user_detail):
     theme.template_name = 'activate_user_email_subject.txt'
     subject = render_to_string(theme.template, request)
     subject = subject.replace('\n', '')
-    #sender = 'support@myslice.info'
     theme.template_name = 'email_default_sender.txt'
     sender =  render_to_string(theme.template, request)
     sender = sender.replace('\n', '')
