@@ -16,7 +16,7 @@ from manifoldapi.manifoldapi            import execute_query, execute_admin_quer
 # Edelberto - LDAP XXX
 from portal.models		import PendingUser
 from django.contrib.auth.models import User   #Pedro
-from portal.actions             import create_pending_user, create_user
+from portal.actions             import create_pending_user, create_user, create_user_in_ldap, clear_user_creds
 from registrationview 		import RegistrationView
 from random     import randint
 from hashlib    import md5
@@ -62,7 +62,7 @@ class HomeView (FreeAccessView, ThemeView):
 	## first you must open a connection to the server
 	try:
 		# Connect to NOC
-		l = ldap.initialize("ldap://200.130.15.186:389")
+		l = ldap.initialize("ldap://10.128.0.50:389")
 		# Bind/authenticate with a root user to search all objects
 		l.simple_bind_s("cn=Manager,dc=br,dc=fibre","fibre2013")
 		
@@ -79,7 +79,10 @@ class HomeView (FreeAccessView, ThemeView):
 	searchFilter = "uid=" + username
 	print searchFilter
 
+        in_ldap = 0
+
 	try:
+            if username != "admin":
 		ldap_result_id = l.search(baseDN, searchScope, searchFilter, retrieveAttributes)
 		result_set = []
 		result_type, result_data = l.result(ldap_result_id, 0)
@@ -125,7 +128,13 @@ class HomeView (FreeAccessView, ThemeView):
 						print cn
 						sn 		=  result_set[0][0][1]['sn'][0]
 						print sn
-						authority_hrn 	=  'fibre' + '.' + username.split('@')[1] 
+                                                fname =  sn.split(' ')[0]
+                                                lname =  sn.split(' ')[1]
+                                                print fname
+                                                print lname
+
+						#authority_hrn 	=  'fibre' + '.' + username.split('@')[1] 
+						authority_hrn 	=  'fibre'
 						print authority_hrn
 						email		= ldap_mail
 						print ldap_mail
@@ -133,7 +142,8 @@ class HomeView (FreeAccessView, ThemeView):
 						print username
 						password	= password
 						print password
-						user_hrn	= 'fibre' + '.' + username.split('@')[1] + '.' + username
+						# user_hrn	= 'fibre' + '.' + username.split('@')[1] + '.' + username
+						user_hrn	= 'fibre' + '.' + username
 						print user_hrn
 
 						# Based on registrationview
@@ -150,10 +160,8 @@ class HomeView (FreeAccessView, ThemeView):
 						print email_hash
 
 					    	user_request = {
-						#'first_name'    : cn,
-						'first_name'    : sn,
-						'last_name'     : '',
-						#'organization'  : username.split('@')[1],
+						'first_name'    : fname,
+						'last_name'     : lname,
 						'organization'  : authority_hrn,
 						'authority_hrn' : authority_hrn,
 						'email'         : ldap_mail,
@@ -163,6 +171,7 @@ class HomeView (FreeAccessView, ThemeView):
 						'email_hash'    : email_hash,
 						'pi'            : '',
 						'user_hrn'	: user_hrn,
+                                                'reasons'       : 'already exists in the LDAP',
 						'type'		: 'user',
 						'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
 					    	}
@@ -208,13 +217,14 @@ class HomeView (FreeAccessView, ThemeView):
 
 						# XXX Verify if errors exist - After!
 					    	#if not errors:
-						create_pending_user(request, user_request, user_detail)
-							
-						create_user(request, user_request)
+						create_user_in_ldap(request, user_request, user_detail)
+						#create_pending_user(request, user_request, user_detail)
 
-            					env['state'] = "User LDAP associated. Authenticate again."
-            					return render_to_response(self.template, env, context_instance=RequestContext(request))
-
+                                                #create_user(request, user_request)
+                                                            
+                                                env['state'] = "LDAP associated. Please, login again."
+                                                return render_to_response(self.template, env, context_instance=RequestContext(request))
+                                                        
 
 				else:
             				env['state'] = "Access denied. Verify LDAP userEnable and password."
@@ -232,7 +242,7 @@ class HomeView (FreeAccessView, ThemeView):
 		print e	
 
         #else:
-	if in_ldap and enabled and pwd:
+	if in_ldap and enabled and pwd or username=="admin":
 
 ################################################################################
 ### XXX Edelberto LDAP auth end XXX

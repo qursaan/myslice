@@ -199,20 +199,24 @@ $(document).ready(function(){
                                                                             {% if authority.authority_hrn == "fibre.cpqd" %}
                                                                                     {value:"{{ authority.authority_hrn }}",label:"CENTRO DE PESQUISA E DESENVOLVIMENTO EM TELECOMUNICACOES"},
                                                                             {% else %}
-										{% if authority.authority_hrn == "fibre.i2cat" %}
-											{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
-										{% else %}
-											{% if authority.authority_hrn == "fibre.uth" %}
-                                                                                        	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
-											{% else %}
-												{% if authority.authority_hrn == "fibre.bristol" %}
-                                                                                                	{value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
-												{% else %}
-                                                                                   		 	{value:"{{ authority.authority_hrn }}",label:"FIBRE"},
-												{% endif %}
+                                                                                    {% if authority.authority_hrn == "fibre.rnp" %}
+                                                                                             {value:"{{ authority.authority_hrn }}",label:"REDE NACIONAL DE ENSINO E PESQUISA"},
+                                                                                    {% else %}
+		                 						    	{% if authority.authority_hrn == "fibre.i2cat" %}
+										        	{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
+										        {% else %}
+											        {% if authority.authority_hrn == "fibre.uth" %}
+                                                                                        	         {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
+											        {% else %}
+												      {% if authority.authority_hrn == "fibre.bristol" %}
+                                                                                                	     {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
+												       {% else %}
+                                                                                   		 	     {value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+  												{% endif %}
 											{% endif %}
 										{% endif %}
                                                                             {% endif %}
+                                                                         {% endif %}
                                                                      {% endif %}
                                                             {% endif %}
                                                     {% endif %}

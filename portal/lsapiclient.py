@@ -13,12 +13,10 @@ class LaboraSchedulerClient:
     """
                 
     direct_calls = [ 'get_testbed_info', 'get_users', 'add_user', 'delete_user', 'update_user',
-                     'get_user_id_by_username' ]
+                     'get_user_id_by_username', 'add_user_public_key', 'delete_user_public_key' ]
 
     def __init__ ( self, organization ):
-       # self.url, self.key = self.getOrganizationConfigs( organization )
-       self.url = "https://portal.ufrj.fibre.org.br:3002/LS-Sched/"
-       self.key = "9763dd03f2da8138fb22a63d78e5e9792b59a637"
+       self.url, self.key = self.getOrganizationConfigs( organization )
 
     def __getattr__(self, name):
         
@@ -45,13 +43,15 @@ class LaboraSchedulerClient:
                 method_parameters.extend(['filter'])
             elif actual_name == "update_user":
                 method_parameters.extend(['user_id', 'new_user_data'])
-            elif actual_name == "delete_user":
+            elif actual_name == "delete_user" or actual_name == "delete_user_public_key":
                 method_parameters.extend(['user_id'])
             elif actual_name == "get_user_id_by_username":
                 method_parameters.extend(['username'])
             elif actual_name == "add_user":
                 method_parameters.extend(['username', 'email', 'password', 'name', 'gidnumber',
-                                          'homedirectory'])
+                                          'homedirectory', 'created_by'])
+            elif actual_name == "add_user_public_key":
+                method_parameters.extend(['user_id', 'public_key'])
             
             for parameter in args:
                 if isinstance(parameter, (frozenset, list, set, tuple, dict)):
@@ -90,7 +90,7 @@ class LaboraSchedulerClient:
         
         databaseConfig = {
             'dbHost'        : '10.128.11.200',
-            'dbUser'        : '',
+            'dbUser'        : 'postgres',
             'dbPassword'    : '',
             'dbName'        : 'LaboraSchedulerNOC'
         }

@@ -345,7 +345,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['flowspaces']= univbrisfvlist.render(self.request)
         template_env['flowspaces_form']= univbrisfvform.render(self.request)
 
-
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
