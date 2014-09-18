@@ -707,6 +707,16 @@ def create_user_in_ldap(wsgi_request, request, user_detail):
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
     
+    organization = request['username'].split('@')[1]
+    lsClient = LaboraSchedulerClient( organization )
+    
+    userId = lsClient.get_user_id_by_username( { 'username': str( request['username'] ) } )
+
+    ls_up_pkey = ls_update_public_key( wsgi_request, request, lsClient, userId )
+    
+    if ls_up_pkey:
+        print "OK PKEY"
+
     from sfa.util.xrn import Xrn 
 
     auth_pi = request.get('pi', None)
