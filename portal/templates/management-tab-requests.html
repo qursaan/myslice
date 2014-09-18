@@ -62,7 +62,7 @@
 {% if my_authorities %}
 	
 	{% for authority, requests in my_authorities.items %}
-	{% if authority == pi_authority or 'fibre'%}
+	{% if authority == pi_authority or authority == "fibre" %}
 	<div class="col-md-12">
 		<h2>{{authority}}</h2>
 		<table class="table">
@@ -127,7 +127,7 @@
 {% if sub_authorities %}
 	
 	{% for authority, requests in sub_authorities.items %}
-	{% if authority == pi_authority or 'fibre'%}
+	{% if authority == pi_authority or authority == 'fibre'%}
 		<div class="col-md-12">
 		<h3>{{authority}}</h3>
 		    <table class="table">
@@ -190,7 +190,7 @@
 {% if delegation_authorities %}
 	
 	{% for authority, requests in delegation_authorities.items %}
-	{% if authority == pi_authority  or 'fibre'%}
+	{% if authority == pi_authority  or authority == 'fibre'%}
 	<div class="col-md-12">
 		<h3>{{authority}}</h3>
 		    <table class="table">

@@ -234,6 +234,7 @@ def make_request_user(user):
     request['public_key']    = user.public_key
     request['private_key']   = user.private_key
     request['username']	     = user.login
+    request['reasons']       = user.reasons
     return request
 
 def make_request_slice(slice):
