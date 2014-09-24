@@ -69,6 +69,10 @@ class HomeView (FreeAccessView, ThemeView):
                     activity.user.login(self.request)
                     
                     ## check user is pi or not
+                    platform_details = {}
+                    account_details = {}
+                    acc_auth_cred = {}
+                    acc_user_cred = {}
                     platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
                     account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
                     platform_details = execute_query(self.request, platform_query)
@@ -118,7 +122,12 @@ class HomeView (FreeAccessView, ThemeView):
         env = self.default_env()
         acc_auth_cred={}
         if request.user.is_authenticated():
+           
             ## check user is pi or not
+            platform_details = {}
+            account_details = {}
+            acc_auth_cred = {}
+            acc_user_cred = {}
             platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
             account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
             # XXX Something like an invalid session seems to make the execute fail sometimes, and thus gives an error on the main page
