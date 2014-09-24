@@ -27,9 +27,10 @@
             </wsag:ServiceProperties>
             {% for term in data.guarantee_terms %}
             <wsag:GuaranteeTerm wsag:Name="{{term.name}}">
-                {# do not need servicescope #}
-	            {% for scope in term.scopes %}
-                <wsag:ServiceScope wsag:ServiceName="{{scope.servicename}}"/>
+                {% for gs in term.scopes %}
+                <wsag:ServiceScope wsag:ServiceName="{{gs.servicename}}">
+                    {{ gs.scope }}
+                </wsag:ServiceScope>
                 {% endfor %}
                 <wsag:ServiceLevelObjective>
                     <wsag:KPITarget>

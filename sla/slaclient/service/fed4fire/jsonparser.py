@@ -109,10 +109,18 @@ def _json_parse_guarantee_terms(d):
     """
     result = []
     for term in d.get("guarantees", None) or ():
+        gs = AgreementInput.GuaranteeTerm.GuaranteeScope(
+            term["scope"].get("service_name", ""),
+            term["scope"].get("scope", "")
+            )
+        print "*******GS****"
+        print gs
         result.append(
             AgreementInput.GuaranteeTerm(
                 metric_name=term["name"],
-                bounds=tuple(term["bounds"])
+                bounds=tuple(term["bounds"]),
+                guarantee_scopes=gs
             )
         )
+
     return result

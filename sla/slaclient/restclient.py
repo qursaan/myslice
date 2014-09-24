@@ -151,7 +151,7 @@ class Client(object):
             )
         """
         url = _buildpath_(self.rooturl, path)
-        
+
         if "testbed" in kwargs:
             url = url + "?testbed=" + kwargs["testbed"]
 
@@ -160,7 +160,7 @@ class Client(object):
                                  "content-type": "application/xml"}
 
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-                               settings.SLA_MANAGER_PASSWORD)
+                                       settings.SLA_MANAGER_PASSWORD)
 
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
@@ -346,12 +346,12 @@ class Templates(object):
         """
         return self.res.getall()
 
-    def getbyid(self, provider_id, testbed):
+    def getbyid(self, provider_id):
         """Get a template
 
         :rtype: wsag_model.Template
         """
-        return self.res.getbyid(provider_id, {"testbed": testbed})
+        return self.res.getbyid(provider_id, {"testbed": provider_id})
 
     def create(self, template):
         """Create a new template

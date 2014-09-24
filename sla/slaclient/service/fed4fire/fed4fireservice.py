@@ -104,10 +104,13 @@ def createagreement(json_data, context):
 
     # Builds AgreementInput from json
     data = jsonparser.agreementinput_from_json(json_data)
+
     # Read template from manager
-    slatemplate, request = client_templates.getbyid(data.template_id, data.template_id)
+    # client_templates.getbyid(provider_id, testbed)
+    slatemplate, request = client_templates.getbyid(data.template_id)
     # Copy (overriding if necessary) from template to AgreementInput
     final_data = data.from_template(slatemplate)
+
     slaagreement = fed4fire.render_slaagreement(final_data)
 
     client_agreements = context.restfactory.agreements()
@@ -120,20 +123,23 @@ def createagreementsimplified(template_id, user, expiration_time, resources):
         TemplateFactory()
     )
 
-    print "Expiration time: ", expiration_time
-
-    # time = dateutil.parser.parse(expiration_time)
-    # print "ISO FORMAT: ", time.strftime('%Y-%m-%dT%H:%M:%S%Z')
-    print "ISO FORMAT: ", expiration_time.strftime('%Y-%m-%dT%H:%M:%S%Z')
-
     agreement = {
         "agreement_id": str(uuid.uuid4()),
         "template_id": template_id,
         "expiration_time": expiration_time.strftime('%Y-%m-%dT%H:%M:%S%Z'),
         "consumer": user,
+        "guarantees": [
+            {
+                "name": "uptime",
+                "bounds": ["0", "1"],
+                "scope": {
+                    "service_name": "",
+                    "scope": resources[template_id]
+                }
+            }
+        ]
     }
 
     json_data = json.dumps(agreement)
 
     return createagreement(json_data, context)
-    

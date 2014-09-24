@@ -106,7 +106,7 @@ Notes about agreements in fed4fire:
 """
 
 from sla.slaclient import wsag_model
-import pdb
+import json
 
 from sla.slaclient.templates.fed4fire.django.factory import Factory
 factory = Factory()
@@ -196,20 +196,49 @@ class AgreementInput(object):
 
     class GuaranteeTerm(object):
 
+        class GuaranteeScope(object):
+
+            def __init__(self,
+                         servicename="",
+                         scope=""):
+
+                self.servicename = servicename
+                self.scope = scope
+
+            def __repr__(self):
+                s = "<GuaranteeScope(servicename={}, scope={})>"
+                return s.format(
+                    self.servicename,
+                    self.scope
+                )
+
         def __init__(self,
                      metric_name="",
-                     bounds=(0, 0)):
+                     bounds=(0, 0),
+                     guarantee_scopes=()):
             """Creates a GuaranteeTerm.
 
             Take into account that the GT's name is based on the metric_name.
-            :param str metric_name: name of the service property being enforced.
-            :param bounds: (lower, upper) bounds of the metric values.
+            :param str metric_name: name of the service property being enforced
+            :param bounds: (lower, upper) bounds of the metric values
             :type bounds: (float, float)
             """
             self.name = "GT_{}".format(metric_name)
             self.metric_name = metric_name
             self.kpiname = metric_name
             self.bounds = bounds
+            self.guarantee_scopes = guarantee_scopes
+
+        def __repr__(self):
+            s = "<GuaranteeTerm(name={}, metric_name={}, " \
+                "kpiname={}, bounds={}, guarantee_scopes={})>"
+            return s.format(
+                self.name,
+                self.metric_name,
+                self.kpiname,
+                self.bounds,
+                repr(self.guarantee_scopes)
+            )
 
     def __init__(self,
                  agreement_id="",
@@ -228,7 +257,7 @@ class AgreementInput(object):
         :param str agreement_name: optional agreement name
         :param str service_id: Domain id/name of the service.
         :param str consumer: Id of the consumer party in the agreement.
-        :param str provider: Resource Id of the provider party in the agreement.
+        :param str provider: Resource Id of the provider party in the agreement
           The provider must exist previously in the SlaManager.
         :param str template_id: TemplateId of the template this agreement is
           based on.
@@ -278,6 +307,11 @@ class AgreementInput(object):
         #
         # NOTE: templateinput does not address guaranteeterms (yet)
         #
+
+        for _, gt in slatemplate.guaranteeterms.items():
+            gt.scopes[0].scope = self.guarantee_terms[0].guarantee_scopes.scope
+            gt.scopes[0].scope = [x.encode('utf-8') for x in gt.scopes[0].scope]
+
         result = AgreementInput(
             agreement_id=self.agreement_id,
             agreement_name=self.agreement_name,
@@ -287,7 +321,15 @@ class AgreementInput(object):
             template_id=slatemplate.template_id,
             expiration_time=self.expiration_time,
             service_properties=slatemplate.variables.values(),
+            #guarantee_terms=self.guarantee_terms
             guarantee_terms=slatemplate.guaranteeterms.values()
         )
-        print result.guarantee_terms[0]
+
+        #print self.guarantee_terms[0], "\nVVVVVVVVVVVVVVVVV"
+        #print slatemplate.guaranteeterms['GT_CPULoad'], "\nVVVVVVVVVVVVVVVVV"
+        #print self.guarantee_terms[0].guarantee_scopes.scope, "\nVVVVVVVVVVVVVVVVV"
+        #print "TIPO: ", type(self.guarantee_terms[0])
+        #print "TIPO 2", type(slatemplate.guaranteeterms['GT_CPULoad']), "\nVVVVVVVVVVVVVVVVV"
+        #print slatemplate.guaranteeterms['GT_CPULoad'].scopes, "\nVVVVVVVVVVVVVVVVV"
+        #print result.guarantee_terms[0], "\nVVVVVVVVVVVVVVVVV"
         return result
