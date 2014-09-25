@@ -832,8 +832,9 @@ def create_user(wsgi_request, request, namespace = None, as_admin = False):
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
 
-    # Add the user to iotlab portal
-    iotlab_create_user (wsgi_request, request)
+    # Add the user to iotlab portal if theme is set to onelab
+    if theme.theme == 'onelab':
+        iotlab_create_user (wsgi_request, request)
 
 def create_pending_user(wsgi_request, request, user_detail):
     """
