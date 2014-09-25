@@ -780,6 +780,42 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
 
     return results
 
+def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False):
+   
+    import requests
+    import time
+    from requests.auth import HTTPBasicAuth
+    
+    URL_REST = 'https://devgrenoble.senslab.info/rest/admin/users'
+    LOGIN_ADMIN = "auge"
+    PASSWORD_ADMIN = "k,mfg1+Q"
+
+    auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
+    headers = {'content-type': 'application/json'}
+
+    for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE email = %s', [request['email']]):
+        password= user.password
+
+
+    iotlab_user_params = {
+        "type"          : "SA",
+        "login"         : request['email'],
+        "password"      : password,
+        "firstName"     : request['first_name'],
+        "lastName"      : request['last_name'],
+        "email"         : request['email'],
+        "structure"     : request['authority_hrn'],
+        "city"          : "N/A",
+        "country"       : "N/A",
+        "sshPublicKey"  : [request['public_key']],
+        "motivations"   : "SFA federation",
+    }    
+   
+    iotlab_user_params1 = json.dumps(iotlab_user_params)
+    r=requests.post(url=URL_REST, data=iotlab_user_params1, headers=headers, auth=auth)
+    print 'Create iotlab user : ', r.status_code, r.text
+    return r.text
+
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
     # XXX This has to be stored centrally
     USER_STATUS_ENABLED = 2
@@ -795,6 +831,9 @@ def create_user(wsgi_request, request, namespace = None, as_admin = False):
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
+
+    # Add the user to iotlab portal
+    iotlab_create_user (wsgi_request, request)
 
 def create_pending_user(wsgi_request, request, user_detail):
     """
