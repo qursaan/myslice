@@ -715,11 +715,11 @@ div.home {
     line-height:1.2em;
     letter-spacing:0.3pt;
     min-height:500px;
-    background-image: url('../img/bg-experiment.png');
+    //background-image: url('../img/bg-experiment.png');
     background-repeat:no-repeat;
     background-size:cover;
     background-position:center top;
-    background-color:#086274;
+    background-color:#4FABA3;
     padding:100px 0;
 }
 div.home h2 {
