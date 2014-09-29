@@ -7,6 +7,10 @@
 		 	 Account &nbsp;>&nbsp; <a href="/account">{{ person.email }}</a>
 		 </div>
 	</div>
+	 {%if 'no_creds'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+{%endif%}
+
 </div>
 {% if messages %}
 <ul class="messages">
@@ -194,9 +198,6 @@
 	  	<div class="col-md-12">
 		<h3>Credentials <small>Delegated to Principal Account</small></h3>
 		        <table class="table">
-					 {%if 'no_creds'  in user_cred %}
-						<p><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
-					{%endif%}	
 					<caption><b>Delegated User Credential</b></caption> 
 		            <tr class="odd"> 
 		                <th>Expiration Date</th>
@@ -279,6 +280,7 @@
 					<p>You may get this message for several reasons.</p>
 					<h3>Account Delegation: Automatic</h3>
 					<ul>
+						<li>If your account is not yet validated</li>
 						<li>If you press the "Clear Credentials" button</li>
 						<li>If you "Generate a new key pair"</li>
 						<li>If a new slice is added to your account</li>
@@ -286,9 +288,10 @@
 					<p>In all the above mentioned cases, it is sufficient to refresh the page or go back to home page. The portal will regenrate your credentials.
 					 In some cases it may take more time than usual. If nothing works, then please logout and login again to the portal.</p>
 					<h3>Account Delegation: Manual</h3>
+						<p>First of all your account needs to be validated by the manager of your organization.</p>
 						<p>As you have uploaded your own public key, the portal can no longer generate your credentials automatically.</p>
 						<p>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
-						<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your credentials to the portal.</a>
+						<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
 					</p>
 					<h5>Contact support</h5>
 					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>

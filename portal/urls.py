@@ -44,6 +44,7 @@ from portal.validationview          import ValidatePendingView
 #from portal.experimentview         import ExperimentView
 from portal.termsview               import TermsView
 from portal.univbrisview            import UnivbrisView
+from portal.manualdelegationview    import ManualDelegationView
 
 from portal.servicedirectory         import ServiceDirectoryView
 
@@ -94,6 +95,7 @@ urlpatterns = patterns('',
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
     url(r'^terms/?$', TermsView.as_view(), name='terms'),
+    url(r'^manual_delegation/?$', ManualDelegationView.as_view(), name='manual_delegation'),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
