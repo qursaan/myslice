@@ -8,14 +8,13 @@
 
     var debug=false;
     debug=true;
-    sync_query_uuid="";
 
 
-    var UnivbrisFvf = Plugin.extend({
+    var UnivbrisFvfo = Plugin.extend({
 
         init: function(options, element) {
 	    //alert("foam init called");
-	    this.classname="univbrisfvf";
+	    this.classname="univbrisfvfo";
             this._super(options, element);
 		
 	    //alert(this.options.hidden_columns);
@@ -58,9 +57,9 @@
 	    // have init_key default to canonical_key
 	    this.init_key = this.init_key || this.canonical_key;
 	    // sanity check
-	    if ( ! this.init_key ) messages.warning ("UnivbrisFvf : cannot find init_key");
-	    if ( ! this.canonical_key ) messages.warning ("UnivbrisFvf : cannot find canonical_key");
-	    if (debug) messages.debug("UnivbrisFvf: canonical_key="+this.canonical_key+" init_key="+this.init_key);
+	    if ( ! this.init_key ) messages.warning ("UnivbrisFvfo : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("UnivbrisFvfo : cannot find canonical_key");
+	    if (debug) messages.debug("UnivbrisFvfo: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             //this.listen_query(options.query_uuid);
@@ -69,11 +68,11 @@
             /* GUI setup and event binding */
             //this.initialize_table();
 	    //alert("init fvf");
-	    jQuery("#uob_fv_table_form").hide();
+	    jQuery("#uob_ofv_table_form").hide();
 	
-	    $('<button id="cancel_addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnCancel()">Cancel</button>').appendTo('#fvf_table_button');
+	    //$('<button id="cancel_addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnCancel()">Cancel</button>').appendTo('#fvf_table_button');
 
-	    $('<button id="addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnAddflowspace()">Add flowspace</button>').appendTo('#fvf_table_button');
+	    //$('<button id="addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnAddflowspace()">Add flowspace</button>').appendTo('#fvf_table_button');
 		
 	    this._querytable_draw_callback();
         },
@@ -81,13 +80,13 @@
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("univbrisfvf.on_show");
+	    if (debug) messages.debug("univbrisfvfo.on_show");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
 
         on_resize: function(e) {
-	    if (debug) messages.debug("univbrisfvf.on_resize");
+	    if (debug) messages.debug("univbrisfvfo.on_resize");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
@@ -174,8 +173,8 @@
 		//var sData=$("#uob_fv_table_form").find("input").serialize();
 		//alert("add flowspace:" + sData);
 		//alert("cancel"); 
+		
 		jQuery("#uob_ofv_table_form").hide();
-		jQuery("#uob_fv_table_form").hide();
 		jQuery( "#univbris_foam_ports_selection" ).hide();
 		jQuery( "#univbris_flowspace_selection" ).show();
 		jQuery('#topo_plugin').hide();
@@ -190,84 +189,48 @@
 
 
 	fnAddflowspace:function(e){
-		
 		e.stopPropagation();
-		//if(fvf_add==1){	
-			jQuery("#uob_ofv_table_form").hide();
+		if(fvf_add==1){		
+			pk_flowspace_index=1+pk_flowspace_index;
 			jQuery("#uob_fv_table_form").hide();
-
-			if(pk_mode==1){
-							
-				var sData=$("#uob_fv_table_form").find("input").serialize();
-		     		var form =serializeAnything("#uob_fv_table_form");
-				var port_table=$("#univbris_foam_ports_selection__table").dataTable();
-				var form2=$('input',port_table.fnGetNodes()).serialize();
-				var nodes = $('input',port_table.fnGetNodes());
-		
-				this.table = $("#univbris_flowspace_selection__table").dataTable();
-				var val_status=validateFvfForm();
-				if (val_status == true){
-					pk_flowspace_index=1+pk_flowspace_index;
-					flowspace=sData;
-					var m_form=form+","+form2;
-					var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";	
-					if(fvf_add==1){
-						this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-					}
-					else{
-						this.table.fnDeleteRow(fvf_nrow);	
-			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-					}
-					jQuery( "#univbris_foam_ports_selection" ).hide();
-					jQuery( "#univbris_flowspace_selection" ).show();
-					jQuery('#topo_plugin').hide();
-				}
-				else{
-					alert("validation failed");
-					jQuery("#uob_fv_table_form").show();
-					jQuery("#uob_ofv_table_form").hide();
-					jQuery( "#univbris_foam_ports_selection" ).show();
-				}
+			var sData=$("#uob_fv_table_form").find("input").serialize();
+	     		var form =serializeAnything("#uob_fv_table_form");
+			//alert(form);
+			//var form2=serializeAnything("#uob_form");
+			//alert(form2);
+			var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+			var form2=$('input',port_table.fnGetNodes()).serialize();
+			//console.log(form2);
+			//alert($('input',port_table.fnGetNodes()).serialize());
+			var nodes = $('input',port_table.fnGetNodes());
+			//console.log(nodes[1]);
+			//console.log(nodes);
+			//alert($("#uob_form").serialize());
+			//var pos = form.search("&urn");
+			//form2=form2.substring(pos+1);
+			//alert(form2[1]);
+			//console.log(form2);
+			this.table = $("#univbris_flowspace_selection__table").dataTable();
+			
+			var val_status=validateFvfForm();
+			//val_status=true;
+			if (val_status == true){
+				flowspace=sData;
+				var m_form=form+","+form2;
+				var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";	
+				this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+				jQuery( "#univbris_foam_ports_selection" ).hide();
+				jQuery( "#univbris_flowspace_selection" ).show();
+				jQuery('#topo_plugin').hide();
 			}
 			else{
-							
-				var sData=$("#uob_ofv_table_form").find("input").serialize();
-		     		var form =serializeAnything("#uob_ofv_table_form");
-				var port_table=$("#univbris_foam_ports_selection__table").dataTable();
-				var form2=$('input',port_table.fnGetNodes()).serialize();
-				var nodes = $('input',port_table.fnGetNodes());
-		
-				this.table = $("#univbris_flowspace_selection__table").dataTable();
-				
-				var val_status=validateoFvfForm();
-				if (val_status == true){
-					opt_flowspace_index=1+opt_flowspace_index;
-					flowspace=sData;
-					var m_form=form+","+form2;
-					var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#oflowspace_name").val()+"</a></p>";	
-					if(fvf_add==1){
-						this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-					}
-					else{
-						this.table.fnDeleteRow(fvf_nrow);	
-			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-					}
-					jQuery( "#univbris_foam_ports_selection" ).hide();
-					jQuery( "#univbris_flowspace_selection" ).show();
-					jQuery('#topo_plugin').hide();
-				}
-				else{
-					alert("validation failed");
-					jQuery("#uob_ofv_table_form").show();
-					jQuery("#uob_fv_table_form").hide();
-					jQuery( "#univbris_foam_ports_selection" ).show();
-				}
-
+				alert("validation failed");
+				jQuery("#uob_ofv_table_form").show();
+				jQuery( "#univbris_foam_ports_selection" ).show();
 			}
-		/*}
+		}
 		else{
 			jQuery("#uob_fv_table_form").hide();
-			jQuery("#uob_ofv_table_form").hide();
 			var sData=$("#uob_fv_table_form").find("input").serialize();
 	     		var form =serializeAnything("#uob_fv_table_form");
 			//var form2=serializeAnything("#uob_form");
@@ -285,7 +248,7 @@
 			jQuery( "#univbris_flowspace_selection" ).show();
 			jQuery('#topo_plugin').hide();
 		
-		}*/
+		}
 	},
 
 
@@ -308,7 +271,7 @@
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
-            result += " class='univbrisfvf-checkbox'";
+            result += " class='univbrisfvfo-checkbox'";
 	 // compute id from canonical_key
 	    var id = record[this.canonical_key]
 	 // compute init_id form init_key
@@ -329,7 +292,7 @@
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
-            //result += " class='univbrisfvf-checkbox'";
+            //result += " class='univbrisfvfo-checkbox'";
 	 // set id - for retrieving from an id, or for posting events upon user's clicks
 	    result += " id='"+ record +"'";
 	    result += " name='"+ record +"'";
@@ -432,7 +395,7 @@
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
 	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("univbrisfvf.set_checkbox_from_record, init_id="+init_id);
+	    if (debug) messages.debug("univbrisfvfo.set_checkbox_from_record, init_id="+init_id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
@@ -441,7 +404,7 @@
 	// id relates to canonical_key
 	set_checkbox_from_data: function (id, checked) {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("univbrisfvf.set_checkbox_from_data, id="+id);
+	    if (debug) messages.debug("univbrisfvfo.set_checkbox_from_data, id="+id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$("[id='"+id+"']");
 	    element.attr('checked',checked);
@@ -482,7 +445,7 @@
 
         on_field_clear: function()
         {
-            alert('UnivbrisFvf::clear_fields() not implemented');
+            alert('UnivbrisFvfo::clear_fields() not implemented');
         },
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
@@ -518,7 +481,7 @@
 
         on_all_field_clear: function()
         {
-            alert('UnivbrisFvf::clear_fields() not implemented');
+            alert('UnivbrisFvfo::clear_fields() not implemented');
         },
 
 
@@ -751,7 +714,7 @@
 
     });
 
-    $.plugin('UnivbrisFvf', UnivbrisFvf);
+    $.plugin('UnivbrisFvfo', UnivbrisFvfo);
 
   /* define the 'dom-checkbox' type for sorting in datatables 
      http://datatables.net/examples/plug-ins/dom_sort.html
@@ -821,16 +784,16 @@ function deserializeDT(d){
 
 function fnPopTable(form1,form2){
 		hideFvfError();
-		jQuery("#univbris_flowspace_selection").hide();
                 $("[id='addflowspaceform']").hide();
-		
+		$("#uob_fv_table_form :input").prop("disabled", false);
+		$("#uob_fv_table_form").deserialize(form1);
 		deserializeDT(form2);
 
 
-                //$("[name='flowspace_name']").prop("disabled", true);
-		//$("#uob_fv_table_form :input").prop("disabled", true);
-		//$("[id='cancel_addflowspaceform']").prop("disabled", false);
-		//$("[id='cancel_addflowspaceform']").text('close');
+                $("[name='flowspace_name']").prop("disabled", true);
+		$("#uob_fv_table_form :input").prop("disabled", true);
+		$("[id='cancel_addflowspaceform']").prop("disabled", false);
+		$("[id='cancel_addflowspaceform']").text('close');
 
 		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
 		var nodes = $('input',port_table.fnGetNodes());
@@ -838,91 +801,17 @@ function fnPopTable(form1,form2){
 			nodes[i].disabled=true;
 		}
 
-		if (form1.search('pk_flowspace')!=-1){
-			pk_mode=1;
+		jQuery("#univbris_flowspace_selection").hide();
+		jQuery("#uob_fv_table_form").show();
+		jQuery( "#univbris_foam_ports_selection" ).show();
+
+		if  ($("#flowspace_name").val().search("pk")==0){
+			topoviewer_state={mode:"read",link_type:"non-optical"};
 		}
 		else{
-			pk_mode=0;
+			topoviewer_state={mode:"read",link_type:"optical"};
 		}
 		
-
-		if  (pk_mode==1){
-			try{
-				manifold.raise_event(sync_query_uuid,CLEAR_FILTERS);
-				var filter=[];
-				filter.push("link type");
-				filter.push("!=");
-				filter.push("optical");
-				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
-			}
-			catch(err){
-				alert("raise error:"+err);
-			}
-			$("#uob_fv_table_form :input").prop("disabled", false);
-			$("#uob_fv_table_form").deserialize(form1);
-			$("[name='flowspace_name']").prop("disabled", true);
-			$("#uob_fv_table_form :input").prop("disabled", true);
-			$("[id='cancel_addflowspaceform']").prop("disabled", false);
-			$("[id='cancel_addflowspaceform']").text('close');
-			topoviewer_state={mode:"read",link_type:"non-optical"};
-			jQuery("#uob_fv_table_form").show();
-		}
-		else{
-
-			try{
-				manifold.raise_event(sync_query_uuid,CLEAR_FILTERS);
-				var filter=[];
-				filter.push("link type");
-				filter.push("!=");
-				filter.push("packet");
-				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
-				filter=[];
-				filter.push("link type");
-				filter.push("!=");
-				filter.push("compute");
-				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
-				filter=[];
-				filter.push("link type");
-				filter.push("!=");
-				filter.push("federation");
-				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
-			}
-			catch(err){
-				alert("raise error:"+err);
-			}
-			$("#uob_ofv_table_form :input").prop("disabled", false);
-			$("#uob_ofv_table_form").deserialize(form1);
-			$("[name='oflowspace_name']").prop("disabled", true);
-			$("#uob_ofv_table_form :input").prop("disabled", true);
-			$("[id='cancel_addflowspaceform']").prop("disabled", false);
-			$("[id='cancel_addflowspaceform']").text('close');
-			topoviewer_state={mode:"read",link_type:"optical"};
-			jQuery("#uob_ofv_table_form").show();
-		}
-
-		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
-		var nodes = $('input',port_table.fnGetNodes());
-		var svg_links = svg.selectAll(".link");
-
-		for(n=0;n<nodes.length;n++){
-				for(var i=0;i<svg_links[0].length;i++){
-					if(svg_links[0][i].__data__.value==nodes[n].id){
-						if(nodes[n].checked==true){
-							svg_links[0][i].style.stroke= 'black';
-							svg_links[0][i].style.strokeWidth= '5px';
-						}
-						else{
-							svg_links[0][i].style.stroke= '#ccc';
-							svg_links[0][i].style.strokeWidth= '4px';
-						}
-						break;
-					}
-				}
-				nodes[n].disabled=false;
-		};
-
-
-		jQuery( "#univbris_foam_ports_selection" ).show();
 		jQuery('#topo_plugin').show();
 };
 
@@ -1023,18 +912,6 @@ function ipProtoValidator (ipproto_str){
 		return true;
 	}	
 }
-
-function wavelengthValidator (wavelength_str){
-		var wavelength_validator=/^\d+.?\d*$/;
-		var result = wavelength_str.match(wavelength_validator);
-		if (result==null){
-			return false;
-		}
-		else{
-			return true;
-		}
-}
-
 
 
 
@@ -1236,52 +1113,6 @@ function validateFvfForm(){
 	return status;
 }
 
-function validateoFvfForm(){
-	var status = false;
-	var checked =0;
-
-	//row 1 validation
-	if (wavelengthValidator($('#uob_ofv_table_wavelength').val())==false){
-		$("#uob_ofv_table_wavelength").addClass('error');
-		$("#uob_ofv_table_wavelength_error").show();
-	}
-	else {
-		checked++;
-	}
-
-	
-
-	//validate that at least one port is selected
-	var port_table=$("#univbris_foam_ports_selection__table").dataTable();
-	var nodes = $('input',port_table.fnGetNodes());
-
-	var port_selected=false;
-	for(var i=0;i<nodes.length;i++){
-		if(nodes[i].checked==true){
-			checked++;
-			port_selected=true;
-			break;
-		}			
-	}
-
-	if (checked >= 2) {
-		status=true;
-	}
-
-	if (port_selected==false & checked == 1){
-		alert("you need to select at least one port");
-	}
-	else if (port_selected==false & checked <= 1){
-		alert("you need to select at least one port and correct other flowspace parameter errors");
-	}
-	else if (port_selected==true & checked <= 1){
-		alert("you need to correct other flowspace parameter errors");
-	}
-	
-	//alert("validator status:"+status+" checked:"+checked);
-	return status;
-}
-
 
 
 function fnGetSelected( oTableLocal )
@@ -1317,15 +1148,6 @@ function hideFvfError(){
 	$("[id*=_error]").hide();
 	console
 	$("#uob_fv_table_form :input").each(function(){
-		try{
-			$(this).removeClass('error');
-		}
-		catch (err){
-		}
-
-	});
-
-	$("#uob_ofv_table_form :input").each(function(){
 		try{
 			$(this).removeClass('error');
 		}
