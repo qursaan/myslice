@@ -9,10 +9,10 @@ class Univbris(Plugin):
 	print "called univbris plugin"
 
     def template_file (self):
-	try:
-        return "univbris_welcome.html"
-	except:
-		print "error template"
+        try:
+            return "univbris_welcome.html"
+        except Exception:
+		    print "error template"
 
     def requirements (self):
         reqs = {
