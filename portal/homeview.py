@@ -125,13 +125,17 @@ class HomeView (FreeAccessView, ThemeView):
 						print "DEBUG: user NOT exists on MySlice DBs"
 						
 						cn 		= result_set[0][0][1]['cn'][0] 
-						print cn
 						sn 		=  result_set[0][0][1]['sn'][0]
-						print sn
-                                                fname =  sn.split(' ')[0]
-                                                lname =  sn.split(' ')[1]
-                                                print fname
-                                                print lname
+
+                                                fname=None
+                                                lname=None
+
+                                                try:
+                                                    fname =  sn.split(' ')[0]
+                                                    lname =  sn.split(' ')[1]
+                                                except:
+                                                    fname = sn
+                                                    lname = ""
 
 						#authority_hrn 	=  'fibre' + '.' + username.split('@')[1] 
 						authority_hrn 	=  'fibre'
