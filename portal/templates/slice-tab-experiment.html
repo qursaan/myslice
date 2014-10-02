@@ -9,14 +9,27 @@
 		on the reserved nodes. To access your slice on a resource just type the following command:
 	</p>
 	<p class="command">
-		$ ssh your_slice_name@planetlab-resource.hostname.com
+		$ ssh coverted_slice_name@planetlab-resource.hostname.com
 	</p>
+	<p>You need to convert your typical slicename into a specific format in order to do SSH. An example below will demonstrate the conversion:</p>
+	<p class="command">
+		Typical slice_name = onelab.upmc.mytestslice<br>
+		converted_slice_name = onelab8upmc_mytestslice
+	</p>
+	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
 		after witch you will be able to access the resource.
 	</p>
 	
 	<h3>FIT IoT-Lab</h3>
+	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://devgrenoble.senslab.info/testbed/" target="_blank">web GUI.</a>
+		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
+		the following command:
+	</p>
+	<p class="command">
+		ssh onelab_username@fit3-dev.inrialpes.fr
+	</p>
 	
 	<h3>NITOS</h3>
 	

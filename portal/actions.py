@@ -807,7 +807,7 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
         "structure"     : request['authority_hrn'],
         "city"          : "N/A",
         "country"       : "N/A",
-        "sshPublicKey"  : [request['public_key']],
+        "sshPublicKey"  : request['public_key'],
         "motivations"   : "SFA federation",
     }    
    
