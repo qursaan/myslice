@@ -325,11 +325,4 @@ class AgreementInput(object):
             guarantee_terms=slatemplate.guaranteeterms.values()
         )
 
-        #print self.guarantee_terms[0], "\nVVVVVVVVVVVVVVVVV"
-        #print slatemplate.guaranteeterms['GT_CPULoad'], "\nVVVVVVVVVVVVVVVVV"
-        #print self.guarantee_terms[0].guarantee_scopes.scope, "\nVVVVVVVVVVVVVVVVV"
-        #print "TIPO: ", type(self.guarantee_terms[0])
-        #print "TIPO 2", type(slatemplate.guaranteeterms['GT_CPULoad']), "\nVVVVVVVVVVVVVVVVV"
-        #print slatemplate.guaranteeterms['GT_CPULoad'].scopes, "\nVVVVVVVVVVVVVVVVV"
-        #print result.guarantee_terms[0], "\nVVVVVVVVVVVVVVVVV"
         return result

@@ -18,7 +18,7 @@ import json
 
 class ServiceDirectoryView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'servicedirectory.html'
-    server_url = "http://157.193.215.125:4001/"
+    server_url = "http://157.193.215.125:4001/service-directory/"
         
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
