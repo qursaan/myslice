@@ -14,6 +14,8 @@ from myslice.theme              import ThemeView
 
 theme = ThemeView()
 
+import activity.slice
+
 # Thierry: moving this right into the code so 
 # most people can use myslice without having to install sfa
 # XXX tmp sfa dependency, should be moved to SFA gateway
@@ -616,7 +618,8 @@ def create_slice(wsgi_request, request):
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
-
+        # log user activity
+        activity.slice.validate(self.request, "Slice validation", { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)

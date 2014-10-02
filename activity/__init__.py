@@ -34,7 +34,7 @@ else :
     # default log server
     server = "http://athos.ipv6.lip6.fr/activity/push/log"
 
-def logWrite(request, action, message):
+def logWrite(request, action, message, objects = None):
     
     if not apikey :
         print "===============>> activity: no apikey"
@@ -54,17 +54,27 @@ def logWrite(request, action, message):
         "action"    : action,
         "message"   : message,
         "apikey"    : apikey,
-        "signature" : sign(secret, "%s%s%s%s" % (timestamp, ip, request.user, action))
+        "signature" : sign(secret, "%s%s%s%s" % (timestamp, ip, request.user, action)),
+        "slice"     : None,
+        "resource"  : None
     }
+    
+    if objects and 'slice' in objects :
+        log['slice'] = objects['slice']
+    
+    if objects and 'resource' in objects :
+        log['resource'] = objects['resource']
+    
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
+        print "===============>> activity: " + action + " <" + request.user + "> " + message
         content = result.read()
     except urllib2.URLError as e:
         print "===============>> activity: connection to " + server + " impossible, could not log action"
 
-def log(request, action, message):
+def log(request, action, message, objects = None):
     # Create a new thread in Daemon mode to send the log entry
-    t = threading.Thread(target=logWrite, args=(request, action, message))
+    t = threading.Thread(target=logWrite, args=(request, action, message, objects))
     t.setDaemon(True)
     t.start()
 

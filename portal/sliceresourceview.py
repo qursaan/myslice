@@ -1,8 +1,8 @@
 from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
 
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
+from manifold.core.query                import Query, AnalyzedQuery
+from manifoldapi.manifoldapi            import execute_query
 import json
 
 from django.views.generic.base          import TemplateView
@@ -22,6 +22,16 @@ from plugins.googlemap                  import GoogleMap
 from plugins.filter_status              import FilterStatusPlugin
 from plugins.testbeds                   import TestbedsPlugin
 from plugins.scheduler2                 import Scheduler2
+
+# Bristol plugin
+from plugins.univbris                   import Univbris
+from plugins.univbrisfoam               import UnivbrisFoam
+from plugins.univbrisfv                 import UnivbrisFv
+from plugins.univbrisfvf                import UnivbrisFvf
+from plugins.univbrisfvfo           	import UnivbrisFvfo
+from plugins.univbristopo               import UnivbrisTopo
+
+
 from plugins.columns_editor             import ColumnsEditor
 from plugins.sladialog                  import SlaDialog
 from plugins.lists.simplelist           import SimpleList
@@ -84,7 +94,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         sq_lease       = aq.subquery('lease')
 
         query_resource_all = Query.get('resource').select(resource_fields)
-        #page.enqueue_query(query_resource_all)
+        page.enqueue_query(query_resource_all)
 
         # leases query
         #lease_md = metadata.details_by_object('lease')
@@ -247,7 +257,86 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             username            = request.user,
         )
             
+        # --------------------------------------------------------------------------
+        # Ofelia OpenFlow Plugin 
+        # Bristol plugin
 
+    	# plugin which display a "gathering resources" message 
+        # waiting for all resources to be returned by manifold
+        univbriswelcome = Univbris(
+            page  = page,
+            title = 'univbris_welcome',
+            domid = 'univbris_welcome',
+            query = query_resource_all,
+        )
+
+        univbrisfoamlist = UnivbrisFoam(
+            page  = page,
+            title = 'univbris_foam_ports_selection',
+            domid = 'univbris_foam_ports_selection',
+            query = query_resource_all,
+            query_all = query_resource_all,
+            checkboxes = False,
+            datatables_options = {
+                'iDisplayLength': 10,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+        #plugin which manages the different flowspaces that the user creates, and also sends flowspaces to manifold
+        univbrisfvlist = UnivbrisFv(
+                page  = page,
+                title = 'univbris_flowspace_selection',
+                domid = 'univbris_flowspace_selection',
+                query = None,
+                query_all = None,
+	            sync_query = query_resource_all,
+                datatables_options = {
+                    'iDisplayLength': 5,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+        )
+
+        #plugin which allows the definition of a single flowspace
+        univbrisfvform = UnivbrisFvf(
+                page  = page,
+                title = 'univbris_flowspace_form',
+                domid = 'univbris_flowspace_form',
+                query = query_resource_all,
+                query_all = None,
+                datatables_options = {
+                    'iDisplayLength': 3,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+        )
+
+	#plugin which allows the definition the match criteria on a single OPTICAL flowspace
+
+	univbrisofvform = UnivbrisFvfo(
+            page  = page,
+            title = 'univbris_oflowspace_form',
+            domid = 'univbris_oflowspace_form',
+	        query = None,
+            query_all = None,
+            datatables_options = { 
+                'iDisplayLength': 3,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+    	#plugin which display the gathered topology
+        univbristopology = UnivbrisTopo(
+            page  = page,
+            title = 'univbris_topology',
+            domid = 'univbris_topology',
+            query = query_resource_all,
+            #query = query_resource_all,
+        )
+	
         # --------------------------------------------------------------------------
         # SLA View and accept dialog
         
@@ -296,6 +385,15 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
+
+        # Bristol plugin
+        template_env['welcome'] = univbriswelcome.render(self.request)
+        template_env['resources'] = univbrisfoamlist.render(self.request)
+        template_env['flowspaces'] = univbrisfvlist.render(self.request)
+        template_env['oflowspaces_form'] = univbrisofvform.render(self.request)
+        template_env['flowspaces_form'] = univbrisfvform.render(self.request)
+        template_env['topology'] = univbristopology.render(self.request)
+	
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
