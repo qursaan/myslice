@@ -82,6 +82,7 @@ with the query passed using POST"""
                 and isinstance(result['description'], (tuple, list, set, frozenset)):
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
         
+        print "=> MANIFOLD PROXY executing: " + manifold_query.action.lower() 
         #
         # register activity
         #
