@@ -30,7 +30,8 @@ from plugins.univbrisfv                 import UnivbrisFv
 from plugins.univbrisfvf                import UnivbrisFvf
 from plugins.univbrisfvfo           	import UnivbrisFvfo
 from plugins.univbristopo               import UnivbrisTopo
-
+from plugins.univbrisvtam 	            import UnivbrisVtam as UnivbrisVtamPlugin
+from plugins.univbrisvtamform 	        import UnivbrisVtamForm
 
 from plugins.columns_editor             import ColumnsEditor
 from plugins.sladialog                  import SlaDialog
@@ -313,9 +314,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                     },
         )
 
-	#plugin which allows the definition the match criteria on a single OPTICAL flowspace
-
-	univbrisofvform = UnivbrisFvfo(
+	    #plugin which allows the definition the match criteria on a single OPTICAL flowspace
+        univbrisofvform = UnivbrisFvfo(
             page  = page,
             title = 'univbris_oflowspace_form',
             domid = 'univbris_oflowspace_form',
@@ -334,9 +334,34 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             title = 'univbris_topology',
             domid = 'univbris_topology',
             query = query_resource_all,
-            #query = query_resource_all,
         )
-	
+
+        # --------------------------------------------------------------------------
+        # Ofelia VTAM Plugin 
+        # Bristol Plugin
+
+        #plugin which display a table where an experimenter will add VMs to according to his needs
+        univbrisvtamplugin = UnivbrisVtamPlugin(
+            page  = page,
+            title = 'univbris_vtam',
+            domid = 'univbris_vtam',
+            query = None,
+        )
+
+    	#plugin which display a form where an experimenter will specify where a
+        univbrisvtamform = UnivbrisVtamForm(
+            page  = page,
+            title = 'univbris_vtam_form',
+            domid = 'univbris_vtam_form',
+	        query = query_resource_all,
+            query_all = None,
+            datatables_options = { 
+                'iDisplayLength': 3,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
         # --------------------------------------------------------------------------
         # SLA View and accept dialog
         
@@ -393,7 +418,9 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['oflowspaces_form'] = univbrisofvform.render(self.request)
         template_env['flowspaces_form'] = univbrisfvform.render(self.request)
         template_env['topology'] = univbristopology.render(self.request)
-	
+        template_env['vms_list'] = univbrisvtamplugin.render(self.request)
+        template_env['vm_form'] = univbrisvtamform.render(self.request)
+
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme

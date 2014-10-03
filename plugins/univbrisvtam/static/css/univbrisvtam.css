@@ -1,0 +1,84 @@
+
+/* the bottom of the datatable needs more space */
+div.UnivbrisVtam-spacer { padding: 8px 4px 15px 4px; }
+
+div.UnivbrisVtam table.dataTable th {
+    font: bold 12px/22px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: #4f6b72;
+    border-right: 1px solid #C1DAD7;
+    border-bottom: 1px solid #C1DAD7;
+    border-top: 1px solid #C1DAD7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 8px 12px 4px 20px;
+    vertical-align:middle;
+/*    background: #CAE8EA url(../img/tablesort-header.jpg) no-repeat; */
+}
+
+div.UnivbrisVtam table.dataTable th.checkbox {
+    padding-left: 14px;
+}
+
+div.UnivbrisVtam table.dataTable td, div.UnivbrisVtam table.dataTable textarea, div.UnivbrisVtam table.dataTable input [type="text"] {
+    font: bold 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: #660099;
+    border-right: 1px solid #C1DAD7;
+    border-bottom: 1px solid #C1DAD7;
+}
+div.UnivbrisVtam table.dataTable td {
+    padding: 4px 8px 4px 8px;
+    /* this applies on even rows only, odd ones have a setting in bootstrap of rbg 249.249.249 */
+    background-color: #f4f4f4;
+    color: #660099;
+}
+div.UnivbrisVtam table.dataTable td a {
+    font-weight:normal;
+}
+/* these come from bootstrap */
+div.UnivbrisVtam div.dataTables_info {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* one could think or using repeat-x here but that's not working because of the arrows
+ * we might need to make these wider some day 
+ * and/or to add background-color: #caebea
+ * which would look less conspicuous in case of overflow
+*/
+
+div.UnivbrisVtam table.dataTable thead .sorting { background: url('../img/tablesort-header-sortable.png') no-repeat; }
+div.UnivbrisVtam table.dataTable thead .sorting_asc { background: url('../img/tablesort-header-up.png') no-repeat; }
+div.UnivbrisVtam table.dataTable thead .sorting_desc { background: url('../img/tablesort-header-down.png') no-repeat; }
+/* this icons set does not have that exact equivalent - using an approximation for now */
+div.UnivbrisVtam table.dataTable thead .sorting_asc_disabled { background: url('../img/tablesort-header.png') repeat-x; }
+div.UnivbrisVtam table.dataTable thead .sorting_desc_disabled { background: url('../img/tablesort-header.png') repeat-x; }
+
+/* the footers are not active */
+div.UnivbrisVtam table.dataTable tfoot { 
+    background: url('../img/tablesort-header.png') repeat-x;
+    background-color: #caebea;
+}
+/* and when sorting is turned off it's useful to set this on header too */
+div.UnivbrisVtam table.dataTable thead { 
+    background: url('../img/tablesort-header.png') repeat-x;
+    background-color: #caebea;
+}
+
+div.UnivbrisVtam table.tbbuttons{
+    background-color:#A9E2F3;
+}
+
+
+div.UnivbrisVtam table.tbbuttons td{
+  padding-top: 7px;
+  /*padding-left: 7px*/
+  /*padding-left: 7px*/
+  padding-bottom: 7px;
+  background-color:#A9E2F3;
+}
+
+div.UnivbrisVtam table.tbbuttons tr{
+  background-color:#A9E2F3;
+}
+
+
