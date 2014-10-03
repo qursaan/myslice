@@ -23,6 +23,8 @@ from portal.actions             import authority_get_pi_emails, manifold_add_use
 
 from myslice.theme import ThemeView
 
+import activity.institution
+
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
 #
@@ -139,7 +141,7 @@ class JoinView (FreeAccessView, ThemeView):
                     site_url              = reg_site_url,
                     site_latitude         = reg_site_latitude, 
                     site_longitude        = reg_site_longitude,
-                    address_line1         = reg_address_line1,
+                    address_line1         = reg_email, # XXX field name must be renamed. Email needed 4 rejection email.
                     address_line2         = reg_address_line2,
                     address_line3         = reg_address_line3,
                     address_city          = reg_address_city,
@@ -195,14 +197,7 @@ class JoinView (FreeAccessView, ThemeView):
                         'authority_hrn'         : reg_root_authority_hrn + '.' + reg_site_authority,
                         'site_abbreviated_name' : reg_site_abbreviated_name, 
                         'site_url'              : reg_site_url,
-                        'site_latitude'         : reg_site_latitude, 
-                        'site_longitude'        : reg_site_longitude,
-                        'address_line1'         : reg_address_line1,
-                        'address_line2'         : reg_address_line2,
-                        'address_line3'         : reg_address_line3,
                         'address_city'          : reg_address_city,
-                        'address_postalcode'    : reg_address_postalcode,
-                        'address_state'         : reg_address_state,
                         'address_country'       : reg_address_country,
                         'first_name'            : reg_fname, 
                         'last_name'             : reg_lname, 
@@ -211,34 +206,36 @@ class JoinView (FreeAccessView, ThemeView):
                         'user_hrn'              : user_hrn,
                         'public_key'            : public_key,
                         }
-                    recipients = authority_get_pi_emails(request,reg_auth)
+
+                    #recipients = authority_get_pi_emails(request,reg_auth)
                     
-                    # We don't need to send this email to user.
-                    # it's for the PI only
-                    #if ctx['cc_myself']:
-                    #    recipients.append(ctx['email'])
-                    theme.template_name = 'authority_request_email.html'
-                    html_content = render_to_string(theme.template, ctx)
+                    self.template_name = 'authority_request_email.html'
+                    html_content = render_to_string(self.template, ctx)
             
-                    theme.template_name = 'authority_request_email.txt'
-                    text_content = render_to_string(theme.template, ctx)
+                    self.template_name = 'authority_request_email.txt'
+                    text_content = render_to_string(self.template, ctx)
             
-                    theme.template_name = 'authority_request_email_subject.txt'
-                    subject = render_to_string(theme.template, ctx)
+                    self.template_name = 'authority_request_email_subject.txt'
+                    subject = render_to_string(self.template, ctx)
                     subject = subject.replace('\n', '')
             
-                    theme.template_name = 'email_default_sender.txt'
-                    sender =  render_to_string(theme.template, ctx)
-                    sender = sender.replace('\n', '')
-            
-                    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+                    #theme.template_name = 'email_default_sender.txt'
+                    #sender =  render_to_string(theme.template, ctx)
+                    #sender = sender.replace('\n', '')
+                    sender = reg_email
+                    
+                    msg = EmailMultiAlternatives(subject, text_content, sender, ['support@onelab.eu'])
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
     
                 except Exception, e:
                     print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
-                
+                    import traceback
+                    traceback.print_exc()
+
                 self.template_name = 'join_complete.html'
+                # log institution activity
+                activity.institution.joined(self.request)
                 return render(request, self.template, {'theme': self.theme})
                 #return render(request, 'user_register_complete.html') 
 
@@ -269,4 +266,6 @@ class JoinView (FreeAccessView, ThemeView):
           'theme': self.theme
           }
         template_env.update(page.prelude_env ())
+        # log institution activity
+        activity.institution.join(self.request)
         return render(request, 'join_view.html',template_env)

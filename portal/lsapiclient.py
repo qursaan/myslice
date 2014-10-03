@@ -91,7 +91,7 @@ class LaboraSchedulerClient:
         databaseConfig = {
             'dbHost'        : '10.128.11.200',
             'dbUser'        : 'postgres',
-            'dbPassword'    : '',
+            'dbPassword'    : '5e6b70f2e9dc',
             'dbName'        : 'LaboraSchedulerNOC'
         }
         

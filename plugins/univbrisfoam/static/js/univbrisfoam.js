@@ -7,7 +7,11 @@
 (function($){
 
     var debug=false;
+    window.query_itr2=0;
+    table_links=[];
     //debug=true
+
+    regex_filter="((packet)|(compute))";
 
     var UnivbrisFoam = Plugin.extend({
 
@@ -62,9 +66,12 @@
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
             this.listen_query(options.query_all_uuid, 'all');
+	    this.listen_query(options.sync_query_uuid,'sync');
 
             /* GUI setup and event binding */
             this.initialize_table();
+
+	    jQuery( "#univbris_foam_ports_selection" ).hide();
 	    
         },
 
@@ -95,7 +102,7 @@
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
                 //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-		sDom: "<'row'<'col-xs-2'l><'col-xs-9'r><'col-xs-2'f>>t<'row'<'col-xs-5'i><'col-xs-5'p>><'next'>",
+		sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-5'p>>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
@@ -158,7 +165,7 @@
 		//self.hide_column(field);
             });
 
-	    $('<button id="next" type="button" style="height: 50px; width: 300px" onclick="fnButnext()">select flowspace</button>').appendTo('div.next');
+	    //$('<button id="next" type="button" style="height: 50px; width: 300px" onclick="fnButnext()">select flowspace</button>').appendTo('div.next');
 
 	    //type="submit"
 
@@ -197,14 +204,14 @@
 		jQuery( "#univbris_flowspace_selection" ).show();
 		//$("#multi_flowpspace_ports_selected").append('<label><input type="checkbox" name="option[]" value="1" />chocolate</label>');
 
-		$("form#uob_form :input[type=checkbox]").each(function(){
- 			var input = $(this); // This is the jquery object of the input, do what you will
-			//alert("id: "+ input.attr('id') + " checked: "+ input.is(':checked'));
-			if(input.is(':checked')==true){
-				//alert("got true");
-				$("#multi_flowpspace_ports_selected").append('<label><input type="checkbox" name="'+input.attr('id')+'" />'+input.attr('id')+'</label>');
-			}
-		});
+		//$("form#uob_form :input[type=checkbox]").each(function(){
+ 		//	var input = $(this); // This is the jquery object of the input, do what you will
+		//	//alert("id: "+ input.attr('id') + " checked: "+ input.is(':checked'));
+		//	if(input.is(':checked')==true){
+		//		//alert("got true");
+		//		$("#multi_flowpspace_ports_selected").append('<label><input type="checkbox" name="'+input.attr('id')+'" />'+input.attr('id')+'</label>');
+		//	}
+		//});
 
 		jQuery( "#univbris_foam_ports_selection" ).hide();
 		//jQuery( "#univbris_flowspace_selection" ).hide();
@@ -256,6 +263,32 @@
             return result;
         }, 
 
+	fnLinkClick:function(link){
+		//console.log("link has been clicked: ");
+		//console.log(link.target.id);
+
+		var svg_links = svg.selectAll(".link");
+		for(var i=0;i<svg_links[0].length;i++){
+			//console.log(svg_links[0][i].__data__.value);
+			if(svg_links[0][i].__data__.value==link.target.id){
+				//console.log("got clicked link in svg");
+				//console.log(link);
+				if(link.target.checked==true){
+					svg_links[0][i].style.stroke= 'black';
+					svg_links[0][i].style.strokeWidth= '5px';
+				}
+				else{
+					svg_links[0][i].style.stroke= '#ccc';
+					svg_links[0][i].style.strokeWidth= '4px';
+				}
+				//svg.transition();
+				break;
+			}
+	
+		}
+		//console.log(svg_links);
+	},
+
 	 fake_checkbox_html : function (record) {
 	    //alert("fake fun called");
             var result="";
@@ -265,6 +298,8 @@
 	 // set id - for retrieving from an id, or for posting events upon user's clicks
 	    result += " id='"+ record +"'";
 	    result += " name='"+ record +"'";
+	    result += " class='checkboxlink'";
+	    //result += " onclick=fnLinkClick(this)";
 	 // set init_id
 	    result += " init_id='" + record + "'";
 	 // wrap up
@@ -278,25 +313,10 @@
 
         new_record: function(record)
         {
-           
-	 // this models a line in dataTables, each element in the line describes a cell
-            line = new Array();
-     
-            // go through table headers to get column names we want
-            // in order (we have temporarily hack some adjustments in names)
-            var cols = this.table.fnSettings().aoColumns;
-            var colnames = cols.map(function(x) {return x.sTitle})
-            var nb_col = cols.length;
-            /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-
 
 	    var urn = record['urn'];
-	    //alert(urn);
             var pos = urn.search('link');
-	    //filter records to add links only	
 	    if (pos!=-1){
-		    //alert(urn);
 		    var link = urn.substring(pos+5);
 		    pos = link.search("_");
 		    var head_node=link.substring(0,pos);
@@ -307,83 +327,98 @@
 		    pos = link.search("_");
 		    var tail_node=link.substring(0,pos);
 	            link=link.substring(pos+1);
-		    //pos = link.search("_");
 		    var tail_port=link;
                 
-		    
-		    //var head_node=urn.substring(pos+5,pos+28);
-                    //var head_port=urn.substring(pos+29,pos+31);
-		    //var tail_node=urn.substring(pos+32,pos+55);
-		    //var tail_port=urn.substring(pos+56,pos+58);
-		    
-		    //link type int 0-packet, 1-optical, 2-compute
-		    var link_type=0;
-		    if (urn.search('circuit')!=-1){
-			link_type=1;
+		   
+		    var link_type="packet";
+
+		    if (urn.search('opticalpacket')!=-1){
+			link_type='opticalpacket';
+		    }
+		    else if (urn.search('optical')!=-1){
+			link_type='optical';
 		    }
 		    else if (urn.search('compute')!=-1){
-			link_type=2;
+			link_type='compute';
 		    }
-
+		    else if (urn.search('federation')!=-1){
+			link_type='federation';
+		    }
+		    
 		    //get island name
 		    pos = urn.search('ofam');
 		    var testbed=urn.substring(pos+5);
 		    testbed=testbed.substring(0, testbed.search('link')-1);
+	    
+	    	    var found=false;
+		    for(i=0;i<table_links.length;i++){
+				if((table_links[i].head_node==head_node && table_links[i].tail_node==tail_node && table_links[i].head_port==head_port && table_links[i].tail_port==tail_port) || 
+				   (table_links[i].head_node==tail_node && table_links[i].tail_node==head_node && table_links[i].head_port==tail_port && table_links[i].tail_port==head_port)){
+					found=true;
+					break;
+				}
+		    }
 
-		    //alert(urn);
+		    if (found == false){
+				var tmp_link={};
+				tmp_link['head_node']=head_node;
+				tmp_link['tail_node']=tail_node;
+				tmp_link['head_port']=head_port;
+				tmp_link['tail_port']=tail_port;
+				tmp_link['testbed']=testbed;
+				tmp_link['link_type']=link_type;
+				tmp_link['urn']=urn;
+				table_links.push(tmp_link);
+		    }
+			   
+		}
 
-		    //alert("h: "+head_node+"/"+head_port);   
-		    //alert("t: "+tail_node+"/"+tail_port);
+	},
 
 
-		    //alert(colnames);
-		    /*replace production*/
-		    /* fill in stuff depending on the column name */
-		    for (var j = 0; j < nb_col; j++) {
+	process_records: function(link){
+
+	 // this models a line in dataTables, each element in the line describes a cell
+            line = new Array();
+     
+            // go through table headers to get column names we want
+            // in order (we have temporarily hack some adjustments in names)
+            var cols = this.table.fnSettings().aoColumns;
+            var colnames = cols.map(function(x) {return x.sTitle})
+            var nb_col = cols.length;
+            /* if we've requested checkboxes, then forget about the checkbox column for now */
+            if (this.options.checkboxes) nb_col -= 1;
+	    
+	    for (var j = 0; j < nb_col; j++) {
 		        if (typeof colnames[j] == 'undefined') {
 		            line.push('...');
 			} else if (colnames[j] == 'testbed') {
-			   line.push(testbed);
+			   line.push(link.testbed);
 		        } else if (colnames[j] == 'head node id/port') {
-			    line.push(head_node+"/"+head_port);
+			    line.push(link.head_node+"/"+link.head_port);
 			}
 			  else if (colnames[j] == 'tail node id/port'){
-			    line.push(tail_node+"/"+tail_port);
+			    line.push(link.tail_node+"/"+link.tail_port);
 			}
 			  else if (colnames[j] == 'link type'){
-			    switch (link_type){
-				case 0:
-					line.push("packet");
-					break;
-
-				case 1:
-					line.push("optical");
-					break;
-	
-				case 2:
-					line.push("compute");
-					break;
-			    }
+			    line.push(link.link_type);
 			}
 			  else if (colnames[j] == 'selected'){
 			    
-			    line.push(this.fake_checkbox_html(urn));
+			    line.push(this.fake_checkbox_html(link.urn));
 			}
 
-		    }
-		   
-	    
-		    // catch up with the last column if checkboxes were requested 
-		    if (this.options.checkboxes) {
+	     }
+
+	       // catch up with the last column if checkboxes were requested 
+	    if (this.options.checkboxes) {
 		        // Use a key instead of hostname (hard coded...)
 		        line.push(this.checkbox_html(record));
-			}
+	    }
 	    
 	    	    // adding an array in one call is *much* more efficient
 			// this.table.fnAddData(line);
-			this.buffered_lines.push(line);
-
-	    }
+	    this.buffered_lines.push(line);
         },
 
         clear_table: function()
@@ -474,6 +509,26 @@
         {
             alert('UnivbrisFoam::clear_fields() not implemented');
         },
+
+
+	/* sync query handler*/
+
+	on_sync_filter_added:function(filter)
+	{
+		//alert("sync query filter called");
+		this.filter=[];
+		this.on_filter_added(filter);
+	},
+
+	 on_sync_filter_clear: function()
+        {
+            // XXX
+	    this.filters=Array();
+            this.redraw_table();
+        },
+
+
+
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
         /*************************** ALL QUERY HANDLER ****************************/
@@ -593,10 +648,22 @@
         }, // on_all_query_in_progress
 
         on_all_query_done: function()
-        {
+        { 
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
+	    this.buffered_lines=[];	
+	    for(var i=0;i<table_links.length;i++){
+		this.process_records(table_links[i]);
+	    }
 	    this.table.fnAddData (this.buffered_lines);
 	    this.buffered_lines=[];
+	    //alert(regex_filter)
+	    /*try{
+	        //this.table.column(3).search("packet",True,True).draw();
+		this.table.fnFilter(regex_filter,3,true);
+	    }
+	    catch (err){
+		alert(err);
+	    }*/
 	    
             var self = this;
 	    // if we've already received the slice query, we have not been able to set 
@@ -670,9 +737,10 @@
              * Handle clicks on checkboxes: reassociate checkbox click every time
              * the table is redrawn 
              */
+	    //alert(options);
             this.elts('querytable-checkbox').unbind('click').click(this, this._check_click);
-	    this.elts("next").unbind('click').click(this, this.fnButnext);
-	    
+	   // this.elts("next").unbind('click').click(this, this.fnButnext);
+	    $(".checkboxlink").unbind('click').click(this,this.fnLinkClick);
 
             if (!this.table)
                 return;
@@ -747,6 +815,11 @@
 	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
 	} );
     }
+
+     /*function fnLinkClick(link){
+		console.log("link has been clicked: ");
+		console.log(link);
+	}*/
 
 })(jQuery);
 

@@ -2,7 +2,7 @@ from unfold.loginrequired               import FreeAccessView
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails, authority_get_pis
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails, make_request_user, create_user, authority_get_pis
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -11,19 +11,34 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 from myslice.theme                      import ThemeView
-from portal.models                      import PendingUser
+from portal.models                      import PendingUser, PendingAuthority
 from django.core.mail                   import EmailMultiAlternatives, send_mail
 from django.contrib.sites.models        import Site
 from django.contrib.auth.models         import User
 #
 import json, os, re, itertools
 
+def ValuesQuerySetToDict(vqs):
+    return [item for item in vqs]
+
 # requires login
 class ActivateEmailView(FreeAccessView, ThemeView):
     template_name = "email_activation.html"
+    def is_ple_enabled(self, pending_user):
+        pending_authorities = PendingAuthority.objects.filter(site_authority__iexact = pending_user.authority_hrn)
+        if pending_authorities:
+            return False                        
+        pending_user_email = pending_user.email
+        query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
+        results = execute_admin_query(self.request, query)
+        for result in results:
+            # User is enabled in PLE
+            if 'enabled' in result and result['enabled']==True:
+                return True
+        return False
+
     def dispatch(self, *args, **kwargs):
         return super(ActivateEmailView, self).dispatch(*args, **kwargs)
-
 
     def get_context_data(self, **kwargs):
 
@@ -35,60 +50,97 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             #print "%s = %s" % (key, value)
             if key == "hash_code":
                 hash_code=value
-       
-        if PendingUser.objects.filter(email_hash__iexact = hash_code):           
-            #get_user = PendingUser.objects.filter(email_hash__iexact = hash_code)
-            #get_user.status= 'True'
-            #get_user.save()
-            #for user in PendingUser.objects.all():
-            #    first_name = user.first_name
-            #    last_name = user.last_name
-            #    authority_hrn = user.authority_hrn
-            #    public_key = user.public_key
-            #    email = user.email
-            #    user_hrn = user.user_hrn
-            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
+        if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
             activation = 'success'
             # sending email after activation success
             try:
                 request = PendingUser.objects.filter(email_hash= hash_code)
-		split_authority_hrn = request[0].authority_hrn.split('.')[0]
-		pis = authority_get_pis(request, split_authority_hrn)
-		pi_emails = []
-		for x in pis:
-		    for e in x['pi_users']:
-		        u = e.split('.')[1]
-			y = User.Objects.get(username = u)
-			if y.username.count("@") != 0:
-			    if y.username.split("@")[1] == request[0].user_hrn.split("@")[1]:
-			        pi_emails += [y.email]
-		subject = 'User email activated'
-		msg = 'The user %s has validated his/her email. Now you can validate his/her account' % (request[0].login)
-		send_mail(subject, msg, 'support@fibre.org.br', pi_emails, fail_silently = False)
-	    except:
-	        print "error sending the email!"    
-            #try:
-                # Send an email: the recipients are the PI of the authority
-                # If No PI is defined for this Authority, send to a default email (different for each theme)
-             #   recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
-             #   theme.template_name = 'user_request_email.html'
-             #   html_content = render_to_string(theme.template, request)
-             #   theme.template_name = 'user_request_email.txt'
-             #   text_content = render_to_string(theme.template, request)
-             #   theme.template_name = 'user_request_email_subject.txt'
-             #   subject = render_to_string(theme.template, request)
-             #   subject = subject.replace('\n', '')
-             #   theme.template_name = 'email_default_sender.txt'
-             #   sender =  render_to_string(theme.template, request)
-             #   sender = sender.replace('\n', '')
-             #   msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
-             #   msg.attach_alternative(html_content, "text/html")
-             #   msg.send()
-           # except Exception, e:
-             #   print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
-             #   import traceback
-             #   traceback.print_exc()
+                split_authority_hrn = request[0].authority_hrn.split('.')[0]
+                pis = authority_get_pis(request, split_authority_hrn)
+                pi_emails = []
+                for x in pis:
+                    for e in x['pi_users']:
+                        u = e.split('.')[1]
+                	y = User.Objects.get(username = u)
+                	if y.username.count("@") != 0:
+                	    if y.username.split("@")[1] == request[0].user_hrn.split("@")[1]:
+                	        pi_emails += [y.email]
+                subject = 'User email activated'
+                msg = 'The user %s has validated his/her email. Now you can validate his/her account' % (request[0].login)
+                send_mail(subject, msg, 'support@fibre.org.br', pi_emails, fail_silently = False)
+    	    except:
+    	        print "error sending the email!"    
+                #try:
+                    # Send an email: the recipients are the PI of the authority
+                    # If No PI is defined for this Authority, send to a default email (different for each theme)
+                 #   recipients = authority_get_pi_emails(wsgi_request, authority_hrn)
+                 #   theme.template_name = 'user_request_email.html'
+                 #   html_content = render_to_string(theme.template, request)
+                 #   theme.template_name = 'user_request_email.txt'
+                 #   text_content = render_to_string(theme.template, request)
+                 #   theme.template_name = 'user_request_email_subject.txt'
+                 #   subject = render_to_string(theme.template, request)
+                 #   subject = subject.replace('\n', '')
+                 #   theme.template_name = 'email_default_sender.txt'
+                 #   sender =  render_to_string(theme.template, request)
+                 #   sender = sender.replace('\n', '')
+                 #   msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+                 #   msg.attach_alternative(html_content, "text/html")
+                 #   msg.send()
+               # except Exception, e:
+                 #   print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                 #   import traceback
+                 #   traceback.print_exc()
 
+            # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
+            if self.theme == "onelab":
+                # Auto-Validation of pending user, which is enabled in a trusted SFA Registry (example: PLE)
+                # We could check in the Registry based on email, but it takes too long 
+                # as we currently need to do a Resolve on each user_hrn of the Registry in order to get its email
+                # TODO in SFA XXX We need a Resolve based on email
+                # TODO maybe we can use MyPLC API for PLE
+                pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
+
+                # by default user is not in PLE
+                ple_user_enabled = False
+
+                if pending_users:
+                    pending_user = pending_users[0]
+                    
+                    # Auto Validation 
+                    if self.is_ple_enabled(pending_user):
+                        pending_user_request = make_request_user(pending_user)
+                        # Create user in SFA and Update in Manifold
+                        create_user(self.request, pending_user_request, namespace = 'myslice', as_admin = True)
+                        # Delete pending user
+                        PendingUser.objects.filter(email_hash__iexact = hash_code).delete()
+
+                        # template user auto validated
+                        activation = 'validated'
+
+                        # sending email after activation success
+                        #try:
+                        #    # Send an email: the recipient is the user
+                        #    recipients = pending_user_eamil 
+                        #    theme.template_name = 'user_request_email.html'
+                        #    html_content = render_to_string(theme.template, request)
+                        #    theme.template_name = 'user_request_email.txt'
+                        #    text_content = render_to_string(theme.template, request)
+                        #    theme.template_name = 'user_request_email_subject.txt'
+                        #    subject = render_to_string(theme.template, request)
+                        #    subject = subject.replace('\n', '')
+                        #    theme.template_name = 'email_default_sender.txt'
+                        #    sender =  render_to_string(theme.template, request)
+                        #    sender = sender.replace('\n', '')
+                        #    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+                        #    msg.attach_alternative(html_content, "text/html")
+                        #    msg.send()
+                        #except Exception, e:
+                        #    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                        #    import traceback
+                        #    traceback.print_exc()
+            
+            PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
         else:
             activation = 'failed'
         

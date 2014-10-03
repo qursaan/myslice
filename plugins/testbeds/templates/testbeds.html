@@ -1,24 +1,34 @@
 <div id={{ domid }} ng-controller="TestbedsCtrl">
 
-<div class="list-group-item sl-platform"><span class="list-group-item-heading">Testbeds</span></div>
+<div class="list-group-item sl-platform"><span class="list-group-item-heading">Facilities</span></div>
 
-<div ng-repeat="testbed in testbeds"
-     ng-click="select(testbed)">
+<div ng-repeat="facility_name in facility_names">
 	<a href="#" 
 	   class="list-group-item sl-platform"
-       ng-class="{active: testbed.active}"
-	   id="testbeds-filter_{[{ testbed.network_hrn }]}"
-	   data-platform="{[{ testbed.network_hrn }]}">
-	<span class="list-group-item-heading">{[{ testbed.platform }]}</span>
-	<!--<p class="list-group-item-heading">{[{ testbed.network_hrn }]}</p>-->
+	   ng-class="{active: is_facility_active(facility_name)}"
+	   id="facility-filter_{[{ facility_name }]}"
+	   ng-click="select_facility(facility_name)"
+	   data-platform="{[{ facility_name }]}">
+	<span class="list-group-item-heading">{[{ facility_name }]}</span>
 	</a>
+	<div ng-repeat="testbed_name in testbed_names[facility_name]">
+		<a href="#" 
+		   class="list-group-item sl-platform"
+		   ng-class="{active: is_testbed_active(facility_name, testbed_name)}"
+		   id="testbeds-filter_{[{ testbed_name }]}"
+  		 ng-click="select_testbed(facility_name, testbed_name)"
+		   data-platform="{[{ testbed_name }]}">
+		<span class="list-group-item-heading">&nbsp;&nbsp;{[{testbed_name}]}</span>
+		</a>
+	</div>
 </div>
 
+<!--
 <style>
 a.sl-platform  {
     text-transform: uppercase;
 }
 
 </style>
-
+-->
 </div>

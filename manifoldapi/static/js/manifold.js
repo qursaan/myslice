@@ -344,13 +344,21 @@ function QueryStore() {
         default_set = (default_set === undefined) ? STATE_SET_OUT : default_set;
 
         var self = this;
-        var query_ext = this.find_analyzed_query_ext(query_uuid);
-        var record_key = manifold.metadata.get_key(query_ext.query.object);
+        var key, object, query_ext, record_key;
 
+        query_ext = this.find_analyzed_query_ext(query_uuid);
+        object = query_ext.query.object;
+        if (object.indexOf(':') != -1) {
+            object = object.split(':')[1];
+        }
+        record_key = manifold.metadata.get_key(object);
+
+        // ["start_time", "resource", "end_time"]
+        // ["urn"]
+        
         $.each(records, function(i, record) {
             //var key = manifold.metadata.get_key(query_ext.query.object);
-            // ["start_time", "resource", "end_time"]
-            // ["urn"]
+            
             var record_key_value = manifold.record_get_value(record, record_key);
             
             query_ext.records.put(record_key_value, record);
@@ -553,6 +561,8 @@ function QueryStore() {
 
         this.iter_records(query_uuid, function(record_key, record) {
             var is_reserved, is_pending, in_set,  is_unconfigured;
+
+            /* By default, a record is visible unless a filter says the opposite */
             var visible = true;
 
             var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
@@ -622,13 +632,16 @@ function QueryStore() {
                 if (op == '=' || op == '==') {
                     if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
                         visible = false;
+
                 }else if (op == 'included') {
+                    /* By default, the filter returns false unless the record
+                     * field match at least one value of the included statement
+                     */
+                    visible = false;
                     $.each(value, function(i,x) {
                       if(x == col_value){
                           visible = true;
                           return false; // ~ break
-                      }else{
-                          visible = false;
                       }
                     });
                 }else if (op == '!=') {
@@ -659,7 +672,7 @@ function QueryStore() {
         });
 
         var end = new Date().getTime();
-        console.log("APPLY FILTERS took", end - start, "ms");
+        console.log("APPLY FILTERS [", filters, "] took", end - start, "ms");
 
     }
 
@@ -1202,7 +1215,15 @@ var manifold = {
     make_record: function(object, record)
     {
         // To make an object a record, we just add the hash function
-        var key = manifold.metadata.get_key(object);
+        var key, new_object;
+
+        if (object.indexOf(':') != -1) {
+            new_object = object.split(':')[1];
+        } else {
+            new_object = object;
+        }
+
+        key = manifold.metadata.get_key(new_object);
         record.hashCode = manifold.record_hashcode(key.sort());
         record.equals   = manifold.record_equals(key);
 

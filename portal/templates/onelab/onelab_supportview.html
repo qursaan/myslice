@@ -14,8 +14,7 @@
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs nav-section">
-				<li class="active"><a href="#support">Tickets</a></li>
-				<li><a href="#faq">FAQ</a></li>
+				<li class="active"><a href="#faq">FAQ</a></li>
 				<li><a href="#contact">Contact</a></li>
 			</ul>
 	    </div>
@@ -23,39 +22,40 @@
 </div>
 
 <div class="container tab-content">
-	<div class="tab-pane active row" id="support">
-	  	<div class="col-md-12">
-	  		<h2>Report a Bug</h2>
-			<p>If you have found a bug or having difficulties accesing some features or found some anomalies, please report it using our ticketing system.</p>
-			<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
-<!--			<h3>Unresolved Tickets</h3>
-			<table class="mytable table table-bordered table-hover">
-		        <tr>
-		            <th>Ticket No</th>
-					<th>Reported By</th>
-					<th>Description</th>
-		            <th>Status</th>
-		        </tr>
-		        <tr>
-		            <td>1</td>
-					<td>yasin.upmc@gmail.com</td>
-					<td> Slice_request page is not working </td>
-					<td> Unresolved</td>
-		        </tr>
-				<tr>
-					<td>2</td>
-					<td>azerty@lip6.fr</td>
-					<td>Unable to Register</td>
-					<td>Unresolved</td>
-				</tr> 
-		
-		    </table> -->
-	  	</div>
-	  </div>
-	<div class="tab-pane row" id="faq">
+	<div class="tab-pane active row" id="faq">
 	  	<div class="col-md-12">
 	  		<h2>Frequently Asked Questions (FAQs)<h2>
 
+			<h3>PlanetLab Europe Users</h3>
+			<ul>
+				<li>
+					<h4>I am a PlanetLab Europe user, how do I sign up?</h4>
+					<p>
+						Users that already have an account on PlanetLab Europe will be able to <a href="/register">sign up</a> using the
+						available form and selecting their institution from the provided list.<br />
+						If the user account on PlanetLab Europe is already enabled it will be automatically validated.
+					</p>
+				</li>
+				<li>
+					<h4>Which testbeds will I be able to access to?</h4>
+					<p>
+						You will be able to access NITOS, a wireless based testbed, and IoT-LAB, a sensor and radio based testbed.
+					</p>
+				</li>
+				<li>
+					<h4>Should I use the OneLab portal for my PlanetLab reservations?</h4>
+					<p>
+						For the time being, we recommend that you continue to use the PlanetLab Europe portal for reserving nodes on the 
+						worldwide PlanetLab system. <br />
+						We are working to provide you with an equally good PlanetLab experience through the OneLab portal, 
+						and we will invite you to help us beta-test this feature as soon as it is available. <br />
+						Other users, who do not have PlanetLab Europe accounts, currently have limited access to
+						PlanetLab Europe through the OneLab portal, but this is not equivalent to the full access you 
+						currently enjoy through your PlanetLab Europe account.
+					</p>
+				</li>
+			</ul>
+			
 			<h3>Users</h3>
 			<ul>
 			<li><h4>Who is a user?</h4></li>
@@ -64,11 +64,11 @@
 			
 			
 			<li><h4>How do I register?</h4></li>
-			<p>In order to register you must go to the <a href="/portal/register">Registration</a> page. You have to choose your corresponding institution (authority). After registration you have to wait until the PI validates your account. However upon registration, you will be able login to the portal with a limited access. Do not try to re-register with the same email address.</p>
+			<p>In order to register you must go to the <a href="/register">Registration</a> page. You have to choose your corresponding institution (authority). After registration you have to wait until the PI validates your account. However upon registration, you will be able login to the portal with a limited access. Do not try to re-register with the same email address.</p>
 			
 			<li><h4>Why can't I register with my email?</h4></li>
 			<p>If you have already registered then you won't be able to register again with the same email address. However, if you have never registered and still you are not able to use your email then please 
-			<a href="/portal/contact">Contact Support</a> and mention the error message that you are getting while trying to register.</p>
+			<a href="/contact">Contact Support</a> and mention the error message that you are getting while trying to register.</p>
 			
 			<li><h4>In registration, in "My keys" option, what should i choose?</h4></li>
 			<p>There are two choices.</p> 
@@ -79,7 +79,7 @@
 			<p>When you register, you choose an authority fromt he list of authorities. For each authority there is a Principal Investigator (PI). PI of your authority will verify your identity and if he finds that you are from his institution, he will validate your account otherwise he will reject your account.</p>
 			
 			<li><h4>How long I have to wait for validation?</h4></li>
-			<p>It depends on the PI of your authority. In general, it should not take more than a week. If you are waiting more than usual, please <a href="/portal/contact">Contact Support</a> and explain your problem.</p>
+			<p>It depends on the PI of your authority. In general, it should not take more than a week. If you are waiting more than usual, please <a href="/contact">Contact Support</a> and explain your problem.</p>
 			<li><h4>I just registered. Why can't I see any slices and resources?</h4></li>
 			<p>Once you register, you can login to your account with limited access. It means that you can view your account details, modify your name and password. You can also view other pages. However, you will not be able to see any slices as well as resources before your account validation. But you can <a href="/portal/slice_request/">Request Slice</a> before being validated. Therefore, the PI will validate your account as well as your requested slice. Once validated, you will be able to see your slice and if you click on your slice, you will be able to see resources in that slice and you can reserve nodes and start your experiment.</p>
 			
@@ -105,31 +105,53 @@
 	  	</div>
 	  </div>
 
-	<div class="tab-pane row" id="contact">
-	  	<div class="col-md-12">
-	  		<h2>Contact Us</h2>
-		
-			<h3>Mailing List</h3>
-			<p>You can subscribe to our mailing list by sending a request to: <b>support</b> AT <b>myslice</b> DOT <b>info</b></p>
-			<p>Also you can adress any issues in the same email address.</p>
-			
-			<h3>Mailing Address</h3>
-			<address>
-			UPMC - LIP6<br> 
-			Boîte courrier 16 <br>
-			Couloir 26-00, Etage 01, Bureau 102<br>
-			4 place Jussieu<br>
-			75252 PARIS CEDEX 05<br>
-			France<br> 
-			</address>
-	  	</div>
-	  </div>
+	<div class="tab-pane" id="contact">
+		<div class="row">
+			<div class="col-md-12">
+	  			<h2>Contact Us</h2>
+	  			<div class="row">
+	  				<div class="col-md-6">
+	  					<h3>Mailing List</h3>
+	  					<p>&nbsp;</p>
+						<p>You can subscribe to our mailing list by sending a request at the following E-Mail address:</p>
+						<p class="address">
+							<a href="mailto:contact@onelab.eu">contact@onelab.eu</a>
+						</p>
+						<p>Also you can adress any issues in the same email address.</p>
+	  				</div>
+	  				<div class="col-md-6">
+	  					<h3>Mailing Address</h3>
+	  					<p>&nbsp;</p>
+	  					<p class="address">
+							<b>OneLab Team</b><br />
+							UPMC - Laboratoire d'Informatique de Paris 6<br />
+							Boite courrier 169<br />
+							4 place Jussieu<br />
+							75252 PARIS cedex 05<br />
+							FRANCE
+						</p>
+						
+	  					
+	  				</div>
+	  			</div>
+	  			<div class="row">
+	  				<div class="col-md-6">
+	  					<h3>Report a Bug</h3>
+						<p>If you have found a bug or having difficulties accesing some features or found some anomalies, 
+							please report it using our ticketing system.
+						</p>
+						<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Ticket</button>
+	  				</div>
+	  			</div>
+	  		</div>
+		</div>
+	</div>
 </div>
 
 <script>
 $(document).ready(function() {
     $('button#ticketbtn').click(function() {
-        window.location="/portal/contact/";
+        window.location="/contact/";
     });
 	$('.nav-tabs a').click(function (e) {
   		e.preventDefault();

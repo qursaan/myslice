@@ -1,0 +1,47 @@
+<style>
+.multiselect {
+    width:40em;
+    height:5em;
+    border:solid 1px #c0c0c0;
+    overflow:auto;
+}
+ 
+.multiselect label {
+    display:block;
+}
+ 
+.multiselect-on {
+    color:#ffffff;
+    background-color:#000099;
+}
+
+.error{
+border:2px solid red;
+}
+
+</style>
+
+<form id="uob_ofv_table_form">
+  <table id='uob_ofv_table'>
+ 			<tr>
+		            	<th><strong>Flowspace Name</strong></th>
+		            	<td colspan="2">
+		            		<input id="oflowspace_name" type="text" style="width:100%;" name="oflowspace_name" maxlength="20" title="Flowspace name" disabled="disabled" />
+		            		
+		            	</td>
+		           </tr>
+			   </p>
+		            <tr>
+		            	<th><strong>Wavelength</strong></th>
+		            	<td>
+		            		
+		            		<label for="uob_ofv_table_wavelength"></label>
+		            		<input id="uob_ofv_table_wavelength" type="text" name="uob_ofv_table_wavelength" maxlength="17" title="wavelength for optical port/link" />
+		            	</td>
+				<td>
+					<p id="uob_ofv_table_wavelength_error" > wavelength should be number/double (value), e.g. 193.9 </p>	
+				</td>
+		            </tr>		      
+  </table>
+ </form>
+

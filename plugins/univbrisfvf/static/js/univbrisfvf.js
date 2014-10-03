@@ -7,7 +7,9 @@
 (function($){
 
     var debug=false;
-    debug=true
+    debug=true;
+    sync_query_uuid="";
+
 
     var UnivbrisFvf = Plugin.extend({
 
@@ -171,54 +173,121 @@
 	fnCancel:function(e){
 		//var sData=$("#uob_fv_table_form").find("input").serialize();
 		//alert("add flowspace:" + sData);
+		//alert("cancel"); 
+		jQuery("#uob_ofv_table_form").hide();
 		jQuery("#uob_fv_table_form").hide();
+		jQuery( "#univbris_foam_ports_selection" ).hide();
 		jQuery( "#univbris_flowspace_selection" ).show();
+		jQuery('#topo_plugin').hide();
+		/*var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].checked=false;
+			console.log(nodes[i].id);
+		}*/
+
 	},
+
 
 	fnAddflowspace:function(e){
-		if(fvf_add==1){
-			pk_flowspace_index=1+pk_flowspace_index;
-			jQuery("#uob_fv_table_form").hide();
-			var sData=$("#uob_fv_table_form").find("input").serialize();
-	     		var form =serializeAnything("#uob_fv_table_form");
-			this.table = $("#univbris_flowspace_selection__table").dataTable();
-			flowspace=sData;
 		
-			var string = "<p id='"+form+"'> <a onclick=\'fnPopTable(\""+form+"\");'>"+$("#flowspace_name").val()+"</a></p>";	
+		e.stopPropagation();
+		//if(fvf_add==1){	
+			jQuery("#uob_ofv_table_form").hide();
+			jQuery("#uob_fv_table_form").hide();
+
+			if(pk_mode==1){
+							
+				var sData=$("#uob_fv_table_form").find("input").serialize();
+		     		var form =serializeAnything("#uob_fv_table_form");
+				var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+				var form2=$('input',port_table.fnGetNodes()).serialize();
+				var nodes = $('input',port_table.fnGetNodes());
+		
+				this.table = $("#univbris_flowspace_selection__table").dataTable();
+				var val_status=validateFvfForm();
+				if (val_status == true){
+					pk_flowspace_index=1+pk_flowspace_index;
+					flowspace=sData;
+					var m_form=form+","+form2;
+					var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";	
+					if(fvf_add==1){
+						this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+					}
+					else{
+						this.table.fnDeleteRow(fvf_nrow);	
 			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-			jQuery( "#univbris_flowspace_selection" ).show();
-		}
+					}
+					jQuery( "#univbris_foam_ports_selection" ).hide();
+					jQuery( "#univbris_flowspace_selection" ).show();
+					jQuery('#topo_plugin').hide();
+				}
+				else{
+					alert("validation failed");
+					jQuery("#uob_fv_table_form").show();
+					jQuery("#uob_ofv_table_form").hide();
+					jQuery( "#univbris_foam_ports_selection" ).show();
+				}
+			}
+			else{
+							
+				var sData=$("#uob_ofv_table_form").find("input").serialize();
+		     		var form =serializeAnything("#uob_ofv_table_form");
+				var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+				var form2=$('input',port_table.fnGetNodes()).serialize();
+				var nodes = $('input',port_table.fnGetNodes());
+		
+				this.table = $("#univbris_flowspace_selection__table").dataTable();
+				
+				var val_status=validateoFvfForm();
+				if (val_status == true){
+					opt_flowspace_index=1+opt_flowspace_index;
+					flowspace=sData;
+					var m_form=form+","+form2;
+					var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#oflowspace_name").val()+"</a></p>";	
+					if(fvf_add==1){
+						this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+					}
+					else{
+						this.table.fnDeleteRow(fvf_nrow);	
+			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+					}
+					jQuery( "#univbris_foam_ports_selection" ).hide();
+					jQuery( "#univbris_flowspace_selection" ).show();
+					jQuery('#topo_plugin').hide();
+				}
+				else{
+					alert("validation failed");
+					jQuery("#uob_ofv_table_form").show();
+					jQuery("#uob_fv_table_form").hide();
+					jQuery( "#univbris_foam_ports_selection" ).show();
+				}
+
+			}
+		/*}
 		else{
 			jQuery("#uob_fv_table_form").hide();
+			jQuery("#uob_ofv_table_form").hide();
 			var sData=$("#uob_fv_table_form").find("input").serialize();
 	     		var form =serializeAnything("#uob_fv_table_form");
+			//var form2=serializeAnything("#uob_form");
+
+			var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+			var form2=$('input',port_table.fnGetNodes()).serialize();
 			this.table = $("#univbris_flowspace_selection__table").dataTable();
 			flowspace=sData;
-			
-			var string = "<p id='"+form+"'> <a onclick=\'fnPopTable(\""+form+"\");'>"+$("#flowspace_name").val()+"</a></p>";
+			var m_form=form+","+form2;
+			var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";
 		   	this.table.fnDeleteRow(fvf_nrow);	
 			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+			
+			jQuery( "#univbris_foam_ports_selection" ).hide();
 			jQuery( "#univbris_flowspace_selection" ).show();
+			jQuery('#topo_plugin').hide();
 		
-		}
+		}*/
 	},
 
-
-	fnModflowspace:function(e){
-		//alert("modify");
-
-		jQuery("#uob_fv_table_form").hide();
-		var sData=$("#uob_fv_table_form").find("input").serialize();
-     		var form =serializeAnything("#uob_fv_table_form");
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
-		flowspace=sData;
-		alert(form+"\n"+sData);
-		
-		var string = "<p id='"+form+"'> <a onclick=\'fnPopTable(\""+form+"\");'>"+$("#flowspace_name").val()+"</a></p>";
-	   	this.table.fnDeleteRow(fvf_nrow);	
-		this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-		jQuery( "#univbris_flowspace_selection" ).show();
-	},
 
         /**
          * @brief Determine index of key in the table columns 
@@ -311,24 +380,6 @@
                     line.push("first");
 		}
 		
-
-		/*if (typeof colnames[j] == 'undefined') {
-                    line.push('...');
-                } else if (colnames[j] == 'hostname') {
-                    if (record['type'] == 'resource,link')
-                        //TODO: we need to add source/destination for links
-                        line.push('');
-                    else
-                        line.push(record['hostname']);
-
-                } else if (colnames[j] == 'hrn' && typeof(record) != 'undefined') {
-                    line.push('<a href="../resource/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record['hrn']);
-                } else {
-                    if (record[colnames[j]])
-                        line.push(record[colnames[j]]);
-                    else
-                        line.push('');
-                }*/
             }
     
             // catch up with the last column if checkboxes were requested 
@@ -635,9 +686,9 @@
 	    	$("#addflowspaceform").unbind('click').click(this, this.fnAddflowspace);
 	    }
 	    else{
-		$("[id='addflowspaceform'").unbind('click').click(this, this.fnModflowspace);
+		$("[id='addflowspaceform']").unbind('click').click(this, this.fnModflowspace);
 	    }
-	    $("#cancel_addflowspaceform").unbind('click').click(this,this.fnCancel);
+	    $("#cancel_addflowspaceform").unbind('click').click(this,this.fnCancel); 
 
             if (!this.table)
                 return;
@@ -717,36 +768,519 @@
 })(jQuery);
 
 
+function deserializeDT(d){
 
-function fnPopTable(e){
-		//alert("e: "+e);
-		//this.table = $("#univbris_flowspace_selection__table").dataTable();
-		//alert(this.table);
-                /**var rows = $("#univbris_flowspace_selection__table").dataTable().fnGetNodes();
-		for(var i=0;i<rows.length;i++)
-        	{
-            		alert($(rows[i]).find("td:eq(0)").html()); 
-        	}
-		**/
+	try{
+	    var data = d,
+                currentDom,
+                $current = null,
+                $currentSavedValue = null,
+                $self = this,
+                i = 0,
+                keyValPairString = [],
+                keyValPairObject = {},
+                tmp = null,
+                defaults = null;
+
+            if (data.constructor === String) {
 
 
-		//var anSelected = fnGetSelected( this.table );
-		//var iRow = oTable.fnGetPosition( anSelected[0] );
-		//alert(iRow);
+                data = decodeURIComponent(data.replace(/\+/g, " "));
 
-		//var rowIndex = this.table.fnGetPosition( $(this).closest('tr')[0]);
-		//alert(rowIndex);
-                $("[id='addflowspaceform']").hide();
-		$("#uob_fv_table_form :input").prop("disabled", false);
-		$("#uob_fv_table_form").deserialize(e);
-                $("[name='flowspace_name']").prop("disabled", true)
-		$("#uob_fv_table_form :input").prop("disabled", true);
-		$("[id='cancel_addflowspaceform']").prop("disabled", false);
-		$("[id='cancel_addflowspaceform']").text('close');
-		//$("[id='addflowspaceform'").hide();
-		jQuery("#univbris_flowspace_selection").hide();
-		jQuery("#uob_fv_table_form").show();
+                keyValPairString = data.split('&');
+
+                for (i = 0; i < keyValPairString.length; i++) {
+                    tmp = keyValPairString[i].split('=');
+                    keyValPairObject[tmp[0]] = tmp[1];
+
+                }
+            }
+
+	  var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+	  var nodes = $('input',port_table.fnGetNodes());
+
+
+	  for(i=0;i<nodes.length;i++){
+			$currentSavedValue = keyValPairObject[nodes[i].id];
+			if ($currentSavedValue === undefined){
+				nodes[i].checked=false;
+			}
+			else{
+				nodes[i].checked=true;
+			}
+	  };
+
+	}
+	catch(err){
+		alert(err);
+	}
+
+	   
 };
+
+
+function fnPopTable(form1,form2){
+		hideFvfError();
+		jQuery("#univbris_flowspace_selection").hide();
+                $("[id='addflowspaceform']").hide();
+		
+		deserializeDT(form2);
+
+
+                //$("[name='flowspace_name']").prop("disabled", true);
+		//$("#uob_fv_table_form :input").prop("disabled", true);
+		//$("[id='cancel_addflowspaceform']").prop("disabled", false);
+		//$("[id='cancel_addflowspaceform']").text('close');
+
+		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].disabled=true;
+		}
+
+		if (form1.search('pk_flowspace')!=-1){
+			pk_mode=1;
+		}
+		else{
+			pk_mode=0;
+		}
+		
+
+		if  (pk_mode==1){
+			try{
+				manifold.raise_event(sync_query_uuid,CLEAR_FILTERS);
+				var filter=[];
+				filter.push("link type");
+				filter.push("!=");
+				filter.push("optical");
+				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
+			}
+			catch(err){
+				alert("raise error:"+err);
+			}
+			$("#uob_fv_table_form :input").prop("disabled", false);
+			$("#uob_fv_table_form").deserialize(form1);
+			$("[name='flowspace_name']").prop("disabled", true);
+			$("#uob_fv_table_form :input").prop("disabled", true);
+			$("[id='cancel_addflowspaceform']").prop("disabled", false);
+			$("[id='cancel_addflowspaceform']").text('close');
+			topoviewer_state={mode:"read",link_type:"non-optical"};
+			jQuery("#uob_fv_table_form").show();
+		}
+		else{
+
+			try{
+				manifold.raise_event(sync_query_uuid,CLEAR_FILTERS);
+				var filter=[];
+				filter.push("link type");
+				filter.push("!=");
+				filter.push("packet");
+				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
+				filter=[];
+				filter.push("link type");
+				filter.push("!=");
+				filter.push("compute");
+				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
+				filter=[];
+				filter.push("link type");
+				filter.push("!=");
+				filter.push("federation");
+				manifold.raise_event(sync_query_uuid,FILTER_ADDED,filter);
+			}
+			catch(err){
+				alert("raise error:"+err);
+			}
+			$("#uob_ofv_table_form :input").prop("disabled", false);
+			$("#uob_ofv_table_form").deserialize(form1);
+			$("[name='oflowspace_name']").prop("disabled", true);
+			$("#uob_ofv_table_form :input").prop("disabled", true);
+			$("[id='cancel_addflowspaceform']").prop("disabled", false);
+			$("[id='cancel_addflowspaceform']").text('close');
+			topoviewer_state={mode:"read",link_type:"optical"};
+			jQuery("#uob_ofv_table_form").show();
+		}
+
+		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		var svg_links = svg.selectAll(".link");
+
+		for(n=0;n<nodes.length;n++){
+				for(var i=0;i<svg_links[0].length;i++){
+					if(svg_links[0][i].__data__.value==nodes[n].id){
+						if(nodes[n].checked==true){
+							svg_links[0][i].style.stroke= 'black';
+							svg_links[0][i].style.strokeWidth= '5px';
+						}
+						else{
+							svg_links[0][i].style.stroke= '#ccc';
+							svg_links[0][i].style.strokeWidth= '4px';
+						}
+						break;
+					}
+				}
+				nodes[n].disabled=false;
+		};
+
+
+		jQuery( "#univbris_foam_ports_selection" ).show();
+		jQuery('#topo_plugin').show();
+};
+
+function macValidator (mac_str){
+	if (mac_str != ""){
+		var mac_validator=/(^(([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2}))$)|(^(([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})))$/;
+		var result =mac_str.match(mac_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else{
+		return true;
+	}
+};
+
+function ethertypeValidator (eth_str){
+	if (eth_str != ""){
+		var ethertype_validator=/^0x[0-9a-fA-F]{4}$/;
+		var result = eth_str.match(ethertype_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else{
+		return true;
+	}
+};
+
+
+function vlanValidator (vlan_str){
+	if (vlan_str != ""){
+		var vlan_validator=/(^[1-9][0-9]{0,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-5]$)/;
+		var result = vlan_str.match(vlan_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}
+};
+
+function ipValidator(ip_str){
+	if (ip_str != ""){
+		var ip_validator=/(^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)/;
+		var result = ip_str.match(ip_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}
+};
+
+
+function portValidator (port_str){
+	if (port_str != ""){
+		var port_validator=/^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/;
+		var result = port_str.match(port_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}	
+}
+
+function ipProtoValidator (ipproto_str){
+	if (ipproto_str != ""){
+		var ipproto_validator=/(^[0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]$)/;
+		var result = ipproto_str.match(ipproto_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}	
+}
+
+function wavelengthValidator (wavelength_str){
+		var wavelength_validator=/^\d+.?\d*$/;
+		var result = wavelength_str.match(wavelength_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+}
+
+
+
+
+
+
+
+
+function validateFvfForm(){
+	var status = false;
+	var checked =0;
+
+	//row 1 validation
+	if (macValidator ($("#uob_fv_table_dl_src_start").val())==false){
+		$("#uob_fv_table_dl_src_start").addClass('error');
+		$("#uob_fv_table_dl_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (macValidator ($("#uob_fv_table_dl_src_end").val())==false){
+		$("#uob_fv_table_dl_src_end").addClass('error');
+		$("#uob_fv_table_dl_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 2 validation
+
+	if (macValidator ($("#uob_fv_table_dl_dst_start").val())==false){
+		$("#uob_fv_table_dl_dst_start").addClass('error');
+		$("#uob_fv_table_dl_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (macValidator ($("#uob_fv_table_dl_dst_end").val())==false){
+		$("#uob_fv_table_dl_dst_end").addClass('error');
+		$("#uob_fv_table_dl_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 3 validation
+	
+	if (ethertypeValidator ($("#uob_fv_table_dl_type_start").val())==false){
+		$("#uob_fv_table_dl_type_start").addClass('error');
+		$("#uob_fv_table_dl_type_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ethertypeValidator ($("#uob_fv_table_dl_type_end").val())==false){
+		$("#uob_fv_table_dl_type_end").addClass('error');
+		$("#uob_fv_table_dl_type_error").show();
+	}
+	else {
+		checked++;
+	}
+
+
+	//row 4 validation
+	if (vlanValidator ($("#uob_fv_table_vlan_id_start").val())==false){
+		$("#uob_fv_table_vlan_id_start").addClass('error');
+		$("#uob_fv_table_vlan_id_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (vlanValidator ($("#uob_fv_table_vlan_id_end").val())==false){
+		$("#uob_fv_table_vlan_id_end").addClass('error');
+		$("#uob_fv_table_vlan_id_error").show();
+	}
+	else {
+		checked++;
+	}
+ 
+	//row 5 validation
+	if (ipValidator ($("#uob_fv_table_nw_src_start").val())==false){
+		$("#uob_fv_table_nw_src_start").addClass('error');
+		$("#uob_fv_table_nw_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipValidator ($("#uob_fv_table_nw_src_end").val())==false){
+		$("#uob_fv_table_nw_src_end").addClass('error');
+		$("#uob_fv_table_nw_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 6 validation
+	if (ipValidator ($("#uob_fv_table_nw_dst_start").val())==false){
+		$("#uob_fv_table_nw_dst_start").addClass('error');
+		$("#uob_fv_table_nw_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipValidator ($("#uob_fv_table_nw_dst_end").val())==false){
+		$("#uob_fv_table_nw_dst_end").addClass('error');
+		$("#uob_fv_table_nw_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+
+
+	//row 7 validation
+
+	if (ipProtoValidator ($("#uob_fv_table_nw_proto_start").val())==false){
+		$("#uob_fv_table_nw_proto_start").addClass('error');
+		$("#uob_fv_table_nw_proto_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipProtoValidator ($("#uob_fv_table_nw_proto_end").val())==false){
+		$("#uob_fv_table_nw_proto_end").addClass('error');
+		$("#uob_fv_table_nw_proto_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 8 validation
+	if (portValidator ($("#uob_fv_table_tp_src_start").val())==false){
+		$("#uob_fv_table_tp_src_start").addClass('error');
+		$("#uob_fv_table_tp_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (portValidator ($("#uob_fv_table_tp_src_end").val())==false){
+		$("#uob_fv_table_tp_src_end").addClass('error');
+		$("#uob_fv_table_tp_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 9 validation
+	if (portValidator ($("#uob_fv_table_tp_dst_start").val())==false){
+		$("#uob_fv_table_tp_dst_start").addClass('error');
+		$("#uob_fv_table_tp_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (portValidator ($("#uob_fv_table_tp_dst_end").val())==false){
+		$("#uob_fv_table_tp_dst_end").addClass('error');
+		$("#uob_fv_table_tp_dst_error").show();
+	}
+	else {
+		checked++;
+	}/**/
+
+	//validate that at least one port is selected
+	var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+	var nodes = $('input',port_table.fnGetNodes());
+
+	var port_selected=false;
+	for(var i=0;i<nodes.length;i++){
+		if(nodes[i].checked==true){
+			checked++;
+			port_selected=true;
+			break;
+		}			
+	}
+
+	if (checked >= 19) {
+		status=true;
+	}
+
+	if (port_selected==false & checked == 18){
+		alert("you need to select at least one port");
+	}
+	else if (port_selected==false & checked <= 18){
+		alert("you need to select at least one port and correct other flowspace parameter errors");
+	}
+	else if (port_selected==true & checked <= 18){
+		alert("you need to correct other flowspace parameter errors");
+	}
+	
+	//alert("validator status:"+status+" checked:"+checked);
+	return status;
+}
+
+function validateoFvfForm(){
+	var status = false;
+	var checked =0;
+
+	//row 1 validation
+	if (wavelengthValidator($('#uob_ofv_table_wavelength').val())==false){
+		$("#uob_ofv_table_wavelength").addClass('error');
+		$("#uob_ofv_table_wavelength_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	
+
+	//validate that at least one port is selected
+	var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+	var nodes = $('input',port_table.fnGetNodes());
+
+	var port_selected=false;
+	for(var i=0;i<nodes.length;i++){
+		if(nodes[i].checked==true){
+			checked++;
+			port_selected=true;
+			break;
+		}			
+	}
+
+	if (checked >= 2) {
+		status=true;
+	}
+
+	if (port_selected==false & checked == 1){
+		alert("you need to select at least one port");
+	}
+	else if (port_selected==false & checked <= 1){
+		alert("you need to select at least one port and correct other flowspace parameter errors");
+	}
+	else if (port_selected==true & checked <= 1){
+		alert("you need to correct other flowspace parameter errors");
+	}
+	
+	//alert("validator status:"+status+" checked:"+checked);
+	return status;
+}
 
 
 
@@ -777,7 +1311,28 @@ function serializeAnything (form){
 		});
 
 		return toReturn.join("&").replace(/%20/g, "+");
+}
 
+function hideFvfError(){
+	$("[id*=_error]").hide();
+	console
+	$("#uob_fv_table_form :input").each(function(){
+		try{
+			$(this).removeClass('error');
+		}
+		catch (err){
+		}
+
+	});
+
+	$("#uob_ofv_table_form :input").each(function(){
+		try{
+			$(this).removeClass('error');
+		}
+		catch (err){
+		}
+
+	});
 }
 
 

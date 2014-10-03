@@ -20,37 +20,115 @@
         /* Plugin instance */
         $scope.instance = null;
 
-        /* Models */
-        $scope.testbeds = Array();
+        $scope.facility_names = Array();
+        $scope.testbed_names = new Object();
 
+        /* Models */
+        //$scope.testbeds = Array();
+        $scope._facility_active = new Object();
+        $scope._testbed_active  = new Object();
+
+        $scope.is_facility_active = function(facility)
+        {
+            return (($scope._facility_active[facility] === undefined) || $scope._facility_active[facility]);
+        };
+
+        $scope.is_testbed_active = function(facility, testbed)
+        {
+            return (($scope._testbed_active[facility] === undefined) || 
+                    ($scope._testbed_active[facility][testbed] === undefined) || 
+                    ($scope._testbed_active[facility][testbed]));
+        };
+
+        $scope.set_facility_active = function(facility, value)
+        {
+            $scope._facility_active[facility] = value;
+        };
+
+        $scope.set_testbed_active = function(facility, testbed, value)
+        {
+            if ($scope._testbed_active[facility] === undefined)
+                $scope._testbed_active[facility] = new Object();
+            $scope._testbed_active[facility][testbed] = value;
+        };
+    
         /* Click event */
-        $scope.select = function(testbed)
+
+        $scope.select_facility = function(facility)
         {
             var selected, prev_selected, num, num_selected, num_prev_selected, filter;
 
-            prev_selected = $.map($scope.testbeds, function(x, i) {
-                return x.active ? x.network_hrn : null;
+            prev_selected = $.map($scope.facility_names, function(x, i) {
+                return $scope.is_facility_active(x) ? x : null;
             });
 
-            testbed.active = !testbed.active;
+            $scope.set_facility_active(facility, ! $scope.is_facility_active(facility));
 
-            selected = $.map($scope.testbeds, function(x, i) {
-                return x.active ? x.network_hrn : null;
+            selected = $.map($scope.facility_names, function(x, i) {
+                return $scope.is_facility_active(x) ? x : null;
             });
 
-            num = $scope.testbeds.length;
+            num = $scope.facility_names.length;
             prev_num_selected = prev_selected.length;
             num_selected = selected.length;
 
-            
             if ((prev_num_selected != 0) && (prev_num_selected != num)) {
                 // Remove previous filter
-                filter = ['network_hrn', 'included', prev_selected];
+                filter = ['facility_name', 'included', prev_selected];
                 manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
             }
 
-            if ((num_selected != 0) && (num_selected != num)) {
-                filter = ['network_hrn', 'included', selected];
+            if (num_selected != num) {
+                filter = ['facility_name', 'included', selected];
+                manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
+            }
+        };
+
+        $scope.select_testbed = function(facility, testbed)
+        {
+            var selected, prev_selected, num, num_selected, num_prev_selected, filter;
+
+            prev_selected = Array();
+            $.each($scope.facility_names, function(i, facility_name) {
+                $.each($scope.testbed_names[facility_name], function(j, testbed_name) {
+                    if ($scope.is_testbed_active(facility_name, testbed_name)) {
+                        // XXX We should have a joint facility/testbed filter
+                        prev_selected.push(testbed_name);
+                    }
+                });
+
+            });
+
+            $scope.set_testbed_active(facility, testbed, ! $scope.is_testbed_active(facility, testbed));
+
+            selected = Array();
+            $.each($scope.facility_names, function(i, facility_name) {
+                $.each($scope.testbed_names[facility_name], function(j, testbed_name) {
+                    if ($scope.is_testbed_active(facility_name, testbed_name)) {
+                        // XXX We should have a joint facility/testbed filter
+                        selected.push(testbed_name);
+                    }
+                });
+
+            });
+
+            num = 0;
+            $.each($scope.facility_names, function(i, facility_name) {
+                num += $scope.testbed_names[facility_name].length;
+            });
+            prev_num_selected = prev_selected.length;
+            num_selected = selected.length;
+
+            if ((prev_num_selected != 0) && (prev_num_selected != num)) {
+                // Remove previous filter
+                // XXX We should have a joint facility/testbed filter
+                filter = ['testbed_name', 'included', prev_selected];
+                manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
+            }
+
+            if (num_selected != num) {
+                // XXX We should have a joint facility/testbed filter
+                filter = ['testbed_name', 'included', selected];
                 manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
             }
         };
@@ -80,7 +158,6 @@
             this._super(options, element);
 
             /* Member variables */
-            this.filters = Array();
             this.testbeds = Array();
 
             this._get_scope().instance = this;
@@ -94,6 +171,7 @@
         /* HANDLERS */
 
         /* When a filter is added/removed, update the list of filters local to the plugin */
+        /*
         on_filter_added: function(filter)
         {
             this.filters.push(filter);
@@ -125,36 +203,30 @@
                 }
             }
         },
-
+        */
         // ... be sure to list all events here
 
-        on_networks_query_done: function()
+        on_query_done: function()
         {
-             this.set_networks();
+            var scope, query_ext, resources;
+            scope = this._get_scope();
+            query_ext = manifold.query_store.find_analyzed_query_ext(this.options.query_uuid);
+            resources = query_ext.records.values();
+
+            $.each(resources, function(i, resource) {
+                if ($.inArray(resource.facility_name, scope.facility_names) == -1)
+                    scope.facility_names.push(resource.facility_name);
+                if (scope.testbed_names[resource.facility_name] === undefined)
+                    scope.testbed_names[resource.facility_name] = Array();
+                if ($.inArray(resource.testbed_name, scope.testbed_names[resource.facility_name]) == -1)
+                    scope.testbed_names[resource.facility_name].push(resource.testbed_name);
+            });
+
+            scope.$apply();
         },
 
-/*
-            var self = this;
-            console.log('query network DONE');
-            $("[id^='testbeds-filter_']").on('click',function(e) {
-                $(this).toggleClass("active");
-
-                // avoid multiple calls when an event is raised to manifold.js
-                e.stopPropagation();
-
-                value = this.dataset['platform'];
-                // handle the hrn that include . in their name (has to be in sync with the data from SFA)
-                //value = value.replace(/\./g,"\\.");
-                key = "network_hrn";
-                op = "included";
-                return $(this).hasClass('active') ? self._addFilter(key, op, value) : self._removeFilter(key, op, value);
-            });
-           
-        },*/
-
-        /* INTERNAL FUNCTIONS */
-
-        set_networks: function()
+        /*
+        on_networks_query_done: function()
         {
             var scope = this._get_scope();
             var query_ext = manifold.query_store.find_analyzed_query_ext(this.options.query_networks_uuid);
@@ -162,12 +234,16 @@
             $.each(scope.testbeds, function(i, testbed) { testbed.active = true });
             scope.$apply();
         },
+*/
+
+        /* INTERNAL FUNCTIONS */
 
         _get_scope : function()
         {
             return angular.element('[ng-controller=TestbedsCtrl]').scope()
         },
 
+/*
         _addFilter: function(key, op, value)
         {
             values = Array();
@@ -187,6 +263,7 @@
             // Update the filter with the new list of values, ex: [ple,nitos,wilab]
             manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
         },
+
         _removeFilter: function(key, op, value)
         {
             console.log("remove "+value);
@@ -213,7 +290,7 @@
                 manifold.raise_event(this.options.query_uuid, FILTER_ADDED, [key, op, values]);
             }
         }
-
+*/
     });
 
     /* Plugin registration */

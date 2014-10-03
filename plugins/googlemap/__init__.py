@@ -8,7 +8,7 @@ class GoogleMap (Plugin):
     # googlemap_key :   mandatory googlemap API v3 key
     # latitude,longitude, zoom : the starting point
     # apparently at some point there has been support for a boolean 'checkboxes' input arg but seems dropped
-    def __init__ (self, query, googlemap_api_key=None, latitude=43., longitude=7., zoom=4, **settings):
+    def __init__ (self, query, googlemap_api_key=None, latitude=50., longitude=50, zoom=3, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
         self.googlemap_api_key=googlemap_api_key

@@ -173,45 +173,49 @@ $(document).ready(function(){
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
             {% else %}
 		{% if authority.authority_hrn == "fibre.ufrj" %}
-                        {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO RIO DE JANEIRO"},
+                        {value:"{{ authority.authority_hrn }}",label:"UFRJ - UNIVERSIDADE FEDERAL DO RIO DE JANEIRO"},
                 {% else %}
                       {% if authority.authority_hrn == "fibre.ufg" %}
-                              {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE GOIAS"},
+                              {value:"{{ authority.authority_hrn }}",label:"UFG - UNIVERSIDADE FEDERAL DE GOIAS"},
                       {% else %}
                               {% if authority.authority_hrn == "fibre.uff" %}
-                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL FLUMINENSE"},
+                                     {value:"{{ authority.authority_hrn }}",label:"UFF - UNIVERSIDADE FEDERAL FLUMINENSE"},
                               {% else %}
                                      {% if authority.authority_hrn == "fibre.ufpa" %}
-                                             {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DO PARA"},
+                                             {value:"{{ authority.authority_hrn }}",label:"UFPA - UNIVERSIDADE FEDERAL DO PARA"},
                                      {% else %}
                                              {% if authority.authority_hrn == "fibre.ufpe" %}
-                                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE PERNAMBUCO"},
+                                                     {value:"{{ authority.authority_hrn }}",label:"UFPE - UNIVERSIDADE FEDERAL DE PERNAMBUCO"},
                                              {% else %}
                                                      {% if authority.authority_hrn == "fibre.ufscar" %}
-                                                            {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE FEDERAL DE SAO CARLOS"},
+                                                            {value:"{{ authority.authority_hrn }}",label:"UFSCAR - UNIVERSIDADE FEDERAL DE SAO CARLOS"},
                                                      {% else %}
                                                             {% if authority.authority_hrn == "fibre.unifacs" %}
-                                                                     {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE SALVADOR"},
+                                                                     {value:"{{ authority.authority_hrn }}",label:"UNIFACS - UNIVERSIDADE SALVADOR"},
                                                             {% else %}
                                                                      {% if authority.authority_hrn == "fibre.usp" %}
-                                                                            {value:"{{ authority.authority_hrn }}",label:"UNIVERSIDADE DE SAO PAULO"},
+                                                                            {value:"{{ authority.authority_hrn }}",label:"USP - UNIVERSIDADE DE SAO PAULO"},
                                                                      {% else %}
                                                                             {% if authority.authority_hrn == "fibre.cpqd" %}
-                                                                                    {value:"{{ authority.authority_hrn }}",label:"CENTRO DE PESQUISA E DESENVOLVIMENTO EM TELECOMUNICACOES"},
+                                                                                    {value:"{{ authority.authority_hrn }}",label:"CPQD - CENTRO DE PESQUISA E DESENVOLVIMENTO EM TELECOMUNICACOES"},
                                                                             {% else %}
                                                                                     {% if authority.authority_hrn == "fibre.rnp" %}
-                                                                                             {value:"{{ authority.authority_hrn }}",label:"REDE NACIONAL DE ENSINO E PESQUISA"},
+                                                                                             {value:"{{ authority.authority_hrn }}",label:"(Catch-all) RNP - REDE NACIONAL DE ENSINO E PESQUISA"},
                                                                                     {% else %}
 		                 						    	{% if authority.authority_hrn == "fibre.i2cat" %}
-										        	{value:"{{ authority.authority_hrn }}",label:"FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
+										        	{value:"{{ authority.authority_hrn }}",label:"I2CAT - FOUNDATION, RESEARCH AND INNOVATION IN THE INTERNET AREA"},
 										        {% else %}
 											        {% if authority.authority_hrn == "fibre.uth" %}
-                                                                                        	         {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF THESSALY"},
+                                                                                        	         {value:"{{ authority.authority_hrn }}",label:"UTH - UNIVERSITY OF THESSALY"},
 											        {% else %}
 												      {% if authority.authority_hrn == "fibre.bristol" %}
-                                                                                                	     {value:"{{ authority.authority_hrn }}",label:"UNIVERSITY OF BRISTOL"},
+                                                                                                	     {value:"{{ authority.authority_hrn }}",label:"UNIBRIS - UNIVERSITY OF BRISTOL"},
 												       {% else %}
-                                                                                   		 	     {value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+												             {% if authority.authority_hrn == "fibre.upmc" %}
+                                                                                                	            {value:"{{ authority.authority_hrn }}",label:"UPMC - UNIVERSITE PIERRE ET MARIE CURIE"},
+												             {% else %}
+                                                                                   		 	            {value:"{{ authority.authority_hrn }}",label:"FIBRE"},
+                         											{% endif %}
   												{% endif %}
 											{% endif %}
 										{% endif %}

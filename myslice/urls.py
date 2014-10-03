@@ -19,7 +19,14 @@ import portal.newsview
 
 import plugins.cafe.edelberto
 
+from portal.about                   import AboutView
 from portal.registrationview        import RegistrationView
+from portal.accountview             import AccountView, account_process
+from portal.institution             import InstitutionView
+
+from portal.supportview             import SupportView
+from portal.contactview             import ContactView
+
 from portal.termsview               import TermsView
 
 home_view=portal.homeview.HomeView.as_view()
@@ -85,7 +92,7 @@ urls = [
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
     #
     # REST monitoring
-    #(r'^monitor/sfa/getversion/?$', 'rest.monitor.sfaGetVersion'),
+    (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
     #
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices')
@@ -101,12 +108,19 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
-    #
+    
+    url(r'^about/?$', AboutView.as_view(), name='about'),
+    
+    url(r'^institution/?$', InstitutionView.as_view(), name='institution'),
     (r'^management/requests/?$', portal.managementtabrequests.ManagementRequestsView.as_view()),
     (r'^management/about/?$', portal.managementtababout.ManagementAboutView.as_view()),
     #
-    url(r'^register/?$', RegistrationView.as_view(), name='registration'),	
+    url(r'^register/?$', RegistrationView.as_view(), name='registration'),
+    url(r'^account/?$', AccountView.as_view(), name='account'),
+    url(r'^account/account_process/?$', account_process),
+    url(r'^contact/?$', ContactView.as_view(), name='contact'),
     url(r'^terms/?$', TermsView.as_view(), name='terms'),
+    url(r'^support/?$', SupportView.as_view(), name='support'),
     #
     url(r'^portal/', include('portal.urls')),
 
