@@ -177,11 +177,11 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 
         pi_authority = user_authority + '.' + user_username.split("@")[1]
         context = super(ManagementRequestsView, self).get_context_data(**kwargs)
-        print "testing"
-        print ctx_my_authorities
-	print auth_hrn
-	print user_username
-	print pi_authority
+        #print "testing"
+        #print ctx_my_authorities
+	    #print auth_hrn
+	    #print user_username
+	    #print pi_authority
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities

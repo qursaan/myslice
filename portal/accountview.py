@@ -189,22 +189,28 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
 
 
         ## check user is pi or not
-        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-        platform_details = execute_query(self.request, platform_query)
-        account_details = execute_query(self.request, account_query)
-        for platform_detail in platform_details:
-            for account_detail in account_details:
-                if platform_detail['platform_id'] == account_detail['platform_id']:
-                    if 'config' in account_detail and account_detail['config'] is not '':
-                        account_config = json.loads(account_detail['config'])
-                        if 'myslice' in platform_detail['platform']:
-                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+      #  platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
+      #  account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
+      #  platform_details = execute_query(self.request, platform_query)
+      #  account_details = execute_query(self.request, account_query)
+      #  for platform_detail in platform_details:
+      #      for account_detail in account_details:
+      #          if platform_detail['platform_id'] == account_detail['platform_id']:
+      #              if 'config' in account_detail and account_detail['config'] is not '':
+      #                  account_config = json.loads(account_detail['config'])
+      #                  if 'myslice' in platform_detail['platform']:
+      #                      acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
         # assigning values
         if acc_auth_cred == {} or acc_auth_cred == 'N/A':
             pi = "is_not_pi"
         else:
             pi = "is_pi"
+
+        # check if the user has creds or not
+        if acc_user_cred == {} or acc_user_cred == 'N/A':
+            user_cred = 'no_creds'
+        else:
+            user_cred = 'has_creds'
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
@@ -212,6 +218,7 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         context['platform_list'] = platform_list
         context['my_users'] = my_users
         context['pi'] = pi
+        context['user_cred'] = user_cred
         context['my_slices'] = my_slices
         context['my_auths'] = my_auths
         context['user_status'] = user_status

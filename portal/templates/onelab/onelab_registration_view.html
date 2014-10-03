@@ -9,32 +9,31 @@
 </div>
 <div class="row">
 	<div class="col-md-12">
-  		<p><strong>Questions? <a href="/portal/contact" >Contact us.</a></strong></p>
+  		<p><strong>Questions? <a href="/contact" >Contact us.</a></strong></p>
   </div>
 </div>
 {% if errors %}
-<ul>
-  {% for error in errors %}
-  <li>{{ error }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-
-<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
 <div class="row">
-	
 	<div class="col-md-12">
-			
+		<ul class="error">
+		  {% for error in errors %}
+		  <li>{{ error | safe }}</li>
+		  {% endfor %}
+		</ul>
+	</div>
+</div>
+{% endif %}
+				<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
+<div class="row">
+	<div class="col-md-12">
 			<div class="form-group">
 				{% csrf_token %}
 		  		<label for="authority_hrn" class="control-label">Organization</label>
 				<p></p>
 		  		<input id="authority_hrn" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
-				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. If it is not in the list, 
-				please request its addition by clicking the link below. We will send an email to the managers that we have on record for 
-				your organization, asking them to validate your sign-up request." required />
+				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
+				 the managers that we have on record for your organization, asking them to validate your sign-up request." required />
 				<p></p>
 				<p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p>
 			</div>
@@ -84,7 +83,7 @@
 	      	<br />
 			<div class="alert alert-danger" id="pkey_del_msg">
 				In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to 
-				<a href="http://trac.myslice.info/wiki/InstallSfa" target="_blank">delegate your public key to the portal.</a>
+				<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
 			</div>
 	    </div>
 	</div>
@@ -102,8 +101,9 @@
 	<div class="col-md-10">
 		<div class="form-group" id="register">
 			<span class="glyphicon glyphicon-info-sign"></span> &nbsp;
-	    	If you are a <b>PlanetLab Europe</b> fill in this form using the same email address that you currently use for your PlanetLab Europe account,
-	    	your existing credentials will be used to validate your OneLab account.
+	    	If you are a <b>PlanetLab Europe</b> user, please fill in this form using the same email address that you
+	    	 currently use for your PlanetLab Europe account.
+	    	Your existing credentials will be used to validate your OneLab account.
 	    	Please be sure to specify a different password for your new OneLab account.
 	    </div>
 	</div>
@@ -113,11 +113,10 @@
 		<div class="form-group" id="register">
 			<p></p>	
 	    	<input class="submit btn btn-onelab" type="submit" value="Sign up" />
-
+	    	</form>
 	    </div>
 	</div>
 </div>
-</form>
 
 	<!-- Modal - columns selector -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -489,9 +488,9 @@ $(document).ready(function(){
         {% for authority in authorities %}
             {% if authority.name %}
                 {value:"{{ authority.name }}",label:"{{authority.name}}"},
-			// to show only full name
-           // {% else %}
-           //     {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+			// show hrn if we don't have the name
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
             {% endif %}
         {% endfor %}    
     {% else %}
@@ -515,15 +514,10 @@ $(document).ready(function(){
       minLength: 0,
       change: function (event, ui) {
           if(!ui.item){
-              //http://api.jqueryui.com/autocomplete/#event-change -
-              // The item selected from the menu, if any. Otherwise the property is null
-              //so clear the item for force selection
               jQuery("#authority_hrn").val("");
           }
       }
-      //select: function( event, ui ) {console.log(jQuery(this))}
     });
-	// for hover texts
 	$('[title!=""]').qtip();
 	$("form").validate();
 	$("form").submit(function() {

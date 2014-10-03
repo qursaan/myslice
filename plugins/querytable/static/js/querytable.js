@@ -12,7 +12,8 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
 
     
     var QUERYTABLE_MAP = {
-        'Testbed': 'network_hrn',
+        'Facility': 'facility_name',
+        'Testbed': 'testbed_name',
         'Resource name': 'hostname',
         'Type': 'type',
     };

@@ -1,8 +1,8 @@
 from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
 
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
+from manifold.core.query                import Query, AnalyzedQuery
+from manifoldapi.manifoldapi            import execute_query
 import json
 
 from django.views.generic.base          import TemplateView
@@ -24,9 +24,12 @@ from plugins.testbeds                   import TestbedsPlugin
 from plugins.scheduler2                 import Scheduler2
 
 # Bristol plugin
-from plugins.univbrisfoam       import UnivbrisFoam
-from plugins.univbrisfv         import UnivbrisFv
-from plugins.univbrisfvf        import UnivbrisFvf
+from plugins.univbris                   import Univbris
+from plugins.univbrisfoam               import UnivbrisFoam
+from plugins.univbrisfv                 import UnivbrisFv
+from plugins.univbrisfvf                import UnivbrisFvf
+from plugins.univbrisfvfo           	import UnivbrisFvfo
+from plugins.univbristopo               import UnivbrisTopo
 
 from plugins.columns_editor             import ColumnsEditor
 from plugins.sladialog                  import SlaDialog
@@ -63,15 +66,26 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(
-                'slice_urn', # XXX We need the key otherwise the storage of records bugs !
+                # SLICE
                 'slice_hrn',
+                # - The record key is needed otherwise the storage of records
+                #   bugs !
+                'slice_urn',
+                # RESOURCES
                 'resource.urn',
                 'resource.hostname', 'resource.type',
-                'resource.network_hrn',
+                # - The facility_name and testbed_name are required for the
+                #   testbeds plugin to properly work.
+                'resource.facility_name', 
+                'resource.testbed_name',
+                # LEASES
                 'lease.resource',
                 'lease.start_time',
                 'lease.end_time',
-                'lease.lease_id', # Important for NITOS identify already existing leases
+                # - The lease_id is important for NITOS identify already existing
+                #   leases
+                'lease.lease_id', 
+
                 #'user.user_hrn',
                 #'application.measurement_point.counter'
         )
@@ -84,7 +98,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         sq_lease       = aq.subquery('lease')
 
         query_resource_all = Query.get('resource').select(resource_fields)
-        #page.enqueue_query(query_resource_all)
+        page.enqueue_query(query_resource_all)
 
         # leases query
         #lease_md = metadata.details_by_object('lease')
@@ -175,10 +189,11 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             # the key to use at init-time
             init_key   = main_query_init_key,
             checkboxes = True,
-            # center on Paris
-            latitude   = 49.,
-            longitude  = 9,
-            zoom       = 8,
+            
+            # To center around Europe : 53,9 / 3
+            latitude   = 53.,
+            longitude  = 9.,
+            zoom       = 3,
         )
 
         # --------------------------------------------------------------------------
@@ -216,22 +231,22 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         network_md = metadata.details_by_object('network')
         network_fields = [column['name'] for column in network_md['column']]
 
-        query_networks = Query.get('network').select(network_fields)
-        page.enqueue_query(query_networks)
+        #query_networks = Query.get('network').select(network_fields)
+        #page.enqueue_query(query_networks)
 
         filter_testbeds = TestbedsPlugin(
             page            = page,
             domid           = 'testbeds-filter',
             title           = 'Filter by testbeds',
             query           = sq_resource,
-            query_networks  = query_networks,
-            init_key        = "network_hrn",
-            checkboxes      = True,
-            datatables_options = {
-                'iDisplayLength': 25,
-                'bLengthChange' : True,
-                'bAutoWidth'    : True,
-                },
+            #query_networks  = query_networks,
+            #init_key        = "network_hrn",
+            #checkboxes      = True,
+            #datatables_options = {
+            #    'iDisplayLength': 25,
+            #    'bLengthChange' : True,
+            #    'bAutoWidth'    : True,
+            #    },
         )
 
         filter_status = FilterStatusPlugin(
@@ -290,7 +305,86 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             )
 
             
+        # --------------------------------------------------------------------------
+        # Ofelia OpenFlow Plugin 
+        # Bristol plugin
 
+    	# plugin which display a "gathering resources" message 
+        # waiting for all resources to be returned by manifold
+        univbriswelcome = Univbris(
+            page  = page,
+            title = 'univbris_welcome',
+            domid = 'univbris_welcome',
+            query = query_resource_all,
+        )
+
+        univbrisfoamlist = UnivbrisFoam(
+            page  = page,
+            title = 'univbris_foam_ports_selection',
+            domid = 'univbris_foam_ports_selection',
+            query = query_resource_all,
+            query_all = query_resource_all,
+            checkboxes = False,
+            datatables_options = {
+                'iDisplayLength': 10,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+        #plugin which manages the different flowspaces that the user creates, and also sends flowspaces to manifold
+        univbrisfvlist = UnivbrisFv(
+                page  = page,
+                title = 'univbris_flowspace_selection',
+                domid = 'univbris_flowspace_selection',
+                query = None,
+                query_all = None,
+	            sync_query = query_resource_all,
+                datatables_options = {
+                    'iDisplayLength': 5,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+        )
+
+        #plugin which allows the definition of a single flowspace
+        univbrisfvform = UnivbrisFvf(
+                page  = page,
+                title = 'univbris_flowspace_form',
+                domid = 'univbris_flowspace_form',
+                query = query_resource_all,
+                query_all = None,
+                datatables_options = {
+                    'iDisplayLength': 3,
+                    'bLengthChange' : True,
+                    'bAutoWidth'    : True,
+                    },
+        )
+
+	#plugin which allows the definition the match criteria on a single OPTICAL flowspace
+
+	univbrisofvform = UnivbrisFvfo(
+            page  = page,
+            title = 'univbris_oflowspace_form',
+            domid = 'univbris_oflowspace_form',
+	        query = None,
+            query_all = None,
+            datatables_options = { 
+                'iDisplayLength': 3,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
+    	#plugin which display the gathered topology
+        univbristopology = UnivbrisTopo(
+            page  = page,
+            title = 'univbris_topology',
+            domid = 'univbris_topology',
+            query = query_resource_all,
+            #query = query_resource_all,
+        )
+	
         # --------------------------------------------------------------------------
         # SLA View and accept dialog
         
@@ -341,9 +435,12 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
 
         # Bristol plugin
+        template_env['welcome'] = univbriswelcome.render(self.request)
         template_env['resources'] = univbrisfoamlist.render(self.request)
-        template_env['flowspaces']= univbrisfvlist.render(self.request)
-        template_env['flowspaces_form']= univbrisfvform.render(self.request)
+        template_env['flowspaces'] = univbrisfvlist.render(self.request)
+        template_env['oflowspaces_form'] = univbrisofvform.render(self.request)
+        template_env['flowspaces_form'] = univbrisfvform.render(self.request)
+        template_env['topology'] = univbristopology.render(self.request)
 
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)

@@ -88,10 +88,10 @@ $(document).ready(function() {
   	{% block topmenu %}
   	{% widget "__widget-topmenu.html" %}
   	{% endblock topmenu %}
-	{% include 'messages-transient.html' %}
 	{% block base_content %}
 	{% endblock %}
 {% endblock container %}
+{% widget "_footer.html" %}
 <div class="loading">
 	<div><img src="{{ STATIC_URL }}/img/loading.gif" /> Loading...</div>
 	<div>&nbsp;</div>

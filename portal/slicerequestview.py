@@ -16,6 +16,8 @@ from myslice.theme import ThemeView
 
 import json, time, re
 
+import activity.user
+
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
     
@@ -33,7 +35,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         errors = []
         slice_name =''
         purpose=''
-        exp_url=''
+        url=''
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
@@ -115,7 +117,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'authority_hrn'     : authority_hrn,
                 'organization'      : wsgi_request.POST.get('org_name', ''),
                 'slice_name'        : wsgi_request.POST.get('slice_name', ''),
-                'exp_url'           : wsgi_request.POST.get('exp_url', ''),
+                'url'               : wsgi_request.POST.get('url', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
                 'current_site'      : current_site
             }
@@ -148,7 +150,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if (purpose is None or purpose == ''):
                 errors.append('Experiment purpose is mandatory')
 
-            exp_url = slice_request['exp_url']
+            url = slice_request['url']
 
             if not errors:
                 if is_pi(wsgi_request, user_hrn, authority_hrn):
@@ -160,6 +162,9 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     # Otherwise a wsgi_request is sent to the PI
                     create_pending_slice(wsgi_request, slice_request, user_email)
                     self.template_name = 'slice-request-ack-view.html'
+                
+                # log user activity
+                activity.user.slice(wsgi_request)
                 
                 return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
         else:
@@ -173,7 +178,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'purpose': purpose,
             'email': user_email,
             'user_hrn': user_hrn,
-            'exp_url': exp_url,
+            'url': url,
             'pi': pi,
             'authority_name': authority_name,        
             'authority_hrn': user_authority,

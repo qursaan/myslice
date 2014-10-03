@@ -20,9 +20,9 @@
 					</div>
 				</li>
 				{%if 'is_pi'  in pi %}	
-				<li id="nav-institution" class=""><a href="/portal/institution">MANAGEMENT</a></li>
+				<li id="nav-institution" class=""><a href="/institution">MANAGEMENT</a></li>
 				 {%endif%}
-				<li><a href="/portal/support/">SUPPORT</a></li>
+				<li><a href="/support/">SUPPORT</a></li>
 			</ul>
 		</div>
 		{% else %}
@@ -32,12 +32,12 @@
 		<div class="col-sm-5 col-md-5 secondary">
 			<ul>
 				<li><a href="/news">News</a></li>
-				<li><a href="/portal/about">About</a></li>
-				<li><a target="_blank" href="http://new.onelab.eu">Public Website</a></li>
+				<li><a href="/about">About</a></li>
+				<li><a target="_blank" href="https://www.onelab.eu">Public Website</a></li>
 				<li><a target="_blank" href="http://intranet.onelab.eu">Intranet</a></li>
 			</ul>
 			{% if username %}
-			<div class="account">You are logged in as &nbsp;<a href="/portal/account/">{{ username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+			<div class="account">You are logged in as &nbsp;<a href="/account/">{{ username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
 			{% endif %}
 		</div>
 	</div>

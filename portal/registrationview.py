@@ -5,6 +5,7 @@ from hashlib    import md5
 
 from django.views.generic       import View
 from django.template.loader     import render_to_string
+
 from django.shortcuts           import render
 from django.contrib.auth        import get_user_model
 from django.contrib.sites.models import Site
@@ -22,6 +23,8 @@ from django.contrib.auth.models import User   #Pedro
 from portal.actions             import create_pending_user
 
 from myslice.theme import ThemeView
+
+import activity.user
 
 # since we inherit from FreeAccessView we cannot redefine 'dispatch'
 # so let's override 'get' and 'post' instead
@@ -45,12 +48,13 @@ class RegistrationView (FreeAccessView, ThemeView):
         if authorities is not None:
             authorities = sorted(authorities)
         
+        print "############ BREAKPOINT 1 #################"
         # Page rendering
         page = Page(wsgi_request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/jquery.qtip.min.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
-
+        print "############ BREAKPOINT 2 #################"
         if method == 'POST':
             reg_form = {}
             # The form has been submitted
@@ -59,9 +63,8 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
 
-            #authorities_query = Query.get('authority').select('name', 'authority_hrn')
-            #authorities = execute_admin_query(wsgi_request, authorities_query)
-    
+            print "############ BREAKPOINT 3 #################"
+
             for authority in authorities:
                 if authority['name'] == wsgi_request.POST.get('org_name', ''):
                     authority_hrn = authority['authority_hrn']     
@@ -69,7 +72,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Handle the case when the template uses only hrn and not name
             if authority_hrn is None:
                 authority_hrn = wsgi_request.POST.get('org_name', '')
-
+            
+            print "############ BREAKPOINT 4 #################"
+            
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
             email_hash = md5(str(salt)+post_email).hexdigest()
@@ -88,7 +93,9 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'pi'            : '',
                 'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
-
+            
+            print "############ BREAKPOINT 5 #################"
+            
             # Construct user_hrn from email (XXX Should use common code)
             # split_email = user_request['email'].split("@")[0] 
             # split_email = split_email.replace(".", "_")
@@ -127,7 +134,8 @@ class RegistrationView (FreeAccessView, ThemeView):
             user_details = execute_admin_query(wsgi_request, user_query)
             for user_detail in user_details:
                 if user_detail['email'] == user_request['email']:
-                    errors.append('Email already registered in Manifold. Please provide a new email address.')
+                    errors.append('Email already registered. <a href="/">Login</a> with your existing account. <a href="/portal/pass_reset/">Forgot your password?</a>')
+
             # Does the user exist in sfa? [query is very slow!!]
             #user_query  = Query().get('user').select('user_hrn','user_email')
             # XXX Test based on the user_hrn is quick
@@ -142,6 +150,18 @@ class RegistrationView (FreeAccessView, ThemeView):
             #         user_request['user_hrn'] = user_request['authority_hrn'] \
             #                 + '.' + split_email + str(randint(1,1000000))
                 
+            # checking in django unfold db portal application pending users
+            # sqlite3 /var/unfold/unfold.sqlite3
+            # select email from portal_pendinguser;
+            if PendingUser.objects.filter(email__iexact = user_request['email']):
+                errors.append('Account pending for validation. Please wait till your account is validated or contact OneLab support.')
+
+            # checking in django_db !!
+            # sqlite3 /var/unfold/unfold.sqlite3
+            # select email from auth_user;
+            if UserModel._default_manager.filter(email__iexact = user_request['email']): 
+                errors.append('Please try with another email.')
+
             # XXX TODO: Factorize with portal/accountview.py
             # XXX TODO: Factorize with portal/registrationview.py
             # XXX TODO: Factorize with portal/joinview.py
@@ -176,10 +196,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             if not errors:
                 create_pending_user(wsgi_request, user_request, user_detail)
                 self.template_name = 'user_register_complete.html'
-            
+                # log user activity
+                #activity.user.registered(self.request)
+
                 return render(wsgi_request, self.template, {'theme': self.theme, 'REQINST':wsgi_request.POST.get('org_name', '').split(".")[1].upper()}) 
 
         else:
+            print "############ BREAKPOINT A #################"
             user_request = {}
             ## this is coming from onelab website onelab.eu
             reg_form = {
@@ -187,6 +210,9 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'last_name': wsgi_request.GET.get('last_name', ''),
                 'email': wsgi_request.GET.get('email', ''),
                 }
+            # log user activity
+            activity.user.signup(self.request)
+            print "############ BREAKPOINT B #################"
 
         template_env = {
           'topmenu_items': topmenu_items_live('Register', page),
@@ -198,4 +224,5 @@ class RegistrationView (FreeAccessView, ThemeView):
         template_env.update(user_request)
         template_env.update(reg_form)
         template_env.update(page.prelude_env ())
+        print "############ BREAKPOINT C #################"
         return render(wsgi_request, self.template,template_env)

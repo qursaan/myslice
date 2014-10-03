@@ -6,7 +6,45 @@
 {% widget '_widget-news.html' %}
 </div> -->
 {% if username %}
+<!-- Modal- No credentials -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
+                    </div>
+                    <div class="modal-body">
+					<p>You may get this message for several reasons.</p>
+					<h3>Account Delegation: Automatic</h3>
+					<ul>
+						<li>If your account is not yet validated</li>
+						<li>If you press the "Clear Credentials" button</li>
+						<li>If you "Generate a new key pair"</li>
+						<li>If a new slice is added to your account</li>
+					</ul>
+					<p>In all the above mentioned cases, it is sufficient to refresh the page or go back to home page. The portal will regenrate your credentials.
+					 In some cases it may take more time than usual. If nothing works, then please logout and login again to the portal.</p>
+					<h3>Account Delegation: Manual</h3>
+						<p>First of all your account needs to be validated by the manager of your organization.</p>
+						<p>As you have uploaded your own public key, the portal can no longer generate your credentials automatically.</p>
+						<p>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
+						<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
+					</p>
+					<h5>Contact support</h5>
+					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
 <div class="container dashboard">
+	   {%if 'no_creds'  in user_cred %}
+      <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+  {%endif%}
+
 	<div class="row">
 		{%if 'is_pi'  in pi %}
 		<div class="col-md-3">
@@ -17,7 +55,7 @@
 				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
 			</div>
 			<div>
-				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Slice</button>
 			</div>
 			<div>
 				<p><strong>Your slices </strong>
@@ -182,4 +220,7 @@ This should go into session
 --------*/
 });
 </script>
+{# widget "_widget-monitor.html" #}
+{# widget "_widget-stats-top-slices.html" #}
+
 {% endblock %}
