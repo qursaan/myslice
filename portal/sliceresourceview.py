@@ -348,7 +348,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
-        template_env["username"] = request.user
+	template_env["username"] = self.request.user
+        template_env["person"] = self.request.user
         template_env["pi"] = pi
         template_env["slice"] = slicename
         template_env["section"] = "resources"

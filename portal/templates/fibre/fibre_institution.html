@@ -38,8 +38,8 @@
     				<table id="user-tab" class="table">
         				<tr>
             				<th>+/-</th>
+            				<th>User hrn </th>
             				<th>Email</th>
-            				<th>User hrn</th>
             				<th>First name</th>
             				<th>Last name</th>
             				<th>Enabled</th>
@@ -98,10 +98,13 @@ $(document).ready(function() {
     {% if user_details.parent_authority %}
 
         $.post("/rest/slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+	    var username = "{{person.username}}";
             var list_slices = [];
             var table_slices = [];
             /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "users", "slice_urn", "slice_expires" */
             $.each( data, function( key, val ) {
+		if(String(val.users).indexOf("@") != -1){
+		if(String(val.users).split("@")[1] == username.split("@")[1]){
                 list_slices.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
                 if(val.nodes=="undefined" || val.nodes==null){
                     nodes_length=0;
@@ -130,7 +133,8 @@ $(document).ready(function() {
                 slice_row += "<td>"+val.slice_expires+"</td>";
                 slice_row += "</tr>";
                 table_slices.push(slice_row);
-                
+		}
+                }
             });
            
             /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */
@@ -141,23 +145,27 @@ $(document).ready(function() {
 		
 		
         $.post("/rest/user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
-            var list_users = [];
+	    var username ="{{person.username}}";
+	    var list_users = [];
             var table_users = [];
 		    /* Available fields
 		    user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
 		    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
 		    */
             $.each( data, function( key, val ) {
-                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                user_row = "<tr id='"+val.user_hrn+"'>";
-                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
-                user_row += "<td>"+val.user_email+"</td>";
-                user_row += "<td>"+val.user_hrn+"</td>";
-                user_row += "<td>"+val.user_first_name+"</td>";
-                user_row += "<td>"+val.user_last_name+"</td>";
-		   	    user_row += "<td>"+val.user_enabled+"</td>";
-                user_row += "</tr>";
-                table_users.push(user_row);
+		if (val.user_hrn.indexOf('@') != -1 ){
+		  if (val.user_hrn.split("@")[1] == username.split("@")[1]){
+                    list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                    user_row = "<tr id='"+val.user_hrn+"'>";
+                    user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
+                    user_row += "<td>"+val.user_hrn+"</td>";
+                    user_row += "<td>"+val.user_email+"</td>";
+                    user_row += "<td>"+val.user_first_name+"</td>";
+                    user_row += "<td>"+val.user_last_name+"</td>";
+		    	        user_row += "<td>"+val.user_enabled+"</td>";
+                    user_row += "</tr>";
+                table_users.push(user_row);}
+		}
             });
             $("table#user-tab tr:last").after(table_users.join( "" ));
             $("div#user-tab-loaded").css("display","block");

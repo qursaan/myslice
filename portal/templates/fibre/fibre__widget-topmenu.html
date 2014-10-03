@@ -37,7 +37,7 @@
 			{% if section != 'Registration' %}
 				{% if username %}
 					{% if person.username %}
-						<div class="account">You are logged in as &nbsp;<a href="/portal/account/">{{ person.username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ person.username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+						<div class="account" id="username" >You are logged in as &nbsp;<a href="/portal/account/">{{ person.username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ person.username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
 					{% else %}
 						<div class="account"> You are logged in as &nbsp;<a href="/portal/account/">{{ email }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ email }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
 					{% endif %}

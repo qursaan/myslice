@@ -469,6 +469,21 @@ def create_pending_slice(wsgi_request, request, email):
     try:
         # Send an email: the recipients are the PI of the authority
         recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+	
+	pis = authority_get_pis(request, request['authority_hrn'])
+        pi_emails = []
+        for x in pis:
+            for e in x['pi_users']:
+                try:
+                    u = e.split(".")[1]
+                    y = User.objects.get(username = u)
+		    print y.username
+                    if y.username.count("@") != 0:
+                        if y.username.split("@")[1] == request['user_hrn'].split("@")[1]:
+                            pi_emails += [y.email]
+			    print y.email
+                except:
+                    print "fail"
 
         theme.template_name = 'slice_request_email.txt' 
         text_content = render_to_string(theme.template, request)
@@ -485,7 +500,7 @@ def create_pending_slice(wsgi_request, request, email):
         sender = sender.replace('\n', '')
 
         #sender = email
-        msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+        msg = EmailMultiAlternatives(subject, text_content, sender, pi_emails)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
