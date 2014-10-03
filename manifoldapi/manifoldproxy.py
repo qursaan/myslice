@@ -89,9 +89,17 @@ with the query passed using POST"""
         # resource reservation
         if (manifold_query.action.lower() == 'update') :
             print result['value'][0]
-            if 'resources' in result['value'][0] :
-                for resources in result['value'][0]['resources'] :
-                    activity.slice.resource(request, { 'slice' : result['value'][0]['slice_hrn'], 'resource' : result['value'][0]})
+            if 'resource' in result['value'][0] :
+                for resource in result['value'][0]['resource'] :
+                    activity.slice.resource(request, 
+                            { 
+                                'slice' :           result['value'][0]['slice_hrn'], 
+                                'resource' :        resource['hostname'], 
+                                'resource_type' :   resource['type'],
+                                'facility' :        resource['facility_name'],
+                                'testbed' :         resource['testbed_name']
+                            }
+                    )
         
         json_answer=json.dumps(result)
 
