@@ -68,7 +68,7 @@ def logWrite(request, action, message, objects = None):
     
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
-        print "===============>> activity: %s <%s> " % (action, request.user,message)
+        print "===============>> activity: %s <%s> %s" % (action, request.user,message)
         content = result.read()
     except urllib2.URLError as e:
         print "===============>> activity: connection to " + server + " impossible, could not log action"
