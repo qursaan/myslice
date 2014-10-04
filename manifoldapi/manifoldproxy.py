@@ -13,6 +13,9 @@ from manifoldresult             import ManifoldException
 from manifold.util.log          import Log
 from myslice.configengine       import ConfigEngine
 
+# register activity
+import activity.slice
+
 debug=False
 #debug=True
 
@@ -78,7 +81,26 @@ with the query passed using POST"""
         if 'description' in result and result['description'] \
                 and isinstance(result['description'], (tuple, list, set, frozenset)):
             result [ 'description' ] = [ ResultValue.to_html (x) for x in result['description'] ]
-
+        
+        print "=> MANIFOLD PROXY executing: " + manifold_query.action.lower() 
+        #
+        # register activity
+        #
+        # resource reservation
+        if (manifold_query.action.lower() == 'update') :
+            print result['value'][0]
+            if 'resource' in result['value'][0] :
+                for resource in result['value'][0]['resource'] :
+                    activity.slice.resource(request, 
+                            { 
+                                'slice' :           result['value'][0]['slice_hrn'], 
+                                'resource' :        resource['hostname'], 
+                                'resource_type' :   resource['type'],
+                                'facility' :        resource['facility_name'],
+                                'testbed' :         resource['testbed_name']
+                            }
+                    )
+        
         json_answer=json.dumps(result)
 
         return HttpResponse (json_answer, mimetype="application/json")
