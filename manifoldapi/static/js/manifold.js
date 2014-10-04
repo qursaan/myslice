@@ -1223,6 +1223,11 @@ var manifold = {
         }
 
         key = manifold.metadata.get_key(new_object);
+        if (!key){
+            console.log("object type: " + new_object + " has no key");
+            console.log(record);
+            return;
+        }
         record.hashCode = manifold.record_hashcode(key.sort());
         record.equals   = manifold.record_equals(key);
 
