@@ -40,7 +40,7 @@ Current implementation makes the following assumptions
   as we use 'aoColumnDefs' instead.
 """
 
-    def __init__ (self, query=None, query_all=None, sync_query=None,
+    def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
                   init_key=None,
                   datatables_options={}, **settings):
@@ -49,7 +49,6 @@ Current implementation makes the following assumptions
         # Until we have a proper way to access queries in Python
         self.query_all      = query_all
         self.query_all_uuid = query_all.query_uuid if query_all else None
-	self.sync_query_uuid = sync_query.query_uuid if sync_query else None
         self.checkboxes     = checkboxes
         # XXX We need to have some hidden columns until we properly handle dynamic queries
         if columns is not None:
@@ -119,6 +118,6 @@ Current implementation makes the following assumptions
     # the list of things passed to the js plugin
     def json_settings_list (self):
         return ['plugin_uuid', 'domid', 
-                'query_uuid', 'query_all_uuid', 'sync_query_uuid',
+                'query_uuid', 'query_all_uuid',
                 'checkboxes', 'datatables_options', 
                 'hidden_columns', 'init_key',]

@@ -72,7 +72,7 @@
 		    if(vt_servers_list[i].testbed==$('#uob_testbed_name option:selected').text()){
 	     			$('#uob_virtualization_server')
 		 			.append($("<option></option>")
-		 			.attr("value",vt_servers_list[i].name)
+		 			.attr("value",vt_servers_list[i].urn)
 		 			.text(vt_servers_list[i].name)); 
 		    }
 		}
@@ -91,9 +91,13 @@
 		//console.log($("#uob_vm_name").val());
 		if (vmNameVal.test($("#uob_vm_name").val())){
 			//build form string
-			var vtam="testbed:"+$('#uob_testbed_name option:selected').text();
-			vtam +=",vt_server:"+$('#uob_virtualization_server option:selected').text();
-			vtam +=",vm_name:"+$("#uob_vm_name").val();
+            //{"urn:publicid:IDN+vtam.univbris+node+uclalien":[{"name":"toto"}]}
+            var vtam='{"'+$('#uob_virtualization_server option:selected').val()+'":';
+            vtam+='[{"name":"'+$('#uob_vm_name').val()+'"}]}';
+			//var vtam="testbed="+$('#uob_testbed_name option:selected').text();
+            // Use the URN instead of the hostname of the server
+			//vtam +=",vt_server="+$('#uob_virtualization_server option:selected').val();
+			//vtam +=",vm_name="+$("#uob_vm_name").val();
 			var vm_name="<p id='"+vtam+"'>"+$("#uob_vm_name").val()+"</p>";
 			var vtamtable = $("#univbris_vtam__table").dataTable();
 			vtamtable.fnAddData([$('#uob_testbed_name option:selected').text(),$('#uob_virtualization_server option:selected').text(), vm_name,'<a class="delete" href="">Delete</a>']);
@@ -129,6 +133,7 @@
                 vt_server['name']=com_ay[com_ay.length-1];
                 var testbed_ay=com_ay[1].split(":");
                 vt_server['testbed']=testbed_ay[0];
+                vt_server['urn']=urn;
                 this.add_new_vt_server(vt_server);
                 this.add_new_testbed(testbed_ay[0]);
                 //this.vt_servers_list.push(vt_server);
@@ -297,7 +302,7 @@
 		    if(vt_servers_list[i].testbed==$('#uob_testbed_name option:selected').text()){
 	     			$('#uob_virtualization_server')
 		 			.append($("<option></option>")
-		 			.attr("value",vt_servers_list[i].name)
+		 			.attr("value",vt_servers_list[i].urn)
 		 			.text(vt_servers_list[i].name)); 
 		    }
 	    }

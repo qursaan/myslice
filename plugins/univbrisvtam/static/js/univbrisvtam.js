@@ -153,8 +153,7 @@
 	fnCreateVms:function(e){
 		console.log("building json to send to backend");
 
-		var testbeds=[];
-		
+		var vms=[];
 
 		try{
 			 var rows = $("#univbris_vtam__table").dataTable().fnGetNodes();
@@ -163,74 +162,46 @@
 			 }
 			 else{
 				for(var i=0;i<rows.length;i++){
-					//console.log(rows[i].cells[2].outerHTML.text());
-					var htmlStr=rows[i].cells[2].outerHTML;
-					var parser=new DOMParser();
-					var htmlDoc=parser.parseFromString(htmlStr, "text/html");
-					var para=htmlDoc.getElementsByTagName('p');
-					//console.log(para.item(0).id);
-					
-					//build row json
-					var tp_row=para.item(0).id.split(",");
-					var d_row={};
-					for (var a=0;a<tp_row.length;a++){
-						var tp=tp_row[a].split(":");
-						d_row[tp[0]]=tp[1];
-					}
-
-					function findTestbedIndex( _testbeds, _name){
-						var index=-1;
-						for(var a=0;a<_testbeds.length;a++){
-							if(_testbeds[a].name==_name){
-								index=a;
-							}
-						}
-						return index;
-					}
-
-					function findServerIndex( _testbeds, _testbedindex, _name){
-						var index=-1;
-						for(var a=0;a<_testbeds[_testbedindex].vt_servers.length;a++){
-							if(_testbeds[_testbedindex].vt_servers[a].name==_name){
-								index=a;
-							}
-						}
-						return index;
-					}
-					
-					var testbedindex=findTestbedIndex(testbeds,d_row['testbed']);
-					if (testbedindex!=-1){
-						var serverindex=findServerIndex(testbeds,testbedindex,d_row['vt_server']);
-						if (serverindex!=-1){
-							//console.log("server:",serverindex);
-							//console.log(testbeds[testbedindex].vt_servers[serverindex].vm_names);
-							testbeds[testbedindex].vt_servers[serverindex].vm_names.push(d_row['vm_name']);
-						}
-						else{
-							var vt_server={};
-							vt_server['name']=d_row['vt_server'];
-							vt_server['vm_names']=[];
-							vt_server['vm_names'].push(d_row['vm_name']);
-							testbeds[testbedindex].vt_servers.push(vt_server);
-						}
-
-					}
-					else{
-						var testbed={};
-						testbed['name']=d_row['testbed'];
-						testbed['vt_servers']=[];
-						var vt_server={};
-						vt_server['name']=d_row['vt_server'];
-						vt_server['vm_names']=[];
-						vt_server['vm_names'].push(d_row['vm_name']);
-						testbed['vt_servers'].push(vt_server);
-						testbeds.push(testbed);
-					}
+                    // get the id of the html element in the table
+                    var cell=rows[i].cells[2];
+                    element = cell.getElementsByTagName('p');
+                    server_vm = element.item(0).id;
+                    t_server_vm = JSON.parse(server_vm);
+                    current_server = Object.keys(t_server_vm);
+                    current_vm = t_server_vm[current_server[0]];
+                    if(vms.length>0){
+                        // add the current vm to vms
+                        $.each( vms, function( i, s_vm ) {
+                            // if the server is already listed in vms, add a new vm to the server
+                            s = Object.keys(s_vm);
+                            vm = s_vm[s[0]];
+                           
+                            if(s[0] == current_server[0]){
+                                vm_exists = false;
+                                // XXX We should also loop on the vm names
+                                $.each( vm, function( i, vm_name ) {
+                                    if(vm_name == current_vm[0]){
+                                        vm_exists = true;
+                                        return;
+                                    }
+                                });
+                                if (vm_exists == false){
+                                    vm.push(current_vm[0]);
+                                }
+                            // else add the server with the current vm
+                            }else{
+                                vms.push(t_server_vm);
+                            }
+                        });
+                    }else{
+                        vms.push(t_server_vm);
+                    }
 
 				}
 
-				var rspecs = JSON.stringify(testbeds);
+				var rspecs = JSON.stringify(vms);
 				console.log(rspecs);
+                // manifold.raise_event(self.options.query_uuid, ...);
 			}
 
 		}
