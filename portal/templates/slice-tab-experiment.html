@@ -8,10 +8,19 @@
 		PlanetLab Europe resources are accessible directly via SSH. Your SSH public key is deployed automatically
 		on the reserved nodes. To access your slice on a resource just type the following command:
 	</p>
+	{%if ple_resources%}
 	<p class="command">
-		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com
+	{%for resource in ple_resources %}
+		$ ssh {{ple_slicename}}@{{resource}}<br>
+	{%endfor%}
 	</p>
-	<p><strong>NOTE:</strong> Your typical slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
+	{%else%}
+		<p><b>NOTE:</b> You did not reserve any PLE resources yet. Once reserved, you will get the actual SSH command. A specimen command is given below:</p>
+		<p class="command">
+    		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com<br>
+		</p>
+	{%endif%}
+	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
