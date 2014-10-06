@@ -9,13 +9,9 @@
 		on the reserved nodes. To access your slice on a resource just type the following command:
 	</p>
 	<p class="command">
-		$ ssh converted_slice_name@planetlab-resource.hostname.com
+		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com
 	</p>
-	<p>You need to convert your typical slicename into a specific format in order to do SSH. An example below will demonstrate the conversion:</p>
-	<p class="command">
-		Typical slice_name = onelab.upmc.mytestslice<br>
-		converted_slice_name = onelab8upmc_mytestslice
-	</p>
+	<p><strong>NOTE:</strong> Your typical slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
@@ -28,7 +24,7 @@
 		the following command:
 	</p>
 	<p class="command">
-		ssh onelab_username@fit3-dev.inrialpes.fr
+		ssh {{username}}@fit3-dev.inrialpes.fr
 	</p>
 	
 	<h3>NITOS</h3>
@@ -38,7 +34,7 @@
 	 The NITOS server address is nitlab.inf.uth.gr, so to connect to the NITOS server:
 	</p>
 	<p class="command">
-	$ ssh your_slice_name@nitlab.inf.uth.gr
+	$ ssh {{slicename}}@nitlab.inf.uth.gr
 	</p>
 	
 	<p>

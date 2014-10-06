@@ -18,6 +18,11 @@ class ExperimentView (FreeAccessView, ThemeView):
     template_name = 'slice-tab-experiment.html'
 
     def get (self, request, slicename, state=None):
+  
+        username = self.request.user    
         
-        return render_to_response(self.template, { 'theme' : self.theme }, context_instance=RequestContext(request))
+        split_slicename = slicename.split('.')
+        ple_slicename = split_slicename[0] + '8' + split_slicename[1] + '_' + split_slicename[2]
+
+        return render_to_response(self.template, { 'theme' : self.theme,'slicename':slicename, 'ple_slicename':ple_slicename, 'username':username }, context_instance=RequestContext(request))
 
