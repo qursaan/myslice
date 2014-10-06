@@ -79,6 +79,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'lease.resource',
                 'lease.start_time',
                 'lease.end_time',
+                # FLOWSPACE
+                'flowspace',               
+                # VMS
+                'vms',
                 # - The lease_id is important for NITOS identify already existing
                 #   leases
                 'lease.lease_id', 
@@ -93,6 +97,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         page.enqueue_query(main_query, analyzed_query=aq)
         sq_resource    = aq.subquery('resource')
         sq_lease       = aq.subquery('lease')
+        sq_flowspace   = aq.subquery('flowspace')
+        sq_vms         = aq.subquery('vms')
 
         query_resource_all = Query.get('resource').select(resource_fields)
         page.enqueue_query(query_resource_all)
@@ -290,9 +296,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 page  = page,
                 title = 'univbris_flowspace_selection',
                 domid = 'univbris_flowspace_selection',
-                query = None,
-                query_all = None,
-	            sync_query = query_resource_all,
+                query = sq_flowspace,
+                query_all = query_resource_all,
                 datatables_options = {
                     'iDisplayLength': 5,
                     'bLengthChange' : True,
@@ -341,19 +346,22 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Bristol Plugin
 
         #plugin which display a table where an experimenter will add VMs to according to his needs
+        # responsible to send the data to Manifold
         univbrisvtamplugin = UnivbrisVtamPlugin(
             page  = page,
             title = 'univbris_vtam',
             domid = 'univbris_vtam',
-            query = None,
+            query = sq_vms,
+            #query = sq_resource,
         )
 
-    	#plugin which display a form where an experimenter will specify where a
+    	#plugin which display a form where an experimenter will specify 
+        # in which testbed and which physical server to setup the VM
         univbrisvtamform = UnivbrisVtamForm(
             page  = page,
             title = 'univbris_vtam_form',
             domid = 'univbris_vtam_form',
-	        query = query_resource_all,
+	        query =  query_resource_all,
             query_all = None,
             datatables_options = { 
                 'iDisplayLength': 3,

@@ -201,9 +201,9 @@
 
 
 	fnButsubmit:function(e){
-		alert("verifying before submitting");
+		console.log("verifying before submitting");
 
-		sync_query_uuid=e.data.options.sync_query_uuid;
+		query_uuid=e.data.options.query_uuid;
 		try{
 
 			 var controller= $('#controller_loc').val();
@@ -328,7 +328,7 @@
                 op   : STATE_SET_ADD,
                 value: json_rspec 
             }
-            manifold.raise_event(sync_query_uuid, FIELD_STATE_CHANGED, data);
+            manifold.raise_event(query_uuid, FIELD_STATE_CHANGED, data);
 
 		    //alert("sending to manifold backend to build rspec");
 
@@ -343,7 +343,7 @@
 
 
 	fnAddflowspace:function(e){
-		sync_query_uuid=e.data.options.sync_query_uuid;
+		query_uuid=e.data.options.query_uuid;
 		pk_mode=1;
 		hideFvfError();
 		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
@@ -366,12 +366,12 @@
 		$("[id='addflowspaceform']").text('add flowspace');
 		
 		try{
-			manifold.raise_event(e.data.options.sync_query_uuid,CLEAR_FILTERS);
+			manifold.raise_event(e.data.options.query_uuid,CLEAR_FILTERS);
 			var filter=[];
 			filter.push("link type");
 			filter.push("!=");
 			filter.push("optical");
-			manifold.raise_event(e.data.options.sync_query_uuid,FILTER_ADDED,filter);
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
 		}
 		catch(err){
 			alert("raise error:"+err);
@@ -397,7 +397,7 @@
 
 	fnAddcflowspace:function(e){
 		pk_mode=0;
-		sync_query_uuid=e.data.options.sync_query_uuid;
+		query_uuid=e.data.options.query_uuid;
 		hideFvfError();
 		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
 		var nodes = $('input',port_table.fnGetNodes());
@@ -416,22 +416,22 @@
 		$("[id='addflowspaceform']").text('add flowspace');
 
 		try{
-			manifold.raise_event(e.data.options.sync_query_uuid,CLEAR_FILTERS);
+			manifold.raise_event(e.data.options.query_uuid,CLEAR_FILTERS);
 			var filter=[];
 			filter.push("link type");
 			filter.push("!=");
 			filter.push("packet");
-			manifold.raise_event(e.data.options.sync_query_uuid,FILTER_ADDED,filter);
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
 			filter=[];
 			filter.push("link type");
 			filter.push("!=");
 			filter.push("compute");
-			manifold.raise_event(e.data.options.sync_query_uuid,FILTER_ADDED,filter);
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
 			filter=[];
 			filter.push("link type");
 			filter.push("!=");
 			filter.push("federation");
-			manifold.raise_event(e.data.options.sync_query_uuid,FILTER_ADDED,filter);
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
 		}
 		catch(err){
 			alert("raise error:"+err);
