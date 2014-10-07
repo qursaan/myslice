@@ -818,3 +818,20 @@ div.s-monitor {
 span#stats-period-txt {
     text-transform:lowercase;
 }
+
+// resource info modal
+a.resource-info:hover {
+    cursor:pointer;
+}
+table.modal-resource-info tr td:first-child {
+    font-weight:bold;
+    text-align:right;
+}
+table.modal-resource-info tr:first-child td {
+    border-top:0;
+    text-align:center;
+}
+table.modal-resource-info tr:last-child td {
+    border-bottom:0;
+    text-align:center;
+}
