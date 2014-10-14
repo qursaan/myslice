@@ -276,24 +276,31 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                             <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
                     </div>
-                    <div class="modal-body">
-					<p>You may get this message for several reasons.</p>
-					<h3>Account Delegation: Automatic</h3>
+					<div class="modal-body" style="text-align:justify;">
+					<p>You are getting this message for any of the following reasons:</p>
 					<ul>
-						<li>If your account is not yet validated</li>
+						<li>If your account is still pending for validation</li>
 						<li>If you press the "Clear Credentials" button</li>
 						<li>If you "Generate a new key pair"</li>
 						<li>If a new slice is added to your account</li>
 					</ul>
-					<p>In all the above mentioned cases, it is sufficient to refresh the page or go back to home page. The portal will regenrate your credentials.
-					 In some cases it may take more time than usual. If nothing works, then please logout and login again to the portal.</p>
-					<h3>Account Delegation: Manual</h3>
-						<p>First of all your account needs to be validated by the manager of your organization.</p>
-						<p>As you have uploaded your own public key, the portal can no longer generate your credentials automatically.</p>
-						<p>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
-						<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
+					<p>Unless your account has not yet been validated, it is sufficient to refresh the page or go back to the home page. 
+						The portal will then regenerate your credentials. In some cases it may take more time than usual. If nothing works, 
+						then please logout and login back into to the portal.
 					</p>
-					<h5>Contact support</h5>
+					<h3>Manual delegation of credentials</h3>
+						<p>
+							You have selected upon sign-up to upload your public key. As you have uploaded your own public key, 
+							the portal can no longer generate your credentials automatically. In order to have your credentials 
+							delegated to the portal, please follow these instructions:
+						</p>
+						<ul>
+							<li>Your account must first be validated by the manager of your organization.</li>
+							<li>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
+								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a></li>
+						</ul>
+					</p>
+					<h3>Contact support</h3>
 					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
                     </div>
                     <div class="modal-footer">
