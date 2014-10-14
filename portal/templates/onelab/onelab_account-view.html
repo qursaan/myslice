@@ -154,9 +154,9 @@
 			  			</tr>
 			  			<tr class="even">
 			    			<td colspan="2">
-			      				<p class="message" id="pkey_del_msg"><b> Tradeoff:</b> Ease-of-use vs Security.<br>
-									<b>Ease-of-use:</b> Automatic account delegation. Don't delete private key.<br>
-									<b>Security:</b> Manual account delegation. Download & Delete private key.
+								<p class="command">
+									<a href="#" style="color:green" data-toggle="modal" data-target="#tradeoffmodal">Trade-off of delegating your credentials:</a>
+									Automatic vs. Manual delegation of credentials</p>
 								</p>
 			    			</td>
 			  			</tr>
@@ -309,6 +309,48 @@
                 </div>
             </div>
 </div>
+
+
+<!-- Modal- Trade-off Message  -->
+<div class="modal fade" id="tradeoffmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">
+								Automatic vs. Manual delegation of credentials
+							</h4>
+                    </div>
+					<div class="modal-body" style="text-align:justify;">
+					<h3>Automatic delegation of credentials</h3>
+						<p>Don't delete private key, ease-of-use option:</p>
+						<ul>
+							<li>
+								This means that you will keep your private key in the portal and it will automatically delegate your credentials on your behalf.
+							</li>
+							<li>
+								This option does not provide as high of a level of security; however, your private key will still only be used in the portal and 
+								will be available to you, the OneLab admins, and your organization's manager.
+							</li>
+						</ul>
+					<h3>Manual delegation of credentials</h3>
+						<p>Download & Delete private key, higher security option:</p>
+						<ul>
+							<li>If you delete your private key, you will have more security but the portal will no longer be able to delegate credentials 
+								on your behalf, and you will have to manually
+								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
+							</li>
+						</ul>
+					<h3>Contact support</h3>
+					<p>For more information, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
+
 
 
 	<div class="tab-pane row" id="access">
