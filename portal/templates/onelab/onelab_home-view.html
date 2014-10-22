@@ -143,6 +143,18 @@
 			<div>	
 				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 			</div>
+			{% if pending_slices %}
+			<p><strong>Pending slices</strong>
+			<span title="Slices that you have requested and are pending for validation by the contact person of your organization."
+				class="glyphicon glyphicon-info-sign">
+			<ul>
+			{% for slices in pending_slices %}
+			<li>{{slices}}</li>
+			{% endfor %}
+			</ul>
+			</span>
+			</p>
+			{%endif%}	
 		</div>
 		<div class="col-md-4">
 			<h3>
