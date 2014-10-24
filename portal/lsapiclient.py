@@ -16,7 +16,9 @@ class LaboraSchedulerClient:
                      'get_user_id_by_username', 'add_user_public_key', 'delete_user_public_key' ]
 
     def __init__ ( self, organization ):
-       self.url, self.key = self.getOrganizationConfigs( organization )
+       #self.url, self.key = self.getOrganizationConfigs( organization )
+       self.url = "https://portal.ufrj.fibre.org.br:3002/LS-Sched/"
+       self.key = "9763dd03f2da8138fb22a63d78e5e9792b59a637"
 
     def __getattr__(self, name):
         

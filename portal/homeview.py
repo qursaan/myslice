@@ -65,7 +65,7 @@ class HomeView (FreeAccessView, ThemeView):
 	## first you must open a connection to the server
 	try:
 		# Connect to NOC
-		l = ldap.initialize("ldap://10.128.0.50:389")
+                l = ldap.initialize("ldap://200.130.15.186:389")
 		# Bind/authenticate with a root user to search all objects
 		l.simple_bind_s("cn=Manager,dc=br,dc=fibre","fibre2013")
 		

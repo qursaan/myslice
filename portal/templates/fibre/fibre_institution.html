@@ -98,13 +98,10 @@ $(document).ready(function() {
     {% if user_details.parent_authority %}
 
         $.post("/rest/slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
-	    var username = "{{person.username}}";
             var list_slices = [];
             var table_slices = [];
             /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "users", "slice_urn", "slice_expires" */
             $.each( data, function( key, val ) {
-		if(String(val.users[0]).indexOf("@") != -1){
-		if(String(val.users[0]).split("@")[1] == username.split("@")[1]){
                 list_slices.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
                 if(val.nodes=="undefined" || val.nodes==null){
                     nodes_length=0;
@@ -133,8 +130,6 @@ $(document).ready(function() {
                 slice_row += "<td>"+val.slice_expires+"</td>";
                 slice_row += "</tr>";
                 table_slices.push(slice_row);
-		}
-              }
             });
            
             /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */

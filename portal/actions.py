@@ -593,21 +593,31 @@ def create_slice(wsgi_request, request):
         Exception
     """
     hrn = "%s.%s" % (request['authority_hrn'], request['slice_name'])
+     
     # XXX tmp sfa dependency
     from sfa.util.xrn import Xrn 
     urn = Xrn(hrn, request['type']).get_urn()
     
     # Add User to Slice if we have the user_hrn in pendingslice table
     user_hrn = request.get('user_hrn', None)
+    user_obj = User.objects.get(username = user_hrn.split(".")[1])
+    list_users = []
     user_hrns = list([user_hrn]) if user_hrn else list()
+    for user in user_hrns:
+        list_users +=[User.objects.get(username = user.split(".")[1])] 
     
-    user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
-    user_details_sfa = execute_admin_query(wsgi_request, user_query)
-    if not user_details_sfa:
-        raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
-    for user in user_details_sfa:
-        user_email = user['user_email']
-
+    #user_query  = Query.get('local:user').select('email').filter_by('email','==',user.username)
+    #user_details_sfa = execute_admin_query(wsgi_request, user_query)
+    
+    pendinguser = PendingUser.objects.filter(login__iexact = user_obj.username)    
+    if pendinguser :
+        raise Exception, "User %s doesn't exist, validate user before validating slice" % user_obj.username
+    #if not user_details_sfa:
+    #    raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
+    #for user in list_users:
+     
+    user_email = user_obj.email
+    
     # XXX LOIC Quick fix because this is totally inconsistent
     if not 'number_of_nodes' in request:
         request['number_of_nodes']=""
@@ -622,15 +632,16 @@ def create_slice(wsgi_request, request):
         'slice_enabled'    : True
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
-
+    
     query = Query.create('slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
-        clear_user_creds(wsgi_request,user_email)
+        clear_user_creds(wsgi_request,user_obj.username)
         # log user activity
-        activity.slice.validate(self.request, "Slice validation", { "slice" : hrn })
+        activity.slice.validate(request, "Slice validation")#, { "slice" : hrn })
+	
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)
