@@ -30,6 +30,8 @@ from plugins.univbrisfv                 import UnivbrisFv
 from plugins.univbrisfvf                import UnivbrisFvf
 from plugins.univbrisfvfo           	import UnivbrisFvfo
 from plugins.univbristopo               import UnivbrisTopo
+from plugins.univbrisvtam 	            import UnivbrisVtam as UnivbrisVtamPlugin
+from plugins.univbrisvtamform 	        import UnivbrisVtamForm
 
 from plugins.columns_editor             import ColumnsEditor
 from plugins.sladialog                  import SlaDialog
@@ -50,11 +52,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         page = Page(request)
         metadata = page.get_metadata()
         page.expose_js_metadata()
-
-        # Bristol
-        univbrisfoam_query=Query().get('ofelia-bristol-of:resource').select('urn')
-        page.enqueue_query(univbrisfoam_query)
-
 
         resource_md = metadata.details_by_object('resource')
         resource_fields = [column['name'] for column in resource_md['column']]
@@ -82,6 +79,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 'lease.resource',
                 'lease.start_time',
                 'lease.end_time',
+                # FLOWSPACE
+                'flowspace',               
+                # VMS
+                'vms',
                 # - The lease_id is important for NITOS identify already existing
                 #   leases
                 'lease.lease_id', 
@@ -96,6 +97,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         page.enqueue_query(main_query, analyzed_query=aq)
         sq_resource    = aq.subquery('resource')
         sq_lease       = aq.subquery('lease')
+        sq_flowspace   = aq.subquery('flowspace')
+        sq_vms         = aq.subquery('vms')
 
         query_resource_all = Query.get('resource').select(resource_fields)
         page.enqueue_query(query_resource_all)
@@ -260,50 +263,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             query           = main_query,
             username            = request.user,
         )
-
-        # Bristol plugin
-        univbrisfoamlist = UnivbrisFoam(
-            page  = page,
-            title = 'univbris_foam_ports_selection',
-            domid = 'univbris_foam_ports_selection',
-            query = univbrisfoam_query,
-            query_all = univbrisfoam_query,
-            checkboxes = False,
-            datatables_options = {
-                'iDisplayLength': 10,
-                'bLengthChange' : True,
-                'bAutoWidth'    : True,
-                },
-        )
-
-        #plugin which manages the different flowspaces that the user creates, and also sends flowspaces to manifold
-        univbrisfvlist = UnivbrisFv(
-                page  = page,
-                title = 'univbris_flowspace_selection',
-                domid = 'univbris_flowspace_selection',
-                query = None,
-                query_all = None,
-                datatables_options = {
-                    'iDisplayLength': 5,
-                    'bLengthChange' : True,
-                    'bAutoWidth'    : True,
-                    },
-            )
-
-        #plugin which allows the definition of a single flowspace
-        univbrisfvform = UnivbrisFvf(
-                page  = page,
-                title = 'univbris_flowspace_form',
-                domid = 'univbris_flowspace_form',
-                query = None,
-                query_all = None,
-                datatables_options = {
-                    'iDisplayLength': 3,
-                    'bLengthChange' : True,
-                    'bAutoWidth'    : True,
-                    },
-            )
-
             
         # --------------------------------------------------------------------------
         # Ofelia OpenFlow Plugin 
@@ -337,9 +296,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                 page  = page,
                 title = 'univbris_flowspace_selection',
                 domid = 'univbris_flowspace_selection',
-                query = None,
-                query_all = None,
-	            sync_query = query_resource_all,
+                query = sq_flowspace,
+                query_all = query_resource_all,
                 datatables_options = {
                     'iDisplayLength': 5,
                     'bLengthChange' : True,
@@ -361,9 +319,8 @@ class SliceResourceView (LoginRequiredView, ThemeView):
                     },
         )
 
-	#plugin which allows the definition the match criteria on a single OPTICAL flowspace
-
-	univbrisofvform = UnivbrisFvfo(
+	    #plugin which allows the definition the match criteria on a single OPTICAL flowspace
+        univbrisofvform = UnivbrisFvfo(
             page  = page,
             title = 'univbris_oflowspace_form',
             domid = 'univbris_oflowspace_form',
@@ -382,9 +339,37 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             title = 'univbris_topology',
             domid = 'univbris_topology',
             query = query_resource_all,
-            #query = query_resource_all,
         )
-	
+
+        # --------------------------------------------------------------------------
+        # Ofelia VTAM Plugin 
+        # Bristol Plugin
+
+        #plugin which display a table where an experimenter will add VMs to according to his needs
+        # responsible to send the data to Manifold
+        univbrisvtamplugin = UnivbrisVtamPlugin(
+            page  = page,
+            title = 'univbris_vtam',
+            domid = 'univbris_vtam',
+            query = sq_vms,
+            #query = sq_resource,
+        )
+
+    	#plugin which display a form where an experimenter will specify 
+        # in which testbed and which physical server to setup the VM
+        univbrisvtamform = UnivbrisVtamForm(
+            page  = page,
+            title = 'univbris_vtam_form',
+            domid = 'univbris_vtam_form',
+	        query =  query_resource_all,
+            query_all = None,
+            datatables_options = { 
+                'iDisplayLength': 3,
+                'bLengthChange' : True,
+                'bAutoWidth'    : True,
+                },
+        )
+
         # --------------------------------------------------------------------------
         # SLA View and accept dialog
         
@@ -441,12 +426,13 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         template_env['oflowspaces_form'] = univbrisofvform.render(self.request)
         template_env['flowspaces_form'] = univbrisfvform.render(self.request)
         template_env['topology'] = univbristopology.render(self.request)
+        template_env['vms_list'] = univbrisvtamplugin.render(self.request)
+        template_env['vm_form'] = univbrisvtamform.render(self.request)
 
 #        template_env['pending_resources'] = pending_resources.render(self.request)
         template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
-	template_env["username"] = self.request.user
-        template_env["person"] = self.request.user
+        template_env["username"] = request.user
         template_env["pi"] = pi
         template_env["slice"] = slicename
         template_env["section"] = "resources"

@@ -2,28 +2,30 @@
  * Description: display a query result in a datatables-powered <table>
  * Copyright (c) 2012-2013 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
- */
+ */ 
 
 (function($){
 
     var debug=false;
     debug=true
 
-    var UnivbrisFv = Plugin.extend({
+    pk_flowspace_index=0;
+    opt_flowspace_index=0;
+    pk_mode=0;
+    fvf_add=1;
+    fvf_nrow=0;
+    
 
+    var UnivbrisVtam = Plugin.extend({
+
+	
         init: function(options, element) {
-	    //alert("foam init called");
-	    this.classname="univbrisfv";
+	    this.classname="univbrisvtam";
             this._super(options, element);
 		
-	    //alert(this.options.hidden_columns);
-            /* Member variables */
-	    // in general we expect 2 queries here
-	    // query_uuid refers to a single object (typically a slice)
-	    // query_all_uuid refers to a list (typically resources or users)
-	    // these can return in any order so we keep track of which has been received yet
-            //this.received_all_query = false;
-            //this.received_query = false;
+	        this.elmt().on('show', this, this.on_show);
+            this.elmt().on('shown.bs.tab', this, this.on_show);
+            this.elmt().on('resize', this, this.on_resize);
 
             // We need to remember the active filter for datatables filtering
             this.filters = Array(); 
@@ -33,36 +35,15 @@
 	    // an internal buffer for keeping lines and display them in one call to fnAddData
 	    this.buffered_lines = [];
 
-            /* Events */
-	    // xx somehow non of these triggers at all for now
-            //this.elmt().on('show', this, this.on_show);
-            //this.elmt().on('shown.bs.tab', this, this.on_show);
-            //this.elmt().on('resize', this, this.on_resize);
-
-            //var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
-            //this.object = query.object;
-
-	    //// we need 2 different keys
-	    // * canonical_key is the primary key as derived from metadata (typically: urn)
-	    //   and is used to communicate about a given record with the other plugins
-	    // * init_key is a key that both kinds of records 
-	    //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
-	    //   in general query_all will return well populated records, but query
-	    //   returns records with only the fields displayed on startup
 	    var keys = manifold.metadata.get_key(this.object);
 	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
-	    // 
 	    this.init_key = this.options.init_key;
 	    // have init_key default to canonical_key
 	    this.init_key = this.init_key || this.canonical_key;
 	    // sanity check
-	    if ( ! this.init_key ) messages.warning ("UnivbrisFv : cannot find init_key");
-	    if ( ! this.canonical_key ) messages.warning ("UnivbrisFv : cannot find canonical_key");
-	    if (debug) messages.debug("UnivbrisFv: canonical_key="+this.canonical_key+" init_key="+this.init_key);
-
-            /* Setup query and record handlers */
-            //this.listen_query(options.query_uuid);
-            //this.listen_query(options.query_all_uuid, 'all');
+	    if ( ! this.init_key ) messages.warning ("UnivbrisVtam : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("UnivbrisVtam : cannot find canonical_key");
+	    if (debug) messages.debug("UnivbrisVtam: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* GUI setup and event binding */
             this.initialize_table();
@@ -72,13 +53,13 @@
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("univbrisfv.on_show");
+	    if (debug) messages.debug("UnivbrisVtam.on_show");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
 
         on_resize: function(e) {
-	    if (debug) messages.debug("univbrisfv.on_resize");
+	    if (debug) messages.debug("UnivbrisVtam.on_resize");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
@@ -89,13 +70,16 @@
 
         initialize_table: function() 
         {
+
+	    
             /* Transforms the table into DataTable, and keep a pointer to it */
             var self = this;
+	    //alert(self.options);
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
                 //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-		sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>><'buttons'>",
+		sDom: "<'row'<'col-xs-5'l><'col-xs-5'r><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>><'buttons'>",
 		//sDom: "<'row'<'col-xs-9'r>t<'buttons'>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
@@ -108,7 +92,7 @@
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */
                 fnDrawCallback: function() { self._querytable_draw_callback.call(self);}
-		//fnFooterCallback: function() {self._univbrisfv_footer_callback.call(self,nFoot, aData, iStart, iEnd, aiDisplay)};}
+		//fnFooterCallback: function() {self._UnivbrisVtam_footer_callback.call(self,nFoot, aData, iStart, iEnd, aiDisplay)};}
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
@@ -122,9 +106,12 @@
 		delete this.options.datatables_options['aoColumnDefs'];
 	    }
 	    $.extend(actual_options, this.options.datatables_options );
-            this.table = $("#univbris_flowspace_selection__table").dataTable(actual_options);
-	    
 
+	    
+            this.table = $("#univbris_vtam__table").dataTable(actual_options);	
+	    
+	    
+	    
 	    //alert(this.table.$("name"));
 
             /* Setup the SelectAll button in the dataTable header */
@@ -149,8 +136,6 @@
                 return self._querytable_filter.call(self, oSettings, aData, iDataIndex);
             });
 
-	   //alert(this.options.hidden_columns);
-
             /* Processing hidden_columns */
             $.each(this.options.hidden_columns, function(i, field) {
                 //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
@@ -159,48 +144,99 @@
 		//self.hide_column(field);
             });
 
-	    //document.getElementById('buttons').text-align='center';
 
-	    /**$('<table><tr><td><button id="add_flowspace" type="button" style="height: 25px; width: 400px; text-align: center" onclick="fnAddflowspace()">Define another packet  flowspace</button></td>').appendTo('div.buttons');
-
-	    $('<table><tr><td><button id="add_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnAddflowspace()">Define another optical  flowspace</button></td>').appendTo('div.buttons');
-
-	    $('<td><button id="submit_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnButsubmit()">Submit flowspaces</button></td></tr></table>').appendTo('div.buttons');
-
-	    $('<td><button id="submit_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnButsubmit()">Define controller location</button></td></tr></table>').appendTo('div.buttons');**/
-	
-	   
-	    jQuery( "#univbris_flowspace_selection" ).hide();
-
-	      //$('<a href="http://localhost:8000/login/" id="next_link">next link</a>').appendTo('div.submit');
-
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		this._querytable_draw_callback();
-	
-		
+	    this._querytable_draw_callback();	
 
         }, // initialize_table
 
 
-	fnButsubmit:function(e){
-		alert("submitting flowspaces to AM (TO BE IMPLEMENTED)");
-		
-			
+	fnCreateVms:function(e){
+		console.log("building json to send to backend");
+
+		var vms=[];
+
+		try{
+			 var rows = $("#univbris_vtam__table").dataTable().fnGetNodes();
+			 if (rows.length<=0){
+				throw("no vm specified");
+			 }
+			 else{
+				for(var i=0;i<rows.length;i++){
+                    // get the id of the html element in the table
+                    var cell=rows[i].cells[2];
+                    element = cell.getElementsByTagName('p');
+                    server_vm = element.item(0).id;
+                    t_server_vm = JSON.parse(server_vm);
+                    current_server = Object.keys(t_server_vm);
+                    current_vm = t_server_vm[current_server[0]];
+                    if(vms.length>0){
+                        // add the current vm to vms
+                        $.each( vms, function( i, s_vm ) {
+                            // if the server is already listed in vms, add a new vm to the server
+                            s = Object.keys(s_vm);
+                            vm = s_vm[s[0]];
+                           
+                            if(s[0] == current_server[0]){
+                                vm_exists = false;
+                                // XXX We should also loop on the vm names
+                                $.each( vm, function( i, vm_name ) {
+                                    if(vm_name == current_vm[0]){
+                                        vm_exists = true;
+                                        return;
+                                    }
+                                });
+                                if (vm_exists == false){
+                                    vm.push(current_vm[0]);
+                                }
+                            // else add the server with the current vm
+                            }else{
+                                vms.push(t_server_vm);
+                            }
+                        });
+                    }else{
+                        vms.push(t_server_vm);
+                    }
+
+				}
+
+				var rspecs = JSON.stringify(vms);
+				console.log(rspecs);
+                // manifold.raise_event(self.options.query_uuid, ...);
+			}
+
+		}
+		catch(err){
+			alert(err)
+		}		
 	},
 
-	fnAddflowspace:function(e){
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
-		//alert("table length" + this.table.fnGetNodes().length);	
-		$("#flowspace_name").val("flowspace"+(this.table.fnGetNodes().length+1));
-		jQuery( "#univbris_flowspace_selection" ).hide();
-		jQuery("#uob_fv_table_form").show();		
+
+
+	fnAddVm:function(e){
+		//this.hideFvfError(e);
+		$('#uob_vm_name').removeClass('error');
+		$("#uob_vm_name").val("");
+		jQuery('#uob_vm_name_error').hide();
+		jQuery("#univbris_vtam").hide();
+		jQuery("#univbris_vtam_form").show();
 	},
 
 	
+
+
+
+
+	
+
+	fnDelete:function(e){
+	    		e.preventDefault();
+	    		var nRow = $(this).parents('tr')[0];
+			this.table = $("#univbris_vtam__table").dataTable();
+	   		this.table.fnDeleteRow( nRow );
+	},
+
+
+
 
 	
 
@@ -214,119 +250,12 @@
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
-	// create a checkbox <input> tag
-	// computes 'id' attribute from canonical_key
-	// computes 'init_id' from init_key for initialization phase
-	// no need to used convoluted ids with plugin-uuid or others, since
-	// we search using table.$ which looks only in this table
-        checkbox_html : function (record) {
-            var result="";
-            // Prefix id with plugin_uuid
-            result += "<input";
-            result += " class='univbrisfv-checkbox'";
-	 // compute id from canonical_key
-	    var id = record[this.canonical_key]
-	 // compute init_id form init_key
-	    var init_id=record[this.init_key];
-	 // set id - for retrieving from an id, or for posting events upon user's clicks
-	    result += " id='"+record[this.canonical_key]+"'";
-	 // set init_id
-	    result += "init_id='" + init_id + "'";
-	 // wrap up
-            result += " type='checkbox'";
-            result += " autocomplete='off'";
-            result += "></input>";
-            return result;
-        }, 
 
-	 fake_checkbox_html : function (record) {
-	    //alert("fake fun called");
-            var result="";
-            // Prefix id with plugin_uuid
-            result += "<input";
-            //result += " class='univbrisfv-checkbox'";
-	 // set id - for retrieving from an id, or for posting events upon user's clicks
-	    result += " id='"+ record +"'";
-	    result += " name='"+ record +"'";
-	 // set init_id
-	    result += " init_id='" + record + "'";
-	 // wrap up
-            result += " type='checkbox'";
-            result += " autocomplete='off'";
-            result += "></input>";
-	    ///alert(result);
-            return result;
-        }, 
-
+	
 
         new_record: function(record)
         {
            
-	 // this models a line in dataTables, each element in the line describes a cell
-            line = new Array();
-     
-            // go through table headers to get column names we want
-            // in order (we have temporarily hack some adjustments in names)
-            var cols = this.table.fnSettings().aoColumns;
-            var colnames = cols.map(function(x) {return x.sTitle})
-            var nb_col = cols.length;
-            /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-	    
-	    //alert(colnames);
-	    /*replace production*/
-            /* fill in stuff depending on the column name */
-             var cols = this.table.fnSettings().aoColumns;
-	    //alert("col "+cols);
-            var colnames = cols.map(function(x) {return x.sTitle})
-            var nb_col = cols.length;
-			//alert("nb_col: "+ nb_col);
-            /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-	    		//alert("nb_col: "+ nb_col);
-	    //alert(colnames);
-	    /*replace production*/
-            /* fill in stuff depending on the column name */
-            for (var j = 0; j < nb_col; j++) {
-                if (typeof colnames[j] == 'undefined') {
-                    line.push('...');
-                } else if (colnames[j] == 'Flowspace Selector') {
-		    //alert("added");
-                    line.push("first");
-		}
-		
-
-		/*if (typeof colnames[j] == 'undefined') {
-                    line.push('...');
-                } else if (colnames[j] == 'hostname') {
-                    if (record['type'] == 'resource,link')
-                        //TODO: we need to add source/destination for links
-                        line.push('');
-                    else
-                        line.push(record['hostname']);
-
-                } else if (colnames[j] == 'hrn' && typeof(record) != 'undefined') {
-                    line.push('<a href="../resource/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record['hrn']);
-                } else {
-                    if (record[colnames[j]])
-                        line.push(record[colnames[j]]);
-                    else
-                        line.push('');
-                }*/
-            }
-    
-            // catch up with the last column if checkboxes were requested 
-            if (this.options.checkboxes) {
-                // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox_html(record));
-	        }
-    
-    	    // adding an array in one call is *much* more efficient
-	        // this.table.fnAddData(line);
-	        this.buffered_lines.push(line);
-		this.table.fnAddData(this.buffered_lines);
-		//this.table.redraw();
-		//this._querytable_draw_callback();
         },
 
         clear_table: function()
@@ -365,7 +294,7 @@
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
 	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("univbrisfv.set_checkbox_from_record, init_id="+init_id);
+	    if (debug) messages.debug("UnivbrisVtam.set_checkbox_from_record, init_id="+init_id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
@@ -374,7 +303,7 @@
 	// id relates to canonical_key
 	set_checkbox_from_data: function (id, checked) {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("univbrisfv.set_checkbox_from_data, id="+id);
+	    if (debug) messages.debug("UnivbrisVtam.set_checkbox_from_data, id="+id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$("[id='"+id+"']");
 	    element.attr('checked',checked);
@@ -415,7 +344,7 @@
 
         on_field_clear: function()
         {
-            alert('UnivbrisFv::clear_fields() not implemented');
+            alert('UnivbrisVtam::clear_fields() not implemented');
         },
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
@@ -451,7 +380,7 @@
 
         on_all_field_clear: function()
         {
-            alert('UnivbrisFv::clear_fields() not implemented');
+            alert('UnivbrisVtam::clear_fields() not implemented');
         },
 
 
@@ -459,12 +388,6 @@
 
         on_new_record: function(record)
         {
-            if (this.received_all_query) {
-        	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this.set_checkbox_from_record(record, true);
-            } else {
-                this.buffered_records_to_check.push(record);
-            }
         },
 
         on_clear_records: function()
@@ -538,7 +461,9 @@
         on_all_query_done: function()
         {
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
-	    this.table.fnAddData (this.buffered_lines);
+
+
+	    //this.table.fnAddData (this.buffered_lines);
 	    this.buffered_lines=[];
 	    
             var self = this;
@@ -614,9 +539,14 @@
              * the table is redrawn    
              */
             this.elts('querytable-checkbox').unbind('click').click(this, this._check_click);
-	    $("#submit_flowspace").unbind('click').click(this, this.fnButsubmit);
-	    $("#add_flowspace").unbind('click').click(this, this.fnAddflowspace);
-
+	    $("#add_vm").unbind('click').click(this, this.fnAddVm);
+	    $("#submit_vms").unbind('click').click(this, this.fnCreateVms);
+	    $('#univbris_vtam__table .delete').unbind('click').click(this, this.fnDelete);
+	    /*var edits=this.elts.all.find('.edit');
+	    edits.each(function(){
+		this.unbind('click').click(this,this.fnEdit);
+	     }
+	    */
             if (!this.table)
                 return;
 
@@ -637,6 +567,9 @@
             } else {
                 $('.querytable_length', wrapper).css('visibility', 'visible');
             }
+
+	    
+
 
         },
 
@@ -678,7 +611,9 @@
 
     });
 
-    $.plugin('UnivbrisFv', UnivbrisFv);
+   
+
+    $.plugin('UnivbrisVtam', UnivbrisVtam);
 
   /* define the 'dom-checkbox' type for sorting in datatables 
      http://datatables.net/examples/plug-ins/dom_sort.html
@@ -691,5 +626,9 @@
 	} );
     }
 
+   
+
 })(jQuery);
+
+
 

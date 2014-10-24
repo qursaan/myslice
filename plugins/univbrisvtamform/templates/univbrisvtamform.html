@@ -1,0 +1,62 @@
+<style>
+.multiselect {
+    width:40em;
+    height:5em;
+    border:solid 1px #c0c0c0;
+    overflow:auto;
+}
+ 
+.multiselect label {
+    display:block;
+}
+ 
+.multiselect-on {
+    color:#ffffff;
+    background-color:#000099;
+}
+
+.error{
+border:2px solid red;
+}
+
+</style>
+
+<form id="uob_vtam_form">
+  <table id='uob_vtam_table'>
+ 			<tr>
+		            	<th><strong>Testbed</strong></th>
+		            	<td>
+		            		<select id="uob_testbed_name" name="uob_testbed_name" maxlength="20" title="Testbed Name"/>
+		            	</td>
+				<td>
+				</td>
+		         </tr>
+
+			<tr>
+		            	<th><strong>Virtualization Server</strong></th>
+		            	<td>
+		            		
+		            		<label for="uob_virtualization_server"></label>
+		            		<select id="uob_virtualization_server" name="uob_virtualization_server" maxlength="20" title="Virtualization Server of VM" />
+		            	</td>
+				<td>
+				</td>
+		         </tr>		      
+
+
+		         <tr>
+		            	<th><strong>VM Name</strong></th>
+		            	<td>
+		            		
+		            		<label for="uob_vm_name"></label>
+		            		<input id="uob_vm_name" type="text" name="uob_vm_name" maxlength="20" title="Name of VM" />
+		            	</td>
+				<td>
+					<p id="uob_vm_name_error" >name of VM should be alphanumeric</p>	
+				</td>
+		         </tr>	
+			      
+  </table>
+ </form>
+<div id="vtam_form_buttons"></div>
+
