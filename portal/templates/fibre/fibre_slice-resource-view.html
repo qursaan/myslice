@@ -54,6 +54,7 @@ $(document).ready(function() {
 			<ul class="nav nav-tabs">
 			  <li class="active"><a href="#resourcelist" role="tab" data-toggle="tab">Table</a></li>
 			  <li> <a href="#resourcemap" role="tab" data-toggle="tab">Map</a></li>
+              <li> <a href="#openflowcontroller" role="tab" data-toggle="tab">OpenFlow Controller</a></li>
               <li> <a href="#resourceflowspace" role="tab" data-toggle="tab">Flowspace</a></li>
 			  <li> <a href="#resourcescheduler" role="tab" data-toggle="tab">Scheduler</a></li>
 			</ul>
@@ -91,8 +92,12 @@ $(document).ready(function() {
 				<div class="tab-pane" id="resourcemap">
 	                {{map_resources}}
 				</div>
+                <div class="tab-pane" id="openflowcontroller">
+                    <p>{{vms_list}}</p>
+                    <p>{{vm_form}}</p>
+                    <p>{{below_table}}</p>
+                </div>
                 <div class="tab-pane" id="resourceflowspace">
-
                     <p>{{welcome}}</p>
                     <p>{{flowspaces}}</p>
                     <p>{{flowspaces_form}}</p>
@@ -101,12 +106,11 @@ $(document).ready(function() {
                     <p>{{resources}}</p>
 
                     <p>{{below_table}}</p>
-
                 </div>
 				<div class="tab-pane" id="resourcescheduler">
 	                {{scheduler}}
 				</div>
-	
+
 				<!--
 				<div id="reserved" class="tab-pane" style="height:370px;display:none;">
 	                <table width="80%">

@@ -1,0 +1,29 @@
+<div id='main-{{ domid }}' class='univbrisvtam-spacer'>
+ <form id="uob_vtam">
+  <table class='table table-striped table-bordered dataTable' id='{{domid}}__table'>
+    <thead>
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %}
+      </tr>
+    </thead> 
+    <tbody>
+    </tbody> 
+    <tfoot> 
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
+      </tr>
+    </tfoot> 
+  </table>
+  <table class = 'table tbbuttons' align="center" id='uob_fv_form_buttons'>
+  	<tr>
+		<td align="center"><button id="add_vm" type="button" style="height: 25px; width: 300px;" onclick="fnAddVm()">add another VM to request</button></td>
+	<tr>
+
+	</tr>
+		<td align="center"><button id="submit_vms" type="button" style="height: 25px; width: 300px" onclick="fnCreateVms()">Create VMs (submit to AM)</button></td>
+	</tr>
+</table>
+ </form>
+</div>

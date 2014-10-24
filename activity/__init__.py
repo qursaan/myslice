@@ -56,21 +56,23 @@ def logWrite(request, action, message, objects = None):
         "apikey"    : apikey,
         "signature" : sign(secret, "%s%s%s%s" % (timestamp, ip, request.user, action)),
         "slice"     : None,
-        "resource"  : None
+        "resource"  : None,
+        "resource_type"     : None,
+        "facility"      : None,
+        "testbed"       : None,
     }
     
-    if objects and 'slice' in objects :
-        log['slice'] = objects['slice']
-    
-    if objects and 'resource' in objects :
-        log['resource'] = objects['resource']
+    for o in objects :
+        if (o in log) :
+            log[o] = objects[o]
     
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
-        print "===============>> activity: " + action + " <" + request.user + "> " + message
+        print "===============>> activity: %s <%s> %s" % (action, request.user,message)
         content = result.read()
     except urllib2.URLError as e:
         print "===============>> activity: connection to " + server + " impossible, could not log action"
+        print "==>> " + e.strerror
 
 def log(request, action, message, objects = None):
     # Create a new thread in Daemon mode to send the log entry

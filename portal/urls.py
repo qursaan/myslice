@@ -44,16 +44,18 @@ from portal.validationview          import ValidatePendingView
 #from portal.experimentview         import ExperimentView
 from portal.termsview               import TermsView
 from portal.univbrisview            import UnivbrisView
+from portal.univbrisvtam            import UnivbrisVtam
+
 from portal.manualdelegationview    import ManualDelegationView
 
-from portal.servicedirectory         import ServiceDirectoryView
+from portal.servicedirectory        import ServiceDirectoryView
 
 from portal.documentationview       import DocumentationView
 from portal.supportview             import SupportView
 from portal.emailactivationview     import ActivateEmailView
 # hopefully these should move in dedicated source files too
-from portal.views               import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
-from portal.django_passresetview import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
+from portal.views                   import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
+from portal.django_passresetview    import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -122,7 +124,8 @@ urlpatterns = patterns('',
         'portal.django_passresetview.password_reset_complete'),
 
     url(r'^univbris/?$', UnivbrisView.as_view(), name='univbris'),
-    
+    url(r'^univbrisvtam/?$', UnivbrisVtam.as_view(), name='univbrisvtam'),   
+
     url(r'^servicedirectory/?$', ServiceDirectoryView.as_view(), name='servicedirectory'),
 
 )
