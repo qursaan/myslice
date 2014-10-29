@@ -612,14 +612,14 @@ def create_slice(wsgi_request, request):
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
-    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    query = Query.create('myslice:slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
         # log user activity
-        activity.slice.validate(self.request, "Slice validation", { "slice" : hrn })
+        #activity.slice.validate(request, "Slice validation", { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)

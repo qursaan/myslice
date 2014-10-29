@@ -62,9 +62,10 @@ def logWrite(request, action, message, objects = None):
         "testbed"       : None,
     }
     
-    for o in objects :
-        if (o in log) :
-            log[o] = objects[o]
+    if objects is not None:
+        for o in objects :
+            if (o in log) :
+                log[o] = objects[o]
     
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
@@ -72,7 +73,8 @@ def logWrite(request, action, message, objects = None):
         content = result.read()
     except urllib2.URLError as e:
         print "===============>> activity: connection to " + server + " impossible, could not log action"
-        print "==>> " + e.strerror
+        print e.strerror
+        print ""
 
 def log(request, action, message, objects = None):
     # Create a new thread in Daemon mode to send the log entry

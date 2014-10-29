@@ -1,24 +1,25 @@
 # this somehow is not used anymore - should it not be ?
-from django.core.context_processors import csrf
-from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.shortcuts import render
+from django.core.context_processors     import csrf
+from django.http                        import HttpResponseRedirect
+from django.contrib.auth                import authenticate, login, logout
+from django.template                    import RequestContext
+from django.shortcuts                   import render_to_response
+from django.shortcuts                   import render
 
-import json
 
-from unfold.loginrequired import FreeAccessView
+from unfold.loginrequired               import FreeAccessView
 
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
 
-from manifoldapi.manifoldresult import ManifoldResult
-from ui.topmenu import topmenu_items, the_user
-from myslice.configengine import ConfigEngine
+from manifoldapi.manifoldresult         import ManifoldResult
+from ui.topmenu                         import topmenu_items, the_user
+from myslice.configengine               import ConfigEngine
 
-from myslice.theme import ThemeView
+from myslice.theme                      import ThemeView
+from portal.models                      import PendingSlice
 
+import json
 import activity.user
 
 class HomeView (FreeAccessView, ThemeView):
@@ -97,8 +98,13 @@ class HomeView (FreeAccessView, ThemeView):
                         user_cred = 'no_creds'
                     else:
                         user_cred = 'has_creds'
+                    
+                    # list the pending slices of this user
+                    pending_slices = []
+                    for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
+                        pending_slices.append(slices.slice_name)
 
-
+                    env['pending_slices'] = pending_slices
                     env['pi'] = pi
                     env['user_cred'] = user_cred                
                 else: 
@@ -155,8 +161,13 @@ class HomeView (FreeAccessView, ThemeView):
                 user_cred = 'no_creds'
             else:
                 user_cred = 'has_creds'
-           
 
+            # list the pending slices of this user
+            pending_slices = []
+            for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
+                pending_slices.append(slices.slice_name)
+        
+            env['pending_slices'] = pending_slices
             env['pi'] = pi
             env['user_cred'] = user_cred                
             env['person'] = self.request.user
