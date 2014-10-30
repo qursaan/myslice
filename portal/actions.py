@@ -619,7 +619,7 @@ def create_slice(wsgi_request, request):
     else:
         clear_user_creds(wsgi_request,user_email)
         # log user activity
-        #activity.slice.validate(request, "Slice validation", { "slice" : hrn })
+        activity.slice.validate(request, { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)
