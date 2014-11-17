@@ -9,8 +9,8 @@ def dispatch(request, action):
         emails = request.POST.getlist('emails[]')
         if not emails:
             emails = request.GET.getlist('emails[]')
-        import pdb
-        pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         if emails :
             for email in emails :
                 try :
