@@ -785,6 +785,7 @@ var manifold = {
             switch (this_type) {
                 case TYPE_VALUE:
                 case TYPE_LIST_OF_VALUES:
+                case TYPE_LIST_OF_RECORDS:
                     if (this_value != other_value)
                         return false;
                     break;
@@ -792,6 +793,9 @@ var manifold = {
                     if (!(_record_equals(this_value, other_value, key_fields)))
                         return false;
                     break;
+                /*
+                XXX WARNING = disabled for OpenFlow plugin !!!
+
                 case TYPE_LIST_OF_RECORDS:
                     if (this_value.length != other_value.length)
                         return false;
@@ -799,6 +803,7 @@ var manifold = {
                         if (!(_record_equals(this_value[j], other_value[j], key_fields)))
                             return false;
                     break;
+                */
             }
         }
         return true;
@@ -1223,6 +1228,11 @@ var manifold = {
         }
 
         key = manifold.metadata.get_key(new_object);
+        if (!key){
+            console.log("object type: " + new_object + " has no key");
+            console.log(record);
+            return;
+        }
         record.hashCode = manifold.record_hashcode(key.sort());
         record.equals   = manifold.record_equals(key);
 

@@ -14,6 +14,8 @@ from myslice.theme              import ThemeView
 
 theme = ThemeView()
 
+import activity.slice
+
 # Thierry: moving this right into the code so 
 # most people can use myslice without having to install sfa
 # XXX tmp sfa dependency, should be moved to SFA gateway
@@ -44,7 +46,7 @@ def authority_get_pi_emails(request, authority_hrn):
         #default_email = default_email.replace('\n', '')
         #return default_email
         # the above doesn't work
-        return ['support@myslice.info']
+        return ['support@onelab.eu']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
         query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
@@ -610,13 +612,14 @@ def create_slice(wsgi_request, request):
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
-    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    query = Query.create('myslice:slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
-
+        # log user activity
+        activity.slice.validate(request, { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)
@@ -780,6 +783,42 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
 
     return results
 
+def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False):
+   
+    import requests
+    import time
+    from requests.auth import HTTPBasicAuth
+    
+    URL_REST = 'https://devgrenoble.senslab.info/rest/admin/users'
+    LOGIN_ADMIN = "auge"
+    PASSWORD_ADMIN = "k,mfg1+Q"
+
+    auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
+    headers = {'content-type': 'application/json'}
+
+    for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE email = %s', [request['email']]):
+        password= user.password
+
+
+    iotlab_user_params = {
+        "type"          : "SA",
+        "login"         : request['email'],
+        "password"      : password,
+        "firstName"     : request['first_name'],
+        "lastName"      : request['last_name'],
+        "email"         : request['email'],
+        "structure"     : request['authority_hrn'],
+        "city"          : "N/A",
+        "country"       : "N/A",
+        "sshPublicKey"  : request['public_key'],
+        "motivations"   : "SFA federation",
+    }    
+   
+    iotlab_user_params1 = json.dumps(iotlab_user_params)
+    r=requests.post(url=URL_REST, data=iotlab_user_params1, headers=headers, auth=auth)
+    print 'Create iotlab user : ', r.status_code, r.text
+    return r.text
+
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
     # XXX This has to be stored centrally
     USER_STATUS_ENABLED = 2
@@ -795,6 +834,10 @@ def create_user(wsgi_request, request, namespace = None, as_admin = False):
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
+
+    # Add the user to iotlab portal if theme is set to onelab
+    if theme.theme == 'onelab':
+        iotlab_create_user (wsgi_request, request)
 
 def create_pending_user(wsgi_request, request, user_detail):
     """
@@ -823,7 +866,6 @@ def create_pending_user(wsgi_request, request, user_detail):
     theme.template_name = 'activate_user_email_subject.txt'
     subject = render_to_string(theme.template, request)
     subject = subject.replace('\n', '')
-    #sender = 'support@myslice.info'
     theme.template_name = 'email_default_sender.txt'
     sender =  render_to_string(theme.template, request)
     sender = sender.replace('\n', '')

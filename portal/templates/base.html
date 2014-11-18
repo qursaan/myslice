@@ -69,11 +69,27 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
+
+    /*
+        Launch queries to get the resources and leases in Manifold Cache
+    */
+        
+    $.post("/rest/resource/", function( data ) {
+    });
+    $.post("/rest/lease/", function( data ) {
+    });
+
+   
     function drawSlices(slices){
         var items = [];
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
+            /*
+            Launch a Query for each slice to get resources and leases in Manifold Cache
+            */
+            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+            });
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
@@ -91,22 +107,7 @@ $(document).ready(function() {
 	{% block base_content %}
 	{% endblock %}
 {% endblock container %}
-<div class="footer">
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			<ul>
-				<li><a href="/terms">Terms and Conditions</a></li>
-			</ul>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12 copy">
-			Copyright © UPMC Sorbonne Universités, on behalf of the OneLab consortium
-		</div>
-	</div>
-</div>
-</div>
+{% widget "_footer.html" %}
 <div class="loading">
 	<div><img src="{{ STATIC_URL }}/img/loading.gif" /> Loading...</div>
 	<div>&nbsp;</div>

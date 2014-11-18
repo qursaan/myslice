@@ -1,0 +1,134 @@
+{% extends "layout_wide.html" %}
+{% load portal_filters %}
+
+{% block head %}
+<!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1RUj824JAiHRVqgc2CSIg4CpKHhh84Lw&sensor=false"></script> -->
+<script src="{{ STATIC_URL }}js/onelab_slice-resource-view.js"></script>
+<script>
+	//myslice.slice = "{{ slice }}";
+
+$(document).ready(function() {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        // find the plugin object inside the tab content referenced by the current tabs
+        $('.plugin', $($(e.target).attr('href'))).trigger('shown.bs.tab');
+        $('.plugin', $($(e.target).attr('href'))).trigger('show');
+            });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+{% widget '_widget-slice-sections.html' %}
+<div class="container-fluid container-resource">
+	<div class="row">
+	<div class="col-md-2">
+		<!-- <div id="select-platform" class="list-group"></div> -->
+		{{filter_testbeds}}
+	</div>
+	<div class="col-md-10" style="height:100%;">
+		<div class="row">
+			{% if msg %}
+			<div class="col-md-12"><p class="alert-success">{{ msg }}</p></div>
+			{% endif %}
+		</div>
+	
+		<div class="row">
+			<div class="col-md-6">
+				{{ filter_status }}
+			</div>
+			<div class="col-md-1">
+				{{ apply }}
+			</div>
+		</div>
+		<!--
+		<div class="list-group-item list-resources">
+			<span class="list-group-item-heading" style="padding-left: 0;">Resource status:</span>
+			<a class="list-group-item active" data-panel="resources" href="#" style='display: inline-block !important;'>All</a>
+		  	<a class="list-group-item" data-panel="reserved" href="#" style='display: inline-block !important;'>Reserved</a>
+		  	<a class="list-group-item" data-panel="pending" href="#" style='display: inline-block !important;'>Pending <span class="badge" id="badge-pending" data-number="0"></span></a>
+		</div>
+		-->
+
+		<div class="row">
+			<div class="col-md-12">
+			<ul class="nav nav-tabs">
+			  <li class="active"><a href="#resourcelist" role="tab" data-toggle="tab">Table</a></li>
+			  <li> <a href="#resourcemap" role="tab" data-toggle="tab">Map</a></li>
+              <li> <a href="#resourceflowspace" role="tab" data-toggle="tab">Flowspace</a></li>
+			  <li> <a href="#resourcescheduler" role="tab" data-toggle="tab">Scheduler</a></li>
+			</ul>
+			</div>
+		</div>
+		
+		<!-- Modal - columns selector -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			<div class="modal-dialog">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        					<h4 class="modal-title" id="myModalLabel">Columns selector</h4>
+      				</div>
+      				<div class="modal-body">
+        				{{columns_editor}}
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      				</div>
+    			</div>
+  			</div>
+		</div>
+		
+		
+		<div class="row">
+			<div class="col-md-12">
+			<div class="tab-content" style="height:100%;">
+				<div class="tab-pane active" id="resourcelist">
+					 <!-- Button trigger modal - columns selector -->
+	 				<button class="btn btn-default btn-sm" style="float:right;" data-toggle="modal" data-target="#myModal">...</button>
+	                {{list_resources}}
+					<!-- <table cellpadding="0" cellspacing="0" border="0" class="table" id="objectList"></table> -->
+				</div>
+				<div class="tab-pane" id="resourcemap">
+	                {{map_resources}}
+				</div>
+                <div class="tab-pane" id="resourceflowspace">
+
+                    <p>{{welcome}}</p>
+                    <p>{{flowspaces}}</p>
+                    <p>{{flowspaces_form}}</p>
+                    <p>{{oflowspaces_form}}</p>
+                    <p>{{topology}}</p>
+                    <p>{{resources}}</p>
+
+                    <p>{{below_table}}</p>
+
+                </div>
+				<div class="tab-pane" id="resourcescheduler">
+	                {{scheduler}}
+				</div>
+	
+				<!--
+				<div id="reserved" class="tab-pane" style="height:370px;display:none;">
+	                <table width="80%">
+	                    <tr><th width="50%" style="text-align:center;">resources</th><th width="50%" style="text-align:center;">leases</th></tr>
+	                    <tr>
+	                        <td style="text-align:center">{{list_reserved_resources}}</td>
+	                        <td style="text-align:center">{{list_reserved_leases}}</td>
+	                    </tr>
+	                </table>
+				</div>
+				<div id="pending" class="tab-pane" style="height:370px;display:none;">
+	                {{pending_resources}}
+				</div>
+				<div id="sla_dialog" class="tab-pane" style="height:370px;display:none;">
+	                {{sla_dialog}}
+				</div>
+	-->
+	
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+</div>
+{% endblock %}

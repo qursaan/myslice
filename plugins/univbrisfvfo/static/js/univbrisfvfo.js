@@ -2,18 +2,19 @@
  * Description: display a query result in a datatables-powered <table>
  * Copyright (c) 2012-2013 UPMC Sorbonne Universite - INRIA
  * License: GPLv3
- */
+ */ 
 
 (function($){
 
     var debug=false;
-    debug=true
+    debug=true;
 
-    var UnivbrisFv = Plugin.extend({
+
+    var UnivbrisFvfo = Plugin.extend({
 
         init: function(options, element) {
 	    //alert("foam init called");
-	    this.classname="univbrisfv";
+	    this.classname="univbrisfvfo";
             this._super(options, element);
 		
 	    //alert(this.options.hidden_columns);
@@ -56,29 +57,36 @@
 	    // have init_key default to canonical_key
 	    this.init_key = this.init_key || this.canonical_key;
 	    // sanity check
-	    if ( ! this.init_key ) messages.warning ("UnivbrisFv : cannot find init_key");
-	    if ( ! this.canonical_key ) messages.warning ("UnivbrisFv : cannot find canonical_key");
-	    if (debug) messages.debug("UnivbrisFv: canonical_key="+this.canonical_key+" init_key="+this.init_key);
+	    if ( ! this.init_key ) messages.warning ("UnivbrisFvfo : cannot find init_key");
+	    if ( ! this.canonical_key ) messages.warning ("UnivbrisFvfo : cannot find canonical_key");
+	    if (debug) messages.debug("UnivbrisFvfo: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             //this.listen_query(options.query_uuid);
             //this.listen_query(options.query_all_uuid, 'all');
 
             /* GUI setup and event binding */
-            this.initialize_table();
-	    
+            //this.initialize_table();
+	    //alert("init fvf");
+	    jQuery("#uob_ofv_table_form").hide();
+	
+	    //$('<button id="cancel_addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnCancel()">Cancel</button>').appendTo('#fvf_table_button');
+
+	    //$('<button id="addflowspaceform" type="button" style="height: 25px; width: 200px" onclick="fnAddflowspace()">Add flowspace</button>').appendTo('#fvf_table_button');
+		
+	    this._querytable_draw_callback();
         },
 
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("univbrisfv.on_show");
+	    if (debug) messages.debug("univbrisfvfo.on_show");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
 
         on_resize: function(e) {
-	    if (debug) messages.debug("univbrisfv.on_resize");
+	    if (debug) messages.debug("univbrisfvfo.on_resize");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
 	},        
@@ -95,8 +103,8 @@
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
                 //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-		sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>><'buttons'>",
-		//sDom: "<'row'<'col-xs-9'r>t<'buttons'>",
+		//sDom: "<'row'<'col-xs-2'l><'col-xs-9'r><'col-xs-2'f>>t<'row'<'col-xs-5'i><'col-xs-5'p>><'next'>",
+		sDom: "<'row'<'col-xs-9'r>t<'buttons'>",
 		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
 		// hopefully this would come with dataTables v1.10 ?
 		// in any case, search for 'sPaginationType' all over the code for more comments
@@ -106,9 +114,9 @@
                 aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
-                bProcessing: true,      /* Loading */
+                bProcessing: false,      /* Loading */
                 fnDrawCallback: function() { self._querytable_draw_callback.call(self);}
-		//fnFooterCallback: function() {self._univbrisfv_footer_callback.call(self,nFoot, aData, iStart, iEnd, aiDisplay)};}
+		//fnFooterCallback: function() {self._univbrisfvf_footer_callback.call(self,nFoot, aData, iStart, iEnd, aiDisplay)};}
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
@@ -122,10 +130,9 @@
 		delete this.options.datatables_options['aoColumnDefs'];
 	    }
 	    $.extend(actual_options, this.options.datatables_options );
-            this.table = $("#univbris_flowspace_selection__table").dataTable(actual_options);
-	    
+            this.table = $("#univbris_flowspace_form__table").dataTable(actual_options);
 
-	    //alert(this.table.$("name"));
+	    //alert(this.table);
 
             /* Setup the SelectAll button in the dataTable header */
             /* xxx not sure this is still working */
@@ -159,50 +166,91 @@
 		//self.hide_column(field);
             });
 
-	    //document.getElementById('buttons').text-align='center';
-
-	    /**$('<table><tr><td><button id="add_flowspace" type="button" style="height: 25px; width: 400px; text-align: center" onclick="fnAddflowspace()">Define another packet  flowspace</button></td>').appendTo('div.buttons');
-
-	    $('<table><tr><td><button id="add_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnAddflowspace()">Define another optical  flowspace</button></td>').appendTo('div.buttons');
-
-	    $('<td><button id="submit_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnButsubmit()">Submit flowspaces</button></td></tr></table>').appendTo('div.buttons');
-
-	    $('<td><button id="submit_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnButsubmit()">Define controller location</button></td></tr></table>').appendTo('div.buttons');**/
-	
-	   
-	    jQuery( "#univbris_flowspace_selection" ).hide();
-
-	      //$('<a href="http://localhost:8000/login/" id="next_link">next link</a>').appendTo('div.submit');
-
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		//this.new_record("t");
-		this._querytable_draw_callback();
-	
-		
-
         }, // initialize_table
 
 
-	fnButsubmit:function(e){
-		alert("submitting flowspaces to AM (TO BE IMPLEMENTED)");
+	fnCancel:function(e){
+		//var sData=$("#uob_fv_table_form").find("input").serialize();
+		//alert("add flowspace:" + sData);
+		//alert("cancel"); 
 		
-			
+		jQuery("#uob_ofv_table_form").hide();
+		jQuery( "#univbris_foam_ports_selection" ).hide();
+		jQuery( "#univbris_flowspace_selection" ).show();
+		jQuery('#topo_plugin').hide();
+		/*var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].checked=false;
+			console.log(nodes[i].id);
+		}*/
+
 	},
+
 
 	fnAddflowspace:function(e){
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
-		//alert("table length" + this.table.fnGetNodes().length);	
-		$("#flowspace_name").val("flowspace"+(this.table.fnGetNodes().length+1));
-		jQuery( "#univbris_flowspace_selection" ).hide();
-		jQuery("#uob_fv_table_form").show();		
+		e.stopPropagation();
+		if(fvf_add==1){		
+			pk_flowspace_index=1+pk_flowspace_index;
+			jQuery("#uob_fv_table_form").hide();
+			var sData=$("#uob_fv_table_form").find("input").serialize();
+	     		var form =serializeAnything("#uob_fv_table_form");
+			//alert(form);
+			//var form2=serializeAnything("#uob_form");
+			//alert(form2);
+			var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+			var form2=$('input',port_table.fnGetNodes()).serialize();
+			//console.log(form2);
+			//alert($('input',port_table.fnGetNodes()).serialize());
+			var nodes = $('input',port_table.fnGetNodes());
+			//console.log(nodes[1]);
+			//console.log(nodes);
+			//alert($("#uob_form").serialize());
+			//var pos = form.search("&urn");
+			//form2=form2.substring(pos+1);
+			//alert(form2[1]);
+			//console.log(form2);
+			this.table = $("#univbris_flowspace_selection__table").dataTable();
+			
+			var val_status=validateFvfForm();
+			//val_status=true;
+			if (val_status == true){
+				flowspace=sData;
+				var m_form=form+","+form2;
+				var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";	
+				this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+				jQuery( "#univbris_foam_ports_selection" ).hide();
+				jQuery( "#univbris_flowspace_selection" ).show();
+				jQuery('#topo_plugin').hide();
+			}
+			else{
+				alert("validation failed");
+				jQuery("#uob_ofv_table_form").show();
+				jQuery( "#univbris_foam_ports_selection" ).show();
+			}
+		}
+		else{
+			jQuery("#uob_fv_table_form").hide();
+			var sData=$("#uob_fv_table_form").find("input").serialize();
+	     		var form =serializeAnything("#uob_fv_table_form");
+			//var form2=serializeAnything("#uob_form");
+
+			var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+			var form2=$('input',port_table.fnGetNodes()).serialize();
+			this.table = $("#univbris_flowspace_selection__table").dataTable();
+			flowspace=sData;
+			var m_form=form+","+form2;
+			var string = "<p id='"+m_form+"'> <a onclick=\'fnPopTable(\""+form+"\",\""+form2+"\");'>"+$("#flowspace_name").val()+"</a></p>";
+		   	this.table.fnDeleteRow(fvf_nrow);	
+			this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
+			
+			jQuery( "#univbris_foam_ports_selection" ).hide();
+			jQuery( "#univbris_flowspace_selection" ).show();
+			jQuery('#topo_plugin').hide();
+		
+		}
 	},
 
-	
-
-	
 
         /**
          * @brief Determine index of key in the table columns 
@@ -223,7 +271,7 @@
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
-            result += " class='univbrisfv-checkbox'";
+            result += " class='univbrisfvfo-checkbox'";
 	 // compute id from canonical_key
 	    var id = record[this.canonical_key]
 	 // compute init_id form init_key
@@ -244,7 +292,7 @@
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
-            //result += " class='univbrisfv-checkbox'";
+            //result += " class='univbrisfvfo-checkbox'";
 	 // set id - for retrieving from an id, or for posting events upon user's clicks
 	    result += " id='"+ record +"'";
 	    result += " name='"+ record +"'";
@@ -295,24 +343,6 @@
                     line.push("first");
 		}
 		
-
-		/*if (typeof colnames[j] == 'undefined') {
-                    line.push('...');
-                } else if (colnames[j] == 'hostname') {
-                    if (record['type'] == 'resource,link')
-                        //TODO: we need to add source/destination for links
-                        line.push('');
-                    else
-                        line.push(record['hostname']);
-
-                } else if (colnames[j] == 'hrn' && typeof(record) != 'undefined') {
-                    line.push('<a href="../resource/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record['hrn']);
-                } else {
-                    if (record[colnames[j]])
-                        line.push(record[colnames[j]]);
-                    else
-                        line.push('');
-                }*/
             }
     
             // catch up with the last column if checkboxes were requested 
@@ -365,7 +395,7 @@
 	set_checkbox_from_record: function (record, checked) {
             if (checked === undefined) checked = true;
 	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("univbrisfv.set_checkbox_from_record, init_id="+init_id);
+	    if (debug) messages.debug("univbrisfvfo.set_checkbox_from_record, init_id="+init_id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$('[init_id="'+init_id+'"]');
 	    element.attr('checked',checked);
@@ -374,7 +404,7 @@
 	// id relates to canonical_key
 	set_checkbox_from_data: function (id, checked) {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("univbrisfv.set_checkbox_from_data, id="+id);
+	    if (debug) messages.debug("univbrisfvfo.set_checkbox_from_data, id="+id);
 	    // using table.$ to search inside elements that are not visible
 	    var element = this.table.$("[id='"+id+"']");
 	    element.attr('checked',checked);
@@ -415,7 +445,7 @@
 
         on_field_clear: function()
         {
-            alert('UnivbrisFv::clear_fields() not implemented');
+            alert('UnivbrisFvfo::clear_fields() not implemented');
         },
 
         /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
@@ -451,7 +481,7 @@
 
         on_all_field_clear: function()
         {
-            alert('UnivbrisFv::clear_fields() not implemented');
+            alert('UnivbrisFvfo::clear_fields() not implemented');
         },
 
 
@@ -614,8 +644,14 @@
              * the table is redrawn    
              */
             this.elts('querytable-checkbox').unbind('click').click(this, this._check_click);
-	    $("#submit_flowspace").unbind('click').click(this, this.fnButsubmit);
-	    $("#add_flowspace").unbind('click').click(this, this.fnAddflowspace);
+	    //alert("fvf_add: "+fvf_add);
+	    if(fvf_add==1){
+	    	$("#addflowspaceform").unbind('click').click(this, this.fnAddflowspace);
+	    }
+	    else{
+		$("[id='addflowspaceform']").unbind('click').click(this, this.fnModflowspace);
+	    }
+	    $("#cancel_addflowspaceform").unbind('click').click(this,this.fnCancel); 
 
             if (!this.table)
                 return;
@@ -678,7 +714,7 @@
 
     });
 
-    $.plugin('UnivbrisFv', UnivbrisFv);
+    $.plugin('UnivbrisFvfo', UnivbrisFvfo);
 
   /* define the 'dom-checkbox' type for sorting in datatables 
      http://datatables.net/examples/plug-ins/dom_sort.html
@@ -689,7 +725,542 @@
 	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
 	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
 	} );
-    }
+
+};
 
 })(jQuery);
+
+
+function deserializeDT(d){
+
+	try{
+	    var data = d,
+                currentDom,
+                $current = null,
+                $currentSavedValue = null,
+                $self = this,
+                i = 0,
+                keyValPairString = [],
+                keyValPairObject = {},
+                tmp = null,
+                defaults = null;
+
+            if (data.constructor === String) {
+
+
+                data = decodeURIComponent(data.replace(/\+/g, " "));
+
+                keyValPairString = data.split('&');
+
+                for (i = 0; i < keyValPairString.length; i++) {
+                    tmp = keyValPairString[i].split('=');
+                    keyValPairObject[tmp[0]] = tmp[1];
+
+                }
+            }
+
+	  var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+	  var nodes = $('input',port_table.fnGetNodes());
+
+
+	  for(i=0;i<nodes.length;i++){
+			$currentSavedValue = keyValPairObject[nodes[i].id];
+			if ($currentSavedValue === undefined){
+				nodes[i].checked=false;
+			}
+			else{
+				nodes[i].checked=true;
+			}
+	  };
+
+	}
+	catch(err){
+		alert(err);
+	}
+
+	   
+};
+
+
+function fnPopTable(form1,form2){
+		hideFvfError();
+                $("[id='addflowspaceform']").hide();
+		$("#uob_fv_table_form :input").prop("disabled", false);
+		$("#uob_fv_table_form").deserialize(form1);
+		deserializeDT(form2);
+
+
+                $("[name='flowspace_name']").prop("disabled", true);
+		$("#uob_fv_table_form :input").prop("disabled", true);
+		$("[id='cancel_addflowspaceform']").prop("disabled", false);
+		$("[id='cancel_addflowspaceform']").text('close');
+
+		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].disabled=true;
+		}
+
+		jQuery("#univbris_flowspace_selection").hide();
+		jQuery("#uob_fv_table_form").show();
+		jQuery( "#univbris_foam_ports_selection" ).show();
+
+		if  ($("#flowspace_name").val().search("pk")==0){
+			topoviewer_state={mode:"read",link_type:"non-optical"};
+		}
+		else{
+			topoviewer_state={mode:"read",link_type:"optical"};
+		}
+		
+		jQuery('#topo_plugin').show();
+};
+
+function macValidator (mac_str){
+	if (mac_str != ""){
+		var mac_validator=/(^(([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2}))$)|(^(([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})))$/;
+		var result =mac_str.match(mac_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else{
+		return true;
+	}
+};
+
+function ethertypeValidator (eth_str){
+	if (eth_str != ""){
+		var ethertype_validator=/^0x[0-9a-fA-F]{4}$/;
+		var result = eth_str.match(ethertype_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else{
+		return true;
+	}
+};
+
+
+function vlanValidator (vlan_str){
+	if (vlan_str != ""){
+		var vlan_validator=/(^[1-9][0-9]{0,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-5]$)/;
+		var result = vlan_str.match(vlan_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}
+};
+
+function ipValidator(ip_str){
+	if (ip_str != ""){
+		var ip_validator=/(^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)/;
+		var result = ip_str.match(ip_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}
+};
+
+
+function portValidator (port_str){
+	if (port_str != ""){
+		var port_validator=/^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/;
+		var result = port_str.match(port_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}	
+}
+
+function ipProtoValidator (ipproto_str){
+	if (ipproto_str != ""){
+		var ipproto_validator=/(^[0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]$)/;
+		var result = ipproto_str.match(ipproto_validator);
+		if (result==null){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	else {
+		return true;
+	}	
+}
+
+
+
+
+
+
+
+function validateFvfForm(){
+	var status = false;
+	var checked =0;
+
+	//row 1 validation
+	if (macValidator ($("#uob_fv_table_dl_src_start").val())==false){
+		$("#uob_fv_table_dl_src_start").addClass('error');
+		$("#uob_fv_table_dl_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (macValidator ($("#uob_fv_table_dl_src_end").val())==false){
+		$("#uob_fv_table_dl_src_end").addClass('error');
+		$("#uob_fv_table_dl_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 2 validation
+
+	if (macValidator ($("#uob_fv_table_dl_dst_start").val())==false){
+		$("#uob_fv_table_dl_dst_start").addClass('error');
+		$("#uob_fv_table_dl_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (macValidator ($("#uob_fv_table_dl_dst_end").val())==false){
+		$("#uob_fv_table_dl_dst_end").addClass('error');
+		$("#uob_fv_table_dl_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 3 validation
+	
+	if (ethertypeValidator ($("#uob_fv_table_dl_type_start").val())==false){
+		$("#uob_fv_table_dl_type_start").addClass('error');
+		$("#uob_fv_table_dl_type_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ethertypeValidator ($("#uob_fv_table_dl_type_end").val())==false){
+		$("#uob_fv_table_dl_type_end").addClass('error');
+		$("#uob_fv_table_dl_type_error").show();
+	}
+	else {
+		checked++;
+	}
+
+
+	//row 4 validation
+	if (vlanValidator ($("#uob_fv_table_vlan_id_start").val())==false){
+		$("#uob_fv_table_vlan_id_start").addClass('error');
+		$("#uob_fv_table_vlan_id_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (vlanValidator ($("#uob_fv_table_vlan_id_end").val())==false){
+		$("#uob_fv_table_vlan_id_end").addClass('error');
+		$("#uob_fv_table_vlan_id_error").show();
+	}
+	else {
+		checked++;
+	}
+ 
+	//row 5 validation
+	if (ipValidator ($("#uob_fv_table_nw_src_start").val())==false){
+		$("#uob_fv_table_nw_src_start").addClass('error');
+		$("#uob_fv_table_nw_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipValidator ($("#uob_fv_table_nw_src_end").val())==false){
+		$("#uob_fv_table_nw_src_end").addClass('error');
+		$("#uob_fv_table_nw_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 6 validation
+	if (ipValidator ($("#uob_fv_table_nw_dst_start").val())==false){
+		$("#uob_fv_table_nw_dst_start").addClass('error');
+		$("#uob_fv_table_nw_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipValidator ($("#uob_fv_table_nw_dst_end").val())==false){
+		$("#uob_fv_table_nw_dst_end").addClass('error');
+		$("#uob_fv_table_nw_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+
+
+	//row 7 validation
+
+	if (ipProtoValidator ($("#uob_fv_table_nw_proto_start").val())==false){
+		$("#uob_fv_table_nw_proto_start").addClass('error');
+		$("#uob_fv_table_nw_proto_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (ipProtoValidator ($("#uob_fv_table_nw_proto_end").val())==false){
+		$("#uob_fv_table_nw_proto_end").addClass('error');
+		$("#uob_fv_table_nw_proto_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 8 validation
+	if (portValidator ($("#uob_fv_table_tp_src_start").val())==false){
+		$("#uob_fv_table_tp_src_start").addClass('error');
+		$("#uob_fv_table_tp_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (portValidator ($("#uob_fv_table_tp_src_end").val())==false){
+		$("#uob_fv_table_tp_src_end").addClass('error');
+		$("#uob_fv_table_tp_src_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	//row 9 validation
+	if (portValidator ($("#uob_fv_table_tp_dst_start").val())==false){
+		$("#uob_fv_table_tp_dst_start").addClass('error');
+		$("#uob_fv_table_tp_dst_error").show();
+	}
+	else {
+		checked++;
+	}
+
+	if (portValidator ($("#uob_fv_table_tp_dst_end").val())==false){
+		$("#uob_fv_table_tp_dst_end").addClass('error');
+		$("#uob_fv_table_tp_dst_error").show();
+	}
+	else {
+		checked++;
+	}/**/
+
+	//validate that at least one port is selected
+	var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+	var nodes = $('input',port_table.fnGetNodes());
+
+	var port_selected=false;
+	for(var i=0;i<nodes.length;i++){
+		if(nodes[i].checked==true){
+			checked++;
+			port_selected=true;
+			break;
+		}			
+	}
+
+	if (checked >= 19) {
+		status=true;
+	}
+
+	if (port_selected==false & checked == 18){
+		alert("you need to select at least one port");
+	}
+	else if (port_selected==false & checked <= 18){
+		alert("you need to select at least one port and correct other flowspace parameter errors");
+	}
+	else if (port_selected==true & checked <= 18){
+		alert("you need to correct other flowspace parameter errors");
+	}
+	
+	//alert("validator status:"+status+" checked:"+checked);
+	return status;
+}
+
+
+
+function fnGetSelected( oTableLocal )
+{
+	var aReturn = new Array();
+	var aTrs = oTableLocal.fnGetNodes();
+	
+	for ( var i=0 ; i<aTrs.length ; i++ )
+	{
+		if ( $(aTrs[i]).hasClass('row_selected') )
+		{
+			aReturn.push( aTrs[i] );
+		}
+	}
+	return aReturn;
+}
+
+function serializeAnything (form){
+	var toReturn	= [];
+	var els 	= $(form).find(':input').get();
+
+	$.each(els, function() {			
+		if (this.name && (this.checked || /select|textarea/i.test(this.nodeName) || /text|hidden|password/i.test(this.type))) {
+				var val = $(this).val();
+				toReturn.push( encodeURIComponent(this.name) + "=" + encodeURIComponent( val ) );
+			}
+		});
+
+		return toReturn.join("&").replace(/%20/g, "+");
+}
+
+function hideFvfError(){
+	$("[id*=_error]").hide();
+	console
+	$("#uob_fv_table_form :input").each(function(){
+		try{
+			$(this).removeClass('error');
+		}
+		catch (err){
+		}
+
+	});
+}
+
+
+(function ($) {
+    $.fn.extend({
+        deserialize : function (d, config) {
+            var data = d,
+                currentDom,
+                $current = null,
+                $currentSavedValue = null,
+                $self = this,
+                i = 0,
+                keyValPairString = [],
+                keyValPairObject = {},
+                tmp = null,
+                defaults = null;
+
+            if (d === undefined || !$self.is('form')) {
+                return $self;
+            }
+
+            defaults = {
+                overwrite : true
+            };
+
+            config = $.extend(defaults, config);
+
+            if (d.constructor === String) {
+
+
+                d = decodeURIComponent(d.replace(/\+/g, " "));
+
+                keyValPairString = d.split('&');
+
+                for (i = 0; i < keyValPairString.length; i++) {
+                    tmp = keyValPairString[i].split('=');
+                    keyValPairObject[tmp[0]] = tmp[1];
+
+                }
+            }
+
+            $('input, select, textarea', $self).each(function (i) {
+
+                $current = $(this);
+                currentDom = $current.get(0);
+                $currentSavedValue = keyValPairObject[$current.attr('name')];
+
+                if (currentDom.disabled === true) {
+		    //current.val($currentSavedValue);
+                    return true;
+                }
+
+                if ($current.is('textarea')) {
+                    if ($currentSavedValue === undefined) {
+                        $current.val('');
+                    } else {
+                        $current.val($currentSavedValue);
+                    }
+                    return true;
+                }
+
+                if ($current.is('select')) {
+                    if ($currentSavedValue === undefined) {
+                        return true;
+                    } else {
+                        currentDom.selectedIndex = $currentSavedValue;
+                    }
+                    return true;
+                }
+
+                if ($current.is('input:radio')) {
+                    if ($currentSavedValue !== undefined) {
+
+                        $current.each(function () {
+                            if ($(this).val() === $currentSavedValue) {
+                                $(this).get(0).checked = true;
+                            }
+                        });
+                    }
+
+                    return true;
+                }
+
+                if ($current.is('input:checkbox')) {
+                    currentDom.checked = ($current.val() === $currentSavedValue);
+                    return true;
+                }
+
+                if ($current.is('input:text, input:hidden')) {
+                    if ($currentSavedValue === undefined) {
+                        $current.val('');
+                    } else {
+                        $current.val($currentSavedValue);
+                        return true;
+                    }
+
+                }
+
+            });
+
+            return $self;
+        }
+
+    });
+
+
+}(jQuery));
+
 

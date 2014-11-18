@@ -9,22 +9,37 @@
 .multiselect label {
     display:block;
 }
- l
+ 
 .multiselect-on {
     color:#ffffff;
     background-color:#000099;
 }
+
+.error{
+border:2px solid red;
+}
+
 </style>
 
 <form id="uob_fv_table_form">
   <table id='uob_fv_table'>
  			<tr>
 		            	<th><strong>Flowspace Name</strong></th>
-		            	<td COLSPAN="2">
-		            		<input id="flowspace_name" type="text" name="flowspace_name" maxlength="20" title="Flowspace name" disabled="disabled" />
+		            	<td colspan="2">
+		            		<input id="flowspace_name" type="text" style="width:100%;" name="flowspace_name" maxlength="20" title="Flowspace name" disabled="disabled" />
 		            		
 		            	</td>
 		           </tr>
+			   </p>
+			   <tr>
+		            	<th></th>
+		            	<td>
+		            		<center>from</center>
+		            	</td>
+		            	<td>
+		            		<center>to</center>
+		            	</td>
+		            </tr>
 		            <tr>
 		            	<th><strong>MAC Source</strong></th>
 		            	<td>
@@ -37,6 +52,10 @@
 		            		<label for="uob_fv_table_dl_src_end"></label>
 		            		<input id="uob_fv_table_dl_src_end" type="text" name="uob_fv_table_dl_src_end" maxlength="17" title="Link layer source address range end"/>
 		            	</td>
+
+				<td>
+					<p id="uob_fv_table_dl_src_error" > mac format should be ff:ff:ff:ff:ff:ff </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>MAC Destination</strong></th>
@@ -46,10 +65,12 @@
 		            		<input id="uob_fv_table_dl_dst_start" type="text" name="uob_fv_table_dl_dst_start" maxlength="17" title="Link layer destination address range start"/>
 		            	</td>
 		            	<td>
-		            		
 		            		<label for="uob_fv_table_dl_dst_end"></label>
 		            		<input id="uob_fv_table_dl_dst_end" type="text" name="uob_fv_table_dl_dst_end" maxlength="17" title="Link layer destination address range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_dl_dst_error" > mac format should be ff:ff:ff:ff:ff:ff </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>Ethernet Type</strong></th>
@@ -63,6 +84,9 @@
 		            		<label for="uob_fv_table_dl_type_end"></label>
 		            		<input type="text" name="uob_fv_table_dl_type_end" id="uob_fv_table_dl_type_end" title="Link layer type range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_dl_type_error" > dl type format should be hex format: 0xffff</p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>VLAN ID</strong></th>
@@ -76,6 +100,9 @@
 		            		<label for="uob_fv_table_vlan_id_end"></label>
 		            		<input type="text" name="uob_fv_table_vlan_id_end" value="25" id="uob_fv_table_vlan_id_end" title="VLAN ID range end" />
 		            	</td>
+				<td>
+					<p id="uob_fv_table_vlan_id_error" > vlan value should be integer between 1 and 4095 </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>IP Source</strong></th>
@@ -89,6 +116,9 @@
 		            		<label for="uob_fv_table_nw_src_end"></label>
 		            		<input type="text" name="uob_fv_table_nw_src_end" id="uob_fv_table_nw_src_end" title="Network source address range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_nw_src_error" > ip format should be xxx.xxx.xxx.xxx </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>IP Destination</strong></th>
@@ -102,6 +132,9 @@
 		            		<label for="uob_fv_table_nw_dst_end"></label>
 		            		<input type="text" name="uob_fv_table_nw_dst_end" value="192.168.1.31" id="uob_fv_table_nw_dst_end" title="Network destination address range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_nw_dst_error" > ip format should be xxx.xxx.xxx.xxx </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>IP Protocol</strong></th>
@@ -115,6 +148,9 @@
 		            		<label for="uob_fv_table_nw_proto_end"></label>
 		            		<input type="text" name="uob_fv_table_nw_proto_end" id="uob_fv_table_nw_proto_end" title="Network protocol range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_nw_proto_error" > ip protocol should be integer between 0 and 255 </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>TCP/UDP Source</strong></th>
@@ -128,6 +164,9 @@
 		            		<label for="uob_fv_table_tp_src_end"></label>
 		            		<input type="text" name="uob_fv_table_tp_src_end" id="uob_fv_table_tp_src_end" title="Transport source port range end" />
 		            	</td>
+				<td>
+					<p id="uob_fv_table_tp_src_error" > tcp value should be integer between 0 and 65535 </p>	
+				</td>
 		            </tr>
 		            <tr>
 		            	<th><strong>TCP/UDP Destination</strong></th>
@@ -141,19 +180,13 @@
 		            		<label for="uob_fv_table_tp_dst_end"></label>
 		            		<input type="text" name="uob_fv_table_tp_dst_end" id="uob_fv_table_tp_dst_end" title="Transport destination port range end"/>
 		            	</td>
+				<td>
+					<p id="uob_fv_table_tp_dst_error" > tcp value should be integer between 0 and 65535 </p>	
+				</td>
 		            </tr>
 			    <tr>
 		            </tr>
-		            <tr>
-		            	<th><strong>Ports</strong></th>
-		            	<td COLSPAN="2">
-		            		
-		            		<label for="uob_fv_table_slivers"></label>
-		            		<div class="multiselect" id="multi_flowpspace_ports_selected">
-					</div>
-		            	</td>
-		            </tr>
+
   </table>
-  <div id="fvf_table_button" name="fvf_table_button"> </div>
  </form>
 

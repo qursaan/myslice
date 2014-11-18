@@ -118,6 +118,6 @@ Current implementation makes the following assumptions
     # the list of things passed to the js plugin
     def json_settings_list (self):
         return ['plugin_uuid', 'domid', 
-                'query_uuid', 'query_all_uuid', 
+                'query_uuid', 'query_all_uuid',
                 'checkboxes', 'datatables_options', 
                 'hidden_columns', 'init_key',]

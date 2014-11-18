@@ -163,6 +163,62 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             });
             $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
             $(".dataTables_filter input").css("width","100%");
+            
+            // resource info
+            var sTable = this.table;
+            $('table.dataTable').delegate('a.resource-info','click',function() {
+                var aPos = sTable.fnGetPosition( this.parentNode );
+                var aData = sTable.fnGetData( aPos[0] );
+                //console.log(aData);
+                
+                var network_hrn = aData[18];
+                var resourceData = {
+                    'hostname' : strip(aData[2]),
+                    'urn' : aData[6],
+                    'type' : aData[3],
+                    'status' : aData[10],
+                    'testbed' : aData[4],
+                    'facility' : aData[5],
+                };
+                
+                
+                console.log(network_hrn);
+                //Greece: 37.6687092,22.2282404
+                if (network_hrn == 'omf.nitos') {
+                    var logo = 'nitos';
+                    var resourceLocation = {
+                        'longitude' : '22.2282404',
+                        'latitude' : '37.6687092',
+                    };
+                    var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
+                } else if (network_hrn == 'iotlab') {
+                    var logo = network_hrn;
+                    var s = resourceData['hostname'].split(".");
+                    var n = s[0].split("-");
+                    resourceData['type'] = 'node ( Hardware: <a target="_blank" href="https://www.iot-lab.info/hardware/'+n[0]+'/">'+n[0]+'</a> )';
+                    var coordinates = resourceData['testbed'];
+                } else {
+                    var logo = network_hrn;
+                    var resourceLocation = {
+                        'longitude' : aData[13],
+                        'latitude' : aData[23],
+                    };
+                    var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
+                }
+                
+                var modal = $('#resource-info-modal');
+                modal.find('.modal-title').text(resourceData['testbed'] + ': ' +resourceData['hostname']);
+                table = modal.find('.modal-resource-info');
+                table.html('<tr><td colspan="2"><img class="img-responsive" src="/static/img/testbeds/'+logo+'.png" alt="'+resourceData['facility']+' - '+resourceData['testbed']+'" /></td></tr>');
+                for (var j in resourceData) {
+                    table.append('<tr><td>' + j + '</td><td>' + resourceData[j] + '</td></tr>');
+                }
+                if (coordinates != '') {
+                    table.append('<tr><td colspan="2"><img src="http://maps.google.com/maps/api/staticmap?center='+coordinates+'&zoom=6&size=400x400&sensor=false&markers=color:red%7C'+coordinates+'" style="width:400px; height:400px;" /></td></tr>');
+                }
+                modal.modal();
+            });
+            
         }, // initialize_table
 
         /**
@@ -232,7 +288,8 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                         //TODO: we need to add source/destination for links
                         line.push('');
                     else
-                        line.push(record['hostname']);
+                        //line.push(record['hostname']);
+                        line.push('<a class="resource-info" data-network_hrn="'+record['network_hrn']+'">' + record['hostname'] + '</a>');
 
                 } else if (colnames[j] == this.init_key && typeof(record) != 'undefined') {
                     obj = this.object
@@ -337,7 +394,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 }
             } else {
                 msg = '<ul class="nav nav-pills">';
-                msg += '<li class="dropdown">'
+                msg += '<li class="dropdown">';
                 msg += '<a href="#" data-toggle="dropdown" class="dropdown-toggle nopadding"><b>&#9888</b></a>';
                 msg += '  <ul class="dropdown-menu dropdown-menu-right" id="menu1">';
                 $.each(warnings, function(i,warning) {
@@ -564,7 +621,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 key  : null,
                 op   : this.checked ? STATE_SET_ADD : STATE_SET_REMOVE,
                 value: this.id
-            }
+            };
             manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
@@ -589,7 +646,6 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 });
             }
         },
-
     });
 
     $.plugin('QueryTable', QueryTable);
@@ -604,6 +660,14 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
         });
     };
+    
+    
 
 })(jQuery);
 
+function strip(html)
+{
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent || tmp.innerText || "";
+}
