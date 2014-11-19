@@ -61,7 +61,6 @@ def clear_user_creds(request, user_email):
     try:
         user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
         user_details = execute_admin_query(request, user_query)
-
         # getting the user_id from the session
         for user_detail in user_details:
             user_id = user_detail['user_id']
@@ -632,15 +631,15 @@ def create_slice(wsgi_request, request):
         'slice_enabled'    : True
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
-    
+
     query = Query.create('slice').set(slice_params).select('slice_hrn')
-    results = execute_query(wsgi_request, query)
+    results = execute_admin_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
-    else:
+    else:	
         clear_user_creds(wsgi_request,user_obj.username)
         # log user activity
-        activity.slice.validate(request, "Slice validation")#, { "slice" : hrn })
+        activity.slice.validate(request,{ "slice" : hrn }) #"Slice validation", { "slice" : hrn })
 	
         try:
             theme.template_name = 'slice_request_validated.txt'
