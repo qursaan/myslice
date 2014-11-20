@@ -9,7 +9,10 @@
 	</div>
 	 {%if 'no_creds'  in user_cred %}
     <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
-{%endif%}
+    {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
 
 </div>
 {% if messages %}

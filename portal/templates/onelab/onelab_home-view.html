@@ -51,6 +51,9 @@
 	   {%if 'no_creds'  in user_cred %}
       <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
   {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
 
 	<div class="row">
 		{%if 'is_pi'  in pi %}
@@ -232,11 +235,31 @@
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-/*-------
-List of slices has been moved in 
-portal/templates/base.html
-This should go into session
---------*/
+
+        /*
+            Launch queries to get the resources and leases in Manifold Cache
+        */
+            
+        $.post("/rest/resource/", function( data ) {
+        });
+        $.post("/rest/lease/", function( data ) {
+        });
+        
+        /*-------
+        List of slices has been moved in 
+        portal/templates/base.html
+        This is now in localStorage 
+        --------*/
+        // myslice.user is in LocalStorage
+        if(myslice.user.slices.length>0){
+            $.each( myslice.user.slices, function(i, val) {
+                /*
+                Launch a Query for each slice to get resources and leases in Manifold Cache
+                */
+                $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+                });
+            });
+        }
 });
 </script>
 {# widget "_widget-monitor.html" #}

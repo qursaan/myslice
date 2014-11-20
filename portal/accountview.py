@@ -16,8 +16,9 @@ from django.contrib.auth.decorators     import login_required
 
 from myslice.theme import ThemeView
 
+from portal.account                     import Account, get_expiration
 #
-import json, os, re, itertools
+import json, os, re, itertools, time
 from OpenSSL import crypto
 from Crypto.PublicKey import RSA
 
@@ -210,7 +211,11 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         if acc_user_cred == {} or acc_user_cred == 'N/A':
             user_cred = 'no_creds'
         else:
-            user_cred = 'has_creds'
+            exp_date = get_expiration(acc_user_cred, 'timestamp')
+            if exp_date < time.time():
+                user_cred = 'creds_expired'
+            else:
+                user_cred = 'has_creds'
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
