@@ -192,7 +192,7 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
         testbeds = []
 
         for slice in slice_details:
-
+            
             if users_hrn[cur_username] in slice['users']:
                 slices_users.append({'slice_hrn':slice['slice_hrn'], 'user':cur_username, 'user_hrn':users_hrn[cur_username] \
                                      , 'resource':slice['resource'], 'lease':slice['lease'] })  
@@ -244,14 +244,17 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
 
         ###### Get Reputation values from Reputation DB
         reps = json_to_rest('http://survivor.lab.netmode.ntua.gr:4567/reputation/showrep', "a")
-        env['logging_test'] = reps    
+        #env['logging_test'] = reps    
         
+        #create a services list and a dict containing the services for each testbed
+        serv_per_tb = {}
         services = []
         for item in reps:
+            serv_per_tb[item['testbed']]=[]
             for serv in item['services']:
                 if serv.keys()[0] not in services:
                     services.append(serv.keys()[0])
-        
+                    serv_per_tb[item['testbed']].append(serv.keys()[0])        
         
         #in json, sevices are in the form: 'services':[{'serv1':x}, {'serv2':y}], so we transform it to 'services':[x,y] based on
         # the services dict above. If for a specific service there is no applicable value, we put N/A            
@@ -272,6 +275,7 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
                 
         ###### Pass variables to template
         env['logging_test'] = json.dumps(all_exp, ensure_ascii=False)
+        env['serv_per_tb'] = json.dumps(serv_per_tb, ensure_ascii=False)
         env['reputation'] = reps
         env['rep_serv'] = services
         env['slicelist'] = all_exp

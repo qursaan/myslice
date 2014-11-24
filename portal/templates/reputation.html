@@ -8,8 +8,6 @@
 
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
 
-
-
 <!-- Reputation Specific -->
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}reputation_static/css/main.css" />
 
@@ -128,7 +126,7 @@
 <div id="scoreform" style="display:none">
     <ol>
         <li>
-            How was your overall experience with NETMODE Testbed? 
+            <span>How was your overall experience with NETMODE Testbed?</span> 
             <div id="q1">
             </div>
         </li>
@@ -231,12 +229,14 @@
 
 <script type="text/javascript">
 
+serv_per_tb = jQuery.parseJSON('{{ serv_per_tb|safe }}');
 
 $(function() {
 	$( "#tabs" ).tabs();
 });
 
 var data = jQuery.parseJSON('{{ json_data|safe }}');
+
 
 
 
@@ -282,10 +282,13 @@ function initDialog() {
 					slicedata = (data[event]);
 				}	
 			}
+			
+
+			
 			slicedata["user_eval"] = {'overall':q1, 'problems':q2, 'support':q3, 'reuse':q4, 'pay':q5, 'availability':q6, 'link_quality':q7, 'quality':q8};
 			testbeds_str = JSON.stringify(slicedata['testbeds'])
 			delete slicedata['testbeds'];
-            console.log(JSON.stringify(slicedata))
+            //console.log(JSON.stringify(slicedata))
                         
             $.ajax({
 	            type: "GET",
@@ -360,7 +363,7 @@ $(function() {
     });
 
     initDialog();
-	
+		
     clone = $("#scoreform").clone(true);
 
     $(".rate_button").click(function() {
@@ -370,9 +373,43 @@ $(function() {
         q4 = -1;
         q5 = -1;
         q6 = -1;
-	q7 = -1;
-	q8 = -1;
-        resid = $(this).attr("data-resid");        
+		q7 = -1;
+		q8 = -1;
+        resid = $(this).attr("data-resid"); 
+        
+        slicedata = {};
+    	for(var event in data){
+			if ((data[event]).id == resid) {
+				slicedata = (data[event]);
+			}	
+		}	
+
+		srv_arr = []	        
+        for (var tb in slicedata["testbeds"]){ 
+        	for (var srv in serv_per_tb[tb]){ 
+        		if (srv != 'equals') {
+        			//console.log(serv_per_tb[tb][srv]); 
+        			srv_arr.push(serv_per_tb[tb][srv]) 
+        		} 
+        	} 
+        }     
+        
+        cq1 = "overall";
+        cq6 = "availability";
+        cq7 = "link_quality";
+        
+        q_to_remove = []
+        
+        if ($.inArray(cq1, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+0+')').remove();
+        } 
+        if ($.inArray(cq6, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+5+')').remove();
+        } 
+		if ($.inArray(cq7, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+6+')').remove();
+        } 
+        
         $("#scoreform").dialog({
             title: "Rate experiment",
             width: 500,
