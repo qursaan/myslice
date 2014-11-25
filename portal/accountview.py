@@ -261,10 +261,19 @@ def account_process(request):
     platform_query  = Query().get('local:platform').select('platform_id','platform')
     platform_details = execute_query(request, platform_query)
     
-    # getting the user_id from the session
-    for user_detail in user_details:
-            user_id = user_detail['user_id']
-            user_email = user_detail['email']
+    # getting the user_id from the session                                            
+    for user_detail in user_details:                                                  
+        user_id = user_detail['user_id']                                              
+        user_email = user_detail['email']                                             
+        try:
+            if user_email == request.user.email:                                          
+                authorize_query = True                                                    
+            else:                                                                         
+                print "SECURITY: %s tried to update %s" % (user_email, request.user.email)
+                messages.error(request, 'You are not authorized to modify another user.') 
+                return HttpResponseRedirect("/portal/account/")                               
+        except Exception,e:
+            print "Exception = %s" % e
 
     for account_detail in account_details:
         for platform_detail in platform_details:
