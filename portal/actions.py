@@ -109,7 +109,7 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
 
 def sfa_get_user(request, user_hrn, pub):
     query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
-    result_sfa_user = execute_query(request, query_sfa_user)
+    result_sfa_user = execute_admin_query(request, query_sfa_user)
     return result_sfa_user                        
 
 def sfa_update_user(request, user_hrn, user_params):
