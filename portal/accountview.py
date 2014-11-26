@@ -38,6 +38,10 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
+        # Execute a Query to delegate credentials if necessary
+        sfa_user_query  = Query().get('myslice:user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
+        sfa_user_result = execute_query(self.request, sfa_user_query)
+
         user_query  = Query().get('local:user').select('config','email','status')
         user_details = execute_query(self.request, user_query)
         
@@ -394,7 +398,7 @@ def account_process(request):
                         # updating sfa
                         public_key = public_key.replace('"', '');
                         user_pub_key = {'keys': public_key}
-                        #sfa_update_user(request, user_hrn, user_pub_key)
+
                         sfa_update_user(request, user_hrn, user_pub_key)
                         result_sfa_user = sfa_get_user(request, user_hrn, public_key)
                         try:
@@ -409,6 +413,7 @@ def account_process(request):
                                 raise Exception,"Keys are not matching"
                         except Exception,e:
                             messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
+                            print "Exception in accountview ", e
                         return HttpResponseRedirect("/portal/account/")
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
