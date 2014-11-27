@@ -9,7 +9,10 @@
 	</div>
 	 {%if 'no_creds'  in user_cred %}
     <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
-{%endif%}
+    {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
 
 </div>
 {% if messages %}
@@ -152,6 +155,15 @@
 							</td>
 						 {%endif%}		
 			  			</tr>
+			    		<tr class="even" id="sfi_config_row">
+			      			<td class="key">sfi_config </td>
+			      			<td class="value">use sfi_config file with sfi.py package (pip install sfa)<a href="#"></a>
+			      				<button type="submit" name="dl_sfi_config" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_sfi_config">
+									<span class="glyphicon glyphicon-download"></span> Download
+								</button>
+			    			</td>
+                        </tr>
+
 			  			<tr class="even">
 			    			<td colspan="2">
 								<p class="command">

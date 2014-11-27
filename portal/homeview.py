@@ -17,9 +17,10 @@ from ui.topmenu                         import topmenu_items, the_user
 from myslice.configengine               import ConfigEngine
 
 from myslice.theme                      import ThemeView
+from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
 
-import json
+import json, time
 import activity.user
 
 class HomeView (FreeAccessView, ThemeView):
@@ -97,8 +98,12 @@ class HomeView (FreeAccessView, ThemeView):
                     if acc_user_cred == {} or acc_user_cred == 'N/A':
                         user_cred = 'no_creds'
                     else:
-                        user_cred = 'has_creds'
-                    
+                        exp_date = get_expiration(acc_user_cred, 'timestamp')
+                        if exp_date < time.time():
+                            user_cred = 'creds_expired'
+                        else:
+                            user_cred = 'has_creds'
+
                     # list the pending slices of this user
                     pending_slices = []
                     for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
@@ -160,7 +165,11 @@ class HomeView (FreeAccessView, ThemeView):
             if acc_user_cred == {} or acc_user_cred == 'N/A':
                 user_cred = 'no_creds'
             else:
-                user_cred = 'has_creds'
+                exp_date = get_expiration(acc_user_cred, 'timestamp')
+                if exp_date < time.time():
+                    user_cred = 'creds_expired'
+                else:
+                    user_cred = 'has_creds'
 
             # list the pending slices of this user
             pending_slices = []

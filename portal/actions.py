@@ -109,7 +109,7 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
 
 def sfa_get_user(request, user_hrn, pub):
     query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
-    result_sfa_user = execute_query(request, query_sfa_user)
+    result_sfa_user = execute_admin_query(request, query_sfa_user)
     return result_sfa_user                        
 
 def sfa_update_user(request, user_hrn, user_params):
@@ -117,7 +117,7 @@ def sfa_update_user(request, user_hrn, user_params):
     if 'email' in user_params:
         user_params['user_email'] = user_params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     return results
 
 def sfa_add_authority(request, authority_params):
@@ -612,14 +612,14 @@ def create_slice(wsgi_request, request):
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
-    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    query = Query.create('myslice:slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
         clear_user_creds(wsgi_request,user_email)
         # log user activity
-        activity.slice.validate(self.request, "Slice validation", { "slice" : hrn })
+        activity.slice.validate(request, { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)
