@@ -117,7 +117,7 @@ def sfa_update_user(request, user_hrn, user_params):
     if 'email' in user_params:
         user_params['user_email'] = user_params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     return results
 
 def sfa_add_authority(request, authority_params):
