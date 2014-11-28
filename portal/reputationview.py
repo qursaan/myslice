@@ -119,12 +119,6 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
     def post (self,request):
         env = self.default_env()
         env['theme'] = self.theme
-        
-        
-        
-        with open('/home/coyiotis/testlog.log') as f:
-            f.write(str('test'))
-                
                 
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
@@ -135,12 +129,6 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
         env = self.default_env()
                 
         #####    *** Reputation Plugin-specific START       ***     ############
-        with open('/home/coyiotis/testlog.log', 'w') as f:
-                f.write(str(request.GET))
-                for key in request.GET:
-                    f.write('\n')
-                    f.write(str(request.GET[key]))
-                    
         #The following 'if' is a dirty way for bypassing the JS AJAX cross-domain prevention policy...not pretty
         if request.GET.has_key(u'slicedata[user_eval][overall]'):
             dict_to_send = {}

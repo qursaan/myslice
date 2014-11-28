@@ -1,0 +1,71 @@
+{% load portal_filters %}
+<div class="col-md-6">
+	<div>
+		<img src="{{ STATIC_URL|add:'img/institutions/'|add:authority.authority_hrn|add:'.gif'|file_exists }}" alt="{{authority.name}}">
+	</div>
+	<br />
+    {% if authority.name and authority.url %}
+	<h3><a href="{{authority.url}}">{{authority.name}}</a></h3>
+    {% elif authority.name %}
+	<h3>{{authority.name}}</h3>
+    {% endif %}
+	<p>
+    {% if authority.address %}
+		{{authority.address}} <br />
+    {% endif %}
+    {% if authority.postcode %}
+		{{authority.postcode}} 
+    {% endif %}
+    {% if authority.address %}
+        {{authority.city}} <br />
+    {% endif %}
+    {% if authority.address %}
+		{{authority.country}}
+    {% endif %}
+	</p>
+	<br />
+
+    {% if authority.address %}
+	<h4>Onelab membership</h4> 
+	<p>
+		{{ authority.onelab_membership }}
+	</p>
+    {% endif %}
+</div>
+<div class="col-md-6">
+    {% if authority.legal %}
+	<h4>Legal Contact:</h4>
+	<p>
+	{% for c in authority_contacts.legal %}
+		 {{ c }} <br />
+	{% endfor %}
+	</p>
+	<br />
+    {% endif %}
+    {% if authority.scientific %}
+	<h4>Scientific Contact:</h4>
+	<p>
+	{% for c in authority_contacts.scientific %}
+		{{ c }} <br />
+	{% endfor %}
+	</p>
+	<br />
+    {% endif %}
+    {% if authority.technical %}
+	<h4>Technical Contact:</h4>
+	<p>
+	{% for c in authority_contacts.technical %}
+		{{ c }} <br />
+	{% endfor %}
+	</p>
+    {% endif %}
+</div>
+<script>$(document).ready(function() {
+{% if authority.name %}
+    auth_name = "{{authority.name}}";
+{% else %}
+    auth_name = "{{authority.authority_hrn}}";
+{% endif %}
+    $('#authority_name').text(auth_name);
+});
+</script>
