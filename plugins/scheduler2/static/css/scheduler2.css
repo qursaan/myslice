@@ -215,6 +215,18 @@
     cursor: not-allowed;
 }
 
+#scheduler-reservation-table tbody tr td.disabled {
+    background: url("../img/forbidden.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.success:after {
+	content: "✓";
+}
+#scheduler-reservation-table tbody tr td.failure:after {
+	content: "✗";
+}
+
 #scheduler-reservation-table tbody tr td.maintenance {
     background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
 }
@@ -229,7 +241,7 @@
 }
 
 #scheduler-reservation-table tbody tr td.free:hover ,#scheduler-reservation-table tbody tr td.selected, #scheduler-reservation-table tbody tr td.selected_tmp {
-    background: #25BA25;
+    background: #26c9e2;
 }
 
 td.no-image {
@@ -257,10 +269,11 @@ td.no-image {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6c9e2', endColorstr='#e0e0e0',GradientType=1 ); /* IE6-9 */
 
     padding: 3px 0 3px 30px;
-    width: 150px;
+    width: 250px;
 }
 
 .legend ol li.free{
+	background: #FFFFFF;
 
 }
 .legend ol li.pendingin{
@@ -281,6 +294,10 @@ background: #E8E8E8;
 
 .legend ol li.selected {
     background: #25BA25;
+}
+
+.legend ol li.disabled {
+	background: url("../img/forbidden.png") no-repeat scroll 2px 50% #FFFFFF;
 }
 
 /* latest stuff */

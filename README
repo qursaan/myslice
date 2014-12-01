@@ -11,7 +11,7 @@ See the devel/ subdir for more devel-oriented doc.
 ** see devel/django-install.txt in case of trouble
 $ apt-get install python-django
 $ apt-get install python-django-south
-$ apt-get install python-pip
+$ apt-get install python-pip or sudo easy_install pip==1.4.1
 $ pip install requests
 $ pip install djangorestframework
 * git clone git://git.onelab.eu/myslice.git

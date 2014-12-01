@@ -46,10 +46,10 @@
 		        bAutoWidth: true,
             });
             
-            //this.elmt('update').click(this, this.do_ok);
-            //this.elmt('refresh').click(this, this.do_cancel);
+            this.elmt('close').click(this, this.do_close);
+            //this.elmt('apply_cancel').click(this, this.do_cancel);
 
-            this.elmt('apply').on('shown.bs.modal', function() {
+            this.elmt('apply__window').on('shown.bs.modal', function() {
                 self.do_update();
             })
 
@@ -80,7 +80,6 @@
 
         clear: function()
         {
-
         },
 
         find_row: function(value)
@@ -98,7 +97,7 @@
 
                 if (cur_value[0] == '{') {
                     cur_value = JSON.parse(cur_value);
-                    return manifold._record_equals(cur_value, value, object_key);_
+                    return manifold._record_equals(cur_value, value, object_key);
                 } else {
                     return (cur_value == value);
                 }
@@ -121,7 +120,6 @@
 
             var username = this.options.username;
 
-            this.spin();
             console.log("do_update in progress");
 
             manifold.raise_event(this.options.query_uuid, RUN_UPDATE);
@@ -131,11 +129,13 @@
 
         },
 
-        do_ok: function(e)
+        do_close: function(e)
         {
-            throw 'queryupdater.do_reset Not implemented';
+            var self = e.data;
+            self.table.fnClearTable();
         },
 
+        // Not used today
         do_cancel: function(e)
         {
             throw 'queryupdater.do_clear_annotations Not implemented';
@@ -214,13 +214,11 @@
 
         on_query_in_progress: function()
         {
-            this.spin();
         },
 
         on_query_done: function()
         {
             this.populate_table();
-            this.unspin();
         },
 
         // D : Data present
@@ -232,12 +230,13 @@
 
         on_clear_records: function()
         {
+        	 $('#applyloading').hide();
             this.clear();
         },
 
         on_query_done: function()
         {
-            this.unspin();
+            $('#applyloading').hide();
         },
 
         // PC : Pending changes
@@ -344,11 +343,12 @@
             // XXX how do we handle status reset ?
 
             // Jordan : I don't understand this. I added this test otherwise we have string = ""..."" double quoted twice.
-            if (typeof(data.value) !== "string")
-                data.value = JSON.stringify(data.value);
             data.selected_resources = this.selected_resources;
             row = this.find_row(data.value);
-            newline = [action, data.key, data.value, msg, button];
+            if (typeof(data.value) !== "string")
+                newline = [action, data.key, JSON.stringify(data.value), msg, button];
+            else
+                newline = [action, data.key, data.value, msg, button];
             if (!row) {
                 // XXX second parameter refresh = false can improve performance. todo in querytable also
                 this.table.fnAddData(newline);

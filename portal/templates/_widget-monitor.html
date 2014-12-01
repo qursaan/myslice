@@ -1,0 +1,29 @@
+<div class="monitor">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        	<h1>Services Status</h1>
+        </div>
+    </div>
+ 
+	<div class="row" id="monitor-services">
+	</div>
+</div>
+</div>
+<script>
+	$(document).ready(function() {
+		$.get('/monitor/services', function(result) {
+			for (var r in result) {
+				html = '<div class="col-xs-6 col-sm-4 col-md-3 s-monitor"><div class="row">';
+				html += '<div class="col-md-2"><img src="{{ STATIC_URL }}icons/'+result[r].status+'.png"></div>';
+				html += '<div class="col-md-8">';
+				html += '<h4>'+result[r].name+'<h4>';
+				html += '<span class="subtitle">'+result[r].type+'</span>';
+				if (typeof(result[r].version) != 'undefined')
+					html += ' <span class="version">version '+result[r].version+'</span>';
+				html += '</div></div></div>';
+				$('div#monitor-services').append(html);
+			}
+		});
+	});
+</script>

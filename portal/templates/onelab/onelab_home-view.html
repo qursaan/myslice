@@ -6,7 +6,55 @@
 {% widget '_widget-news.html' %}
 </div> -->
 {% if username %}
+<!-- Modal- No credentials -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
+                    </div>
+                    <div class="modal-body" style="text-align:justify;">
+					<p>You are getting this message for any of the following reasons:</p>
+					<ul>
+						<li>If your account is still pending for validation</li>
+						<li>If you press the "Clear Credentials" button</li>
+						<li>If you "Generate a new key pair"</li>
+						<li>If a new slice is added to your account</li>
+					</ul>
+					<p>Unless your account has not yet been validated, it is sufficient to refresh the page or go back to the home page. 
+						The portal will then regenerate your credentials. In some cases it may take more time than usual. If nothing works, 
+						then please logout and login back into to the portal.
+					</p>
+					<h3>Manual delegation of credentials</h3>
+						<p>
+							You have selected upon sign-up to upload your public key. As you have uploaded your own public key, 
+							the portal can no longer generate your credentials automatically. In order to have your credentials 
+							delegated to the portal, please follow these instructions:
+						</p>
+						<ul>
+							<li>Your account must first be validated by the manager of your organization.</li>
+							<li>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
+								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a></li>
+						</ul>
+					</p>
+					<h3>Contact support</h3>
+					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
 <div class="container dashboard">
+	   {%if 'no_creds'  in user_cred %}
+      <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+  {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
+
 	<div class="row">
 		{%if 'is_pi'  in pi %}
 		<div class="col-md-3">
@@ -17,14 +65,17 @@
 				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
 			</div>
 			<div>
-				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create Slice</button>
 			</div>
 			<div>
 				<p><strong>Your slices </strong>
- 				 	<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
-      					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'." 
-      					class="glyphicon glyphicon-info-sign">
-  					</span>
+					<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
+					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
+					However, on the OneLab portal, you will only see slices that you have created through OneLab. If you have created slices elsewhere, 
+					such as on the PlanetLab Europe portal, those slices will not appear here."
+					class="glyphicon glyphicon-info-sign">
+				</span>
+
   				</p>
 			</div>
 			<div>	
@@ -85,7 +136,9 @@
 			<div>
 				<p><strong>Your slices </strong>
 				<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
-					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'." 
+					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
+					However, on the OneLab portal, you will only see slices that you have created through OneLab. If you have created slices elsewhere, 
+					such as on the PlanetLab Europe portal, those slices will not appear here."
 					class="glyphicon glyphicon-info-sign">
 				</span>
 				</p>
@@ -93,6 +146,18 @@
 			<div>	
 				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 			</div>
+			{% if pending_slices %}
+			<p><strong>Pending slices</strong>
+			<span title="Slices that you have requested and are pending for validation by the contact person of your organization."
+				class="glyphicon glyphicon-info-sign">
+			<ul>
+			{% for slices in pending_slices %}
+			<li>{{slices}}</li>
+			{% endfor %}
+			</ul>
+			</span>
+			</p>
+			{%endif%}	
 		</div>
 		<div class="col-md-4">
 			<h3>
@@ -170,11 +235,34 @@
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-/*-------
-List of slices has been moved in 
-portal/templates/base.html
-This should go into session
---------*/
+
+        /*
+            Launch queries to get the resources and leases in Manifold Cache
+        */
+            
+        $.post("/rest/resource/", function( data ) {
+        });
+        $.post("/rest/lease/", function( data ) {
+        });
+        
+        /*-------
+        List of slices has been moved in 
+        portal/templates/base.html
+        This is now in localStorage 
+        --------*/
+        // myslice.user is in LocalStorage
+        if(myslice.user.slices.length>0){
+            $.each( myslice.user.slices, function(i, val) {
+                /*
+                Launch a Query for each slice to get resources and leases in Manifold Cache
+                */
+                $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+                });
+            });
+        }
 });
 </script>
+{# widget "_widget-monitor.html" #}
+{# widget "_widget-stats-top-slices.html" #}
+
 {% endblock %}

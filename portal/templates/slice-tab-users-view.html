@@ -1,18 +1,134 @@
+<script type="text/javascript" src="{{STATIC_URL}}/js/jquery-ui.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}/js/jquery.qtip.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.qtip.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui.css">
+<script>
+    function get_users_in_slice(authority_hrn){
+        console.log(authority_hrn);
+        $("table#user-tab").html("<tr><th>+/-</th><th>Email</th><th>User hrn</th></tr>");
+     	var slice_users = [];
+    	var slice_users_removed = [];
+ 	  	var slice_users_emails = [];
+    	var slice_users_emails_removed = [];
+    	$.post("/rest/user/",{'filters':{'parent_authority': authority_hrn}}, function( data ) {
+        	var list_users = [];
+        	var table_users = [];
+    		/* Available fields
+    		user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+    	    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+    		*/
+        	$.each( data, function( key, val ) {
+            	list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+            	user_row = "<tr>";
+    			// checking the box for the users that belong to the selected slice
+    			var flag_checkbox = 0;
+    			for(var data in val.slices) {
+    				var element = val.slices[data];
+    				if (element == "{{slice}}"){
+    					//console.log("the slice is: "+ element);	
+    					flag_checkbox = 1;
+    					slice_users.push (val.user_hrn)
+    					user_row += "<td><input type='checkbox' checked='True' class='user'></td>";
+    				}
+    			}
+    			if(flag_checkbox != 1){
+            		user_row += "<td><input type='checkbox' class='user'></td>";
+    			}
+            	user_row += "<td>"+val.user_email+"</td>";
+            	user_row += "<td>"+val.user_hrn+"</td>";
+    			//user_row += "<td>"+val.user_enabled+"</td>";
+            	user_row += "</tr>";
+            	table_users.push(user_row);
+            
+        	});
+    		$("table#user-tab tr:first").after(table_users.join( "" ));
+        	$("div#user-tab-loaded").css("display","block");
+        	$("div#user-tab-loading").css("display","none");
+            $("input:checkbox.user").click(function() {
+                user_hrn = $(this).closest('tr').find('td:eq(2)').html();
+                user_email = $(this).closest('tr').find('td:eq(1)').html();
+                if(this.checked){
+                    var record_id = this.id;
+                    slice_users.push (user_hrn);
+					slice_users_removed.splice($.inArray(user_hrn, slice_users_removed),1);
+                    slice_users_emails.push (user_email);
+					slice_users_emails_removed.splice($.inArray(user_email, slice_users_emails_removed),1);	
+	
+                }else{
+                    slice_users_removed.push (user_hrn);
+					slice_users.splice($.inArray(user_hrn, slice_users),1);
+                    slice_users_emails_removed.push (user_email);
+					// this one is removing from the list wrong user when u uncheck
+					//slice_users_emails.splice($.inArray(user_email, slice_users_emails),1);
+					//this one is still buggy cz it still keeps users in both arrays
+					// but it's ok for the moment
+					slice_users_emails;
+	
+                }
+            });
+     	}); // post rest/use
+
+	 	$('button#addusers').click(function() {
+     		$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+         		if(data.success){
+             		// TODO: highlight row after success
+             		//$('tr[id="'+record_id+'"]').highlight();
+             		mysliceAlert('Success: slice updated','success', true);
+         		}else{
+             		mysliceAlert('Rest Error for: '+data.error,'warning', true);
+         		}
+     		}); // post update slice
+			emails = slice_users_emails.concat(slice_users_emails_removed);
+     		$.post("/credentials/clear/",{'emails':emails}, function(data) {
+     		}); // post credentials clear
+
+ 		}); // button#addusers click
+
+    } // get_users_in_slice
+
+    $(document).ready(function() {
+            // TODO: Add a filter based on the list of authorities
+        	$.post("/rest/authority/",{'fields':['authority_hrn']}, function( data ) {
+                var list_authorities = [];
+                $.each( data, function( key, val ) {
+                    auth_hrn = val.authority_hrn;
+                    // Keep only the sub authorities, remove root auth
+                    if(auth_hrn.indexOf(".") > -1){
+                        list_authorities.push(auth_hrn);
+						list_authorities.sort();
+                        if(auth_hrn=="{{user_details.parent_authority}}"){
+							$('#auth_list').val(auth_hrn);
+						}
+                    }
+                });
+				$( "#auth_list" ).autocomplete({
+      				source: list_authorities,
+      				minLength: 0,
+      				select: function (event, ui) {
+		  				get_users_in_slice(ui.item.value);
+      				}
+      				//select: function( event, ui ) {console.log(jQuery(this))}
+    			});
+            }); // post rest/authority
+
+            get_users_in_slice("{{user_details.parent_authority}}");
+
+	$('[title!=""]').qtip();
+    }); // document ready
+</script>
+
 	<div class="col-md-2">
 		<div id="select-platform" class="list-group">
 		</div>
 			
 		<ul class="list-group">
-		  <li class="list-group-item">Authority:<b> {{user_details.parent_authority}}</b>
-			<!--<select id="auth_list">
-  				<option value="ple.upmc">UPMC</option>
-  				<option value="ple.inria">INRIA</option>
-  				<option value="ple.nitos">NITOS</option>
-  				<option value="ple.iminds">iMinds</option>
-			</select> -->
-		  </li>
-		  <li class="list-group-item">Filter: slice</li>
-		 
+		  <li class="list-group-item">Authority</li>
+		  <li class="list-group-item" style="padding-left:5px;">
+			<input type="text" id="auth_list"  style ="min-width:190px;" 
+			title="The default value is  the authority that you belong to and the selected users belong to this slice.
+				   You can view users of other authorities (organizations) from the list that apears when you click in the field and start to type.
+				   Use the arrow keys to scroll through the list; type part of the name to narrow down the list."/>
+          </li>
 		</ul>
 	
 	</div>
@@ -22,90 +138,10 @@
         	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
         	<div id="user-tab-loaded" style="display:none;">
             	<table id="user-tab" class="table">
-                	<tr>
-                    	<th>+/-</th>
-                    	<th>Email</th>
-                    	<th>User hrn</th>
-                    	<th>Enabled</th>
-                	</tr>
             	</table>
 
                 <!-- XXX TODO: for the moment only PIs have access to Update but users that have slice credentials should also have access to that -->
 
-				{% if 'is_pi'  in pi %}
 				<button id="addusers" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Update users</button>
-				{%endif%}
         	</div>
-<script>
-    $(document).ready(function() {
-            // TODO: Add a filter based on the list of authorities
-        	$.post("/rest/authority/",{'fields':['authority_hrn']}, function( data ) {
-                console.log(data);
-            }); // post rest/authority
-
-			var slice_users = [];
-        	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
-            	var list_users = [];
-            	var table_users = [];
-				/* Available fields
-				user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
-			    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
-				*/
-            	$.each( data, function( key, val ) {
-                	list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
-                	user_row = "<tr>";
-					// checking the box for the users that belong to the selected slice
-					var flag_checkbox = 0;
-					for(var data in val.slices) {
-    					var element = val.slices[data];
-						if (element == "{{slice}}"){
-							//console.log("the slice is: "+ element);	
-							flag_checkbox = 1;
-							slice_users.push (val.user_hrn)
-							user_row += "<td><input type='checkbox' checked='True' class='user'></td>";
-						}
-					}
-					if(flag_checkbox != 1){
-                		user_row += "<td><input type='checkbox' class='user'></td>";
-					}
-                	user_row += "<td>"+val.user_email+"</td>";
-                	user_row += "<td>"+val.user_hrn+"</td>";
-					user_row += "<td>"+val.user_enabled+"</td>";
-                	user_row += "</tr>";
-                	table_users.push(user_row);
-                
-            	});
-            
-				$("table#user-tab tr:last").after(table_users.join( "" ));
-            	$("div#user-tab-loaded").css("display","block");
-            	$("div#user-tab-loading").css("display","none");
-                $("input:checkbox.user").click(function() {
-                    user_hrn = $(this).closest('tr').find('td:eq(2)').html();
-                    if(this.checked){
-                        var record_id = this.id;
-                        slice_users.push (user_hrn);
-                    }else{
-                        console.log(slice_users);
-                    }
-                });
-           
-         	}); // post rest/user
-	        $('button#addusers').click(function() {
-                $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
-                	if(data.success){
-                    	// TODO: highlight row after success
-                    	//$('tr[id="'+record_id+'"]').highlight();
-                    	mysliceAlert('Success: slice updated','success', true);
-                	}else{
-                    	mysliceAlert('Rest Error for: '+data.error,'warning', true);
-                	}
-                }); // post update slice
-            
-            	// TODO: refresh table
-            	//window.location="/portal/institution#slices";
-
-            }); // button#addusers click
-
-    }); // document ready
-</script>
 

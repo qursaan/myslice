@@ -8,12 +8,28 @@ body {
     margin:0;
     padding:0;
     height: 100%;
+    letter-spacing:0.3px;
 }
 a, a:active, a:focus {
     outline: 0;
     text-decoration:none;
+    color:#760073;
+}
+a:hover {
+    color:#0D0049;
 }
 
+a.current {
+    text-decoration:underline;
+    color:#333333;
+}
+p.command {
+    padding:15px;
+    margin:15px 0;
+    color:#890000;
+    background-color:#E0E0E0; 
+    font-family:Courier, monospace;
+}
 h1 {
     border-bottom:1px solid #DDDDDD;
     padding:0 0 0 0;
@@ -26,12 +42,45 @@ h1 img {
     margin-right:10px;
 }
 h2 {
+    margin:0 0 15px 0;
     font-size:14pt;
     color:#333333;
 }
 h3 {
+    margin:0 0 5px 0;
     font-size:13pt;
     color:#201E62;
+}
+h4 {
+    margin:0 0 5px 0;
+    font-size:12pt;
+    color:#333333;
+}
+span.subtitle {
+    color:#454545;
+    font-size:9pt;
+    font-weight:normal;
+    text-transform:uppercase;
+}
+span.small {
+    font-size:9pt;
+}
+span.gray {
+    color:gray;
+}
+span.type {
+    color:#201E62;
+    font-weight:bold;
+    font-size:9pt;
+}
+span.htitle {
+    color:#454545;
+    font-size:9pt;
+    font-weight:normal;
+}
+span.version {
+    font-size:8pt;
+    color:#888888;
 }
 input[type=text], input[type=password], input[type=email], input[type=tel], input[type=number], select, option {
     min-width:260px;
@@ -60,6 +109,15 @@ div.breadcrumbs {
     margin:15px 0;
     color:gray;
     font-size:10pt;
+}
+div.breadcrumbs a {
+    color:gray;
+}
+div.breadcrumbs a:hover {
+    text-decoration:underline;
+}
+.tab-pane {
+    padding-top:15px;
 }
 /* buttons */
 button.btn, input.btn {
@@ -369,13 +427,23 @@ a.sl-resources, a.sl-resources:hover {
     padding:2px 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+    width:105px;
+    margin-left:4px;
+    margin-bottom:8px;
+    text-align: center;
 }
 a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus {
     border:0;
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
-
+a.sl-resources:first-child {
+    margin-left:12px;
+}
+button.btn-apply {
+    font-size:13px;
+    padding:2px 8px;
+}
 div#slice-info {
     margin-top:25px;
 }
@@ -454,6 +522,8 @@ div#slice-info td {
     padding:3px 5px;
 }
 .slice-pending button.apply {
+    font-size:14px;
+    padding:2px 5px;
 }
 .slice-pending button.clear {
 }
@@ -583,7 +653,7 @@ div.secondary li a {
     color:#747474;
 }
 div.secondary li a:hover {
-    text-decoration:none;
+    text-decoration:underline;
 }
 div.secondary .button {    
     width:300px;
@@ -602,6 +672,44 @@ div.secondary .account span {
 div.secondary .account a {
     color:black;
 }
+
+
+div.footer {
+    padding-top:15px;
+}
+div.footer div.bottom {
+    position:absolute;
+    bottom:0;
+}
+div.footer ul {
+   margin:6px 0 0 0;
+   padding:0;
+}
+
+div.footer li {
+    font-size:9pt;
+    display:inline;
+    list-style:none;
+    margin:0px;
+    padding:0;
+    margin-right:15px;
+    color:#747474;
+    letter-spacing:0.4px;
+}
+
+div.footer li a {
+    color:#747474;
+}
+div.footer li a:hover {
+    text-decoration:underline;
+}
+div.copy {
+    font-size:8pt;
+    color:gray;
+    padding-top:15px;
+    padding-bottom:15px;
+}
+
 div.home {
     font-size:11pt;
     line-height:1.2em;
@@ -692,4 +800,38 @@ div.slogan {
     color:white;
     padding-top:60px;
     text-shadow: 1px 1px #013540;
+}
+
+th {
+    border:0 !important;
+}
+
+div.monitor {
+    padding:40px 0 25px 0;
+}
+div.monitor h1 {
+    margin-bottom:25px;
+}
+div.s-monitor {
+    padding-bottom:25px;
+}
+span#stats-period-txt {
+    text-transform:lowercase;
+}
+
+// resource info modal
+a.resource-info:hover {
+    cursor:pointer;
+}
+table.modal-resource-info tr td:first-child {
+    font-weight:bold;
+    text-align:right;
+}
+table.modal-resource-info tr:first-child td {
+    border-top:0;
+    text-align:center;
+}
+table.modal-resource-info tr:last-child td {
+    border-bottom:0;
+    text-align:center;
 }

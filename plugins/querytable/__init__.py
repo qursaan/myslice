@@ -34,7 +34,8 @@ Current implementation makes the following assumptions
 """
 
     MAP = {
-        'network_hrn'   :   'Testbed',
+        'facility_name' :   'Facility',
+        'testbed_name'  :   'Testbed',
         'hostname'      :   'Resource name',
         'type'          :   'Type',
     }

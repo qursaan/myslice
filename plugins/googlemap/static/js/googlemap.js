@@ -83,8 +83,11 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
 
         on_show: function(e) {
 	        if (debug) messages.debug("googlemap.on_show");
-            var googlemap = e.data;
-            google.maps.event.trigger(googlemap.map, 'resize');
+            var self = e.data;
+            var center = new google.maps.LatLng(self.options.latitude, self.options.longitude);
+
+            google.maps.event.trigger(self.map, 'resize');
+            self.map.setCenter(center);
         }, 
 
         /**************************************************************************
@@ -173,7 +176,7 @@ GOOGLEMAP_BGCOLOR_REMOVED = 2;
                 data = {
                     state: STATE_SET,
                     key  : null,
-                    op   : this.checked ? SET_ADD : SET_REMOVED,
+                    op   : this.checked ? STATE_SET_ADD : STATE_SET_REMOVE,
                     value: id
                 }
                 manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);

@@ -7,13 +7,13 @@ from manifoldapi.manifoldapi         import execute_query
 from django.views.generic.base      import TemplateView
 
 from unfold.loginrequired           import LoginRequiredView
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http                    import HttpResponse
+from django.shortcuts               import render
 
-from manifold.core.query             import Query, AnalyzedQuery
-from manifoldapi.manifoldapi         import execute_query
+from manifold.core.query            import Query, AnalyzedQuery
+from manifoldapi.manifoldapi        import execute_query
 
-from portal.actions             import get_requests
+from portal.actions                 import get_requests
 
 from myslice.theme import ThemeView
 
@@ -133,8 +133,9 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
                 if auth_hrn in pi_expired_credential_authorities:
                     r['allowed'] = 'expired'
                 if 'allowed' not in r:
-                    r['allowed'] = 'denied'
-
+                    ## TEMP FIX for allowing new authority registration
+                    #r['allowed'] = 'denied'
+                    r['allowed'] = 'allowed'
 
                 if not auth_hrn in dest:
                     dest[auth_hrn] = []
@@ -157,8 +158,8 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 #         env['section'] = "Requests"
         
         context = super(ManagementRequestsView, self).get_context_data(**kwargs)
-        print "testing"
-        print ctx_my_authorities
+        
+            
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities

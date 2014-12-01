@@ -69,11 +69,27 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
+
+    /*
+        Launch queries to get the resources and leases in Manifold Cache
+    */
+        
+    $.post("/rest/resource/", function( data ) {
+    });
+    $.post("/rest/lease/", function( data ) {
+    });
+
+   
     function drawSlices(slices){
         var items = [];
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
+            /*
+            Launch a Query for each slice to get resources and leases in Manifold Cache
+            */
+            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+            });
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
@@ -88,9 +104,14 @@ $(document).ready(function() {
   	{% block topmenu %}
   	{% widget "_widget-topmenu.html" %}
   	{% endblock topmenu %}
-	{% include 'messages-transient.html' %}
 	{% block base_content %}
 	{% endblock %}
 {% endblock container %}
+{% widget "_footer.html" %}
+<div class="loading">
+	<div><img src="{{ STATIC_URL }}/img/loading.gif" /> Loading...</div>
+	<div>&nbsp;</div>
+	<div class="message"></div>
+</div>
 </body>
 </html>

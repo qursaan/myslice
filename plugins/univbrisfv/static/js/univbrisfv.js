@@ -11,8 +11,10 @@
 
     pk_flowspace_index=0;
     opt_flowspace_index=0;
+    pk_mode=0;
     fvf_add=1;
     fvf_nrow=0;
+    
 
     var UnivbrisFv = Plugin.extend({
 
@@ -95,8 +97,11 @@
 
         initialize_table: function() 
         {
+
+	    
             /* Transforms the table into DataTable, and keep a pointer to it */
             var self = this;
+	    //alert(self.options);
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
@@ -179,7 +184,7 @@
 	    $('<td><button id="submit_flowspace" type="button" style="height: 25px; width: 400px" onclick="fnButsubmit()">Define controller location</button></td></tr></table>').appendTo('div.buttons');**/
 	
 	   
-	    jQuery( "#univbris_flowspace_selection" ).hide();
+	    //jQuery( "#univbris_flowspace_selection" ).hide();
 
 	      //$('<a href="http://localhost:8000/login/" id="next_link">next link</a>').appendTo('div.submit');
 
@@ -189,121 +194,354 @@
 		//this.new_record("t");
 		//this.new_record("t");
 		this._querytable_draw_callback();
-	
+		jQuery("#univbris_flowspace_selection").hide();	
 		
 
         }, // initialize_table
 
 
 	fnButsubmit:function(e){
-		 alert("submitting"); 
-		 var rows = $("#univbris_flowspace_selection__table").dataTable().fnGetNodes();
-		 var cells=[];
-		 for(var i=0;i<rows.length;i++){
-			var htmlStr=$(rows[i]).find("td:eq(0)").html();
-			var parser=new DOMParser();
-			var htmlDoc=parser.parseFromString(htmlStr, "text/html");
-			var para=htmlDoc.getElementsByTagName('p');
-			if(typeof para.item(0).id != 'undefined'){
-				cells.push(para.item(0).id);
+		console.log("verifying before submitting");
+
+		query_uuid=e.data.options.query_uuid;
+		try{
+
+			 var controller= $('#controller_loc').val();
+
+			 //validating controller field
+			 //alert (controller.length);
+			 if (controller.length>=7){
+				//alert(controller.substring(0,4))
+				if(controller.substring(0,4)=="tcp:" | controller.substring(0,4)=="ssl:"){
+					var controller_ip=controller.substring(4,controller.length);
+					//alert(controller_ip)
+					var index=controller_ip.indexOf(":")
+					if (index!=-1){
+						var controller_ip1=controller_ip.substring(0,index);
+						//alert(controller_ip1);
+						var ip_validator= /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/; 
+						if (!controller_ip1.match(ip_validator)){
+						  throw "Incorrect IP format";
+						}
+						//else{
+						//  throw "incorrect ip";
+						//}
+
+						var controller_port=controller_ip.substring(index+1,controller_ip.length);
+						if(!isNaN(controller_port)){
+							controller_port=parseInt(controller_port,10);
+							if (!((controller_port >0) & (controller_port <65536))){
+							//if(controller_port >0){
+								throw "Incorrect controller port";
+							}
+							//else{
+							//	throw "correct port";
+							//}
+						}
+						else{
+							throw "Incorrect controller port";
+						}
+					}
+					else{
+						throw "Incorrect controller specified";
+					} 
+				}
+				else{
+					throw "Controller must start with tcp: or ssl:";
+				}
+
+			 }
+			 else{
+			    throw "Incorrect controller specified";
+			 }
+			 //end of validation of controller field
+	 
+			 var rows = $("#univbris_flowspace_selection__table").dataTable().fnGetNodes();
+			 var cells=[];
+			 
+			 var json_rspec={};
+			 json_rspec["controller"]=controller;
+			 var groups_rspec=[];
+			 var matches_rspec=[];
+
+			 if (rows.length <=0) {
+				throw "No Flowspace defined"
+			 }
+
+
+			 var queryStringToJSON = function (url) {
+                if (url === '') return '';
+                var pairs = (url || location.search).slice(1).split('&');
+                var result = {};
+                for (var idx in pairs) {
+                    if ($.isNumeric(idx)) {
+                	    var pair = pairs[idx].split('=');
+                	    if (!!pair[0]){
+                			result[pair[0].toLowerCase()] = decodeURIComponent(pair[1].replace(/\+/g, " ") || '');
+                        }
+                    }
+                }
+                return result;
 			}
-        	 }
 
-		var controller= $('#controller_loc').val();
+			 for(var i=0;i<rows.length;i++){
+				var htmlStr=$(rows[i]).find("td:eq(0)").html();
+				var parser=new DOMParser();
+				var htmlDoc=parser.parseFromString(htmlStr, "text/html");
+				var para=htmlDoc.getElementsByTagName('p');
+				if(typeof para.item(0).id != 'undefined'){
+					cells.push(para.item(0).id);
+					var m_form=para.item(0).id.split(",");
+					var result=queryStringToJSON("?"+m_form[0]);
+					matches_rspec.push(result);
+					//console.log(m_form[1]);
+					var result2=queryStringToJSON("?"+m_form[1]);
+					result2["flowspace_name"]=result["flowspace_name"];
+					groups_rspec.push(result2);
+				}
+			 }
 
-		cells.push("controller="+controller);
+			json_rspec["groups"]=groups_rspec;
+			json_rspec["matches"]=matches_rspec;	
 
-		var str="";		
+			//console.log(JSON.stringify(json_rspec));
 
-		//Just for show: built output string 
-		for(var i=0;i<cells.length;i++){
-			str+=cells[i]+"\n";
+
+			//var controller= $('#controller_loc').val();
+
+			//cells.push("controller="+controller);
+
+			
+			
+
+			//var str="";		
+
+			//Just for show: built output string 
+			//for(var i=0;i<cells.length;i++){
+			//	str+=cells[i]+"\n";
+
+			//}
+		    //alert(str);
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : STATE_SET_ADD,
+                value: json_rspec 
+            }
+            manifold.raise_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+		    //alert("sending to manifold backend to build rspec");
 
 		}
-		alert(str);
-		alert("send to manifold backend to build rspec");		
+		catch(err){
+			alert(err)
+		}
+		
+				
 	},
 
+
+
 	fnAddflowspace:function(e){
+		query_uuid=e.data.options.query_uuid;
+		pk_mode=1;
+		hideFvfError();
+		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].checked=false;
+			nodes[i].disabled=false;
+		}
+
 		fvf_add=1;
 		$("#uob_fv_table_form").trigger("reset");
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
+		var port_table = $("#univbris_flowspace_selection__table").DataTable();
 		//alert("table length" + this.table.fnGetNodes().length);	
 		$("#flowspace_name").val("pk_flowspace_"+ pk_flowspace_index);
 		//pk_flowspace_index=1+pk_flowspace_index;
-
 		$("[id='addflowspaceform']").show();
 		$("#uob_fv_table_form :input").prop("disabled", false);
-		$("[name='flowspace_name']").prop("disabled", true)
+		$("[name='flowspace_name']").prop("disabled", true);
 		$("[id='cancel_addflowspaceform']").text('cancel');
-		$("[id='addflowspaceform'").text('add flowspace');
-		jQuery( "#univbris_flowspace_selection" ).hide();
-		jQuery("#uob_fv_table_form").show();		
+		$("[id='addflowspaceform']").text('add flowspace');
+		
+		try{
+			manifold.raise_event(e.data.options.query_uuid,CLEAR_FILTERS);
+			var filter=[];
+			filter.push("link type");
+			filter.push("!=");
+			filter.push("optical");
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
+		}
+		catch(err){
+			alert("raise error:"+err);
+		}
+
+		var svg_links = svg.selectAll(".link");
+		for(var i=0;i<svg_links[0].length;i++){
+			svg_links[0][i].style.stroke= '#ccc';
+			svg_links[0][i].style.strokeWidth= '4px';
+		};
+
+
+		jQuery("#univbris_flowspace_selection").hide();	
+		jQuery("#uob_fv_table_form").show();
+		jQuery( "#univbris_foam_ports_selection" ).show();
+		
+		
+		topoviewer_state={mode:"edit",link_type:"non-optical"};
+
+		jQuery('#topo_plugin').show();
+		
 	},
 
 	fnAddcflowspace:function(e){
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
-		//alert("table length" + this.table.fnGetNodes().length);	
-		$("#flowspace_name").val("opt_flowspace_"+ opt_flowspace_index);
-		opt_flowspace_index=1+pk_flowspace_index;
+		pk_mode=0;
+		query_uuid=e.data.options.query_uuid;
+		hideFvfError();
+		var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+		var nodes = $('input',port_table.fnGetNodes());
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].checked=false;
+			nodes[i].disabled=false;
+		}
+
+		$("#uob_ofv_table_form").trigger("reset");
+		$("#oflowspace_name").val("opt_flowspace_"+ opt_flowspace_index);
+		fvf_add=1;
+		$("[id='addflowspaceform']").show();
+		$("#uob_ofv_table_form :input").prop("disabled", false);
+		$("[name='oflowspace_name']").prop("disabled", true);
+		$("[id='cancel_addflowspaceform']").text('cancel');
+		$("[id='addflowspaceform']").text('add flowspace');
+
+		try{
+			manifold.raise_event(e.data.options.query_uuid,CLEAR_FILTERS);
+			var filter=[];
+			filter.push("link type");
+			filter.push("!=");
+			filter.push("packet");
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
+			filter=[];
+			filter.push("link type");
+			filter.push("!=");
+			filter.push("compute");
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
+			filter=[];
+			filter.push("link type");
+			filter.push("!=");
+			filter.push("federation");
+			manifold.raise_event(e.data.options.query_uuid,FILTER_ADDED,filter);
+		}
+		catch(err){
+			alert("raise error:"+err);
+		}
+
+		var svg_links = svg.selectAll(".link");
+		for(var i=0;i<svg_links[0].length;i++){
+			svg_links[0][i].style.stroke= '#ccc';
+			svg_links[0][i].style.strokeWidth= '4px';
+		};
+
 		jQuery( "#univbris_flowspace_selection" ).hide();
-		jQuery("#uob_fv_table_form").show();		
+		jQuery("#uob_ofv_table_form").show();
+		jQuery( "#univbris_foam_ports_selection" ).show();
+
+
+
+		topoviewer_state={mode:"edit",link_type:"optical"};
+
+		jQuery("#topo_plugin").show();		
 	},
 
 	
 
 	fnDelete:function(e){
 	    		e.preventDefault();
+			//alert("delwete");
 	    		var nRow = $(this).parents('tr')[0];
 			this.table = $("#univbris_flowspace_selection__table").dataTable();
 	   		this.table.fnDeleteRow( nRow );
 	},
 
-	fnEdit:function(e){
+	fnEdit:function(e){	
 	    		e.preventDefault();
 			fvf_add=0;
+			hideFvfError();
 			
-	    		var nRow = $(this).parents('tr')[0];
-			fvf_nrow=nRow;
-			var row= $("#univbris_flowspace_selection__table").dataTable().fnGetData(nRow);
-			var parser=new DOMParser();
-			var htmlDoc=parser.parseFromString(row[0], "text/html");
-			//alert("html_doc"+htmlDoc);
-			var para=htmlDoc.getElementsByTagName('p');
+			try{
+		    		var nRow = $(this).parents('tr')[0];
+				fvf_nrow=nRow;
+				var row= $("#univbris_flowspace_selection__table").dataTable().fnGetData(nRow);
+				var parser=new DOMParser();
+				var htmlDoc=parser.parseFromString(row[0], "text/html");
+				//alert("html_doc"+htmlDoc);
+				var para=htmlDoc.getElementsByTagName('p');
+			}
+			catch(err){
+				alert("error:"+err);
 
-			//alert("test:"+ para.item(0).id);
+			}
+			//alert("p id:"+ para.item(0).id);
+			var m_form=para.item(0).id.split(",");
+			//console.log(htmlDoc.getElementsByTagName('a'));
 			$("#uob_fv_table_form").trigger("reset");
 			$("#uob_fv_table_form :input").prop("disabled", false);
-			//$("[name='flowspace_name']").prop("disabled", false);
-			$("#uob_fv_table_form").deserialize(para.item(0).id);
+			$("[name='flowspace_name']").prop("disabled", false);
+			$("#uob_fv_table_form").deserialize(m_form[0]);
+
+			try{
+				deserializeDT(m_form[1]);
+			}
+			catch (err){
+				alert("error:"+err);
+			}
+
+			 var port_table=$("#univbris_foam_ports_selection__table").dataTable();
+			 var nodes = $('input',port_table.fnGetNodes());
+			 var svg_links = svg.selectAll(".link");
+
+			 for(n=0;n<nodes.length;n++){
+				for(var i=0;i<svg_links[0].length;i++){
+					if(svg_links[0][i].__data__.value==nodes[n].id){
+						if(nodes[n].checked==true){
+							svg_links[0][i].style.stroke= 'black';
+							svg_links[0][i].style.strokeWidth= '5px';
+						}
+						else{
+							svg_links[0][i].style.stroke= '#ccc';
+							svg_links[0][i].style.strokeWidth= '4px';
+						}
+						break;
+					}
+				}
+				nodes[n].disabled=false;
+			};
+			
+			//alert($("#flowspace_name").val());
+
+			if  ($("#flowspace_name").val().search("pk")==0){
+				topoviewer_state={mode:"edit",link_type:"non-optical"};
+			}
+			else{
+				topoviewer_state={mode:"edit",link_type:"optical"};
+			}
+
+			
+			
 		        $("[name='flowspace_name']").prop("disabled", true);
 			$("[id='cancel_addflowspaceform']").prop("disabled", false);
 			$("[id='addflowspaceform']").prop("disabled", false);
-			$("[id='addflowspaceform'").text('modify');
-			$("[id='addflowspaceform'").show();
-			jQuery("#univbris_flowspace_selection").hide();
+			$("[id='addflowspaceform']").text('modify');
+			$("[id='addflowspaceform']").show();			
+			jQuery( "#univbris_foam_ports_selection" ).show();				
 			jQuery("#uob_fv_table_form").show();
+			jQuery("#univbris_flowspace_selection").hide();
+			jQuery('#topo_plugin').show();
+			
 	},
 
 
-	fnModflowspace:function(e){
-		alert("modify");
-		//pk_flowspace_index=1+pk_flowspace_index;
-		jQuery("#uob_fv_table_form").hide();
-		var sData=$("#uob_fv_table_form").find("input").serialize();
-     		var form =serializeAnything("#uob_fv_table_form");
-		this.table = $("#univbris_flowspace_selection__table").dataTable();
-		flowspace=sData;
-		alert(form+"\n"+sData);
-		
-		var string = "<p id='"+form+"'> <a onclick=\'fnPopTable(\""+form+"\");'>"+$("#flowspace_name").val()+"</a></p>";
-	   	this.table.fnDeleteRow(fvf_nrow);	
-		this.table.fnAddData([string, '<a class="edit">Edit</a>', '<a class="delete" href="">Delete</a>']);
-		jQuery( "#univbris_flowspace_selection" ).show();
-		//onclick=\'fnEdit("test");\'
-		//alert("myserialise: "+form);		
-		//alert("added flowspace:" + sData);	
-	},
 
 	
 
@@ -641,6 +879,8 @@
         on_all_query_done: function()
         {
 	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
+
+
 	    this.table.fnAddData (this.buffered_lines);
 	    this.buffered_lines=[];
 	    

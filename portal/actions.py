@@ -4,13 +4,17 @@ from manifoldapi.manifoldapi    import execute_query,execute_admin_query
 from portal.models              import PendingUser, PendingSlice, PendingAuthority
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models  import User
+from django.contrib.sites.models import Site
+from django.contrib.auth        import get_user_model
 from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
 
 from myslice.theme              import ThemeView
 
 theme = ThemeView()
+
+import activity.slice
 
 # Thierry: moving this right into the code so 
 # most people can use myslice without having to install sfa
@@ -42,12 +46,51 @@ def authority_get_pi_emails(request, authority_hrn):
         #default_email = default_email.replace('\n', '')
         #return default_email
         # the above doesn't work
-        return ['support@myslice.info']
+        return ['support@onelab.eu']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
         query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
         results = execute_admin_query(request, query)
         return [result['user_email'] for result in results]
+
+#clear user credentials
+def clear_user_creds(request, user_email):
+    try:
+        user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
+        user_details = execute_admin_query(request, user_query)
+    
+        # getting the user_id from the session
+        for user_detail in user_details:
+            user_id = user_detail['user_id']
+            user_email = user_detail['email']
+    
+        account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
+        account_details = execute_admin_query(request, account_query)
+    
+        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_details = execute_admin_query(request, platform_query)
+    
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        #user_cred = account_config.get('delegated_user_credential','N/A')
+                        user_cred = account_config.get('user_credential','N/A')
+                        if 'N/A' not in user_cred:
+                            user_hrn = account_config.get('user_hrn','N/A')
+                            user_pub_key = json.dumps(account_config.get('user_public_key','N/A'))
+                            user_priv_key = json.dumps(account_config.get('user_private_key','N/A'))
+                            updated_config = '{"user_public_key":'+ user_pub_key + ', "user_private_key":'+ user_priv_key + ', "user_hrn":"'+ user_hrn + '"}'
+                            user_params = { 'config': updated_config}
+                            manifold_update_account(request, user_id,user_params)
+                            return user_email
+                        else:
+                            return None
+
+    except Exception,e:
+        print "Exception in actions.py in clear_user_creds %s" % e
+        return None
 
 def is_pi(wsgi_request, user_hrn, authority_hrn):
     # XXX could be done in a single query !
@@ -66,7 +109,7 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
 
 def sfa_get_user(request, user_hrn, pub):
     query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
-    result_sfa_user = execute_query(request, query_sfa_user)
+    result_sfa_user = execute_admin_query(request, query_sfa_user)
     return result_sfa_user                        
 
 def sfa_update_user(request, user_hrn, user_params):
@@ -74,7 +117,7 @@ def sfa_update_user(request, user_hrn, user_params):
     if 'email' in user_params:
         user_params['user_email'] = user_params['email']
     query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
-    results = execute_query(request,query)
+    results = execute_admin_query(request,query)
     return results
 
 def sfa_add_authority(request, authority_params):
@@ -159,6 +202,11 @@ def manifold_update_account(request,user_id,account_params):
 #explicitly mention the platform_id
 def manifold_delete_account(request, platform_id, user_id, account_params):
     query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).filter_by('user_id', '==', user_id).set(account_params).select('user_id')
+    results = execute_admin_query(request,query)
+    return results
+
+def manifold_delete_user(request, user_id, user_params):
+    query = Query.delete('local:user').filter_by('user_id', '==', user_id).set(user_params).select('user_id')
     results = execute_admin_query(request,query)
     return results
 
@@ -252,7 +300,7 @@ def get_request_by_id(ids):
 def get_requests(authority_hrns=None):
     print "get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
-        ## get those pending users who have validated their emails
+        ## get those pending users who have confirmed their emails
         pending_users  = PendingUser.objects.filter(status__iexact = 'True')
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
@@ -321,13 +369,14 @@ def portal_validate_request(wsgi_request, request_ids):
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
-
+                
+                # Only hrn is required for Manifold Query 
                 sfa_authority_params = {
-                    'hrn'        : hrn,
-                    'urn'        : urn,
-                    'type'       : request['type'],
+                    'authority_hrn'        : hrn,
+                    #'authority_urn'        : urn,
+                    #'type'       : request['type'],
                     #'pi'        : None,
-                    'enabled'    : True
+                    #'enabled'    : True
                 }
                 print "ADD Authority"
                 sfa_add_authority(wsgi_request, sfa_authority_params)
@@ -343,12 +392,176 @@ def portal_validate_request(wsgi_request, request_ids):
 
     return status
 
-
 def validate_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
     status = portal_validate_request(request, ids)
     json_answer = json.dumps(status)
     return HttpResponse (json_answer, mimetype="application/json")
+
+
+def reject_action(request, **kwargs):
+    ids = filter(None, kwargs['id'].split('/'))
+    status = portal_reject_request(request, ids)
+    json_answer = json.dumps(status)
+    return HttpResponse (json_answer, mimetype="application/json")
+
+
+def portal_reject_request(wsgi_request, request_ids):
+    status = {}
+    # get the domain url    
+    current_site = Site.objects.get_current()
+    current_site = current_site.domain
+
+
+    if not isinstance(request_ids, list):
+        request_ids = [request_ids]
+
+    requests = get_request_by_id(request_ids)
+    for request in requests:
+        # type, id, timestamp, details, allowed -- MISSING: authority_hrn
+        # CAREFUL about details
+        # user  : first name, last name, email, password, keypair
+        # slice : number of nodes, type of nodes, purpose
+        
+        request_status = {}
+
+        if request['type'] == 'user':
+            try:
+                request_status['SFA user'] = {'status': True }
+                # getting user email based on id 
+                ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+                for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE id = %s', [request['id']]):
+                    user_email= user.email
+                    first_name = user.first_name
+                    last_name = user.last_name
+
+                ctx = {
+                    'first_name'    : first_name, 
+                    'last_name'     : last_name, 
+                    'portal_url'    : current_site,
+                    }
+                try:
+                    theme.template_name = 'user_request_denied.txt'
+                    text_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'user_request_denied.html'
+                    html_content = render_to_string(theme.template, ctx)
+                    theme.template_name = 'email_default_sender.txt'
+                    sender =  render_to_string(theme.template, ctx)
+                    sender = sender.replace('\n', '')
+                               
+                    subject = 'User request denied.'
+
+                    msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                except Exception, e:
+                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
+            
+                # removing from Django auth_user
+                UserModel = get_user_model()
+                UserModel._default_manager.filter(email__iexact = user_email).delete()
+                # removing from Django portal_pendinguser
+                PendingUser.objects.get(id=request['id']).delete()
+                # removing from manifold
+                # removing manifold account
+                user_query = Query().get('local:user') \
+                    .filter_by('email', '==', user_email)           \
+                    .select('user_id')
+                user = execute_admin_query(wsgi_request, user_query)
+                user_id = user[0]['user_id']
+        
+                platform_query = Query().get('local:platform') \
+                    .filter_by('platform', '==', 'myslice')           \
+                    .select('platform_id')
+                platform = execute_admin_query(wsgi_request, platform_query)
+                platform_id = platform[0]['platform_id']
+                account_params = {'user_id':user_id}
+                manifold_delete_account(request, platform_id, user_id, account_params)           
+             
+                # removing manifold user
+                user_params = {'user_id':user_id}
+                manifold_delete_user(request, user_id, user_params)
+            except Exception, e:
+                request_status['SFA authority'] = {'status': False, 'description': str(e)}
+                      
+        elif request['type'] == 'slice':
+            request_status['SFA slice'] = {'status': True } 
+
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingSlice.objects.raw('SELECT * FROM portal_pendingslice WHERE id = %s', [request['id']]):
+                user_email= user.type_of_nodes # XXX type_of_nodes field contains the email [shd be renamed in DB]
+                slice_name = user.slice_name
+                purpose = user.purpose
+                url = user.number_of_nodes
+
+            ctx = {
+                'slice_name': slice_name,
+                'purpose': purpose,
+                'url': url,
+                'portal_url': current_site,
+                }
+            try:
+                theme.template_name = 'slice_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'slice_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
+                               
+                subject = 'Slice request denied.'
+
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                      
+            PendingSlice.objects.get(id=request['id']).delete()
+
+        elif request['type'] == 'authority':
+            request_status['SFA authority'] = {'status': True }
+            
+            # getting user email based on id 
+            ## RAW SQL queries on Django DB- https://docs.djangoproject.com/en/dev/topics/db/sql/
+            for user in PendingAuthority.objects.raw('SELECT * FROM portal_pendingauthority WHERE id = %s', [request['id']]):
+                user_email= user.address_line1 # XXX address_line1 field contains the email [shd be renamed in DB]
+                site_name = user.site_name
+                city = user.address_city
+                country = user.address_country
+                short_name = user.site_abbreviated_name
+                url = user.site_url
+
+            ctx = { 
+                'site_name': site_name,
+                'short_name': short_name,
+                'url': url,
+                'city': city,
+                'country': country,                          
+                'portal_url'    : current_site,
+                }
+                
+            try:
+                theme.template_name = 'authority_request_denied.txt'
+                text_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'authority_request_denied.html'
+                html_content = render_to_string(theme.template, ctx)
+                theme.template_name = 'email_default_sender.txt'
+                sender =  render_to_string(theme.template, ctx)
+                sender = sender.replace('\n', '')
+                subject = 'Authority request denied.'
+                msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception, e:
+                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
+            PendingAuthority.objects.get(id=request['id']).delete()
+
+        status['%s__%s' % (request['type'], request['id'])] = request_status
+
+    return status
 
 # Django and ajax
 # http://djangosnippets.org/snippets/942/
@@ -376,21 +589,55 @@ def create_slice(wsgi_request, request):
     # Add User to Slice if we have the user_hrn in pendingslice table
     user_hrn = request.get('user_hrn', None)
     user_hrns = list([user_hrn]) if user_hrn else list()
+    
+    user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    user_details_sfa = execute_admin_query(wsgi_request, user_query)
+    if not user_details_sfa:
+        raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
+    for user in user_details_sfa:
+        user_email = user['user_email']
+
+    # XXX LOIC Quick fix because this is totally inconsistent
+    if not 'number_of_nodes' in request:
+        request['number_of_nodes']=""
 
     # XXX We should create a slice with Manifold terminology
     slice_params = {
         'slice_hrn'        : hrn, 
         'slice_urn'        : urn,
         'slice_type'       : request['type'],
+        'url'              : request['number_of_nodes'],
         'users'            : user_hrns,
         'slice_enabled'    : True
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
-    query = Query.create('slice').set(slice_params).select('slice_hrn')
+    query = Query.create('myslice:slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
+    else:
+        clear_user_creds(wsgi_request,user_email)
+        # log user activity
+        activity.slice.validate(request, { "slice" : hrn })
+        try:
+            theme.template_name = 'slice_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'slice_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+            subject = 'Slice request validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+       
     return results
 
 def create_pending_slice(wsgi_request, request, email):
@@ -402,8 +649,9 @@ def create_pending_slice(wsgi_request, request, email):
         slice_name      = request['slice_name'],
         user_hrn        = request['user_hrn'],
         authority_hrn   = request['authority_hrn'],
-        number_of_nodes = request['number_of_nodes'],
+        number_of_nodes = request['url'], # field needs to be renamed
         purpose         = request['purpose'],
+        type_of_nodes   = request['email'] # field needs to be renamed 
     )
     s.save()
 
@@ -474,7 +722,7 @@ def manifold_add_reference_user_accounts(wsgi_request, request):
         }
         manifold_add_account(wsgi_request, manifold_account_params)
 
-def sfa_create_user(wsgi_request, request):
+def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     """
     Arguments:
         wsgi_request (~ WSGIRequest) : 
@@ -501,14 +749,77 @@ def sfa_create_user(wsgi_request, request):
         'user_enabled'      : True
     }
 
-    query = Query.create('user').set(sfa_user_params).select('user_hrn')
-    results = execute_query(wsgi_request, query)
+    if namespace is not None:
+        query = Query.create('%s:user' % namespace).set(sfa_user_params).select('user_hrn')
+    else:
+        query = Query.create('user').set(sfa_user_params).select('user_hrn')
+
+    if as_admin:
+        results = execute_admin_query(wsgi_request, query)
+    else:
+        results = execute_query(wsgi_request, query)
+
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % sfa_user_params['user_hrn']
+    else:
+        try:
+            theme.template_name = 'user_request_validated.txt'
+            text_content = render_to_string(theme.template, request)
+            theme.template_name = 'user_request_validated.html'
+            html_content = render_to_string(theme.template, request)
+        
+            theme.template_name = 'email_default_sender.txt'
+            sender =  render_to_string(theme.template, request)
+            sender = sender.replace('\n', '')
+
+
+            subject = 'User validated'
+
+            msg = EmailMultiAlternatives(subject, text_content, sender, [request['email']])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        except Exception, e:
+            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
     return results
 
-def create_user(wsgi_request, request):
+def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False):
+   
+    import requests
+    import time
+    from requests.auth import HTTPBasicAuth
     
+    URL_REST = 'https://devgrenoble.senslab.info/rest/admin/users'
+    LOGIN_ADMIN = "auge"
+    PASSWORD_ADMIN = "k,mfg1+Q"
+
+    auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
+    headers = {'content-type': 'application/json'}
+
+    for user in PendingUser.objects.raw('SELECT * FROM portal_pendinguser WHERE email = %s', [request['email']]):
+        password= user.password
+
+
+    iotlab_user_params = {
+        "type"          : "SA",
+        "login"         : request['email'],
+        "password"      : password,
+        "firstName"     : request['first_name'],
+        "lastName"      : request['last_name'],
+        "email"         : request['email'],
+        "structure"     : request['authority_hrn'],
+        "city"          : "N/A",
+        "country"       : "N/A",
+        "sshPublicKey"  : request['public_key'],
+        "motivations"   : "SFA federation",
+    }    
+   
+    iotlab_user_params1 = json.dumps(iotlab_user_params)
+    r=requests.post(url=URL_REST, data=iotlab_user_params1, headers=headers, auth=auth)
+    print 'Create iotlab user : ', r.status_code, r.text
+    return r.text
+
+def create_user(wsgi_request, request, namespace = None, as_admin = False):
     # XXX This has to be stored centrally
     USER_STATUS_ENABLED = 2
 
@@ -516,13 +827,17 @@ def create_user(wsgi_request, request):
     # we would have to perform the steps in create_pending_user too
 
     # Add the user to the SFA registry
-    sfa_create_user(wsgi_request, request)
+    sfa_create_user(wsgi_request, request, namespace, as_admin)
 
     # Update Manifold user status
     manifold_update_user(wsgi_request, request['email'], {'status': USER_STATUS_ENABLED})
 
     # Add reference accounts for platforms
     manifold_add_reference_user_accounts(wsgi_request, request)
+
+    # Add the user to iotlab portal if theme is set to onelab
+    if theme.theme == 'onelab':
+        iotlab_create_user (wsgi_request, request)
 
 def create_pending_user(wsgi_request, request, user_detail):
     """
@@ -538,7 +853,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         public_key    = request['public_key'],
         private_key   = request['private_key'],
         user_hrn      = request['user_hrn'],
-        pi            = '',                         # XXX Why not None ?
+        pi            = request['pi'],
         email_hash    = request['email_hash'],
         status        = 'False',
     )
@@ -551,7 +866,6 @@ def create_pending_user(wsgi_request, request, user_detail):
     theme.template_name = 'activate_user_email_subject.txt'
     subject = render_to_string(theme.template, request)
     subject = subject.replace('\n', '')
-    #sender = 'support@myslice.info'
     theme.template_name = 'email_default_sender.txt'
     sender =  render_to_string(theme.template, request)
     sender = sender.replace('\n', '')

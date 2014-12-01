@@ -17,6 +17,32 @@ function debug_query (msg, query) {
     else messages.debug ("debug_query: " + msg + " query= " + query);
 }
 
+// http://stackoverflow.com/questions/7837456/comparing-two-arrays-in-javascript
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array)
+        return false;
+
+    // compare lengths - can save a lot of time 
+    if (this.length != array.length)
+        return false;
+
+    for (var i = 0, l=this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].equals(array[i]))
+                return false;
+        }
+        else if (this[i] != array[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+}
+
 // http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
 Object.toType = (function toType(global) {
   return function(obj) {
@@ -318,12 +344,20 @@ function QueryStore() {
         default_set = (default_set === undefined) ? STATE_SET_OUT : default_set;
 
         var self = this;
-        var query_ext = this.find_analyzed_query_ext(query_uuid);
-        var record_key = manifold.metadata.get_key(query_ext.query.object);
+        var key, object, query_ext, record_key;
+
+        query_ext = this.find_analyzed_query_ext(query_uuid);
+        object = query_ext.query.object;
+        if (object.indexOf(':') != -1) {
+            object = object.split(':')[1];
+        }
+        record_key = manifold.metadata.get_key(object);
+
+        // ["start_time", "resource", "end_time"]
+        // ["urn"]
+        
         $.each(records, function(i, record) {
-            var key = manifold.metadata.get_key(query_ext.query.object);
-            // ["start_time", "resource", "end_time"]
-            // ["urn"]
+            //var key = manifold.metadata.get_key(query_ext.query.object);
             
             var record_key_value = manifold.record_get_value(record, record_key);
             query_ext.records.put(record_key_value, record);
@@ -343,6 +377,18 @@ function QueryStore() {
     {
         var query_ext = this.find_analyzed_query_ext(query_uuid);
         return query_ext.records.get(record_key);
+    }
+
+    this.del_record = function(query_uuid, record_key)
+    {
+        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        return query_ext.records.remove(record_key);
+    }
+
+    this.del_state = function(query_uuid, record_key)
+    {
+        var query_ext = this.find_analyzed_query_ext(query_uuid);
+        return query_ext.state.remove(record_key);
     }
 
     this.add_record = function(query_uuid, record, new_state)
@@ -375,8 +421,15 @@ function QueryStore() {
         } else {
             record_key = record;
         }
-
-        manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
+        
+        if ((query_ext.query.object == 'lease') && (new_state == STATE_SET_OUT)) {
+            // Leases that are marked out are in fact leases from other slices
+            // We need to _remove_ leases that we mark as OUT
+            manifold.query_store.del_record(query_uuid, record_key);
+            manifold.query_store.del_state(query_uuid, record_key);
+        } else {
+            manifold.query_store.set_record_state(query_uuid, record_key, STATE_SET, new_state);
+        }
     }
 
     this.iter_records = function(query_uuid, callback)
@@ -443,7 +496,7 @@ function QueryStore() {
     {
         var query_ext = this.find_analyzed_query_ext(query_uuid);
         query_ext.filters = $.grep(query_ext.filters, function(x) {
-            return x == filter;
+            return !(x.equals(filter));
         });
 
         this.apply_filters(query_uuid);
@@ -507,6 +560,8 @@ function QueryStore() {
 
         this.iter_records(query_uuid, function(record_key, record) {
             var is_reserved, is_pending, in_set,  is_unconfigured;
+
+            /* By default, a record is visible unless a filter says the opposite */
             var visible = true;
 
             var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
@@ -576,13 +631,16 @@ function QueryStore() {
                 if (op == '=' || op == '==') {
                     if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
                         visible = false;
+
                 }else if (op == 'included') {
+                    /* By default, the filter returns false unless the record
+                     * field match at least one value of the included statement
+                     */
+                    visible = false;
                     $.each(value, function(i,x) {
                       if(x == col_value){
                           visible = true;
                           return false; // ~ break
-                      }else{
-                          visible = false;
                       }
                     });
                 }else if (op == '!=') {
@@ -613,7 +671,7 @@ function QueryStore() {
         });
 
         var end = new Date().getTime();
-        console.log("APPLY FILTERS took", end - start, "ms");
+        console.log("APPLY FILTERS [", filters, "] took", end - start, "ms");
 
     }
 
@@ -704,7 +762,7 @@ var manifold = {
     {
         return function() {
             ret = "";
-            for (i=0; i < key_fields.length; i++)
+            for (var i=0; i < key_fields.length; i++)
                 ret += "@@" + this[key_fields[i]];
             return ret;
         };
@@ -712,7 +770,10 @@ var manifold = {
 
     _record_equals: function(self, other, key_fields)
     {
-        for (i=0; i < key_fields.length; i++) {
+        if ((typeof self === "string") && (typeof other === "string")) {
+            return self == other;
+        }
+        for (var i=0; i < key_fields.length; i++) {
             var this_value  = self[key_fields[i]];
             var other_value = other[key_fields[i]];
 
@@ -724,6 +785,7 @@ var manifold = {
             switch (this_type) {
                 case TYPE_VALUE:
                 case TYPE_LIST_OF_VALUES:
+                case TYPE_LIST_OF_RECORDS:
                     if (this_value != other_value)
                         return false;
                     break;
@@ -731,13 +793,17 @@ var manifold = {
                     if (!(_record_equals(this_value, other_value, key_fields)))
                         return false;
                     break;
+                /*
+                XXX WARNING = disabled for OpenFlow plugin !!!
+
                 case TYPE_LIST_OF_RECORDS:
                     if (this_value.length != other_value.length)
                         return false;
-                    for (i = 0; i < this_value.length; i++)
-                        if (!(_record_equals(this_value, other_value, key_fields)))
+                    for (var j = 0; j < this_value.length; j++)
+                        if (!(_record_equals(this_value[j], other_value[j], key_fields)))
                             return false;
                     break;
+                */
             }
         }
         return true;
@@ -753,7 +819,7 @@ var manifold = {
     _in_array: function(element, array, key_fields)
     {
         if (key_fields.length > 1) {
-            for (i = 0; i < array.length; i++) {
+            for (var i = 0; i < array.length; i++) {
                 if (manifold._record_equals(element, array[i], key_fields))
                     return true;
             }
@@ -1018,7 +1084,7 @@ var manifold = {
         if (query_ext.set_query_ext) {
             // We have a domain query
             // The results are stored in the corresponding set_query
-            manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records)
+            manifold.query_store.set_records(query_ext.set_query_ext.query.query_uuid, records);
             
         } else if (query_ext.domain_query_ext) {
             // We have a set query, it is only used to determine which objects are in the set, we should only retrieve the key
@@ -1153,9 +1219,22 @@ var manifold = {
     make_record: function(object, record)
     {
         // To make an object a record, we just add the hash function
-        var key = manifold.metadata.get_key(object);
-        record.hashCode = manifold.record_hashcode(record, key.sort());
-        record.equals   = manifold.record_equals(record, key);
+        var key, new_object;
+
+        if (object.indexOf(':') != -1) {
+            new_object = object.split(':')[1];
+        } else {
+            new_object = object;
+        }
+
+        key = manifold.metadata.get_key(new_object);
+        if (!key){
+            console.log("object type: " + new_object + " has no key");
+            console.log(record);
+            return;
+        }
+        record.hashCode = manifold.record_hashcode(key.sort());
+        record.equals   = manifold.record_equals(key);
 
         // Looking after subrecords
         for (var field in record) {
@@ -1283,7 +1362,7 @@ case TYPE_LIST_OF_VALUES:
                 */
                 case TYPE_LIST_OF_VALUES: // XXX Until fixed
                 case TYPE_LIST_OF_RECORDS:
-                    var new_state,cur_query_uuid;
+                    var key, new_state, cur_query_uuid;
 
                     cur_query_uuid = query.analyzed_query.subqueries[field].query_uuid;
 
@@ -1291,7 +1370,15 @@ case TYPE_LIST_OF_VALUES:
                     //  - update_query_orig.params.resource = resources in slice before update
                     //  - update_query.params.resource = resource requested in slice
                     //  - keys from field = resources obtained
-                    var key = manifold.metadata.get_key(field);
+                
+                    if (field == 'lease') {
+                         // lease_id has been added to be repeated when
+                         // constructing request rspec. We don't want it for
+                         // comparisons
+                        key = ['start_time', 'end_time', 'resource'];
+                    } else {
+                        key = manifold.metadata.get_key(field);
+                    }
                     if (!key)
                         continue;
                     /*
@@ -1326,6 +1413,14 @@ case TYPE_LIST_OF_VALUES:
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: added_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+                        // Inform subquery also
+                        data.key = '';
+                        manifold.raise_record_event(cur_query_uuid, FIELD_STATE_CHANGED, data);
+                        // XXX Passing no parameters so that they can redraw everything would
+                        // be more efficient but is currently not supported
+                        // XXX We could also need to inform plugins about nodes IN (not pending) that are no more, etc.
+                        // XXX refactor all this when suppressing update_queries, and relying on state instead !
                     });
                     $.each(removed_keys, function(i, removed_key) {
                         new_state = (manifold._in_array(removed_key, result_keys, key)) ? STATE_SET_OUT_FAILURE : STATE_SET_OUT_SUCCESS;
@@ -1338,6 +1433,10 @@ case TYPE_LIST_OF_VALUES:
 
                         data = { state: STATE_SET, key  : field, op   : new_state, value: removed_key }
                         manifold.raise_record_event(query_uuid, FIELD_STATE_CHANGED, data);
+
+                        // Inform subquery also
+                        data.key = '';
+                        manifold.raise_record_event(cur_query_uuid, FIELD_STATE_CHANGED, data);
                     });
 
                     break;
@@ -1349,6 +1448,7 @@ case TYPE_LIST_OF_VALUES:
 
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
         query_ext.query_state = QUERY_STATE_DONE;
+
 
         // Send DONE message to plugins
         query.iter_subqueries(function(sq, data, parent_query) {
@@ -1540,7 +1640,7 @@ case TYPE_LIST_OF_VALUES:
         }
     },
 
-    _enforce_constraints: function(query_ext, record, resource_key, event_type)
+    _enforce_constraints: function(query_ext, record, record_key, event_type)
     {
         var query, data;
 
@@ -1555,14 +1655,14 @@ case TYPE_LIST_OF_VALUES:
                 // XXX Not always a resource
                 var is_reservable = (record.exclusive == true);
                 if (is_reservable) {
-                    var warnings = manifold.query_store.get_record_state(query.query_uuid, resource_key, STATE_WARNINGS);
+                    var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
 
                     if (event_type == STATE_SET_ADD) {
                         // We should have a lease_query associated
                         var lease_query = query_ext.parent_query_ext.query.subqueries['lease']; // in  options
                         var lease_query_ext = manifold.query_store.find_analyzed_query_ext(lease_query.query_uuid);
                         // Do we have lease records (in) with this resource
-                        var lease_records = $.grep(lease_query_ext.records.entries(), this._grep_active_lease_callback(lease_query, resource_key));
+                        var lease_records = $.grep(lease_query_ext.records.entries(), this._grep_active_lease_callback(lease_query, record_key));
                         if (lease_records.length == 0) {
                             // Sets a warning
                             // XXX Need for a better function to manage warnings
@@ -1577,7 +1677,7 @@ case TYPE_LIST_OF_VALUES:
                         delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                     }
 
-                    manifold.query_store.set_record_state(query.query_uuid, resource_key, STATE_WARNINGS, warnings);
+                    manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
                 }
 
                 /* This was redundant */
@@ -1586,7 +1686,7 @@ case TYPE_LIST_OF_VALUES:
                 // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
                 data = {
                     state:  STATE_WARNINGS,
-                    key   : resource_key,
+                    key   : record_key,
                     op    : null,
                     value : warnings
                 }
@@ -1594,7 +1694,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case 'lease':
-                var resource_key = record.resource;
+                var resource_key = record_key.resource;
                 var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
                 var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
 
@@ -1792,6 +1892,7 @@ case TYPE_LIST_OF_VALUES:
             // FILTERS
 
             case FILTER_ADDED: 
+                console.log("FILTER ADDED", data);
                 /* Update internal record state */
                 manifold.query_store.add_filter(query_uuid, data);
 
@@ -1801,6 +1902,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case FILTER_REMOVED:
+                console.log("FILTER REMOVED", data);
                 /* Update internal record state */
                 manifold.query_store.remove_filter(query_uuid, data);
 
