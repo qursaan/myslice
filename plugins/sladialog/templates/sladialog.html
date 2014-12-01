@@ -1,18 +1,27 @@
 <div id={{ domid }}>
-<div class="modal fade" id="slamodal-wilab2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+<div class="modal fade" id="slamodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
 		data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="myModalLabel">Provider iMinds offers the following SLA</h4>
+        <h4 class="modal-title" id="myModalLabel">Selected testbed(s) provide the following SLAs</h4>
       </div>
       <div class="modal-body"  id="modal-body">
-        <!-- <p>SLA description</p>
-        <p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the WiLab2 resources during the sliver lifetime</p> -->
+        <table class="table" id="sla-modal-table">
+          <thead>
+          <tr>
+            <th>Testbed</th>
+            <th>SLA Description</th>
+            <th>Accept</th>
+          </tr>
+          </thead>
+          <tbody id="sla-table-body">
+          </tbody>
+        </table>
       </div>
       <div class="modal-footer">
-        <button type="button" id="dismiss_sla_wilab2" class="btn btn-default" data-dismiss="modal">Dismiss</button>
-        <button type="button" id="accept_sla_wilab2" class="btn btn-primary">Accept</button>
+        <button type="button" id="cancel_sla" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="submit_sla" class="btn btn-primary">Submit</button>
       </div>
     </div>
   </div>
