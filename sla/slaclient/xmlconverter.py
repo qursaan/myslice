@@ -9,7 +9,7 @@ to a more-friendly POJO instances.
 The converters are designed to be pluggable: see ListConverter.
 
 
-Usage: 
+Usage:
 c = AnyConverter() or
 c = ListConverter(AnyOtherConverter())
 
@@ -22,8 +22,14 @@ c.convert(root.getroot())
 
 """
 
-from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
+try:
+    # Much faster and lighter library (C implementation)
+    from xml.etree import cElementTree as ElementTree
+except ImportError:
+    from xml.etree import ElementTree
+
+from xml.etree.ElementTree import QName
+
 import dateutil.parser
 
 from wsag_model import Agreement
@@ -81,7 +87,13 @@ class ListConverter(Converter):
     def convert(self, xmlroot):
         result = []
 
-        for item in xmlroot.find("items"):      # loop through "items" children
+        # Converter for the old xml structure
+        # for item in xmlroot.find("items"): # loop through "items" children
+        #     inner = self.innerconverter.convert(item)
+        #     result.append(inner)
+        # return result
+
+        for item in xmlroot:      # loop through children
             inner = self.innerconverter.convert(item)
             result.append(inner)
         return result
@@ -132,17 +144,19 @@ class EnforcementConverter(Converter):
         result.enabled = xmlroot.find("enabled").text
         return result
 
+
 class ViolationConverter(Converter):
     """Converter for a violation.
 
     Input:
     <violation>
-        <uuid>ce0e148f-dfac-4492-bb26-ad2e9a6965ec</uuid>
-        <contract_uuid>agreement04</contract_uuid>
-        <service_scope></service_scope>
-        <metric_name>Performance</metric_name>
-        <datetime>2014-01-14T11:28:22Z</datetime>
-        <actual_value>0.09555700123360344</actual_value>
+        <uuid>1d94627e-c318-41ba-9c45-42c95b67cc32</uuid>
+        <contract_uuid>26e5d5b6-f5a1-4eb3-bc91-606e8f24fb09</contract_uuid>
+        <service_name>servicename1</service_name>
+        <service_scope>test1</service_scope>
+        <metric_name>UpTime</metric_name>
+        <datetime>2014-07-17T09:32:00+02:00</datetime>
+        <actual_value>0.0</actual_value>
     </violation>
 
     Output:
@@ -155,11 +169,13 @@ class ViolationConverter(Converter):
         result = Violation()
         result.uuid = xmlroot.find("uuid").text
         result.contract_uuid = xmlroot.find("contract_uuid").text
+        result.service_name = xmlroot.find("service_name").text
         result.service_scope = xmlroot.find("service_scope").text
         result.metric_name = xmlroot.find("metric_name").text
         result.actual_value = xmlroot.find("actual_value").text
         dt_str = xmlroot.find("datetime").text
         result.datetime = dateutil.parser.parse(dt_str)
+
         return result
 
 
@@ -168,10 +184,9 @@ class AgreementConverter(Converter):
         """Converter for an ws-agreement agreement or template.
         """
         super(AgreementConverter, self).__init__()
-        self._namespaces = { 
+        self._namespaces = {
             "wsag": "http://www.ggf.org/namespaces/ws-agreement",
             "sla": "http://sla.atos.eu",
-            "xifi": "http://sla.xifi.eu"
         }
         self.agreement_tags = (
             "{{{}}}Agreement".format(self._namespaces["wsag"]),
@@ -185,12 +200,17 @@ class AgreementConverter(Converter):
         :param Element xmlroot: root element of xml to convert.
         :rtype: wsag_model.Agreement
         """
+        for name, value in xmlroot.attrib.items():
+            print '{0}="{1}"'.format(name, value)
+
         if xmlroot.tag in self.agreement_tags:
             result = Agreement()
-            result.agreement_id = xmlroot.attrib["AgreementId"]
+            agreementId = str(QName(self._namespaces["wsag"], "AgreementId"))
+            result.agreement_id = xmlroot.attrib[agreementId]
         elif xmlroot.tag in self.template_tags:
             result = Template()
-            result.template_id = xmlroot.attrib["TemplateId"]
+            templateId = str(QName(self._namespaces["wsag"], "TemplateId"))
+            result.template_id = xmlroot.attrib[templateId]
         else:
             raise ValueError("Not valid root element name: " + xmlroot.tag)
 
@@ -298,7 +318,6 @@ class AgreementConverter(Converter):
         return name, result
 
     def _parse_guarantees(self, elements):
-
         result = {}
         for element in elements:
             key, value = self._parse_guarantee(element)
@@ -341,7 +360,7 @@ def _get_attribute(element, attrname):
     isns = (attrname[0] == '{')
 
     #
-    # Handle qnamed request: 
+    # Handle qnamed request:
     #   attrname = {uri}name
     #
     if isns:
