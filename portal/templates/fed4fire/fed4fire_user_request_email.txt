@@ -1,0 +1,14 @@
+NEW USER REQUEST
+
+First name   : {{first_name}}
+Last name    : {{last_name}} 
+Organization :{{organization}}
+Authority hrn: {{authority_hrn}}
+Public key   : {{public_key}}
+Email        : {{email}}
+User hrn     : {{user_hrn}}
+Portal url   : {{ current_site }}
+
+Please note that the validation request will only become visible once the user has confirmed his/her email address.
+
+
