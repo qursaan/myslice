@@ -1,6 +1,6 @@
 NEW SLICE REQUEST
 
-You are receiving this request because we have you listed as a manager at an organization that uses Fed4Fire.
+You are receiving this request because we have you listed as a manager at an organization that uses Fed4FIRE.
 A user from your organization has requested the creation of a new slice, which will allow him or her to reserve testbed resources to conduct an experiment.
 
 Slice name      : {{slice_name}}
