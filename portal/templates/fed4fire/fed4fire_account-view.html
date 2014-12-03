@@ -158,11 +158,28 @@
 			    		<tr class="even" id="sfi_config_row">
 			      			<td class="key">sfi_config </td>
 			      			<td class="value">use sfi_config file with sfi.py package (pip install sfa)<a href="#"></a>
-			      				<button type="submit" name="dl_sfi_config" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_sfi_config">
+			      				<button type="submit" name="dl_sfi_config" class="btn btn-default btn-xs" title="Download your sfi_config" id="dl_sfi_config">
 									<span class="glyphicon glyphicon-download"></span> Download
 								</button>
 			    			</td>
                         </tr>
+						<tr class="odd">
+							{%if 'N/A' not in user_private_key%}
+							<td class="key">Identity</td> 
+    						<td>
+								<button type="submit" name="dl_identity" class="btn btn-default btn-xs" title="You will require it to use jfed" id="dl_identity">
+    								<span class="glyphicon glyphicon-download"></span> Download 
+								</button>
+							</td>
+							{%else%}
+							<td class="key">Identity</td> 
+							<td>
+    							<button type="submit" name="dl_identity" class="btn btn-default btn-xs disabled" title="You will require it to use jfed" id="dl_identity">
+        							<span class="glyphicon glyphicon-download"></span> Download 
+    							</button>
+							</td>
+							{%endif%} 
+						</tr>
 
 			  			<tr class="even">
 			    			<td colspan="2">
