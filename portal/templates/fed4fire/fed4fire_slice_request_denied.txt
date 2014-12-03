@@ -1,6 +1,6 @@
 Dear Fed4Fire user,
 
-You have recently requested the following slice on the Fed4fire portal({{portal_url}}):
+You have recently requested the following slice on the Fed4FIRE portal({{portal_url}}):
 
 Slice name   : {{slice_name}}
 URL          : {{url}}

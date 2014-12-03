@@ -1,6 +1,6 @@
 Dear Fed4FIRE user,
 
-You have recently requested a slice in the OneLab portal.
+You have recently requested a slice in the Fed4FIRE portal.
 
 Slice name      : {{slice_name}}
 URL             : {{url}}
