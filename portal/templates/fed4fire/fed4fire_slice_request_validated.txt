@@ -1,0 +1,15 @@
+Dear Fed4FIRE user,
+
+You have recently requested a slice in the OneLab portal.
+
+Slice name      : {{slice_name}}
+URL             : {{url}}
+Purpose         : {{purpose}}
+
+
+We are pleased to inform you that a manager from your institution has validated your slice request on the Fed4FIRE portal. You can now add resources to you slice and start experimenting.
+
+We wish you a fruitful user experience with the Fed4FIRE portal.
+
+Yours sincerely,
+The Fed4FIRE team
