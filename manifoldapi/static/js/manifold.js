@@ -1451,6 +1451,8 @@ case TYPE_LIST_OF_VALUES:
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
         query_ext.query_state = QUERY_STATE_DONE;
 
+        var tmp_query = manifold.query_store.find_analyzed_query(query.query_uuid);
+        manifold.publish_result_rec(tmp_query, records);
 
         // Send DONE message to plugins
         query.iter_subqueries(function(sq, data, parent_query) {
