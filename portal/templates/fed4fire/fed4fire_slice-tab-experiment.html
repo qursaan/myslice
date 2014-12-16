@@ -14,11 +14,17 @@
 		$ ssh {{ple_slicename}}@{{resource}}<br>
 	{%endfor%}
 	</p>
+	 <h4>Windows users</h4>
+	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%else%}
 		<p><b>NOTE:</b> You did not reserve any PLE resources yet. Once reserved, you will get the actual SSH command. A specimen command is given below:</p>
 		<p class="command">
     		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com<br>
 		</p>
+		 <h4>Windows users</h4>
+		 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%endif%}
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
@@ -36,7 +42,9 @@
 	<p class="command">
 	$ ssh {{slicename}}@nitlab.inf.uth.gr
 	</p>
-	
+	<h4>Windows users</h4>
+	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	<p>
 	<!-- In order to connect to NITOS server he has to upload his public key on the server. 
 	For now we do it this way: http://nitlab.inf.uth.gr/NITlab/index.php/your-ssh-keys. 
