@@ -1,4 +1,6 @@
-<div class="col-md-10 col-md-offset-1">
+<div class="col-md-2">
+</div>
+<div class="col-md-8">
 	<h2>How to access your slice</h2>
 	<h3>PlanetLab Europe</h3>
 	
@@ -14,14 +16,16 @@
 	</p>
 	 <h4>Windows users</h4>
 	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%else%}
 		<p><b>NOTE:</b> You did not reserve any PLE resources yet. Once reserved, you will get the actual SSH command. A specimen command is given below:</p>
 		<p class="command">
     		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com<br>
 		</p>
+		 <h4>Windows users</h4>
+		 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%endif%}
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
@@ -29,34 +33,17 @@
 		after witch you will be able to access the resource.
 	</p>
 	
-	<h3>FIT IoT-Lab</h3>
-	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://devgrenoble.senslab.info/testbed/" target="_blank">web GUI.</a>
-		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
-		the following command:
-	</p>
-	<p class="command">
-		ssh {{username}}@fit3-dev.inrialpes.fr
-	</p>
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
-
 	<h3>NITOS</h3>
 	
 	<p>
 	 NITOS resources are not directly accessible. You will need to log in on a gateway server and from there access the node.
-	 You will find the ssh commands to connect to NITOS nodes below:
+	 The NITOS server address is nitlab.inf.uth.gr, so to connect to the NITOS server:
 	</p>
-	<h4>NITLab</h4>
 	<p class="command">
 	$ ssh {{slicename}}@nitlab.inf.uth.gr
 	</p>
-	<h4>FIT NITOS-Lab Paris</h4>
-	 <p class="command">
- 	$ ssh {{slicename}}@griffin.ipv6.lip6.fr
-	 </p>
-
-	 <h5>Windows users</h5>
-	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+	<h4>Windows users</h4>
+	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 
 	<p>
 	<!-- In order to connect to NITOS server he has to upload his public key on the server. 
@@ -70,7 +57,7 @@
 	</p>
 	
 	<p class="command">
-		$ omf load -i baseline_grid.ndz -t node016
+		$ omf load -i baseline_grid.ndz -t omf.nitos.node016
 	</p>
 
 	<p>
@@ -78,7 +65,7 @@
 	</p>
 	
 	<p class="command">
-		$ omf tell -a on -t node016
+		$ omf tell -a on -t omf.nitos.node016
 	</p>
 	<p>
 		And finally ssh on the node:
@@ -97,7 +84,6 @@
 	The complete tutorial is available at the following address:
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
 	</p>
-	<p>To learn more about OMF6, please click <a href="http://omf.mytestbed.net/projects/omf6/wiki/Wiki" target="_blank">here.</a></p>
 	
 	<br />
 	
@@ -106,17 +92,12 @@
 	<p>
 	Secure Shell (SSH) is a cryptographic network protocol for secure data communication, remote command-line login, remote command execution, and other secure network services between two networked computers that connects, via a secure channel over an insecure network, a server and a client (running SSH server and SSH client programs, respectively). The protocol specification distinguishes between two major versions that are referred to as SSH-1 and SSH-2.
 	</p>
-	<p> More info: <a href="http://en.wikipedia.org/wiki/Secure_Shell" target="_blank">http://en.wikipedia.org/wiki/Secure_Shell</a></p>
+	<p> More Info: <a href="http://en.wikipedia.org/wiki/Secure_Shell" target="_blank">http://en.wikipedia.org/wiki/Secure_Shell</a></p>
 	<br>
-	<p><img src="{{ STATIC_URL }}img/putty-logo.png" width="50"> <b>PuTTY</b></p>
-	<p>
-		PuTTY is an SSH and telnet client, developed originally by Simon Tatham for the Windows platform. PuTTY is open source software that is available with source code and is developed and supported by a group of volunteers.
-	</p>
-	<p>More info: <a href="http://www.putty.org/" target="_blank">http://www.putty.org/</a></p>	
 	<br>
 	<p><img src="{{ STATIC_URL }}img/nepi_logo.png" width="90"></p>
 	<p>NEPI, the Network Experimentation Programming Interface, is a life-cycle management tool for network experiments. The idea behind NEPI is to provide a single tool to design, deploy, and control network experiments, and gather the experiment results. Going further, NEPI was specially conceived to function with arbitrary experimentation platforms, so researchers could use a single tool to work with network simulators, emulators, or physical testbeds, or even a mixture of them. To accomplish this, NEPI provides a high-level interface to describe experiments that is independent from any experimentation platform, but is able to capture platform specific configurations. Experiment definitions can be stored in XML format to be later reproduced, and modified according to experimentation needs. Experiment execution is orchestrated by a global experiment controller, that is platform independent, and different platform-dependent testbed controllers, creating a control hierarchy that is able t adapt to platform specific requirements while providing an integrated control scheme.</p>
-	<p> More info: <a href="http://nepi.inria.fr" target="_blank">http://nepi.inria.fr</a></p>
+	<p> More Info: <a href="http://nepi.inria.fr" target="_blank">http://nepi.inria.fr</a></p>
 	<br>
 	<p><img src="{{ STATIC_URL }}img/omf-logo.png" width="90"></p>
 	<p>OMF is a Testbed Control, Measurement and Management Framework.</p>
@@ -125,4 +106,6 @@
 	</p>
 	<p>In addition to the main OMF software, this site also hosts OMF sub-projects addressing various related aspects of a testbed's control, measurement, and management.</p>
 	<p>More Info: <a href="http://mytestbed.net/projects/omf" target="_blank">http://mytestbed.net/projects/omf</a></p>
+</div>
+<div class="col-md-2">
 </div>
