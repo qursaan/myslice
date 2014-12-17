@@ -1,7 +1,20 @@
-{% extends "layout_wide.html" %}
+{% extends "layout.html" %}
 {% block content %}
 
+<div class="row">
+	<div class="col-md-12">
+		 <div class="breadcrumbs">
+		 	 Account &nbsp;>&nbsp; <a href="/account">{{ person.email }}</a>
+		 </div>
+	</div>
+	 {%if 'no_creds'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+    {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
 
+</div>
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
@@ -9,18 +22,16 @@
     {% endfor %}
 </ul>
 {% endif %}
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-tabs nav-section">
-				<li class="active"><a href="#profile"><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Account" /> User Profile</a></li>
-				<li><a href="#account">Account</a></li>
-				<li><a href="#access">Testbed Access</a></li>
-			</ul>
-	    </div>
-	</div>
+<div class="row">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs nav-section">
+			<li class="active"><a href="#profile">User Profile</a></li>
+			<li><a href="#account">Account</a></li>
+			<li><a href="#access">Testbed Access</a></li>
+		</ul>
+    </div>
 </div>
-<div class="container tab-content">
+<div class="tab-content">
 	<div class="tab-pane active row" id="profile">
 		
 	  	<div class="col-md-12">
@@ -30,14 +41,14 @@
 			  		<table class="profile">          
 			    		<tr>
 			      			<td colspan="2">
-								<div>Platform: Myslice</div>
+								<div><h3>Platform: Myslice</h3></div>
 			      			</td>
 			    		</tr>
 			    		<tr>
 			      			<td class="key">Email</td>
 			      			<td class="value">
 								<span id="emailval" class="value" >{{ person.email }}</span>
-								<button class="btn btn-default btn-xs" type="button" id="edit_email" onclick="editAlert();"  title="To change your affiliation please contact the administrator">
+								<button class="btn btn-default" type="button" id="edit_email" onclick="editAlert();"  title="To change your affiliation please contact the administrator">
 		    						<span class="glyphicon glyphicon-question-sign"></span> Edit
 								</button>
 							</td>
@@ -98,7 +109,7 @@
 						<tr class="even">
 				  			<td class="key">Generate Keys</td>
 				  			<td>
-								<input type="submit" name="generate" class="btn btn-danger btn-xs" value="Generate a new Key Pair" id="generate_keypair" 
+								<input type="submit" name="generate" class="btn btn-primary" value="Generate a new Key Pair" id="generate_keypair" 
 									   onclick="return confirm('Are you sure? If you do so, your current credentials will be overwritten.');" 
 									   title="It will generate a new key Pair and your current credentials will be overwritten."/>
 			      			</td> 
@@ -108,7 +119,7 @@
 			      			<td class="value">
 								<span id="keyval" class="value">******** </span>
 								<span class="hide_this" id="span_upload">
-				  					<button type="button" class="btn btn-default btn-xs" title="Cancel" id="cancel_upload"> Cancel </button>
+				  					<button type="button" class="btn btn-default" title="Cancel" id="cancel_upload"> Cancel </button>
 				  					<div style='display:none;'>
 				  						<input type='hidden'  name='upload'  /></div>
 				  						<input type="file" name="pubkey" class="required" id="pubkey"/>  
@@ -128,7 +139,7 @@
 						 {%if 'N/A' not in user_private_key%}
 			      			<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
 			      			<td class="value">********<a href="#"></a>
-			      				<button type="submit" name="dl_pkey" class="btn btn-default btn-xs" title="Download your privaye key" id="dl_pkey">
+			      				<button type="submit" name="dl_pkey" class="btn btn-default" title="Download your privaye key" id="dl_pkey">
 									<span class="glyphicon glyphicon-download"></span> Download	
 								</button>
 			      				<input class="btn btn-danger btn-xs" id="delete" name="delete" type="submit"  value="Delete" title="Delete your private key"
@@ -137,13 +148,21 @@
 						  {%else%}
 							<td class="key">Private Key </td> <!-- Hide if priv_key doesn't exist in myslice platform   -->
 		 					<td class="value">********<a href="#"></a>
-		     					<button type="submit" name="dl_pkey" class="btn btn-default btn-xs disabled" title="Download your privaye key" id="dl_pkey">
+		     					<button type="submit" name="dl_pkey" class="btn btn-default disabled" title="Download your privaye key" id="dl_pkey">
 		        					<span class="glyphicon glyphicon-download"></span> Download 
 		     					</button>
 		     					<input class="btn btn-danger btn-xs disabled" id="delete" name="delete" type="submit" title="Delete your private key" value="Delete" />
 							</td>
 						 {%endif%}		
 			  			</tr>
+			    		<tr class="even" id="sfi_config_row">
+			      			<td class="key">sfi_config </td>
+			      			<td class="value">use sfi_config file with sfi.py package (pip install sfa)<a href="#"></a>
+			      				<button type="submit" name="dl_sfi_config" class="btn btn-default btn-xs" title="Download your sfi_config" id="dl_sfi_config">
+									<span class="glyphicon glyphicon-download"></span> Download
+								</button>
+			    			</td>
+                        </tr>
 						<tr class="odd">
 							{%if 'N/A' not in user_private_key%}
 							<td class="key">Identity</td> 
@@ -161,11 +180,12 @@
 							</td>
 							{%endif%} 
 						</tr>
+
 			  			<tr class="even">
 			    			<td colspan="2">
-			      				<p class="message" id="pkey_del_msg"><b> Tradeoff:</b> Ease-of-use vs Security.<br>
-									<b>Ease-of-use:</b> Automatic account delegation. Don't delete private key.<br>
-									<b>Security:</b> Manual account delegation. Download & Delete private key.
+								<p class="command">
+									<a href="#" style="color:green" data-toggle="modal" data-target="#tradeoffmodal">Automatic vs. Manual delegation of credentials:</a>
+									Trade-off between ease-of-use & security</p>
 								</p>
 			    			</td>
 			  			</tr>
@@ -222,9 +242,9 @@
 							<button class="btn btn-default btn-xs" name= "dl_user_cert" type="submit" title="Download User Certificate">
 								<span class="glyphicon glyphicon-download"></span> Certificate
 							</button>
-							<button class="btn btn-default btn-xs" name= "dl_user_p12" type="submit" title="Download User PKCS12">
-								<span class="glyphicon glyphicon-download"></span> PKCS p12
-							</button>
+                             <button class="btn btn-default btn-xs" name= "dl_user_p12" type="submit" title="Download User PKCS12">
+                                 <span class="glyphicon glyphicon-download"></span> PKCS p12
+                             </button>
 						</td>
 					</tr>
 					{%endfor%}
@@ -277,6 +297,90 @@
 				{%endif%}
 		</div>
 	</div>
+<!-- Modal- No credentials -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
+                    </div>
+					<div class="modal-body" style="text-align:justify;">
+					<p>You are getting this message for any of the following reasons:</p>
+					<ul>
+						<li>If your account is still pending for validation</li>
+						<li>If you press the "Clear Credentials" button</li>
+						<li>If you "Generate a new key pair"</li>
+						<li>If a new slice is added to your account</li>
+					</ul>
+					<p>Unless your account has not yet been validated, it is sufficient to refresh the page or go back to the home page. 
+						The portal will then regenerate your credentials. In some cases it may take more time than usual. If nothing works, 
+						then please logout and login back into to the portal.
+					</p>
+					<h3>Manual delegation of credentials</h3>
+						<p>
+							You have selected upon sign-up to upload your public key. As you have uploaded your own public key, 
+							the portal can no longer generate your credentials automatically. In order to have your credentials 
+							delegated to the portal, please follow these instructions:
+						</p>
+						<ul>
+							<li>Your account must first be validated by the manager of your organization.</li>
+							<li>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
+								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a></li>
+						</ul>
+					</p>
+					<h3>Contact support</h3>
+					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
+
+
+<!-- Modal- Trade-off Message  -->
+<div class="modal fade" id="tradeoffmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">
+								Automatic vs. Manual delegation of credentials
+							</h4>
+                    </div>
+					<div class="modal-body" style="text-align:justify;">
+					<h3>Automatic delegation of credentials</h3>
+						<p>Don't delete private key, ease-of-use option:</p>
+						<ul>
+							<li>
+								This means that you will keep your private key in the portal and it will automatically delegate your credentials on your behalf.
+							</li>
+							<li>
+								This option does not provide as high of a level of security; however, your private key will still only be used in the portal and 
+								will be available to you and the Fed4FIRE admins only.
+							</li>
+						</ul>
+					<h3>Manual delegation of credentials</h3>
+						<p>Download & Delete private key, higher security option:</p>
+						<ul>
+							<li>If you delete your private key, you will have more security but the portal will no longer be able to delegate credentials 
+								on your behalf, and you will have to manually
+								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
+							</li>
+						</ul>
+					<h3>Contact support</h3>
+					<p>For more information, please  <a href="/contact/" target="_blank">contact us</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+</div>
+
+
 
 	<div class="tab-pane row" id="access">
 	  	<div class="col-md-12">
@@ -295,7 +399,7 @@
                 <td class="odd"> {{ row.account_type }} </td>
 				<td class="odd"> {{ row.account_reference }} </td>
 				<td class="odd">
-    				<button class="btn btn-danger btn-xs" name="delete_{{row.platform_name}}" type="submit" title="Delete account from this platform">
+    				<button class="btn btn-danger" name="delete_{{row.platform_name}}" type="submit" title="Delete account from this platform">
 						<span class="glyphicon glyphicon-minus"></span>
 					</button>
 				</td>

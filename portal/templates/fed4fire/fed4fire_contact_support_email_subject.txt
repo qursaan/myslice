@@ -1,1 +1,1 @@
-Fed4fire support: {{email}} submitted a query.
+Fed4FIRE support: {{email}} submitted a query.

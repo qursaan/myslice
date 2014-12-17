@@ -54,10 +54,10 @@ class UsersView (LoginRequiredAutoLogoutView, ThemeView):
 
             status_list.append(user_status)
             #get authority
-            #if user['config']:
-            user_config = json.loads(user['config'])
-            user_authority = user_config.get('authority','N/A')
-            authority_list.append(user_authority)
+            if user['config'] is not None:
+                user_config = json.loads(user['config'])
+                user_authority = user_config.get('authority','N/A')
+                authority_list.append(user_authority)
     
         user_list = [{'email': t[0], 'status': t[1], 'authority':t[2]}
             for t in zip(email_list, status_list, authority_list)]

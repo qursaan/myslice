@@ -1,0 +1,8 @@
+Dear {{first_name}} {{last_name}},
+
+You have recently registered as a user to Fed4FIRE portal. We are sorry to inform you that, a manager of your institution has rejected your request. Please contact the manager of your institution for further information. For any other queries, contact us by replying to this email.
+
+We wish you all the best.
+
+Yours sincerely,
+The Fed4FIRE team

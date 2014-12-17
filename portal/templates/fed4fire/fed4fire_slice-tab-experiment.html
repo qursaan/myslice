@@ -16,14 +16,16 @@
 	</p>
 	 <h4>Windows users</h4>
 	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%else%}
 		<p><b>NOTE:</b> You did not reserve any PLE resources yet. Once reserved, you will get the actual SSH command. A specimen command is given below:</p>
 		<p class="command">
     		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com<br>
 		</p>
+		 <h4>Windows users</h4>
+		 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	{%endif%}
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
@@ -31,17 +33,6 @@
 		after witch you will be able to access the resource.
 	</p>
 	
-	<h3>FIT IoT-Lab</h3>
-	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://devgrenoble.senslab.info/testbed/" target="_blank">web GUI.</a>
-		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
-		the following command:
-	</p>
-	<p class="command">
-		ssh {{username}}@fit3-dev.inrialpes.fr
-	</p>
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
-
 	<h3>NITOS</h3>
 	
 	<p>
@@ -51,8 +42,8 @@
 	<p class="command">
 	$ ssh {{slicename}}@nitlab.inf.uth.gr
 	</p>
-	 <h4>Windows users</h4>
-	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+	<h4>Windows users</h4>
+	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 
 	<p>
 	<!-- In order to connect to NITOS server he has to upload his public key on the server. 

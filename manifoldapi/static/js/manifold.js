@@ -243,6 +243,7 @@ function QueryStore() {
         // XXX query.change_action() should become deprecated
         update_query = query.clone();
         update_query.action = 'update';
+        update_query.fields = [];
         update_query.analyzed_query.action = 'update';
         update_query.params = {};
         update_query_ext = new QueryExt(update_query);
@@ -1363,8 +1364,9 @@ case TYPE_LIST_OF_VALUES:
                 case TYPE_LIST_OF_VALUES: // XXX Until fixed
                 case TYPE_LIST_OF_RECORDS:
                     var key, new_state, cur_query_uuid;
-
-                    cur_query_uuid = query.analyzed_query.subqueries[field].query_uuid;
+                    if($.inArray(field,Object.keys(query.analyzed_query.subqueries)) > -1){
+                        cur_query_uuid = query.analyzed_query.subqueries[field].query_uuid;
+                    }
 
                     // example: slice.resource
                     //  - update_query_orig.params.resource = resources in slice before update
@@ -1449,6 +1451,8 @@ case TYPE_LIST_OF_VALUES:
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
         query_ext.query_state = QUERY_STATE_DONE;
 
+        var tmp_query = manifold.query_store.find_analyzed_query(query.query_uuid);
+        manifold.publish_result_rec(tmp_query, records);
 
         // Send DONE message to plugins
         query.iter_subqueries(function(sq, data, parent_query) {
@@ -1884,6 +1888,7 @@ case TYPE_LIST_OF_VALUES:
                 break;
 
             case RUN_UPDATE:
+                query_ext.main_query_ext.update_query_ext.query.fields = [];
                 manifold.run_query(query_ext.main_query_ext.update_query_ext.query);
                 break;
 

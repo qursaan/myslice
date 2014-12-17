@@ -1,4 +1,6 @@
 from datetime import datetime
+from dateutil import tz
+import dateutil.parser
 
 """Contains the bean models for the SlaManager xml/json types
 """
@@ -23,7 +25,7 @@ class Agreement(object):
                 repr(self.provider),
                 repr(self.consumer),
                 repr(self.service))
-            
+
         def service_formatted(self):
             return self.service.replace('_', ' ')
 
@@ -31,8 +33,11 @@ class Agreement(object):
             return self.template_id.replace('Service', ' - ')
 
         def time_formatted(self):
-            import dateutil.parser
+            from_zone = tz.tzutc()
+            to_zone = tz.tzlocal()
             time = dateutil.parser.parse(self.expirationtime)
+            time = time.replace(tzinfo=from_zone)
+            time = time.astimezone(to_zone)
             return time.strftime('%d-%m-%Y at %H:%M:%S')
 
     class Property(object):
@@ -43,7 +48,8 @@ class Agreement(object):
             self.location = ""
 
         def __repr__(self):
-            str_ = "<Property(name={}, servicename={}, metric={}, location={})>"
+            str_ = "<Property(name={}, servicename={}, \
+                    metric={}, location={})>"
             return str_.format(
                 repr(self.name),
                 repr(self.servicename),
@@ -69,7 +75,8 @@ class Agreement(object):
                 self.customservicelevel = ""
 
             def __repr__(self):
-                s = "<ServiceLevelObjective(kpiname={}, customservicelevel={})>"
+                s = "<ServiceLevelObjective(kpiname={}, \
+                    customservicelevel={})>"
                 return s.format(
                     repr(self.kpiname),
                     repr(self.customservicelevel)
@@ -113,7 +120,6 @@ class Agreement(object):
 
 
 class Template(Agreement):
-    #egarrido this code has been copied from xifi and has not beeing tested
     def __init__(self):
         super(Template, self).__init__()
         self.template_id = ""
@@ -140,7 +146,8 @@ class Enforcement(object):
         return ("<Enforcement(agreement_id={}, enabled={})>".format(
                 self.agreement_id,
                 self.enabled)
-        )
+                )
+
 
 class AgreementStatus(object):
 
@@ -167,9 +174,9 @@ class AgreementStatus(object):
         return (
             "<AgreementStatus( agreement_id={}, guaranteestatus={}, " +
             "guaranteeterms={})>").format(
-                self.agreement_id,
-                self.guaranteestatus,
-                repr(self.guaranteeterms))
+            self.agreement_id,
+            self.guaranteestatus,
+            repr(self.guaranteeterms))
 
     @staticmethod
     def json_decode(json_obj):
@@ -191,23 +198,25 @@ class Violation(object):
         self.uuid = ""
         self.contract_uuid = ""
         self.service_scope = ""
+        self.service_name = ""
         self.metric_name = ""
         self.datetime = datetime.utcnow()
         self.actual_value = 0
 
     def __repr__(self):
-        return ("<Violation(uuid={}, agremeent_id={}, service_scope={}, " +
-            "metric_name={}, datetime={}, actual_value={})>".format(
+        return ("<Violation(uuid={}, datetime={}, contract_uuid={}, \
+                service_name={}, service_scope={}, metric_name={}, \
+                actual_value={})>\n".format(
                 self.uuid,
+                self.datetime,
                 self.contract_uuid,
+                self.service_name,
                 self.service_scope,
                 self.metric_name,
-                self.datetime,
                 self.actual_value)
-        )
+                )
 
     def format_time(self):
-        # return datetime.strptime(self.datetime.datetime.utcnow,'%Y-%m-%d %H:%M:%S')
         # return str(datetime.fromtimestamp(self.datetime))
         return str(self.datetime)
 
@@ -222,7 +231,8 @@ class Provider(object):
         return ("<Provider(uuid={}, name={})>".format(
                 self.uuid,
                 self.name)
-        )
+                )
+
     def to_xml(self):
         xml = "<provider><uuid>{}</uuid><name>{}</name></provider>""".format(
             self.uuid,
@@ -240,4 +250,4 @@ class Provider(object):
         out = wsag_model.Provider.from_dict(json_obj)
         """
         result = Provider(d["uuid"], d["name"])
-        return result        
+        return result

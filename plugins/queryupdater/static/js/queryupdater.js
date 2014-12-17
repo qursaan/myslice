@@ -56,7 +56,109 @@
 
         /***************************** GUI EVENTS *****************************/
 
-        /************************** GUI MANIPULATION **************************/
+        do_checksla: function(e) {
+            var username = e.data.options.username;
+            var urn = data.value;
+            var arraySelectedResources = data.selected_resources;
+
+            var accepted_sla = [];
+            var count = 0;
+            var self = e.data;
+            // var testbedsWithSLA = ["iminds", "fuseco", "netmode"];
+            var testbedsWithSLA;
+            
+            var sliverPattern = /IDN\+(.+)\+(node|channel)\+/;
+            var list = [];
+
+            var promt = $('#sla-table-body');
+            
+            $.get("/sla/testbeds/", function(data) {
+                testbedsWithSLA = data;
+
+                console.log("Testbeds with SLA: " + testbedsWithSLA);
+
+                $(arraySelectedResources).each(function () {
+                    var sliverMatch = sliverPattern.exec(this);
+                    var sliverId = sliverMatch[1];
+                    for (var i = 0; i < testbedsWithSLA.length; i++) {
+                        if(this.indexOf(testbedsWithSLA[i].toLowerCase()) >= 0){ // If it has SLA
+                            if (list.indexOf(sliverId) == -1) { // If it is not in the list
+                                list.push(sliverId);
+                            }
+                        }
+                    }
+                });
+
+                if (list.length > 0) {
+                    for (var i = 0; i < list.length; i++) {
+                        var element = $('<tr>');
+                        element.append(
+                            $('<td>').append(list[i]),
+                            $('<td>').append('99% of Uptime for 99% of resources'),
+                            $('<td align="center">').append('<input type="checkbox" name="slaaccept" value="' + list[i] + '"/> <br />')
+                        );
+                        promt.append(element);
+                    }
+
+                    $('#sla_dialog').show();
+                    $('#slamodal').modal('show');
+                } else {
+                    //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                }
+            
+            });
+                    
+            $("#submit_sla").unbind().click(function(){
+                console.log("With username: " + username);
+
+                var notChecked = $("input[name='slaaccept']:not(:checked)");
+                
+                if (notChecked.length > 0) {
+                    for (var i = 0; i < notChecked.length; i++) {
+                         console.log("SLA not accepted: " + notChecked[i].value);
+                    }    
+
+                    alert("All SLAs have to be accepted to continue with the reservation");
+
+                } else {
+                    // $(list).each(function () {
+                    //     var date = new Date();
+                    //     date.setYear(date.getFullYear() + 1);
+
+                    //     $.post("/sla/agreements/simplecreate", 
+                    //         { "template_id": this.toString(),
+                    //           "user": username,
+                    //           "expiration_time": date.toISOString()
+                    //         });
+
+                        
+                    // });
+
+                    $.ajax({
+                        url: "/sla/agreements/simplecreate", 
+                        data: { testbeds: list,
+                          user: username,
+                          resources: arraySelectedResources,
+                          slice: main_query.filters.slice()[0][2]
+                        },
+                        type: "post",
+                        traditional: true
+                    });
+
+                    console.log(main_query.filters.slice()[0][2]);
+                      
+                    $('#slamodal').modal('hide');
+                    $('#sla-table-body').empty();
+                    //manifold.raise_event(self.options.query_uuid, RUN_UPDATE);
+                }
+            });
+
+        	$("#cancel_sla").unbind().click(function(){
+                $('#slamodal').modal('hide');
+                $('#sla-table-body').empty();
+            }); 
+        },
+		/************************** GUI MANIPULATION **************************/
 
         populate_table: function()
         {
