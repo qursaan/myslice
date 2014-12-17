@@ -2,6 +2,9 @@
 
 import os.path
 
+import djcelery
+djcelery.setup_loader()
+
 ### detect if we're in a build environment
 try:
     import manifold
@@ -233,6 +236,9 @@ INSTALLED_APPS = [
     'south', 
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
+	# FORGE Plugin app
+	'djcelery',
+	'forge',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
@@ -241,6 +247,8 @@ INSTALLED_APPS = [
 ]
 # this app won't load in a build environment
 if not building: INSTALLED_APPS.append ('rest')
+
+BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
