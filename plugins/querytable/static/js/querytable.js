@@ -158,8 +158,13 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             });
 
             /* Processing hidden_columns */
+            arr = [];
+            arr = $.map(Object.keys(QUERYTABLE_MAP), function(x, i) { return QUERYTABLE_MAP[x]; });
             $.each(this.options.hidden_columns, function(i, field) {
-                self.hide_column(field);
+                is_inarray = $.inArray(field,arr);
+                if(is_inarray==-1){
+                    self.hide_column(field);
+                }
             });
             $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
             $(".dataTables_filter input").css("width","100%");
@@ -182,7 +187,6 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 };
                 
                 
-                console.log(network_hrn);
                 //Greece: 37.6687092,22.2282404
                 if (network_hrn == 'omf.nitos') {
                     var logo = 'nitos';

@@ -287,9 +287,7 @@
         // myslice.user is in LocalStorage
         if(myslice.user.slices.length>0){
             $.each( myslice.user.slices, function(i, val) {
-                /*
-                Launch a Query for each slice to get resources and leases in Manifold Cache
-                */
+                // Launch a Query for each slice to get resources and leases in Manifold Cache
                 $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
                 });
             });

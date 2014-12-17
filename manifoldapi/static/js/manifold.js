@@ -1092,7 +1092,11 @@ var manifold = {
             // Has it a domain query, and has it completed ?
             $.each(records, function(i, record) {
                 var key = manifold.metadata.get_key(query.object);
-                var record_key = manifold.record_get_value(record, key);
+                if ( typeof record === "string" ){
+                    var record_key = record;
+                }else{
+                    var record_key = manifold.record_get_value(record, key);
+                }
                 manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
             });
 
