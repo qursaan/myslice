@@ -1,25 +1,19 @@
 <div class="col-md-10 col-md-offset-1">
-	<h2>How to access your slice</h2>
+	{% if ple_resources or iotlab_resources or nitos_resources or nitos_paris_resources%}
+		<h2>How to access your reserved resources</h2>
+	{% endif %}
+	{% if ple_resources %}
 	<h3>PlanetLab Europe</h3>
 	
 	<p>
 		PlanetLab Europe resources are accessible directly via SSH. Your SSH public key is deployed automatically
 		on the reserved nodes. To access your slice on a resource just type the following command:
 	</p>
-	{%if ple_resources%}
 	<p class="command">
 	{%for resource in ple_resources %}
 		$ ssh {{ple_slicename}}@{{resource}}<br>
 	{%endfor%}
 	</p>
-	 <h4>Windows users</h4>
-	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
-	{%else%}
-		<p><b>NOTE:</b> You did not reserve any PLE resources yet. Once reserved, you will get the actual SSH command. A specimen command is given below:</p>
-		<p class="command">
-    		$ ssh {{ple_slicename}}@planetlab-resource.hostname.com<br>
-		</p>
-	{%endif%}
 	<h4>Windows users</h4>
 	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
@@ -28,7 +22,9 @@
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
 		after witch you will be able to access the resource.
 	</p>
-	
+	{% endif %}
+
+	{% if iotlab_resources %}	
 	<h3>FIT IoT-Lab</h3>
 	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://devgrenoble.senslab.info/testbed/" target="_blank">web GUI.</a>
 		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
@@ -39,67 +35,63 @@
 	</p>
 	<h4>Windows users</h4>
 	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
-
+	{% endif %}
+	{% if nitos_resources or nitos_paris_resources %}
 	<h3>NITOS</h3>
 	
 	<p>
 	 NITOS resources are not directly accessible. You will need to log in on a gateway server and from there access the node.
 	 You will find the ssh commands to connect to NITOS nodes below:
 	</p>
+
+	{% if nitos_resources %}	
 	<h4>NITLab</h4>
 	<p class="command">
 	$ ssh {{slicename}}@nitlab.inf.uth.gr
 	</p>
+	
+	<p>For each of the reserved nodes, follo the steps given below:</p>
+	<p class="command">
+	{%for resource in nitos_resources %}
+    	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
+		$ omf tell -a on -t {{resource}}  #turn on the node <br>
+		$ ssh root@{{resource}}  #ssh to the node<br>
+	{%endfor%}
+	</p>
+	{% endif %}
+
+	{% if nitos_paris_resources %}
 	<h4>FIT NITOS-Lab Paris</h4>
 	 <p class="command">
- 	$ ssh {{slicename}}@griffin.ipv6.lip6.fr
+ 		$ ssh {{slicename}}@griffin.ipv6.lip6.fr
 	 </p>
-
-	 <h5>Windows users</h5>
-	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
-
-	<p>
-	<!-- In order to connect to NITOS server he has to upload his public key on the server. 
-	For now we do it this way: http://nitlab.inf.uth.gr/NITlab/index.php/your-ssh-keys. 
-	I think this is a procedure that needs to be done at the registration phase of the user, 
-	through myslice, Broker etc. but I will answer you in a couple of days for sure. -->
-	</p>
-
-	<p>
-		You will then need to prepare the resource by loading an OMF image on it:
-	</p>
-	
+	<p>For each of the reserved nodes, follo the steps given below:</p>
 	<p class="command">
-		$ omf load -i baseline_grid.ndz -t node016
+	{%for resource in nitos_paris_resources %}
+    	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
+    	$ omf tell -a on -t {{resource}}  #turn on the node <br>
+    	$ ssh root@{{resource}}  #ssh to the node<br><br>
+	{%endfor%}
 	</p>
+	{%endif%}
 
-	<p>
-		Turn on the node:
-	</p>
-	
-	<p class="command">
-		$ omf tell -a on -t node016
-	</p>
-	<p>
-		And finally ssh on the node:
-	</p>
-	<p class="command">
-		$ ssh root@node016
-	</p>
 	<p>
 		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml according to your slice settings and then
 		restart the OMF Resource Controller and finally execute the experiment:
 	</p>
 	<p class="command">
-		$ omf exec --slice slice_name your_exp.rb
+		$ omf exec --slice {{slicename}} your_exp.rb
 	</p>
 	<p>
 	The complete tutorial is available at the following address:
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
 	</p>
 	<p>To learn more about OMF6, please click <a href="http://omf.mytestbed.net/projects/omf6/wiki/Wiki" target="_blank">here.</a></p>
+	{% endif %}
 	
-	<br />
+	 <h5>Windows users</h5>
+	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
+
 	
 	<h2>Available Tools</h2>
 	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"> <b>SSH</b></p>
