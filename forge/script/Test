@@ -1,0 +1,11 @@
+Slice name : upmc_testForge
+	Env 1
+		distance : 0	hostname : planetlab2.upc.es	longitude : 2.11273	latitude : 41.3897	type : private	id : 931
+		distance : 0	hostname : aguila1.lsi.upc.edu	longitude : 2.11273	latitude : 41.3897	type : common	id : 15840
+		distance : 1198	hostname : aladdin.planetlab.extranet.uni-passau.de	longitude : 13.47	latitude : 48.58	type : common	id : 14809
+		distance : 19310	hostname : planetlab-n2.wand.net.nz	longitude : 175.318	latitude : -37.7892	type : common	id : 14617
+	Env 2
+		distance : 0	hostname : planetlab1.upc.es	longitude : 2.11273	latitude : 41.3897	type : private	id : 930
+		distance : 0	hostname : aguila1.lsi.upc.edu	longitude : 2.11273	latitude : 41.3897	type : common	id : 15840
+		distance : 1198	hostname : aladdin.planetlab.extranet.uni-passau.de	longitude : 13.47	latitude : 48.58	type : common	id : 14809
+		distance : 19310	hostname : planetlab-n2.wand.net.nz	longitude : 175.318	latitude : -37.7892	type : common	id : 14617
