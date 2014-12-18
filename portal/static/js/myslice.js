@@ -114,17 +114,44 @@ var myslice = {
 		}
 		return this.user;
 	},
+    loadSlices: function(slices) {
+        if (typeof(slices) == "undefined"){
 
+            if(myslice.user != null && typeof(myslice.user.slices) != "undefined" && myslice.user.slices.length>0){
+                slices == myslice.user.slices
+            }
+        }
+        // myslice.user is in LocalStorage
+        if(typeof(slices) != "undefined"){
+            /*
+                Launch queries to get the resources and leases in Manifold Cache
+            */
+            $.post("/rest/resource/", function( data ) {
+            });
+            $.post("/rest/lease/", function( data ) {
+            });
+
+            $.each( slices, function(i, val) {
+                /*
+                Launch a Query for each slice to get resources and leases in Manifold Cache
+                */
+                $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+                });
+            });
+        }
+
+    },
 	login: function(fn) {
         user = localStorage.getItem('user');
         if($.isEmptyObject(user)){
-		    $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+            // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+		    $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
 			    //myslice.user = new user(data[0]);
 			    localStorage.setItem('user', JSON.stringify(data[0]));
+                myslice.loadSlices(data[0].slices);
 		    });
         }
 	},
-
     getSlices: function(name) {
     	
     },

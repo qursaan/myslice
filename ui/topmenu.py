@@ -72,7 +72,9 @@ def topmenu_items_live (current, page):
     request=page.request
     # XXX TODO This should be triggered only when user is logged in
     # We might use local storage instead
-    query_pi_auths = Query.get('user').filter_by('user_hrn', '==', '$user_hrn' ).select('user_hrn','pi_authorities')
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query_pi_auths = Query.get('myslice:user').filter_by('user_hrn', '==', '$user_hrn' ).select('user_hrn','pi_authorities')
     page.enqueue_query(query_pi_auths)
 #        # even though this plugin does not have any html materialization, the corresponding domid
 #        # must exist because it is searched at init-time to create the JS plugin
