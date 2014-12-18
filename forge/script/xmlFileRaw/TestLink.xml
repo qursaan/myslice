@@ -1,0 +1,14 @@
+<links>
+	<link>
+		<host1>
+			<slice>upmc_tp</slice>
+			<id>1</id>
+			<bridge_name>tap2</bridge_name>
+		</host1>
+		<host2>
+			<slice>upmc_tp</slice>
+			<id>2</id>
+			<bridge_name>tap1</bridge_name>
+		</host2>
+	</link>
+</links>

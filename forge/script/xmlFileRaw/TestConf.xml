@@ -1,0 +1,21 @@
+<conf>
+	<slice>
+		<slice_name>upmc_tp</slice_name>
+		<host>
+			<id>1</id>
+			<url>ple2.ipv6.lip6.fr</url>
+			<interface>
+				<bridge_name>tap2</bridge_name>
+				<ip>10.1.3.1/24</ip>
+			</interface>
+		</host>
+		<host>
+			<id>2</id>
+			<url>ple1.cesnet.cz</url>
+			<interface>
+				<bridge_name>tap1</bridge_name>
+				<ip>10.1.3.2/24</ip>
+			</interface>
+		</host>
+	</slice>
+</conf>

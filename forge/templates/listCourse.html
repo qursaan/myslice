@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>List of all your class</title>
+	</head>
+	<body>
+		{% if courses %}
+			<ul>
+			{% for course, environments in courses %}
+				
+				{% if course.ready %}
+					<ul>
+					<li><a href=" {{ course.mainKey.url }}">Main SSH Key</a></li>
+					{# <li>{{ course.id }}</li> #}
+					<li><a href=" {{ course.lab.subject.url }}">Subject</a></li>
+					<li><a href="/ict_education/delete-course/{{ course.id }}">Delete Course</a></li>
+					<li><a href="/ict_education/renew-slice/{{ course.id }}">Renew-Slice</a></li>
+					<ul>
+					{% for environment, slices  in environments %}
+						{% if environment.ready %}
+							<li>Environment <a href="/ict_education/install-env/{{ environment.id }}">Re-install environment</a></li>
+							<li><a href=" {{ environment.sshKey.url }}">SSH Key</a></li>
+							<ul>
+							{% for pleSlice, hosts in slices %}
+								<li>{{ pleSlice.sliceName }}</li>
+								<ul>
+								{% for host, services, interfaces in hosts %}
+									<li>Hostname : {{ host.hostname }} Type : {{ host.hostType }}</li>
+									<ul>
+									{% if services %}
+										<li>Service List :</li>
+										<ul>
+										{% for service in services %}
+											{% if service.servicePort == '' %}
+												<li>{{ service.serviceName }}</li>
+											{% else %}
+												<li>{{ service.serviceName }} on {{ service.servicePort }}</li>
+											{% endif %}
+										{% endfor %}
+										</ul>
+									{% endif %}
+									{% if interfaces %}
+										<li>Interface List :</li>
+										<ul>
+										{% for interface in interfaces %}
+											<li>{{ interface.name }} : {{ interface.ip }}</li>
+										{% endfor %}
+										</ul>
+									{% endif %}
+									</ul>
+								{% endfor %}
+								</ul>
+							{% endfor %}
+							</ul>
+						{% else %}
+							<ul>Now installing this environment</ul>
+							<li>Environment <a href="/ict_education/install-env/{{ environment.id }}">Re-install environment</a></li>
+						{% endif %}
+					{% endfor %}
+					</ul>
+				{% else %}
+					<li>Course not ready</li>
+					<li>{{ course.ready }}</li>
+				{% endif %}
+				</ul>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>You have not created a class yet</p>
+		{% endif %}
+	</body>
+</html>
