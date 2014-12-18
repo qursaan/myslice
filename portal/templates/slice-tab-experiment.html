@@ -11,6 +11,7 @@
 	</p>
 	<p class="command">
 	{%for resource in ple_resources %}
+		<b>Resource</b><br>
 		$ ssh {{ple_slicename}}@{{resource}}<br>
 	{%endfor%}
 	</p>
@@ -53,9 +54,10 @@
 	<p>For each of the reserved nodes, follo the steps given below:</p>
 	<p class="command">
 	{%for resource in nitos_resources %}
+		<b>Resource</b><br>
     	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
 		$ omf tell -a on -t {{resource}}  #turn on the node <br>
-		$ ssh root@{{resource}}  #ssh to the node<br>
+		$ ssh root@{{resource}}  #ssh to the node<br><br>
 	{%endfor%}
 	</p>
 	{% endif %}
@@ -68,6 +70,7 @@
 	<p>For each of the reserved nodes, follo the steps given below:</p>
 	<p class="command">
 	{%for resource in nitos_paris_resources %}
+		<b>Resource</b><br>
     	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
     	$ omf tell -a on -t {{resource}}  #turn on the node <br>
     	$ ssh root@{{resource}}  #ssh to the node<br><br>
