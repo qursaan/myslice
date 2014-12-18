@@ -14,6 +14,7 @@ $ apt-get install python-django-south
 $ apt-get install python-pip or sudo easy_install pip==1.4.1
 $ pip install requests
 $ pip install djangorestframework
+$ pip install django-celery
 * git clone git://git.onelab.eu/myslice.git
 -- or --
 * git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
