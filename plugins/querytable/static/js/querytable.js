@@ -158,19 +158,32 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             
             // resource info
             var sTable = this.table;
+            var oSettings = this.table.fnSettings();
+            var cols = oSettings.aoColumns;
+            var self = this;
             $('table.dataTable').delegate('a.resource-info','click',function() {
                 var aPos = sTable.fnGetPosition( this.parentNode );
                 var aData = sTable.fnGetData( aPos[0] );
                 //console.log(aData);
-                
-                var network_hrn = aData[18];
+
+                var index = {}
+                // XXX Loic @ Hardcoded !!! Maybe a loop over all fields would be better 
+                index['network_hrn'] = self.getColIndex('network_hrn',cols);
+                var network_hrn = aData[index['network_hrn']];
+
+                index['hostname'] = self.getColIndex('hostname',cols);
+                index['urn'] = self.getColIndex('urn',cols);
+                index['type'] = self.getColIndex('type',cols);
+                index['status'] = self.getColIndex('boot_state',cols);
+                index['testbed'] = self.getColIndex('testbed_name',cols);
+                index['facility'] = self.getColIndex('facility_name',cols);
                 var resourceData = {
-                    'hostname' : strip(aData[2]),
-                    'urn' : aData[6],
-                    'type' : aData[3],
-                    'status' : aData[10],
-                    'testbed' : aData[4],
-                    'facility' : aData[5],
+                    'hostname' : strip(aData[index['hostname']]),
+                    'urn' : aData[index['urn']],
+                    'type' : aData[index['type']],
+                    'status' : aData[index['status']],
+                    'testbed' : aData[index['testbed']],
+                    'facility' : aData[index['facility']],
                 };
                 
                 /*
