@@ -173,7 +173,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                     'facility' : aData[5],
                 };
                 
-                
+                /*
                 //Greece: 37.6687092,22.2282404
                 if (network_hrn == 'omf.nitos') {
                     var logo = 'nitos';
@@ -183,6 +183,8 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                     };
                     var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
                 } else if (network_hrn == 'iotlab') {
+                */
+                if (network_hrn == 'iotlab') {
                     var logo = network_hrn;
                     var s = resourceData['hostname'].split(".");
                     var n = s[0].split("-");
