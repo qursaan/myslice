@@ -15,8 +15,6 @@
 		$ ssh {{ple_slicename}}@{{resource}}<br>
 	{%endfor%}
 	</p>
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>Please note that the first '.' is replaced by number 8 and the rest of the dot/s are replaced by underscore/s.</p>
 	<p>
@@ -32,10 +30,8 @@
 		the following command:
 	</p>
 	<p class="command">
-		ssh {{username}}@fit3-dev.inrialpes.fr
+		ssh {{iot_login}}@fit3-dev.inrialpes.fr
 	</p>
-	<h4>Windows users</h4>
-	<p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 	{% endif %}
 	{% if nitos_resources or nitos_paris_resources %}
 	<h3>NITOS</h3>
@@ -90,9 +86,6 @@
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
 	</p>
 	<p>To learn more about OMF6, please click <a href="http://omf.mytestbed.net/projects/omf6/wiki/Wiki" target="_blank">here.</a></p>
-
-	 <h5>Windows users</h5>
-	 <p>Use <a href="http://www.putty.org/" target="_blank">SSH client.</a></p>
 
 	{% endif %}
 	

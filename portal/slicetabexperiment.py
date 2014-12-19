@@ -16,6 +16,8 @@ from myslice.configengine import ConfigEngine
 
 from myslice.theme import ThemeView
 
+import urllib2,json
+
 class ExperimentView (FreeAccessView, ThemeView):
     template_name = 'slice-tab-experiment.html'
 
@@ -60,7 +62,7 @@ class ExperimentView (FreeAccessView, ThemeView):
 
 
         except Exception,e:
-            print "Exception in slicetabexperiment.py in ple resource search %s" % e
+            print "Exception in slicetabexperiment.py in OneLab resource search %s" % e
         
         #print "list of ple res hrns"
         #print ple_resource_list
@@ -70,8 +72,29 @@ class ExperimentView (FreeAccessView, ThemeView):
         #print iotlab_resource_list
         #print "list of nitos res hrns"
         #print nitos_resource_list
-        
-        
 
-        return render_to_response(self.template, { 'theme' : self.theme,'slicename':slicename, 'ple_slicename':ple_slicename, 'username':username, 'ple_resources':ple_resource_list, 'nitos_resources': nitos_resource_list, 'nitos_paris_resources':nitos_paris_resource_list, 'iotlab_resources':iotlab_resource_list }, context_instance=RequestContext(request))
+        #get all  iotlab users
+        try:
+            userData = "Basic " + ('auge' + ":" + 'k,mfg1+Q').encode("base64").rstrip()
+            req = urllib2.Request('https://devgrenoble.senslab.info/rest/admin/users')
+            req.add_header('Accept', 'application/json')
+            req.add_header("Content-type", "application/x-www-form-urlencoded")
+            req.add_header('Authorization', userData)
+            # make the request and print the results
+            res = urllib2.urlopen(req)
+            all_users = json.load(res) 
+        except URLError as e:
+            print "There is a problem in getting iotlab users %s" % e.reason
+       
+        #print all_users 
+
+        #getting the login from email
+        #initial value  no-account == contact_admin
+        iot_login = 'contact_admin'
+        username = str(username)
+        for user in all_users:
+            if user['email'] == username:
+                iot_login = user['login']
+            
+        return render_to_response(self.template, { 'theme' : self.theme,'slicename':slicename, 'ple_slicename':ple_slicename, 'username':username, 'ple_resources':ple_resource_list, 'nitos_resources': nitos_resource_list, 'nitos_paris_resources':nitos_paris_resource_list, 'iotlab_resources':iotlab_resource_list, 'iot_login':iot_login }, context_instance=RequestContext(request))
 
