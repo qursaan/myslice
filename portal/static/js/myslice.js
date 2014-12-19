@@ -118,7 +118,7 @@ var myslice = {
         if (typeof(slices) == "undefined"){
 
             if(myslice.user != null && typeof(myslice.user.slices) != "undefined" && myslice.user.slices.length>0){
-                slices == myslice.user.slices
+                slices = myslice.user.slices
             }
         }
         // myslice.user is in LocalStorage
