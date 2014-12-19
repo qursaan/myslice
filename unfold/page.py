@@ -123,6 +123,10 @@ class Page:
         # xxx this is fetched synchroneously..
         self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";\n")
 
+    def expose_js_var(self, name, value):
+        # expose variable as a js value
+        self.add_js_init_chunks("var " + name + "=" + value + ";\n")
+
     def expose_js_manifold_config (self):
         self.add_js_init_chunks(ConfigEngine().manifold_js_export())
 

@@ -33,12 +33,16 @@ class ColumnsEditor(Plugin):
 
     def template_env(self, request):
         fields = []
+        if self.default_fields is not None:
+            default_fields = self.default_fields
+        else:
+            default_fields = self.query.fields
         #hidden_columns = self.hidden_columns
         metadata = self.page.get_metadata()
         md_fields = metadata.details_by_object('resource')
 
         # XXX use django templating system here
-        for md_field in md_fields['column']:
+        for md_field in sorted(md_fields['column']):
             if md_field['type'] == 'string':
                 if 'allowed_values' in md_field:
                     allowed_values = md_field['allowed_values'].split(',')
@@ -82,7 +86,7 @@ class ColumnsEditor(Plugin):
                 'resource_type': 'N/A',
                 'filter_input':  filter_input,
                 'header':        None,
-                'checked':       md_field['name'] in self.query.get_select()
+                'checked':       md_field['name'] in default_fields
             })
         #return { 'fields': fields, 'hidden_columns': hidden_columns }
         #return { 'fields': fields , 'query_uuid': self.query_uuid, 'query_all_uuid': self.query_all_uuid }

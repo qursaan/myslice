@@ -10,14 +10,6 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
 
 (function($){
 
-    
-    var QUERYTABLE_MAP = {
-        'Facility': 'facility_name',
-        'Testbed': 'testbed_name',
-        'Resource name': 'hostname',
-        'Type': 'type',
-    };
-
     var debug=false;
 //    debug=true
 
@@ -158,13 +150,8 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             });
 
             /* Processing hidden_columns */
-            arr = [];
-            arr = $.map(Object.keys(QUERYTABLE_MAP), function(x, i) { return QUERYTABLE_MAP[x]; });
             $.each(this.options.hidden_columns, function(i, field) {
-                is_inarray = $.inArray(field,arr);
-                if(is_inarray==-1){
-                    self.hide_column(field);
-                }
+                self.hide_column(field);
             });
             $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
             $(".dataTables_filter input").css("width","100%");

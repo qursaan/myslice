@@ -76,6 +76,22 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
         main_query.select(slice_fields)
+
+        # Columns shown by default in Query_table plugin
+        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Status':'boot_state'}")
+       
+        # Columns checked by default in Columns_selector plugin
+        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'boot_state']
+
+        QUERYTABLE_MAP = { 
+            'hostname'      :   'Resource name',
+            'type'          :   'Type',
+            'facility_name' :   'Facility',
+            'testbed_name'  :   'Testbed',
+            'boot_state'    :   'Status',
+        }
+
+
         #        # SLICE
         #        'slice_hrn',
         #        # - The record key is needed otherwise the storage of records
@@ -121,14 +137,16 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # ALL RESOURCES LIST
         # resources as a list using datatable plugin
  
-        list_resources = QueryTable(
-            page       = page,
-            domid      = 'resources-list',
-            title      = 'List view',
-            query      = sq_resource,
-            query_all  = query_resource_all,
-            init_key   = "urn",
-            checkboxes = True,
+        list_resources     = QueryTable(
+            page           = page,
+            domid          = 'resources-list',
+            title          = 'List view',
+            query          = sq_resource,
+            query_all      = query_resource_all,
+            mapping        = QUERYTABLE_MAP,
+            default_fields = query_default_fields,
+            init_key       = "urn",
+            checkboxes     = True,
             datatables_options = {
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
@@ -179,6 +197,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             page  = page,
             query = sq_resource, 
             query_all = query_resource_all,
+            default_fields = query_default_fields,
             title = "Select Columns",
             domid = 'select-columns',
         )
