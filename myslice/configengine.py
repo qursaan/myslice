@@ -35,6 +35,10 @@ class ConfigEngine(object):
     default_manifold_admin_password = 'demo'
     default_myslice_theme           = 'onelab'
 
+    #iotlab dev url
+    default_iotlab_url = "https://devgrenoble.senslab.info/rest/admin/users"
+    default_iotlab_admin_user = "auge"
+    default_iotlab_admin_password= "k,mfg1+Q"
 
     def __init__ (self):
         parser = RawConfigParser ()
