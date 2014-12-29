@@ -11,6 +11,8 @@ from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
 
 from myslice.theme              import ThemeView
+from myslice.configengine       import ConfigEngine
+
 
 theme = ThemeView()
 
@@ -25,6 +27,8 @@ import activity.slice
 # Get the list of authorities
 
 def authority_get_pis(request, authority_hrn):
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
     query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
     results = execute_admin_query(request, query)
     print "authority_get_pis = %s" % results
@@ -49,7 +53,9 @@ def authority_get_pi_emails(request, authority_hrn):
         return ['support@onelab.eu']
     else:
         pi_user_hrns = [ hrn for x in pi_users for hrn in x['pi_users'] ]
-        query = Query.get('user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
+
+        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+        query = Query.get('myslice:user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
         results = execute_admin_query(request, query)
         return [result['user_email'] for result in results]
 
@@ -95,8 +101,10 @@ def clear_user_creds(request, user_email):
 def is_pi(wsgi_request, user_hrn, authority_hrn):
     # XXX could be done in a single query !
 
-    # select pi_authorities from user where user_hrn == "ple.upmc.jordan_auge"
-    query = Query.get('user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
+    # seauthorities from user where user_hrn == "ple.upmc.jordan_auge"
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
     results = execute_admin_query(wsgi_request, query)
     if not results:
         # XXX Warning ?
@@ -108,19 +116,25 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
 # SFA get record
 
 def sfa_get_user(request, user_hrn, pub):
-    query_sfa_user = Query.get('user').filter_by('user_hrn', '==', user_hrn)
-    result_sfa_user = execute_query(request, query_sfa_user)
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query_sfa_user = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn)
+    result_sfa_user = execute_admin_query(request, query_sfa_user)
     return result_sfa_user                        
 
 def sfa_update_user(request, user_hrn, user_params):
     # user_params: keys [public_key] 
     if 'email' in user_params:
         user_params['user_email'] = user_params['email']
-    query = Query.update('user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
-    results = execute_query(request,query)
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query = Query.update('myslice:user').filter_by('user_hrn', '==', user_hrn).set(user_params).select('user_hrn')
+    results = execute_admin_query(request,query)
     return results
 
 def sfa_add_authority(request, authority_params):
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
     query = Query.create('authority').set(authority_params).select('authority_hrn')
     results = execute_query(request, query)
     print "sfa_add_auth results=",results
@@ -130,10 +144,14 @@ def sfa_add_authority(request, authority_params):
 
 def sfa_add_user_to_slice(request, user_hrn, slice_params):
 # UPDATE myslice:slice SET researcher=['ple.upmc.jordan_auge','ple.inria.thierry_parmentelat','ple.upmc.loic_baron','ple.upmc.ciro_scognamiglio','ple.upmc.mohammed-yasin_rahman','ple.upmc.azerty'] where slice_hrn=='ple.upmc.myslicedemo'
-    query_current_users = Query.get('slice').select('user').filter_by('slice_hrn','==',slice_params['hrn'])
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query_current_users = Query.get('myslice:slice').select('user').filter_by('slice_hrn','==',slice_params['hrn'])
     results_current_users = execute_query(request, query_current_users)
     slice_params['researcher'] = slice_params['researcher'] | results_current_users
-    query = Query.update('slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query = Query.update('myslice:slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
     results = execute_query(request, query)
 # Also possible but not supported yet
 # UPDATE myslice:user SET slice=['ple.upmc.agent','ple.upmc.myslicedemo','ple.upmc.tophat'] where user_hrn=='ple.upmc.azerty'
@@ -590,7 +608,8 @@ def create_slice(wsgi_request, request):
     user_hrn = request.get('user_hrn', None)
     user_hrns = list([user_hrn]) if user_hrn else list()
     
-    user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
     user_details_sfa = execute_admin_query(wsgi_request, user_query)
     if not user_details_sfa:
         raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
@@ -612,6 +631,7 @@ def create_slice(wsgi_request, request):
     }
     # ignored in request: id, timestamp,  number_of_nodes, type_of_nodes, purpose
 
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
     query = Query.create('myslice:slice').set(slice_params).select('slice_hrn')
     results = execute_query(wsgi_request, query)
     if not results:
@@ -619,7 +639,7 @@ def create_slice(wsgi_request, request):
     else:
         clear_user_creds(wsgi_request,user_email)
         # log user activity
-        #activity.slice.validate(request, "Slice validation", { "slice" : hrn })
+        activity.slice.validate(request, { "slice" : hrn })
         try:
             theme.template_name = 'slice_request_validated.txt'
             text_content = render_to_string(theme.template, request)
@@ -752,7 +772,8 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
     if namespace is not None:
         query = Query.create('%s:user' % namespace).set(sfa_user_params).select('user_hrn')
     else:
-        query = Query.create('user').set(sfa_user_params).select('user_hrn')
+        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+        query = Query.create('myslice:user').set(sfa_user_params).select('user_hrn')
 
     if as_admin:
         results = execute_admin_query(wsgi_request, query)
@@ -789,9 +810,9 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
     import time
     from requests.auth import HTTPBasicAuth
     
-    URL_REST = 'https://devgrenoble.senslab.info/rest/admin/users'
-    LOGIN_ADMIN = "auge"
-    PASSWORD_ADMIN = "k,mfg1+Q"
+    URL_REST = ConfigEngine.default_iotlab_url
+    LOGIN_ADMIN = ConfigEngine.default_iotlab_admin_user
+    PASSWORD_ADMIN = ConfigEngine.default_iotlab_admin_password
 
     auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
     headers = {'content-type': 'application/json'}
@@ -802,7 +823,7 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
 
     iotlab_user_params = {
         "type"          : "SA",
-        "login"         : request['email'],
+        #"login"         : request['email'], #auto generated by iotlab
         "password"      : password,
         "firstName"     : request['first_name'],
         "lastName"      : request['last_name'],

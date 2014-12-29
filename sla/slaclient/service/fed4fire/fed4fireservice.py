@@ -5,9 +5,9 @@ to sla manager.
 It is intended as backend service for a rest interface.
 
 The json input must work together with the templates to form a valid template
- or agreement for Xifi (be careful!)
+ or agreement for fed4fire (be careful!)
 
-This (very simple) service is coupled to the way xifi is interpreting
+This (very simple) service is coupled to the way fed4fire is interpreting
 ws-agreement.
 
 
@@ -18,10 +18,13 @@ from sla.slaclient import wsag_model
 from sla.slaclient import restclient
 from sla.slaclient.templates.fed4fire.django.factory import Factory as TemplateFactory
 import sla.slaclient.templates.fed4fire as fed4fire
-from time import localtime, strftime
+#from time import localtime, strftime
 import uuid
+import dateutil.parser
+
+
 class ServiceContext(object):
-    def __init__(self, restfactory = None, templatefactory=None):
+    def __init__(self, restfactory=None, templatefactory=None):
         """
         :type restfactory: restclient.Factory
         """
@@ -101,38 +104,42 @@ def createagreement(json_data, context):
 
     # Builds AgreementInput from json
     data = jsonparser.agreementinput_from_json(json_data)
+
     # Read template from manager
+    # client_templates.getbyid(provider_id, testbed)
     slatemplate, request = client_templates.getbyid(data.template_id)
     # Copy (overriding if necessary) from template to AgreementInput
     final_data = data.from_template(slatemplate)
+
     slaagreement = fed4fire.render_slaagreement(final_data)
 
     client_agreements = context.restfactory.agreements()
-    return client_agreements.create(slaagreement)
-    
-
-def createagreementsimplified(template_id, user, expiration_time):
-        context = ServiceContext(
-            restclient.Factory(),
-            TemplateFactory()
-        )
-        
-        agreement = {
-            "agreement_id": str(uuid.uuid4()),
-            "template_id": template_id,
-            "expiration_time": expiration_time,
-            "consumer": user,
-        }
-    
-        json_data = json.dumps(agreement)
-
-        return createagreement(json_data, context)
-    
-def main():
-    createagreementsimplified("iMindsServiceWiLab2", "virtualwall", "2014-04-34T23:12:12")
+    return client_agreements.create(slaagreement, data.template_id)
 
 
-if __name__ == "__main__":
-    main()
-      
-        
+def createagreementsimplified(template_id, user, expiration_time, resources):
+    context = ServiceContext(
+        restclient.Factory(),
+        TemplateFactory()
+    )
+
+    agreement = {
+        "agreement_id": str(uuid.uuid4()),
+        "template_id": template_id,
+        "expiration_time": expiration_time.strftime('%Y-%m-%dT%H:%M:%S%Z'),
+        "consumer": user,
+        "guarantees": [
+            {
+                "name": "uptime",
+                "bounds": ["0", "1"],
+                "scope": {
+                    "service_name": "",
+                    "scope": resources[template_id]
+                }
+            }
+        ]
+    }
+
+    json_data = json.dumps(agreement)
+
+    return createagreement(json_data, context)

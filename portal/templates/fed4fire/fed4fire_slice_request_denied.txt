@@ -1,0 +1,15 @@
+Dear Fed4FIRE user,
+
+You have recently requested the following slice on the Fed4FIRE portal({{portal_url}}):
+
+Slice name   : {{slice_name}}
+URL          : {{url}}
+Purpose      : {{purpose}}
+ 
+We regret to inform you that, a manager of your institution has not confirmed your request. Please contact the manager of your institution for further information. For any other queries, please contact us by replying to this email.
+
+We wish you a fruitful user experience on Fed4FIRE.
+
+Yours sincerely,
+The Fed4FIRE team
+

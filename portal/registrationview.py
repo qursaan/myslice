@@ -41,6 +41,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         """
         errors = []
         authority_hrn = None
+        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
@@ -52,6 +53,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/jquery.qtip.min.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css" ] )
         page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.expose_js_metadata()
         print "############ BREAKPOINT 2 #################"
         if method == 'POST':
             reg_form = {}
@@ -116,7 +118,9 @@ class RegistrationView (FreeAccessView, ThemeView):
             # Does the user exist in sfa? [query is very slow!!]
             #user_query  = Query().get('user').select('user_hrn','user_email')
             # XXX Test based on the user_hrn is quick
-            user_query  = Query().get('user').select('user_hrn','user_email').filter_by('user_hrn','==',user_request['user_hrn'])
+
+            # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+            user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_request['user_hrn'])
             user_details_sfa = execute_admin_query(wsgi_request, user_query)
 
             for user in user_details_sfa:
@@ -191,7 +195,7 @@ class RegistrationView (FreeAccessView, ThemeView):
             print "############ BREAKPOINT B #################"
 
         template_env = {
-          'topmenu_items': topmenu_items_live('Register', page),
+          #'topmenu_items': topmenu_items_live('Register', page),
           'errors': errors,
           'authorities': authorities,
           'theme': self.theme

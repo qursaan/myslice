@@ -2,6 +2,9 @@
 
 import os.path
 
+import djcelery
+djcelery.setup_loader()
+
 ### detect if we're in a build environment
 try:
     import manifold
@@ -233,6 +236,9 @@ INSTALLED_APPS = [
     'south', 
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
+	# FORGE Plugin app
+	'djcelery',
+	'forge',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
@@ -241,6 +247,8 @@ INSTALLED_APPS = [
 ]
 # this app won't load in a build environment
 if not building: INSTALLED_APPS.append ('rest')
+
+BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
@@ -278,7 +286,8 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend','django.contrib.auth.backends.ModelBackend' )
+AUTHENTICATION_BACKENDS = ('auth.manifoldbackend.ManifoldBackend',
+                           'django.contrib.auth.backends.ModelBackend')
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
@@ -292,6 +301,7 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 ####SLA#####
 
-SLA_MANAGER_URL = "http://157.193.215.125:4000/sla-service"
-SLA_MANAGER_USER = "normal_user"
+SLA_MANAGER_URL = "http://157.193.215.125:4001/sla-collector/sla"
+#SLA_MANAGER_URL = "http://172.24.76.28:8000/sla"
+SLA_MANAGER_USER = "portal"
 SLA_MANAGER_PASSWORD = "password"

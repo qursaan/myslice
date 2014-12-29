@@ -69,11 +69,22 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
+
+    /*
+        Launch queries to get the resources and leases in Manifold Cache
+    */
+        
     function drawSlices(slices){
         var items = [];
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
+            /*
+            // Launch a Query for each slice to get resources and leases in Manifold Cache
+            // Now only done in Homeview to speed up the other pages
+            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+            });
+            */
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));

@@ -59,6 +59,7 @@ with the query passed using POST"""
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
             if 'manifold' in request.session:
+                print '===> manifoldproxy.proxy: before auth', manifold_query
                 manifold_api_session_auth = request.session['manifold']['auth']
             else:
                 json_answer=json.dumps({'code':0,'value':[]})

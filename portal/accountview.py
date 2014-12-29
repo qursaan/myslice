@@ -14,10 +14,12 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 
+from myslice.configengine           import ConfigEngine
 from myslice.theme import ThemeView
 
+from portal.account                     import Account, get_expiration
 #
-import json, os, re, itertools
+import json, os, re, itertools, time
 from OpenSSL import crypto
 from Crypto.PublicKey import RSA
 
@@ -36,6 +38,10 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
 
         page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
+
+        # Execute a Query to delegate credentials if necessary
+        sfa_user_query  = Query().get('myslice:user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
+        sfa_user_result = execute_query(self.request, sfa_user_query)
 
         user_query  = Query().get('local:user').select('config','email','status')
         user_details = execute_query(self.request, user_query)
@@ -210,7 +216,11 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         if acc_user_cred == {} or acc_user_cred == 'N/A':
             user_cred = 'no_creds'
         else:
-            user_cred = 'has_creds'
+            exp_date = get_expiration(acc_user_cred, 'timestamp')
+            if exp_date < time.time():
+                user_cred = 'creds_expired'
+            else:
+                user_cred = 'has_creds'
 
         context = super(AccountView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
@@ -243,6 +253,20 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         context.update(prelude_env)
         return context
 
+@login_required
+def get_myslice_platform(request):
+    platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled','config').filter_by('platform','==','myslice')
+    platform_details = execute_query(request, platform_query)
+    for platform_detail in platform_details:
+        return platform_detail
+
+@login_required
+def get_myslice_account(request):
+    platform_myslice = get_myslice_platform(request)
+    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
+    account_details = execute_query(request, account_query)
+    for account_detail in account_details:
+        return account_detail
 
 @login_required
 #my_acc form value processing
@@ -256,10 +280,19 @@ def account_process(request):
     platform_query  = Query().get('local:platform').select('platform_id','platform')
     platform_details = execute_query(request, platform_query)
     
-    # getting the user_id from the session
-    for user_detail in user_details:
-            user_id = user_detail['user_id']
-            user_email = user_detail['email']
+    # getting the user_id from the session                                            
+    for user_detail in user_details:                                                  
+        user_id = user_detail['user_id']                                              
+        user_email = user_detail['email']                                             
+        try:
+            if user_email == request.user.email:                                          
+                authorize_query = True                                                    
+            else:                                                                         
+                print "SECURITY: %s tried to update %s" % (user_email, request.user.email)
+                messages.error(request, 'You are not authorized to modify another user.') 
+                return HttpResponseRedirect("/portal/account/")                               
+        except Exception,e:
+            print "Exception = %s" % e
 
     for account_detail in account_details:
         for platform_detail in platform_details:
@@ -380,7 +413,7 @@ def account_process(request):
                         # updating sfa
                         public_key = public_key.replace('"', '');
                         user_pub_key = {'keys': public_key}
-                        #sfa_update_user(request, user_hrn, user_pub_key)
+
                         sfa_update_user(request, user_hrn, user_pub_key)
                         result_sfa_user = sfa_get_user(request, user_hrn, public_key)
                         try:
@@ -395,6 +428,7 @@ def account_process(request):
                                 raise Exception,"Keys are not matching"
                         except Exception,e:
                             messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
+                            print "Exception in accountview ", e
                         return HttpResponseRedirect("/portal/account/")
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
@@ -514,6 +548,40 @@ def account_process(request):
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
+
+    # Download sfi_config
+    elif 'dl_sfi_config' in request.POST:
+        platform_detail = get_myslice_platform(request)
+        platform_config = json.loads(platform_detail['config'])
+        account_detail = get_myslice_account(request)
+        account_config = json.loads(account_detail['config'])
+
+        user_hrn = account_config.get('user_hrn','N/A')
+        t_user_hrn = user_hrn.split('.')
+        authority_hrn = t_user_hrn[0] + '.' + t_user_hrn[1]
+        import socket
+        hostname = socket.gethostbyaddr(socket.gethostname())[0]
+        registry = platform_config.get('registry','N/A')
+        admin_user = platform_config.get('user','N/A')
+        if 'localhost' in registry:
+            port = registry.split(':')[-1:][0]
+            registry = "http://" + hostname +':'+ port
+        manifold_host = ConfigEngine().manifold_url()
+        if 'localhost' in manifold_host:
+            manifold_host = manifold_host.replace('localhost',hostname)
+        sfi_config  = '[sfi]\n'
+        sfi_config += 'auth = '+ authority_hrn +'\n'
+        sfi_config += 'user = '+ user_hrn +'\n'
+        sfi_config += 'registry = '+ registry +'\n'
+        sfi_config += 'sm = http://sfa3.planet-lab.eu:12346/\n\n'
+        sfi_config += '[myslice]\n'
+        sfi_config += 'backend = '+ manifold_host +'\n'
+        sfi_config += 'delegate  = '+ admin_user +'\n'
+        sfi_config += 'platform  = myslice\n'
+        sfi_config += 'username  = '+ user_email +'\n'
+        response = HttpResponse(sfi_config, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="sfi_config"'
+        return response
 
     #clear all creds
     elif 'clear_cred' in request.POST:

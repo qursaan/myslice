@@ -51,6 +51,9 @@
 	   {%if 'no_creds'  in user_cred %}
       <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
   {%endif%}
+	 {%if 'creds_expired'  in user_cred %}
+    <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
 
 	<div class="row">
 		{%if 'is_pi'  in pi %}
@@ -232,11 +235,9 @@
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-/*-------
-List of slices has been moved in 
-portal/templates/base.html
-This should go into session
---------*/
+
+        myslice.loadSlices();
+        
 });
 </script>
 {# widget "_widget-monitor.html" #}

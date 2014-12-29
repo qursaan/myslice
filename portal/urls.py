@@ -57,6 +57,8 @@ from portal.emailactivationview     import ActivateEmailView
 from portal.views                   import PresViewView, pres_view_static, pres_view_methods, pres_view_animation
 from portal.django_passresetview    import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
+from portal.reputationview      import ReputationView
+
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
 # DEPRECATED #    ("step2", RegisterUserStep2Form)
@@ -128,6 +130,11 @@ urlpatterns = patterns('',
 
     url(r'^servicedirectory/?$', ServiceDirectoryView.as_view(), name='servicedirectory'),
 
+
+    url(r'^reputation/?$', ReputationView.as_view(), name='reputation'),
+    url(r'^reputation/submit_eval/?$', ReputationView.as_view(), name='reputation_submit_eval'),
+    
+    
 )
 # (r'^accounts/', include('registration.backends.default.urls')),
 

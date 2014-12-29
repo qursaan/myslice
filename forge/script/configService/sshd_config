@@ -1,0 +1,14 @@
+Protocol 2
+SyslogFacility AUTHPRIV
+
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/id_rsa.pub
+
+PasswordAuthentication yes
+
+ChallengeResponseAuthentication no
+UsePAM yes
+
+X11Forwarding yes
+
+# The listening port is added by the function from service.py
