@@ -11,6 +11,8 @@ from django.template.loader     import render_to_string
 from django.core.mail           import EmailMultiAlternatives, send_mail
 
 from myslice.theme              import ThemeView
+from myslice.configengine       import ConfigEngine
+
 
 theme = ThemeView()
 
@@ -808,9 +810,9 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
     import time
     from requests.auth import HTTPBasicAuth
     
-    URL_REST = 'https://devgrenoble.senslab.info/rest/admin/users'
-    LOGIN_ADMIN = "auge"
-    PASSWORD_ADMIN = "k,mfg1+Q"
+    URL_REST = ConfigEngine.default_iotlab_url
+    LOGIN_ADMIN = ConfigEngine.default_iotlab_admin_user
+    PASSWORD_ADMIN = ConfigEngine.default_iotlab_admin_password
 
     auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
     headers = {'content-type': 'application/json'}

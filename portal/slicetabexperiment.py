@@ -15,6 +15,7 @@ from ui.topmenu import topmenu_items, the_user
 from myslice.configengine import ConfigEngine
 
 from myslice.theme import ThemeView
+from myslice.configengine import ConfigEngine
 
 import urllib2,json
 
@@ -75,8 +76,8 @@ class ExperimentView (FreeAccessView, ThemeView):
 
         #get all  iotlab users
         try:
-            userData = "Basic " + ('auge' + ":" + 'k,mfg1+Q').encode("base64").rstrip()
-            req = urllib2.Request('https://devgrenoble.senslab.info/rest/admin/users')
+            userData = "Basic " + (ConfigEngine.default_iotlab_admin_user + ":" + ConfigEngine.default_iotlab_admin_password).encode("base64").rstrip()
+            req = urllib2.Request(ConfigEngine.default_iotlab_url)
             req.add_header('Accept', 'application/json')
             req.add_header("Content-type", "application/x-www-form-urlencoded")
             req.add_header('Authorization', userData)
