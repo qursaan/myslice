@@ -57,7 +57,6 @@ $(document).ready(function() {
         /* In Javascript getMonth() gives month[0] = january, month[1] = february, and so on...  */
         var month = now.getMonth()+2;
         var one_month_later = now.getFullYear()+"-"+month+"-"+now.getDate()+" "+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
-        console.log(one_month_later);
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
