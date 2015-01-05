@@ -55,7 +55,7 @@ $(document).ready(function() {
     
     var slices = [];
     if($.isEmptyObject(user)){
-        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
             if(data.length > 0){
                 drawSlices(data[0].slices);  
             }else{

@@ -124,20 +124,28 @@ var myslice = {
         // myslice.user is in LocalStorage
         if(typeof(slices) != "undefined"){
             /*
+                This allows progressive loading per AM platform
                 Launch queries to get the resources and leases in Manifold Cache
+                XXX platform:object
+                TODO support cache for prefixed objects
+                XXX Disabled until it's supported on Manifold side
             */
-            $.post("/rest/resource/", function( data ) {
-            });
-            $.post("/rest/lease/", function( data ) {
-            });
+            /*
+            $.post("/rest/platform/", function( data ) {
+                $.each(data, function(index, p) {
+                    $.post("/rest/"+p.platform+":resource/", function( data ) {
+                    });
+                    $.post("/rest/"+p.platform+":lease/", function( data ) {
+                    });
+                    $.each( slices, function(i, val) {
+                        // Launch a Query for each slice to get it in Manifold Cache
+                        $.post("/rest/"+p.platform+":slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+                        });
+                    });
 
-            $.each( slices, function(i, val) {
-                /*
-                Launch a Query for each slice to get resources and leases in Manifold Cache
-                */
-                $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
                 });
             });
+            */
         }
 
     },

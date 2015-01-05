@@ -7,7 +7,7 @@ import ConfigParser
 
 def servicesStatus(request):
     Config = ConfigParser.ConfigParser()
-    Config.read(os.getcwd() + "/myslice/monitor.ini")
+    Config.read(os.getcwd() + "/myslice/myslice/monitor.ini")
     
     result = {}
     
@@ -16,15 +16,15 @@ def servicesStatus(request):
     
     cert = os.path.abspath(Config.get('monitor', 'cert'))
     if not os.path.isfile(cert) :
-         return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+         return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
      
      
     if not Config.has_option('monitor', 'pkey') :
-        return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+        return HttpResponse(json.dumps({'error' : '-3'}), content_type="application/json")
     
     pkey = os.path.abspath(Config.get('monitor', 'pkey'))
     if not os.path.isfile(pkey) :
-         return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+         return HttpResponse(json.dumps({'error' : '-4'}), content_type="application/json")
     
     services = Config.sections()
     for s in services :
