@@ -976,9 +976,10 @@ var manifold = {
 
         /*
             If the Query object concerns SFA AM objects, iterate on each AM platform
-            This allows a progressive loading per AM platform
+            Loop per platform, allows a progressive loading per AM platform
+            Update is run on all platforms at the same time to get a final answer, we don't manage partial answers yet...
         */
-        if(query.object == 'resource' || query.object == 'lease' || query.object == 'slice'){
+        if((query.object == 'resource' || query.object == 'lease' || query.object == 'slice') && query.action != "update"){
             var obj = query.object;
             $.post("/rest/platform/", function( data ) {
                 $.each(data, function(index, p) {
