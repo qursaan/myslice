@@ -21,6 +21,50 @@
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
 		after witch you will be able to access the resource.
 	</p>
+    <div id="initscript">
+        <div>
+            <h4>Init Script on PLE</h4>
+            <i>This bash script will be deployed on all PLE nodes of your slice</i>
+        </div>
+        <textarea style="width:100%; height:100px;" id="initscript_code"></textarea><br>
+        <button name="deploy" class="btn btn-success btn-sm" onclick="deploy('{{slicename}}');">Deploy</button>
+        <button name="delete" class="btn btn-danger btn-xs" onclick="del('{{slicename}}');">Delete</button>
+    </div>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $.post("/initscript/get/",{'slice_hrn':'onelab.upmc.express'}, function( data ) {
+            console.log(data);
+            jQuery('#initscript_code').val(data['initscript_code']);
+        });
+    });
+    function deploy(slice_hrn){
+        console.log("deploy = "+slice_hrn);
+        var initscript_code = jQuery('#initscript_code').val()
+        $.post("/initscript/update/",{'slice_hrn':slice_hrn, 'initscript_code':initscript_code}, function( data ) {
+            console.log(data);
+            if (data['ret'] == 0) {
+                mysliceAlert('Success: initscript deployed','success', true);
+            }else{
+                mysliceAlert('Rest Error for: '+data.error,'warning', true);
+            }
+            //jQuery('#initscript_code').val(data['initscript_code']);
+        });
+    }
+    function del(slice_hrn){
+        console.log("delete");
+        $.post("/initscript/delete/",{'slice_hrn':slice_hrn}, function( data ) {
+            console.log(data);
+            if (data['ret'] == 0) {
+                mysliceAlert('Success: initscript deleted','success', true);
+                jQuery('#initscript_code').val('');
+            }else{
+                mysliceAlert('Rest Error for: '+data.error,'warning', true);
+            }
+
+        });
+    }
+    </script>
+    <br>
 	{% endif %}
 
 	{% if iotlab_resources %}	
