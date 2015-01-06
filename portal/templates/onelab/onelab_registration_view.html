@@ -30,10 +30,24 @@
 				{% csrf_token %}
 		  		<label for="authority_hrn" class="control-label">Organization</label>
 				<p></p>
-		  		<input id="authority_hrn" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
+                <div class="ui-widget">
+		  		<select id="org_name" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
-				 the managers that we have on record for your organization, asking them to validate your sign-up request." required />
+				 the managers that we have on record for your organization, asking them to validate your sign-up request." required>
+                {% if authorities %}
+                    {% for authority in authorities %}
+                        {% if authority.name %}
+                            <option value="{{ authority.authority_hrn }}">{{authority.name}}</option>
+                        {% else %}
+                            <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
+                        {% endif %}
+                    {% endfor %}    
+                {% else %}
+                    <option value:"">No authority found !!!</option>
+                {% endif %}
+                </select>
+                </div>
 				<p></p>
 				<p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p>
 			</div>
@@ -487,7 +501,7 @@ $(document).ready(function(){
     {% if authorities %}
         {% for authority in authorities %}
             {% if authority.name %}
-                {value:"{{ authority.name }}",label:"{{authority.name}}"},
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
 			// show hrn if we don't have the name
             {% else %}
                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
@@ -498,6 +512,7 @@ $(document).ready(function(){
     {% endif %}
     ];
 	// sorting the list
+    
 	availableTags.sort(function(a,b){
 		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
 		if (nameA < nameB) {
@@ -509,15 +524,7 @@ $(document).ready(function(){
 	return 0;
 	}); 
 	// auto-complete the form
-    $( "#authority_hrn" ).autocomplete({
-      source: availableTags,
-      minLength: 0,
-      change: function (event, ui) {
-          if(!ui.item){
-              jQuery("#authority_hrn").val("");
-          }
-      }
-    });
+    jQuery("#org_name").combobox();
 	$('[title!=""]').qtip();
 	$("form").validate();
 	$("form").submit(function() {
