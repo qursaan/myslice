@@ -59,51 +59,6 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         user_md = metadata.details_by_object('user')
         user_fields = ['user_hrn'] # [column['name'] for column in user_md['column']]
 
-        # TODO The query to run is embedded in the URL
-        # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
-        main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
-        main_query.select(
-                # SLICE
-                'slice_hrn',
-                # - The record key is needed otherwise the storage of records
-                #   bugs !
-                'slice_urn',
-                # RESOURCES
-                'resource',
-                'lease',
-                'resource.urn',
-                'resource.hostname', 'resource.type',
-                # - The facility_name and testbed_name are required for the
-                #   testbeds plugin to properly work.
-                'resource.facility_name', 
-                'resource.testbed_name',
-                # LEASES
-                'lease.resource',
-                'lease.start_time',
-                'lease.end_time',
-                # - The lease_id is important for NITOS identify already existing
-                #   leases
-                'lease.lease_id', 
-
-                # FLOWSPACE
-                #'flowspace',               
-                # VMS
-                #'vms',
-
-
-                #'user.user_hrn',
-                #'application.measurement_point.counter'
-        )
-        # for internal use in the querytable plugin;
-        # needs to be a unique column present for each returned record
-        main_query_init_key = 'urn'
-        aq = AnalyzedQuery(main_query, metadata=metadata)
-        page.enqueue_query(main_query, analyzed_query=aq)
-        sq_resource    = aq.subquery('resource')
-        sq_lease       = aq.subquery('lease')
-        #sq_flowspace   = aq.subquery('flowspace')
-        #sq_vms         = aq.subquery('vms')
-
         query_resource_all = Query.get('resource').select(resource_fields)
         page.enqueue_query(query_resource_all)
 
@@ -114,18 +69,84 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         #query_lease_all = Query.get('lease').select(lease_fields)
         #page.enqueue_query(query_lease_all)
 
+        slice_md = metadata.details_by_object('slice')
+        slice_fields = [column['name'] for column in slice_md['column']]
+        print "SLICE RES VIEW fields = %s" % slice_fields
+        # TODO The query to run is embedded in the URL
+        # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
+        main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
+        main_query.select(slice_fields)
+
+        # Columns shown by default in Query_table plugin
+        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Status':'boot_state'}")
+       
+        # Columns checked by default in Columns_selector plugin
+        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'boot_state']
+
+        QUERYTABLE_MAP = { 
+            'hostname'      :   'Resource name',
+            'type'          :   'Type',
+            'facility_name' :   'Facility',
+            'testbed_name'  :   'Testbed',
+            'boot_state'    :   'Status',
+        }
+
+
+        #        # SLICE
+        #        'slice_hrn',
+        #        # - The record key is needed otherwise the storage of records
+        #        #   bugs !
+        #        'slice_urn',
+        #        # RESOURCES
+        #        'resource',
+        #        'lease',
+        #        'resource.urn',
+        #        'resource.hostname', 'resource.type',
+        #        # - The facility_name and testbed_name are required for the
+        #        #   testbeds plugin to properly work.
+        #        'resource.facility_name',
+        #        'resource.testbed_name',
+        #        # LEASES
+        #        'lease.resource',
+        #        'lease.start_time',
+        #        'lease.end_time',
+        #        # - The lease_id is important for NITOS identify already existing
+        #        #   leases
+        #        'lease.lease_id',
+
+        #        # FLOWSPACE
+        #        #'flowspace',
+        #        # VMS
+        #        #'vms',
+
+
+        #        #'user.user_hrn',
+        #        #'application.measurement_point.counter'
+        #)
+        # for internal use in the querytable plugin;
+        # needs to be a unique column present for each returned record
+        main_query_init_key = 'urn'
+        aq = AnalyzedQuery(main_query, metadata=metadata)
+        page.enqueue_query(main_query, analyzed_query=aq)
+        sq_resource    = aq.subquery('resource')
+        sq_lease       = aq.subquery('lease')
+        #sq_flowspace   = aq.subquery('flowspace')
+        #sq_vms         = aq.subquery('vms')
+
         # --------------------------------------------------------------------------
         # ALL RESOURCES LIST
         # resources as a list using datatable plugin
  
-        list_resources = QueryTable(
-            page       = page,
-            domid      = 'resources-list',
-            title      = 'List view',
-            query      = sq_resource,
-            query_all  = query_resource_all,
-            init_key   = "urn",
-            checkboxes = True,
+        list_resources     = QueryTable(
+            page           = page,
+            domid          = 'resources-list',
+            title          = 'List view',
+            query          = sq_resource,
+            query_all      = query_resource_all,
+            mapping        = QUERYTABLE_MAP,
+            default_fields = query_default_fields,
+            init_key       = "urn",
+            checkboxes     = True,
             datatables_options = {
                 'iDisplayLength': 25,
                 'bLengthChange' : True,
@@ -176,6 +197,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             page  = page,
             query = sq_resource, 
             query_all = query_resource_all,
+            default_fields = query_default_fields,
             title = "Select Columns",
             domid = 'select-columns',
         )

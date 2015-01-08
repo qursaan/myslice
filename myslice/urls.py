@@ -44,6 +44,8 @@ import portal.slicetabmeasurements
 import portal.managementtababout
 import portal.managementtabrequests
 
+import forge.views
+
 #### high level choices
 # main entry point (set to the / URL)
 # beware that if this view is broken you end up in an endless cycle...
@@ -82,6 +84,7 @@ urls = [
     #
     # RESTful interface
     (r'^rest/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.get.dispatch'),
+    (r'^sfa/(?P<method>[^/]+)/?$', 'rest.sfa_api.dispatch'),
     (r'^table/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.get.dispatch'),
     (r'^datatable/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.get.dispatch'),
     (r'^update/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.update.dispatch'),
@@ -106,6 +109,7 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
+    (r'^studentslabs/(?P<slicename>[^/]+)/?$', forge.views.CreateCourseViev.as_view()),
     
     url(r'^about/?$', AboutView.as_view(), name='about'),
     

@@ -1,6 +1,6 @@
 This file documents the contents of this module
 change
-Last update 4 sept. 2013
+Last update 18 DEC. 2014
 
 See the devel/ subdir for more devel-oriented doc.
 
@@ -14,6 +14,10 @@ $ apt-get install python-django-south
 $ apt-get install python-pip or sudo easy_install pip==1.4.1
 $ pip install requests
 $ pip install djangorestframework
+$ pip install django-celery
+$ pip install geopy
+$ pip install paramiko
+
 * git clone git://git.onelab.eu/myslice.git
 -- or --
 * git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
