@@ -9,9 +9,9 @@ See the devel/ subdir for more devel-oriented doc.
 *  REQUIREMENTS  is to have python + django (1.5.2) installed django
 ** should be straightforward
 ** see devel/django-install.txt in case of trouble
-$ apt-get install python-django
-$ apt-get install python-django-south
 $ apt-get install python-pip or sudo easy_install pip==1.4.1
+$ pip install django=="1.5.2
+$ apt-get install python-django-south
 $ pip install requests
 $ pip install djangorestframework
 $ pip install django-celery
