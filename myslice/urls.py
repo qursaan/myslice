@@ -16,6 +16,7 @@ import portal.platformsview
 import portal.dashboardview
 import portal.homeview
 import portal.newsview
+import portal.loginwidget
 
 from portal.about                   import AboutView
 from portal.registrationview        import RegistrationView
@@ -98,6 +99,8 @@ urls = [
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices')
     #
+    # Login widget to be used in an iframe
+    (r'^loginwidget/?$', portal.loginwidget.LoginWidget.as_view()),
     #
     # Portal
     (r'^news/?$', portal.newsview.NewsView.as_view()),
