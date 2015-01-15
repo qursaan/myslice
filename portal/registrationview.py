@@ -138,7 +138,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 # sqlite3 /var/unfold/unfold.sqlite3
                 # select email from auth_user;
                 if UserModel._default_manager.filter(email__iexact = user_request['email']): 
-                    errors.append('<a href="/contact">Contact OneLab support</a> or try with another email.')
+                    errors.append('<a href="/contact">Contact support</a> or try with another email.')
 
                 # XXX TODO: Factorize with portal/accountview.py
                 # XXX TODO: Factorize with portal/registrationview.py
