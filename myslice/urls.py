@@ -91,6 +91,7 @@ urls = [
     (r'^create/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.create.dispatch'),
     (r'^delete/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.delete.dispatch'),
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
+    (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
     #
     # REST monitoring
     (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
