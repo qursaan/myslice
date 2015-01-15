@@ -87,7 +87,7 @@ class ExperimentView (FreeAccessView, ThemeView):
         except URLError as e:
             print "There is a problem in getting iotlab users %s" % e.reason
        
-        #print all_users 
+        all_users = list() 
 
         #getting the login from email
         #initial value  no-account == contact_admin
