@@ -1,0 +1,185 @@
+{% extends "layout_wide.html" %}
+
+{% block head %} 
+<script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
+{% endblock head %}
+
+{% block content %}
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			 <div class="breadcrumbs">
+			 	 Management &nbsp;>&nbsp; Institution: <span id="authority_name"></span>
+			 </div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-tabs nav-section">
+				<li class="active"><a href="#about">About</a></li>
+				<li><a href="#users">Users</a></li>
+				<li><a href="#slices">Slices</a></li>
+				<li><a href="#requests">Requests</a></li>
+			</ul>
+	    </div>
+	</div>
+</div>
+<div class="container tab-content">
+	<div class="tab-pane active row" id="about">
+	</div>
+	
+	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
+		<div class="col-md-12 el">
+			<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+				<div id="user-tab-loaded" style="display:none;">
+    				<table id="user-tab" class="table">
+        				<tr>
+            				<th>+/-</th>
+            				<th>Email</th>
+            				<th>User hrn</th>
+                            <!--
+            				<th>First name</th>
+            				<th>Last name</th>
+            				<th>Enabled</th>
+                            -->
+        				</tr>
+    				</table>
+				
+			</div>
+			{%if 'is_pi'  in pi %}	
+			<div>
+				<button id="deleteusers" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected users</button>
+			</div>
+			{% endif %}
+		</div>
+ 	</div>
+
+	<div class="tab-pane row" id="slices">
+		<div class="col-md-12 el">
+	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+	    <div id="slice-tab-loaded" style="display:none;">
+	        <table id="slice-tab" class="table">
+	            <tr>
+	                <th>+/-</th>
+	                <th>Slice hrn</th>
+	                <th>Users</th>
+	                <th>Url</th>
+	                <!-- <th>nodes</th> -->
+	                <th>Creation</th>
+	            </tr>
+	        </table>			
+	    </div>
+    	{% if 'is_pi'  in pi %}
+        <div>
+        	{% if 'is_pi'  in pi %}
+	  		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+			{% else %}
+			<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
+			{% endif %}
+            <button id="renewslices" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
+            <button id="deleteslices" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
+        </div>
+		{% endif %} 
+	   </div>
+	</div>
+	<div class="tab-pane row" id="requests">
+	</div>
+</div>
+<script>
+$(document).ready(function() {
+    {% if person %}
+    {% if user_details.parent_authority %}
+
+        $.post("/rest/slice/",{'fields':['slice_hrn','users','url','slice_date_created'],'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+            var list_slices = [];
+            var table_slices = [];
+            /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "users", "slice_urn", "slice_expires" */
+            $.each( data, function( key, val ) {
+                list_slices.push( "<li><a href=\"portal/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+                if(val.nodes=="undefined" || val.nodes==null){
+                    nodes_length=0;
+                }else{
+                    nodes_length=val.nodes.length;
+                }
+                console.log(val);
+                if(val.users=="undefined" || val.users==null){
+                    users_length=0;
+                }else{
+                    users_length=val.users.length;
+                }
+
+                if(val.url=="undefined" || val.url==null){
+                    slice_url="";
+                }else{
+                    slice_url="<a href='"+val.url+"' target='_blank'>"+val.url+"</a>";
+                }
+                
+                slice_row = "<tr id='"+val.slice_hrn+"'>";
+                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
+                slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
+                slice_row += "<td>"+users_length+"</td>";
+                slice_row += "<td>"+slice_url+"</td>";
+                //slice_row += "<td>"+nodes_length+"</td>";
+                slice_row += "<td>"+val.slice_date_created+"</td>";
+                slice_row += "</tr>";
+                table_slices.push(slice_row);
+                
+            });
+           
+            /* $("div#slice-list").html($( "<ul/>", { html: list_slices.join( "" ) })); */
+            $("table#slice-tab tr:last").after(table_slices.join( "" ));
+            $("div#slice-tab-loaded").css("display","block");
+            $("div#slice-tab-loading").css("display","none");
+        });
+		
+		
+        $.post("/rest/user/",{'fields':['user_hrn','user_email'],'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+            var list_users = [];
+            var table_users = [];
+		    /* Available fields
+		    user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+		    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+		    */
+            $.each( data, function( key, val ) {
+                list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                user_row = "<tr id='"+val.user_hrn+"'>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"'></td>";
+                user_row += "<td>"+val.user_email+"</td>";
+                user_row += "<td>"+val.user_hrn+"</td>";
+                /*
+                user_row += "<td>"+val.user_first_name+"</td>";
+                user_row += "<td>"+val.user_last_name+"</td>";
+		   	    user_row += "<td>"+val.user_enabled+"</td>";
+                */
+                user_row += "</tr>";
+                table_users.push(user_row);
+            });
+            $("table#user-tab tr:last").after(table_users.join( "" ));
+            $("div#user-tab-loaded").css("display","block");
+            $("div#user-tab-loading").css("display","none");
+        });
+
+    {% endif %}
+    {% endif %}
+
+}); // End document.ready
+
+$(document).ready(function() {
+	$('.nav-tabs a').click(function (e) {
+  		e.preventDefault();
+  		$(this).tab('show');
+    	var id = $(this).attr('href').substr(1);
+    	if ((id == 'requests') || (id == 'about'))
+    		$("#" + id).load('/management/' + id);
+	});
+	var hash = window.location.hash;
+	if (hash) {
+		$('.nav-tabs a[href='+hash+']').click();
+	} else {
+		$('.nav-tabs a[href=#about]').click();
+	}
+});
+</script>
+{% endblock %}
