@@ -76,15 +76,16 @@ class ExperimentView (FreeAccessView, ThemeView):
 
         #get all  iotlab users
         try:
-            userData = "Basic " + (ConfigEngine.default_iotlab_admin_user + ":" + ConfigEngine.default_iotlab_admin_password).encode("base64").rstrip()
-            req = urllib2.Request(ConfigEngine.default_iotlab_url)
+            engine = ConfigEngine()
+            userData = "Basic " + (engine.iotlab_admin_user() + ":" + engine.iotlab_admin_password()).encode("base64").rstrip()
+            req = urllib2.Request(engine.iotlab_url())
             req.add_header('Accept', 'application/json')
             req.add_header("Content-type", "application/x-www-form-urlencoded")
             req.add_header('Authorization', userData)
             # make the request and print the results
             res = urllib2.urlopen(req)
             all_users = json.load(res) 
-        except URLError as e:
+        except urllib2.URLError as e:
             print "There is a problem in getting iotlab users %s" % e.reason
        
         all_users = list() 

@@ -37,8 +37,8 @@ class ConfigEngine(object):
 
     #iotlab dev url
     default_iotlab_url = "https://devgrenoble.senslab.info/rest/admin/users"
-    default_iotlab_admin_user = "auge"
-    default_iotlab_admin_password= "k,mfg1+Q"
+    default_iotlab_admin_user = "xxx"
+    default_iotlab_admin_password= "yyy"
 
     def __init__ (self):
         parser = RawConfigParser ()
@@ -49,6 +49,11 @@ class ConfigEngine(object):
 
         parser.add_section('myslice')
         parser.set ('myslice', 'theme', ConfigEngine.default_myslice_theme)
+
+        parser.add_section('iotlab')
+        parser.set ('iotlab', 'url', ConfigEngine.default_iotlab_url)
+        parser.set ('iotlab', 'admin_user', ConfigEngine.default_iotlab_admin_user)
+        parser.set ('iotlab', 'admin_password', ConfigEngine.default_iotlab_admin_password)
 
         parser.add_section('googlemap')
         parser.set ('googlemap','api_key', None)
@@ -65,6 +70,15 @@ class ConfigEngine(object):
     def manifold_admin_user_password(self):
         return (self.config_parser.get('manifold','admin_user'),
                 self.config_parser.get('manifold','admin_password'))
+
+    def iotlab_url (self):
+        return self.config_parser.get('iotlab','url')
+
+    def iotlab_admin_user(self):
+        return self.config_parser.get('iotlab','admin_user')
+
+    def iotlab_admin_password(self):
+        return self.config_parser.get('iotlab','admin_password')
 
     def googlemap_api_key (self):
         return self.config_parser.get('googlemap','api_key')
