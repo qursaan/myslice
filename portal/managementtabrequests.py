@@ -73,24 +73,17 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
             
             for user_account in user_accounts:
 
-                print "USER ACCOUNT", user_account
                 if user_account['auth_type'] == 'reference':
                     continue # we hardcoded the myslice platform...
 
                 config = json.loads(user_account['config'])
                 creds = []
-                print "CONFIG KEYS", config.keys()
                 if 'authority_credentials' in config:
-                    print "***", config['authority_credentials'].keys()
                     for authority_hrn, credential in config['authority_credentials'].items():
                         credential_authorities.add(authority_hrn)
                 if 'delegated_authority_credentials' in config:
-                    print "***", config['delegated_authority_credentials'].keys()
                     for authority_hrn, credential in config['delegated_authority_credentials'].items():
                         credential_authorities.add(authority_hrn)
-
-            print 'credential_authorities =', credential_authorities
-            print 'credential_authorities_expired =', credential_authorities_expired
 
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
@@ -119,17 +112,21 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 
             # iterate on the requests and check if the authority matches a prefix 
             # startswith an authority on which the user is PI
-            requests = get_requests()
+            if len(pi_my_authorities)>0:
+                requests = get_requests(pi_my_authorities)
+            else:
+                requests = get_requests()
             for r in requests:
                 auth_hrn = r['authority_hrn']
                 for my_auth in pi_my_authorities: 
                     if auth_hrn.startswith(my_auth):
                         dest = ctx_my_authorities
                         r['allowed'] = 'allowed'
-                for my_auth in pi_delegation_authorities:
-                    if auth_hrn.startswith(my_auth):
-                        dest = ctx_delegation_authorities
-                        r['allowed'] = 'allowed'
+
+                #for my_auth in pi_delegation_authorities:
+                #    if auth_hrn.startswith(my_auth):
+                #        dest = ctx_delegation_authorities
+                #        r['allowed'] = 'allowed'
                 if auth_hrn in pi_expired_credential_authorities:
                     r['allowed'] = 'expired'
                 if 'allowed' not in r:

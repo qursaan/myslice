@@ -52,6 +52,7 @@ $(document).ready(function() {
     myslice.login();
 
     user = myslice.user();
+
     var slices = [];
     if($.isEmptyObject(user)){
         $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
@@ -68,22 +69,22 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
-    $.each( slices, function(i, val) {
-        console.log(val);
-        /*
-        Launch a Query for each slice to get resources and leases in Manifold Cache
-        $.post("/rest/slice/", { 'fields': ['slice_hrn','slice_urn','resource','lease','resource.urn','resource.hostname','resource.type','resource.facility_name','resource.testbed_name','lease.resource','lease.start_time','lease.end_time','lease.lease_id'], 'filters': { 'slice_hrn' : val } }, function(data) {
-        });
-
-        */
-    });
-
    
+    /*
+        Launch queries to get the resources and leases in Manifold Cache
+    */
+        
     function drawSlices(slices){
         var items = [];
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
+            /*
+            // Launch a Query for each slice to get resources and leases in Manifold Cache
+            // Now only done in Homeview to speed up the other pages
+            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
+            });
+            */
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));

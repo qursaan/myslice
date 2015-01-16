@@ -103,10 +103,11 @@
 	  </div>
 	  <div id="tabs-2">
 		<h1>Experiment Evaluation</h1>
-		<p><b>List of your unrated experiments</b></p><div id="slicelist">
+		<p><b>List of your unrated experiments</b></p>
+		<div style=" width: 70% !important" id="slicelist">
 			
 			{% for aslice in slicelist %}
-			<h3>Slice <b>{{ aslice.slice_hrn }}</b></h3>
+				<h3>Slice <b>{{ aslice.slice_hrn }}</b></h3>
 		        <div style="padding-bottom:0;padding-top:0;">
 		            <ul><li>
 		                    experiment from <b>{{ aslice.start_t }}</b> to <b>{{ aslice.end_t }}</b> | <a href="#" class="rate_button" data-resid={{ aslice.id }}>Rate it</a>
@@ -126,7 +127,7 @@
 <div id="scoreform" style="display:none">
     <ol>
         <li>
-            <span>How was your overall experience with NETMODE Testbed?</span> 
+            <span>How was your overall experience with this Testbed?</span> 
             <div id="q1">
             </div>
         </li>
@@ -144,7 +145,7 @@
             </div>
         </li>
         <li>
-            Would you use NETMODE testbed again?
+            Would you use this testbed again?
             <div id="q4">
                 <input type="radio" name="q4" value="1" />Yes
                 <input type="radio" name="q4" value="0" />No
@@ -237,9 +238,6 @@ $(function() {
 
 var data = jQuery.parseJSON('{{ json_data|safe }}');
 
-
-
-
 var resid = -1;
 var q1 = -1;
 var q2 = -1;
@@ -267,7 +265,7 @@ function initDialog() {
 
         $("a[data-resid='"+resid+"']").css("text-decoration", "line-through").unbind("click").removeAttr("href");
 
-        //TODO: check input if valid before submitting
+        //TODO: validate input before submitting
 
         sum = q1 + q2 + q3 + q4 + q5 + q6 + q7 +q8;
 
@@ -282,8 +280,6 @@ function initDialog() {
 					slicedata = (data[event]);
 				}	
 			}
-			
-
 			
 			slicedata["user_eval"] = {'overall':q1, 'problems':q2, 'support':q3, 'reuse':q4, 'pay':q5, 'availability':q6, 'link_quality':q7, 'quality':q8};
 			testbeds_str = JSON.stringify(slicedata['testbeds'])

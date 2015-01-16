@@ -1,0 +1,29 @@
+<conf>
+	<slice>
+		<slice_name>upmc_tp</slice_name>
+		<host>
+			<id>1</id>
+			<url>ple2.ipv6.lip6.fr</url>
+			<interface>
+				<bridge_name>tap1</bridge_name>
+				<ip>10.1.1.1/24</ip>
+			</interface>
+			<services>
+				<service>httpd:8080</service>
+			</services>
+		</host>
+		<host>
+			<id>2</id>
+			<url>ple3.ipv6.lip6.fr</url>
+			<interface>
+				<bridge_name>tap1</bridge_name>
+				<ip>10.1.1.2/24</ip>
+			</interface>
+			<services>
+				<service>x11:2222</service>
+				<service>firefox</service>
+				<service>wireshark</service>
+			</services>
+		</host>
+	</slice>
+</conf>

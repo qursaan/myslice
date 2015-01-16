@@ -8,9 +8,10 @@ function mysliceAlert(msg, level, timeout) {
 	var el = $('#myslice-message');
 	el.find('.message').text(msg);
 	el.addClass('alert-' + level);
+    el.fadeIn('fast');
 	el.parent().fadeIn('fast');
 	if (timeout) {
-		setTimeout(function(){el.alert('close');},5000);
+		setTimeout(function(){el.hide();},5000);
 	}
 };
 /* Table initialisation */
@@ -20,13 +21,8 @@ $(document).ready(function() {
 	});
 	
 	var platformParameters = {};
-	
-	$('#myslice-message').bind('closed.bs.alert', function () {
-		$(this).parent().hide();
-	});
 
 	//mysliceAlert('hello','danger');
-	
 	
 	$("#objectList").load("/table/resource/", {"fields" : ["hostname","hrn","country","type"], "options": ["checkbox"] }, function(data) {
 		$(this).dataTable( {

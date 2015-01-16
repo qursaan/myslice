@@ -33,12 +33,6 @@ Current implementation makes the following assumptions
   as we use 'aoColumnDefs' instead.
 """
 
-    MAP = {
-        'facility_name' :   'Facility',
-        'testbed_name'  :   'Testbed',
-        'hostname'      :   'Resource name',
-        'type'          :   'Type',
-    }
 
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
@@ -56,10 +50,19 @@ Current implementation makes the following assumptions
             _columns = columns
             _hidden_columns = []
         elif self.query:
-            _columns = [field for field in self.query.fields if not field == 'urn']
+            print "self.query.fields = ", self.query_all.fields
+            # Columns displayed by default
+            if self.default_fields is not None:
+                _columns = [field for field in self.default_fields if not field == 'urn']
+            else:
+                _columns = [field for field in self.query.fields if not field == 'urn']
             if query_all:
                 # We need a list because sets are not JSON-serializable
-                _hidden_columns = list(self.query_all.fields - self.query.fields)
+                if self.default_fields is not None:
+                    print self.query_all.fields
+                    _hidden_columns = list(self.query_all.fields - set(self.default_fields))
+                else:
+                    _hidden_columns = list(self.query_all.fields - self.query.fields)
                 _hidden_columns.append('urn')
             else:
                 _hidden_columns = []
@@ -68,9 +71,10 @@ Current implementation makes the following assumptions
             _hidden_columns = []
 
         print "_columns=", _columns
-        self.columns = { self.MAP.get(c, c) : c for c in _columns }
-        self.hidden_columns = { self.MAP.get(c, c) : c for c in _hidden_columns }
+        self.columns = { self.mapping.get(c, c) : c for c in _columns }
+        self.hidden_columns = { self.mapping.get(c, c) : c for c in _hidden_columns }
         print "self.columns", self.columns
+        print "self.hidden_columns", self.hidden_columns
 
         self.init_key=init_key
         self.datatables_options=datatables_options

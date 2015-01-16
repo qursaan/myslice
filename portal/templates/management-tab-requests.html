@@ -163,13 +163,12 @@
 {% endif %}
 </div>
 
-
+{% if sub_authorities %}
 <br />
 <div class="col-md-12">
 	<h2>From your sub-authorities</h2>
 </div>
-{% if sub_authorities %}
-	
+
 	{% for authority, requests in sub_authorities.items %}
 	<div class="col-md-12">
 	<h3>{{authority}}</h3>
@@ -217,18 +216,13 @@
 	    </table>
 	</div>
 	{% endfor %}
-{% else %}
-<div class="col-md-12">
-	<i>There is no pending request waiting for validation.</i>
-</div>
 {% endif %}
+{% if delegation_authorities %}
 <br />
 <div class="col-md-12">
 	<h2>From your authorities with delegation</h2>
 </div>
 
-{% if delegation_authorities %}
-	
 	{% for authority, requests in delegation_authorities.items %}
 	<div class="col-md-12">
 		<h3>{{authority}}</h3>
@@ -276,10 +270,6 @@
 		    </table>
 		</div>
 		{% endfor %}
-{% else %}
-<div class="col-md-12">
-	<i>There is no pending request waiting for validation.</i>
-</div>
 {% endif %}
 <br />
 <div class="col-md-12">

@@ -16,6 +16,7 @@ import portal.platformsview
 import portal.dashboardview
 import portal.homeview
 import portal.newsview
+import portal.loginwidget
 
 from portal.about                   import AboutView
 from portal.registrationview        import RegistrationView
@@ -43,6 +44,8 @@ import portal.slicetabmeasurements
 
 import portal.managementtababout
 import portal.managementtabrequests
+
+import forge.views
 
 #### high level choices
 # main entry point (set to the / URL)
@@ -89,6 +92,7 @@ urls = [
     (r'^create/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.create.dispatch'),
     (r'^delete/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.delete.dispatch'),
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
+    (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
     #
     # REST monitoring
     (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
@@ -96,6 +100,8 @@ urls = [
     #(r'^view/?', include('view.urls')),
     #(r'^list/slices', 'view.list.slices')
     #
+    # Login widget to be used in an iframe
+    (r'^loginwidget/?$', portal.loginwidget.LoginWidget.as_view()),
     #
     # Portal
     (r'^news/?$', portal.newsview.NewsView.as_view()),
@@ -107,6 +113,7 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
+    (r'^studentslabs/(?P<slicename>[^/]+)/?$', forge.views.CreateCourseViev.as_view()),
     
     url(r'^about/?$', AboutView.as_view(), name='about'),
     

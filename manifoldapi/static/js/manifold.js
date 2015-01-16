@@ -974,18 +974,43 @@ var manifold = {
         var query_ext = manifold.query_store.find_query_ext(query.query_uuid);
         query_ext.query_state = QUERY_STATE_INPROGRESS;
 
-        var query_json = JSON.stringify(query);
+        /*
+            If the Query object concerns SFA AM objects, iterate on each AM platform
+            Loop per platform, allows a progressive loading per AM platform
+            Update is run on all platforms at the same time to get a final answer, we don't manage partial answers yet...
+        */
+        if((query.object == 'resource' || query.object == 'lease' || query.object == 'slice') && query.action != "update"){
+            var obj = query.object;
+            $.post("/rest/platform/", function( data ) {
+                $.each(data, function(index, p) {
+                    query.object = p.platform+":"+obj;
+                    var query_json = JSON.stringify(query);
 
-        // Inform plugins about the progress
-        query.iter_subqueries(function (sq) {
-            var sq_query_ext = manifold.query_store.find_analyzed_query_ext(sq.query_uuid);
-            sq_query_ext.query_state = QUERY_STATE_INPROGRESS;
+                    // Inform plugins about the progress
+                    query.iter_subqueries(function (sq) {
+                        var sq_query_ext = manifold.query_store.find_analyzed_query_ext(sq.query_uuid);
+                        sq_query_ext.query_state = QUERY_STATE_INPROGRESS;
+                        manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
+                    });
 
-            manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
-        });
+                    $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback));
 
+                });
+            });
 
-        $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback));
+        }else{
+            var query_json = JSON.stringify(query);
+
+            // Inform plugins about the progress
+            query.iter_subqueries(function (sq) {
+                var sq_query_ext = manifold.query_store.find_analyzed_query_ext(sq.query_uuid);
+                sq_query_ext.query_state = QUERY_STATE_INPROGRESS;
+                manifold.raise_record_event(sq.query_uuid, IN_PROGRESS);
+            });
+
+            $.post(manifold.proxy_url, {'json': query_json} , manifold.success_closure(query, null, callback));
+
+        }
     },
 
     // XXX DEPRECATED
@@ -1092,7 +1117,11 @@ var manifold = {
             // Has it a domain query, and has it completed ?
             $.each(records, function(i, record) {
                 var key = manifold.metadata.get_key(query.object);
-                var record_key = manifold.record_get_value(record, key);
+                if ( typeof record === "string" ){
+                    var record_key = record;
+                }else{
+                    var record_key = manifold.record_get_value(record, key);
+                }
                 manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_SET, STATE_SET_IN);
             });
 

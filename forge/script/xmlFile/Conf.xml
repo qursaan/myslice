@@ -1,0 +1,21 @@
+<conf>
+	<slice>
+		<slice_name>SliceName</slice_name>
+		<host>
+			<id>1</id>
+			<url>Host1</url>
+			<interface>
+				<bridge_name>tap1</bridge_name>
+				<ip>10.1.1.1/24</ip>
+			</interface>
+		</host>
+		<host>
+			<id>2</id>
+			<url>Host2</url>
+			<interface>
+				<bridge_name>tap1</bridge_name>
+				<ip>10.1.1.2/24</ip>
+			</interface>
+		</host>
+	</slice>
+</conf>

@@ -16,8 +16,11 @@ import hashlib
 import datetime
 import urllib2
 import ast
+import time
+
 from django.views.decorators.csrf import csrf_exempt
 from django.http                  import *
+
 
 def response_mimetype(request):
         
@@ -57,24 +60,26 @@ def timestamp_to_unix(timest):
 def slice_to_exp(slices_users):
     experiments = {}
     testbeds = {}
+    wildcard_testbeds = {}
+   
     
-    
-    for slice in slices_users:
+    for slice in slices_users:  
         nodes={}
         leases = slice['lease']
-        if leases is not None:
+         
+        if leases is not None and leases:
             for lease in leases:
                 resource = lease['resource']
                 start_t = lease['start_time']
                 end_t = lease['end_time']
-                #node = lease['resource']
                 
                 testbed_start = resource.index('IDN+')+4
                 testbed_end = resource.index('+node+')
                 
                 testbed = resource[testbed_start:testbed_end]
                 node = resource[testbed_end+6:]
-                
+                if 'omf:nitos' in testbed:
+                    testbed = 'omf:nitos'
                 if testbed in testbeds:
                     if node not in testbeds[testbed]:
                         testbeds[testbed].append(node)
@@ -93,17 +98,96 @@ def slice_to_exp(slices_users):
                                 f=1
                         if f==0:
                             nodes[node][str(start_t)]={'start_t':start_t, 'nodes':node, 'end_t':end_t}
+
+            ######### FOR PLE LIKE start ##################
+            for resource in slice['resource']:
+                testbed_start = resource.index('IDN+')+4
+                testbed_end = resource.index('+node+')
+                tb = resource[testbed_start:testbed_end]
+                node = resource[testbed_end+6:]
+                if 'ple:' in tb:
+                    tb = 'ple'
+                if 'omf:nitos' in tb:
+                    tb = 'omf:nitos'
+                if tb not in testbeds:
+                    try:
+                        if node not in wildcard_testbeds[slice['slice_hrn']][tb]:
+                            wildcard_testbeds[slice['slice_hrn']][tb].append([node])
+                    except:
+                        try:
+                            wildcard_testbeds[slice['slice_hrn']][tb] = [node]
+                        except:
+                            wildcard_testbeds[slice['slice_hrn']]={tb:[node]}
+                    
+            
+        else:
+            s = slice['slice_last_updated']
+            #s_time = int(time.mktime(datetime.datetime.strptime(s, "%Y%m%dT%H:%M:%Ss").timetuple()))
+            s_time = time.mktime(s.timetuple())                
+                
+            if slice['resource'] is not None:
+                                    
+                for resource in slice['resource']:
+                    testbed_start = resource.index('IDN+')+4
+                    testbed_end = resource.index('+node+')
+                    tb = resource[testbed_start:testbed_end]
+                    if 'ple:' in tb:
+                        tb = 'ple'
+                    if 'omf:nitos' in tb:
+                        tb = 'omf:nitos'
+                    node = resource[testbed_end+6:]
+                    
+                    if testbed in testbeds:
+                        if node not in testbeds[testbed]:
+                            testbeds[testbed].append(node)
+                    else:
+                        testbeds[testbed] = [node]       
+                    
+                    if not node in nodes:  
+                        #nodes[node] = {str(start_t):{'start_t':s_time, 'nodes':node, 'end_t':int(time.time())}} 
+                        nodes[node] = {str(start_t):{'start_t':s_time, 'nodes':node, 'end_t':s_time}}    
+            ######### FOR PLE LIKE end ##################
+ 
                         
         #group grouped nodes in experiments
         for n in nodes:
             for exp in nodes[n]:
-                key = str(exp) + str(nodes[n][exp]['end_t'])
+                key = str(exp) + str(nodes[n][exp]['end_t']) + slice['slice_hrn']
                 
                 if key not in experiments:
                     experiments[key]={'slice_hrn':slice['slice_hrn'], \
                                       'start':nodes[n][exp]['start_t'], 'end':nodes[n][exp]['end_t'], 'nodes':[nodes[n][exp]['nodes']]}   
+                    
+                    
+                    ######### FOR PLE LIKE start ##################
+                    for item in wildcard_testbeds:
+                        if item == experiments[key]['slice_hrn']:
+                            for testbed in wildcard_testbeds[item]:
+                                
+                                if testbed not in testbeds:
+                                    testbeds[testbed] = wildcard_testbeds[item][testbed] 
+                                
+                                for n in wildcard_testbeds[item][testbed]:
+                                    if n not in experiments[key]['nodes']:
+                                        experiments[key]['nodes'].append(n)                                           
+                    ######### FOR PLE LIKE end ##################
+                    
                 elif nodes[n][exp]['end_t'] == experiments[key]['end']:
                     experiments[key]['nodes'].append(nodes[n][exp]['nodes'])
+                    
+                    
+                    ######### FOR PLE LIKE start ##################
+                    for item in wildcard_testbeds:
+                        if item == experiments[key]['slice_hrn']:
+                            for testbed in wildcard_testbeds[item]:
+                                
+                                if testbed not in testbeds:
+                                    testbeds[testbed] = wildcard_testbeds[item][testbed] 
+                                
+                                for n in wildcard_testbeds[item][testbed]:
+                                    if n not in experiments[key]['nodes']:
+                                        experiments[key]['nodes'].append(n)                       
+                    ######### FOR PLE LIKE end ##################
                     
     return (experiments,testbeds)
    
@@ -120,10 +204,7 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
         env = self.default_env()
         env['theme'] = self.theme
                 
-        return render_to_response(self.template, env, context_instance=RequestContext(request))
-
-
-    
+        return render_to_response(self.template, env, context_instance=RequestContext(request))    
     
     def get (self, request, state=None):
         env = self.default_env()
@@ -158,13 +239,13 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
         slices_users = []
         
         #get slices
-        userslice_query = Query().get('slice').select('slice_urn', 'slice_hrn', 'users', 'resource', 'lease')
+        userslice_query = Query().get('slice').select('slice_urn', 'slice_hrn', 'users', 'resource', 'lease', 'slice_last_updated')
         slice_details = execute_query(self.request, userslice_query)
         
         #get local users
         local_user_query  = Query().get('local:user').select('email','status','config')
         local_user_details = execute_admin_query(self.request, local_user_query)
-        
+                   
         #get users - create dict[email]=hrn
         user_query  = Query().get('user').select('user_hrn','user_urn','user_email')
         user_details = execute_admin_query(self.request, user_query)
@@ -178,19 +259,18 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
         
         #get a list of all the slices for the logged in user
         testbeds = []
-
+        #env['slices_users'] = json.dumps(slice_details, ensure_ascii=False)
         for slice in slice_details:
             
             if users_hrn[cur_username] in slice['users']:
                 slices_users.append({'slice_hrn':slice['slice_hrn'], 'user':cur_username, 'user_hrn':users_hrn[cur_username] \
-                                     , 'resource':slice['resource'], 'lease':slice['lease'] })  
+                                     , 'resource':slice['resource'], 'lease':slice['lease'], 'slice_last_updated':slice['slice_last_updated']  })  
                 
                              
-        env['slices_users'] = slices_users  ### For logging
-       
+        #env['slices_users'] = slices_users  ### For logging
         #####create slicelist for template & JSON
         experiments,testbeds =  slice_to_exp(slices_users)
-    
+            
         all_exp = []
         iddata = []
                           
@@ -217,9 +297,10 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
             
             iddata.append(tempid)
             all_exp.append(experiment)
-        
-        
+            env['logging_test'] = json.dumps(all_exp, ensure_ascii=False)
+            env['slices_users'] = json.dumps(all_exp, ensure_ascii=False)
         ###### Check which experiments have not been rated yet. Pop from all_exp any experiment that has already been rated
+        
         unrated_exp = json_to_rest('http://survivor.lab.netmode.ntua.gr:4567/reputation/qid', iddata)    
         
         for item in all_exp:
@@ -227,8 +308,6 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
                 pass
             else:
                 all_exp.pop(all_exp.index(item))
-
-
 
         ###### Get Reputation values from Reputation DB
         reps = json_to_rest('http://survivor.lab.netmode.ntua.gr:4567/reputation/showrep', "a")
@@ -262,7 +341,7 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
                     testbed['services'].append('N/A')
                 
         ###### Pass variables to template
-        env['logging_test'] = json.dumps(all_exp, ensure_ascii=False)
+        #env['logging_test'] = json.dumps(all_exp, ensure_ascii=False)
         env['serv_per_tb'] = json.dumps(serv_per_tb, ensure_ascii=False)
         env['reputation'] = reps
         env['rep_serv'] = services
