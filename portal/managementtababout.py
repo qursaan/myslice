@@ -22,9 +22,6 @@ class ManagementAboutView (FreeAccessView, ThemeView):
     def get (self, request):
         
         if request.user.is_authenticated(): 
-            user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
-            user_details = execute_query(self.request, user_query)
-            
             user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(self.request.user))
             user_local_details = execute_query(self.request, user_local_query)
             user_authority = json.loads(user_local_details[0]['config']).get('authority')
