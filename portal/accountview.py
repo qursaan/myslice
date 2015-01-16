@@ -1,7 +1,5 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
-from sfa.trust.credential               import Credential
-from sfa.trust.certificate              import Keypair
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
@@ -271,6 +269,9 @@ def get_myslice_account(request):
 @login_required
 #my_acc form value processing
 def account_process(request):
+    from sfa.trust.credential               import Credential
+    from sfa.trust.certificate              import Keypair
+
     user_query  = Query().get('local:user').select('user_id','email','password','config')
     user_details = execute_query(request, user_query)
     
