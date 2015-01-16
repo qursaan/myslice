@@ -126,7 +126,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             slice_name = slice_request['slice_name']
             req_slice_hrn = authority_hrn + '.' + slice_name
             # comparing requested slice_hrn with the existing slice_hrn 
-            slice_query  = Query().get('slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
+            slice_query  = Query().get('myslice:slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
             slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
             for _slice in slice_details_sfa:
                 if _slice['slice_hrn'] == req_slice_hrn:

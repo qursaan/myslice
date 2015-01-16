@@ -94,7 +94,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
 
             # ** Where am I a PI **
             # For this we need to ask SFA (of all authorities) = PI function
-            pi_authorities_query = Query.get('user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
+            pi_authorities_query = Query.get('myslice:user').filter_by('user_hrn', '==', '$user_hrn').select('pi_authorities')
             pi_authorities_tmp = execute_query(self.request, pi_authorities_query)
             pi_authorities = set()
             try:

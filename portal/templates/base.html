@@ -52,10 +52,9 @@ $(document).ready(function() {
     myslice.login();
 
     user = myslice.user();
-    
     var slices = [];
     if($.isEmptyObject(user)){
-        $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
             if(data.length > 0){
                 drawSlices(data[0].slices);  
             }else{
@@ -69,14 +68,14 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
+    $.each( slices, function(i, val) {
+        console.log(val);
+        /*
+        Launch a Query for each slice to get resources and leases in Manifold Cache
+        $.post("/rest/slice/", { 'fields': ['slice_hrn','slice_urn','resource','lease','resource.urn','resource.hostname','resource.type','resource.facility_name','resource.testbed_name','lease.resource','lease.start_time','lease.end_time','lease.lease_id'], 'filters': { 'slice_hrn' : val } }, function(data) {
+        });
 
-    /*
-        Launch queries to get the resources and leases in Manifold Cache
-    */
-        
-    $.post("/rest/resource/", function( data ) {
-    });
-    $.post("/rest/lease/", function( data ) {
+        */
     });
 
    
@@ -85,11 +84,6 @@ $(document).ready(function() {
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
-            /*
-            Launch a Query for each slice to get resources and leases in Manifold Cache
-            */
-            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
-            });
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));

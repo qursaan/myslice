@@ -35,7 +35,7 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
 
         if request.user.is_authenticated(): 
             env['person'] = self.request.user
-            user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
+            user_query  = Query().get('myslice:user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
             user_details = execute_query(self.request, user_query)
             try:
                 env['user_details'] = user_details[0]

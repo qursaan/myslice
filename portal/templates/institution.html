@@ -97,7 +97,7 @@ $(document).ready(function() {
             $("div#authority-tab-loading").css("display","none");
          });
 
-        $.post("/rest/slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+        $.post("/rest/myslice:slice/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
             var list_slices = [];
             var table_slices = [];
             /* "slice_hrn", "slice_description", "slice_type", "parent_authority", "created", "nodes", "slice_url", "slice_last_updated", "users", "slice_urn", "slice_expires" */
