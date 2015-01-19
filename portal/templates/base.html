@@ -52,7 +52,7 @@ $(document).ready(function() {
     myslice.login();
 
     user = myslice.user();
-    
+
     var slices = [];
     if($.isEmptyObject(user)){
         $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
@@ -69,7 +69,7 @@ $(document).ready(function() {
         slices = user.slices;
         drawSlices(slices);
     }
-
+   
     /*
         Launch queries to get the resources and leases in Manifold Cache
     */
