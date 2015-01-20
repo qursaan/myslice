@@ -42,7 +42,7 @@
                         {% else %}
                             <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
                         {% endif %}
-                    {% endfor %}    
+                    {% endfor %}
                 {% else %}
                     <option value:"">No authority found !!!</option>
                 {% endif %}
@@ -118,7 +118,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-group" id="register">
-			<p></p>	
+			<p></p>
 	    	<input class="submit btn btn-onelab" type="submit" value="Sign up" />
 	    	</form>
 	    </div>
@@ -148,13 +148,9 @@
 
     
 <script>
-//setting the default value in the org_list
-$(function() {
-    var temp="fed4fire.global"; 
-    $("#org_name").val(temp);
-});
 
 $(document).ready(function(){
+    /*
     var availableTags = [
     {% if authorities %}
         {% for authority in authorities %}
@@ -181,8 +177,24 @@ $(document).ready(function(){
 		}
 	return 0;
 	}); 
+    */
+    
 	// auto-complete the form
     jQuery("#org_name").combobox();
+
+    //setting the default value in the org_list
+    var temp="fed4fire.global"; 
+    $("#org_name").val(temp);
+
+    /*
+    // Must be executed in Python as Admin Query - User is not logged in
+
+    $.post("/rest/authority/",{'filters':{'authority_hrn':'CONTAINS'+temp}}, function( data ) {
+        $.each( data, function( key, val ) {
+            console.log(val);
+        });
+    });
+    */
 	$('[title!=""]').qtip();
 	$("form").validate();
 	$("form").submit(function() {

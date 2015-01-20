@@ -1,6 +1,10 @@
 /*
  * MySlice Class
  */
+function isFunction(functionToCheck) {
+ var getType = {};
+ return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
 
 function list() {
 	this.elements = [];
@@ -114,6 +118,20 @@ var myslice = {
 		}
 		return this.user;
 	},
+	projects: {},
+	
+	projects: function() {
+		if ($.isEmptyObject(this.projects)) {
+			//this.login(function() { return this.user; });
+            if(localStorage.getItem('projects')!='undefined'){
+			    this.projects = JSON.parse(localStorage.getItem('projects'));
+            }else{
+                return false;
+            }
+		}
+		return this.projects;
+	},
+
     loadSlices: function(slices) {
         if (typeof(slices) == "undefined"){
 
@@ -154,12 +172,43 @@ var myslice = {
         if($.isEmptyObject(user)){
             // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
 		    $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-			    //myslice.user = new user(data[0]);
 			    localStorage.setItem('user', JSON.stringify(data[0]));
                 myslice.loadSlices(data[0].slices);
+                if(isFunction(fn)){
+                    fn();
+                }
 		    });
+        }else{
+            if(isFunction(fn)){
+                fn();
+            }
         }
+
 	},
+	loadProjects: function(fn) {
+        user = JSON.parse(localStorage.getItem('user'));
+        projects = localStorage.getItem('projects');
+        if($.isEmptyObject(projects)){
+            if($.isEmptyObject(user) || $.isEmptyObject(user.parent_authority)){
+		        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'},'fields':['parent_authority']}, function( data ) {
+                    parent_authority = data[0].parent_authority;
+
+                });
+            }else{
+                parent_authority = user.parent_authority;
+            }
+            // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+            $.post("/rest/authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+parent_authority}}, function( data ) {
+                localStorage.setItem('projects', JSON.stringify(data));
+            });
+        }else{
+            if(isFunction(fn)){
+                fn();
+            }
+        }
+
+	},
+
     getSlices: function(name) {
     	
     },
