@@ -128,6 +128,15 @@ table.profile form{
   margin-right: 15px;
 
 }
+
+#makepi {
+  position:relative;
+  width: 215px;
+  float: right;
+  margin-right: 15px;
+
+}
+
 #edit_password table {
  display:inline;
  margin: auto;
