@@ -129,7 +129,7 @@ div#navigation li a {
 }
 div#navigation li a:hover {
     text-decoration:none;
-    color:#B8B2FF;
+    color:black;
 }
 div#navigation li:last-child {
     margin-right:0;
