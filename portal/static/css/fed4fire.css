@@ -13,10 +13,9 @@ a, a:active, a:focus {
 
 h1 {
     border-bottom:1px solid #DDDDDD;
-    padding:0 0 0 0;
-    margin:0 0 0 0;
+    padding:0;
+    margin:25px 0;
     font-size:14pt;
-    margin-top: 12px;
 }
 h1 img {
     vertical-align:middle;
@@ -70,13 +69,10 @@ div#header {
 }
 
 div#secondary {
-    
 }
 
 div#secondary ul {
-    position:absolute;
-    top:20px;
-    right:0;
+       float:right;
 }
 
 div#secondary li {
@@ -100,6 +96,7 @@ div#navigation {
     background-color:orange;
     width:100%;
     height:40px;
+    text-align: center;
 }
 div#navigation div.wrapper {
     text-align:center;
@@ -115,21 +112,26 @@ div#navigation ul {
 div#navigation li {
     color:white;
     font-family:helvetica, sans-serif;
-    font-size:10pt ;
-    font-weight:normal;
+    font-size:9pt ;
+    font-weight:bold;
     line-height:0.8em;
     letter-spacing:0.6pt;
     list-style:none;
     float:left;
     padding:0;
-    margin:15px 25px 0 0;
+    margin:16px 25px 0 0;
 }
 div#navigation li a {
-    color:white;
+    color:#003333;
+}
+div#navigation .iconlogout {
+    margin-top:-10px;
+    margin-right:2px;
+    color:#003333;
 }
 div#navigation li a:hover {
     text-decoration:none;
-    color:black;
+    color:white;
 }
 div#navigation li:last-child {
     margin-right:0;

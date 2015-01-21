@@ -23,14 +23,14 @@
 	</div>
 </div>
 {% endif %}
-				<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
+<form action="/register" class="cmxform form-horizontal" method="post" enctype="multipart/form-data">
 <div class="row">
 	<div class="col-md-12">
-			<div class="form-group">
+			<p>
 				{% csrf_token %}
 		  		<label for="authority_hrn" class="control-label">Organization</label>
-				<p></p>
-                <div class="ui-widget">
+			</p>
+			<p>
 		  		<select id="org_name" name="org_name" class="form-control" style="width:590px" value="{{ organization }}" 
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
@@ -47,55 +47,50 @@
                     <option value:"">No authority found !!!</option>
                 {% endif %}
                 </select>
-                </div>
-				<p></p>
-				<!--<p>Organization not listed? <a href="/portal/join">Request its addition now.</a></p>-->
+            </p>
 				<p class="help-block">If your organization does not deploy a Fed4FIRE authority itself, you can use the<br> default one called "fed4fire.global".
 		If your organization however does provide a<br> Fed4FIRE authority itself, please make sure to select it here. If you start typing<br> your organization's
 		 name, it will pop up.
 		</p> 
-			</div>
 	</div>
 </div>
 
 <div class="row">
 	<div class="col-md-6">
-	
-	    <div class="form-group">
+        <p>
 			<label for="firstname" class="control-label">Personal information</label>
-			<p></p>
+		</p>
+        <p>
 			<input type="text" name="firstname" class="form-control" style="width:350px" minlength="2" value="{{ first_name }}" placeholder="First name" required />
-	    </div>
-	    <div class="form-group">
+	    </p>
+        <p>
 			<input type="text" name="lastname" size="25" class="form-control" style="width:350px" minlength="2" value="{{ last_name }}" placeholder="Last name" required />
-	    </div>
-		<div class="form-group">
+	    </p>
+        <p>
 	    	<input type="email" name="email" size="25"  class="form-control" style="width:350px" value="{{ email }}" 
 			title="Your e-mail address will be your identifier for logging in. We contact you to verify your account and then, occasionally, for important issues."
 			placeholder="Email" required />
-		</div>
+		</p>
 	</div>	
 
 	<div class="col-md-6">
-	    <div class="form-group">
+        <p>
 	      <label for="password" class="control-label">Authentication</label>
-		  <p></p>	
-	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" 
-			title="Your password allows you to log in to this portal."
-			placeholder="Password" required />
-	    </div>
-	    <div class="form-group">
-			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="4" class="form-control" value="" 
-				placeholder="Confirm password" required />
-	    </div>
-	    <div class="form-group">
+		</p>
+		<p>	
+	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" title="Your password allows you to log in to this portal." placeholder="Password" required />
+	    </p>
+        <p>
+			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="4" class="form-control" value="" placeholder="Confirm password" required />
+	    </p>
+        <p>
 			<select name="question" class="form-control" style="width:350px" id="key-policy" 
 				title="Your public/private key pair allows you to access the testbeds." required >        
 		  		<option value="generate">Generate my keys for me (recommended)</option>
 		  		<option value="upload">Upload my public key (advanced users only)</option>
 			</select>
-	    </div>
-	    <div class="form-group" style="display:none;" id="upload_key">
+	    </p>
+	    <div style="display:none;" id="upload_key">
 	      	<label for="file" class="control-label">Upload public key</label>
 	      	<input type="file" name="user_public_key" class="form-control" style="width:200px" id="user_public_key" />
 	      	<br />
@@ -108,42 +103,41 @@
 </div>
 <div class="row">
 	<div class="col-md-12">
-		<div class="form-group">
-			<p></p>
+        <p>
 			<input type="checkbox" name="agreement" value="agreement" required />&nbsp;&nbsp; I agree to the 
 			<a href="#" data-toggle="modal" data-target="#myModal">terms and conditions.</a> 
-		</div>
+		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12">
-		<div class="form-group" id="register">
-			<p></p>
+		<div id="register">
+			<p>
 	    	<input class="submit btn btn-onelab" type="submit" value="Sign up" />
-	    	</form>
+	       </p>
 	    </div>
 	</div>
 </div>
-
+</form>
 	<!-- Modal - columns selector -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  			<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        					<h4 class="modal-title" id="myModalLabel">Terms & Conditions</h4>
-      				</div>
-      				<div class="modal-body">
-						<p align="left">
-							The exact terms and conditions for Fed4FIRE are currently under development.
-						</p>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Terms & Conditions</h4>
+			</div>
+			<div class="modal-body">
+				<p align="left">
+					The exact terms and conditions for Fed4FIRE are currently under development.
+				</p>
 
-      				</div>
-      				<div class="modal-footer">
-        				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      				</div>
-    			</div>
-  			</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
 </div>
 
     
