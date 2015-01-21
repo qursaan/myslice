@@ -198,7 +198,7 @@ var myslice = {
                 parent_authority = user.parent_authority;
             }
             // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-            $.post("/rest/authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+parent_authority}}, function( data ) {
+            $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+parent_authority}}, function( data ) {
                 localStorage.setItem('projects', JSON.stringify(data));
             });
         }else{
