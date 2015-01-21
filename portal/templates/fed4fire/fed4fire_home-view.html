@@ -55,7 +55,7 @@
 	{%if 'creds_expired'  in user_cred %}
     	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
     {%endif%}
-		{%if 'is_pi'  in pi %}
+		{% if pi %}
 		<div class="col-md-3">
 			<h3>
 				EXPERIMENT

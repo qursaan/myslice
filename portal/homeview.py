@@ -19,6 +19,7 @@ from myslice.configengine               import ConfigEngine
 from myslice.theme                      import ThemeView
 from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
+from portal.actions                     import authority_check_pis
 
 import json, time
 import activity.user
@@ -89,10 +90,12 @@ class HomeView (FreeAccessView, ThemeView):
                                             acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
                                             acc_user_cred = account_config.get('delegated_user_credential','N/A')
                     # assigning values
-                    if acc_auth_cred=={} or acc_auth_cred=='N/A':
-                        pi = "is_not_pi"
-                    else:
-                        pi = "is_pi"
+                    #if acc_auth_cred=={} or acc_auth_cred=='N/A':
+                    #    pi = "is_not_pi"
+                    #else:
+                    #    pi = "is_pi"
+                    user_email = str(self.request.user)                   
+                    pi = authority_check_pis(self.reques, user_email)
 
                     # check if the user has creds or not
                     if acc_user_cred == {} or acc_user_cred == 'N/A':
@@ -156,11 +159,12 @@ class HomeView (FreeAccessView, ThemeView):
                                         acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
                                         acc_user_cred = account_config.get('delegated_user_credential','N/A')
             # assigning values
-            if acc_auth_cred=={} or acc_auth_cred=='N/A':
-                pi = "is_not_pi"
-            else:
-                pi = "is_pi"
-
+            #if acc_auth_cred=={} or acc_auth_cred=='N/A':
+            #    pi = "is_not_pi"
+            #else:
+            #    pi = "is_pi"
+            user_email = str(self.request.user) 
+            pi = authority_check_pis(self.request, user_email)
             # check if the user has creds or not
             if acc_user_cred == {} or acc_user_cred == 'N/A':
                 user_cred = 'no_creds'

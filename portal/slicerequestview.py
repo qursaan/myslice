@@ -7,7 +7,7 @@ from unfold.page                import Page
 from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
-from portal.actions             import is_pi, create_slice, create_pending_slice, clear_user_creds
+from portal.actions             import is_pi, create_slice, create_pending_slice, clear_user_creds, authority_check_pis
 #from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
@@ -60,14 +60,14 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         # Handle the case when we use only hrn and not name
         if authority_name is None:
             authority_name = user_authority
-        #
+        
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         account_details = execute_query(wsgi_request, account_query)
-        #
+        
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         platform_details = execute_query(wsgi_request, platform_query)
         user_hrn = None
-        # getting user_hrn from local:account
+        #getting user_hrn from local:account
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
@@ -76,15 +76,16 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
                         user_hrn = account_config.get('user_hrn','N/A')
-                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+        #                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
 
 
         # checking if pi or not
-        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-            pi = "is_not_pi"
-        else:
-            pi = "is_pi"
+        #if acc_auth_cred == {} or acc_auth_cred == 'N/A':
+        #    pi = "is_not_pi"
+        #else:
+        #    pi = "is_pi"
 
+        pi = authority_check_pis (wsgi_request, user_email)       
 
         # Page rendering
         page = Page(wsgi_request)
