@@ -3,7 +3,7 @@ from unfold.loginrequired               import LoginRequiredAutoLogoutView
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
-from portal.actions                     import sfa_update_user, authority_get_pis, authority_add_pis, authority_remove_pis, clear_user_creds
+from portal.actions                     import sfa_update_user, authority_get_pis, authority_add_pis, authority_remove_pis,authority_check_pis ,clear_user_creds
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -191,12 +191,7 @@ class UserView(LoginRequiredAutoLogoutView, ThemeView):
             for t in itertools.izip_longest(total_platform_list)]
 
         ## check pi or no
-        pi_status = False
-        pis = authority_get_pis (self.request, authority_hrn)
-        for pi in pis:
-            pi_list = pi['pi_users']
-        if account_usr_hrn_myslice in pi_list:
-            pi_status = True
+        pi_status = authority_check_pis(self.request, user_email)
 
         context = super(UserView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list

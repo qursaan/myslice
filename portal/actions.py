@@ -24,8 +24,7 @@ import activity.slice
 #from sfa.util.xrn                import Xrn 
 
 
-# Get the list of authorities
-
+# Get the list of pis in a given authority
 def authority_get_pis(request, authority_hrn):
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
@@ -39,6 +38,45 @@ def authority_get_pis(request, authority_hrn):
     #result, = results
     #return result['pi_users']
     return results
+
+#check the user is pi or not in the registry
+def authority_check_pis(request, user_email):
+    try:
+        user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
+        user_details = execute_admin_query(request, user_query)
+    
+        # getting the authority_hrn
+        for user_detail in user_details:
+            user_id = user_detail['user_id']
+            if user_detail['config']:
+                config = json.loads(user_detail['config'])
+                authority_hrn = config.get('authority','Unknown Authority')
+ 
+        account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
+        account_details = execute_admin_query(request, account_query)
+    
+        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_details = execute_admin_query(request, platform_query)
+    
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_hrn = account_config.get('user_hrn','N/A')
+
+        pi_status = False
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
+
+        if user_hrn in pi_list:
+            pi_status = True
+        return pi_status
+
+    except Exception,e:
+        print "Exception in actions.py in authority_check_pis %s" % e
+        return None
 
 
 def authority_add_pis(request, authority_hrn,user_hrn):
