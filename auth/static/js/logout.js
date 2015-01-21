@@ -5,7 +5,7 @@ function logout () {
     var msg="Are you sure you want to logout as " + username + " ?";
     /* redirect to /logout, see urls.py */
     if (confirm(msg)){
-        localStorage.removeItem('user');
+        localStorage.clear();
         window.location="/logout/";
     }
 }
