@@ -208,6 +208,10 @@ var myslice = {
                         fn();
                     }
                 });
+            }else{
+                if(isFunction(fn)){
+                    fn();
+                }
             }
         }
 
