@@ -93,8 +93,22 @@
 				<a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a>
 			</div>
 			<div>
+				<button id="projectrequestbtn" type="button" class="btn btn-default" style="width:165px;"><span class="glyphicon glyphicon-plus"></span> Join Project</button>
+			</div>
+			<div>
 				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
 			</div>
+			<div>
+				<p><strong>Your projects </strong>
+					<span title="A project is a sub-authority under the responsability of your institution gathering users, who will be able to create slices for their experiments."
+					class="glyphicon glyphicon-info-sign">
+				</span>
+  				</p>
+			</div>
+			<div>	
+				<div id="home-project-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
+			</div>
+
 		</div>
 		<div class="col-md-3">
 			<h3>
@@ -108,7 +122,7 @@
 			</div>
 			<p></p>
 			<div>
-    			<button id="statbtn" type="button" style="width: 150px;" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' status</button>
+    			<button id="statbtn" type="button" style="width: 170px;" class="btn btn-default"><span class="glyphicon glyphicon-stats" style="margin-right: 10px;"></span>Testbeds' status</button>
 			</div>
 			<div>
     			<button id="repbtn" type="button" style="width: 170px;" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' reputation</button>
@@ -268,6 +282,9 @@
 		});
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
+		});
+		$('button#projectrequestbtn').click(function() {
+			window.location="/portal/project_request/";
 		});
 
         myslice.loadSlices();

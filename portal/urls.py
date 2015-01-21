@@ -37,6 +37,7 @@ from portal.dashboardview           import DashboardView
 from portal.accountview             import AccountView, account_process
 from portal.contactview             import ContactView
 from portal.slicerequestview        import SliceRequestView
+from portal.projectrequestview      import ProjectRequestView
 from portal.registrationview        import RegistrationView
 from portal.joinview                import JoinView
 from portal.sliceviewold            import SliceView
@@ -79,6 +80,7 @@ urlpatterns = patterns('',
     #url(r'^my_account/?$', MyAccountView.as_view(), name='my_account'),
     url(r'^account/?$', AccountView.as_view(), name='account'),
     url(r'^institution/?$', InstitutionView.as_view(), name='institution'),
+    url(r'^project/(?P<authority_hrn>[\w\.]+)/?$', InstitutionView.as_view(), name='project'),
     url(r'^about/?$', AboutView.as_view(), name='about'),
     url(r'^users/?$', UsersView.as_view(), name='user_list'),
     url(r'^user/(?P<email>[\w\s.@\-]+)/?$', UserView.as_view(), name='user'),
@@ -98,6 +100,8 @@ urlpatterns = patterns('',
     #url(r'^pass_reset/?$', PassResetView.as_view(), name='pass_rest'),
     # Slice request
     url(r'^slice_request/?$', SliceRequestView.as_view(), name='slice_request'),
+    # Project request
+    url(r'^project_request/?$', ProjectRequestView.as_view(), name='project_request'),
     url(r'^terms/?$', TermsView.as_view(), name='terms'),
     url(r'^manual_delegation/?$', ManualDelegationView.as_view(), name='manual_delegation'),
     # Validate pending requests

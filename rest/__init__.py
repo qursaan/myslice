@@ -74,6 +74,7 @@ class ObjectRequest(object):
     def setKey(self):
         # What about key formed of multiple fields???
         query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
+        print query
         results = execute_query(self.request, query)
         print "key of object = %s" % results
         if results :
@@ -114,6 +115,8 @@ class ObjectRequest(object):
                     query.filter_by(k, '<=', f[2:])
                 elif (f[:1] == "<") :
                     query.filter_by(k, '<', f[1:])
+                elif (f[:8] == "CONTAINS") :
+                    query.filter_by(k, 'CONTAINS', f[8:])
                 else :
                     query.filter_by(k, '==', f)
         return query

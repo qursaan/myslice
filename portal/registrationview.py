@@ -45,6 +45,7 @@ class RegistrationView (FreeAccessView, ThemeView):
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
+            authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
             authorities = sorted(authorities, key=lambda k: k['name'])
         
         print "############ BREAKPOINT 1 #################"
