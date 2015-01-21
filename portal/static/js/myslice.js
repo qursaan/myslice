@@ -204,11 +204,10 @@ var myslice = {
                 // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
                 $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+parent_authority}}, function( data ) {
                     localStorage.setItem('projects', JSON.stringify(data));
+                    if(isFunction(fn)){
+                        fn();
+                    }
                 });
-            }else{
-                if(isFunction(fn)){
-                    fn();
-                }
             }
         }
 
