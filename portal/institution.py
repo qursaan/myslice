@@ -31,7 +31,6 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
     def get (self, request, authority_hrn=None, state=None):
-        print " -----  institution",authority_hrn
         env = self.default_env()
         if request.user.is_authenticated(): 
             env['person'] = self.request.user
