@@ -95,7 +95,7 @@ class HomeView (FreeAccessView, ThemeView):
                     #else:
                     #    pi = "is_pi"
                     user_email = str(self.request.user)                   
-                    pi = authority_check_pis(self.reques, user_email)
+                    pi = authority_check_pis(self.request, user_email)
 
                     # check if the user has creds or not
                     if acc_user_cred == {} or acc_user_cred == 'N/A':
