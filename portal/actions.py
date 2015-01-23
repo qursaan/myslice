@@ -88,7 +88,7 @@ def authority_add_pis(request, authority_hrn,user_hrn):
    
         updated_pi_list = pi_list.append(user_hrn) 
         query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
-        results = execute_admin_query(request,query)
+        results = execute_query(request,query)
         newpis = authority_get_pis (request, authority_hrn)
         return newpis
     except Exception,e: 
@@ -105,13 +105,12 @@ def authority_remove_pis(request, authority_hrn,user_hrn):
  
         updated_pi_list = pi_list.remove(user_hrn) 
         query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
-        results = execute_admin_query(request,query)
+        results = execute_query(request,query)
         newpis = authority_get_pis (request, authority_hrn)
         return newpis
     except Exception,e: 
         print "Exception in actions.py in authority_remove_pis %s" % e
         return None
-
 
 
 def authority_get_pi_emails(request, authority_hrn):

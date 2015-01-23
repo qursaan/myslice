@@ -36,11 +36,13 @@ $(document).ready(function() {
 
     /* TODO: factorize into functions */
     $('button#deleteslices').click(function() {
+        var flag = false;
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
                 $.post("/delete/slice/",{'filters':{'slice_hrn':this.id}}, function(data) {
                     if(data.success){
+                        localStorage.clear();
                         $('tr[id="'+record_id+'"]').fadeOut("slow");
                         $('tr[id="'+record_id+'"]').remove();
                         mysliceAlert('Success: slice deleted','success', true);
@@ -76,9 +78,33 @@ $(document).ready(function() {
         // TODO: refresh table
         //window.location="/portal/institution#slices";
     });
+    $('button#deleteprojects').click(function() {
+        var flag = false;
+        $('input:checkbox.project').each(function (index) {
+            if(this.checked){
+                var record_id = this.id;
+                console.log(record_id);
+                $.post("/delete/myslice:authority/",{'filters':{'authority_hrn':this.id}}, function(data) {
+                    if(data.success){
+                        localStorage.clear();
+                        $('tr[id="'+record_id+'"]').fadeOut("slow");
+                        $('tr[id="'+record_id+'"]').remove();
+                        mysliceAlert('Success: project deleted','success', true);
+                    }else{
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
+                    }
+                });
+            }
+        });
+    });
 
     $('button#createslice').click(function() {
         window.location="/portal/slice_request/";
+    });
+
+    $('button#createproject').click(function() {
+        window.location="/portal/project_request/";
     });
     $('button#slicerequestbtn').click(function() {
         /*
