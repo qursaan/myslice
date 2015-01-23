@@ -179,7 +179,7 @@ $(document).ready(function() {
            
             var table_users = [];
             $.each( data[0].pi_users, function( key, val ) {
-                console.log(val);
+                //console.log(val);
                 user_row = "<tr id='"+val+"'>";
                 user_row += "<td><input type='checkbox' class='user' id='"+val+"'></td>";
                 user_row += "<td>"+val+"</td>";
@@ -276,9 +276,9 @@ $(document).ready(function() {
                 }
             });
             if(flag == true){
-                $.post("/update/myslice:authority/",{'filters':{'authority_hrn':'fed4fire.upmc'},'params':{'pi_users':pi_users}}, function(data) {
+                $.post("/update/myslice:authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'},'params':{'pi_users':pi_users}}, function(data) {
                     if(data.success){
-                        mysliceAlert('Success: slice renewed','success', true);
+                        mysliceAlert('Success: User rights added to: {{user_details.parent_authority}}','success', true);
                     }else{
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
@@ -288,5 +288,40 @@ $(document).ready(function() {
         });
     });
 });
+//downgrade to user [in projects:remove from project]
+$(document).ready(function() {
+    $('button#removepi').click(function() {
+        var flag = false;
+        var pi_users = [];
+        $.post("/rest/myslice:authority/",{'filters':{'authority_hrn': '{{user_details.parent_authority}}'}}, function( data ) {
+            pi_users = data[0]["pi_users"];
+			// http://stackoverflow.com/questions/9792927/javascript-array-search-and-remove-string
+            $('input:checkbox.user').each(function (index) {
+                if(this.checked){
+                    var record_id = this.id;
+					for (var i=pi_users.length-1; i>=0; i--) {
+    					if (pi_users[i] === record_id) {
+        					pi_users.splice(i, 1);
+    					}
+					}
+                    flag = true;                
+                }
+            });
+            if(flag == true){
+                $.post("/update/myslice:authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'},'params':{'pi_users':pi_users}}, function(data) {
+                    if(data.success){
+                        mysliceAlert('Success: User rights removed from: {{user_details.parent_authority}}','success', true);
+                    }else{
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
+                    }
+                });
+            }
+        });
+    });
+});
+
+
+
 </script>
 {% endblock %}
