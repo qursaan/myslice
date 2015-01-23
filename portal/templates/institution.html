@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-md-12">
 			 <div class="breadcrumbs">
-			 	 Management &nbsp;>&nbsp; Institution: <span id="authority_name"></span>
+			 	 Management &nbsp;>&nbsp; Institution: <span id="authority_name">{{user_details.parent_authority}}</span>
 			 </div>
 		</div>
 	</div>
@@ -194,9 +194,12 @@ $(document).ready(function() {
   		$(this).tab('show');
     	var id = $(this).attr('href').substr(1);
         /*
+    	if ((id == 'requests')){
+    		$("#" + id).load('/management/' + id);
+        }
+        */
     	if ((id == 'requests') || (id == 'about'))
     		$("#" + id).load('/management/' + id);
-        */
 	});
 	var hash = window.location.hash;
 	if (hash) {

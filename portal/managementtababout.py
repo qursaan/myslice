@@ -29,7 +29,7 @@ class ManagementAboutView (FreeAccessView, ThemeView):
             # select column.name from local:object where table=='authority'
             authority_query = Query().get('authority').select('authority_hrn', 'name', 'address', 'enabled','description', 
                                                               'scientific', 'city', 'name', 'url', 'country', 'enabled', 'longitude', 
-                                                              'tech', 'latitude', 'pi_users', 'parent_authority', 'onelab_membership', 
+                                                              'tech', 'latitude', 'pi_users', 'onelab_membership', 
                                                               'postcode').filter_by('authority_hrn','==',user_authority)
             authority_details = execute_query(self.request, authority_query)
             
