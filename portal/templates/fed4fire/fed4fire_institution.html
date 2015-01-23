@@ -143,7 +143,7 @@ $(document).ready(function() {
                 }else{
                     nodes_length=val.nodes.length;
                 }
-                console.log(val);
+                //console.log(val);
                 if(val.users=="undefined" || val.users==null){
                     users_length=0;
                 }else{
@@ -259,6 +259,34 @@ $(document).ready(function() {
 	} else {
 		$('.nav-tabs a[href=#about]').click();
 	}
+});
+
+//upgrade users to PI
+$(document).ready(function() {
+    $('button#makepi').click(function() {
+        var flag = false;
+        var pi_users = [];
+        $.post("/rest/myslice:authority/",{'filters':{'authority_hrn': '{{user_details.parent_authority}}'}}, function( data ) {
+            pi_users = data[0]["pi_users"];
+            $('input:checkbox.user').each(function (index) {
+                if(this.checked){
+                    var record_id = this.id;
+                    pi_users.push(record_id)
+                    flag = true;                
+                }
+            });
+            if(flag == true){
+                $.post("/update/myslice:authority/",{'filters':{'authority_hrn':'fed4fire.upmc'},'params':{'pi_users':pi_users}}, function(data) {
+                    if(data.success){
+                        mysliceAlert('Success: slice renewed','success', true);
+                    }else{
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                        //alert("Rest Error for "+record_id+": "+data.error);
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
 {% endblock %}
