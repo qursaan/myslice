@@ -97,6 +97,9 @@ $(document).ready(function() {
 </script>
 </head>
 <body ng-app="ManifoldApp">
+<div class="row">
+{% widget '_widget-message.html' %}
+</div>
 {% block container %}
   	{% block topmenu %}
   	{% widget "_widget-topmenu.html" %}

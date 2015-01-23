@@ -80,30 +80,38 @@ def authority_check_pis(request, user_email):
 
 
 def authority_add_pis(request, authority_hrn,user_hrn):
-
-    # getting pis of the authority of the user
-    pis = authority_get_pis (request, authority_hrn)
-    for pi in pis:
-        pi_list = pi['pi_users']
+    try:
+        # getting pis of the authority of the user
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
    
-    updated_pi_list = pi_list.append(user_hrn) 
-    query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
-    results = execute_admin_query(request,query)
-    newpis = authority_get_pis (request, authority_hrn)
-    return newpis
+        updated_pi_list = pi_list.append(user_hrn) 
+        query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
+        results = execute_admin_query(request,query)
+        newpis = authority_get_pis (request, authority_hrn)
+        return newpis
+    except Exception,e: 
+        print "Exception in actions.py in authority_add_pis %s" % e
+        return None
+
 
 def authority_remove_pis(request, authority_hrn,user_hrn):
-
-    # getting pis of the authority of the user
-    pis = authority_get_pis (request, authority_hrn)
-    for pi in pis:
-        pi_list = pi['pi_users']
+    try:
+        # getting pis of the authority of the user
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
  
-    updated_pi_list = pi_list.remove(user_hrn) 
-    query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
-    results = execute_admin_query(request,query)
-    newpis = authority_get_pis (request, authority_hrn)
-    return newpis
+        updated_pi_list = pi_list.remove(user_hrn) 
+        query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
+        results = execute_admin_query(request,query)
+        newpis = authority_get_pis (request, authority_hrn)
+        return newpis
+    except Exception,e: 
+        print "Exception in actions.py in authority_remove_pis %s" % e
+        return None
+
 
 
 def authority_get_pi_emails(request, authority_hrn):
