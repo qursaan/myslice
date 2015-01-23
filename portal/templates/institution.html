@@ -48,8 +48,10 @@
     				</table>
 				
 			</div>
-			{%if 'is_pi'  in pi %}	
+			{%if  pi %}	
 			<div>
+				<button id="makepi" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Upgrade to PI</button>
+				<button id="removepi" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Downgrade to  user</button>
 				<button id="deleteusers" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected users</button>
 			</div>
 			{% endif %}
@@ -71,9 +73,9 @@
 	            </tr>
 	        </table>			
 	    </div>
-    	{% if 'is_pi'  in pi %}
+    	{% if pi %}
         <div>
-        	{% if 'is_pi'  in pi %}
+        	{% if  pi %}
 	  		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
 			{% else %}
 			<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
@@ -103,7 +105,7 @@ $(document).ready(function() {
                 }else{
                     nodes_length=val.nodes.length;
                 }
-                console.log(val);
+                //console.log(val);
                 if(val.users=="undefined" || val.users==null){
                     users_length=0;
                 }else{

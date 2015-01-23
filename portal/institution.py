@@ -13,7 +13,8 @@ from manifoldapi.manifoldresult     import ManifoldResult
 from ui.topmenu                     import topmenu_items, the_user
 from myslice.configengine           import ConfigEngine
 
-from myslice.theme                          import ThemeView
+from portal.actions                 import authority_check_pis
+from myslice.theme                  import ThemeView
 import json
 
 class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
@@ -56,27 +57,14 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
             else:
                 env['project'] = True
                 env['user_details'] = {'parent_authority': authority_hrn}
-            ## check user is pi or not
-            platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-            account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-            platform_details = execute_query(self.request, platform_query)
-            account_details = execute_query(self.request, account_query)
-            for platform_detail in platform_details:
-                for account_detail in account_details:
-                    if platform_detail['platform_id'] == account_detail['platform_id']:
-                        if 'config' in account_detail and account_detail['config'] is not '':
-                            account_config = json.loads(account_detail['config'])
-                            if 'myslice' in platform_detail['platform']:
-                                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-            # assigning values
-            if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-                pi = "is_not_pi"
-            else:
-                pi = "is_pi"
+
+                        
 
         else: 
             env['person'] = None
     
+        pi = authority_check_pis (self.request, str(self.request.user))        
+
         env['theme'] = self.theme
         env['section'] = "Institution"
         env['pi'] = pi 
