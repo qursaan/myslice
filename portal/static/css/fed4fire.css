@@ -339,6 +339,7 @@ ul.nav-section li a {
 ul.nav-section li:first-child {
     padding:0;
 }
+/* it used to give space for the icon, which has been removed
 ul.nav-section li:first-child a {
     font-weight:bold;
     padding:6px 15px 4px 15px;
@@ -346,6 +347,8 @@ ul.nav-section li:first-child a {
 ul.nav-section li:first-child.active a {
     padding:6px 15px 3px 15px;
 }
+
+*/
 ul.nav-section li:first-child img {
     margin:0 4px 1px 0;
     padding:0;

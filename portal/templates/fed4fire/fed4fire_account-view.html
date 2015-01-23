@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
+{% load portal_filters %}
 {% block content %}
-
+{% widget "_widget-no_credentials.html" %}
+{% widget "_widget-tradeoff.html" %}
 <div class="row">
 	<div class="col-md-12">
 		 <div class="breadcrumbs">
@@ -221,165 +223,81 @@
 		</table>
 	
 		</div>
-	
 
 	{%if 'Enabled'  in user_status %}
 	  	<div class="col-md-12">
 		<h3>Credentials <small>Delegated to Principal Account</small></h3>
-		        <table class="table">
-					<caption><b>Delegated User Credential</b></caption> 
-		            <tr class="odd"> 
-		                <th>Expiration Date</th>
-						<th>Download</th>
-		            </tr>
-					{% for row in my_users %}         
-					<tr class="border_bottom">
-		    			<td class="odd"> {{ row.cred_exp }} </td>
-						<td class="odd">
-							<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
-								<span class="glyphicon glyphicon-download"></span> Credential
-							</button>
-							<button class="btn btn-default btn-xs" name= "dl_user_cert" type="submit" title="Download User Certificate">
-								<span class="glyphicon glyphicon-download"></span> Certificate
-							</button>
-                             <button class="btn btn-default btn-xs" name= "dl_user_p12" type="submit" title="Download User PKCS12">
-                                 <span class="glyphicon glyphicon-download"></span> PKCS p12
-                             </button>
-						</td>
-					</tr>
-					{%endfor%}
-				 </table>
-				<p></p>
-				<table class="mytable table table-bordered table-hover">
-					<caption><b>Delegated Slice Credentials</b></caption>  
-		     		<tr class="odd"> 
-						<th>Slice Name</th> 
-		         		<th>Expiration Date</th>
-						<th>Download</th>
-		     		</tr>
-					{% for row in my_slices %}     
-		     		<tr class="border_bottom">
-		         		<td class="odd"> {{ row.slice_name }} </td>
-						<td class="odd"> {{ row.cred_exp }} </td>
-						<td class="odd"> 
-							<button class="btn btn-default btn-xs" name= "dl_{{row.slice_name}}" type="submit" title="Download Slice Credentials">
-								<span class="glyphicon glyphicon-download"></span> Download
-							</button> 
-						</td>
-		     		</tr>
-		     		{%endfor%}
-		  		</table>
-				<p></p>
-				<table class="mytable table table-bordered table-hover">
-		   			<caption><b>Delegated Authority Credentials</b></caption>
-		   			<tr class="odd"> 
-		       			<th>Authority Name</th> 
-		       			<th>Expiration Date</th>
-						<th>Download</th>
-		   			</tr>
-		   			{% for row in my_auths %}
-		   			<tr class="border_bottom">
-		       			<td class="odd"> {{ row.auth_name }} </td>
-		       			<td class="odd"> {{ row.cred_exp }} </td>
-						<td class="odd">
-							<button class="btn btn-default btn-xs" name= "dl_{{row.auth_name}}" type="submit" title="Download Authority Credentials">
-								<span class="glyphicon glyphicon-download"></span> Download
-							</button>
-						</td>
-		   			</tr>
-		   			{%endfor%}
-				</table>
-				<p></p>
-				 {%if '' not in my_users%}	
-				<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
-				{%else%}
-				<p><button class="btn btn-danger btn-lg btn-block disabled"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
-				{%endif%}
+		    <table class="table">
+				<caption><b>Delegated User Credential</b></caption> 
+		        <tr class="odd"> 
+		            <th>Expiration Date</th>
+					<th>Download</th>
+		        </tr>
+				{% for row in my_users %}         
+				<tr class="border_bottom">
+		    		<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd">
+						<button class="btn btn-default btn-xs" name= "dl_user_cred" type="submit" title="Download User Credential">
+							<span class="glyphicon glyphicon-download"></span> Credential
+						</button>
+						<button class="btn btn-default btn-xs" name= "dl_user_cert" type="submit" title="Download User Certificate">
+							<span class="glyphicon glyphicon-download"></span> Certificate
+						</button>
+                         <button class="btn btn-default btn-xs" name= "dl_user_p12" type="submit" title="Download User PKCS12">
+                             <span class="glyphicon glyphicon-download"></span> PKCS p12
+                         </button>
+					</td>
+				</tr>
+				{%endfor%}
+			 </table>
+			<p></p>
+			<table class="mytable table table-bordered table-hover">
+				<caption><b>Delegated Slice Credentials</b></caption>  
+		    	<tr class="odd"> 
+					<th>Slice Name</th> 
+		     		<th>Expiration Date</th>
+					<th>Download</th>
+		    	</tr>
+				{% for row in my_slices %}     
+		    	<tr class="border_bottom">
+		     		<td class="odd"> {{ row.slice_name }} </td>
+					<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd"> 
+						<button class="btn btn-default btn-xs" name= "dl_{{row.slice_name}}" type="submit" title="Download Slice Credentials">
+							<span class="glyphicon glyphicon-download"></span> Download
+						</button> 
+					</td>
+		    	</tr>
+		    	{%endfor%}
+		  	</table>
+			<p></p>
+			<table class="mytable table table-bordered table-hover">
+		   		<caption><b>Delegated Authority Credentials</b></caption>
+		   		<tr class="odd"> 
+		    		<th>Authority Name</th> 
+		    		<th>Expiration Date</th>
+					<th>Download</th>
+		   		</tr>
+		   		{% for row in my_auths %}
+		   		<tr class="border_bottom">
+		    		<td class="odd"> {{ row.auth_name }} </td>
+		    		<td class="odd"> {{ row.cred_exp }} </td>
+					<td class="odd">
+						<button class="btn btn-default btn-xs" name= "dl_{{row.auth_name}}" type="submit" title="Download Authority Credentials">
+							<span class="glyphicon glyphicon-download"></span> Download
+						</button>
+					</td>
+		   		</tr>
+		   		{%endfor%}
+			</table>
+			<p></p>
+			 {%if '' not in my_users%}	
+			<p><button class="btn btn-danger btn-lg btn-block"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+			{%else%}
+			<p><button class="btn btn-danger btn-lg btn-block disabled"   name= "clear_cred" type="submit" title="Clear All Credentials">Clear Credentials</button></p>
+			{%endif%}
 		</div>
 	</div>
-<!-- Modal- No credentials -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel">No credentials are delegated to the portal</h4>
-                    </div>
-					<div class="modal-body" style="text-align:justify;">
-					<p>You are getting this message for any of the following reasons:</p>
-					<ul>
-						<li>If your account is still pending for validation</li>
-						<li>If you press the "Clear Credentials" button</li>
-						<li>If you "Generate a new key pair"</li>
-						<li>If a new slice is added to your account</li>
-					</ul>
-					<p>Unless your account has not yet been validated, it is sufficient to refresh the page or go back to the home page. 
-						The portal will then regenerate your credentials. In some cases it may take more time than usual. If nothing works, 
-						then please logout and login back into to the portal.
-					</p>
-					<h3>Manual delegation of credentials</h3>
-						<p>
-							You have selected upon sign-up to upload your public key. As you have uploaded your own public key, 
-							the portal can no longer generate your credentials automatically. In order to have your credentials 
-							delegated to the portal, please follow these instructions:
-						</p>
-						<ul>
-							<li>Your account must first be validated by the manager of your organization.</li>
-							<li>In order for the portal to contact testbeds on your behalf, so as to list and reserve resources, you will need to
-								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a></li>
-						</ul>
-					</p>
-					<h3>Contact support</h3>
-					<p>If you don't have the above mentioned cases and still have this message, please  <a href="/contact/" target="_blank">contact us</a>.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-</div>
-
-
-<!-- Modal- Trade-off Message  -->
-<div class="modal fade" id="tradeoffmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel">
-								Automatic vs. Manual delegation of credentials
-							</h4>
-                    </div>
-					<div class="modal-body" style="text-align:justify;">
-					<h3>Automatic delegation of credentials</h3>
-						<p>Don't delete private key, ease-of-use option:</p>
-						<ul>
-							<li>
-								This means that you will keep your private key in the portal and it will automatically delegate your credentials on your behalf.
-							</li>
-							<li>
-								This option does not provide as high of a level of security; however, your private key will still only be used in the portal and 
-								will be available to you and the Fed4FIRE admins only.
-							</li>
-						</ul>
-					<h3>Manual delegation of credentials</h3>
-						<p>Download & Delete private key, higher security option:</p>
-						<ul>
-							<li>If you delete your private key, you will have more security but the portal will no longer be able to delegate credentials 
-								on your behalf, and you will have to manually
-								<a href="/portal/manual_delegation" target="_blank">delegate your credentials to the portal.</a>
-							</li>
-						</ul>
-					<h3>Contact support</h3>
-					<p>For more information, please  <a href="/contact/" target="_blank">contact us</a>.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-</div>
-
 
 
 	<div class="tab-pane row" id="access">
@@ -437,7 +355,6 @@
 			e.preventDefault();
 			$(this).tab('show');
 			id = $(this).attr('href').substr(1);
-		
 		});
 		
         $('button#createslice').click(function() {

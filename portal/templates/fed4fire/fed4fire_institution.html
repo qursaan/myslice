@@ -9,7 +9,11 @@
 	<div class="row">
 		<div class="col-md-12">
 			 <div class="breadcrumbs">
-			 	 Management &nbsp;>&nbsp; Institution: <span id="authority_name">{{user_details.parent_authority}}</span>
+                {% if project %}
+			 	Management &nbsp;>&nbsp; Project: <span id="authority_name">{{user_details.parent_authority}}</span>
+                {% else %}
+			 	Management &nbsp;>&nbsp; Institution: <span id="authority_name">{{user_details.parent_authority}}</span>
+                {% endif %}
 			 </div>
 		</div>
 	</div>
@@ -20,6 +24,9 @@
 			<ul class="nav nav-tabs nav-section">
 				<li class="active"><a href="#about">About</a></li>
 				<li><a href="#users">Users</a></li>
+                {% if not project %}
+				<li><a href="#projects">Projects</a></li>
+                {% endif %}
 				<li><a href="#slices">Slices</a></li>
 				<li><a href="#requests">Requests</a></li>
 			</ul>
@@ -40,7 +47,9 @@
     				<table id="user-tab" class="table">
         				<tr>
             				<th>+/-</th>
+                            {% if not project %}
             				<th>Email</th>
+                            {% endif %}
             				<th>User hrn</th>
                             <!--
             				<th>First name</th>
@@ -53,14 +62,42 @@
 			</div>
 			{%if  pi %}	
 			<div>
+                {% if project %}
+				<button id="removepi" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Remove from project</button>
+                {% else %}
 				<button id="makepi" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-up"></span> Upgrade to PI</button>
 				<button id="removepi" type="button" class="btn"><span class="glyphicon glyphicon-arrow-down"></span> Downgrade to  user</button>
 				<button id="deleteusers" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected users</button>
+                {% endif %}
 			</div>
 			{% endif %}
 		</div>
  	</div>
 
+    {% if not project %}
+	<div class="tab-pane row" id="projects" data-authority="{{user_details.parent_authority}}">
+		<div class="col-md-12 el">
+			<div id="project-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Projects" /></div>
+				<div id="project-tab-loaded" style="display:none;">
+    				<table id="project-tab" class="table">
+        				<tr>
+            				<th>+/-</th>
+            				<th>Project hrn</th>
+        				</tr>
+    				</table>
+				
+			</div>
+        	{% if  pi %}
+			<div>
+	  		<button id="createproject" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create project</button>
+			<button id="deleteprojects" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected projects</button>
+			{% else %}
+			<button id="createproject" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request project</button>
+			{% endif %}
+			</div>
+		</div>
+ 	</div>
+   {% endif %}
 	<div class="tab-pane row" id="slices">
 		<div class="col-md-12 el">
 	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
@@ -76,17 +113,15 @@
 	            </tr>
 	        </table>			
 	    </div>
-    	{% if pi %}
         <div>
-        	{% if  pi %}
+        	{% if pi %}
 	  		<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+            <button id="renewslices" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
+            <button id="deleteslices" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
 			{% else %}
 			<button id="createslice" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
 			{% endif %}
-            <button id="renewslices" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Renew Slices</button>
-            <button id="deleteslices" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete Slices</button>
         </div>
-		{% endif %} 
 	   </div>
 	</div>
 	<div class="tab-pane row" id="requests">
@@ -108,7 +143,7 @@ $(document).ready(function() {
                 }else{
                     nodes_length=val.nodes.length;
                 }
-                //console.log(val);
+                console.log(val);
                 if(val.users=="undefined" || val.users==null){
                     users_length=0;
                 }else{
@@ -123,7 +158,7 @@ $(document).ready(function() {
                 
                 slice_row = "<tr id='"+val.slice_hrn+"'>";
                 slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
-                slice_row += "<td><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></td>";
+                slice_row += "<td><a href='/slice/"+val.slice_hrn+"'>" + val.slice_hrn + "</a></td>";
                 slice_row += "<td>"+users_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
                 //slice_row += "<td>"+nodes_length+"</td>";
@@ -140,15 +175,13 @@ $(document).ready(function() {
         });
 		
         {% if project %}
-        // XXX LOIC CACHE PB IF PREFIXED !
- 		$.post("/rest/authority/",{'fields':['pi_users'],'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
+ 		$.post("/rest/myslice:authority/",{'fields':['pi_users'],'filters':{'authority_hrn':'{{user_details.parent_authority}}'}}, function( data ) {
            
             var table_users = [];
             $.each( data[0].pi_users, function( key, val ) {
                 console.log(val);
                 user_row = "<tr id='"+val+"'>";
                 user_row += "<td><input type='checkbox' class='user' id='"+val+"'></td>";
-                user_row += "<td></td>";
                 user_row += "<td>"+val+"</td>";
                 user_row += "</tr>";
                 table_users.push(user_row);
@@ -183,6 +216,22 @@ $(document).ready(function() {
             $("table#user-tab tr:last").after(table_users.join( "" ));
             $("div#user-tab-loaded").css("display","block");
             $("div#user-tab-loading").css("display","none");
+        });
+ 		$.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS{{user_details.parent_authority}}'}}, function( data ) {
+           
+            var table_projects = [];
+            $.each( data, function( key, val ) {
+                console.log(val);
+                project_row = "<tr id='"+val.authority_hrn+"'>";
+                project_row += "<td><input type='checkbox' class='project' id='"+val.authority_hrn+"'></td>";
+                project_row += "<td><a href='/portal/project/"+val.authority_hrn+"'>"+val.authority_hrn+"</a></td>";
+                project_row += "</tr>";
+                table_projects.push(project_row);
+            });
+            $("table#project-tab tr:last").after(table_projects.join( "" ));
+            $("div#project-tab-loaded").css("display","block");
+            $("div#project-tab-loading").css("display","none");
+
         });
 
         {% endif %}
