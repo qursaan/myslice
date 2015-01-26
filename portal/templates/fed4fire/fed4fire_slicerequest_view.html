@@ -43,6 +43,12 @@
 				{% endif %}
 			  </div>
 			  <div class="form-group">
+                Project: 
+                <select id="projects">
+                    <option>project A</option>
+                </select>
+              </div>
+			  <div class="form-group">
 			    <input type="text" class="form-control" name="url" id="url" style="width:300px" placeholder="Experiment URL (if one exists)"
 				title="Please provide the url of your experiment if you have one." value="{{url}}">
 			  </div>
@@ -66,6 +72,7 @@ jQuery(document).ready(function(){
 	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
         $(this).attr("value", jsonData[0]['parent_authority']);
+        draw_projects(jsonData[0]['parent_authority']);
     });
 	$("#authority_hrn").val("{{authority_name}}");
 	var availableTags = [
@@ -96,13 +103,28 @@ jQuery(document).ready(function(){
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
-      select: function( event, ui ) {console.log(jQuery(this));}
+      select: function( event, ui ) {
+        draw_projects(jQuery('.ui-state-focus').html());
+      },
     });
 
-	$("#submit_pi").click(function() {
-		localStorage.clear();
-	});
 });
+
+function draw_projects(authority_hrn){
+    $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
+       
+        var projects = [];
+        project_row = "<option value=''> - </option>";
+        projects.push(project_row);
+       
+        $.each( data, function( key, val ) {
+            console.log(val);
+            project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
+            projects.push(project_row);
+        });
+        $("#projects").html(projects.join( "" ));
+    });
+}
 </script>
 {% endblock %}
 
