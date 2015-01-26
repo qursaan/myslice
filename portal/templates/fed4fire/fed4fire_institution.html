@@ -311,6 +311,17 @@ $(document).ready(function() {
                 $.post("/update/myslice:authority/",{'filters':{'authority_hrn':'{{user_details.parent_authority}}'},'params':{'pi_users':pi_users}}, function(data) {
                     if(data.success){
                         mysliceAlert('Success: User rights removed from: {{user_details.parent_authority}}','success', true);
+                        {% if project %}
+                        // remove the user from the list of pis of the project displayed
+                        $('input:checkbox.user').each(function (index) {
+                           if(this.checked){
+                               var record_id = this.id;
+                               $('tr[id="'+record_id+'"]').fadeOut("slow");
+                               $('tr[id="'+record_id+'"]').remove();
+                            }
+
+                        });
+                        {% endif %}
                     }else{
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
