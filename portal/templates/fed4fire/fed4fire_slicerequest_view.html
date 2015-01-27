@@ -38,14 +38,17 @@
 				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
 				title="An authority responsible for vetting your slice" required="required">
 				{% else %}
-			    <input type="text" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
+			    <input type="hidden" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
 				title="An authority responsible for vetting your slice" required="required" readonly>
+                <span style="float:left;">Authority: &nbsp;</span>
+                <div id="authority_display">
+                <img src="{{ STATIC_URL }}img/loading.gif" alt="Loading authority" />
+                </div>
 				{% endif %}
 			  </div>
 			  <div class="form-group">
                 Project: 
-                <select id="projects">
-                    <option>project A</option>
+                <select id="project" name="project">
                 </select>
               </div>
 			  <div class="form-group">
@@ -72,8 +75,15 @@ jQuery(document).ready(function(){
 	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
         $(this).attr("value", jsonData[0]['parent_authority']);
+	    {% if pi %}
         draw_projects(jsonData[0]['parent_authority']);
+        {% else %}
+        $('#authority_display').html(jsonData[0]['parent_authority']);
+        draw_projects('');
+        {% endif %}
     });
+
+	{% if pi %}
 	$("#authority_hrn").val("{{authority_name}}");
 	var availableTags = [
     {% if authorities %}
@@ -107,23 +117,36 @@ jQuery(document).ready(function(){
         draw_projects(jQuery('.ui-state-focus').html());
       },
     });
-
+    {% endif %}
 });
 
 function draw_projects(authority_hrn){
-    $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
-       
-        var projects = [];
-        project_row = "<option value=''> - </option>";
-        projects.push(project_row);
-       
-        $.each( data, function( key, val ) {
-            console.log(val);
-            project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
+    var projects = [];
+    project_row = "<option value=''> - </option>";
+    projects.push(project_row);
+
+    if(authority_hrn.length > 0){
+        // Not for root authority
+        if(authority_hrn.split('.').length > 1){
+            $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
+               
+                $.each( data, function( key, val ) {
+                    project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
+                    projects.push(project_row);
+                });
+                $("#project").html(projects.join( "" ));
+            });
+        }else{
+            $("#project").html(projects.join( "" ));
+        }
+    }else{
+        my_projects = JSON.parse(localStorage.getItem('projects'));
+        $.each( my_projects, function( i, val ) {
+            project_row = "<option value='"+val+"'>"+val+"</option>";
             projects.push(project_row);
         });
-        $("#projects").html(projects.join( "" ));
-    });
+        $("#project").html(projects.join( "" ));
+    }
 }
 </script>
 {% endblock %}

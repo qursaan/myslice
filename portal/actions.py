@@ -1,17 +1,19 @@
-from django.http                import HttpResponse
-from manifold.core.query        import Query
-from manifoldapi.manifoldapi    import execute_query,execute_admin_query
-from portal.models              import PendingUser, PendingSlice, PendingAuthority
+from django.http                    import HttpResponse
+from manifold.core.query            import Query
+from manifoldapi.manifoldapi        import execute_query,execute_admin_query
+from portal.models                  import PendingUser, PendingSlice, PendingAuthority
+from unfold.page                    import Page
+
 import json
 
-from django.contrib.auth.models  import User
-from django.contrib.sites.models import Site
-from django.contrib.auth        import get_user_model
-from django.template.loader     import render_to_string
-from django.core.mail           import EmailMultiAlternatives, send_mail
+from django.contrib.auth.models     import User
+from django.contrib.sites.models    import Site
+from django.contrib.auth            import get_user_model
+from django.template.loader         import render_to_string
+from django.core.mail               import EmailMultiAlternatives, send_mail
 
-from myslice.theme              import ThemeView
-from myslice.configengine       import ConfigEngine
+from myslice.theme                  import ThemeView
+from myslice.configengine           import ConfigEngine
 
 
 theme = ThemeView()
@@ -28,7 +30,7 @@ import activity.slice
 def authority_get_pis(request, authority_hrn):
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
+    query = Query.get('myslice:authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
     results = execute_admin_query(request, query)
     print "authority_get_pis = %s" % results
     # NOTE: temporarily commented. Because results is giving empty list. 
@@ -172,19 +174,26 @@ def clear_user_creds(request, user_email):
         return None
 
 def is_pi(wsgi_request, user_hrn, authority_hrn):
-    # XXX could be done in a single query !
-
-    # seauthorities from user where user_hrn == "ple.upmc.jordan_auge"
-
-    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
-    results = execute_admin_query(wsgi_request, query)
-    if not results:
-        # XXX Warning ?
-        return False
-    result = results[0]
-    user_authority_hrns = result.get('pi_authorities', [])
-    return authority_hrn in user_authority_hrns
+    # authorities from user where user_hrn == "ple.upmc.jordan_auge"
+    print "#### actions.py is_pi authority_hrn = ", authority_hrn
+    try:
+        # CACHE PB with fields
+        page = Page(wsgi_request)
+        metadata = page.get_metadata()
+        user_md = metadata.details_by_object('user')
+        user_fields = [column['name'] for column in user_md['column']]
+        
+        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+        query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
+        #query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
+        results = execute_query(wsgi_request, query)
+        print "is_pi results = ", results
+        for user_detail in results:
+            if authority_hrn in user_detail['pi_authorities']:
+                return True
+    except Exception,e:
+        print "Exception in actions.py in is_pi %s" % e
+    return False
     
 # SFA get record
 
@@ -694,9 +703,16 @@ def create_slice(wsgi_request, request):
     # Add User to Slice if we have the user_hrn in pendingslice table
     user_hrn = request.get('user_hrn', None)
     user_hrns = list([user_hrn]) if user_hrn else list()
-    
+   
+    # CACHE PB with fields
+    page = Page(wsgi_request)
+    metadata = page.get_metadata()
+    user_md = metadata.details_by_object('user')
+    user_fields = [column['name'] for column in user_md['column']]
+
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    #user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
     user_details_sfa = execute_admin_query(wsgi_request, user_query)
     if not user_details_sfa:
         raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn

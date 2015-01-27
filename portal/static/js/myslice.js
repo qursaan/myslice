@@ -174,6 +174,29 @@ var myslice = {
 		    $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
 		        if (data.length > 0) {
     			    localStorage.setItem('user', JSON.stringify(data[0]));
+                    projects = [];
+    			    $.each(data[0].pi_authorities, function(idx, auth) {
+                        // PI on projects
+                        if(auth.split('.').length>2){
+                            if($.inArray(auth,projects) == -1){
+                                projects.push(auth);
+                            }
+                        }else if (auth.split('.').length>1){
+                        // PI on authorities
+                            // What are the projects under this authority?
+                            $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+auth}}, function( data ) {
+    			                $.each(data, function(idx, project) {
+                                    console.log(project.authority_hrn);
+                                    if($.inArray(project.authority_hrn,projects) == -1){
+                                        projects.push(project.authority_hrn);
+                                    }
+                                });
+                            });
+                        }else{
+                            console.log("admin account - we don't list all from root");
+                        }
+                    });
+                    localStorage.setItem('projects', JSON.stringify(projects));
                     myslice.loadSlices(data[0].slices);
                     if(isFunction(fn)){
                         fn();
@@ -183,35 +206,6 @@ var myslice = {
         }else{
             if(isFunction(fn)){
                 fn();
-            }
-        }
-
-	},
-	loadProjects: function(fn) {
-	    var u = localStorage.getItem('user');
-	    if (u !== 'undefined') {
-            user = JSON.parse(u);
-            projects = localStorage.getItem('projects');
-            if($.isEmptyObject(projects)){
-                if($.isEmptyObject(user) || $.isEmptyObject(user.parent_authority)){
-    		        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'},'fields':['parent_authority']}, function( data ) {
-                        parent_authority = data[0].parent_authority;
-    
-                    });
-                }else{
-                    parent_authority = user.parent_authority;
-                }
-                // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-                $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+parent_authority}}, function( data ) {
-                    localStorage.setItem('projects', JSON.stringify(data));
-                    if(isFunction(fn)){
-                        fn();
-                    }
-                });
-            }else{
-                if(isFunction(fn)){
-                    fn();
-                }
             }
         }
 
