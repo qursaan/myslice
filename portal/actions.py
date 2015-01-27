@@ -1,7 +1,7 @@
 from django.http                import HttpResponse
 from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_query,execute_admin_query
-from portal.models              import PendingUser, PendingSlice, PendingAuthority
+from portal.models              import PendingUser, PendingSlice, PendingAuthority, PendingProject
 import json
 
 from django.contrib.auth.models  import User
@@ -340,6 +340,16 @@ def make_request_slice(slice):
     request['purpose'] = slice.purpose
     return request
 
+def make_request_project(project):
+    request = {}
+    request['type'] = 'project'
+    request['user_hrn'] = project.user_hrn
+    request['timestamp'] = project.created
+    request['authority_hrn'] = project.authority_hrn
+    request['project_name'] = project.project_name
+    request['purpose'] = project.purpose
+    return request
+
 def make_request_authority(authority):
     request = {}
     request['type']                  = 'authority'
@@ -361,7 +371,7 @@ def make_request_authority(authority):
     request['timestamp']             = authority.created
     return request
 
-def make_requests(pending_users, pending_slices, pending_authorities):
+def make_requests(pending_users, pending_slices, pending_authorities, pending_projects):
     requests = []
     for user in pending_users:
         requests.append(make_request_user(user))
@@ -369,6 +379,8 @@ def make_requests(pending_users, pending_slices, pending_authorities):
         requests.append(make_request_slice(slice))
     for authority in pending_authorities:
         requests.append(make_request_authority(authority))
+    for project in pending_projects:
+        requests.append(make_request_project(project))
     return requests   
 
 def get_request_by_id(ids):
@@ -395,26 +407,33 @@ def get_requests(authority_hrns=None):
         pending_users  = PendingUser.objects.filter(status__iexact = 'True')
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
+        pending_projects = PendingProject.objects.all()
+        print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" , pending_projects
     else:
         pending_users  = PendingUser.objects
         pending_slices = PendingSlice.objects
         pending_authorities = PendingAuthority.objects
+        pending_projects = PendingProject.objects
         from django.db.models import Q
         list_user_Q = list()
         list_slice_Q = list()
         list_auth_Q = list()
+        list_proj_Q = list()
         for hrn in authority_hrns:
             list_user_Q.append(Q(authority_hrn__startswith=hrn, status__iexact = 'True'))
             list_slice_Q.append(Q(authority_hrn__startswith=hrn))
             list_auth_Q.append(Q(site_authority__startswith=hrn))
+            list_proj_Q.append(Q(authority_hrn__startswith=hrn))
+            print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" , list_proj_Q
             print "startswith hrn = ",hrn
         from operator import __or__ as OR
         pending_users        = pending_users.filter(reduce(OR, list_user_Q))
         pending_slices       = pending_slices.filter(reduce(OR, list_slice_Q))
         pending_authorities  = pending_authorities.filter(reduce(OR, list_auth_Q))
+        pending_projects     = pending_projects.filter(reduce(OR, list_auth_Q))
         #pending_authorities  = pending_authorities.all() #filter(reduce(OR, list_Q))
 
-    return make_requests(pending_users, pending_slices, pending_authorities)
+    return make_requests(pending_users, pending_slices, pending_authorities, pending_projects)
 
 # XXX Is it in sync with the form fields ?
 
@@ -782,6 +801,42 @@ def create_pending_slice(wsgi_request, request, email):
         msg.send()
     except Exception, e:
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
+
+def create_pending_project(wsgi_request, request):
+    """
+    """
+
+    # Insert an entry in the PendingProject table
+    s = PendingProject(
+        project_name    = request['project_name'],
+        user_hrn        = request['user_hrn'],
+        authority_hrn   = request['authority_hrn'],
+        purpose         = request['purpose'],
+    )
+    s.save()
+
+#     try:
+#         # Send an email: the recipients are the PI of the authority
+#         recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+# 
+#         theme.template_name = 'slice_request_email.txt' 
+#         text_content = render_to_string(theme.template, request)
+#     
+#         theme.template_name = 'slice_request_email.html' 
+#         html_content = render_to_string(theme.template, request)
+#     
+#         theme.template_name = 'slice_request_email_subject.txt'
+#         subject = render_to_string(theme.template, request)
+#         subject = subject.replace('\n', '')
+#     
+#         sender = email
+#         msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+#         msg.attach_alternative(html_content, "text/html")
+#         msg.send()
+#     except Exception, e:
+#         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
 
 #-------------------------------------------------------------------------------
 # REQUESTS - Users

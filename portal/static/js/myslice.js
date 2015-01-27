@@ -190,8 +190,8 @@ var myslice = {
 	loadProjects: function(fn) {
 	    var u = localStorage.getItem('user');
 	    if (u !== 'undefined') {
-            user = JSON.parse(u);
-            projects = localStorage.getItem('projects');
+            var user = JSON.parse(u);
+            var projects = localStorage.getItem('projects');
             if($.isEmptyObject(projects)){
                 if($.isEmptyObject(user) || $.isEmptyObject(user.parent_authority)){
     		        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'},'fields':['parent_authority']}, function( data ) {
