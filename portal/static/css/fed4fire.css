@@ -31,6 +31,20 @@ h3 {
     color:#201E62;
 }
 
+input[type=text], input[type=password], input[type=email], input[type=tel], input[type=number] {
+    min-width:260px;
+    padding:6px;
+    border:1pt solid #CCCCCC;
+    vertical-align:bottom;
+    border-radius:0;
+}
+
+textarea {
+    padding:6px;
+    border:1pt solid #CCCCCC !important;
+    border-radius:0 !important;
+}
+
 div.wrapper {
     width:980px;
     margin:0 auto;

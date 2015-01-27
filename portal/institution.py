@@ -5,6 +5,7 @@ from django.template                import RequestContext
 from django.shortcuts               import render_to_response
 from django.shortcuts               import render
 
+from unfold.page                    import Page
 from unfold.loginrequired           import LoginRequiredAutoLogoutView
 
 from manifold.core.query            import Query
@@ -13,7 +14,7 @@ from manifoldapi.manifoldresult     import ManifoldResult
 from ui.topmenu                     import topmenu_items, the_user
 from myslice.configengine           import ConfigEngine
 
-from portal.actions                 import authority_check_pis
+from portal.actions                 import is_pi, authority_check_pis
 from myslice.theme                  import ThemeView
 import json
 
@@ -36,7 +37,15 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
         if request.user.is_authenticated(): 
             env['person'] = self.request.user
             if authority_hrn is None: 
-                user_query  = Query().get('myslice:user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
+                # CACHE PB with fields
+                page = Page(wsgi_request)
+                metadata = page.get_metadata()
+                user_md = metadata.details_by_object('user')
+                user_fields = [column['name'] for column in user_md['column']]
+                
+                # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+                user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
+                #user_query  = Query().get('myslice:user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
                 user_details = execute_query(self.request, user_query)
                 try:
                     env['user_details'] = user_details[0]
@@ -57,12 +66,11 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
                 env['project'] = True
                 env['user_details'] = {'parent_authority': authority_hrn}
 
-                        
-
         else: 
             env['person'] = None
-    
-        pi = authority_check_pis (self.request, str(self.request.user))        
+        print "BEFORE  ####------####  is_pi"
+        pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
+        print "is_pi = ",is_pi
 
         env['theme'] = self.theme
         env['section'] = "Institution"

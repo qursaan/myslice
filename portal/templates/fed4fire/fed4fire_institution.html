@@ -87,8 +87,8 @@
     				</table>
 				
 			</div>
-        	{% if  pi %}
 			<div>
+        	{% if  pi %}
 	  		<button id="createproject" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create project</button>
 			<button id="deleteprojects" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete selected projects</button>
 			{% else %}
@@ -158,7 +158,14 @@ $(document).ready(function() {
                 
                 slice_row = "<tr id='"+val.slice_hrn+"'>";
                 slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
-                slice_row += "<td><a href='/slice/"+val.slice_hrn+"'>" + val.slice_hrn + "</a></td>";
+
+                // filter links to slices, only those that the user has credentials for
+                s = myslice.user.slices;
+                if(s.length > 0 && $.inArray(val.slice_hrn, myslice.user.slices)!=-1){
+                    slice_row += "<td><a href='/slice/"+val.slice_hrn+"'>" + val.slice_hrn + "</a></td>";
+                }else{
+                    slice_row += "<td>" + val.slice_hrn + "</td>";
+                }
                 slice_row += "<td>"+users_length+"</td>";
                 slice_row += "<td>"+slice_url+"</td>";
                 //slice_row += "<td>"+nodes_length+"</td>";
@@ -192,7 +199,7 @@ $(document).ready(function() {
 
         });
         {% else %}
-        $.post("/rest/user/",{'fields':['user_hrn','user_email'],'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
+        $.post("/rest/myslice:user/",{'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
             var list_users = [];
             var table_users = [];
 		    /* Available fields
@@ -224,7 +231,14 @@ $(document).ready(function() {
                 console.log(val);
                 project_row = "<tr id='"+val.authority_hrn+"'>";
                 project_row += "<td><input type='checkbox' class='project' id='"+val.authority_hrn+"'></td>";
-                project_row += "<td><a href='/portal/project/"+val.authority_hrn+"'>"+val.authority_hrn+"</a></td>";
+
+                // filter links to projects, only those that the user has credentials for
+                p = myslice.projects;
+                if(p.length > 0 && $.inArray(val.authority_hrn, p)!=-1){
+                    project_row += "<td><a href='/portal/project/"+val.authority_hrn+"'>"+val.authority_hrn+"</a></td>";
+                }else{
+                    project_row += "<td>"+val.authority_hrn+"</td>";
+                }
                 project_row += "</tr>";
                 table_projects.push(project_row);
             });

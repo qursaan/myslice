@@ -96,3 +96,10 @@ class PendingSlice(models.Model):
     type_of_nodes   = models.TextField(default='NA')
     purpose         = models.TextField(default='NA')
     created         = models.DateTimeField(auto_now_add = True)
+    
+class PendingProject(models.Model):
+    project_name    = models.TextField()
+    user_hrn        = models.TextField()
+    authority_hrn   = models.TextField(null=True)
+    purpose         = models.TextField(default='NA')
+    created         = models.DateTimeField(auto_now_add = True)

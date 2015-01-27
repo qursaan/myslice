@@ -15,7 +15,6 @@
 	{%if 'creds_expired'  in user_cred %}
     	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
     {%endif%}
-		{% if pi %}
 		<div class="col-md-3">
 			<h3>
 				EXPERIMENT
@@ -107,88 +106,6 @@
 	    	</div>
 		</div>
 	</div>
-	{%else%}
-	<div class="row">
-		<div class="col-md-4">
-			<h3>
-				EXPERIMENT
-			</h3>
-			<div>
-				<a href="#"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
-			</div>
-			<div>
-				<p><strong>Your slices </strong>
-				<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
-					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
-					However, on the Fed4FIRE portal, you will only see slices that you have created through Fed4FIRE. If you have created slices elsewhere, 
-					those slices will not appear here."
-					class="glyphicon glyphicon-info-sign">
-				</span>
-				</p>
-			</div>
-			<div>	
-				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-			</div>
-			{% if pending_slices %}
-			<p><strong>Pending slices</strong>
-			<span title="Slices that you have requested and are pending for validation by the contact person of your organization."
-				class="glyphicon glyphicon-info-sign">
-			<ul>
-			{% for slices in pending_slices %}
-			<li>{{slices}}</li>
-			{% endfor %}
-			</ul>
-			</span>
-			</p>
-			{%endif%}
-			<h3 title="Some tools do their own slice creation and management.">Experiment now</h3>
-			<a class="btn btn-primary" style="width: 150px;" 
-                    href='http://jfed.iminds.be/releases/5.4-dev/r2289/webstart/experimenter/jfed-experimenter.jnlp'
-					title="Click here to start your experiment with jFed" 
-					onclick="return  launchApplication('http://jfed.iminds.be/releases/5.4-dev/r2289/webstart/experimenter/jfed-experimenter.jnlp');">
-                    <span class="glyphicon glyphicon-cloud"></span> jFed</a>	
-		</div>
-		<div class="col-md-4">
-			<h3>
-				SUPPORT
-			</h3>
-			<div>
-				<a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
-			</div>
-			<p></p>
-			<div>
-    			<button id="statbtn" type="button" style="width: 150px;" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' status</button>
-			</div>
-			<div>
-    			<button id="repbtn" type="button" style="width: 170px;" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' reputation</button>
-			</div>
-		</div>
-		
-		<div class="col-md-4">
-			<h3>
-				ACCOUNT
-			</h3>
-			<div>
-				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-			</div>
-			<div>
-				{% if person.last_name %}
-					{{person.first_name}} {{person.last_name}}<br />
-				{% endif %}
-    			<span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
-	    	</div>
-		</div>
-	</div>
-	{%endif%}
 
 </div>
 {% else %}

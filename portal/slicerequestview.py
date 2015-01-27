@@ -42,7 +42,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
         if authorities is not None:
-            authorities = sorted(authorities)
+            authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
+            authorities = sorted(authorities, key=lambda k: k['name'])
 
         # Get user_email (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email','config')
@@ -85,7 +86,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         #else:
         #    pi = "is_pi"
 
-        pi = authority_check_pis (wsgi_request, user_email)       
+        pi = authority_check_pis (wsgi_request, user_email)
+        print "SLICEREQUESTVIEW.PY -----  pi=",pi
 
         # Page rendering
         page = Page(wsgi_request)
@@ -108,6 +110,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # Handle the case when we use only hrn and not name
             if authority_hrn is None:
                 authority_hrn = wsgi_request.POST.get('org_name', '')
+
+            # Handle project if used
+            project = wsgi_request.POST.get('project', None)
+            if project is not None:
+                authority_hrn = project
 
             slice_request = {
                 'type'              : 'slice',
