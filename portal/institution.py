@@ -38,13 +38,13 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
             env['person'] = self.request.user
             if authority_hrn is None: 
                 # CACHE PB with fields
-                page = Page(wsgi_request)
+                page = Page(request)
                 metadata = page.get_metadata()
                 user_md = metadata.details_by_object('user')
                 user_fields = [column['name'] for column in user_md['column']]
                 
                 # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-                user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
+                user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==','$user_hrn')
                 #user_query  = Query().get('myslice:user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
                 user_details = execute_query(self.request, user_query)
                 try:

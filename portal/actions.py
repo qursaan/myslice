@@ -417,7 +417,6 @@ def get_requests(authority_hrns=None):
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
         pending_projects = PendingProject.objects.all()
-        print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" , pending_projects
     else:
         pending_users  = PendingUser.objects
         pending_slices = PendingSlice.objects
@@ -433,13 +432,11 @@ def get_requests(authority_hrns=None):
             list_slice_Q.append(Q(authority_hrn__startswith=hrn))
             list_auth_Q.append(Q(site_authority__startswith=hrn))
             list_proj_Q.append(Q(authority_hrn__startswith=hrn))
-            print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" , list_proj_Q
-            print "startswith hrn = ",hrn
         from operator import __or__ as OR
         pending_users        = pending_users.filter(reduce(OR, list_user_Q))
         pending_slices       = pending_slices.filter(reduce(OR, list_slice_Q))
         pending_authorities  = pending_authorities.filter(reduce(OR, list_auth_Q))
-        pending_projects     = pending_projects.filter(reduce(OR, list_auth_Q))
+        pending_projects     = pending_projects.filter(reduce(OR, list_proj_Q))
         #pending_authorities  = pending_authorities.all() #filter(reduce(OR, list_Q))
 
     return make_requests(pending_users, pending_slices, pending_authorities, pending_projects)

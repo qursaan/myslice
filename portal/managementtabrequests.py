@@ -88,7 +88,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
                         credential_authorities.add(authority_hrn)
 
             # CACHE PB with fields
-            page = Page(wsgi_request)
+            page = Page(self.request)
             metadata = page.get_metadata()
             user_md = metadata.details_by_object('user')
             user_fields = [column['name'] for column in user_md['column']]
