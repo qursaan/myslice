@@ -6,9 +6,8 @@ from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 
-from portal.actions import create_pending_project
-
-from portal.models import PendingProject
+from portal.actions import create_pending_project, create_pending_join, sfa_add_authority, authority_add_pis, is_pi
+from portal.models import PendingProject, PendingJoin
 
 from myslice.theme import ThemeView
 
@@ -53,6 +52,13 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                         account_config = json.loads(account_detail['config'])
                         user_hrn = account_config.get('user_hrn','N/A')
         return user_hrn        
+
+    def getUserEmail(self, request):
+        # Get user_email (XXX Would deserve to be simplified)
+        user_query  = Query().get('local:user').select('email','config')
+        user_details = execute_query(request, user_query)
+        user_email = user_details[0].get('email')
+        return user_email
                    
     def post(self, request):
         return self.handle_request(request, 'POST')
@@ -65,7 +71,11 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
         authority_hrn = None
         authority_name = None
         
+        #errors.append(wsgi_request.POST)
+
         user_hrn = self.getUserHrn(wsgi_request)
+
+        user_email = self.getUserEmail(wsgi_request)
         
         authorities = self.getAuthorities(wsgi_request)
         
@@ -77,51 +87,71 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                 authority_name = authority['name']
         
         if method == 'POST' :
-           
-            post = {
-                'user_hrn'          : user_hrn,
-                'authority_hrn'     : wsgi_request.POST.get('authority_name', ''),
-                'project_name'      : wsgi_request.POST.get('project_name', ''),
-                'purpose'           : wsgi_request.POST.get('purpose', ''),
-            }
         
-#             # create slice_hrn based on authority_hrn and slice_name
-#             #             slice_name = slice_request['slice_name']
-#             req_slice_hrn = authority_hrn + '.' + slice_name
-#             # comparing requested slice_hrn with the existing slice_hrn 
-#             slice_query  = Query().get('myslice:slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
-#             slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
-#             for _slice in slice_details_sfa:
-#                 if _slice['slice_hrn'] == req_slice_hrn:
-#                     errors.append('Slice already exists. Please use a different slice name.')
-            
+            if 'join' in wsgi_request.POST:
+                post = {
+                    'user_hrn'          : user_hrn,
+                    'email'             : user_email,
+                    'project_name'      : wsgi_request.POST.get('project_name', ''),
+                    'authority_hrn'     : wsgi_request.POST.get('project_name', ''),
+                }
 
-            # What kind of slice name is valid?
+            else:
+                post = {
+                    'user_hrn'          : user_hrn,
+                    'email'             : user_email,
+                    'authority_hrn'     : wsgi_request.POST.get('authority_name', ''),
+                    'project_name'      : wsgi_request.POST.get('project_name', ''),
+                    'purpose'           : wsgi_request.POST.get('purpose', ''),
+                }
+
+                if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
+                    errors.append('Organization is mandatory')
+    
+                if (post['purpose'] is None or post['purpose'] == ''):
+                    errors.append('Experiment purpose is mandatory')
+
+                if (re.search(r'^[A-Za-z0-9_]*$', post['project_name']) == None):
+                    errors.append('Project name may contain only letters, numbers, and underscore.')
+
+            # What kind of project name is valid?
             if (post['project_name'] is None or post['project_name'] == ''):
                 errors.append('Project name is mandatory')
             
-            if (re.search(r'^[A-Za-z0-9_]*$', post['project_name']) == None):
-                errors.append('Project name may contain only letters, numbers, and underscore.')
-            
-            if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
-                errors.append('Organization is mandatory')
-    
-            if (post['purpose'] is None or post['purpose'] == ''):
-                errors.append('Experiment purpose is mandatory')
-
             if not errors:
-                create_pending_project(wsgi_request, post)
-        
-        # retrieves the pending projects list
+                print "is_pi on auth_hrn = ", user_authority
+                if is_pi(wsgi_request, user_hrn, user_authority):
+                    # PIs can directly create/join project in their own authority...
+                    if 'join' in wsgi_request.POST:
+                        authority_add_pis(wsgi_request, post['project_name'], user_hrn)
+                    else:
+                        hrn = post['authority_hrn'] + '.' + post['project_name']
+                        sfa_add_authority(wsgi_request, {'authority_hrn':hrn})
+                        authority_add_pis(wsgi_request, hrn, user_hrn)
+                    self.template_name = 'slice-request-done-view.html'
+                else:
+                    # Otherwise a wsgi_request is sent to the PI
+                    if 'join' in wsgi_request.POST:
+                        create_pending_join(wsgi_request, post)
+                    else:
+                        create_pending_project(wsgi_request, post)
+                    self.template_name = 'slice-request-ack-view.html'
+
+        # retrieves the pending projects creation list
         pending_projects = PendingProject.objects.all().filter(user_hrn=user_hrn)
-                    
+        # retrieves the pending join a project list
+        pending_join_projects = PendingJoin.objects.all().filter(user_hrn=user_hrn)
+
+        root_authority = user_authority.split('.', 1)[0]                  
         env = {
                'errors':        errors,
                'username':      wsgi_request.user,
                'theme':         self.theme,
                'authorities':   authorities,
                'authority_hrn': user_authority,
+               'root_authority_hrn': root_authority,
                'pending_projects': pending_projects,
+               'pending_join_projects': pending_join_projects,
         }
         return render(wsgi_request, self.template, env)
     

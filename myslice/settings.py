@@ -47,7 +47,7 @@ except:
 # assume we have ./static present already
 HTTPROOT="/var/myslice-f4f"
 # the place to store local data, like e.g. the sqlite db
-DATAROOT="/Users/moray/Sites/upmc/myslice"
+DATAROOT="/var/unfold"
 # if not there, then we assume it's from a devel tree
 if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT

@@ -100,6 +100,14 @@ class PendingSlice(models.Model):
 class PendingProject(models.Model):
     project_name    = models.TextField()
     user_hrn        = models.TextField()
+    email           = models.TextField()
     authority_hrn   = models.TextField(null=True)
     purpose         = models.TextField(default='NA')
+    created         = models.DateTimeField(auto_now_add = True)
+
+class PendingJoin(models.Model):
+    user_hrn        = models.TextField()
+    email           = models.TextField()
+    project_name    = models.TextField(null=True)
+    authority_hrn   = models.TextField()
     created         = models.DateTimeField(auto_now_add = True)

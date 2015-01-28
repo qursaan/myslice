@@ -9,10 +9,10 @@
 		 	 Account &nbsp;>&nbsp; <a href="/account">{{ person.email }}</a>
 		 </div>
 	</div>
-	 {%if 'no_creds'  in user_cred %}
+	 {%if 'no_creds' in user_cred %}
     <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
     {%endif%}
-	 {%if 'creds_expired'  in user_cred %}
+	 {%if 'creds_expired' in user_cred %}
     <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
     {%endif%}
 
@@ -26,7 +26,7 @@
 {% endif %}
 
 <form id="editForm" method="post" action="account_process" enctype="multipart/form-data">
-<input type="text" id="button_value"  name="button_value" value="" />
+<input type="hidden" id="button_value"  name="button_value" value="" />
 
 <div class="row">
 	<div class="col-md-12">
@@ -354,6 +354,11 @@
 </form>
 <script>
     $(document).ready(function() {
+	    {%if 'no_creds' in user_cred or 'creds_expired' in user_cred %}
+        localStorage.clear();
+        $.post("/cache/clear/", function( data ) {
+        });
+        {% endif %}
     	$('.nav-tabs a').click(function (e) {
 			e.preventDefault();
 			$(this).tab('show');

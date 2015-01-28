@@ -47,8 +47,8 @@
 				{% endif %}
 			  </div>
 			  <div class="form-group">
-                Project: 
-                <select id="project" name="project">
+                Project: <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
+                <select id="project" name="project" style="display:none;">
                 </select>
               </div>
 			  <div class="form-group">
@@ -114,6 +114,8 @@ jQuery(document).ready(function(){
       source: availableTags,
       minLength: 0,
       select: function( event, ui ) {
+        $("#project").hide();
+        $("#project_loading").css('display', 'inline-block');
         draw_projects(jQuery('.ui-state-focus').html());
       },
     });
@@ -121,6 +123,7 @@ jQuery(document).ready(function(){
 });
 
 function draw_projects(authority_hrn){
+
     var projects = [];
     project_row = "<option value=''> - </option>";
     projects.push(project_row);
@@ -147,6 +150,8 @@ function draw_projects(authority_hrn){
         });
         $("#project").html(projects.join( "" ));
     }
+    $("#project").show();
+    $("#project_loading").hide();
 }
 </script>
 {% endblock %}
