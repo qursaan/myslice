@@ -113,7 +113,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
             # Handle project if used
             project = wsgi_request.POST.get('project', None)
-            if project is not None:
+            if project is not None and project != '':
                 authority_hrn = project
 
             slice_request = {
