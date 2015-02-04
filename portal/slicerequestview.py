@@ -92,7 +92,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         # Page rendering
         page = Page(wsgi_request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/jquery-ui.js" ] )
-        page.add_css_files ( [ "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" ] )
+        page.add_css_files ( [ "css/jquery-ui.css" ] )
         page.expose_js_metadata()
 
         if method == 'POST':
