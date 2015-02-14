@@ -1,14 +1,18 @@
---- search package name
+--- search package by name
 apt-cache search emacs
+
 --- install one package
 apt-get install emacs23-nox
+
 --- preparing upgrade (fetch and index latest versions of the repos)
 apt-get update 
 --- actually update one package
 apt-get upgrade myslice
+
 --- list packages
 dpkg -l
 dpkg -l '*foo*'
+
 --- list (files for) one package 
 dpkg -L myslice
 dpkg-deb -c myslice_0.2.4.lxc.2013.11.26_amd64.deb
@@ -25,3 +29,7 @@ gdebi foo.deb
 --- find which package a file belongs to
 apt-file search /path/to/file
 (can be installed with : sudo apt-get install apt-file)
+
+--- reinstall a package
+apt-get purge openfire
+apt-get install openfire
