@@ -58,30 +58,34 @@
         {
             var selected, prev_selected, num, num_selected, num_prev_selected, filter;
 
-            prev_selected = $.map($scope.facility_names, function(x, i) {
-                return $scope.is_facility_active(x) ? x : null;
-            });
+            // prev_selected = $.map($scope.facility_names, function(x, i) {
+                // return $scope.is_facility_active(x) ? x : null;
+            // });
 
             $scope.set_facility_active(facility, ! $scope.is_facility_active(facility));
-
-            selected = $.map($scope.facility_names, function(x, i) {
-                return $scope.is_facility_active(x) ? x : null;
+            
+            $.each($scope.testbed_names[facility], function(j, testbed_name) {
+                $scope.select_testbed(facility, testbed_name);
             });
+            console.log($scope);
+            // selected = $.map($scope.facility_names, function(x, i) {
+                // return $scope.is_facility_active(x) ? x : null;
+            // });
 
-            num = $scope.facility_names.length;
-            prev_num_selected = prev_selected.length;
-            num_selected = selected.length;
+            // num = $scope.facility_names.length;
+            // prev_num_selected = prev_selected.length;
+            // num_selected = selected.length;
 
-            if ((prev_num_selected != 0) && (prev_num_selected != num)) {
-                // Remove previous filter
-                filter = ['facility_name', 'included', prev_selected];
-                manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
-            }
-
-            if (num_selected != num) {
-                filter = ['facility_name', 'included', selected];
-                manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
-            }
+            // if ((prev_num_selected != 0) && (prev_num_selected != num)) {
+                // // Remove previous filter
+                // filter = ['facility_name', 'included', prev_selected];
+                // manifold.raise_event($scope.instance.options.query_uuid, FILTER_REMOVED, filter);
+            // }
+// 
+            // if (num_selected != num) {
+                // filter = ['facility_name', 'included', selected];
+                // manifold.raise_event($scope.instance.options.query_uuid, FILTER_ADDED, filter);
+            // }
         };
 
         $scope.select_testbed = function(facility, testbed)
@@ -240,7 +244,7 @@
 
         _get_scope : function()
         {
-            return angular.element('[ng-controller=TestbedsCtrl]').scope()
+            return angular.element('[ng-controller=TestbedsCtrl]').scope();
         },
 
 /*
