@@ -430,7 +430,7 @@ a.sl-testbed.active {
     color:black;
 }
 div.sl-filter-resources {
-    margin:10px 0;
+    margin:0 0 10px 0;
     text-align:center;
 }
 span.sl-resources {
@@ -451,15 +451,12 @@ a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus 
     padding:2px 8px;
     -moz-border-radius: 2px;
     border-radius: 2px;
-    background-color:#FFA500;
+    background-color:#E7A6E7;
     color:#000000;
 }
 a.sl-resources:first-child {
 }
 button.btn-apply {
-    background-color:#FFA500;
-    border-bottom: 2pt solid #FFCA00;
-    color:black;
     font-size:13px;
     padding:2px 8px;
     margin:0 5px;
