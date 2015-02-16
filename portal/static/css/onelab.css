@@ -382,6 +382,7 @@ div.container-resource, div.container-slice {
 div#slice-view {
     margin:0;
 }
+
 div.sl-filter-facilities {
     padding:0 5px;
 }
@@ -428,32 +429,43 @@ a.sl-testbed:hover {
 a.sl-testbed.active {
     color:black;
 }
+div.sl-filter-resources {
+    margin:10px 0;
+    text-align:center;
+}
 span.sl-resources {
     font-size:9pt;
     color:gray;
 }
-a.sl-resources, a.sl-resources:hover {
+a.sl-resources {
     font-size:9pt;
     border:0;
-    padding:2px 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    width:105px;
-    margin-left:4px;
-    margin-bottom:8px;
+    padding:2px 8px;
+    margin:0 5px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
     text-align: center;
 }
 a.sl-resources.active, a.sl-resources.active:hover, a.sl-resources.active:focus {
     border:0;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
+    padding:2px 8px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    background-color:#FFA500;
+    color:#000000;
 }
 a.sl-resources:first-child {
-    margin-left:12px;
 }
 button.btn-apply {
+    background-color:#FFA500;
+    border-bottom: 2pt solid #FFCA00;
+    color:black;
     font-size:13px;
     padding:2px 8px;
+    margin:0 5px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    text-align: center;
 }
 div#slice-info {
     margin-top:25px;
