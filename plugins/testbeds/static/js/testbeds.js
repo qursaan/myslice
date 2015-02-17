@@ -51,6 +51,10 @@
                 $scope._testbed_active[facility] = new Object();
             $scope._testbed_active[facility][testbed] = value;
         };
+        
+        $scope.tolower = function(string) {
+            return string.toLowerCase(string);  
+        };
     
         /* Click event */
 

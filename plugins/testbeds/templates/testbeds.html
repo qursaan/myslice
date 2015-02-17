@@ -10,7 +10,7 @@
                id="facility-filter_{[{ facility_name }]}"
                ng-click="select_facility(facility_name)"
                data-platform="{[{ facility_name }]}">
-               <img class="sl-image" src="/static/icons/{[{ facility_name }]}.png" /> {[{ facility_name }]}
+               <img class="sl-image" src="/static/icons/{[{ tolower(facility_name) }]}.png" /> {[{ facility_name }]}
             </a>
             <div class="sl-testbeds" ng-repeat="testbed_name in testbed_names[facility_name]">
                 <a href="#" 
