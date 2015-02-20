@@ -6,9 +6,17 @@
 {% widget '_widget-news.html' %}
 </div> -->
 {% if username %}
+{% widget "_widget-no_credentials.html" %}
 <div class="container dashboard">
+	{%if 'no_creds'  in user_cred %}
+        <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+    {%endif%}
+	{%if 'creds_expired'  in user_cred %}
+        <p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
+
 	<div class="row">
-		{%if 'is_pi'  in pi %}
+		{% if pi %}
 		<div class="col-md-3">
 			<h3>
 				EXPERIMENT
@@ -98,6 +106,18 @@
 			<div>	
 				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 			</div>
+			{% if pending_slices %}
+			<p><strong>Pending slices</strong>
+			<span title="Slices that you have requested and are pending for validation by the contact person of your organization."
+				class="glyphicon glyphicon-info-sign">
+			<ul>
+			{% for slices in pending_slices %}
+			<li>{{slices}}</li>
+			{% endfor %}
+			</ul>
+			</span>
+			</p>
+			{%endif%}	
 		</div>
 		<div class="col-md-4">
 			<h3>
@@ -138,11 +158,10 @@
 		<div class="col-sm-2"></div>
 		<div class="col-sm-4 slogan">
 			<h2>
-				SmartFIRE
+				Your Easy Access to Computer Networking Testbeds:
 			</h2>
 			<h3>
-				EU-South Korea Cooperation<br>
-				On Future Internet Infrastructure
+				A wide variety of world class testbeds available through your one account
 			</h3>
 		</div>
 		<div class="col-sm-5 col-sm-offset-1">
@@ -176,14 +195,10 @@
 		$('button#slicerequestbtn').click(function() {
 			window.location="/portal/slice_request/";
 		});
-/*-------
-List of slices has been moved in 
-portal/templates/base.html
-This should go into session
---------*/
+
+        myslice.loadSlices();
+        
 });
 </script>
-{# widget "_widget-monitor.html" #}
-{# widget "_widget-stats-top-slices.html" #}
 
 {% endblock %}

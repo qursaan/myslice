@@ -13,7 +13,7 @@ body {
 a, a:active, a:focus {
     outline: 0;
     text-decoration:none;
-    color:#760073;
+    color:#FF4400;
 }
 a:hover {
     color:#0D0049;
@@ -174,14 +174,14 @@ button.btn-danger:active {
 }
 button.btn-onelab, input.btn-onelab {
     border:0;
-    border-bottom:3px solid #760073;
-    background-color:#302562;
+    border-bottom:3px solid #FFA315;
+    background-color:#FFA315;
     color:white;
 }
 button.btn-onelab:hover, input.btn-onelab:hover {
     border:0;
-    border-bottom:3px solid #760073;
-    background-color:#302562;
+    border-bottom:3px solid #FF7E00;
+    background-color:#FF7E00;
     color:white;
 }
 button.btn-onelab:active, input.btn-onelab:active {
@@ -576,7 +576,7 @@ div.navigation li a {
     color:#0C0047;
 }
 div.navigation li a:hover, div.navigation li a.current {
-    color:#760073;
+    color:#FF4400;
     text-decoration:none;
 }
 
@@ -715,7 +715,7 @@ div.home {
     line-height:1.2em;
     letter-spacing:0.3pt;
     min-height:500px;
-    //background-image: url('../img/bg-experiment.png');
+    background-image: url('../img/bg-smartfire.png');
     background-repeat:no-repeat;
     background-size:cover;
     background-position:center top;
@@ -798,7 +798,6 @@ div.registration-form {
 div.slogan {
     text-align:center;
     color:white;
-    padding-top:60px;
     text-shadow: 1px 1px #013540;
 }
 
