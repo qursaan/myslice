@@ -1,48 +1,66 @@
 This file documents the contents of this module
 change
-Last update 4 FEB. 2015
+Last update 20 FEB. 2015
 
-See the devel/ subdir for more devel-oriented doc.
+Installation
+=================================================================
+OS
+==
+Download a vm of Debian GNU/Linux 7.5 (wheezy) x64
 
-==================== 1 minute howto
+PYTHON DEPENDENCIES
+=====================
+sudo apt-get install python-pip or sudo easy_install pip==1.4.1
+sudo apt-get install python-dev (for paramiko and pyOpenSSL)
+sudo apt-get install libffi-dev (for pyOpenSSL)
 
-*  REQUIREMENTS  is to have python + django (1.5.2) installed django
-** should be straightforward
-** see devel/django-install.txt in case of trouble
-$ apt-get install python-pip or sudo easy_install pip==1.4.1
-$ pip install django=="1.5.2
+$ pip install django=="1.5.2"
 $ apt-get install python-django-south
 $ pip install requests
 $ pip install djangorestframework
 $ pip install django-celery
 $ pip install geopy
 $ pip install paramiko
+$ pip install pyparsing
+$ pip install python-dateutil
+$ pip instal pyOpenSSL
 
-* git clone git://git.onelab.eu/myslice.git
--- or --
-* git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
+MYSLICE
+=======
+git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
+cd myslice
+git checkout onelab
 
-* edit/create myslice/myslice.ini and enter the details of your manifold backend
+edit/create myslice/myslice.ini and enter the details of your manifold backend
 
-$ apt-get install python-django-south
-* init django
-** when django prompts for creating an admin account, create it and 
-** keep the username and password safe
+mkdir /var/unfold
+copy unfold.sqlite3 to /var/unfold
+
 $ ./manage.py syncdb
 $ ./manage.py migrate
 
-* gather static files
-$ ./manage.py collectstatic 
--- or --
-$ ./manage.py collectstatic --noinput
--- or --
-$ make static (which is a shorthand for cleaning up and run manage collectstatic --noinput)
+use the unfold.sqlite3 i gave to u
 
-* gather templates files 
-  for now we still seem to rely on a make-based templates-collection process
-  that creates templates/ 
-$ make templates [$ make redo (each time when you pull, do that and restart the server)]
+$ make redo
+$ ./devel/server-loop.sh
 
+MANIFOLD
+==========
+git clone git://git.onelab.eu/manifold.git
+cd manifold
+git checkout devel
+make && make install
+
+SFA
+===
+$ git clone -b geni-v3 git://git.onelab.eu/sfa.git
+$ cd sfa 
+$ git checkout geni-v3
+
+$ make version
+$ python ./setup.py install
+
+=====================================================================
 
 ## Whenever doing a git pull the following operations are recommended:
 

@@ -82,6 +82,10 @@ span.version {
     font-size:8pt;
     color:#888888;
 }
+input[type=checkbox] {
+  min-width:5px !important;
+  margin-left:0 !important;
+}
 input[type=text], input[type=password], input[type=email], input[type=tel], input[type=number], select, option {
     min-width:260px;
     padding:6px;
@@ -378,43 +382,53 @@ div.container-resource, div.container-slice {
 div#slice-view {
     margin:0;
 }
-div.list-group-item {
-    border:0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    background-color:white;
-    font-weight:bold;
-    padding-left:0;
-}
-a.list-group-item {
-    -moz-border-radius: 0;
-    border-radius: 0;
-    border:0;
-    background-color:white;
-    padding:3px 2px 3px 10px;
-    border-left:2pt white solid;
-}
-a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
-    -moz-border-radius: 0;
-    border-radius: 0;
-    font-weight: bold;
-    color:black;
-    background-color:#F5F5F5;
-    border-left:2pt blue solid;
-}
 
-a.list-group-item:hover {
-    -moz-border-radius: 0;
-    border-radius: 0;
-    border-left:2pt blue solid;
+/* FACILITY/TESTBED filters */
+div.sl-filter-facilities {
+    padding:0 5px;
 }
-a.list-group-item p.list-group-item-text {
-    -moz-border-radius: 0;
-    border-radius: 0;
-    font-size:9pt;
-    font-style:italic;
-    font-weight: normal;
-    color: black !important;
+div.sl-filter-facilities h4 {
+    margin-bottom:15px;
+    
+}
+img.sl-image {
+    margin:0 5px 5px 0;
+    padding:0;
+    vertical-align:middle;
+}
+a.sl-facility {
+    color:gray;
+    text-decoration:none;
+}
+a.sl-facility:hover {
+    color:#342961;
+}
+a.sl-facility.active {
+    color:black;
+    text-decoration:none;
+}
+a.sl-facility::before {
+    content: " ";
+}
+div.sl-facilities {
+    border-bottom:#CCCCCC 1px solid;
+    padding-bottom:15px;
+    margin-bottom:15px;
+}
+div.sl-facilities:last-child {
+    border:0;
+}
+a.sl-testbed {
+    color:gray;
+    text-decoration:none;
+    margin-left:25px;
+    margin-bottom:5px;
+}
+a.sl-testbed:hover {
+    color:#342961;
+}
+a.sl-testbed.active {
+    color:black;
 }
 
 span.sl-resources {
