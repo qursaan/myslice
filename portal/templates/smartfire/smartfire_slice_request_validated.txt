@@ -9,7 +9,7 @@ Purpose         : {{purpose}}
 
 We are pleased to inform you that a manager from your institution has validated your slice request on the SmartFIRE portal. You can now add resources to you slice and start experimenting.
 
-On behalf of the entire team, I wish you a fruitful user experience with the SmartFIRE portal.
+We wish you a fruitful user experience with the SmartFIRE portal.
 
 Yours sincerely,
 The SmartFIRE team
