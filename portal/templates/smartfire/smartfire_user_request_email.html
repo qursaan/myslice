@@ -1,0 +1,16 @@
+<img src="{{ STATIC_URL }}img/SmartFIRE_logo.png">
+<br>
+<h1>NEW USER REQUEST</h1>
+<br>
+<b>First name   :</b> {{first_name}}<br>
+<b>Last name    :</b> {{last_name}}<br>
+<b>Organization :</b> {{organization}}<br>
+<b>Authority hrn:</b> {{authority_hrn}}<br>
+<b>Public key   :</b> {{public_key}}<br>
+<b>Email        :</b> {{email}}<br>
+<b>User hrn     :</b> {{user_hrn}}<br>
+<b>Portal url	:</b> {{ current_site }}<br>
+<p></p>
+<p>You can validate the user <a href="http://{{current_site}}/portal/validate">here</a>.<p>
+<br>
+<p>Please note that the validation request will only become visible once the user has confirmed his/her email address.</p>

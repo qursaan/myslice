@@ -1,0 +1,18 @@
+Dear SmartFIRE user,
+
+You have recently requested an addition of the following authority in the SmartFIRE portal ({{portal_url}}): 
+
+Name of organization: {{site_name}}
+Short name: {{short_name}}
+Url: {{url}}
+City: {{city}}
+Country: {{country}}
+
+
+After verifying your request, we regret to inform you that, we are unable to validate your request.
+For any queries, contact us by replying to this email.
+
+On behalf of the entire team, I wish you all the best.
+
+Yours sincerely,
+The SmartFIRE team
