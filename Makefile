@@ -110,8 +110,9 @@ ftags: force
 
 #################### sync : push current code on a box running myslice
 # this for now targets deployments based on the debian packaging
-SSHURL:=root@$(MYSLICEBOX):/
-SSHCOMMAND:=ssh root@$(MYSLICEBOX)
+SSHUSER    ?= root
+SSHURL     := $(SSHUSER)@$(MYSLICEBOX):
+SSHCOMMAND := ssh $(SSHUSER)@$(MYSLICEBOX)
 
 ### rsync options
 # the config file should probably not be overridden ??
@@ -162,4 +163,15 @@ ifeq (,$(MYSLICEBOX))
 	@exit 1
 else
 	+$(SSHCOMMAND) apachectl restart
+endif
+
+#SSHUSER=tparment
+#MYSLICEBOX=srv-diana.inria.fr
+sync-devel:
+ifeq (,$(MYSLICEBOX))
+	@echo "you need to set MYSLICEBOX, like in e.g."
+	@echo "  $(MAKE) MYSLICEBOX=srv-diana.inria.fr "$@""
+	@exit 1
+else
+	+$(RSYNC) --relative $$(git ls-files) $(SSHURL)myslice/
 endif
