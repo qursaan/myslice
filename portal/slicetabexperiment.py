@@ -31,9 +31,6 @@ class ExperimentView (FreeAccessView, ThemeView):
         split_slicename = slicename.split('.')
         ple_slicename = hash_loginbase(split_slicename[0] + '.' + split_slicename[1]) + '_' + split_slicename[2]
         
-        print "testing-yasin"
-        print ple_slicename
-        
         query_current_resources = Query.get('slice').select('resource').filter_by('slice_hrn','==',slicename)
         current_resources = execute_query(request, query_current_resources)
 
