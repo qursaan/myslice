@@ -109,7 +109,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                     errors.append('Organization is mandatory')
     
                 if (post['purpose'] is None or post['purpose'] == ''):
-                    errors.append('Experiment purpose is mandatory')
+                    errors.append('Project purpose is mandatory')
 
                 if (re.search(r'^[A-Za-z0-9_]*$', post['project_name']) == None):
                     errors.append('Project name may contain only letters, numbers, and underscore.')
@@ -128,14 +128,14 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                         hrn = post['authority_hrn'] + '.' + post['project_name']
                         sfa_add_authority(wsgi_request, {'authority_hrn':hrn})
                         authority_add_pis(wsgi_request, hrn, user_hrn)
-                    self.template_name = 'slice-request-done-view.html'
+                    self.template_name = 'project-request-done-view.html'
                 else:
                     # Otherwise a wsgi_request is sent to the PI
                     if 'join' in wsgi_request.POST:
                         create_pending_join(wsgi_request, post)
                     else:
                         create_pending_project(wsgi_request, post)
-                    self.template_name = 'slice-request-ack-view.html'
+                    self.template_name = 'project-request-ack-view.html'
 
         # retrieves the pending projects creation list
         pending_projects = PendingProject.objects.all().filter(user_hrn=user_hrn)
