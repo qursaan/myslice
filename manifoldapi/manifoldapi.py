@@ -41,6 +41,7 @@ class ManifoldAPI:
         self.calls = {}
         self.multicall = False
         self.url = ConfigEngine().manifold_url()
+        # for more debug on this link, set verbose=True
         self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
