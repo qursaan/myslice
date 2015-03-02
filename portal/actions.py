@@ -1061,9 +1061,9 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
     import time
     from requests.auth import HTTPBasicAuth
     
-    URL_REST = ConfigEngine.default_iotlab_url
-    LOGIN_ADMIN = ConfigEngine.default_iotlab_admin_user
-    PASSWORD_ADMIN = ConfigEngine.default_iotlab_admin_password
+    URL_REST = ConfigEngine.iotlab_url
+    LOGIN_ADMIN = ConfigEngine.iotlab_admin_user
+    PASSWORD_ADMIN = ConfigEngine.iotlab_admin_password
 
     auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
     headers = {'content-type': 'application/json'}
