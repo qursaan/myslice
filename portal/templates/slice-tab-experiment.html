@@ -87,18 +87,22 @@
 	{% if nitos_resources %}	
 	<h4>NITLab</h4>
 	<p class="command">
-	$ ssh {{slicename}}@nitlab.inf.uth.gr
-	</p>
+	    $ ssh {{slicename}}@nitlab.inf.uth.gr #nodes 001-040<br>
+        $ ssh {{slicename}}@nitlab2.inf.uth.gr #nodes 041-049<br>
+        $ ssh {{slicename}}@nitlab3.inf.uth.gr #nodes > 049
+    </p>
 	
-	<p>For each of the reserved nodes, follo the steps given below:</p>
+	<p>Loading an OMF-compatible image on your resource:</p>
 	<p class="command">
 	{%for resource in nitos_resources %}
 		<b>Resource</b><br>
-    	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
-		$ omf tell -a on -t {{resource}}  #turn on the node <br>
-		$ ssh root@{{resource}}  #ssh to the node<br><br>
+        $ omf6 stat -t {{resource}} #check the status of the node<br>
+        $ omf6 tell -a on -t {{resource}}  #turn on/off the node <br>
+    	$ omf6 load -i baseline.ndz -t {{resource}}  #for orbit-like node (002-009) use "baseline_orbit.ndz"<br>
+		$ ssh root@{{resource}}  #ssh to the node<br>
 	{%endfor%}
 	</p>
+    <p><b>NOTE:</b> Nodes 002-009 are orbit-like nodes. For these nodes use "baseline_orbit.ndz". All these images come with OMF5.4 resource controller. To do OMF6 experiments use "baseline_omf6_1_1.ndz" and  "baseline_orbit_omf6_1_1.ndz" for grid nodes and orbit nodes respectively. </p>
 	{% endif %}
 
 	{% if nitos_paris_resources %}
@@ -118,17 +122,18 @@
 	{%endif%}
 
 	<p>
-		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml according to your slice settings and then
+		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
 		restart the OMF Resource Controller and finally execute the experiment:
 	</p>
 	<p class="command">
 		$ omf exec --slice {{slicename}} your_exp.rb
 	</p>
 	<p>
-	The complete tutorial is available at the following address:
+	The complete tutorial on NITOS nodes:
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
 	</p>
-	<p>To learn more about OMF6, please click <a href="http://omf.mytestbed.net/projects/omf6/wiki/Wiki" target="_blank">here.</a></p>
+    <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
+	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
 
 	{% endif %}
 	
