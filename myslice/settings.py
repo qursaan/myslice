@@ -1,5 +1,7 @@
 # Django settings for unfold project.
 
+from __future__ import print_function
+
 import os.path
 
 import djcelery
@@ -13,7 +15,9 @@ except:
     building=True
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+
+# show the various settings as we go
+DEBUG_SETTINGS = False
 
 # compute ROOT from where this file is installed
 # should fit every need including developers
@@ -48,12 +52,21 @@ except:
 HTTPROOT="/var/www/myslice/"
 # the place to store local data, like e.g. the sqlite db
 DATAROOT="/var/unfold"
+if not os.path.isdir(DATAROOT):
+    print("WARNING: {} is a non-existing directory".format(DATAROOT))
+    print("consequently we assume development mode and re-route DATAROOT to {}".format(ROOT))
+    DATAROOT=ROOT
 # if not there, then we assume it's from a devel tree
 if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT
 
 if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
 if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
+
+if DEBUG_SETTINGS:
+    print('ROOT', ROOT)
+    print('DATAROOT', DATAROOT)
+    print('HTTPROOT', HTTPROOT)
 
 # dec 2013 - we currently have 2 auxiliary subdirs with various utilities
 # that we do not wish to package 
@@ -100,6 +113,9 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+if DEBUG_SETTINGS:
+    print('DATABASE NAME',DATABASES['default']['NAME'])
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -252,7 +268,7 @@ BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print "Using devel auxiliary",aux
+        print("Using devel auxiliary",aux)
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.

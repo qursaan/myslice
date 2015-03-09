@@ -49,7 +49,7 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 #        else:
         print "SLICE QUERY"
         print "-" * 80
-        slice_query = Query().get('user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
+        slice_query = Query().get('myslice:user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)
 

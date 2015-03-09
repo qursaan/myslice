@@ -5,6 +5,7 @@ from django.template                import RequestContext
 from django.shortcuts               import render_to_response
 from django.shortcuts               import render
 
+from unfold.page                    import Page
 from unfold.loginrequired           import LoginRequiredAutoLogoutView
 
 from manifold.core.query            import Query
@@ -13,7 +14,8 @@ from manifoldapi.manifoldresult     import ManifoldResult
 from ui.topmenu                     import topmenu_items, the_user
 from myslice.configengine           import ConfigEngine
 
-from myslice.theme                          import ThemeView
+from portal.actions                 import is_pi, authority_check_pis
+from myslice.theme                  import ThemeView
 import json
 
 class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
@@ -30,50 +32,46 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
         env['theme'] = self.theme
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
-    def get (self, request, state=None):
+    def get (self, request, authority_hrn=None, state=None):
         env = self.default_env()
-
         if request.user.is_authenticated(): 
             env['person'] = self.request.user
-            user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
-            user_details = execute_query(self.request, user_query)
-            try:
-                env['user_details'] = user_details[0]
-            except Exception,e:
-                env['error'] = "Please check your Credentials"
-            
-            try:
-                user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(env['person']))
-                user_local_details = execute_query(self.request, user_local_query)
-                user_local = user_local_details[0]            
-                user_local_config = user_local['config']
-                user_local_config = json.loads(user_local_config)
-                user_local_authority = user_local_config.get('authority')
-                if 'user_details' not in env or 'parent_authority' not in env['user_details'] or env['user_details']['parent_authority'] is None:
-                    env['user_details'] = {'parent_authority': user_local_authority}
-            except Exception,e:
-                env['error'] = "Please check your Manifold user config"
-            ## check user is pi or not
-            platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-            account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-            platform_details = execute_query(self.request, platform_query)
-            account_details = execute_query(self.request, account_query)
-            for platform_detail in platform_details:
-                for account_detail in account_details:
-                    if platform_detail['platform_id'] == account_detail['platform_id']:
-                        if 'config' in account_detail and account_detail['config'] is not '':
-                            account_config = json.loads(account_detail['config'])
-                            if 'myslice' in platform_detail['platform']:
-                                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-            # assigning values
-            if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-                pi = "is_not_pi"
+            if authority_hrn is None: 
+                # CACHE PB with fields
+                page = Page(request)
+                metadata = page.get_metadata()
+                user_md = metadata.details_by_object('user')
+                user_fields = [column['name'] for column in user_md['column']]
+                
+                # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+                user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==','$user_hrn')
+                #user_query  = Query().get('myslice:user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
+                user_details = execute_query(self.request, user_query)
+                try:
+                    env['user_details'] = user_details[0]
+                except Exception,e:
+                    # If the Query fails, check in local DB 
+                    try:
+                        user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(env['person']))
+                        user_local_details = execute_query(self.request, user_local_query)
+                        user_local = user_local_details[0]            
+                        user_local_config = user_local['config']
+                        user_local_config = json.loads(user_local_config)
+                        user_local_authority = user_local_config.get('authority')
+                        if 'user_details' not in env or 'parent_authority' not in env['user_details'] or env['user_details']['parent_authority'] is None:
+                            env['user_details'] = {'parent_authority': user_local_authority}
+                    except Exception,e:
+                        env['error'] = "Please check your Credentials"
             else:
-                pi = "is_pi"
+                env['project'] = True
+                env['user_details'] = {'parent_authority': authority_hrn}
 
         else: 
             env['person'] = None
-    
+        print "BEFORE  ####------####  is_pi"
+        pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
+        print "is_pi = ",is_pi
+
         env['theme'] = self.theme
         env['section'] = "Institution"
         env['pi'] = pi 

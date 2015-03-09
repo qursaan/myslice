@@ -1,7 +1,5 @@
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
-from sfa.trust.credential               import Credential
-from sfa.trust.certificate              import Keypair
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
@@ -40,8 +38,8 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
         # Execute a Query to delegate credentials if necessary
-        sfa_user_query  = Query().get('myslice:user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
-        sfa_user_result = execute_query(self.request, sfa_user_query)
+        #sfa_user_query  = Query().get('myslice:user').select('user_hrn').filter_by('user_hrn','==','$user_hrn')
+        #sfa_user_result = execute_query(self.request, sfa_user_query)
 
         user_query  = Query().get('local:user').select('config','email','status')
         user_details = execute_query(self.request, user_query)
@@ -271,6 +269,9 @@ def get_myslice_account(request):
 @login_required
 #my_acc form value processing
 def account_process(request):
+    from sfa.trust.credential               import Credential
+    from sfa.trust.certificate              import Keypair
+
     user_query  = Query().get('local:user').select('user_id','email','password','config')
     user_details = execute_query(request, user_query)
     
@@ -297,7 +298,7 @@ def account_process(request):
     for account_detail in account_details:
         for platform_detail in platform_details:
             # Add reference account to the platforms
-            if 'add_'+platform_detail['platform'] in request.POST:
+            if 'add_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'add_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
                 user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
                 manifold_add_account(request,user_params)
@@ -305,7 +306,7 @@ def account_process(request):
                 return HttpResponseRedirect("/portal/account/")
 
             # Delete reference account from the platforms
-            if 'delete_'+platform_detail['platform'] in request.POST:
+            if 'delete_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'delete_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
                 manifold_delete_account(request,platform_id, user_id, user_params)
@@ -330,7 +331,7 @@ def account_process(request):
             slice_cred.append(value)
         # special case: download each slice credentials separately 
         for i in range(0, len(slice_list)):
-            if 'dl_'+slice_list[i] in request.POST:
+            if 'dl_'+slice_list[i] in request.POST or request.POST['button_value'] == 'dl_'+slice_list[i]:
                 slice_detail = "Slice name: " + slice_list[i] +"\nSlice Credentials: \n"+ slice_cred[i]
                 response = HttpResponse(slice_detail, content_type='text/plain')
                 response['Content-Disposition'] = 'attachment; filename="slice_credential.txt"'
@@ -345,7 +346,7 @@ def account_process(request):
             auth_cred.append(value)
         # special case: download each slice credentials separately
         for i in range(0, len(auth_list)):
-            if 'dl_'+auth_list[i] in request.POST:
+            if 'dl_'+auth_list[i] in request.POST or request.POST['button_value'] == 'dl_'+auth_list[i]:
                 auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
                 response = HttpResponse(auth_detail, content_type='text/plain')
                 response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
@@ -417,7 +418,6 @@ def account_process(request):
                         sfa_update_user(request, user_hrn, user_pub_key)
                         result_sfa_user = sfa_get_user(request, user_hrn, public_key)
                         try:
-                            result_sfa_user = result_sfa_user[0]
                             if 'keys' in result_sfa_user and result_sfa_user['keys'][0] == public_key:
                                 # updating manifold
                                 updated_config = json.dumps(account_config) 
@@ -426,7 +426,7 @@ def account_process(request):
                                 messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
                             else:
                                 raise Exception,"Keys are not matching"
-                        except Exception,e:
+                        except Exception, e:
                             messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
                             print "Exception in accountview ", e
                         return HttpResponseRedirect("/portal/account/")
@@ -467,7 +467,7 @@ def account_process(request):
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
 
-    elif 'dl_pubkey' in request.POST:
+    elif 'dl_pubkey' in request.POST or request.POST['button_value'] == 'dl_pubkey':
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
@@ -482,7 +482,7 @@ def account_process(request):
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
                
-    elif 'dl_pkey' in request.POST:
+    elif 'dl_pkey' in request.POST or request.POST['button_value'] == 'dl_pkey':
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
@@ -501,7 +501,7 @@ def account_process(request):
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
     
-    elif 'delete' in request.POST:
+    elif 'delete' in request.POST or request.POST['button_value'] == 'delete':
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
@@ -527,7 +527,7 @@ def account_process(request):
             return HttpResponseRedirect("/portal/account/")
     
     # download identity for jfed
-    elif 'dl_identity' in request.POST:
+    elif 'dl_identity' in request.POST or request.POST['button_value'] == 'dl_identity':
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
@@ -550,7 +550,7 @@ def account_process(request):
             return HttpResponseRedirect("/portal/account/")
 
     # Download sfi_config
-    elif 'dl_sfi_config' in request.POST:
+    elif 'dl_sfi_config' in request.POST or request.POST['button_value'] == 'dl_sfi_config':
         platform_detail = get_myslice_platform(request)
         platform_config = json.loads(platform_detail['config'])
         account_detail = get_myslice_account(request)
@@ -584,7 +584,7 @@ def account_process(request):
         return response
 
     #clear all creds
-    elif 'clear_cred' in request.POST:
+    elif 'clear_cred' in request.POST or request.POST['button_value'] == 'clear_cred':
         try:
             result = clear_user_creds(request, user_email)
             if result is not None: 
@@ -597,7 +597,7 @@ def account_process(request):
         return HttpResponseRedirect("/portal/account/")
 
     # Download delegated_user_cred
-    elif 'dl_user_cred' in request.POST:
+    elif 'dl_user_cred' in request.POST or request.POST['button_value'] == 'dl_user_cred':
         if 'delegated_user_credential' in account_config:
             user_cred = account_config['delegated_user_credential']
             response = HttpResponse(user_cred, content_type='text/plain')
@@ -608,7 +608,7 @@ def account_process(request):
             return HttpResponseRedirect("/portal/account/")
 
     # Download user_cert
-    elif 'dl_user_cert' in request.POST:
+    elif 'dl_user_cert' in request.POST or request.POST['button_value'] == 'dl_user_cert':
         if 'user_credential' in account_config:
             user_cred = account_config['user_credential']
             obj_cred = Credential(string=user_cred)
@@ -631,7 +631,7 @@ def account_process(request):
             return HttpResponseRedirect("/portal/account/")
 
     # Download user p12 = private_key + Certificate
-    elif 'dl_user_p12' in request.POST:
+    elif 'dl_user_p12' in request.POST or request.POST['button_value'] == 'dl_user_p12':
         if 'user_credential' in account_config and 'user_private_key' in account_config:
             user_cred = account_config['user_credential']
             obj_cred = Credential(string=user_cred)
@@ -672,8 +672,6 @@ def account_process(request):
         else:
             messages.error(request, 'Download error: User private key or credential is not stored in the server')
             return HttpResponseRedirect("/portal/account/")
-
-
 
     else:
         messages.info(request, 'Under Construction. Please try again later!')

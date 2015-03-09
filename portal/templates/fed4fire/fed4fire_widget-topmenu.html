@@ -1,56 +1,52 @@
 
 <div id="header">
-	<div class="wrapper">
-		<div class="logo">
-			<a href="/"><img src="{{ STATIC_URL }}img/f4f-logo.png" alt="Fed4Fire Portal" width="80px" />Home</a>
-		</div>
-		
-		<div id="secondary">
+    <div class="container">
+    <div class="row">
+        <div class="col-sm-4 col-md-4 logo">
+            <a href="/"><img src="{{ STATIC_URL }}img/f4f-logo.png" alt="Fed4Fire Portal" width="80px" /></a>
+        </div>
+        
+        
+	    <div id="secondary" class="col-sm-8 col-md-8 secondary">
 			<ul>
+			    <li><a href="/">Home</a></li>
 				<li><a href="/portal/about">About</a></li>
 				<li><a href="http://doc.fed4fire.eu/">Documentation</a></li>
 				<li><a target="_blank" href="http://www.fed4fire.eu">Project website</a></li>
 			</ul>
 		</div>
 	</div>
-	
-	{% if username %}
-	<div id="navigation">
-		<div class="wrapper">
-		<ul>
-			<li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
-			<li>|</li>
-			<!--<li id="nav-institution" class=""><a href="/portal/institution">AUTHORITY</a></li>-->
-			<li class="slices">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-       				SLICES <span class="caret"></span>
-    			</a>
-				
-				<div class="dropdown-menu" style="z-index:99;">
-						<ul id="dropdown-slice-list">
-							<li><a href="/portal/slice_request/">Request Slice</a></li>
-                            <!--
-							<li><a href="/slice/ple.upmc.agent3/">ple.upmc.agent3</a></li>
-						    <li><a href="/slice/ple.upmc.agent/">ple.upmc.agent</a></li>
-						    <li><a href="/slice/ple.upmc.myslicedemo/">ple.upmc.myslicedemo</a></li>
-						    <li><a href="/slice/ple.upmc.slicestat/">ple.upmc.slicestat</a></li>
-						    <li><a href="/slice/ple.upmc.agent2/">ple.upmc.agent2</a></li>
-                            -->
-						</ul>
-				</div>
-				</li>
-			<li id="nav-service"><a href="/portal/servicedirectory">SERVICES</a></li>
-			<li id="nav-support"><a href="http://doc.fed4fire.eu/support.html">SUPPORT</a></li>
-			<li>|</li>
-			<li id="nav-logout" style="margin-top: 10px;"><a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> LOGOUT</a></li>
-		</ul>
-		</div>
-	</div>
-	{% else %}
-	<div id="navigation">
-		<div class="wrapper"></div>
-	</div>
-	{% endif %}
+    </div>
+<div id="navigation">
+    <div class="container"> 
+	<div class="row">
+	   {% if username %}
+        <div class="col-md-12 navigation">
+            <ul>
+                <li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
+                <li>|</li>
+                <!--<li id="nav-institution" class=""><a href="/portal/institution">AUTHORITY</a></li>-->
+                <li class="slices">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">SLICES <span class="caret"></span></a>
+                    
+                    <div class="dropdown-menu" style="z-index:99;">
+                            <ul id="dropdown-slice-list">
+                                <li><a href="/portal/slice_request/">Request Slice</a></li>
+                            </ul>
+                    </div>
+                    </li>
+                <li id="nav-service"><a href="/portal/servicedirectory">SERVICES</a></li>
+                <li id="nav-support"><a href="http://doc.fed4fire.eu/support.html">SUPPORT</a></li>
+                <li>|</li>
+                <li id="nav-logout"><span class="glyphicon glyphicon-off iconlogout"></span> <a id="logout" data-username="{{ username }}" href="#">LOGOUT</a></li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="col-sm-4 col-md-4 navigation">
+        </div>
+        {% endif %}
+    </div>
+    </div>
 </div>
 <script>
 	$(document).ready(function() {
@@ -62,16 +58,5 @@
 				$(this).fadeOut(100);
 			}
 		});
-		// var slices = localStorage.getItem('slices');
-		// if (slices.length == 0) {
-			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-		  	// var items = [];
-		  		// localStorage.setItem('slices', data[0].slice);
-			// });
-		// }
-		// $.each(slices, function( key, val ) {
-		  	// items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
-		// });
-		// $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
 	});
 </script>

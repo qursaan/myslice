@@ -1,6 +1,10 @@
 /*
  * MySlice Class
  */
+function isFunction(functionToCheck) {
+ var getType = {};
+ return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
 
 function list() {
 	this.elements = [];
@@ -114,6 +118,20 @@ var myslice = {
 		}
 		return this.user;
 	},
+	projects: {},
+	
+	projects: function() {
+		if ($.isEmptyObject(this.projects)) {
+			//this.login(function() { return this.user; });
+            if(localStorage.getItem('projects')!='undefined'){
+			    this.projects = JSON.parse(localStorage.getItem('projects'));
+            }else{
+                return false;
+            }
+		}
+		return this.projects;
+	},
+
     loadSlices: function(slices) {
         if (typeof(slices) == "undefined"){
 
@@ -154,12 +172,46 @@ var myslice = {
         if($.isEmptyObject(user)){
             // REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
 		    $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-			    //myslice.user = new user(data[0]);
-			    localStorage.setItem('user', JSON.stringify(data[0]));
-                myslice.loadSlices(data[0].slices);
+		        if (data.length > 0) {
+    			    localStorage.setItem('user', JSON.stringify(data[0]));
+                    projects = [];
+    			    $.each(data[0].pi_authorities, function(idx, auth) {
+                        // PI on projects
+                        if(auth.split('.').length>2){
+                            if($.inArray(auth,projects) == -1){
+                                projects.push(auth);
+                            }
+                        }else if (auth.split('.').length>1){
+                        // PI on authorities
+                            // What are the projects under this authority?
+                            $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+auth}}, function( data ) {
+    			                $.each(data, function(idx, project) {
+                                    console.log(project.authority_hrn);
+                                    if($.inArray(project.authority_hrn,projects) == -1){
+                                        projects.push(project.authority_hrn);
+                                    }
+                                });
+                            });
+                        }else{
+                            console.log("admin account - we don't list all from root");
+                        }
+                    });
+                    localStorage.setItem('projects', JSON.stringify(projects));
+                    myslice.loadSlices(data[0].slices);
+                    if(isFunction(fn)){
+                        fn();
+                    }
+                }
 		    });
+        }else{
+            if(isFunction(fn)){
+                fn();
+            }
         }
+
 	},
+
+
     getSlices: function(name) {
     	
     },

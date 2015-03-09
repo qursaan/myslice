@@ -737,6 +737,12 @@ var manifold = {
                 } else {
                     console.log('Unknown field');
                 }
+            // FIX if the record contains a string instead of a key:value 
+            // example: select resource, slice_hrn from slice where slice_hrn=='xxx'
+            // Result will be {slice_hrn:'xxx', resource:'urn+zzz'}
+            // We don't have this resource:{urn:'urn+zzz'}
+            } else if(typeof(record) === 'string'){
+                return record;
             } else {
                 return record[fields];
             }
@@ -979,7 +985,8 @@ var manifold = {
             Loop per platform, allows a progressive loading per AM platform
             Update is run on all platforms at the same time to get a final answer, we don't manage partial answers yet...
         */
-        if((query.object == 'resource' || query.object == 'lease' || query.object == 'slice') && query.action != "update"){
+        // Removed slice from the per platform query - it's quick enough...
+        if((query.object == 'resource' || query.object == 'lease') && query.action != "update"){
             var obj = query.object;
             $.post("/rest/platform/", function( data ) {
                 $.each(data, function(index, p) {

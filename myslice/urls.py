@@ -92,6 +92,7 @@ urls = [
     (r'^create/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.create.dispatch'),
     (r'^delete/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.delete.dispatch'),
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
+    (r'^cache/(?P<action>[^/]+)/?$', 'rest.cache.dispatch'),
     (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
     #
     # REST monitoring
@@ -131,7 +132,7 @@ urls = [
     url(r'^portal/', include('portal.urls')),
 
     # SLA
-    url(r'^sla/', include('sla.urls')),
+#    url(r'^sla/', include('sla.urls')),
 ]
 
 #this one would not match the convention

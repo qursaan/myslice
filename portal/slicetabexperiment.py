@@ -17,6 +17,8 @@ from myslice.configengine import ConfigEngine
 from myslice.theme import ThemeView
 from myslice.configengine import ConfigEngine
 
+from sfa.planetlab.plxrn import hash_loginbase
+
 import urllib2,json
 
 class ExperimentView (FreeAccessView, ThemeView):
@@ -26,11 +28,13 @@ class ExperimentView (FreeAccessView, ThemeView):
   
         username = self.request.user    
         
-        split_slicename = slicename.split('.')
-        ple_slicename = split_slicename[0] + '8' + split_slicename[1] + '_' + split_slicename[2]
-
-        query_current_resources = Query.get('slice').select('resource').filter_by('slice_hrn','==',slicename)
+        query_current_resources = Query.get('slice').select('resource','parent_authority').filter_by('slice_hrn','==',slicename)
         current_resources = execute_query(request, query_current_resources)
+
+        parent_authority = current_resources[0]['parent_authority']
+        
+        split_slicename = slicename.split('.')
+        ple_slicename = hash_loginbase(parent_authority) + '_' + split_slicename[-1]
 
         ple_resource_list=[]
         nitos_resource_list=[]

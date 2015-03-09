@@ -36,7 +36,7 @@ class ConfigEngine(object):
     default_myslice_theme           = 'onelab'
 
     #iotlab dev url
-    default_iotlab_url = "https://devgrenoble.senslab.info/rest/admin/users"
+    default_iotlab_url = "https://devwww.iot-lab.info/rest/admin/users"
     default_iotlab_admin_user = "xxx"
     default_iotlab_admin_password= "yyy"
 

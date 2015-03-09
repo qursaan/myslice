@@ -21,23 +21,22 @@ class ManagementAboutView (FreeAccessView, ThemeView):
 
     def get (self, request):
         
+        authority_contacts = {}
+        authority = {'authority_hrn':'fed4fire.upmc'}
         if request.user.is_authenticated(): 
-            user_query  = Query().get('user').select('user_hrn','parent_authority').filter_by('user_hrn','==','$user_hrn')
-            user_details = execute_query(self.request, user_query)
-            
             user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(self.request.user))
             user_local_details = execute_query(self.request, user_local_query)
             user_authority = json.loads(user_local_details[0]['config']).get('authority')
+            print "**************________    management about  = ",user_authority
             # XXX Should be done using Metadata
             # select column.name from local:object where table=='authority'
             authority_query = Query().get('authority').select('authority_hrn', 'name', 'address', 'enabled','description', 
                                                               'scientific', 'city', 'name', 'url', 'country', 'enabled', 'longitude', 
-                                                              'tech', 'latitude', 'pi_users', 'parent_authority', 'onelab_membership', 
+                                                              'tech', 'latitude', 'pi_users', 'onelab_membership', 
                                                               'postcode').filter_by('authority_hrn','==',user_authority)
             authority_details = execute_query(self.request, authority_query)
             
             if authority_details :
-                authority_contacts = {}
                 authority = authority_details[0]
                 if 'scientific' in authority and authority['scientific'] is not None:
                     authority_contacts['scientific'] = [ x.strip()[1:-1] for x in authority['scientific'][1:-1].split(',') ]

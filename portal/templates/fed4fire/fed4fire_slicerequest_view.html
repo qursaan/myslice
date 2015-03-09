@@ -4,7 +4,7 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			 <div class="breadcrumbs">
+			 <div class="breadcrumbs" style="line-height: 3;">
 			 	 Experiment &nbsp;>&nbsp; Request a new Slice
 			 </div>
 		</div>
@@ -34,14 +34,23 @@
 				title="Please enter a name for your slice"required="required">
 			  </div>
 			  <div class="form-group">
-				{%if 'is_pi'  in pi %}
+				{% if pi %}
 				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
 				title="An authority responsible for vetting your slice" required="required">
-				{%else%}
-			    <input type="text" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
+				{% else %}
+			    <input type="hidden" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
 				title="An authority responsible for vetting your slice" required="required" readonly>
-				{%endif%}
+                <span style="float:left;">Authority: &nbsp;</span>
+                <div id="authority_display">
+                <img src="{{ STATIC_URL }}img/loading.gif" alt="Loading authority" />
+                </div>
+				{% endif %}
 			  </div>
+			  <div class="form-group">
+                Project: <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
+                <select id="project" name="project" style="display:none;">
+                </select>
+              </div>
 			  <div class="form-group">
 			    <input type="text" class="form-control" name="url" id="url" style="width:300px" placeholder="Experiment URL (if one exists)"
 				title="Please provide the url of your experiment if you have one." value="{{url}}">
@@ -50,11 +59,11 @@
 			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
 				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
-			  {%if 'is_pi'  in pi %}	
+			  {% if pi %}	
 			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
-			  {%else%}
+			  {% else %}
 			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
-			  {%endif%}	
+			  {% endif %}	
 			</form>
 	
 		</div>
@@ -66,7 +75,15 @@ jQuery(document).ready(function(){
 	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
         $(this).attr("value", jsonData[0]['parent_authority']);
+	    {% if pi %}
+        draw_projects(jsonData[0]['parent_authority']);
+        {% else %}
+        $('#authority_display').html(jsonData[0]['parent_authority']);
+        draw_projects('');
+        {% endif %}
     });
+
+	{% if pi %}
 	$("#authority_hrn").val("{{authority_name}}");
 	var availableTags = [
     {% if authorities %}
@@ -96,13 +113,46 @@ jQuery(document).ready(function(){
     $( "#authority_hrn" ).autocomplete({
       source: availableTags,
       minLength: 0,
-      select: function( event, ui ) {console.log(jQuery(this));}
+      select: function( event, ui ) {
+        $("#project").hide();
+        $("#project_loading").css('display', 'inline-block');
+        draw_projects(jQuery('.ui-state-focus').html());
+      },
     });
-
-	$("#submit_pi").click(function() {
-		localStorage.clear();
-	});
+    {% endif %}
 });
+
+function draw_projects(authority_hrn){
+
+    var projects = [];
+    project_row = "<option value=''> - </option>";
+    projects.push(project_row);
+
+    if(authority_hrn.length > 0){
+        // Not for root authority
+        if(authority_hrn.split('.').length > 1){
+            $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
+               
+                $.each( data, function( key, val ) {
+                    project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
+                    projects.push(project_row);
+                });
+                $("#project").html(projects.join( "" ));
+            });
+        }else{
+            $("#project").html(projects.join( "" ));
+        }
+    }else{
+        my_projects = JSON.parse(localStorage.getItem('projects'));
+        $.each( my_projects, function( i, val ) {
+            project_row = "<option value='"+val+"'>"+val+"</option>";
+            projects.push(project_row);
+        });
+        $("#project").html(projects.join( "" ));
+    }
+    $("#project").show();
+    $("#project_loading").hide();
+}
 </script>
 {% endblock %}
 

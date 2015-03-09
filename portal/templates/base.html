@@ -3,7 +3,16 @@
 <html lang="en"><head>
 <title>{{theme}} portal - {{ section }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="/static/img/favicon.ico">
+
+<!--Selecting favicon based on theme. Add more for other portals -->
+{% if theme == "fed4fire" %}
+    <link rel="shortcut icon" href="/static/img/fed4fire_favicon.ico">
+{% elif theme == "smartfire" %}
+    <link rel="shortcut icon" href="/static/img/smartfire_favicon.ico">
+{% else %}
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+{% endif %}
+
 {# This is where insert_str will end up #}{% media_container prelude %}
 {% include 'messages-transient-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>
@@ -18,6 +27,7 @@
 {{ header_prelude }}
 {% block head %} {% endblock head %}
 {# let's add these ones no matter what #}
+{#NOTE: DO NOT ADD JQUERY-UI JS & CSS HERE. IT BREAKS THE RESOURCE BROWSING PAGE -- DETAILS WITH JORDAN AUGE#}
 {% insert_str prelude "js/jquery.min.js" %}
 {% insert_str prelude "js/angular/angular.min.js" %}
 {% insert_str prelude "js/jquery.html5storage.min.js" %}
@@ -48,53 +58,58 @@ XXX TODO: session
 This list of slices should go into SESSION !
 */
 $(document).ready(function() {
-    {% if username %}
-    myslice.login();
+{% if username %}
+    myslice.login(function(){
+        user = myslice.user();
 
-    user = myslice.user();
-    
-    var slices = [];
-    if($.isEmptyObject(user)){
-        $.post("/rest/myslice:user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
-            if(data.length > 0){
-                drawSlices(data[0].slices);  
-            }else{
-            	$("div#home-slice-list").html(
-					"<div>You do not yet have a slice</div>");
-        		$("ul#dropdown-slice-list").append("<li>no slice</li>");
-                slices.push("no slice");
-            }
-    	});
-    }else{
-        slices = user.slices;
-        drawSlices(slices);
-    }
+        var slices = [];
+        if($.isEmptyObject(user)){
+            $("div#home-slice-list").html(
+	        	"<div>You do not yet have a slice</div>");
+            $("ul#dropdown-slice-list").append("<li>no slice</li>");
+            slices.push("no slice");
+        }else{
+            slices = user.slices;
+            drawSlices(slices);
+        }
+        {% if theme == "fed4fire" %}
+        p = myslice.projects();
+        if(p != null){
+            drawProjects(p);
+        }
+        {% endif %}
+    });
 
-    /*
-        Launch queries to get the resources and leases in Manifold Cache
-    */
-        
     function drawSlices(slices){
         var items = [];
 		
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
-            /*
-            // Launch a Query for each slice to get resources and leases in Manifold Cache
-            // Now only done in Homeview to speed up the other pages
-            $.post("/rest/slice/", { 'filters': { 'slice_hrn' : val } }, function(data) {
-            });
-            */
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
+    
+    {% if theme == "fed4fire" %}
+    function drawProjects(projects){
+        var items = [];
+		
+        $.each( projects, function(i, val) {
+            items.push( "<li><a href=\"/portal/project/"+val+"\">" + val + "</a></li>" );
+        });
+        $("div#home-project-list").html($( "<ul/>", { html: items.join( "" ) }));
+        $("ul#dropdown-project-list").append(items.join( "" ));
+    }
     {% endif %}
+{% endif %}
 	jQuery('[title!=""]').qtip();
 });
 </script>
 </head>
 <body ng-app="ManifoldApp">
+<div class="row">
+{% widget '_widget-message.html' %}
+</div>
 {% block container %}
   	{% block topmenu %}
   	{% widget "_widget-topmenu.html" %}

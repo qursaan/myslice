@@ -29,12 +29,16 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         if pending_authorities:
             return False                        
         pending_user_email = pending_user.email
-        query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
-        results = execute_admin_query(self.request, query)
-        for result in results:
-            # User is enabled in PLE
-            if 'enabled' in result and result['enabled']==True:
-                return True
+        try:
+            query = Query.get('myplcuser').filter_by('email', '==', pending_user_email).select('enabled')
+            results = execute_admin_query(self.request, query)
+            for result in results:
+                # User is enabled in PLE
+                if 'enabled' in result and result['enabled']==True:
+                    return True
+        except Exception, e:
+            print "Exception in myplc query = ",e
+
         return False
 
     def dispatch(self, *args, **kwargs):

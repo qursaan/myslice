@@ -60,7 +60,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         user_fields = ['user_hrn'] # [column['name'] for column in user_md['column']]
 
         query_resource_all = Query.get('resource').select(resource_fields)
-        page.enqueue_query(query_resource_all)
+        #page.enqueue_query(query_resource_all)
 
         # leases query
         #lease_md = metadata.details_by_object('lease')

@@ -1,17 +1,19 @@
-from django.http                import HttpResponse
-from manifold.core.query        import Query
-from manifoldapi.manifoldapi    import execute_query,execute_admin_query
-from portal.models              import PendingUser, PendingSlice, PendingAuthority
+from django.http                    import HttpResponse
+from manifold.core.query            import Query
+from manifoldapi.manifoldapi        import execute_query,execute_admin_query
+from portal.models                  import PendingUser, PendingSlice, PendingAuthority, PendingProject, PendingJoin
+from unfold.page                    import Page
+
 import json
 
-from django.contrib.auth.models  import User
-from django.contrib.sites.models import Site
-from django.contrib.auth        import get_user_model
-from django.template.loader     import render_to_string
-from django.core.mail           import EmailMultiAlternatives, send_mail
+from django.contrib.auth.models     import User
+from django.contrib.sites.models    import Site
+from django.contrib.auth            import get_user_model
+from django.template.loader         import render_to_string
+from django.core.mail               import EmailMultiAlternatives, send_mail
 
-from myslice.theme              import ThemeView
-from myslice.configengine       import ConfigEngine
+from myslice.theme                  import ThemeView
+from myslice.configengine           import ConfigEngine
 
 
 theme = ThemeView()
@@ -24,14 +26,18 @@ import activity.slice
 #from sfa.util.xrn                import Xrn 
 
 
-# Get the list of authorities
-
+# Get the list of pis in a given authority
 def authority_get_pis(request, authority_hrn):
+    # CACHE PB with fields
+    page = Page(request)
+    metadata = page.get_metadata()
+    auth_md = metadata.details_by_object('authority')
+    auth_fields = [column['name'] for column in auth_md['column']]
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.get('authority').filter_by('authority_hrn', '==', authority_hrn).select('pi_users')
+    query = Query.get('myslice:authority').filter_by('authority_hrn', '==', authority_hrn).select(auth_fields)
     results = execute_admin_query(request, query)
-    print "authority_get_pis = %s" % results
+    #print "authority_get_pis = %s" % results
     # NOTE: temporarily commented. Because results is giving empty list. 
     # Needs more debugging
     #if not results:
@@ -39,6 +45,80 @@ def authority_get_pis(request, authority_hrn):
     #result, = results
     #return result['pi_users']
     return results
+
+#check the user is pi or not in the registry
+def authority_check_pis(request, user_email):
+    try:
+        user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id','email','password','config')
+        user_details = execute_admin_query(request, user_query)
+    
+        # getting the authority_hrn
+        for user_detail in user_details:
+            user_id = user_detail['user_id']
+            if user_detail['config']:
+                config = json.loads(user_detail['config'])
+                authority_hrn = config.get('authority','Unknown Authority')
+ 
+        account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
+        account_details = execute_admin_query(request, account_query)
+    
+        platform_query  = Query().get('local:platform').select('platform_id','platform')
+        platform_details = execute_admin_query(request, platform_query)
+    
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_hrn = account_config.get('user_hrn','N/A')
+
+        pi_status = False
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
+
+        if user_hrn in pi_list:
+            pi_status = True
+        return pi_status
+
+    except Exception,e:
+        print "Exception in actions.py in authority_check_pis %s" % e
+        return None
+
+
+def authority_add_pis(request, authority_hrn,user_hrn):
+    try:
+        # getting pis of the authority of the user
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
+   
+        updated_pi_list = pi_list.append(user_hrn) 
+        query = Query.update('myslice:authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
+        results = execute_query(request,query)
+        newpis = authority_get_pis (request, authority_hrn)
+        return newpis
+    except Exception,e: 
+        print "Exception in actions.py in authority_add_pis %s" % e
+        return None
+
+
+def authority_remove_pis(request, authority_hrn,user_hrn):
+    try:
+        # getting pis of the authority of the user
+        pis = authority_get_pis (request, authority_hrn)
+        for pi in pis:
+            pi_list = pi['pi_users']
+ 
+        updated_pi_list = pi_list.remove(user_hrn) 
+        query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
+        results = execute_query(request,query)
+        newpis = authority_get_pis (request, authority_hrn)
+        return newpis
+    except Exception,e: 
+        print "Exception in actions.py in authority_remove_pis %s" % e
+        return None
+
 
 def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
@@ -99,28 +179,35 @@ def clear_user_creds(request, user_email):
         return None
 
 def is_pi(wsgi_request, user_hrn, authority_hrn):
-    # XXX could be done in a single query !
-
-    # seauthorities from user where user_hrn == "ple.upmc.jordan_auge"
-
-    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
-    results = execute_admin_query(wsgi_request, query)
-    if not results:
-        # XXX Warning ?
-        return False
-    result = results[0]
-    user_authority_hrns = result.get('pi_authorities', [])
-    return authority_hrn in user_authority_hrns
+    # authorities from user where user_hrn == "ple.upmc.jordan_auge"
+    print "#### actions.py is_pi authority_hrn = ", authority_hrn
+    try:
+        # CACHE PB with fields
+        page = Page(wsgi_request)
+        metadata = page.get_metadata()
+        user_md = metadata.details_by_object('user')
+        user_fields = [column['name'] for column in user_md['column']]
+        
+        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+        query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
+        #query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
+        results = execute_query(wsgi_request, query)
+        print "is_pi results = ", results
+        for user_detail in results:
+            if authority_hrn in user_detail['pi_authorities']:
+                return True
+    except Exception,e:
+        print "Exception in actions.py in is_pi %s" % e
+    return False
     
 # SFA get record
 
-def sfa_get_user(request, user_hrn, pub):
+def sfa_get_user(request, user_hrn, pub=None):
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
     query_sfa_user = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn)
     result_sfa_user = execute_admin_query(request, query_sfa_user)
-    return result_sfa_user                        
+    return result_sfa_user[0]                        
 
 def sfa_update_user(request, user_hrn, user_params):
     # user_params: keys [public_key] 
@@ -135,7 +222,7 @@ def sfa_update_user(request, user_hrn, user_params):
 def sfa_add_authority(request, authority_params):
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.create('authority').set(authority_params).select('authority_hrn')
+    query = Query.create('myslice:authority').set(authority_params).select('authority_hrn')
     results = execute_query(request, query)
     print "sfa_add_auth results=",results
     if not results:
@@ -267,6 +354,29 @@ def make_request_slice(slice):
     request['purpose'] = slice.purpose
     return request
 
+def make_request_project(project):
+    request = {}
+    request['type'] = 'project'
+    request['id'] = project.id
+    request['user_hrn'] = project.user_hrn
+    request['email'] = project.email
+    request['timestamp'] = project.created
+    request['authority_hrn'] = project.authority_hrn
+    request['project_name'] = project.project_name
+    request['purpose'] = project.purpose
+    return request
+
+def make_request_join(join):
+    request = {}
+    request['type'] = 'join'
+    request['id'] = join.id
+    request['user_hrn'] = join.user_hrn
+    request['email'] = join.email
+    request['timestamp'] = join.created
+    request['authority_hrn'] = join.authority_hrn
+    request['project_name'] = join.project_name
+    return request
+
 def make_request_authority(authority):
     request = {}
     request['type']                  = 'authority'
@@ -288,7 +398,8 @@ def make_request_authority(authority):
     request['timestamp']             = authority.created
     return request
 
-def make_requests(pending_users, pending_slices, pending_authorities):
+def make_requests(pending_users, pending_slices, pending_authorities, pending_projects, pending_joins):
+    print "$$$$$$$$$$$$$$$  make_request"
     requests = []
     for user in pending_users:
         requests.append(make_request_user(user))
@@ -296,10 +407,15 @@ def make_requests(pending_users, pending_slices, pending_authorities):
         requests.append(make_request_slice(slice))
     for authority in pending_authorities:
         requests.append(make_request_authority(authority))
+    for project in pending_projects:
+        requests.append(make_request_project(project))
+    for join in pending_joins:
+        requests.append(make_request_join(join))
     return requests   
 
 def get_request_by_id(ids):
-    sorted_ids = { 'user': [], 'slice': [], 'authority': [] }
+    print "$$$$$$$$$$$$$$$$  get_request_by_id"
+    sorted_ids = { 'user': [], 'slice': [], 'authority': [], 'project': [], 'join': [] }
     for type__id in ids:
         type, id = type__id.split('__')
         sorted_ids[type].append(id)
@@ -308,40 +424,53 @@ def get_request_by_id(ids):
         pending_users  = PendingUser.objects.all()
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
+        pending_projects = PendingProject.objects.all()
+        pending_joins = PendingJoin.objects.all()
     else:
         pending_users  = PendingUser.objects.filter(id__in=sorted_ids['user']).all()
         pending_slices = PendingSlice.objects.filter(id__in=sorted_ids['slice']).all()
         pending_authorities = PendingAuthority.objects.filter(id__in=sorted_ids['authority']).all()
+        pending_projects = PendingProject.objects.filter(id__in=sorted_ids['project']).all()
+        pending_joins = PendingJoin.objects.filter(id__in=sorted_ids['join']).all()
 
-    return make_requests(pending_users, pending_slices, pending_authorities)
+    return make_requests(pending_users, pending_slices, pending_authorities, pending_projects, pending_joins)
 
 def get_requests(authority_hrns=None):
-    print "get_request_by_authority auth_hrns = ", authority_hrns
+    print "$$$$$$$$$$$$$   get_request_by_authority auth_hrns = ", authority_hrns
     if not authority_hrns:
         ## get those pending users who have confirmed their emails
         pending_users  = PendingUser.objects.filter(status__iexact = 'True')
         pending_slices = PendingSlice.objects.all()
         pending_authorities = PendingAuthority.objects.all()
+        pending_projects = PendingProject.objects.all()
+        pending_joins = PendingJoin.objects.all()
     else:
         pending_users  = PendingUser.objects
         pending_slices = PendingSlice.objects
         pending_authorities = PendingAuthority.objects
+        pending_projects = PendingProject.objects
+        pending_joins = PendingJoin.objects
         from django.db.models import Q
         list_user_Q = list()
         list_slice_Q = list()
         list_auth_Q = list()
+        list_proj_Q = list()
+        list_join_Q = list()
         for hrn in authority_hrns:
             list_user_Q.append(Q(authority_hrn__startswith=hrn, status__iexact = 'True'))
             list_slice_Q.append(Q(authority_hrn__startswith=hrn))
             list_auth_Q.append(Q(site_authority__startswith=hrn))
-            print "startswith hrn = ",hrn
+            list_proj_Q.append(Q(authority_hrn__startswith=hrn))
+            list_join_Q.append(Q(authority_hrn__startswith=hrn))
         from operator import __or__ as OR
         pending_users        = pending_users.filter(reduce(OR, list_user_Q))
         pending_slices       = pending_slices.filter(reduce(OR, list_slice_Q))
         pending_authorities  = pending_authorities.filter(reduce(OR, list_auth_Q))
+        pending_projects     = pending_projects.filter(reduce(OR, list_proj_Q))
+        pending_joins        = pending_joins.filter(reduce(OR, list_join_Q))
         #pending_authorities  = pending_authorities.all() #filter(reduce(OR, list_Q))
 
-    return make_requests(pending_users, pending_slices, pending_authorities)
+    return make_requests(pending_users, pending_slices, pending_authorities, pending_projects, pending_joins)
 
 # XXX Is it in sync with the form fields ?
 
@@ -391,6 +520,10 @@ def portal_validate_request(wsgi_request, request_ids):
                 request_status['SFA slice'] = {'status': True }
                 PendingSlice.objects.get(id=request['id']).delete()
 
+                # Clear user's Credentials
+                sfa_user = sfa_get_user(wsgi_request, request['user_hrn'])
+                clear_user_creds(wsgi_request,sfa_user['user_email'])
+
             except Exception, e:
                 request_status['SFA slice'] = {'status': False, 'description': str(e)}
 
@@ -418,6 +551,43 @@ def portal_validate_request(wsgi_request, request_ids):
             except Exception, e:
                 request_status['SFA authority'] = {'status': False, 'description': str(e)}
 
+        elif request['type'] == 'project':
+            try:
+                hrn = request['authority_hrn'] + '.' + request['project_name']
+
+                # Only hrn is required for Manifold Query 
+                sfa_authority_params = {
+                    'authority_hrn'        : hrn
+                }
+                sfa_add_authority(wsgi_request, sfa_authority_params)
+                request_status['SFA project'] = {'status': True }
+                PendingProject.objects.get(id=request['id']).delete()
+                
+                # Add user as a PI of the project
+                authority_add_pis(wsgi_request, hrn , request['user_hrn'])
+
+                # Clear user's Credentials
+                #sfa_user = sfa_get_user(wsgi_request, request['user_hrn'])
+                clear_user_creds(wsgi_request,request['email'])
+
+            except Exception, e:
+                request_status['SFA project'] = {'status': False, 'description': str(e)}
+
+        elif request['type'] == 'join':
+            try:
+                # Add user as a PI of the project
+                authority_add_pis(wsgi_request, request['authority_hrn'] , request['user_hrn'])
+
+                request_status['SFA join'] = {'status': True }
+                PendingJoin.objects.get(id=request['id']).delete()
+
+                # Clear user's Credentials
+                clear_user_creds(wsgi_request,request['email'])
+
+            except Exception, e:
+                request_status['SFA join'] = {'status': False, 'description': str(e)+' - '+str(request)}
+        else:
+            request_status['other'] = {'status': False, 'description': 'unknown type of request'}
         # XXX Remove from Pendings in database
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
@@ -591,6 +761,15 @@ def portal_reject_request(wsgi_request, request_ids):
 
             PendingAuthority.objects.get(id=request['id']).delete()
 
+        # XXX TMP we should send an email to the user to inform him/her
+        elif request['type'] == 'project':
+            request_status['SFA project'] = {'status': True }
+            PendingProject.objects.get(id=request['id']).delete()
+
+        elif request['type'] == 'join':
+            request_status['SFA join'] = {'status': True }
+            PendingJoin.objects.get(id=request['id']).delete()
+
         status['%s__%s' % (request['type'], request['id'])] = request_status
 
     return status
@@ -621,9 +800,16 @@ def create_slice(wsgi_request, request):
     # Add User to Slice if we have the user_hrn in pendingslice table
     user_hrn = request.get('user_hrn', None)
     user_hrns = list([user_hrn]) if user_hrn else list()
-    
+   
+    # CACHE PB with fields
+    page = Page(wsgi_request)
+    metadata = page.get_metadata()
+    user_md = metadata.details_by_object('user')
+    user_fields = [column['name'] for column in user_md['column']]
+
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    #user_query  = Query().get('myslice:user').select('user_hrn','user_email').filter_by('user_hrn','==',user_hrn)
+    user_query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
     user_details_sfa = execute_admin_query(wsgi_request, user_query)
     if not user_details_sfa:
         raise Exception, "User %s doesn't exist, validate user before validating slice" % user_hrn
@@ -709,6 +895,57 @@ def create_pending_slice(wsgi_request, request, email):
         msg.send()
     except Exception, e:
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
+
+def create_pending_project(wsgi_request, request):
+    """
+    """
+
+    # Insert an entry in the PendingProject table
+    s = PendingProject(
+        project_name    = request['project_name'],
+        user_hrn        = request['user_hrn'],
+        email           = request['email'],
+        authority_hrn   = request['authority_hrn'],
+        purpose         = request['purpose'],
+    )
+    s.save()
+
+def create_pending_join(wsgi_request, request):
+    """
+    """
+
+    # Insert an entry in the PendingJoin table
+    s = PendingJoin(
+        user_hrn        = request['user_hrn'],
+        email           = request['email'],
+        project_name    = request['project_name'],
+        authority_hrn   = request['authority_hrn'],
+    )
+    s.save()
+
+
+#     try:
+#         # Send an email: the recipients are the PI of the authority
+#         recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+# 
+#         theme.template_name = 'slice_request_email.txt' 
+#         text_content = render_to_string(theme.template, request)
+#     
+#         theme.template_name = 'slice_request_email.html' 
+#         html_content = render_to_string(theme.template, request)
+#     
+#         theme.template_name = 'slice_request_email_subject.txt'
+#         subject = render_to_string(theme.template, request)
+#         subject = subject.replace('\n', '')
+#     
+#         sender = email
+#         msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
+#         msg.attach_alternative(html_content, "text/html")
+#         msg.send()
+#     except Exception, e:
+#         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+
 
 #-------------------------------------------------------------------------------
 # REQUESTS - Users
@@ -823,10 +1060,11 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
     import requests
     import time
     from requests.auth import HTTPBasicAuth
-    
-    URL_REST = ConfigEngine.default_iotlab_url
-    LOGIN_ADMIN = ConfigEngine.default_iotlab_admin_user
-    PASSWORD_ADMIN = ConfigEngine.default_iotlab_admin_password
+   
+    engine = ConfigEngine() 
+    URL_REST = engine.iotlab_url()
+    LOGIN_ADMIN = engine.iotlab_admin_user()
+    PASSWORD_ADMIN = engine.iotlab_admin_password()
 
     auth = HTTPBasicAuth(LOGIN_ADMIN,PASSWORD_ADMIN)
     headers = {'content-type': 'application/json'}

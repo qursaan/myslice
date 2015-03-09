@@ -1,0 +1,192 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block content %}
+<script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+<script src="{{ STATIC_URL }}js/jquery-ui-combobox.js"></script>
+<link rel='stylesheet' type='text/css' href="{{ STATIC_URL }}css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.ui.combobox.css">
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs nav-section">
+            <li class="active"><a href="#existing">Join existing Project</a></li>
+            <li><a href="#new">Create new Project</a></li>
+            
+        </ul>
+    </div>
+</div>
+
+{% if errors %}
+<div class="row">
+    <div class="col-md-12">
+    <ul class="error">
+      {% for error in errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="container tab-content">
+    
+	<div class="tab-pane active" id="existing"> 
+        <div class="row">
+            <div class="col-md-6">
+                 <h3>Join an existing Project</h3>
+            </div>
+            <div class="col-md-6">
+                 <h3>List of projects you are part of</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <form role="form" method="post" action="/portal/project_request">
+                {% csrf_token %}
+                <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
+                <select id="projects" name="project_name" style="display:none;"></select> <div style="display:none;" id="projects_button"><input type="submit" id="join" name="join" value="Join" class="btn"/></div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <table class="table project-list">
+                    {% for pending in pending_projects %}
+                    <tr><td>(PENDING) {{ pending.project_name }}</td><td>{{ pending.authority_hrn }}</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
+                    {% endfor %}
+                    {% for pending in pending_join_projects %}
+                    <tr><td>(PENDING JOIN) {{ pending.project_name }}</td><td>&nbsp;</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane" id="new"> 
+        <div class="row">
+            <div class="col-md-12">
+                 <h3>Create a new Project</h3>
+            </div>
+        </div>
+    
+        
+        <div class="row">
+            <div class="col-md-12">
+                <form role="form" method="post" action="/portal/project_request">
+                {% csrf_token %}
+                  <div class="form-group">
+                    <input type="text" name="project_name" value="" style="width:380px;" placeholder="Name" required>
+                  </div>
+                  <div class="form-group">
+                    <select id="org_name" name="authority_name" class="form-control" style="width:380px" value="{{ organization }}" required> 
+                    {% if authorities %}
+                        {% for authority in authorities %}
+                            {% if authority.name %}
+                                <option value="{{ authority.authority_hrn }}">{{authority.name}}</option>
+                            {% else %}
+                                <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
+                            {% endif %}
+                        {% endfor %} 
+                    {% endif %}
+                    </select>
+                  </div>
+                  
+                  
+                  <div class="form-group">
+                    <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Description" style="width:380px" title="Purpose of your project (informative)" required="required"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Send Request</button>
+                </form>
+        
+            </div>
+        </div>
+    </div>
+    
+</div>
+		
+<script>
+$(document).ready(function() {
+    var myprojects = JSON.parse(localStorage.getItem('projects'));
+    console.log(myprojects);
+    if (myprojects) {
+        $.each(myprojects, function (i, val){
+            console.log(val);
+            $('.project-list').append('<tr><td>'+ val +'</td></tr>');
+        });
+    } else {
+        $('.project-list').html('<tr><td>no projetcs</td></tr>');
+    }
+    
+    $('.nav-tabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+    $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS{{ root_authority_hrn }}' }}, function( data ) {
+       
+        var projects = [];
+        project_row = "<option value=''> - </option>";
+        projects.push(project_row);
+       
+        $.each( data, function( key, val ) {
+            if(val.authority_hrn.split('.').length > 2){
+                if($.inArray(val.authority_hrn, myprojects)==-1){
+                project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
+                projects.push(project_row);
+                }
+            }
+        });
+        $("#projects").show();
+        $("#projects_button").css('margin-left', '50px');
+        $("#projects_button").css('display', 'inline-block');
+        $("#project_loading").hide();
+        $("#projects").html(projects.join( "" ));
+        $("#projects").combobox();
+    });
+/*
+	
+	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+		var jsonData = JSON.parse(data);
+        $(this).attr("value", jsonData[0]['parent_authority']);
+    });
+	$("#authority_hrn").val("{{authority_name}}");
+	var availableTags = [
+    {% if authorities %}
+        {% for authority in authorities %}
+            {% if authority.name %}
+                {value:"{{ authority.name }}",label:"{{authority.name}}"},
+			// to show only full name
+            {% else %}
+                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
+            {% endif %}
+        {% endfor %}    
+    {% else %}
+        {value:"",label:"No authority found !!!"}
+    {% endif %}
+    ];
+	// sorting the list
+	availableTags.sort(function(a,b){
+		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
+		if (nameA < nameB) {
+    		return -1;
+		}
+		if (nameA > nameB) {
+    		return 1;
+		}
+	return 0;
+	}); 
+    $( "#authority_hrn" ).autocomplete({
+      source: availableTags,
+      minLength: 0,
+      select: function( event, ui ) {console.log(jQuery(this));}
+    });
+*/
+	$("#submit_pi").click(function() {
+		localStorage.clear();
+	});
+	// auto-complete the form
+    jQuery("#org_name").combobox();
+
+});
+</script>
+{% endblock %}
+
