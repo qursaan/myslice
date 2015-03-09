@@ -45,7 +45,7 @@ except:
 # when deployed from a package
 # this code is run by collectstatic too, so we cannot
 # assume we have ./static present already
-HTTPROOT="/var/myslice-f4f"
+HTTPROOT="/var/www/myslice/"
 # the place to store local data, like e.g. the sqlite db
 DATAROOT="/var/unfold"
 # if not there, then we assume it's from a devel tree

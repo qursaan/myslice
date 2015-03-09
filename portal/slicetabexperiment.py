@@ -74,6 +74,7 @@ class ExperimentView (FreeAccessView, ThemeView):
         #print "list of nitos res hrns"
         #print nitos_resource_list
 
+        all_users = list() 
         #get all  iotlab users
         try:
             engine = ConfigEngine()
@@ -88,7 +89,6 @@ class ExperimentView (FreeAccessView, ThemeView):
         except urllib2.URLError as e:
             print "There is a problem in getting iotlab users %s" % e.reason
        
-        all_users = list() 
 
         #getting the login from email
         #initial value  no-account == contact_admin
