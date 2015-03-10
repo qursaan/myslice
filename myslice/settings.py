@@ -4,8 +4,8 @@ from __future__ import print_function
 
 import os.path
 
-import djcelery
-djcelery.setup_loader()
+# import djcelery
+# djcelery.setup_loader()
 
 ### detect if we're in a build environment
 try:
@@ -44,7 +44,12 @@ try:
         theme = configEngine.myslice.theme
 except:
     pass
-    
+
+##
+# components module
+##
+import components
+
 # find out HTTPROOT, which is different from ROOT 
 # when deployed from a package
 # this code is run by collectstatic too, so we cannot
@@ -253,16 +258,16 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
 	# FORGE Plugin app
-	'djcelery',
-	'forge',
+# 	'djcelery',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
-    # SLA
-    'sla',
 ]
 # this app won't load in a build environment
 if not building: INSTALLED_APPS.append ('rest')
+
+for component in components.list() :
+    INSTALLED_APPS.append(component)
 
 BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
