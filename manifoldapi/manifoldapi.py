@@ -1,5 +1,5 @@
 # Manifold API Python interface
-import copy, xmlrpclib
+import copy, xmlrpclib, ssl
 
 from myslice.configengine import ConfigEngine
 
@@ -41,7 +41,11 @@ class ManifoldAPI:
         self.calls = {}
         self.multicall = False
         self.url = ConfigEngine().manifold_url()
-        self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
+        
+        # Manifold uses a self signed certificate
+        # https://www.python.org/dev/peps/pep-0476/
+        context = ssl._create_unverified_context()
+        self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True, context=context)
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
 
