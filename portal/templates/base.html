@@ -3,7 +3,16 @@
 <html lang="en"><head>
 <title>{{theme}} portal - {{ section }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="/static/img/favicon.ico">
+
+<!--Selecting favicon based on theme. Add more for other portals -->
+{% if theme == "fed4fire" %}
+    <link rel="shortcut icon" href="/static/img/fed4fire_favicon.ico">
+{% elif theme == "smartfire" %}
+    <link rel="shortcut icon" href="/static/img/smartfire_favicon.ico">
+{% else %}
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+{% endif %}
+
 {# This is where insert_str will end up #}{% media_container prelude %}
 {% include 'messages-transient-header.html' %}
 <script type="text/javascript"> {# raw js code - use {% insert prelude_js %} ... {% endinsert %} #} {% container prelude_js %}</script>

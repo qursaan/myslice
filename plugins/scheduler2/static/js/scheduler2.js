@@ -619,7 +619,7 @@ var SCHEDULER_COLWIDTH = 50;
                 var scope = this._get_scope();
             
                 manifold.query_store.iter_records(this.options.query_lease_uuid, function(lease_key, lease) {
-                    console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
+                    //console.log("SET LEASES", lease.resource, new Date(lease.start_time* 1000), new Date(lease.end_time* 1000));
                     // XXX We should ensure leases are correctly merged, otherwise our algorithm won't work
 
                     // Populate leases by resource array: this will help us merging leases later
@@ -724,6 +724,10 @@ var SCHEDULER_COLWIDTH = 50;
 
                 resource = this.scope_resources_by_key[lease.resource];
                 day_timestamp = SchedulerDateSelected.getTime() / 1000;
+                if(resource === undefined){
+                    console.log('resource undefined = '+lease.resource);
+                    return;
+                }
                 id_start = Math.floor((lease.start_time - day_timestamp) / resource.granularity);
 
                 /* Some leases might be in the past */
