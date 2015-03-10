@@ -80,6 +80,7 @@ class ExperimentView (FreeAccessView, ThemeView):
 
         all_users = list() 
         #get all  iotlab users
+        all_users = list() 
         try:
             engine = ConfigEngine()
             userData = "Basic " + (engine.iotlab_admin_user() + ":" + engine.iotlab_admin_password()).encode("base64").rstrip()
