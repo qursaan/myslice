@@ -44,8 +44,10 @@ class ManifoldAPI:
         
         # Manifold uses a self signed certificate
         # https://www.python.org/dev/peps/pep-0476/
-        context = ssl._create_unverified_context()
-        self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True, context=context)
+        if hasattr(ssl, '_create_unverified_context'): 
+            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True, context=ssl._create_unverified_context())
+        else :
+            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
     def __repr__ (self): return "ManifoldAPI[%s]"%self.url
 
