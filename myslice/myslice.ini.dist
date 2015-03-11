@@ -1,0 +1,16 @@
+[manifold]
+url = https://portal.onelab.eu:7080
+admin_user = 
+admin_password = 
+
+[myslice]
+theme = onelab
+debug = true
+httproot =
+dataroot =
+components = sla,influxdb,forge
+
+[activity]
+#server = http://athos.ipv6.lip6.fr/activity/push/log
+#apikey = 
+#secret = 

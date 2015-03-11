@@ -1,6 +1,7 @@
-# Django settings for unfold project.
-
 from __future__ import print_function
+
+import myslice.components
+from myslice.configengine import ConfigEngine
 
 import os.path
 
@@ -14,53 +15,51 @@ try:
 except:
     building=True
 
-DEBUG = True
+config = ConfigEngine()
+
+if config.myslice.debug :
+    DEBUG = True
+else :
+    DEBUG = False
 
 # show the various settings as we go
 DEBUG_SETTINGS = False
 
-# compute ROOT from where this file is installed
-# should fit every need including developers
 # but you can redefine ROOT if that's not working for you
 try:
     # get the directory where this file is
-    ROOT=os.path.dirname(__file__) or '.'
-    # move one step up
-    ROOT=os.path.realpath(ROOT+'/..')
+    ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
 except:
     # something is badly wrong here
-    ROOT=None
+    ROOT = None
     import traceback
     traceback.print_exc()
 
 #### this is where the problem lies I believe
 # first try to run manage.py collectstatic without this
 # themes
-theme=None
-try:
-    from myslice.configengine import ConfigEngine
-    configEngine = ConfigEngine()
-    if configEngine.myslice.theme :
-        theme = configEngine.myslice.theme
-except:
-    pass
+if config.myslice.theme :
+    theme = config.myslice.theme
+else :
+    theme = None
 
-##
-# components module
-##
-import components
+# HTTPROOT
+if config.myslice.httproot :
+    HTTPROOT = config.myslice.httproot
+else :
+    HTTPROOT = "/var/myslice-f4f"
 
-# find out HTTPROOT, which is different from ROOT 
-# when deployed from a package
-# this code is run by collectstatic too, so we cannot
-# assume we have ./static present already
-HTTPROOT="/var/myslice-f4f"
-# the place to store local data, like e.g. the sqlite db
-DATAROOT="/var/unfold"
+# DATAROOT
+if config.myslice.httproot :
+    DATAROOT = config.myslice.httproot
+else :
+    DATAROOT = "/var/unfold"
+
 if not os.path.isdir(DATAROOT):
     print("WARNING: {} is a non-existing directory".format(DATAROOT))
     print("consequently we assume development mode and re-route DATAROOT to {}".format(ROOT))
     DATAROOT=ROOT
+
 # if not there, then we assume it's from a devel tree
 if not os.path.isdir (os.path.join(HTTPROOT,"static")):
     HTTPROOT=ROOT
@@ -110,12 +109,12 @@ EMAIL_USE_TLS = False
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(DATAROOT,'unfold.sqlite3'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE'    : 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME'      : os.path.join(DATAROOT,'unfold.sqlite3'), # Or path to database file if using sqlite3.
+        'USER'      : '',                      # Not used with sqlite3.
+        'PASSWORD'  : '',                  # Not used with sqlite3.
+        'HOST'      : '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT'      : '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 

@@ -1,10 +1,13 @@
 from django.conf.urls import include, url
 from myslice.configengine import ConfigEngine
 
-def urls():
+def list():
     config = ConfigEngine()
+    return config.myslice.components.split(',')
+
+def urls():
     u = []
-    for component in config.myslice.components.split(','):
+    for component in list():
         try:
             __import__(component)
             u.append( url(r'^%s/' % component, include('%s.urls' % component)) )
@@ -14,3 +17,4 @@ def urls():
             print "-> Loaded component %s" % component
             
     return u
+
