@@ -1,9 +1,14 @@
-from __future__ import print_function
-
-import myslice.components
-from myslice.configengine import ConfigEngine
-
+#from __future__ import print_function
 import os.path
+
+try:
+    ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
+except:
+    import traceback
+    traceback.print_exc()
+
+import myslice.components as components
+from myslice.configengine import ConfigEngine
 
 # import djcelery
 # djcelery.setup_loader()
@@ -22,21 +27,6 @@ if config.myslice.debug :
 else :
     DEBUG = False
 
-# show the various settings as we go
-DEBUG_SETTINGS = False
-
-# but you can redefine ROOT if that's not working for you
-try:
-    # get the directory where this file is
-    ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
-except:
-    # something is badly wrong here
-    ROOT = None
-    import traceback
-    traceback.print_exc()
-
-#### this is where the problem lies I believe
-# first try to run manage.py collectstatic without this
 # themes
 if config.myslice.theme :
     theme = config.myslice.theme
@@ -47,30 +37,14 @@ else :
 if config.myslice.httproot :
     HTTPROOT = config.myslice.httproot
 else :
-    HTTPROOT = "/var/myslice-f4f"
+    HTTPROOT = ROOT
 
 # DATAROOT
 if config.myslice.httproot :
-    DATAROOT = config.myslice.httproot
+    DATAROOT = config.myslice.dataroot
 else :
-    DATAROOT = "/var/unfold"
+    DATAROOT = ROOT
 
-if not os.path.isdir(DATAROOT):
-    print("WARNING: {} is a non-existing directory".format(DATAROOT))
-    print("consequently we assume development mode and re-route DATAROOT to {}".format(ROOT))
-    DATAROOT=ROOT
-
-# if not there, then we assume it's from a devel tree
-if not os.path.isdir (os.path.join(HTTPROOT,"static")):
-    HTTPROOT=ROOT
-
-if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
-if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
-
-if DEBUG_SETTINGS:
-    print('ROOT', ROOT)
-    print('DATAROOT', DATAROOT)
-    print('HTTPROOT', HTTPROOT)
 
 # dec 2013 - we currently have 2 auxiliary subdirs with various utilities
 # that we do not wish to package 
@@ -107,20 +81,33 @@ EMAIL_USE_TLS = False
 #    EMAIL_USE_TLS = False
 #    DEFAULT_FROM_EMAIL = 'testing@example.com'
 
-DATABASES = {
-    'default': {
-        'ENGINE'    : 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME'      : os.path.join(DATAROOT,'unfold.sqlite3'), # Or path to database file if using sqlite3.
-        'USER'      : '',                      # Not used with sqlite3.
-        'PASSWORD'  : '',                  # Not used with sqlite3.
-        'HOST'      : '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT'      : '',                      # Set to empty string for default. Not used with sqlite3.
+if config.database : 
+    DATABASES = {
+        'default': {
+            'ENGINE'    : 'django.db.backends.%s' % config.database.engine,
+            'USER'      : config.database.user or '',
+            'PASSWORD'  : config.database.password or '',
+            'HOST'      : config.database.host or '',
+            'PORT'      : config.database.port or '',
+        }
     }
-}
-
-if DEBUG_SETTINGS:
-    print('DATABASE NAME',DATABASES['default']['NAME'])
-
+    if config.database.engine == 'sqlite3' :
+        DATABASES['default']['NAME'] = os.path.join(DATAROOT,'%s.sqlite3' % config.database.name)
+    else :
+        DATABASES['default']['NAME'] = config.database.name
+else :
+    # default database is sqlite
+    DATABASES = {
+        'default': {
+            'ENGINE'    : 'django.db.backends.sqlite3',
+            'NAME'      : os.path.join(DATAROOT,'myslice.sqlite3'),
+            'USER'      : '',
+            'PASSWORD'  : '',
+            'HOST'      : '',
+            'PORT'      : '',
+        }
+    }
+print DATABASES
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -223,14 +210,14 @@ ROOT_URLCONF = 'myslice.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'unfold.wsgi.application'
 
-TEMPLATE_DIRS = [ ]
+TEMPLATE_DIRS = []
 # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
 if theme is not None:
-    TEMPLATE_DIRS.append ( os.path.join(HTTPROOT,"portal/templates", theme))
-TEMPLATE_DIRS.append     ( os.path.join(HTTPROOT,"portal/templates"))
-TEMPLATE_DIRS.append     (  os.path.join(HTTPROOT,"templates"))
+    TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"portal/templates", theme) )
+TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"portal/templates") )
+TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"templates") )
 
 INSTALLED_APPS = [ 
     'django.contrib.auth',
