@@ -364,7 +364,7 @@ var SCHEDULER_COLWIDTH = 50;
             }
             
 
-            $scope._dump_leases();
+            //$scope._dump_leases();
         };
   
         $scope._dump_leases = function()
