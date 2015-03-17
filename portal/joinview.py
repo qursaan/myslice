@@ -173,7 +173,7 @@ class JoinView (FreeAccessView, ThemeView):
                     'user_hrn'      : user_hrn,
                     'pi'            : [reg_auth],
                     'auth_type'     : 'managed',
-                    'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
+                    'validation_link': current_site + '/portal/email_activation/'+ email_hash
                 }
 
                 
