@@ -20,16 +20,27 @@ $(document).ready(function() {
         $('input:checkbox.user').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
-                $.post("/delete/user/",{'filters':{'user_hrn':this.id}}, function(data) {
+                var user_email = this.dataset.email; 
+                console.log(this);
+                // Delete in SFA Registry
+                $.post("/delete/user/",{'filters':{'user_hrn':record_id}}, function(data) {
                     if(data.success){
-                        $('tr[id="'+record_id+'"]').fadeOut("slow");
-                        $('tr[id="'+record_id+'"]').remove();
-                        mysliceAlert('Success: user deleted','success', true);
+                        $.post("/local_user/delete/",{'filters':{'email':user_email}}, function(data) {
+                            console.log(data);
+                            if (data == true){
+                                mysliceAlert('Success: user deleted','success', true);
+                            }else{
+                                mysliceAlert('Local DB Error for: '+record_id,'warning', true);
+                            }
+                            $('tr[id="'+record_id+'"]').fadeOut("slow");
+                            $('tr[id="'+record_id+'"]').remove();
+                        });
+                        //$.post("/delete/local:user/",{'filters':{'user_hrn':this.id}}, function(data) {
                     }else{
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }   
-                });     
+                });
             } 
         });
     });

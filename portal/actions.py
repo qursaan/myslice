@@ -192,7 +192,7 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
         query  = Query().get('myslice:user').select(user_fields).filter_by('user_hrn','==',user_hrn)
         #query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('pi_authorities')
         results = execute_query(wsgi_request, query)
-        print "is_pi results = ", results
+        #print "is_pi results = ", results
         for user_detail in results:
             if authority_hrn in user_detail['pi_authorities']:
                 return True
@@ -305,13 +305,15 @@ def manifold_update_account(request,user_id,account_params):
     return results
 
 #explicitly mention the platform_id
-def manifold_delete_account(request, platform_id, user_id, account_params):
-    query = Query.delete('local:account').filter_by('platform_id', '==', platform_id).filter_by('user_id', '==', user_id).set(account_params).select('user_id')
+def manifold_delete_account(request, user_id, platform_id = None):
+    query = Query.delete('local:account').filter_by('user_id', '==', user_id)
+    if platform_id is not None:
+        query.filter_by('platform_id', '==', platform_id)
     results = execute_admin_query(request,query)
     return results
 
-def manifold_delete_user(request, user_id, user_params):
-    query = Query.delete('local:user').filter_by('user_id', '==', user_id).set(user_params).select('user_id')
+def manifold_delete_user(request, user_id):
+    query = Query.delete('local:user').filter_by('user_id', '==', user_id).select('user_id')
     results = execute_admin_query(request,query)
     return results
 
@@ -324,6 +326,35 @@ def manifold_add_platform(request, platform_params):
         raise Exception, "Failed creating manifold platform %s for user: %s" % (platform_params['platform'], platform_params['user'])
     result, = results
     return result['platform_id']
+
+def delete_local_user(wsgi_request, user_email):
+    user_query = Query().get('local:user') \
+        .filter_by('email', '==', user_email)           \
+        .select('user_id','config')
+    user = execute_admin_query(wsgi_request, user_query)
+    if len(user) == 0:
+        return False
+        #raise Exception, "User not found, check local DB"
+    else:
+        user_id = user[0]['user_id']
+        user_config = json.loads(user[0]['config'])
+        authority_hrn = user_config.get('authority', None)
+        
+        if is_pi(wsgi_request, '$user_hrn', authority_hrn):
+            # removing from Django auth_user
+            UserModel = get_user_model()
+            UserModel._default_manager.filter(email__iexact = user_email).delete()
+
+            # removing manifold account
+            manifold_delete_account(wsgi_request, user_id)           
+                     
+            # removing manifold user
+            manifold_delete_user(wsgi_request, user_id)
+        else:
+            return False
+            #raise Exception, "No sufficient rights on authority = ",authority_hrn
+
+    return True      
 
 
 def make_request_user(user):
@@ -658,31 +689,11 @@ def portal_reject_request(wsgi_request, request_ids):
                     msg.send()
                 except Exception, e:
                     print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
-            
-                # removing from Django auth_user
-                UserModel = get_user_model()
-                UserModel._default_manager.filter(email__iexact = user_email).delete()
+
                 # removing from Django portal_pendinguser
                 PendingUser.objects.get(id=request['id']).delete()
-                # removing from manifold
-                # removing manifold account
-                user_query = Query().get('local:user') \
-                    .filter_by('email', '==', user_email)           \
-                    .select('user_id')
-                user = execute_admin_query(wsgi_request, user_query)
-                user_id = user[0]['user_id']
-        
-                platform_query = Query().get('local:platform') \
-                    .filter_by('platform', '==', 'myslice')           \
-                    .select('platform_id')
-                platform = execute_admin_query(wsgi_request, platform_query)
-                platform_id = platform[0]['platform_id']
-                account_params = {'user_id':user_id}
-                manifold_delete_account(request, platform_id, user_id, account_params)           
-             
-                # removing manifold user
-                user_params = {'user_id':user_id}
-                manifold_delete_user(request, user_id, user_params)
+            
+                delete_local_user(wsgi_request, user_email)
             except Exception, e:
                 request_status['SFA authority'] = {'status': False, 'description': str(e)}
                       

@@ -1,5 +1,6 @@
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
+from portal.actions                 import is_pi
 
 from django.http                    import HttpResponse
 
@@ -45,8 +46,7 @@ class ObjectRequest(object):
             table = self.type.split(':')
             prefix = table[0]
             table = table[1]
-
-            if prefix is 'local':
+            if prefix == 'local':
                 # XXX TODO: find a generic Query to get the fields like 
                 # select column.name from local:object where table == local:user
                 table = self.type.split(':')
@@ -74,7 +74,6 @@ class ObjectRequest(object):
     def setKey(self):
         # What about key formed of multiple fields???
         query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
-        print query
         results = execute_query(self.request, query)
         print "key of object = %s" % results
         if results :
