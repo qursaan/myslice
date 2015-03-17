@@ -3,7 +3,10 @@ from myslice.configengine import ConfigEngine
 
 def list():
     config = ConfigEngine()
-    return config.myslice.components.split(',')
+    if config.myslice.components :
+        return config.myslice.components.split(',')
+    else :
+        return []
 
 def urls():
     u = []
