@@ -44,9 +44,12 @@ class RegistrationView (FreeAccessView, ThemeView):
         # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
+        print "RegistrationView authorities = ", authorities
         if authorities is not None:
-            authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            authorities = sorted(authorities, key=lambda k: k['name'])
+            # Remove the root authority from the list
+            matching = [s for s in authorities if "." in s['authority_hrn']]
+            authorities = sorted(matching, key=lambda k: k['authority_hrn'])
+            authorities = sorted(matching, key=lambda k: k['name'])
         
         print "############ BREAKPOINT 1 #################"
         # Page rendering
@@ -81,12 +84,12 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
                 'pi'            : '',
-                'validation_link': current_site + '/portal/email_activation/'+ email_hash
+                'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             print "############ BREAKPOINT 4 #################"
             auth = wsgi_request.POST.get('org_name', None)
-            if auth is None:
+            if auth is None or auth == "":
                 errors.append('Organization required: please select one or request its addition')
             else:
                
