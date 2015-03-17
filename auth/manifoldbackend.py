@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from manifoldapi.manifoldapi    import ManifoldAPI, ManifoldException, ManifoldResult
 from manifold.core.query        import Query
 
+from myslice.settings import config, logger, DEBUG
+
 # Name my backend 'ManifoldBackend'
 class ManifoldBackend:
 
@@ -13,6 +15,8 @@ class ManifoldBackend:
     def authenticate(self, token=None):
         if not token:
             return None
+        
+        person = {}
 
         try:
             username = token['username']
@@ -22,15 +26,13 @@ class ManifoldBackend:
             auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
             api = ManifoldAPI(auth)
             sessions_result = api.forward(Query.create('local:session').to_dict())
-            print "result"
             sessions = sessions_result.ok_value()
-            print "ok"
             if not sessions:
-                print "GetSession failed", sessions_result.error()
+                logger.error("GetSession failed", sessions_result.error())
                 return
-            print "first", sessions
             session = sessions[0]
-
+            logger.debug("SESSION : %s" % session)
+            
             # Change to session authentication
             api.auth = {'AuthMethod': 'session', 'session': session['session']}
             self.api = api
@@ -40,19 +42,19 @@ class ManifoldBackend:
             persons_result = api.forward(Query.get('local:user').to_dict())
             persons = persons_result.ok_value()
             if not persons:
-                print "GetPersons failed",persons_result.error()
+                logger.error("GetPersons failed",persons_result.error())
                 return
             person = persons[0]
-            print "PERSON=", person
+            logger.debug("PERSON : %s" % person)
+            #logger.info("%s %s <%s> logged in" % (person['config']['first_name'], person['config']['last_name'], person['config']['email']))
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
         except ManifoldException, e:
-            print "ManifoldBackend.authenticate caught ManifoldException, returning corresponding ManifoldResult"
-            return e.manifold_result
+            logger.error("Manifold Auth Backend: %s" % e.manifold_result)
         except Exception, e:
-            print "E: manifoldbackend", e
-            import traceback
-            traceback.print_exc()
+            logger.error("Manifold Auth Backend: %s" % e)
+            #import traceback
+            #traceback.print_exc()
             return None
 
         try:

@@ -1,14 +1,23 @@
-#from __future__ import print_function
 import os.path
+import logging
 
+logger = logging.getLogger('myslice')
+
+# ROOT
 try:
     ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
 except:
     import traceback
     traceback.print_exc()
 
-import myslice.components as components
+
 from myslice.configengine import ConfigEngine
+
+config = ConfigEngine()
+
+import myslice.components as components
+
+
 
 # import djcelery
 # djcelery.setup_loader()
@@ -20,14 +29,15 @@ try:
 except:
     building=True
 
-config = ConfigEngine()
 
+
+# DEBUG
 if config.myslice.debug :
     DEBUG = True
 else :
     DEBUG = False
 
-# themes
+# theme
 if config.myslice.theme :
     theme = config.myslice.theme
 else :
@@ -81,7 +91,7 @@ EMAIL_USE_TLS = False
 #    EMAIL_USE_TLS = False
 #    DEFAULT_FROM_EMAIL = 'testing@example.com'
 
-if config.database : 
+if config.database.engine : 
     DATABASES = {
         'default': {
             'ENGINE'    : 'django.db.backends.%s' % config.database.engine,
@@ -107,7 +117,7 @@ else :
             'PORT'      : '',
         }
     }
-print DATABASES
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -290,6 +300,39 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+    }
+}
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'debug':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'myslice': {
+            'handlers': ['debug'],
+            'propagate': True,
+            'level': 'DEBUG',
+        }
     }
 }
 
