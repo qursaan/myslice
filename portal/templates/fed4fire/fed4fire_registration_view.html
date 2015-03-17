@@ -35,6 +35,7 @@
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
 				 the managers that we have on record for your organization, asking them to validate your sign-up request." required>
+                    <option value="">select an organization</option>
                 {% if authorities %}
                     {% for authority in authorities %}
                         {% if authority.name %}

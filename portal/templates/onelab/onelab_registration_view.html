@@ -30,20 +30,13 @@
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
 				 the managers that we have on record for your organization, asking them to validate your sign-up request." required>
+                    <option value="">select an organization</option>
                 {% if authorities %}
                     {% for authority in authorities %}
                         {% if authority.name %}
-                            {% if authority.authority_hrn == authority_hrn %}
-                                <option value="{{ authority.authority_hrn }}" selected>{{authority.name}}</option>
-                            {% else %}
                                 <option value="{{ authority.authority_hrn }}">{{authority.name}}</option>
-                            {% endif %}
                         {% else %}
-                            {% if authority.authority_hrn == authority_hrn %}
-                            <option value="{{ authority.authority_hrn }}" selected>{{authority.authority_hrn}}</option>
-                            {% else %}
                             <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
-                            {% endif %}
                         {% endif %}
                     {% endfor %}               
                 {% else %}
