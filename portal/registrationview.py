@@ -89,7 +89,7 @@ class RegistrationView (FreeAccessView, ThemeView):
 
             print "############ BREAKPOINT 4 #################"
             auth = wsgi_request.POST.get('org_name', None)
-            if auth is None:
+            if auth is None or auth == "":
                 errors.append('Organization required: please select one or request its addition')
             else:
                
