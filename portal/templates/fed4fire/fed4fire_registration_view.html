@@ -35,6 +35,7 @@
 		  		title="Choose your organization (company/university) from the list that apears when you click in the field and start to type.
 				 Use the arrow keys to scroll through the list; type part of the name to narrow down the list. We will send an email to 
 				 the managers that we have on record for your organization, asking them to validate your sign-up request." required>
+                    <option value="">select an organization</option>
                 {% if authorities %}
                     {% for authority in authorities %}
                         {% if authority.name %}
@@ -78,10 +79,10 @@
 	      <label for="password" class="control-label">Authentication</label>
 		</p>
 		<p>	
-	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="4" value="{{ password }}" title="Your password allows you to log in to this portal." placeholder="Password" required />
+	      <input type="password"  id="password" name="password"   class="form-control" style="width:250px" minlength="8" value="{{ password }}" title="Your password allows you to log in to this portal." placeholder="Password" required />
 	    </p>
         <p>
-			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="4" class="form-control" value="" placeholder="Confirm password" required />
+			<input type="password"  id="confirmpassword" name="confirmpassword" style="width:250px"  minlength="8" class="form-control" value="" placeholder="Confirm password" required />
 	    </p>
         <p>
 			<select name="question" class="form-control" style="width:350px" id="key-policy" 
