@@ -78,6 +78,7 @@ class ExperimentView (FreeAccessView, ThemeView):
         #print "list of nitos res hrns"
         #print nitos_resource_list
 
+        all_users = list() 
         #get all  iotlab users
         all_users = list() 
         try:

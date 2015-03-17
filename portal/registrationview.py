@@ -84,12 +84,12 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'current_site'  : current_site,
                 'email_hash'    : email_hash,
                 'pi'            : '',
-                'validation_link': current_site + '/portal/email_activation/'+ email_hash
+                'validation_link': 'https://' + current_site + '/portal/email_activation/'+ email_hash
             }
 
             print "############ BREAKPOINT 4 #################"
             auth = wsgi_request.POST.get('org_name', None)
-            if auth is None:
+            if auth is None or auth == "":
                 errors.append('Organization required: please select one or request its addition')
             else:
                
