@@ -204,7 +204,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                     resourceData['type'] = 'node ( Hardware: <a target="_blank" href="https://www.iot-lab.info/hardware/'+n[0]+'/">'+n[0]+'</a> )';
                     var coordinates = resourceData['testbed'];
                 } else {
-                    var logo = network_hrn;
+                    var logo = resourceData['testbed'];
                     var resourceLocation = {
                         'longitude' : aData[13],
                         'latitude' : aData[23],
