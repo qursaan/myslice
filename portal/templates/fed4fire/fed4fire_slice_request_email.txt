@@ -10,7 +10,7 @@ Email           : {{email}}
 Organization	: {{organization}}
 Portal url		: {{current_site}}
 
-You can see new slice request in: http://{{current_site}}/portal/validate
+You can see new slice request in: {{current_site}}/portal/validate
 Please be sure that you know the user who is requesting this slice, as you are responsible for his or her actions.
  
 And kindly ensure that the stated experiment purpose is clear, and, if there is a website that explains the website, that a URL is provided. 

@@ -10,9 +10,9 @@ Email           : {{email}}
 Organization	: {{organization}}
 Portal url		: {{current_site}}
 
-You can see new slice request in: http://{{current_site}}/portal/validate
+You can see new slice request in: {{current_site}}/portal/validate
 Please be sure that you know the user who is requesting this slice, as you are responsible for his or her actions, as described in the OneLab terms and conditions:
-	http://{{current_site}}/terms
+	{{current_site}}/terms
  
 And kindly ensure that the stated experiment purpose is clear, and, if there is a website that explains the website, that a URL is provided. 
 OneLab and its affiliated testbeds exist purely to support useful and interesting work. To ensure the future of these environments, we need to know what work is actually being done. 
