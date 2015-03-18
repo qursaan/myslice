@@ -25,7 +25,7 @@ $(document).ready(function() {
                 // Delete in SFA Registry
                 $.post("/delete/user/",{'filters':{'user_hrn':record_id}}, function(data) {
                     if(data.success){
-                        $.post("/local_user/delete/",{'filters':{'email':user_email}}, function(data) {
+                        $.post("/local_user/delete/",{'email':user_email}, function(data) {
                             console.log(data);
                             if (data == true){
                                 mysliceAlert('Success: user deleted','success', true);
