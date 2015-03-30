@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors import csrf
 from django.http import HttpResponseRedirect
@@ -27,7 +29,7 @@ class ManagementAboutView (FreeAccessView, ThemeView):
             user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(self.request.user))
             user_local_details = execute_query(self.request, user_local_query)
             user_authority = json.loads(user_local_details[0]['config']).get('authority')
-            print "**************________    management about  = ",user_authority
+            print("**************________    management about  = ",user_authority)
             # XXX Should be done using Metadata
             # select column.name from local:object where table=='authority'
             authority_query = Query().get('authority').select('authority_hrn', 'name', 'address', 'enabled','description', 

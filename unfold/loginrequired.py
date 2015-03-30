@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.contrib.auth.decorators     import login_required
 from django.utils.decorators            import method_decorator
 from django.http                        import HttpResponseRedirect
@@ -45,7 +47,7 @@ def logout_on_manifold_exception (fun_that_returns_httpresponse):
             return HttpResponseRedirect ('/')
         except Exception, e:
             # xxx we need to sugarcoat this error message in some error template...
-            print "Unexpected exception",e
+            print("Unexpected exception",e)
             import traceback
             traceback.print_exc()
             return HttpResponseRedirect ('/')

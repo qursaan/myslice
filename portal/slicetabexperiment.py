@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors import csrf
 from django.http import HttpResponseRedirect
@@ -67,7 +69,7 @@ class ExperimentView (FreeAccessView, ThemeView):
 
 
         except Exception,e:
-            print "Exception in slicetabexperiment.py in OneLab resource search %s" % e
+            print("Exception in slicetabexperiment.py in OneLab resource search %s" % e)
         
         #print "list of ple res hrns"
         #print ple_resource_list
@@ -92,7 +94,7 @@ class ExperimentView (FreeAccessView, ThemeView):
             res = urllib2.urlopen(req)
             all_users = json.load(res) 
         except urllib2.URLError as e:
-            print "There is a problem in getting iotlab users %s" % e.reason
+            print("There is a problem in getting iotlab users %s" % e.reason)
        
 
         #getting the login from email

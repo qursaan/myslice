@@ -21,6 +21,8 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from django import forms
 from portal.models import PendingUser, PendingSlice
 #from crispy_forms.helper import FormHelper
@@ -206,7 +208,7 @@ class PasswordResetForm(forms.Form):
                 email = loader.render_to_string(email_template_name, c)
                 send_mail(subject, email, from_email, [user.email])
         except Exception, e:
-            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+            print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
 
 class SetPasswordForm(forms.Form):

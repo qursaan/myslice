@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors     import csrf
 from django.http                        import HttpResponseRedirect
@@ -61,7 +63,7 @@ class HomeView (FreeAccessView, ThemeView):
         elif auth_result is not None:
             user=auth_result
             if user.is_active:
-                print "LOGGING IN"
+                print("LOGGING IN")
                 login(request, user)
                 
                 if request.user.is_authenticated(): 

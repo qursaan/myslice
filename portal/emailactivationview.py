@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from unfold.loginrequired               import FreeAccessView
 #
 from manifold.core.query                import Query
@@ -37,7 +39,7 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 if 'enabled' in result and result['enabled']==True:
                     return True
         except Exception, e:
-            print "Exception in myplc query = ",e
+            print("Exception in myplc query = ",e)
 
         return False
 

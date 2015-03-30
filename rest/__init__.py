@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
 from portal.actions                 import is_pi
@@ -75,7 +77,7 @@ class ObjectRequest(object):
         # What about key formed of multiple fields???
         query = Query.get('local:object').filter_by('table', '==', self.type).select('key')
         results = execute_query(self.request, query)
-        print "key of object = %s" % results
+        print("key of object = %s" % results)
         if results :
             for r in results[0]['key'] :
                 self.id = r
@@ -136,9 +138,9 @@ class ObjectRequest(object):
         if self.params :
             for p in self.params :
                 for k,v in p.iteritems() :
-                    print "param: %s : %s" % (k,v)
+                    print("param: %s : %s" % (k,v))
                     query.set({k : v})
-            print "query = ",query
+            print("query = ",query)
         else:
             raise Exception, "Params are required for create"
         return execute_query(self.request, query)
@@ -150,9 +152,9 @@ class ObjectRequest(object):
         if self.params :
             for p in self.params :
                 for k,v in p.iteritems() :
-                    print "param: %s : %s" % (k,v)
+                    print("param: %s : %s" % (k,v))
                     query.set({k : v})
-            print "query = ",query
+            print("query = ",query)
         else:
             raise Exception, "Params are required for update"
 

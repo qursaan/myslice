@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from unfold.plugin import Plugin
 
 class UnivbrisFv (Plugin):
@@ -55,13 +57,13 @@ Current implementation makes the following assumptions
             self.columns=columns
             self.hidden_columns = []
         elif self.query:
-	    self.columns = list (['Flowspace Name', 'Edit', 'Delete'])
-	    #replace production
+            self.columns = list (['Flowspace Name', 'Edit', 'Delete'])
+            #replace production
             #self.columns = self.query.fields
             if query_all:
                 #replace production
-		self.hidden_columns = []
-		# We need a list because sets are not JSON-serializable
+                self.hidden_columns = []
+                # We need a list because sets are not JSON-serializable
                 #self.hidden_columns = #list(self.query_all.fields - self.query.fields)
             else:
                 self.hidden_columns = []
@@ -69,7 +71,7 @@ Current implementation makes the following assumptions
             self.columns = []
             self.hidden_columns = []
 
-	self.columns = list (['Flowspace Name', 'Edit', 'Delete'])
+        self.columns = list (['Flowspace Name', 'Edit', 'Delete'])
         self.init_key=init_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type
@@ -78,7 +80,7 @@ Current implementation makes the following assumptions
         if self.checkboxes:
             # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
             if 'aoColumns' in self.datatables_options:
-                print 'WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded'
+                print('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
                 del self.datatables_options['aoColumns']
             # set aoColumnDefs in datatables_options - might already have stuff in there
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])
@@ -98,12 +100,13 @@ Current implementation makes the following assumptions
     def requirements (self):
         reqs = {
             'js_files' : [ "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
- "js/dataTables.js",  "js/dataTables.bootstrap.js", "js/with-datatables.js", "js/jquery.jeditable.js", 
+                           "js/dataTables.js",  "js/dataTables.bootstrap.js",
+                           "js/with-datatables.js", "js/jquery.jeditable.js", 
                            "js/manifold.js", "js/manifold-query.js", 
                            "js/unfold-helper.js",
                           # querytable.js needs to be loaded after dataTables.js as it extends 
                           # dataTableExt.afnSortData
-			  # "js/jquery-ui.min.js" "js/jquery.dataTables.editable.js", "js/jquery.validate.js",
+                          # "js/jquery-ui.min.js" "js/jquery.dataTables.editable.js", "js/jquery.validate.js",
                            "js/univbrisfv.js",#"js/univbrisfv.js",
                            ] ,
             'css_files': [ "css/dataTables.bootstrap.css",

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
 
@@ -71,7 +73,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         slice_md = metadata.details_by_object('slice')
         slice_fields = [column['name'] for column in slice_md['column']]
-        print "SLICE RES VIEW fields = %s" % slice_fields
+        print("SLICE RES VIEW fields = %s" % slice_fields)
         # TODO The query to run is embedded in the URL
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.core.context_processors import csrf
 from django.http                    import HttpResponseRedirect
 from django.contrib.auth            import authenticate, login, logout
@@ -68,9 +70,9 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
 
         else: 
             env['person'] = None
-        print "BEFORE  ####------####  is_pi"
+        print("BEFORE  ####------####  is_pi")
         pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
-        print "is_pi = ",is_pi
+        print("is_pi = ",is_pi)
 
         env['theme'] = self.theme
         env['section'] = "Institution"

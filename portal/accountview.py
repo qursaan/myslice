@@ -1,9 +1,13 @@
+from __future__ import print_function
+
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
 #
 #
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, sfa_get_user, clear_user_creds
+from portal.actions                     import (
+    manifold_update_user, manifold_update_account, manifold_add_account,
+    manifold_delete_account, sfa_update_user, sfa_get_user, clear_user_creds )
 #
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
@@ -12,7 +16,7 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 
-from myslice.configengine           import ConfigEngine
+from myslice.configengine               import ConfigEngine
 from myslice.theme import ThemeView
 
 from portal.account                     import Account, get_expiration
@@ -289,11 +293,11 @@ def account_process(request):
             if user_email == request.user.email:                                          
                 authorize_query = True                                                    
             else:                                                                         
-                print "SECURITY: %s tried to update %s" % (user_email, request.user.email)
+                print("SECURITY: %s tried to update %s" % (user_email, request.user.email))
                 messages.error(request, 'You are not authorized to modify another user.') 
                 return HttpResponseRedirect("/portal/account/")                               
         except Exception,e:
-            print "Exception = %s" % e
+            print("Exception = %s" % e)
 
     for account_detail in account_details:
         for platform_detail in platform_details:
@@ -428,7 +432,7 @@ def account_process(request):
                                 raise Exception,"Keys are not matching"
                         except Exception, e:
                             messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
-                            print "Exception in accountview ", e
+                            print("Exception in accountview ", e)
                         return HttpResponseRedirect("/portal/account/")
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
@@ -592,7 +596,7 @@ def account_process(request):
             else:
                 messages.error(request, 'Delete error: Credentials are not stored in the server')
         except Exception,e:
-            print "Exception in accountview.py in clear_user_creds %s" % e
+            print("Exception in accountview.py in clear_user_creds %s" % e)
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
         return HttpResponseRedirect("/portal/account/")
 

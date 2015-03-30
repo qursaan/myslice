@@ -269,7 +269,7 @@ BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print("Using devel auxiliary",aux)
+        print(("Using devel auxiliary",aux))
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.

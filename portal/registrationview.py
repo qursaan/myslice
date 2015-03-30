@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os.path, re
 import json
 from random     import randint
@@ -44,14 +46,14 @@ class RegistrationView (FreeAccessView, ThemeView):
         # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
-        print "RegistrationView authorities = ", authorities
+        print("RegistrationView authorities = ", authorities)
         if authorities is not None:
             # Remove the root authority from the list
             matching = [s for s in authorities if "." in s['authority_hrn']]
             authorities = sorted(matching, key=lambda k: k['authority_hrn'])
             authorities = sorted(matching, key=lambda k: k['name'])
         
-        print "############ BREAKPOINT 1 #################"
+        print("############ BREAKPOINT 1 #################")
         # Page rendering
         page = Page(wsgi_request)
 
@@ -61,7 +63,7 @@ class RegistrationView (FreeAccessView, ThemeView):
 
         page.add_css_files ( [ "css/onelab.css", "css/registration.css", "css/jquery.qtip.min.css", "css/jquery.ui.combobox.css" ] )
         page.expose_js_metadata()
-        print "############ BREAKPOINT 2 #################"
+        print("############ BREAKPOINT 2 #################")
         if method == 'POST':
             reg_form = {}
             # The form has been submitted
@@ -70,7 +72,7 @@ class RegistrationView (FreeAccessView, ThemeView):
             current_site = Site.objects.get_current()
             current_site = current_site.domain
            
-            print "############ BREAKPOINT 3 #################"
+            print("############ BREAKPOINT 3 #################")
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)
             email_hash = md5(str(salt)+post_email).hexdigest()
@@ -87,13 +89,13 @@ class RegistrationView (FreeAccessView, ThemeView):
                 'validation_link': current_site + '/portal/email_activation/'+ email_hash
             }
 
-            print "############ BREAKPOINT 4 #################"
+            print("############ BREAKPOINT 4 #################")
             auth = wsgi_request.POST.get('org_name', None)
             if auth is None or auth == "":
                 errors.append('Organization required: please select one or request its addition')
             else:
                
-                print "############ BREAKPOINT 5 #################"
+                print("############ BREAKPOINT 5 #################")
                 
                 # Construct user_hrn from email (XXX Should use common code)
                 split_email = user_request['email'].split("@")[0] 
@@ -183,7 +185,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                     return render(wsgi_request, self.template, {'theme': self.theme}) 
 
         else:
-            print "############ BREAKPOINT A #################"
+            print("############ BREAKPOINT A #################")
             user_request = {}
             ## this is coming from onelab website onelab.eu
             reg_form = {
@@ -193,7 +195,7 @@ class RegistrationView (FreeAccessView, ThemeView):
                 }
             # log user activity
             activity.user.signup(self.request)
-            print "############ BREAKPOINT B #################"
+            print("############ BREAKPOINT B #################")
 
         template_env = {
           #'topmenu_items': topmenu_items_live('Register', page),
@@ -204,5 +206,5 @@ class RegistrationView (FreeAccessView, ThemeView):
         template_env.update(user_request)
         template_env.update(reg_form)
         template_env.update(page.prelude_env ())
-        print "############ BREAKPOINT C #################"
+        print("############ BREAKPOINT C #################")
         return render(wsgi_request, self.template,template_env)
