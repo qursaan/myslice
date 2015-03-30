@@ -31,7 +31,7 @@ class ManifoldBackend:
                 logger.error("GetSession failed", sessions_result.error())
                 return
             session = sessions[0]
-            logger.debug("SESSION : %s" % session)
+            logger.debug("SESSION : {}".format(session))
             
             # Change to session authentication
             api.auth = {'AuthMethod': 'session', 'session': session['session']}
@@ -45,16 +45,17 @@ class ManifoldBackend:
                 logger.error("GetPersons failed",persons_result.error())
                 return
             person = persons[0]
-            logger.debug("PERSON : %s" % person)
-            #logger.info("%s %s <%s> logged in" % (person['config']['first_name'], person['config']['last_name'], person['config']['email']))
+            logger.debug("PERSON : {}".format(person))
+            #logger.info("{} {} <{}> logged in"\
+            #    .format(person['config']['first_name'], person['config']['last_name'], person['config']['email']))
 
             request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
-        except ManifoldException, e:
-            logger.error("Manifold Auth Backend: %s" % e.manifold_result)
-        except Exception, e:
-            logger.error("Manifold Auth Backend: %s" % e)
-            #import traceback
-            #traceback.print_exc()
+        except ManifoldException as e:
+            logger.error("ManifoldException in Auth Backend: {}".format(e.manifold_result))
+        except Exception as e:
+            logger.error("Exception in Manifold Auth Backend: {}".format(e))
+            import traceback
+            traceback.print_exc()
             return None
 
         try:

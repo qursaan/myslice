@@ -1,14 +1,18 @@
 # Manifold API Python interface
-import copy, xmlrpclib, ssl
-from myslice.settings import config, logger, DEBUG
+from __future__ import print_function
+
+import copy
+import xmlrpclib
+import ssl
 
 from django.contrib import messages
 from django.shortcuts import redirect
-from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException
+
 from manifold.core.result_value import ResultValue
 
-debug_deep=False
-#debug_deep=True
+from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
+
+from myslice.settings import config, logger
 
 class ManifoldAPI:
 
@@ -25,7 +29,8 @@ class ManifoldAPI:
         # Manifold uses a self signed certificate
         # https://www.python.org/dev/peps/pep-0476/
         if hasattr(ssl, '_create_unverified_context'): 
-            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True, context=ssl._create_unverified_context())
+            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True,
+                                           context=ssl._create_unverified_context())
         else :
             self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
 
@@ -39,52 +44,41 @@ class ManifoldAPI:
 
         def func(*args, **kwds):
             import time
-            
             start = time.time()
+            
+            # the message to display
+            auth_message = "<AuthMethod not set in {}>".format(auth) if 'AuthMethod' not in self.auth \
+                           else "[session]" if self.auth['AuthMethod'] == 'session' \
+                           else "user:{}".format(self.auth['Username']) if self.auth['AuthMethod'] == 'password' \
+                           else "anonymous" if self.auth['AuthMethod'] == 'anonymous' \
+                           else "[???]" + "{}".format(self.auth)
+            end_message = "MANIFOLD {}( {}( {} ) ) with auth={} to {}"\
+                          .format(methodName,
+                                  args[0]['action'] or '', 
+                                  args[0]['object'] or '',
+                                  auth_message,
+                                  self.url)
             try:
-                
-                #logger.debug("MANIFOLD %s( %s( %s ) ) to %s" % (methodName, args[0]['action'], args[0]['object'], self.url))
-                
-                if ('Username' in self.auth) :
-                    username = self.auth['Username']
-                else :
-                    username = "-"
-                
                 args += ({ 'authentication': self.auth },)
-                                
                 result = getattr(self.server, methodName)(*args, **kwds)
-                
-                logger.debug("MANIFOLD %s( %s( %s ) ) as %s to %s executed in %s seconds -> %s" % 
-                             (methodName, 
-                              args[0]['action'] or '', 
-                              args[0]['object'] or '',
-                              username,
-                              self.url, 
-                              (time.time() - start),
-                              args))
-
+                logger.debug("{} executed in {} seconds -> {}"\
+                             .format(end_message, time.time() - start, truncate_result(result)))
                 return ResultValue(**result)
 
-            except Exception, error:
-                if True: 
-                    print "===== xmlrpc catch-all exception:", error
-                    import traceback
-                    traceback.print_exc(limit=3)
+            except Exception as error:
+                print("===== xmlrpc catch-all exception:", error)
+                import traceback
+                traceback.print_exc(limit=3)
                 
                 if "Connection refused" in error:
                     raise ManifoldException ( ManifoldResult (code=ManifoldCode.SERVER_UNREACHABLE,
-                                                              output="%s answered %s" % (self.url,error)))
+                                                              output="{} answered {}".format(self.url, error)))
                 # otherwise
-                logger.error("MANIFOLD %s( %s( %s ) ) as %s to %s executed in %s seconds -> %s" % 
-                             (methodName, 
-                              args[0]['action'] or '', 
-                              args[0]['object'] or '',
-                              username,
-                              self.url, 
-                              (time.time() - start),
-                              args))
-                logger.error("MANIFOLD %s", error)
-                raise ManifoldException ( ManifoldResult (code = ManifoldCode.SERVER_UNREACHABLE, output = "%s" % error) )
+                logger.error("{} FAILED - executed in {} seconds"\
+                             .format(end_message, time.time() - start)) 
+                logger.error("MANIFOLD {}".format(error))
+                raise ManifoldException ( ManifoldResult (code = ManifoldCode.SERVER_UNREACHABLE,
+                                                          output = "{}".format(error)))
 
         return func
 
@@ -92,8 +86,8 @@ def _execute_query(request, query, manifold_api_session_auth):
     
     manifold_api = ManifoldAPI(auth = manifold_api_session_auth)
     
-    logger.debug("MANIFOLD QUERY : %s" % " ".join(str(query).split()))
-    #logger.debug("MANIFOLD DICT : %s" % query.to_dict())
+    logger.debug("MANIFOLD QUERY : {}".format(" ".join(str(query).split())))
+    #logger.debug("MANIFOLD DICT : {}".format(query.to_dict()))
     result = manifold_api.forward(query.to_dict())
     if result['code'] == 2:
         # this is gross; at the very least we need to logout() 
@@ -103,10 +97,10 @@ def _execute_query(request, query, manifold_api_session_auth):
         del request.session['manifold']
         # Flush django session
         request.session.flush()
-        #raise Exception, 'Error running query: %r' % result
+        #raise Exception, 'Error running query: {}'.format(result)
     
     if result['code'] == 1:
-        log.warning("MANIFOLD : %s" % result['description'])
+        log.warning("MANIFOLD : {}".format(result['description']))
 
     # XXX Handle errors
     #Error running query: {'origin': [0, 'XMLRPCAPI'], 'code': 2, 'description': 'No such session: No row was found for one()', 'traceback': 'Traceback (most recent call last):\n  File "/usr/local/lib/python2.7/dist-packages/manifold/core/xmlrpc_api.py", line 68, in xmlrpc_forward\n    user = Auth(auth).check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 245, in check\n    return self.auth_method.check()\n  File "/usr/local/lib/python2.7/dist-packages/manifold/auth/__init__.py", line 95, in check\n    raise AuthenticationFailure, "No such session: %s" % e\nAuthenticationFailure: No such session: No row was found for one()\n', 'type': 2, 'ts': None, 'value': None}
@@ -126,5 +120,8 @@ def execute_query(request, query):
 
 def execute_admin_query(request, query):
     admin_user, admin_password = config.manifold_admin_user_password()
+    if not admin_user or not admin_password:
+        logger.error("""CONFIG: you need to setup admin_user and admin_password in myslice.ini
+Some functions won't work properly until you do so""")
     admin_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
     return _execute_query(request, query, admin_auth)
