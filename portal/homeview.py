@@ -61,7 +61,6 @@ class HomeView (FreeAccessView, ThemeView):
         elif auth_result is not None:
             user=auth_result
             if user.is_active:
-                print "LOGGING IN"
                 login(request, user)
                 
                 if request.user.is_authenticated(): 
