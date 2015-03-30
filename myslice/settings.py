@@ -242,7 +242,7 @@ INSTALLED_APPS = [
     # our django project
     'myslice',
     # the core of the UI
-    'auth', 
+    'localauth', 
     'manifoldapi',
     'unfold',
     # plugins
@@ -336,7 +336,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ('auth.manifoldbackend.ManifoldBackend',
+AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
                            'django.contrib.auth.backends.ModelBackend')
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests

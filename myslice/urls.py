@@ -65,7 +65,7 @@ urls = [
     # seems to be what login_required uses to redirect ...
     (r'^accounts/login/$', portal.homeview.HomeView.as_view()),
     (r'^login/?$', portal.homeview.HomeView.as_view()),
-    (r'^logout/?$', 'auth.views.logout_user'),
+    (r'^logout/?$', 'localauth.views.logout_user'),
     #
     # the manifold proxy
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifoldapi.manifoldproxy.proxy'),
