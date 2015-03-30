@@ -28,7 +28,7 @@ class ManifoldBackend:
             sessions_result = api.forward(Query.create('local:session').to_dict())
             sessions = sessions_result.ok_value()
             if not sessions:
-                logger.error("GetSession failed", sessions_result.error())
+                logger.error("GetSession failed: {}".format(sessions_result.error()))
                 return
             session = sessions[0]
             logger.debug("SESSION : {}".format(session))
@@ -42,7 +42,7 @@ class ManifoldBackend:
             persons_result = api.forward(Query.get('local:user').to_dict())
             persons = persons_result.ok_value()
             if not persons:
-                logger.error("GetPersons failed",persons_result.error())
+                logger.error("GetPersons failed: {}".format(persons_result.error()))
                 return
             person = persons[0]
             logger.debug("PERSON : {}".format(person))
