@@ -12,7 +12,12 @@ import components
 # admin.autodiscover()
 
 # to enable insert_above stuff
-from django.template.loader import add_to_builtins
+# add_to_builtins has changed location with django-1.7
+# also note this will probably go away some day
+try:
+    from django.template.loader import add_to_builtins
+except:
+    from django.template.base import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
 from settings import auxiliaries, INSTALLED_APPS
