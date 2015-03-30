@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.template             import RequestContext
 from django.shortcuts            import render_to_response
 
@@ -26,7 +28,7 @@ class PlatformView(FreeAccessView, ThemeView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
-            print "%s = %s" % (key, value)       
+            print("%s = %s" % (key, value))       
             if key == "platformname":
                 platformname=value
                 

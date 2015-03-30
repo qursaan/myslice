@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os.path, re
 import json
 from random import randint
@@ -229,7 +231,7 @@ class JoinView (FreeAccessView, ThemeView):
                     msg.send()
     
                 except Exception, e:
-                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                    print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
                     import traceback
                     traceback.print_exc()
 

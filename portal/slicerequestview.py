@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.shortcuts           import render
 from django.contrib.sites.models import Site
 
@@ -87,7 +89,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         #    pi = "is_pi"
 
         pi = authority_check_pis (wsgi_request, user_email)
-        print "SLICEREQUESTVIEW.PY -----  pi=",pi
+        print("SLICEREQUESTVIEW.PY -----  pi=",pi)
 
         # Page rendering
         page = Page(wsgi_request)

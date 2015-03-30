@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import json
 from manifold.core.query         import Query
 from manifoldapi.manifoldapi     import execute_query
@@ -25,7 +27,7 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
         #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 
-        print "Dashboard page"
+        print("Dashboard page")
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
         testbed_query  = Query().get('network').select('network_hrn','platform','version')
@@ -47,8 +49,8 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 #            root_authority = sub_authority[0]
 #            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
 #        else:
-        print "SLICE QUERY"
-        print "-" * 80
+        print("SLICE QUERY")
+        print("-" * 80)
         slice_query = Query().get('myslice:user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)

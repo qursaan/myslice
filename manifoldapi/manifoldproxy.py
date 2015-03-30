@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import json
 import os.path
 
@@ -85,7 +87,7 @@ def proxy (request,format):
         #
         # resource reservation
         if (manifold_query.action.lower() == 'update') :
-            print result['value'][0]
+            print(result['value'][0])
             if 'resource' in result['value'][0] :
                 for resource in result['value'][0]['resource'] :
                     activity.slice.resource(request, 
@@ -114,5 +116,5 @@ def proxy (request,format):
 # this however turns out disappointing/not very informative
 failure_answer=[ "csrf_failure" ]
 def csrf_failure(request, reason=""):
-    print "CSRF failure with reason '%s'"%reason
+    print("CSRF failure with reason '%s'"%reason)
     return HttpResponseForbidden (json.dumps (failure_answer), mimetype="application/json")

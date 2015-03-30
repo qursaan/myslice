@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.shortcuts               import render_to_response
 
 from unfold.loginrequired           import LoginRequiredView
@@ -19,7 +21,7 @@ def dispatch(request, object_type, object_name):
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('fields'):
-            print req_items.getlist('fields[]')
+            print(req_items.getlist('fields[]'))
             o.setFields(req_items.getlist('fields[]'))
         elif el[0].startswith('options'):
             o.options = req_items.getlist('options[]')

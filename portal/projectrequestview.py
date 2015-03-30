@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.shortcuts           import render
 from django.contrib.sites.models import Site
 
@@ -119,7 +121,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                 errors.append('Project name is mandatory')
             
             if not errors:
-                print "is_pi on auth_hrn = ", user_authority
+                print("is_pi on auth_hrn = ", user_authority)
                 if is_pi(wsgi_request, user_hrn, user_authority):
                     # PIs can directly create/join project in their own authority...
                     if 'join' in wsgi_request.POST:

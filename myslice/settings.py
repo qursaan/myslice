@@ -242,7 +242,7 @@ INSTALLED_APPS = [
     # our django project
     'myslice',
     # the core of the UI
-    'auth', 
+    'localauth', 
     'manifoldapi',
     'unfold',
     # plugins
@@ -269,7 +269,7 @@ BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print("Using devel auxiliary",aux)
+        print(("Using devel auxiliary",aux))
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
@@ -336,7 +336,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ('auth.manifoldbackend.ManifoldBackend',
+AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
                            'django.contrib.auth.backends.ModelBackend')
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests

@@ -6,6 +6,8 @@
 # The secret is a 64 chars string that is used to sign the request
 # The generated signature is a SHA256 hes digest
 
+from __future__ import print_function
+
 import urllib, urllib2
 import threading
 import hmac
@@ -37,10 +39,10 @@ else :
 def logWrite(request, action, message, objects = None):
     
     if not apikey :
-        print "===============>> activity: no apikey"
+        print("===============>> activity: no apikey")
         return
     if not secret :
-        print "===============>> activity: no secret"
+        print("===============>> activity: no secret")
         return
     
     timestamp = time.mktime(datetime.datetime.today().timetuple())
@@ -69,12 +71,12 @@ def logWrite(request, action, message, objects = None):
     
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
-        print "===============>> activity: %s <%s> %s" % (action, request.user,message)
+        print("===============>> activity: %s <%s> %s" % (action, request.user,message))
         content = result.read()
     except urllib2.URLError as e:
-        print "===============>> activity: connection to " + server + " impossible, could not log action"
-        print e.strerror
-        print ""
+        print("===============>> activity: connection to " + server + " impossible, could not log action")
+        print(e.strerror)
+        print("")
 
 def log(request, action, message, objects = None):
     # Create a new thread in Daemon mode to send the log entry

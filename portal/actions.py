@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.http                    import HttpResponse
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query,execute_admin_query
@@ -82,7 +84,7 @@ def authority_check_pis(request, user_email):
         return pi_status
 
     except Exception,e:
-        print "Exception in actions.py in authority_check_pis %s" % e
+        print("Exception in actions.py in authority_check_pis %s" % e)
         return None
 
 
@@ -99,7 +101,7 @@ def authority_add_pis(request, authority_hrn,user_hrn):
         newpis = authority_get_pis (request, authority_hrn)
         return newpis
     except Exception,e: 
-        print "Exception in actions.py in authority_add_pis %s" % e
+        print("Exception in actions.py in authority_add_pis %s" % e)
         return None
 
 
@@ -116,13 +118,13 @@ def authority_remove_pis(request, authority_hrn,user_hrn):
         newpis = authority_get_pis (request, authority_hrn)
         return newpis
     except Exception,e: 
-        print "Exception in actions.py in authority_remove_pis %s" % e
+        print("Exception in actions.py in authority_remove_pis %s" % e)
         return None
 
 
 def authority_get_pi_emails(request, authority_hrn):
     pi_users = authority_get_pis(request,authority_hrn)
-    print "pi_users = %s" % pi_users
+    print("pi_users = %s" % pi_users)
 
     if any(pi['pi_users'] == None or not pi['pi_users']  for pi in pi_users):
         #theme.template_name = 'email_default_recipients.txt' 
@@ -175,12 +177,12 @@ def clear_user_creds(request, user_email):
                             return None
 
     except Exception,e:
-        print "Exception in actions.py in clear_user_creds %s" % e
+        print("Exception in actions.py in clear_user_creds %s" % e)
         return None
 
 def is_pi(wsgi_request, user_hrn, authority_hrn):
     # authorities from user where user_hrn == "ple.upmc.jordan_auge"
-    print "#### actions.py is_pi authority_hrn = ", authority_hrn
+    print("#### actions.py is_pi authority_hrn = ", authority_hrn)
     try:
         # CACHE PB with fields
         page = Page(wsgi_request)
@@ -197,7 +199,7 @@ def is_pi(wsgi_request, user_hrn, authority_hrn):
             if authority_hrn in user_detail['pi_authorities']:
                 return True
     except Exception,e:
-        print "Exception in actions.py in is_pi %s" % e
+        print("Exception in actions.py in is_pi %s" % e)
     return False
     
 # SFA get record
@@ -224,7 +226,7 @@ def sfa_add_authority(request, authority_params):
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
     query = Query.create('myslice:authority').set(authority_params).select('authority_hrn')
     results = execute_query(request, query)
-    print "sfa_add_auth results=",results
+    print("sfa_add_auth results=",results)
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % authority_params['hrn']
     return results
@@ -430,7 +432,7 @@ def make_request_authority(authority):
     return request
 
 def make_requests(pending_users, pending_slices, pending_authorities, pending_projects, pending_joins):
-    print "$$$$$$$$$$$$$$$  make_request"
+    print("$$$$$$$$$$$$$$$  make_request")
     requests = []
     for user in pending_users:
         requests.append(make_request_user(user))
@@ -445,7 +447,7 @@ def make_requests(pending_users, pending_slices, pending_authorities, pending_pr
     return requests   
 
 def get_request_by_id(ids):
-    print "$$$$$$$$$$$$$$$$  get_request_by_id"
+    print("$$$$$$$$$$$$$$$$  get_request_by_id")
     sorted_ids = { 'user': [], 'slice': [], 'authority': [], 'project': [], 'join': [] }
     for type__id in ids:
         type, id = type__id.split('__')
@@ -467,7 +469,7 @@ def get_request_by_id(ids):
     return make_requests(pending_users, pending_slices, pending_authorities, pending_projects, pending_joins)
 
 def get_requests(authority_hrns=None):
-    print "$$$$$$$$$$$$$   get_request_by_authority auth_hrns = ", authority_hrns
+    print("$$$$$$$$$$$$$   get_request_by_authority auth_hrns = ", authority_hrns)
     if not authority_hrns:
         ## get those pending users who have confirmed their emails
         pending_users  = PendingUser.objects.filter(status__iexact = 'True')
@@ -574,7 +576,7 @@ def portal_validate_request(wsgi_request, request_ids):
                     #'pi'        : None,
                     #'enabled'    : True
                 }
-                print "ADD Authority"
+                print("ADD Authority")
                 sfa_add_authority(wsgi_request, sfa_authority_params)
                 request_status['SFA authority'] = {'status': True }
                 PendingAuthority.objects.get(id=request['id']).delete()
@@ -688,7 +690,7 @@ def portal_reject_request(wsgi_request, request_ids):
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
                 except Exception, e:
-                    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"   
+                    print("Failed to send email, please check the mail templates and the SMTP configuration of your server")   
 
                 # removing from Django portal_pendinguser
                 PendingUser.objects.get(id=request['id']).delete()
@@ -729,7 +731,7 @@ def portal_reject_request(wsgi_request, request_ids):
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
             except Exception, e:
-                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
                       
             PendingSlice.objects.get(id=request['id']).delete()
 
@@ -768,7 +770,7 @@ def portal_reject_request(wsgi_request, request_ids):
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
             except Exception, e:
-                print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
             PendingAuthority.objects.get(id=request['id']).delete()
 
@@ -867,7 +869,7 @@ def create_slice(wsgi_request, request):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
         except Exception, e:
-            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+            print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
        
     return results
 
@@ -905,7 +907,7 @@ def create_pending_slice(wsgi_request, request, email):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
-        print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+        print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
 
 def create_pending_project(wsgi_request, request):
@@ -1062,7 +1064,7 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
         except Exception, e:
-            print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+            print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
     return results
 
@@ -1100,7 +1102,7 @@ def iotlab_create_user (wsgi_request, request, namespace = None, as_admin=False)
    
     iotlab_user_params1 = json.dumps(iotlab_user_params)
     r=requests.post(url=URL_REST, data=iotlab_user_params1, headers=headers, auth=auth)
-    print 'Create iotlab user : ', r.status_code, r.text
+    print('Create iotlab user : ', r.status_code, r.text)
     return r.text
 
 def create_user(wsgi_request, request, namespace = None, as_admin = False):
@@ -1197,7 +1199,7 @@ def create_pending_user(wsgi_request, request, user_detail):
         }
         manifold_add_account(wsgi_request, account_params)
     except Exception, e:
-        print "Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email'])
+        print("Failed creating manifold account on platform %s for user: %s" % ('myslice', request['email']))
 
     try:
         # Send an email: the recipients are the PI of the authority
@@ -1222,6 +1224,6 @@ def create_pending_user(wsgi_request, request, user_detail):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
-        print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+        print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
         import traceback
         traceback.print_exc()

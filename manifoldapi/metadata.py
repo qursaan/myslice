@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import json 
 import os.path
 
@@ -34,10 +36,10 @@ class MetaData:
         # xxx need a way to export error messages to the UI
         if result['code'] == 1: # warning
             # messages.warning(request, result['description'])
-            print ("METADATA WARNING -",request,result['description'])
+            print(("METADATA WARNING -",request,result['description']))
         elif result['code'] == 2:
             # messages.error(request, result['description'])
-            print ("METADATA ERROR -",request,result['description'])
+            print(("METADATA ERROR -",request,result['description']))
             # XXX FAIL HERE XXX
             return
 
@@ -58,5 +60,5 @@ class MetaData:
         return self.hash_by_object[object]['column'].sort()
 
     def get_field_type(self, object, field):
-        if debug: print "Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon"
+        if debug: print("Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon")
         return field

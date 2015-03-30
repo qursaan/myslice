@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from unfold.plugin import Plugin
 
 class UnivbrisTopo(Plugin):
@@ -5,20 +7,21 @@ class UnivbrisTopo(Plugin):
     def __init__ (self, query=None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
-	self.query_uuid = query.query_uuid if query else None
-	print "called univbris topo plugin"
+        self.query_uuid = query.query_uuid if query else None
+        print("called univbris topo plugin")
 
     def template_file (self):
-	try:
-        	return "univbris_topology.html"
-	except:
-		print "error template"
+        try:
+            return "univbris_topology.html"
+        except:
+            print("error template")
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
-                           "js/manifold.js", "js/manifold-query.js", 
-                           "js/unfold-helper.js",
+            'js_files' : [
+                "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
+                "js/manifold.js", "js/manifold-query.js", 
+                "js/unfold-helper.js",
                 'js/univbristopo.js', 'js/d3.v2.min.js','js/tooltip.topology.js',
             ],
             'css_files': [

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from sfa.trust.certificate      import Keypair, Certificate
 from sfa.client.sfaserverproxy  import SfaServerProxy
 from sfa.client.return_value    import ReturnValue
@@ -58,15 +60,15 @@ def dispatch(request, method):
     from manifoldapi.manifoldapi    import execute_admin_query
     for pf in platforms:
         platform = get_platform_config(pf)
-        print platform
+        print(platform)
         if 'sm' in platform and len(platform['sm']) > 0:
-            print 'sm'
+            print('sm')
             server_url = platform['sm']
         if 'rm' in platform and len(platform['rm']) > 0:
-            print 'rm'
+            print('rm')
             server_url = platform['rm']
         if 'registry' in platform and len(platform['registry']) > 0:
-            print 'registry'
+            print('registry')
             server_url = platform['registry']
     
         if not Config.has_option('monitor', 'cert') :
