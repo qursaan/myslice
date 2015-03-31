@@ -43,7 +43,6 @@ class SessionCache(dict):
         Get the auth previously attached to the request's session, or None
         """
         result = self._get(request, 'auth')
-        logger.info('OUT {}'.format(result))
         return result
 
     def store_auth(self, request, auth):
@@ -51,7 +50,6 @@ class SessionCache(dict):
         Store the auth object attached to this request's session
         create that extension if needed
         """
-        logger.info('IN {}'.format(auth))
         return self._store(request, 'auth', auth)
 
     def get_metadata(self, request):
