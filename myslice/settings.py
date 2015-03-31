@@ -249,8 +249,6 @@ INSTALLED_APPS = [
     'plugins',
     # views - more or less stable 
     'ui',
-    # managing database migrations
-    'south', 
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
 	# FORGE Plugin app
@@ -259,8 +257,16 @@ INSTALLED_APPS = [
     # 'django.contrib.admindocs',
     'portal',
 ]
+# with django-1.7 we leave south and use native migrations
+# managing database migrations
+import django
+major, minor, _, _, _ = django.VERSION
+if major == 1 and minor <= 6:
+    INSTALLED_APPS.append('south')
+
 # this app won't load in a build environment
-if not building: INSTALLED_APPS.append ('rest')
+if not building:
+    INSTALLED_APPS.append ('rest')
 
 for component in components.list() :
     INSTALLED_APPS.append(component)
