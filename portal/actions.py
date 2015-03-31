@@ -628,14 +628,14 @@ def validate_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
     status = portal_validate_request(request, ids)
     json_answer = json.dumps(status)
-    return HttpResponse (json_answer, mimetype="application/json")
+    return HttpResponse (json_answer, content_type="application/json")
 
 
 def reject_action(request, **kwargs):
     ids = filter(None, kwargs['id'].split('/'))
     status = portal_reject_request(request, ids)
     json_answer = json.dumps(status)
-    return HttpResponse (json_answer, mimetype="application/json")
+    return HttpResponse (json_answer, content_type="application/json")
 
 
 def portal_reject_request(wsgi_request, request_ids):

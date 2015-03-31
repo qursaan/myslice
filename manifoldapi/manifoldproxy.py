@@ -38,14 +38,14 @@ def proxy (request,format):
     # expecting a POST
     if request.method != 'POST':
         logger.error("MANIFOLDPROXY unexpected method {} -- exiting".format(request.method))
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        return HttpResponse ({"ret":0}, content_type="application/json")
     # we only support json for now
     # if needed in the future we should probably cater for
     # format_in : how is the query encoded in POST
     # format_out: how to serve the results
     if format != 'json':
         logger.error("MANIFOLDPROXY unexpected format {} -- exiting".format(format))
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        return HttpResponse ({"ret":0}, content_type="application/json")
     try:
         # translate incoming POST request into a query object
         #logger.debug("MANIFOLDPROXY request.POST {}".format(request.POST))
@@ -63,10 +63,10 @@ def proxy (request,format):
         else:
             manifold_api_session_auth = SessionCache().get_auth(request)
             if not manifold_api_session_auth:
-                return HttpResponse (json.dumps({'code':0,'value':[]}), mimetype="application/json")
+                return HttpResponse (json.dumps({'code':0,'value':[]}), content_type="application/json")
                 
         if debug_empty and manifold_query.action.lower()=='get':
-            return HttpResponse (json.dumps({'code':0,'value':[]}), mimetype="application/json")
+            return HttpResponse (json.dumps({'code':0,'value':[]}), content_type="application/json")
                 
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
@@ -101,13 +101,13 @@ def proxy (request,format):
         
         json_answer=json.dumps(result)
 
-        return HttpResponse (json_answer, mimetype="application/json")
+        return HttpResponse (json_answer, content_type="application/json")
 
     except Exception as e:
         logger.error("MANIFOLDPROXY {}".format(e))
         import traceback
         logger.error(traceback.format_exc())
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        return HttpResponse ({"ret":0}, content_type="application/json")
 
 #################### 
 # see CSRF_FAILURE_VIEW in settings.py
@@ -116,4 +116,4 @@ def proxy (request,format):
 failure_answer=[ "csrf_failure" ]
 def csrf_failure(request, reason=""):
     logger.error("CSRF failure with reason '{}'".format(reason))
-    return HttpResponseForbidden (json.dumps (failure_answer), mimetype="application/json")
+    return HttpResponseForbidden (json.dumps (failure_answer), content_type="application/json")
