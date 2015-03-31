@@ -12,6 +12,8 @@ from manifoldapi                import ManifoldAPI
 from manifoldresult             import ManifoldException
 from manifold.util.log          import Log
 
+from unfold.sessioncache import SessionCache
+
 from myslice.settings import config, logger
 
 # register activity
@@ -59,9 +61,8 @@ def proxy (request,format):
             admin_user, admin_password = config.manifold_admin_user_password()
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
-            if 'manifold' in request.session:
-                manifold_api_session_auth = request.session['manifold']['auth']
-            else:
+            manifold_api_session_auth = SessionCache().get_auth(request)
+            if not manifold_api_session_auth:
                 return HttpResponse (json.dumps({'code':0,'value':[]}), mimetype="application/json")
                 
         if debug_empty and manifold_query.action.lower()=='get':

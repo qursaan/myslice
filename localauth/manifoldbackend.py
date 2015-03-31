@@ -7,6 +7,8 @@ from manifold.core.query        import Query
 
 from myslice.settings import config, logger, DEBUG
 
+from unfold.sessioncache import SessionCache
+
 # Name my backend 'ManifoldBackend'
 class ManifoldBackend:
 
@@ -34,7 +36,8 @@ class ManifoldBackend:
             logger.debug("SESSION : {}".format(session))
             
             # Change to session authentication
-            api.auth = {'AuthMethod': 'session', 'session': session['session']}
+            session_auth = {'AuthMethod': 'session', 'session': session['session']}
+            api.auth = session_auth
             self.api = api
 
             # Get account details
@@ -49,7 +52,8 @@ class ManifoldBackend:
             #logger.info("{} {} <{}> logged in"\
             #    .format(person['config']['first_name'], person['config']['last_name'], person['config']['email']))
 
-            request.session['manifold'] = {'auth': api.auth, 'person': person, 'expires': session['expires']}
+            SessionCache().store_auth(request, session_auth)
+
         except ManifoldException as e:
             logger.error("ManifoldException in Auth Backend: {}".format(e.manifold_result))
         except Exception as e:

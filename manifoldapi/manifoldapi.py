@@ -7,8 +7,9 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from manifold.core.result_value import ResultValue
-
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
+
+from unfold.sessioncache import SessionCache
 
 from myslice.settings import config, logger
 
@@ -45,12 +46,12 @@ class ManifoldAPI:
             start = time.time()
             
             # the message to display
-            auth_message = "<AuthMethod not set in {}>".format(auth) if 'AuthMethod' not in self.auth \
+            auth_message = "<AuthMethod not set in {}>".format(self.auth) if 'AuthMethod' not in self.auth \
                            else "[session]" if self.auth['AuthMethod'] == 'session' \
                            else "user:{}".format(self.auth['Username']) if self.auth['AuthMethod'] == 'password' \
                            else "anonymous" if self.auth['AuthMethod'] == 'anonymous' \
                            else "[???]" + "{}".format(self.auth)
-            end_message = "MANIFOLD {}( {}( {} ) ) with auth={} to {}"\
+            end_message = "MANIFOLD <- {}( {}( {} ) ) with auth={} to {}"\
                           .format(methodName,
                                   args[0]['action'] or '', 
                                   args[0]['object'] or '',
@@ -84,15 +85,14 @@ def _execute_query(request, query, manifold_api_session_auth):
     
     manifold_api = ManifoldAPI(auth = manifold_api_session_auth)
     
-    logger.debug("MANIFOLD QUERY : {}".format(" ".join(str(query).split())))
-    #logger.debug("MANIFOLD DICT : {}".format(query.to_dict()))
+    logger.debug("MANIFOLD -> QUERY : {}".format(" ".join(str(query).split())))
     result = manifold_api.forward(query.to_dict())
     if result['code'] == 2:
         # this is gross; at the very least we need to logout() 
         # but most importantly there is a need to refine that test, since 
         # code==2 does not necessarily mean an expired session
         # XXX only if we know it is the issue
-        del request.session['manifold']
+        SessionCache().end_session(request)
         # Flush django session
         request.session.flush()
         #raise Exception, 'Error running query: {}'.format(result)
@@ -106,13 +106,13 @@ def _execute_query(request, query, manifold_api_session_auth):
     return result['value'] 
 
 def execute_query(request, query):
-    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
+    
+    manifold_api_session_auth = SessionCache().get_auth(request)
+    if not manifold_api_session_auth:
         request.session.flush()
         #raise Exception, "User not authenticated"
         host = request.get_host()
         return redirect('/')
-    
-    manifold_api_session_auth = request.session['manifold']['auth']
     
     return _execute_query(request, query, manifold_api_session_auth)
 
