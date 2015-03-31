@@ -1,6 +1,6 @@
-from __future__ import print_function
-
 from unfold.plugin import Plugin
+
+from myslice.settings import logger
 
 class UnivbrisFv (Plugin):
 
@@ -80,7 +80,7 @@ Current implementation makes the following assumptions
         if self.checkboxes:
             # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
             if 'aoColumns' in self.datatables_options:
-                print('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
+                logger.warning('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
                 del self.datatables_options['aoColumns']
             # set aoColumnDefs in datatables_options - might already have stuff in there
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])

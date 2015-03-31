@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from django.contrib.auth.decorators     import login_required
 from django.utils.decorators            import method_decorator
 from django.http                        import HttpResponseRedirect
@@ -7,6 +5,8 @@ from django.http                        import HttpResponseRedirect
 from django.views.generic.base          import TemplateView
 
 from manifoldapi.manifoldresult            import ManifoldException
+
+from myslice.settings import logger
 
 ###
 # IMPORTANT NOTE
@@ -35,7 +35,6 @@ class LoginRequiredView (TemplateView):
 
 def logout_on_manifold_exception (fun_that_returns_httpresponse):
     def wrapped (request, *args, **kwds):
-#        print 'wrapped by logout_on_manifold_exception'
         try:
             return fun_that_returns_httpresponse(request,*args, **kwds)
         except ManifoldException, manifold_result:
@@ -47,9 +46,9 @@ def logout_on_manifold_exception (fun_that_returns_httpresponse):
             return HttpResponseRedirect ('/')
         except Exception, e:
             # xxx we need to sugarcoat this error message in some error template...
-            print("Unexpected exception",e)
+            logger.error("Unexpected exception {}".format(e))
             import traceback
-            traceback.print_exc()
+            logger.error(traceback.format_exc())
             return HttpResponseRedirect ('/')
     return wrapped
 

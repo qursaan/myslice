@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from manifold.core.query        import Query
 from unfold.page                import Page
 
@@ -24,7 +22,6 @@ class ResourceView(FreeAccessView, ThemeView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
-            print("%s = %s" % (key, value))       
             if key == "urn":
                 resource_urn=value
                 

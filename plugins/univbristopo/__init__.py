@@ -1,6 +1,6 @@
-from __future__ import print_function
-
 from unfold.plugin import Plugin
+
+from myslice.settings import logger
 
 class UnivbrisTopo(Plugin):
     
@@ -8,13 +8,13 @@ class UnivbrisTopo(Plugin):
         Plugin.__init__ (self, **settings)
         self.query=query
         self.query_uuid = query.query_uuid if query else None
-        print("called univbris topo plugin")
+        logger.info("called univbris topo plugin")
 
     def template_file (self):
         try:
             return "univbris_topology.html"
-        except:
-            print("error template")
+        except Exception as e :
+            logger.error("error template {}".format(e))
 
     def requirements (self):
         reqs = {

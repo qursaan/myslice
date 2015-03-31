@@ -1,4 +1,4 @@
-from __future__ import print_function
+import json
 
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
@@ -20,8 +20,7 @@ from manifoldapi.manifoldapi        import execute_query
 from portal.actions                 import get_requests
 
 from myslice.theme import ThemeView
-
-import json
+from myslice.settings import logger
 
 class ManagementRequestsView (LoginRequiredView, ThemeView):
     template_name = "management-tab-requests.html"
@@ -49,7 +48,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
             sfa_platforms_query = Query().get('local:platform').filter_by('gateway_type', '==', 'sfa').select('platform_id', 'platform', 'auth_type')
             sfa_platforms = execute_query(self.request, sfa_platforms_query)
             for sfa_platform in sfa_platforms:
-                print("SFA PLATFORM > ", sfa_platform['platform'])
+                logger.info("SFA PLATFORM > {}".format(sfa_platform['platform']))
                 if not 'auth_type' in sfa_platform:
                     continue
                 auth = sfa_platform['auth_type']
@@ -57,7 +56,7 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
                     all_authorities.append(auth)
                 platform_ids.append(sfa_platform['platform_id'])
 
-            print("W: Hardcoding platform myslice")
+            logger.warning("W: Hardcoding platform myslice")
             # There has been a tweak on how new platforms are referencing a
             # so-called 'myslice' platform for storing authentication tokens.
             # XXX This has to be removed in final versions.
@@ -103,8 +102,8 @@ class ManagementRequestsView (LoginRequiredView, ThemeView):
             try:
                 for pa in pi_authorities_tmp:
                     pi_authorities |= set(pa['pi_authorities'])
-            except:
-                print('No pi_authorities')
+            except Exception as e:
+                logger.error('No pi_authorities')
 
             pi_credential_authorities = pi_authorities & credential_authorities
             pi_no_credential_authorities = pi_authorities - credential_authorities - credential_authorities_expired

@@ -46,7 +46,6 @@ def dispatch(request, action):
                 error = "Error in delete return value"
     except Exception, e:
         error = str(e)
-        #print "Exception : ",e
     if error is not None:
         ret = { "ret" : 1, "error" : error }
     elif not results :

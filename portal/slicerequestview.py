@@ -1,8 +1,9 @@
-from __future__ import print_function
+import json
+import time
+import re
 
 from django.shortcuts           import render
 from django.contrib.sites.models import Site
-
 
 from unfold.page                import Page
 
@@ -15,8 +16,7 @@ from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
 from myslice.theme import ThemeView
-
-import json, time, re
+from myslice.settings import logger
 
 import activity.user
 
@@ -89,7 +89,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         #    pi = "is_pi"
 
         pi = authority_check_pis (wsgi_request, user_email)
-        print("SLICEREQUESTVIEW.PY -----  pi=",pi)
+        logger.debug("SLICEREQUESTVIEW.PY -----  pi= {}".format(pi))
 
         # Page rendering
         page = Page(wsgi_request)

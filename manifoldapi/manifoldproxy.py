@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import json
 import os.path
 
@@ -14,7 +12,7 @@ from manifoldapi                import ManifoldAPI
 from manifoldresult             import ManifoldException
 from manifold.util.log          import Log
 
-from myslice.settings import config, logger, DEBUG
+from myslice.settings import config, logger
 
 # register activity
 import activity.slice
@@ -37,18 +35,18 @@ def proxy (request,format):
     
     # expecting a POST
     if request.method != 'POST':
-        logger.error("MANIFOLDPROXY unexpected method %s -- exiting" % request.method)
+        logger.error("MANIFOLDPROXY unexpected method {} -- exiting".format(request.method))
         return HttpResponse ({"ret":0}, mimetype="application/json")
     # we only support json for now
     # if needed in the future we should probably cater for
     # format_in : how is the query encoded in POST
     # format_out: how to serve the results
     if format != 'json':
-        logger.error("MANIFOLDPROXY unexpected format %s -- exiting" % format)
+        logger.error("MANIFOLDPROXY unexpected format {} -- exiting".format(format))
         return HttpResponse ({"ret":0}, mimetype="application/json")
     try:
         # translate incoming POST request into a query object
-        #logger.debug("MANIFOLDPROXY request.POST %s" % request.POST)
+        #logger.debug("MANIFOLDPROXY request.POST {}".format(request.POST))
 
         manifold_query = Query()
         #manifold_query = ManifoldQuery()
@@ -87,7 +85,7 @@ def proxy (request,format):
         #
         # resource reservation
         if (manifold_query.action.lower() == 'update') :
-            print(result['value'][0])
+            logger.debug(result['value'][0])
             if 'resource' in result['value'][0] :
                 for resource in result['value'][0]['resource'] :
                     activity.slice.resource(request, 
@@ -104,10 +102,10 @@ def proxy (request,format):
 
         return HttpResponse (json_answer, mimetype="application/json")
 
-    except Exception,e:
-        logger.error("MANIFOLDPROXY %s" % e)
+    except Exception as e:
+        logger.error("MANIFOLDPROXY {}".format(e))
         import traceback
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         return HttpResponse ({"ret":0}, mimetype="application/json")
 
 #################### 
@@ -116,5 +114,5 @@ def proxy (request,format):
 # this however turns out disappointing/not very informative
 failure_answer=[ "csrf_failure" ]
 def csrf_failure(request, reason=""):
-    print("CSRF failure with reason '%s'"%reason)
+    logger.error("CSRF failure with reason '{}'".format(reason))
     return HttpResponseForbidden (json.dumps (failure_answer), mimetype="application/json")

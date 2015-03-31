@@ -1,6 +1,6 @@
-from __future__ import print_function
-
 from unfold.plugin import Plugin
+
+from myslice.settings import logger
 
 class QueryTable (Plugin):
 
@@ -52,7 +52,7 @@ Current implementation makes the following assumptions
             _columns = columns
             _hidden_columns = []
         elif self.query:
-            print("self.query.fields = ", self.query_all.fields)
+            logger.debug("self.query.fields = {}".format(self.query_all.fields))
             # Columns displayed by default
             if self.default_fields is not None:
                 _columns = [field for field in self.default_fields if not field == 'urn']
@@ -61,7 +61,7 @@ Current implementation makes the following assumptions
             if query_all:
                 # We need a list because sets are not JSON-serializable
                 if self.default_fields is not None:
-                    print(self.query_all.fields)
+                    logger.debug(self.query_all.fields)
                     _hidden_columns = list(self.query_all.fields - set(self.default_fields))
                 else:
                     _hidden_columns = list(self.query_all.fields - self.query.fields)
@@ -72,11 +72,11 @@ Current implementation makes the following assumptions
             _columns = []
             _hidden_columns = []
 
-        print("_columns=", _columns)
+        logger.debug("_columns={}".format(_columns))
         self.columns = { self.mapping.get(c, c) : c for c in _columns }
         self.hidden_columns = { self.mapping.get(c, c) : c for c in _hidden_columns }
-        print("self.columns", self.columns)
-        print("self.hidden_columns", self.hidden_columns)
+        logger.debug("self.columns {}".format(self.columns))
+        logger.debug("self.hidden_columns {}".format(self.hidden_columns))
 
         self.init_key=init_key
         self.datatables_options=datatables_options
@@ -86,7 +86,7 @@ Current implementation makes the following assumptions
         if self.checkboxes:
             # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
             if 'aoColumns' in self.datatables_options:
-                print('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
+                logger.warning('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
                 del self.datatables_options['aoColumns']
             # set aoColumnDefs in datatables_options - might already have stuff in there
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])

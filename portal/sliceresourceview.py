@@ -1,18 +1,16 @@
-from __future__ import print_function
+import json
 
 from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
-
-from manifold.core.query                import Query, AnalyzedQuery
-from manifoldapi.manifoldapi            import execute_query
-import json
-
 from django.views.generic.base          import TemplateView
-
-from unfold.loginrequired               import LoginRequiredView
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from manifold.core.query                import Query, AnalyzedQuery
+from manifoldapi.manifoldapi            import execute_query
+
+
+from unfold.loginrequired               import LoginRequiredView
 from unfold.page                        import Page
 
 from myslice.configengine               import ConfigEngine
@@ -32,7 +30,7 @@ from plugins.univbrisfv                 import UnivbrisFv
 from plugins.univbrisfvf                import UnivbrisFvf
 from plugins.univbrisfvfo           	import UnivbrisFvfo
 from plugins.univbristopo               import UnivbrisTopo
-from plugins.univbrisvtam 	            import UnivbrisVtam as UnivbrisVtamPlugin
+from plugins.univbrisvtam               import UnivbrisVtam as UnivbrisVtamPlugin
 from plugins.univbrisvtamform 	        import UnivbrisVtamForm
 
 from plugins.columns_editor             import ColumnsEditor
@@ -40,6 +38,7 @@ from plugins.sladialog                  import SlaDialog
 from plugins.lists.simplelist           import SimpleList
 
 from myslice.theme import ThemeView
+from myslice.settings import logger
 
 class SliceResourceView (LoginRequiredView, ThemeView):
     template_name = "slice-resource-view.html"
@@ -73,7 +72,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         slice_md = metadata.details_by_object('slice')
         slice_fields = [column['name'] for column in slice_md['column']]
-        print("SLICE RES VIEW fields = %s" % slice_fields)
+        logger.debug("SLICE RES VIEW fields = {}".format(slice_fields))
         # TODO The query to run is embedded in the URL
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)

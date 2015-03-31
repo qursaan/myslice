@@ -1,7 +1,7 @@
-from __future__ import print_function
-
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+
+from myslice.settings import logger
 
 import activity.user
 
@@ -10,7 +10,7 @@ def logout_user (request):
     # check that we're indeed logged in
     if not request.user.is_authenticated():
         return HttpResponseRedirect ('/')
-    print("LOGGING OUT")
+    logger.info("LOGGING OUT")
     
     # log user activity
     activity.user.logout(request)

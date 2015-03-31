@@ -1,8 +1,8 @@
-from __future__ import print_function
-
 from types import StringTypes, ListType
 
 from django.template.loader import render_to_string
+
+from myslice.settings import logger
 
 debug=False
 
@@ -55,7 +55,7 @@ class Prelude:
         result += ",".join( [ "%s->%s"%(k,len(getattr(self,k))) for k in Prelude.keys ] )
         return result
     def inspect (self,msg):
-        print(self.inspect_string(msg))
+        logger.debug(self.inspect_string(msg))
 
     # first attempt was to use a simple dict like this
     #    env={}
@@ -88,8 +88,9 @@ class Prelude:
         env['all_js_chunks']= self.js_init_chunks + self.js_chunks
         env['css_chunks']=self.css_chunks
         if debug:
-            print("prelude has %d js_files, %d css files, (%d+%d) js chunks and %d css_chunks"%\
-                (len(self.js_files),len(self.css_files),len(self.js_init_chunks),len(self.js_chunks),len(self.css_chunks),))
+            logger.debug("prelude has {} js_files, {} css files, ({}+{}) js chunks and {} css_chunks"\
+                         .format (len(self.js_files), len(self.css_files),
+                                  len(self.js_init_chunks), len(self.js_chunks), len(self.css_chunks),))
         # render this with prelude.html and put the result in header_prelude
         header_prelude = render_to_string ('prelude.html',env)
         return { 'header_prelude' : header_prelude }

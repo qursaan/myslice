@@ -1,4 +1,5 @@
-from __future__ import print_function
+import time
+import json
 
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors     import csrf
@@ -8,22 +9,20 @@ from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
 from django.shortcuts                   import render
 
-
 from unfold.loginrequired               import FreeAccessView
+from ui.topmenu                         import topmenu_items, the_user
 
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
-
 from manifoldapi.manifoldresult         import ManifoldResult
-from ui.topmenu                         import topmenu_items, the_user
-from myslice.configengine               import ConfigEngine
 
+from myslice.configengine               import ConfigEngine
 from myslice.theme                      import ThemeView
+
 from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
 from portal.actions                     import authority_check_pis
 
-import json, time
 import activity.user
 
 class HomeView (FreeAccessView, ThemeView):

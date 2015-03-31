@@ -1,24 +1,31 @@
-from __future__ import print_function
+import json
+import os
+import re
+import itertools
 
-from unfold.loginrequired               import FreeAccessView
-#
-from manifold.core.query                import Query
-from manifoldapi.manifoldapi            import execute_query, execute_admin_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user, authority_get_pi_emails, make_request_user, create_user
-#
-from unfold.page                        import Page    
-from ui.topmenu                         import topmenu_items_live, the_user
-#
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
-from myslice.theme                      import ThemeView
-from portal.models                      import PendingUser, PendingAuthority
 from django.core.mail                   import EmailMultiAlternatives, send_mail
 from django.contrib.sites.models        import Site
 
-#
-import json, os, re, itertools
+from manifold.core.query                import Query
+from manifoldapi.manifoldapi            import execute_query, execute_admin_query
+
+from unfold.loginrequired               import FreeAccessView
+
+from portal.actions                     import (
+    manifold_update_user, manifold_update_account, manifold_add_account,
+    manifold_delete_account, sfa_update_user, authority_get_pi_emails,
+    make_request_user, create_user)
+from portal.models                      import PendingUser, PendingAuthority
+
+from unfold.page                        import Page    
+from ui.topmenu                         import topmenu_items_live, the_user
+
+from myslice.theme                      import ThemeView
+from myslice.settings                   import logger
+
 
 def ValuesQuerySetToDict(vqs):
     return [item for item in vqs]
@@ -38,8 +45,8 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 # User is enabled in PLE
                 if 'enabled' in result and result['enabled']==True:
                     return True
-        except Exception, e:
-            print("Exception in myplc query = ",e)
+        except Exception as e:
+            logger.error("Exception in myplc query = {}".format(e))
 
         return False
 
@@ -53,7 +60,6 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         #page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
         for key, value in kwargs.iteritems():
-            #print "%s = %s" % (key, value)
             if key == "hash_code":
                 hash_code=value
         if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
@@ -102,10 +108,10 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                         #    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
                         #    msg.attach_alternative(html_content, "text/html")
                         #    msg.send()
-                        #except Exception, e:
-                        #    print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
+                        #except Exception as e:
+                        #    logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
                         #    import traceback
-                        #    traceback.print_exc()
+                        #    logger.error(traceback.format_exc())
             
             PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
         else:

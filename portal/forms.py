@@ -21,10 +21,9 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
+# TODO: Remove these automated forms and use html templates and views like any other page !
 
 from django import forms
-from portal.models import PendingUser, PendingSlice
 #from crispy_forms.helper import FormHelper
 #from crispy_forms.layout import Submit
 from django.utils.translation import ugettext_lazy as _
@@ -34,8 +33,12 @@ from django.contrib.sites.models import get_current_site
 from django.utils.http import int_to_base36
 from django.template import loader
 
-# TODO: Remove these automated forms and use html templates and views like any other page !
 from django.contrib.auth.hashers import identify_hasher
+
+from portal.models import PendingUser, PendingSlice
+
+from myslice.settings import logger
+
 # adapted from https://sourcegraph.com/github.com/fusionbox/django-authtools/symbols/python/authtools/forms
 
 def is_password_unusable(pw):
@@ -207,8 +210,8 @@ class PasswordResetForm(forms.Form):
                 subject = ''.join(subject.splitlines())
                 email = loader.render_to_string(email_template_name, c)
                 send_mail(subject, email, from_email, [user.email])
-        except Exception, e:
-            print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
+        except Exception as e:
+            logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
 
 class SetPasswordForm(forms.Form):

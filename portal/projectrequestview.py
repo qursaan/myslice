@@ -1,4 +1,6 @@
-from __future__ import print_function
+import json
+import time
+import re
 
 from django.shortcuts           import render
 from django.contrib.sites.models import Site
@@ -12,8 +14,7 @@ from portal.actions import create_pending_project, create_pending_join, sfa_add_
 from portal.models import PendingProject, PendingJoin
 
 from myslice.theme import ThemeView
-
-import json, time, re
+from myslice.settings import logger
 
 class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'projectrequest_view.html'
@@ -121,7 +122,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                 errors.append('Project name is mandatory')
             
             if not errors:
-                print("is_pi on auth_hrn = ", user_authority)
+                logger.info("is_pi on auth_hrn = {}".format(user_authority))
                 if is_pi(wsgi_request, user_hrn, user_authority):
                     # PIs can directly create/join project in their own authority...
                     if 'join' in wsgi_request.POST:

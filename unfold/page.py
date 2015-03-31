@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 # the supervisor for Plugins
 # keeps a handle on all present plugins for managing their queries in a consistent way
 # it is expected to exist one such object for a given page
@@ -13,6 +11,7 @@ from manifoldapi.metadata import MetaData
 from unfold.prelude import Prelude
 
 from myslice.configengine import ConfigEngine
+from myslice.settings import logger
 
 # decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
@@ -108,7 +107,7 @@ class Page:
 
         # if cached, use it
         if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
-            if debug: print("Page.get_metadata: return cached value")
+            logger.debug("Page.get_metadata: return cached value")
             return manifold['metadata']
 
         metadata_auth = {'AuthMethod':'anonymous'}
@@ -117,7 +116,7 @@ class Page:
         metadata.fetch(self.request)
         # store it for next time
         manifold['metadata']=metadata
-        if debug: print("Page.get_metadata: return new value")
+        logger.debug("Page.get_metadata: return new value")
         return metadata
             
     def expose_js_metadata (self):

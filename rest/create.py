@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from django.views.generic.base      import TemplateView
 from django.shortcuts               import render_to_response
 
@@ -25,7 +23,6 @@ def dispatch(request, object_type, object_name):
     elif request.method == 'GET':
         #return error('only post request is supported')
         req_items = request.GET
-    print(req_items)
     for el in list(req_items.items()):
         # Filters not used for create
         if el[0].startswith('filters'):

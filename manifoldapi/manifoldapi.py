@@ -1,6 +1,4 @@
 # Manifold API Python interface
-from __future__ import print_function
-
 import copy
 import xmlrpclib
 import ssl
@@ -66,9 +64,9 @@ class ManifoldAPI:
                 return ResultValue(**result)
 
             except Exception as error:
-                print("===== xmlrpc catch-all exception:", error)
+                logger.error("===== xmlrpc catch-all exception: {}".format(error))
                 import traceback
-                traceback.print_exc(limit=3)
+                logger.error(traceback.format_exc(limit=3))
                 
                 if "Connection refused" in error:
                     raise ManifoldException ( ManifoldResult (code=ManifoldCode.SERVER_UNREACHABLE,

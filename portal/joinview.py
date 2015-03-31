@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os.path, re
 import json
 from random import randint
@@ -24,6 +22,7 @@ from portal.models              import PendingUser,PendingAuthority
 from portal.actions             import authority_get_pi_emails, manifold_add_user,manifold_add_account, create_pending_user
 
 from myslice.theme import ThemeView
+from myslice.settings import logger
 
 import activity.institution
 
@@ -231,9 +230,9 @@ class JoinView (FreeAccessView, ThemeView):
                     msg.send()
     
                 except Exception, e:
-                    print("Failed to send email, please check the mail templates and the SMTP configuration of your server")
+                    logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
                     import traceback
-                    traceback.print_exc()
+                    logger.error(traceback.format_exc())
 
                 self.template_name = 'join_complete.html'
                 # log institution activity

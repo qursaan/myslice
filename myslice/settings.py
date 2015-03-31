@@ -8,7 +8,7 @@ try:
     ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
 except:
     import traceback
-    traceback.print_exc()
+    logger.error(traceback.format_exc())
 
 
 from myslice.configengine import ConfigEngine
@@ -269,7 +269,7 @@ BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print(("Using devel auxiliary",aux))
+        logger.info("Using devel auxiliary {}".format(aux))
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
