@@ -30,16 +30,52 @@
                     slice_url="<a href='"+val.slice_url+"' target='_blank'>"+val.slice_url+"</a>";
                 }
                 
-                slice_row = "<tr><td>Description:</b></td><td>"+val.slice_description+"</td></tr>";
-                slice_row += "<tr><td>url:</td><td><a href='"+val.slice_url+" target='_blank'>"+val.slice_url+"</a></td></tr>";
-                slice_row += "<tr><td>users:</td><td>"+user_length+"</td></tr>";
+               // slice_row = "<tr><td>Description:</b></td><td>"+val.slice_description+"</td></tr>";
+               // slice_row += "<tr><td>url:</td><td><a href='"+val.slice_url+" target='_blank'>"+val.slice_url+"</a></td></tr>";
+                slice_row = "<tr><td>users:</td><td>"+user_length+"</td></tr>";
                 //slice_row += "<tr><td>resources:</td><td>"+nodes_length+"</td></tr>";
-                slice_row += "<tr><td>created:</td><td>"+val.created+"</td></tr>";
+                //slice_row += "<tr><td>created:</td><td>"+val.created+"</td></tr>";
                 slice_row += "<tr><td>last update:</td><td>"+val.slice_last_updated+"</td></tr>";
-                slice_row += "<tr><td>expires:</td><td>"+val.slice_expires+"</td></tr>";
+                //slice_row += "<tr><td>expires:</td><td>"+val.slice_expires+"</td></tr>";
                 table_slices.push(slice_row);
             });
            $("div#slice-info").html("<table>" + table_slices.join( "" ) + "</table>");
         });
+        $('button#renewslices').click(function() {
+            var now = new Date();
+            /* In Javascript getMonth() gives month[0] = january, month[1] = february, and so on...  */
+            var month = now.getMonth()+2;
+            var one_month_later = now.getFullYear()+"-"+month+"-"+now.getDate()+" "+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
+            $.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'expires':one_month_later}}, function(data) {
+                if(data.success){
+                    mysliceAlert('Success: slice renewed','success', true);
+                }
+                else{
+                    mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                }
+            });
+        });
+        $('button#deleteslices').click(function() {
+            if (confirm('Are you sure? It will remove the slice permanently.')) {
+                $.post("/delete/slice/",{'filters':{'slice_hrn':'{{slice}}'}}, function(data) {
+                    if(data.success){
+                        localStorage.clear();
+                        mysliceAlert('Success: slice deleted','success', true);
+                    }else{
+                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
+                    }
+                    window.location.replace("/");
+                });
+            } 
+            else {
+                return false;
+            }
+        });
     });
+
 </script>
+
+<div>
+    <button id="renewslices" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Renew slice</button>
+    <button id="deleteslices" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete slice</button>
+</div>
