@@ -9,10 +9,12 @@ from ui.topmenu import topmenu_items, the_user
 # tmp
 from trashutils import lorem, hard_wired_slice_names
 
+from myslice.settings import logger
+
 @login_required
 def tab_view (request):
-    print "request", request.__class__
-    print request
+    logger.info("request {}".format(request.__class__))
+    logger.info("{}".format(request))
     prelude=Prelude( js_files='js/bootstrap.js', css_files='css/bootstrap.css')
 
     tab_env = {'title':'Page for playing with Tabs',

@@ -16,6 +16,7 @@ from plugins.querytable          import QueryTable
 
 from myslice.configengine        import ConfigEngine
 from myslice.theme import ThemeView
+from myslice.settings import logger
 
 # View for 1 platform and its details
 class PlatformView(FreeAccessView, ThemeView):
@@ -26,7 +27,7 @@ class PlatformView(FreeAccessView, ThemeView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
-            print "%s = %s" % (key, value)       
+            logger.debug("{} = {}".format(key, value))
             if key == "platformname":
                 platformname=value
                 

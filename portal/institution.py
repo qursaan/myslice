@@ -1,3 +1,5 @@
+import json
+
 from django.core.context_processors import csrf
 from django.http                    import HttpResponseRedirect
 from django.contrib.auth            import authenticate, login, logout
@@ -16,7 +18,8 @@ from myslice.configengine           import ConfigEngine
 
 from portal.actions                 import is_pi, authority_check_pis
 from myslice.theme                  import ThemeView
-import json
+from myslice.settings               import logger
+
 
 class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'institution.html'
@@ -68,9 +71,9 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
 
         else: 
             env['person'] = None
-        print "BEFORE  ####------####  is_pi"
+        logger.debug("BEFORE  ####------####  is_pi")
         pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
-        print "is_pi = ",is_pi
+        logger.debug("is_pi = {}".format(is_pi))
 
         env['theme'] = self.theme
         env['section'] = "Institution"

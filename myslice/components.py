@@ -14,9 +14,9 @@ def urls():
             __import__(component)
             u.append( url(r'^%s/' % component, include('%s.urls' % component)) )
         except Exception, e:
-            logger.info("Cannot load component (%s): %s" % (component, e))
+            logger.error("Cannot load component ({}): {}".format(component, e))
         else:
-            logger.info("Loaded component %s" % component)
+            logger.info("Loaded component {}".format(component))
             
     return u
 

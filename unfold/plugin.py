@@ -9,30 +9,32 @@ from django.template.loader import render_to_string
 from unfold.page import Page
 from unfold.prelude import Prelude
 
+from myslice.settings import logger
+
 #################### 
 # set DEBUG to
 # . False : silent
 # . [ 'SliceList', 'TabbedView' ] : to debug these classes
 # . True : to debug all plugin
 
-DEBUG= False
-#DEBUG= [ 'SimpleList' ]
-#DEBUG=True
+DEBUG = False
+#DEBUG = [ 'SimpleList' ]
+#DEBUG = True
 
 # decorator to deflect calls on Plugin to its Prelude through self.page.prelude
 def to_prelude (method):
     def actual (self, *args, **kwds):
         if not self.page: # jordan
             return None
-        prelude_method=Prelude.__dict__[method.__name__]
-        return prelude_method(self.page.prelude,*args, **kwds)
+        prelude_method = Prelude.__dict__[method.__name__]
+        return prelude_method(self.page.prelude, *args, **kwds)
     return actual
 
 class Plugin:
 
     # using a simple incremental scheme to generate domids for now
     # we just need this to be unique in a page
-    domid=0
+    domid = 0
 
     # when a domid is not set by the caller, we name plugins after their respective class as well, 
     # so as to limit name clashes between different views
@@ -41,7 +43,7 @@ class Plugin:
     # and maybe xxx we should just enforce that...
     def newdomid(self):
         Plugin.domid += 1
-        return "plugin-%s-%d"%(self.__class__.__name__.lower(),Plugin.domid)
+        return "plugin-{}-{}".format(self.__class__.__name__.lower(), Plugin.domid)
 
     ########## 
     # Constructor
@@ -84,31 +86,34 @@ class Plugin:
                   **settings):
         self.page = page
         # callers can provide their domid for css'ing 
-        if not domid: domid=self.newdomid()
-        self.domid=domid
+        if not domid:
+            domid=self.newdomid()
+        self.domid = domid
         # title is shown when togglable
         #if not title: title="Plugin title for %s"%domid
-        self.title=title
-        self.classname=self._py_classname()
-        self.plugin_classname=self._js_classname()
-        self.visible=visible
-        if togglable is None:           self.togglable=self.default_togglable()
-        else:                           self.togglable=togglable
-        if toggled is None:             self.toggled=self.default_toggled()
-        else:                           self.toggled=toggled
-        if outline_complete is None:    self.outline_complete=self.default_outline_complete()
-        else:                           self.outline_complete=outline_complete
-        if outline_body is None:        self.outline_body=self.default_outline_body()
-        else:                           self.outline_body=outline_body
+        self.title = title
+        self.classname = self._py_classname()
+        self.plugin_classname = self._js_classname()
+        self.visible = visible
+        if togglable is None:           self.togglable = self.default_togglable()
+        else:                           self.togglable = togglable
+        if toggled is None:             self.toggled = self.default_toggled()
+        else:                           self.toggled = toggled
+        if outline_complete is None:    self.outline_complete = self.default_outline_complete()
+        else:                           self.outline_complete = outline_complete
+        if outline_body is None:        self.outline_body = self.default_outline_body()
+        else:                           self.outline_body = outline_body
         # what comes from subclasses
         for (k,v) in settings.iteritems():
-            setattr(self,k,v)
-            if self.need_debug(): print "%s init - subclass setting %s"%(self.classname,k)
+            setattr(self, k, v)
+            if self.need_debug():
+                logger.debug("{} init - subclass setting {}".format(self.classname, k))
         # minimal debugging
         if self.need_debug():
-            print "%s init dbg .... BEG"%self.classname
-            for (k,v) in self.__dict__.items(): print "dbg %s:%s"%(k,v)
-            print "%s init dbg .... END"%self.classname
+            logger.debug("{} init dbg .... BEG".format(self.classname))
+            for (k, v) in self.__dict__.items():
+                logger.debug("dbg {}:{}".format(k, v))
+            logger.debug("{} init dbg .... END".format(self.classname))
         # do this only once the structure is fine
         if self.page: # I assume we can have a None page (Jordan)
             self.page.record_plugin(self)
@@ -132,18 +137,19 @@ class Plugin:
 
     def setting_json (self, setting):
         # TMP: js world expects plugin_uuid
-        if setting=='plugin_uuid':
-            value=self.domid
-        elif setting=='query_uuid':
-            try: value=self.query.query_uuid
-            except: return '%s:"undefined"'%setting
+        if setting == 'plugin_uuid':
+            value = self.domid
+        elif setting == 'query_uuid':
+            try: value = self.query.query_uuid
+            except: return '{}:"undefined"'.format(setting)
         else:
-            value=getattr(self,setting,None)
-            if value is None: value = "unknown-setting-%s"%setting
+            value = getattr(self,setting,None)
+            if value is None:
+                value = "unknown-setting-%s"%setting
         # first try to use to_json method (json.dumps not working on class instances)
-        try:    value_json=value.to_json()
-        except: value_json=json.dumps(value,separators=(',',':'))
-        return "%s:%s"%(setting,value_json)
+        try:    value_json = value.to_json()
+        except: value_json = json.dumps(value,separators=(',',':'))
+        return "{}:{}".format(setting, value_json)
 
     # expose in json format to js the list of fields as described in json_settings_list()
     # and add plugin_uuid: domid in the mix
@@ -151,7 +157,7 @@ class Plugin:
     def settings_json (self):
         exposed_settings=self.json_settings_list()
         if 'query' in exposed_settings:
-            print "WARNING, cannot expose 'query' directly in json_settings_list, query_uuid is enough"
+            logger.debug("WARNING, cannot expose 'query' directly in json_settings_list, query_uuid is enough")
         result = "{"
         result += ",".join([ self.setting_json(setting) for setting in self.json_settings_list() ])
         result += "}"
@@ -170,24 +176,25 @@ class Plugin:
         plugin_content = self.render_content (request)
         # shove this into plugin.html
         env = {}
-        env ['plugin_content']= plugin_content
+        env['plugin_content'] = plugin_content
         env.update(self.__dict__)
         # translate high-level 'toggled' into 4 different booleans
         self.need_toggle = False
-        if self.toggled=='persistent':
+        if self.toggled == 'persistent':
             # start with everything turned off and let the js callback do its job
-            env.update({'persistent_toggle':True,'display_hide_button':False,
-                        'display_show_button':False,'display_body':False})
-        elif self.toggled==False:
-            env.update({'persistent_toggle':False,'display_hide_button':False,
-                        'display_show_button':True,'display_body':False})
+            env.update({'persistent_toggle' : True, 'display_hide_button' : False,
+                        'display_show_button' : False, 'display_body' : False})
+        elif self.toggled == False:
+            env.update({'persistent_toggle' : False, 'display_hide_button' : False,
+                        'display_show_button' : True, 'display_body' : False})
         else:
-            env.update({'persistent_toggle':False,'display_hide_button':True,
-                        'display_show_button':False,'display_body':True})
+            env.update({'persistent_toggle' : False, 'display_hide_button' : True,
+                        'display_show_button' : False, 'display_body' : True})
         if self.need_debug(): 
-            print "rendering plugin.html with env keys %s"%env.keys()
+            logger.debug("rendering plugin.html with env keys {}".format(env.keys()))
             for (k,v) in env.items(): 
-                if "display" in k or "persistent" in k: print k,'->',v
+                if "display" in k or "persistent" in k:
+                    logger.debug("{} -> {}".format(k, v))
         result = render_to_string ('plugin.html',env)
 
         # export this only for relevant plugins
@@ -210,40 +217,38 @@ class Plugin:
         """Should return an HTML fragment"""
         template = self.template_file()
         # start with a fresh one
-        env={}
+        env = {}
         # add our own settings as defaults
         env.update(self.__dict__)
         # then the things explicitly defined in template_env()
         env.update(self.template_env(request))
         if not isinstance (env,dict):
             raise Exception, "%s.template_env returns wrong type"%self.classname
-        result=render_to_string (template, env)
+        result = render_to_string (template, env)
         if self.need_debug():
-            print "%s.render_content: BEG --------------------"%self.classname
-            print "template=%s"%template
-            print "env.keys=%s"%env.keys()
-            #print "env=%s"%env
-            #print result
-            print "%s.render_content: END --------------------"%self.classname
+            logger.debug("{}.render_content: BEG --------------------".format(self.classname))
+            logger.debug("template={}".format(template))
+            logger.debug("env.keys={}".format(env.keys()))
+            logger.debug("{}.render_content: END --------------------".format(self.classname))
         return result
 
     # or from the result of self.requirements()
     def handle_requirements (self, request):
         try:
-            d=self.requirements()
+            d = self.requirements()
             for (k,v) in d.iteritems():
                 if self.need_debug():
-                    print "%s: handling requirement %s"%(self.classname,v)
+                    logger.debug("{}: handling requirement {}".format(self.classname, v))
                 # e.g. js_files -> add_js_files
-                method_name='add_'+k
-                method=Page.__dict__[method_name]
-                method(self.page,v)
+                method_name = 'add_' + k
+                method = Page.__dict__[method_name]
+                method(self.page, v)
         except AttributeError: 
             # most likely the object does not have that method defined, which is fine
             pass
         except:
             import traceback
-            traceback.print_exc()
+            logger.log(traceback.format_exc())
             pass
 
     #################### requirements/prelude management
