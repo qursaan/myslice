@@ -60,6 +60,10 @@
                 $.post("/delete/slice/",{'filters':{'slice_hrn':'{{slice}}'}}, function(data) {
                     if(data.success){
                         localStorage.clear();
+                        var user_email = [];
+                        user_email.push ('{{username}}');
+                        $.post("/credentials/clear/",{'emails':user_email}, function(data) {
+                        }); // post credentials clear
                         mysliceAlert('Success: slice deleted','success', true);
                     }else{
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
