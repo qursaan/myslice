@@ -238,7 +238,18 @@ var SCHEDULER_COLWIDTH = 50;
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
             /* Remove from local cache also, unless we listen to events from outside */
             $scope._leases_by_resource[other.resource] = $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
-
+            /* Last lease removed for this resource -> remove the resource from the list */
+            if($scope._leases_by_resource.hasOwnProperty(other.resource) && $scope._leases_by_resource[other.resource].length == 0){
+                /* remove resource from the list of selected resources */
+                 data_resource = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : STATE_SET_REMOVE,
+                    value: other.resource
+                };
+                manifold.raise_event($scope.instance.options.query_uuid, FIELD_STATE_CHANGED, data_resource);
+               
+            }
         }
 
         $scope.select = function(index, model_lease, model_resource)
