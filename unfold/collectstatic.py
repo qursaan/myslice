@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 from django.conf import settings
 from django.utils.datastructures import SortedDict
@@ -79,7 +81,7 @@ class ThirdPartyFinder(BaseFinder):
                         matched_path = os.path.join(path, file) 
                         if not all:
                             return matched_path
-                        print 'ThirdPartyFinder, adding',matched_path
+                        print('ThirdPartyFinder, adding',matched_path)
                         matches.append(matched_path)
         return matches
 

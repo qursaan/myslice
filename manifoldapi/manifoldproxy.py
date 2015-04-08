@@ -12,7 +12,9 @@ from manifoldapi                import ManifoldAPI
 from manifoldresult             import ManifoldException
 from manifold.util.log          import Log
 
-from myslice.settings import config, logger, DEBUG
+from unfold.sessioncache import SessionCache
+
+from myslice.settings import config, logger
 
 # register activity
 import activity.slice
@@ -35,18 +37,18 @@ def proxy (request,format):
     
     # expecting a POST
     if request.method != 'POST':
-        logger.error("MANIFOLDPROXY unexpected method %s -- exiting" % request.method)
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        logger.error("MANIFOLDPROXY unexpected method {} -- exiting".format(request.method))
+        return HttpResponse ({"ret":0}, content_type="application/json")
     # we only support json for now
     # if needed in the future we should probably cater for
     # format_in : how is the query encoded in POST
     # format_out: how to serve the results
     if format != 'json':
-        logger.error("MANIFOLDPROXY unexpected format %s -- exiting" % format)
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        logger.error("MANIFOLDPROXY unexpected format {} -- exiting".format(format))
+        return HttpResponse ({"ret":0}, content_type="application/json")
     try:
         # translate incoming POST request into a query object
-        #logger.debug("MANIFOLDPROXY request.POST %s" % request.POST)
+        #logger.debug("MANIFOLDPROXY request.POST {}".format(request.POST))
 
         manifold_query = Query()
         #manifold_query = ManifoldQuery()
@@ -59,13 +61,12 @@ def proxy (request,format):
             admin_user, admin_password = config.manifold_admin_user_password()
             manifold_api_session_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
         else:
-            if 'manifold' in request.session:
-                manifold_api_session_auth = request.session['manifold']['auth']
-            else:
-                return HttpResponse (json.dumps({'code':0,'value':[]}), mimetype="application/json")
+            manifold_api_session_auth = SessionCache().get_auth(request)
+            if not manifold_api_session_auth:
+                return HttpResponse (json.dumps({'code':0,'value':[]}), content_type="application/json")
                 
         if debug_empty and manifold_query.action.lower()=='get':
-            return HttpResponse (json.dumps({'code':0,'value':[]}), mimetype="application/json")
+            return HttpResponse (json.dumps({'code':0,'value':[]}), content_type="application/json")
                 
         # actually forward
         manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
@@ -85,7 +86,7 @@ def proxy (request,format):
         #
         # resource reservation
         if (manifold_query.action.lower() == 'update') :
-            print result['value'][0]
+            logger.debug(result['value'][0])
             if 'resource' in result['value'][0] :
                 for resource in result['value'][0]['resource'] :
                     activity.slice.resource(request, 
@@ -100,13 +101,13 @@ def proxy (request,format):
         
         json_answer=json.dumps(result)
 
-        return HttpResponse (json_answer, mimetype="application/json")
+        return HttpResponse (json_answer, content_type="application/json")
 
-    except Exception,e:
-        logger.error("MANIFOLDPROXY %s" % e)
+    except Exception as e:
+        logger.error("MANIFOLDPROXY {}".format(e))
         import traceback
-        traceback.print_exc()
-        return HttpResponse ({"ret":0}, mimetype="application/json")
+        logger.error(traceback.format_exc())
+        return HttpResponse ({"ret":0}, content_type="application/json")
 
 #################### 
 # see CSRF_FAILURE_VIEW in settings.py
@@ -114,5 +115,5 @@ def proxy (request,format):
 # this however turns out disappointing/not very informative
 failure_answer=[ "csrf_failure" ]
 def csrf_failure(request, reason=""):
-    print "CSRF failure with reason '%s'"%reason
-    return HttpResponseForbidden (json.dumps (failure_answer), mimetype="application/json")
+    logger.error("CSRF failure with reason '{}'".format(reason))
+    return HttpResponseForbidden (json.dumps (failure_answer), content_type="application/json")

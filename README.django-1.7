@@ -1,0 +1,30 @@
+Thierry Parmentelat <thierry.parmentelat@inria.fr>
+
+As of March 31 2015, the code should be mostly ready for django-1.7,
+with the following restrictions
+
+* migrations : django-1.7 comes with its own native migrations system
+  and so south is not needed/recommended any longer. So for now we have a
+  version of such native migrations that does a one-shot setup of a db
+  schema but this is stored in
+
+  portal/native_migrations
+
+  instead of the standard location
+
+  portal/migrations
+
+  because this one is still expected to hold south code with earlier djangos
+  You might need to rename native_migrations/ into migrations/ before
+  running manage.py migrate in the first place
+
+* testing quite a few issues related to 1.7 have been addressed but it
+  would be presomptuous to state that things were tested very
+  thoroughly, far from that.
+
+  So please use with care and let meknow of any additional issues
+
+
+
+  
+

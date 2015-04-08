@@ -1,3 +1,6 @@
+import time
+import json
+
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors     import csrf
 from django.http                        import HttpResponseRedirect
@@ -6,30 +9,28 @@ from django.template                    import RequestContext
 from django.shortcuts                   import render_to_response
 from django.shortcuts                   import render
 
-
 from unfold.loginrequired               import FreeAccessView
+from ui.topmenu                         import topmenu_items, the_user
 
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query
-
 from manifoldapi.manifoldresult         import ManifoldResult
-from ui.topmenu                         import topmenu_items, the_user
-from myslice.configengine               import ConfigEngine
 
+from myslice.configengine               import ConfigEngine
 from myslice.theme                      import ThemeView
+
 from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
 from portal.actions                     import authority_check_pis
 
-import json, time
 import activity.user
 
 class HomeView (FreeAccessView, ThemeView):
     template_name = 'home-view.html'
-        
+
     # expose this so we can mention the backend URL on the welcome page
     def default_env (self):
-        return { 
+        return {
                  'MANIFOLD_URL':ConfigEngine().manifold_url(),
                  }
 
@@ -37,12 +38,12 @@ class HomeView (FreeAccessView, ThemeView):
         env = self.default_env()
         env['theme'] = self.theme
         env['section'] = "Dashboard"
-        
+
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         # pass request within the token, so manifold session key can be attached to the request session.
-        token = {'username': username, 'password': password, 'request': request}    
+        token = {'username': username, 'password': password, 'request': request}
 
         # our authenticate function returns either
         # . a ManifoldResult - when something has gone wrong, like e.g. backend is unreachable
@@ -55,22 +56,21 @@ class HomeView (FreeAccessView, ThemeView):
             manifoldresult = auth_result
             # let's use ManifoldResult.__repr__
             env['state']="%s"%manifoldresult
-            
+
             return render_to_response(self.template,env, context_instance=RequestContext(request))
         # user was authenticated at the backend
         elif auth_result is not None:
             user=auth_result
             if user.is_active:
-                print "LOGGING IN"
                 login(request, user)
-                
-                if request.user.is_authenticated(): 
+
+                if request.user.is_authenticated():
                     env['person'] = self.request.user
                     env['username'] = self.request.user
-                    
+
                     # log user activity
                     activity.user.login(self.request)
-                    
+
                     ## check user is pi or not
                     platform_details = {}
                     account_details = {}
@@ -94,7 +94,7 @@ class HomeView (FreeAccessView, ThemeView):
                     #    pi = "is_not_pi"
                     #else:
                     #    pi = "is_pi"
-                    user_email = str(self.request.user)                   
+                    user_email = str(self.request.user)
                     pi = authority_check_pis(self.request, user_email)
 
                     # check if the user has creds or not
@@ -114,8 +114,8 @@ class HomeView (FreeAccessView, ThemeView):
 
                     env['pending_slices'] = pending_slices
                     env['pi'] = pi
-                    env['user_cred'] = user_cred                
-                else: 
+                    env['user_cred'] = user_cred
+                else:
                     env['person'] = None
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
             else:
@@ -123,21 +123,21 @@ class HomeView (FreeAccessView, ThemeView):
                 activity.user.login(self.request, "notactive")
                 env['state'] = "Your account is not active, please contact the site admin."
                 env['layout_1_or_2']="layout-unfold2.html"
-                
+
                 return render_to_response(self.template,env, context_instance=RequestContext(request))
         # otherwise
         else:
             # log user activity
             activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
-            
+
             return render_to_response(self.template, env, context_instance=RequestContext(request))
 
     def get (self, request, state=None):
         env = self.default_env()
         acc_auth_cred={}
         if request.user.is_authenticated():
-           
+
             ## check user is pi or not
             platform_details = {}
             account_details = {}
@@ -163,7 +163,7 @@ class HomeView (FreeAccessView, ThemeView):
             #    pi = "is_not_pi"
             #else:
             #    pi = "is_pi"
-            user_email = str(self.request.user) 
+            user_email = str(self.request.user)
             pi = authority_check_pis(self.request, user_email)
             # check if the user has creds or not
             if acc_user_cred == {} or acc_user_cred == 'N/A':
@@ -179,12 +179,12 @@ class HomeView (FreeAccessView, ThemeView):
             pending_slices = []
             for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
                 pending_slices.append(slices.slice_name)
-        
+
             env['pending_slices'] = pending_slices
             env['pi'] = pi
-            env['user_cred'] = user_cred                
+            env['user_cred'] = user_cred
             env['person'] = self.request.user
-        else: 
+        else:
             env['person'] = None
 
         env['theme'] = self.theme
@@ -196,7 +196,7 @@ class HomeView (FreeAccessView, ThemeView):
         if state: env['state'] = state
         elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
-        
+
 #         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
 #         account_details = execute_query(self.request, account_query)
 #         for account_detail in account_details:
@@ -206,17 +206,17 @@ class HomeView (FreeAccessView, ThemeView):
 #                 acc_user_cred = account_config.get('delegated_user_credential','N/A')
 #                 acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
 #                 acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-# 
+#
 #                 if 'N/A' not in acc_user_cred:
 #                     exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
 #                     if exp_date:
 #                         user_exp_date = exp_date.group(1)
 #                         user_cred_exp_list.append(user_exp_date)
-# 
+#
 #                     my_users = [{'cred_exp': t[0]}
 #                         for t in zip(user_cred_exp_list)]
-#                
-# 
+#
+#
 #                 if 'N/A' not in acc_slice_cred:
 #                     for key, value in acc_slice_cred.iteritems():
 #                         slice_list.append(key)
@@ -225,10 +225,10 @@ class HomeView (FreeAccessView, ThemeView):
 #                         if exp_date:
 #                             exp_date = exp_date.group(1)
 #                             slice_cred_exp_list.append(exp_date)
-# 
+#
 #                     my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
 #                         for t in zip(slice_list, slice_cred_exp_list)]
-# 
+#
 #                 if 'N/A' not in acc_auth_cred:
 #                     for key, value in acc_auth_cred.iteritems():
 #                         auth_list.append(key)
@@ -238,6 +238,6 @@ class HomeView (FreeAccessView, ThemeView):
 #                             exp_date = exp_date.group(1)
 #                             auth_cred_exp_list.append(exp_date)
 
-        
+
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 

@@ -1,5 +1,7 @@
 # a set of utilities to help make the global layout consistent across views
 
+from myslice.settings import logger
+
 def the_user (request):
     "retrieves logged in user's email, or empty string"
     if not request.user.is_authenticated (): 
@@ -22,7 +24,7 @@ def the_user (request):
 def topmenu_items_static (current, request):
     has_user=request.user.is_authenticated()
     result=[]
-    print request.user
+    logger.debug("request user = {}".format(request.user))
     if has_user:
         result.append({'label':'Dashboard', 'href': '/portal/dashboard/'})
         result.append({'label':'Request a slice', 'href': '/portal/slice_request/'})
@@ -58,7 +60,7 @@ def topmenu_items_static (current, request):
 
 # tmp - transition phase
 def topmenu_items (current, request):
-    print "WARNING -- please now use topmenu_items_live (label, page) toplevel_items is deprecated -- WARNING"
+    logger.warning("WARNING -- please now use topmenu_items_live (label, page) toplevel_items is deprecated -- WARNING")
     return topmenu_items_static (current, request)
 
 # integrated helper function for an animated menu

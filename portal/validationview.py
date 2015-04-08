@@ -44,7 +44,9 @@ from portal.actions             import get_requests
 from manifoldapi.manifoldapi    import execute_query
 from manifold.core.query        import Query
 from unfold.page                import Page
+
 from myslice.theme import ThemeView
+from myslice.settings import logger
 
 class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "validate_pending.html"
@@ -90,7 +92,7 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
             sfa_platforms_query = Query().get('local:platform').filter_by('gateway_type', '==', 'sfa').select('platform_id', 'platform', 'auth_type')
             sfa_platforms = execute_query(self.request, sfa_platforms_query)
             for sfa_platform in sfa_platforms:
-                print "SFA PLATFORM > ", sfa_platform['platform']
+                logger.info("SFA PLATFORM > {}".format(sfa_platform['platform']))
                 if not 'auth_type' in sfa_platform:
                     continue
                 auth = sfa_platform['auth_type']
@@ -98,7 +100,7 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
                     all_authorities.append(auth)
                 platform_ids.append(sfa_platform['platform_id'])
 
-            print "W: Hardcoding platform myslice"
+            logger.warning("W: Hardcoding platform myslice")
             # There has been a tweak on how new platforms are referencing a
             # so-called 'myslice' platform for storing authentication tokens.
             # XXX This has to be removed in final versions.
@@ -120,30 +122,30 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
             #print "=" * 80
             for user_account in user_accounts:
 
-                print "USER ACCOUNT", user_account
+                logger.debug("USER ACCOUNT {}".format(user_account))
                 if user_account['auth_type'] == 'reference':
                     continue # we hardcoded the myslice platform...
 
                 config = json.loads(user_account['config'])
                 creds = []
-                print "CONFIG KEYS", config.keys()
+                logger.debug("CONFIG KEYS {}".format(config.keys()))
                 if 'authority_credentials' in config:
-                    print "***", config['authority_credentials'].keys()
+                    logger.debug("*** AC {}".format(config['authority_credentials'].keys()))
                     for authority_hrn, credential in config['authority_credentials'].items():
                         #if credential is not expired:
                         credential_authorities.add(authority_hrn)
                         #else
                         #    credential_authorities_expired.add(authority_hrn)
                 if 'delegated_authority_credentials' in config:
-                    print "***", config['delegated_authority_credentials'].keys()
+                    logger.debug("*** DAC {}".format(config['delegated_authority_credentials'].keys()))
                     for authority_hrn, credential in config['delegated_authority_credentials'].items():
                         #if credential is not expired:
                         credential_authorities.add(authority_hrn)
                         #else
                         #    credential_authorities_expired.add(authority_hrn)
 
-            print 'credential_authorities =', credential_authorities
-            print 'credential_authorities_expired =', credential_authorities_expired
+            logger.debug('credential_authorities = {}'.format(credential_authorities))
+            logger.debug('credential_authorities_expired = {}'.format(credential_authorities_expired))
 
 #            # Using cache manifold-tables to get the list of authorities faster
 #            all_authorities_query = Query.get('authority').select('name', 'authority_hrn')
@@ -157,8 +159,8 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
             try:
                 for pa in pi_authorities_tmp:
                     pi_authorities |= set(pa['pi_authorities'])
-            except:
-                print 'No pi_authorities'
+            except Exception as e:
+                logger.error('No pi_authorities')
 # TODO: exception if no parent_authority
 #             try:
 #                 for pa in pi_authorities_tmp:
@@ -260,8 +262,8 @@ class ValidatePendingView(LoginRequiredAutoLogoutView, ThemeView):
                 dest[auth_hrn].append(request)
         
         context = super(ValidatePendingView, self).get_context_data(**kwargs)
-        print "testing"
-        print ctx_my_authorities
+        logger.debug("testing")
+        logger.debug(ctx_my_authorities)
         context['my_authorities']   = ctx_my_authorities
         context['sub_authorities']   = ctx_sub_authorities
         context['delegation_authorities'] = ctx_delegation_authorities

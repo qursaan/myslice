@@ -1,24 +1,27 @@
 from unfold.plugin import Plugin
 
+from myslice.settings import logger
+
 class UnivbrisTopo(Plugin):
     
     def __init__ (self, query=None, **settings):
         Plugin.__init__ (self, **settings)
         self.query=query
-	self.query_uuid = query.query_uuid if query else None
-	print "called univbris topo plugin"
+        self.query_uuid = query.query_uuid if query else None
+        logger.info("called univbris topo plugin")
 
     def template_file (self):
-	try:
-        	return "univbris_topology.html"
-	except:
-		print "error template"
+        try:
+            return "univbris_topology.html"
+        except Exception as e :
+            logger.error("error template {}".format(e))
 
     def requirements (self):
         reqs = {
-            'js_files' : [ "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
-                           "js/manifold.js", "js/manifold-query.js", 
-                           "js/unfold-helper.js",
+            'js_files' : [
+                "js/spin-presets.js", "js/spin.min.js", "js/jquery.spin.js",
+                "js/manifold.js", "js/manifold-query.js", 
+                "js/unfold-helper.js",
                 'js/univbristopo.js', 'js/d3.v2.min.js','js/tooltip.topology.js',
             ],
             'css_files': [

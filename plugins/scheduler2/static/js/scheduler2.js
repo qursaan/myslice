@@ -197,10 +197,21 @@ var SCHEDULER_COLWIDTH = 50;
                 value: new_lease
             }
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+
             /* Add to local cache also, unless we listen to events from outside */
-            if (!(resource_urn in $scope._leases_by_resource))
+            if (!(resource_urn in $scope._leases_by_resource)){
                 $scope._leases_by_resource[resource_urn] = [];
+                /* Add the resource of the selected timeslot to the pending list */
+                data_resource = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : STATE_SET_ADD,
+                    value: resource_urn
+                };
+                manifold.raise_event($scope.instance.options.query_uuid, FIELD_STATE_CHANGED, data_resource);
+            }
             $scope._leases_by_resource[resource_urn].push(new_lease);
+
         }
 
         $scope._remove_lease = function(other)
@@ -227,7 +238,18 @@ var SCHEDULER_COLWIDTH = 50;
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
             /* Remove from local cache also, unless we listen to events from outside */
             $scope._leases_by_resource[other.resource] = $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
-
+            /* Last lease removed for this resource -> remove the resource from the list */
+            if($scope._leases_by_resource.hasOwnProperty(other.resource) && $scope._leases_by_resource[other.resource].length == 0){
+                /* remove resource from the list of selected resources */
+                 data_resource = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : STATE_SET_REMOVE,
+                    value: other.resource
+                };
+                manifold.raise_event($scope.instance.options.query_uuid, FIELD_STATE_CHANGED, data_resource);
+               
+            }
         }
 
         $scope.select = function(index, model_lease, model_resource)

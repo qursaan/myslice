@@ -6,6 +6,8 @@ from manifoldapi        import ManifoldAPI
 
 from django.contrib     import messages
 
+from myslice.settings   import logger
+
 debug=False
 #debug=True
 
@@ -34,10 +36,10 @@ class MetaData:
         # xxx need a way to export error messages to the UI
         if result['code'] == 1: # warning
             # messages.warning(request, result['description'])
-            print ("METADATA WARNING -",request,result['description'])
+            logger.warning(("METADATA WARNING - {} {}".format(request,result['description'])))
         elif result['code'] == 2:
             # messages.error(request, result['description'])
-            print ("METADATA ERROR -",request,result['description'])
+            logger.error(("METADATA ERROR - {} {}".format(request,result['description'])))
             # XXX FAIL HERE XXX
             return
 
@@ -58,5 +60,6 @@ class MetaData:
         return self.hash_by_object[object]['column'].sort()
 
     def get_field_type(self, object, field):
-        if debug: print "Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon"
+        if debug:
+            logger.debug("Temp fix for metadata::get_field_type() -> consider moving to manifold.core.metadata soon")
         return field
