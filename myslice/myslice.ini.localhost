@@ -4,6 +4,7 @@ admin_user = xxx
 admin_password = xxx
 
 [myslice]
+# theme possible values = onelab, fed4fire, fibre, smartfire
 theme=onelab
 debug = true
 httproot =
