@@ -10,7 +10,7 @@ Email           : {{email}}
 Organization	: {{organization}}
 Portal url		: {{current_site}}
 
-You can see new slice request in: {{current_site}}/portal/validate
+You can see new slice request in: {{current_site}}/portal/institution#requests
 Please be sure that you know the user who is requesting this slice, as you are responsible for his or her actions, as described in the OneLab terms and conditions:
 	{{current_site}}/terms
  
