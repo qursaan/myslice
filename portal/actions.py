@@ -1056,7 +1056,7 @@ def sfa_create_user(wsgi_request, request, namespace = None, as_admin = False):
             sender = sender.replace('\n', '')
 
 
-            subject = 'User validated'
+            subject = 'Account validated'
 
             msg = EmailMultiAlternatives(subject, text_content, sender, [request['email']])
             msg.attach_alternative(html_content, "text/html")
