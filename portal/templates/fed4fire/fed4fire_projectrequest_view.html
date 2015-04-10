@@ -10,8 +10,8 @@
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs nav-section">
-            <li class="active"><a href="#existing">Join existing Project</a></li>
-            <li><a href="#new">Create new Project</a></li>
+            <li class="active"><a href="#new">Create new Project</a></li>
+            <li><a href="#existing">Join existing Project</a></li>
             
         </ul>
     </div>
@@ -30,39 +30,8 @@
 {% endif %}
 
 <div class="container tab-content">
-    
-	<div class="tab-pane active" id="existing"> 
-        <div class="row">
-            <div class="col-md-6">
-                 <h3>Join an existing Project</h3>
-            </div>
-            <div class="col-md-6">
-                 <h3>List of projects you are part of</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <form role="form" method="post" action="/portal/project_request">
-                {% csrf_token %}
-                <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
-                <select id="projects" name="project_name" style="display:none;"></select> <div style="display:none;" id="projects_button"><input type="submit" id="join" name="join" value="Join" class="btn"/></div>
-                </form>
-            </div>
-            <div class="col-md-6">
-                <table class="table project-list">
-                    {% for pending in pending_projects %}
-                    <tr><td>(PENDING) {{ pending.project_name }}</td><td>{{ pending.authority_hrn }}</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
-                    {% endfor %}
-                    {% for pending in pending_join_projects %}
-                    <tr><td>(PENDING JOIN) {{ pending.project_name }}</td><td>&nbsp;</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
-                    {% endfor %}
 
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tab-pane" id="new"> 
+    <div class="tab-pane active" id="new"> 
         <div class="row">
             <div class="col-md-12">
                  <h3>Create a new Project</h3>
@@ -102,6 +71,36 @@
         </div>
     </div>
     
+	<div class="tab-pane" id="existing"> 
+        <div class="row">
+            <div class="col-md-6">
+                 <h3>Join an existing Project</h3>
+            </div>
+            <div class="col-md-6">
+                 <h3>List of projects you are part of</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <form role="form" method="post" action="/portal/project_request">
+                {% csrf_token %}
+                <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
+                <select id="projects" name="project_name" style="display:none;"></select> <div style="display:none;" id="projects_button"><input type="submit" id="join" name="join" value="Join" class="btn"/></div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <table class="table project-list">
+                    {% for pending in pending_projects %}
+                    <tr><td>(PENDING) {{ pending.project_name }}</td><td>{{ pending.authority_hrn }}</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
+                    {% endfor %}
+                    {% for pending in pending_join_projects %}
+                    <tr><td>(PENDING JOIN) {{ pending.project_name }}</td><td>&nbsp;</td><td>{{ pending.created|date:"d/m/Y" }}</td></tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 		
 <script>
