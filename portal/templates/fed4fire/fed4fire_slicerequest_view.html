@@ -35,7 +35,7 @@
 			  </div>
 			  <div class="form-group">
 				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Project" 
-				title="Select a project under which you want to create your slice" required="required">
+				title="Select a project under which you want to create your slice. Don't have any project yet! Create/Join project from the dashboard." required="required">
 			  </div>
 			  <div class="form-group">
 			    <input type="text" class="form-control" name="url" id="url" style="width:300px" placeholder="Experiment URL (if one exists)"
@@ -45,11 +45,7 @@
 			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
 				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
-			  {% if pi %}	
 			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
-			  {% else %}
-			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
-			  {% endif %}	
 			</form>
 	
 		</div>
