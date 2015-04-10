@@ -135,12 +135,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             
             # create slice_hrn based on authority_hrn and slice_name
             slice_name = slice_request['slice_name']
-            req_slice_hrn = authority_hrn + '.' + slice_name
-            # comparing requested slice_hrn with the existing slice_hrn 
-            slice_query  = Query().get('myslice:slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
+            # slice name is unique among all authorities 
+            slice_query  = Query().get('myslice:slice').select('slice_hrn')
             slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
             for _slice in slice_details_sfa:
-                if _slice['slice_hrn'] == req_slice_hrn:
+                split_list = _slice['slice_hrn'].split('.')
+                sfa_slice_name = split_list[-1]
+                if sfa_slice_name == slice_name:
                     errors.append('Slice already exists. Please use a different slice name.')
             
 
