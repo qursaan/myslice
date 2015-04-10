@@ -20,8 +20,10 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
-            authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            authorities = sorted(authorities, key=lambda k: k['name'])
+            # Remove the root authority from the list
+            matching = [s for s in authorities if "." in s['authority_hrn']]
+            authorities = sorted(matching, key=lambda k: k['authority_hrn'])
+            authorities = sorted(matching, key=lambda k: k['name'])
         return authorities
     
     def getUserAuthority(self, request):
