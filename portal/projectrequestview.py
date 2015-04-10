@@ -122,6 +122,11 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
             # What kind of project name is valid?
             if (post['project_name'] is None or post['project_name'] == ''):
                 errors.append('Project name is mandatory')
+
+            # max project_name length is 10
+            if (len(post['project_name']) >10):
+                errors.append('Project name can be maximum 10 characters long')
+
             
             if not errors:
                 logger.info("is_pi on auth_hrn = {}".format(user_authority))

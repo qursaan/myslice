@@ -19,6 +19,7 @@ from myslice.theme import ThemeView
 from myslice.settings import logger
 
 import activity.user
+theme = ThemeView()
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
@@ -150,9 +151,17 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
             
-            organization = slice_request['organization']    
-            if (organization is None or organization == ''):
-                errors.append('Organization is mandatory')
+            organization = slice_request['organization']
+            if theme.theme == 'fed4fire':
+                if (organization is None or organization == ''):
+                    errors.append('Selecting project is mandatory')
+            else:
+                if (organization is None or organization == ''):
+                    errors.append('Organization is mandatory')
+
+            slice_length= len(slice_request['slice_name'])
+            if slice_length >19:
+                errors.append('Slice name can be maximum 19 characters long')
 
 
     
