@@ -10,14 +10,17 @@ import json, os, re, itertools
 
 class Account:
     def __init__ (self, platform_id, user_id):
-        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id', '==', platform_id).filter_by('user_id', '==', user_id)
+        account_query  = Query().get('local:account')\
+                                .select('user_id','platform_id','auth_type','config')\
+                                .filter_by('platform_id', '==', platform_id)\
+                                .filter_by('user_id', '==', user_id)
  
-        account_details = execute_query(self.request, account_query)
+        account_details  = execute_query(self.request, account_query)
         self.user_id     = account_details['user_id']
         self.platform_id = account_details['platform_id']
         self.auth_type   = account_details['auth_type']
         self.config      = account_details['config']
-        account_config = json.loads(account_details['config'])
+        account_config   = json.loads(account_details['config'])
 
         self.usr_hrn = account_config.get('user_hrn',None)
         self.pub_key = account_config.get('user_public_key',None)
