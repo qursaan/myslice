@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+  <h1>Success</h1>
+
+Your slice has been created. You can view all your slices in the <a href="/">dashboard.</a>
+<script>
+$(document).ready(function() {
+    localStorage.clear();
+});
+</script>
+{% endblock %}
+

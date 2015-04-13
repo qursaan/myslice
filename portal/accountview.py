@@ -38,7 +38,8 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         metadata = page.get_metadata()
         page.expose_js_metadata()
 
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js",
+                               "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
         # Execute a Query to delegate credentials if necessary
@@ -178,8 +179,13 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
                         pub_key_list.append(account_pub_key)
                         user_status_list.append(user_status)
                         # combining 5 lists into 1 [to render in the template] 
-                        principal_acc_list = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4], 'user_status':t[5],} 
-                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list, user_status_list)]
+                        principal_acc_list = [
+                            {'platform_name' : pn, 'account_type' : at,
+                             'delegation_type' : dt, 'usr_hrn' : uh,
+                             'usr_pubkey' : up, 'user_status' : us,} 
+                            for pn, at, dt, uh, up, us in zip(platform_name_list, account_type_list, delegation_type_list,
+                                         usr_hrn_list, pub_key_list, user_status_list)
+                        ]
                     # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
@@ -257,7 +263,9 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
 
 @login_required
 def get_myslice_platform(request):
-    platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled','config').filter_by('platform','==','myslice')
+    platform_query  = Query().get('local:platform')\
+                             .select('platform_id','platform','gateway_type','disabled','config')\
+                             .filter_by('platform','==','myslice')
     platform_details = execute_query(request, platform_query)
     for platform_detail in platform_details:
         return platform_detail
@@ -265,7 +273,9 @@ def get_myslice_platform(request):
 @login_required
 def get_myslice_account(request):
     platform_myslice = get_myslice_platform(request)
-    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
+    account_query  = Query().get('local:account')\
+                            .select('user_id','platform_id','auth_type','config')\
+                            .filter_by('platform_id','==',platform_myslice['platform_id'])
     account_details = execute_query(request, account_query)
     for account_detail in account_details:
         return account_detail
@@ -302,15 +312,19 @@ def account_process(request):
     for account_detail in account_details:
         for platform_detail in platform_details:
             # Add reference account to the platforms
-            if 'add_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'add_'+platform_detail['platform']:
+            if 'add_'+platform_detail['platform'] in request.POST\
+               or request.POST['button_value'] == 'add_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
-                user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+                user_params = {'platform_id': platform_id, 'user_id': user_id,
+                               'auth_type': "reference",
+                               'config': '{"reference_platform": "myslice"}'}
                 manifold_add_account(request,user_params)
                 messages.info(request, 'Reference Account is added to the selected platform successfully!')
                 return HttpResponseRedirect("/portal/account/")
 
             # Delete reference account from the platforms
-            if 'delete_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'delete_'+platform_detail['platform']:
+            if 'delete_'+platform_detail['platform'] in request.POST\
+               or request.POST['button_value'] == 'delete_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
                 manifold_delete_account(request,platform_id, user_id, user_params)
@@ -372,7 +386,8 @@ def account_process(request):
                 updated_config = json.dumps(config)
                 user_params = {'config': updated_config}
             else: # it's needed if the config is empty 
-                user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
+                user_config['config'] = '{{"firstname":"{}", "lastname":"{}", "authority": "Unknown Authority"}}'\
+                                        .format(edited_first_name, edited_last_name)
                 user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
         manifold_update_user(request, request.user.email,user_params)
@@ -387,10 +402,10 @@ def account_process(request):
         for user_pass in user_details:
             user_pass['password'] = edited_password
         #updating password in local:user
-        user_params = { 'password': user_pass['password']}
-        manifold_update_user(request,request.user.email,user_params)
+        user_params = { 'password' : user_pass['password']}
+        manifold_update_user(request, request.user.email, user_params)
 #        return HttpResponse('Success: Password Changed!!')
-        messages.success(request, 'Sucess: Password Updated.')
+        messages.success(request, 'Success: Password Updated.')
         return HttpResponseRedirect("/portal/account/")
 
 # XXX TODO: Factorize with portal/registrationview.py
@@ -410,7 +425,8 @@ def account_process(request):
                         account_config = json.loads(account_detail['config'])
                         # preserving user_hrn
                         user_hrn = account_config.get('user_hrn','N/A')
-                        keypair = '{"user_public_key":'+ public_key + ', "user_private_key":'+ private_key + ', "user_hrn":"'+ user_hrn + '"}'
+                        keypair = '{{"user_public_key":{}, "user_private_key":{}, "user_hrn":"{}"}}'\
+                                  .format(public_key, private_key, user_hrn)
                         #updated_config = json.dumps(account_config) 
                         # updating manifold
                         #user_params = { 'config': keypair, 'auth_type':'managed'}
@@ -425,17 +441,24 @@ def account_process(request):
                             if 'keys' in result_sfa_user and result_sfa_user['keys'][0] == public_key:
                                 # updating manifold
                                 updated_config = json.dumps(account_config) 
-                                user_params = { 'config': keypair, 'auth_type':'managed'}
+                                user_params = {'config' : keypair, 'auth_type' : 'managed'}
                                 manifold_update_account(request, user_id, user_params)
-                                messages.success(request, 'Sucess: New Keypair Generated! Delegation of your credentials will be automatic.')
+                                messages.success(request,
+                                                 'Success: New Keypair Generated! '
+                                                 'Delegation of your credentials will be automatic.')
                             else:
                                 raise Exception,"Keys are not matching"
                         except Exception as e:
-                            messages.error(request, 'Error: An error occured during the update of your public key at the Registry, or your public key is not matching the one stored.')
+                            messages.error(request,
+                                           'Error: An error occured during the update '
+                                           'of your public key at the Registry, or your '
+                                           'public key is not matching the one stored.')
                             logger.error("Exception in accountview {}".format(e))
                         return HttpResponseRedirect("/portal/account/")
         else:
-            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request,
+                           'Account error: You need an account in '
+                           'myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
                        
     elif 'upload_key' in request.POST:
@@ -452,23 +475,31 @@ def account_process(request):
                             account_config = json.loads(account_detail['config'])
                             # preserving user_hrn
                             user_hrn = account_config.get('user_hrn','N/A')
-                            file_content = '{"user_public_key":"'+ file_content + '", "user_hrn":"'+ user_hrn +'"}'
+                            file_content = '{"user_public_key":"{}", "user_hrn":"{}"}'\
+                                           .format(file_content, user_hrn)
                             #file_content = re.sub("\r", "", file_content)
                             #file_content = re.sub("\n", "\\n",file_content)
                             file_content = ''.join(file_content.split())
                             #update manifold local:account table
-                            user_params = { 'config': file_content, 'auth_type':'user'}
+                            user_params = {'config' : file_content, 'auth_type':'user'}
                             manifold_update_account(request, user_id, user_params)
                             # updating sfa
                             user_pub_key = {'keys': file_content}
                             sfa_update_user(request, user_hrn, user_pub_key)
-                            messages.success(request, 'Publickey uploaded! Please delegate your credentials using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+                            messages.success(request,
+                                             'Publickey uploaded! Please delegate your '
+                                             'credentials using SFA: '
+                                             'http://trac.myslice.info/wiki/DelegatingCredentials')
                             return HttpResponseRedirect("/portal/account/")
                         else:
-                            messages.error(request, 'RSA key error: Please upload a valid RSA public key [.txt or .pub].')
+                            messages.error(request,
+                                           'RSA key error: Please upload '
+                                           'a valid RSA public key [.txt or .pub].')
                             return HttpResponseRedirect("/portal/account/")
         else:
-            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request,
+                           'Account error: You need an account '
+                           'in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
 
     elif 'dl_pubkey' in request.POST or request.POST['button_value'] == 'dl_pubkey':
@@ -483,7 +514,9 @@ def account_process(request):
                         return response
                         break
         else:
-            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request,
+                           'Account error: You need an account '
+                           'in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
                
     elif 'dl_pkey' in request.POST or request.POST['button_value'] == 'dl_pkey':
@@ -498,11 +531,15 @@ def account_process(request):
                             response['Content-Disposition'] = 'attachment; filename="privkey.txt"'
                             return response
                         else:
-                            messages.error(request, 'Download error: Private key is not stored in the server')
+                            messages.error(request,
+                                           'Download error: '
+                                           'Private key is not stored in the server')
                             return HttpResponseRedirect("/portal/account/")
 
         else:
-            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
+            messages.error(request,
+                           'Account error: You need an account '
+                           'in myslice platform to perform this action')
             return HttpResponseRedirect("/portal/account/")
     
     elif 'delete' in request.POST or request.POST['button_value'] == 'delete':
@@ -519,8 +556,13 @@ def account_process(request):
                             updated_config = json.dumps(account_config)
                             user_params = { 'config': updated_config, 'auth_type':'user'}
                             manifold_update_account(request, user_id, user_params)
-                            messages.success(request, 'Private Key deleted. You need to delegate credentials manually once it expires.')
-                            messages.success(request, 'Once your credentials expire, Please delegate manually using SFA: http://trac.myslice.info/wiki/DelegatingCredentials')
+                            messages.success(request,
+                                             'Private Key deleted. You need to delegate '
+                                             'credentials manually once it expires.')
+                            messages.success(request,
+                                             'Once your credentials expire, Please delegate '
+                                             'manually using SFA: '
+                                             'http://trac.myslice.info/wiki/DelegatingCredentials')
                             return HttpResponseRedirect("/portal/account/")
                         else:
                             messages.error(request, 'Delete error: Private key is not stored in the server')

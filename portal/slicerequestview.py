@@ -19,6 +19,7 @@ from myslice.theme import ThemeView
 from myslice.settings import logger
 
 import activity.user
+theme = ThemeView()
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
@@ -134,12 +135,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             
             # create slice_hrn based on authority_hrn and slice_name
             slice_name = slice_request['slice_name']
-            req_slice_hrn = authority_hrn + '.' + slice_name
-            # comparing requested slice_hrn with the existing slice_hrn 
-            slice_query  = Query().get('myslice:slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
+            # slice name is unique among all authorities 
+            slice_query  = Query().get('myslice:slice').select('slice_hrn')
             slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
             for _slice in slice_details_sfa:
-                if _slice['slice_hrn'] == req_slice_hrn:
+                split_list = _slice['slice_hrn'].split('.')
+                sfa_slice_name = split_list[-1]
+                if sfa_slice_name == slice_name:
                     errors.append('Slice already exists. Please use a different slice name.')
             
 
@@ -150,9 +152,17 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
             
-            organization = slice_request['organization']    
-            if (organization is None or organization == ''):
-                errors.append('Organization is mandatory')
+            organization = slice_request['organization']
+            if theme.theme == 'fed4fire':
+                if (organization is None or organization == ''):
+                    errors.append('Selecting project is mandatory')
+            else:
+                if (organization is None or organization == ''):
+                    errors.append('Organization is mandatory')
+
+            slice_length= len(slice_request['slice_name'])
+            if slice_length >19:
+                errors.append('Slice name can be maximum 19 characters long')
 
 
     

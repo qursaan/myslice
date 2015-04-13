@@ -125,13 +125,15 @@
 	   </div>
 	</div>
 	<div class="tab-pane row" id="requests">
+        <div id="spinner" style="padding-top:40px; padding-left:40px;"/>
 	</div>
 </div>
 <script>
 $(document).ready(function() {
     {% if person %}
     {% if user_details.parent_authority %}
-
+        $('#spinner').spin();
+        
         $.post("/rest/myslice:slice/",{'fields':['slice_hrn','users','url','slice_date_created'],'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
             var list_slices = [];
             var table_slices = [];

@@ -136,7 +136,7 @@ jQuery(document).ready(function(){
                       jQuery("#upload_file").click(function(){
 
                               jQuery("#span_upload").show();
-                              jQuery("#dl_file").hide();
+                              jQuery("#dl_pubkey").hide();
                               jQuery("#upload_file").hide();
                               jQuery("#keyval").hide();
                               // enforcing when one edit is clicked the rest will not work at same time
@@ -157,7 +157,7 @@ jQuery(document).ready(function(){
 
                               jQuery("#span_upload").hide();
                               jQuery("#keyval").show();
-                              jQuery("#dl_file").show();
+                              jQuery("#dl_pubkey").show();
                               jQuery("#upload_file").show();
                       });
                   });
