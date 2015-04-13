@@ -107,8 +107,8 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                     'purpose'           : wsgi_request.POST.get('purpose', ''),
                 }
 
-                if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
-                    errors.append('Organization is mandatory')
+                #if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
+                #    errors.append('Organization is mandatory')
     
                 if (post['purpose'] is None or post['purpose'] == ''):
                     errors.append('Project purpose is mandatory')
