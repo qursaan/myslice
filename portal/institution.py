@@ -71,6 +71,7 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
             pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
         else: 
             env['person'] = None
+            pi = False
         env['theme'] = self.theme
         env['section'] = "Institution"
         env['pi'] = pi 
