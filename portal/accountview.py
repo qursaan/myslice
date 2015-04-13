@@ -38,7 +38,8 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
         metadata = page.get_metadata()
         page.expose_js_metadata()
 
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js",
+                               "js/my_account.edit_profile.js","js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
         # Execute a Query to delegate credentials if necessary
@@ -178,8 +179,13 @@ class AccountView(LoginRequiredAutoLogoutView, ThemeView):
                         pub_key_list.append(account_pub_key)
                         user_status_list.append(user_status)
                         # combining 5 lists into 1 [to render in the template] 
-                        principal_acc_list = [{'platform_name': t[0], 'account_type': t[1], 'delegation_type': t[2], 'usr_hrn':t[3], 'usr_pubkey':t[4], 'user_status':t[5],} 
-                            for t in zip(platform_name_list, account_type_list, delegation_type_list, usr_hrn_list, pub_key_list, user_status_list)]
+                        principal_acc_list = [
+                            {'platform_name' : pn, 'account_type' : at,
+                             'delegation_type' : dt, 'usr_hrn' : uh,
+                             'usr_pubkey' : up, 'user_status' : us,} 
+                            for pn, at, dt, uh, up, us in zip(platform_name_list, account_type_list, delegation_type_list,
+                                         usr_hrn_list, pub_key_list, user_status_list)
+                        ]
                     # to hide private key row if it doesn't exist    
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
@@ -286,15 +292,19 @@ def account_process(request):
     for account_detail in account_details:
         for platform_detail in platform_details:
             # Add reference account to the platforms
-            if 'add_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'add_'+platform_detail['platform']:
+            if 'add_'+platform_detail['platform'] in request.POST\
+               or request.POST['button_value'] == 'add_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
-                user_params = {'platform_id': platform_id, 'user_id': user_id, 'auth_type': "reference", 'config': '{"reference_platform": "myslice"}'}
+                user_params = {'platform_id': platform_id, 'user_id': user_id,
+                               'auth_type': "reference",
+                               'config': '{"reference_platform": "myslice"}'}
                 manifold_add_account(request,user_params)
                 messages.info(request, 'Reference Account is added to the selected platform successfully!')
                 return HttpResponseRedirect("/portal/account/")
 
             # Delete reference account from the platforms
-            if 'delete_'+platform_detail['platform'] in request.POST or request.POST['button_value'] == 'delete_'+platform_detail['platform']:
+            if 'delete_'+platform_detail['platform'] in request.POST\
+               or request.POST['button_value'] == 'delete_'+platform_detail['platform']:
                 platform_id = platform_detail['platform_id']
                 user_params = {'user_id':user_id}
                 manifold_delete_account(request,platform_id, user_id, user_params)
@@ -356,7 +366,8 @@ def account_process(request):
                 updated_config = json.dumps(config)
                 user_params = {'config': updated_config}
             else: # it's needed if the config is empty 
-                user_config['config']= '{"firstname":"' + edited_first_name + '", "lastname":"'+ edited_last_name + '", "authority": "Unknown Authority"}'
+                user_config['config'] = '{{"firstname":"{}", "lastname":"{}", "authority": "Unknown Authority"}}'\
+                                        .format(edited_first_name, edited_last_name)
                 user_params = {'config': user_config['config']} 
         # updating config local:user in manifold       
         manifold_update_user(request, request.user.email,user_params)
@@ -371,10 +382,10 @@ def account_process(request):
         for user_pass in user_details:
             user_pass['password'] = edited_password
         #updating password in local:user
-        user_params = { 'password': user_pass['password']}
-        manifold_update_user(request,request.user.email,user_params)
+        user_params = { 'password' : user_pass['password']}
+        manifold_update_user(request, request.user.email, user_params)
 #        return HttpResponse('Success: Password Changed!!')
-        messages.success(request, 'Sucess: Password Updated.')
+        messages.success(request, 'Success: Password Updated.')
         return HttpResponseRedirect("/portal/account/")
 
 # XXX TODO: Factorize with portal/registrationview.py
@@ -494,7 +505,7 @@ def account_process(request):
             else:
                 messages.error(request, 'Delete error: Private key is not stored in the server')
                 return HttpResponseRedirect("/portal/account/")
-                           
+                          
         except Exception as e:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')    
             return HttpResponseRedirect("/portal/account/")

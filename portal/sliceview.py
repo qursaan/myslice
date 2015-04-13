@@ -37,4 +37,10 @@ class SliceView (LoginRequiredView, ThemeView):
             pi = "is_not_pi"
         else:
             pi = "is_pi"
-        return render_to_response(self.template, {"slice": slicename, "theme": self.theme, "username": request.user,"pi":pi, "section": "Slice %s" % slicename }, context_instance=RequestContext(request))
+        return render_to_response(self.template,
+                                  {"slice" : slicename,
+                                   "theme" : self.theme,
+                                   "username" : request.user,
+                                   "pi" : pi,
+                                   "section" : "Slice {}".format(slicename) },
+                                  context_instance=RequestContext(request))
