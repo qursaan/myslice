@@ -83,10 +83,10 @@ def log(request, action, message, objects = None):
     t.start()
 
 def getClientIp(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
+    try :
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         ip = x_forwarded_for.split(',')[0]
-    else:
+    except:
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
