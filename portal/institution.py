@@ -69,12 +69,12 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
                 env['project'] = True
                 env['user_details'] = {'parent_authority': authority_hrn}
 
+            logger.debug("BEFORE  ####------####  is_pi")
+            logger.debug("is_pi = {}".format(is_pi))
+            pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
         else: 
             env['person'] = None
-        logger.debug("BEFORE  ####------####  is_pi")
-        pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
-        logger.debug("is_pi = {}".format(is_pi))
-
+            pi = False
         env['theme'] = self.theme
         env['section'] = "Institution"
         env['pi'] = pi 
