@@ -59,16 +59,14 @@
                 <h3>
                     <a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="" /></a>ACCOUNT
                 </h3>
-                
-                <div>
-                    <button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-                </div>
-            <div>
                 {% if person.last_name %}
-                    {{person.first_name}} {{person.last_name}}<br />
+                <p>
+                    {{person.first_name}} {{person.last_name}}
+                </p>
                 {% endif %}
-                <span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
-            </div>
+                <p>
+                    <span class="glyphicon glyphicon-user"></span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
+                </p>
             </div>
             <div class="row">
                 <h3>
@@ -92,6 +90,10 @@
                     <span class="glyphicon glyphicon-stats"></span> <a target="_blank" href="https://flsmonitor.fed4fire.eu">Testbeds' status</a>
                     </br />
                     <span class="glyphicon glyphicon-stats"></span> <a href="/portal/reputation">Testbeds' reputation</a>
+                    
+                </p>
+                <p>
+                    <span class="glyphicon glyphicon-book"></span> <a target="_blank" href="http://doc.fed4fire.eu/">Documentation</a>
                 </p>
            
             </div>
