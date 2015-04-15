@@ -1,15 +1,19 @@
 from django.http import HttpResponse
 from rest import error
-import os,json
-import ConfigParser
-import string, random
+import os,json,string,random
+import logging,ConfigParser
 
 from portal.models import MeasurementsDB
 
 from manifold.core.query             import Query, AnalyzedQuery
 from manifoldapi.manifoldapi         import execute_query
 
-from influxdb import InfluxDBClient
+logger = logging.getLogger(__name__)
+
+try :
+    from influxdb import InfluxDBClient
+except :
+    logger.error('can\'t import InfluxDBClient module')
 
 def createDatabase(request, slicename):
     result = {}
