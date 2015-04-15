@@ -21,7 +21,7 @@
 <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.qtip.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.datatables.js"></script>
-<!-- <script src="{{ STATIC_URL }}js/stash.min.js"></script> -->
+<script src="{{ STATIC_URL }}js/common.functions.js"></script>
 <script src="{{ STATIC_URL }}js/myslice.js"></script>
 <script src="{{ STATIC_URL }}js/myslice-ui.js"></script>
 
@@ -82,6 +82,7 @@ $(document).ready(function() {
         p = myslice.projects();
         if(p != null){
             drawProjects(p);
+            drawProjectsTree(p,slices);
         }
         {% endif %}
     });
@@ -105,6 +106,26 @@ $(document).ready(function() {
         });
         $("div#home-project-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-project-list").append(items.join( "" ));
+    }
+    function drawProjectsTree(projects,slices) {
+        var items = [];
+        var items_sl = [];
+        $.each( projects, function(i, p) {
+            $.each( slices, function(y, s) {
+                console.log(escapeRegExp(p));
+                if (s.match('^' + escapeRegExp(p))) {
+                     items_sl.push( "<li><a href=\"/resources/" + s + "\">" + s.replace(p + '.','') + "</a></li>" );
+                }
+            });
+            el = "<li><a href=\"/portal/project/" + p + "\">" + p + "</a>";
+            if (items_sl.length > 0) {
+                el += "<ul>" + items_sl.join( "" ) + "</ul>";
+            }
+            el += "</li>";
+            items.push(el);
+            items_sl = [];
+        });
+        $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
     }
     {% endif %}
 {% endif %}
