@@ -282,6 +282,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             page            = page,
             domid           = "filter-status",
             query           = sq_resource,
+            query_lease     = sq_lease,
         )
         apply = ApplyPlugin(
             page            = page,
