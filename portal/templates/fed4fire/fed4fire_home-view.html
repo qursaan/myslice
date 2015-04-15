@@ -6,112 +6,99 @@
 {% widget '_widget-news.html' %}
 </div> -->
 {% if username %}
+
 {% block head %} 
-<script type="text/javascript" src="https://java.com/js/dtjava.js"/>
-<script type="text/javascript">
-</script>
+<script type="text/javascript" src="https://java.com/js/dtjava.js"></script>
 {% endblock head %}
 
 {% widget "_widget-no_credentials.html" %}
 <div class="container dashboard">
 	<div class="row">
+	    <div class="col-md-12">
 	{%if 'no_creds'  in user_cred %}
       	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
   	{%endif%}
 	{%if 'creds_expired'  in user_cred %}
     	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
     {%endif%}
-		<div class="col-md-3">
-			<h3>
-				EXPERIMENT
-			</h3>
-			<div>
-				<a href="/portal/slice_request"><img src="{{ STATIC_URL }}img/icon_slices.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="slicerequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
-			</div>
-			<div>
-				<p><strong>Your slices </strong>
-					<span title="A slice is a set of testbed resources on which you can conduct an experiment. 
-					Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
-					However, on the Fed4FIRE portal, you will only see slices that you have created through Fed4FIRE. If you have created slices elsewhere, 
-					those slices will not appear here."
-					class="glyphicon glyphicon-info-sign">
-				</span>
-
-  				</p>
-			</div>
-			<div>	
-				<div id="home-slice-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
-			</div>
-			<h3 title="Some tools do their own slice creation and management.">Experiment now</h3>
-			<a class="btn btn-primary" id="webstart-button" style="width: 150px;" 
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>
+                <a href="/portal/slice_request"><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="" /></a>EXPERIMENT
+            </h3>
+            
+            <div>
+                Your projects and slices
+                <span title="A <b>slice</b> is a set of testbed resources on which you can conduct an experiment. 
+                Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
+                However, on the Fed4FIRE portal, you will only see slices that you have created through Fed4FIRE. If you have created slices elsewhere, 
+                those slices will not appear here. <br /><br /> A <b>project</b> is a sub-authority under the responsability of your institution gathering users, 
+                who will be able to create slices for their experiments." class="glyphicon glyphicon-info-sign">&nbsp;</span> 
+            </div>
+            
+            <div>   
+                <div id="home-project-tree"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
+            </div>
+            <div>
+                <span class="glyphicon glyphicon-plus"></span> <a href="/portal/slice_request/">Create slice</a>
+                <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
+            </div>
+            
+            <div>
+                <h3 title="Some tools do their own slice creation and management.">Experiment now</h3>
+                    <a class="btn btn-primary" id="webstart-button" style="width: 150px;" 
                     href='http://jfed.iminds.be/releases/5.4-dev/r2314/webstart/experimenter/jfed-experimenter.jnlp'
-					title="Click here to start your experiment with jFed">
+                    title="Click here to start your experiment with jFed">
                     <span class="glyphicon glyphicon-cloud"></span> jFed</a>
-		</div>
-		<div class="col-md-3">
-			<h3>MANAGEMENT</h3>
-			<div>
-				<a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="projectrequestbtn" type="button" class="btn btn-default" style="width:165px;"><span class="glyphicon glyphicon-plus"></span> Create/Join project</button>
-			</div>
-			<div>
-				<button id="validaterequestbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span> Validate Requests</button>
-			</div>
-			<div>
-				<p><strong>Your projects </strong>
-					<span title="A project is a sub-authority under the responsability of your institution gathering users, who will be able to create slices for their experiments."
-					class="glyphicon glyphicon-info-sign">
-				</span>
-  				</p>
-			</div>
-			<div>	
-				<div id="home-project-list"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
-			</div>
-
-		</div>
-		<div class="col-md-3">
-			<h3>
-				SUPPORT
-			</h3>
-			<div>
-				<a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="ticketbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Contact</button>
-			</div>
-			<p></p>
-			<div>
-    			<button id="statbtn" type="button" style="width: 170px;" class="btn btn-default"><span class="glyphicon glyphicon-stats" style="margin-right: 10px;"></span>Testbeds' status</button>
-			</div>
-			<div>
-    			<button id="repbtn" type="button" style="width: 170px;" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>Testbeds' reputation</button>
-			</div>
-		</div>
-		
-		<div class="col-md-3">
-			<h3>
-				ACCOUNT
-			</h3>
-			<div>
-				<a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_color.png" alt="" /></a>
-			</div>
-			<div>
-				<button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
-			</div>
-			<div>
-				{% if person.last_name %}
-					{{person.first_name}} {{person.last_name}}<br />
-				{% endif %}
-    			<span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
-	    	</div>
-		</div>
-	</div>
-
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <h3>
+                    <a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="" /></a>ACCOUNT
+                </h3>
+                
+                <div>
+                    <button id="logoutbtn" type="button" class="btn btn-default" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</button>
+                </div>
+            <div>
+                {% if person.last_name %}
+                    {{person.first_name}} {{person.last_name}}<br />
+                {% endif %}
+                <span class="label">Username:</span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
+            </div>
+            </div>
+            <div class="row">
+                <h3>
+                    <a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /></a>MANAGEMENT
+                </h3>
+               
+                <div>
+                    <span class="glyphicon glyphicon-ok"></span> <a href="/portal/institution#requests">Validate Requests</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <h3>
+                    <a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="" /></a>SUPPORT 
+                </h3>
+                <p>
+                    <span class="glyphicon glyphicon-envelope"></span> <a href="/portal/contact/">Contact</a>
+                </p>
+                <p>
+                    <span class="glyphicon glyphicon-stats"></span> <a target="_blank" href="https://flsmonitor.fed4fire.eu">Testbeds' status</a>
+                    </br />
+                    <span class="glyphicon glyphicon-stats"></span> <a href="/portal/reputation">Testbeds' reputation</a>
+                </p>
+           
+            </div>
+            
+            
+        </div>
+    </div>
 </div>
 {% else %}
 <div class="container-fluid home">
@@ -163,29 +150,7 @@
 			$('div.home-panel').hide();
 			$('div#'+$(this).data('panel')).show();
 		});
-		$('button#validaterequestbtn').click(function() {
-			window.location="/portal/institution#requests";
-		});
-		$('button#ticketbtn').click(function() {
-			window.location="/portal/contact/";
-		});
-		$('button#statbtn').click(function() {
-    		window.location="https://flsmonitor.fed4fire.eu";
-		});
-		 $('button#repbtn').click(function() {
-     		window.location="/portal/reputation";
-		 });
-		$('button#signupbtn').click(function() {
-			window.location="/portal/register/";
-		});
-		$('button#slicerequestbtn').click(function() {
-			window.location="/portal/slice_request/";
-		});
-		$('button#projectrequestbtn').click(function() {
-			window.location="/portal/project_request/";
-		});
-
-        myslice.loadSlices();
+		
 });
 </script>
 
@@ -206,7 +171,5 @@ for jfed tool
      }
 </script>
 -->
-{# widget "_widget-monitor.html" #}
-{# widget "_widget-stats-top-slices.html" #}
 
 {% endblock %}

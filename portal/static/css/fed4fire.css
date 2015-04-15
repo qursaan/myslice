@@ -27,7 +27,8 @@ h2 {
     color:#333333;
 }
 h3 {
-    font-size:13pt;
+    font-size:12pt;
+    letter-spacing:0.6pt;
     color:#201E62;
 }
 input[type=checkbox] {
@@ -651,17 +652,28 @@ div.secondary .account span {
 div.secondary .account a {
     color:black;
 }
-div.dashboard div {
-    margin:25px 0;
-}
+
 div.dashboard {
-    text-align:center;
+}
+div.dashboard a {
+    color:black;
+}
+div.dashboard a:hover {
 }
 div.dashboard ul {
     text-align:left;
     margin-left:24px;
     list-style:none;
 }
+div.dashboard h3 {
+    border-bottom:0.5px solid #E0E0E0;
+    margin-right:15px;
+}
+div.dashboard h3 img {
+    margin:15px 15px 15px 0;
+}
+
+
 div.dataTables_filter label{
     float:left;
     width:400px;
