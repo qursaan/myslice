@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
 {% load i18n %}
-
-{% block content %}
+{% block head %}
 <script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
 <script src="{{ STATIC_URL }}js/jquery-ui-combobox.js"></script>
 <link rel='stylesheet' type='text/css' href="{{ STATIC_URL }}css/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.ui.combobox.css">
+{% endblock head %}
+{% block content %}
 <br />
 <div class="row">
     <div class="col-md-12">
@@ -85,7 +86,10 @@
                 <form role="form" method="post" action="/portal/project_request">
                 {% csrf_token %}
                 <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
-                <select id="projects" name="project_name" style="display:none;"></select> <div style="display:none;" id="projects_button"><input type="submit" id="join" name="join" value="Join" class="btn"/></div>
+                <select id="projects" name="project_name" style="display:none;"></select> 
+                <div style="display:none;" id="projects_button">
+                    <input type="submit" id="join" name="join" value="Join" class="btn"/>
+                </div>
                 </form>
             </div>
             <div class="col-md-6">
