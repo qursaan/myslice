@@ -674,6 +674,7 @@ div.home h3, div.home h4 {
     color:#424242;
     line-height:1.4em;
 }
+
 div.home h3 a {
     color:#FD6D2C;
 }
@@ -682,6 +683,7 @@ div.dashboard {
 div.dashboard a {
     color:#206090;
 }
+
 div.dashboard a:hover {
     text-decoration:underline;
 }
@@ -713,6 +715,9 @@ div.dashboard h3 {
     border-bottom:1px solid #E0E0E0;
     margin-right:15px;
     margin-bottom:25px;
+}
+div.dashboard h3 a {
+     color:#201E62;
 }
 div.dashboard h3 img {
     margin:15px 15px 15px 0;

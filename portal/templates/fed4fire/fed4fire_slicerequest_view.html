@@ -42,21 +42,21 @@
 			          If your are not part of any projects you can <a href="/portal/project_request/">join or create one</a>
 			      </label>
 				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:100%" placeholder="Project" 
-				        title="Select a project under which you want to create your slice. Don't have any project yet! Create/Join project from the dashboard." required="required">
+				        title="Select a project under which you want to create your slice" required="required">
 			  </div>
 			  <div class="form-group">
 			      <label>
-			          Provide an URL for your experiment
+			          Provide an URL for your experiment (not required)
 			      </label>
 			      <input type="text" class="form-control" name="url" id="url" style="width:100%" placeholder="Experiment URL (if one exists)"
-				        title="Please provide the url of your experiment if you have one." value="{{url}}">
+				        title="Please provide the url of your experiment" value="{{url}}">
 			  </div>
 			  <div class="form-group">
 			      <label>
                         Please provide a description of the purpose for your experiment
                    </label>
 			  	  <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment description" style="width:100%" 
-				        title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
+				        title="Description of your experiment" required="required">{{ purpose }}</textarea>
 			  </div>
 			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
 			</form>
