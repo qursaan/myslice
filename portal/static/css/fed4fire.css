@@ -658,6 +658,20 @@ div.secondary .account a {
     color:black;
 }
 
+div.home {
+    padding-top:50px;
+}
+div.home h1 {
+    font-size:22pt;
+    border:0;
+}
+div.home h3, div.home h4 {
+    color:#424242;
+    line-height:1.4em;
+}
+div.home h3 a {
+    color:#FD6D2C;
+}
 div.dashboard {
 }
 div.dashboard a {

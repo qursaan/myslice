@@ -107,26 +107,26 @@
     </div>
 </div>
 {% else %}
-<div class="container-fluid home">
+<div class="container home">
 	<div class="">
-		<div class="col-sm-2"></div>
-		<div class="col-sm-4 slogan">
-			<h2>
+		<div class="col-sm-4 col-sm-offset-1 slogan">
+			<h1>
 				Fed4FIRE Portal
-			</h2>
+			</h1>
 			<h3>
-				Your easy access to Future Internet Research and Experimentation testbeds belonging to the Fed4FIRE federation.
+				Your easy access to Future Internet Research and Experimentation testbeds belonging to the 
+				<a target="_blank" href="http://www.fed4fire.eu/">Fed4FIRE</a> federation.
 			</h3>
-			<h3>
+			<br />
+			<h4>
 				 <a href='http://doc.fed4fire.eu'>Want to learn more?</a>
-			</h3>
+			</h4>
 		</div>
 		<div class="col-sm-4 col-sm-offset-1" style="width:400px; top:16px; float:left;">
    			<div class="row">
 				{% widget '_widget-login-user.html' %}
 			</div>
 		</div>
-		<div class="col-sm-1"></div>
 	</div>
 </div>
 {% endif %}
