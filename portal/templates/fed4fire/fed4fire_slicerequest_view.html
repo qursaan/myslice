@@ -65,7 +65,7 @@ jQuery(document).ready(function(){
                     $("#authority_hrn").val("");
                 }
         }
-    });
+    }).bind('focus', function(){ $(this).autocomplete("search"); } );
 });
 
 /*function draw_projects(authority_hrn){
