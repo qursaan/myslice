@@ -141,10 +141,10 @@ var QUERY_STATE_DONE        = 2;
  * RECORD STATES (for query_store)
  ******************************************************************************/
 
-var STATE_SET       = 0;
-var STATE_VALUE     = 1;
-var STATE_WARNINGS  = 2;
-var STATE_VISIBLE   = 3;
+var STATE_SET       = 20;
+var STATE_VALUE     = 21;
+var STATE_WARNINGS  = 22;
+var STATE_VISIBLE   = 23;
 
 // ACTIONS
 var STATE_SET_CHANGE = 0;
@@ -1708,6 +1708,17 @@ case TYPE_LIST_OF_VALUES:
                             // XXX Need for a better function to manage warnings
                             var warn = CONSTRAINT_RESERVABLE_LEASE_MSG;
                             warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+
+                            manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
+                            // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                            data = {
+                                state:  STATE_WARNINGS,
+                                key   : record_key,
+                                op    : null,
+                                value : warnings
+                            }
+                            manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
+
                         } else {
                             // Lease are defined, delete the warning in case it was set previously
                             delete warnings[CONSTRAINT_RESERVABLE_LEASE];
@@ -1716,21 +1727,11 @@ case TYPE_LIST_OF_VALUES:
                         // Remove warnings attached to this resource
                         delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                     }
-
-                    manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
                 }
 
                 /* This was redundant */
                 // manifold.query_store.recount(query.query_uuid); 
 
-                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
-                data = {
-                    state:  STATE_WARNINGS,
-                    key   : record_key,
-                    op    : null,
-                    value : warnings
-                }
-                manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
                 break;
 
             case 'lease':
@@ -1738,7 +1739,7 @@ case TYPE_LIST_OF_VALUES:
                 var resource_query = query_ext.parent_query_ext.query.subqueries['resource'];
                 var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
 
-                if (event_type == STATE_SET_ADD) {
+                if (event_type == STATE_SET_ADD || event_type == STATE_SET_IN_PENDING) {
                      // A lease is added, it removes the constraint
                     delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                 } else {
@@ -1749,23 +1750,22 @@ case TYPE_LIST_OF_VALUES:
                         // XXX Need for a better function to manage warnings
                         var warn = CONSTRAINT_RESERVABLE_LEASE_MSG;
                         warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
+
+                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                        data = {
+                            state:  STATE_WARNINGS,
+                            key   : resource_key,
+                            op    : null,
+                            value : warnings
+                        }
+                        manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
                     } else {
                         // Lease are defined, delete the warning in case it was set previously
                         delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                     }
-                    
                 }
-
+                /* Adding a lease can remove a warning and reduce the unconfigured resources  */
                 manifold.query_store.recount(resource_query.query_uuid); 
-
-                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
-                data = {
-                    state:  STATE_WARNINGS,
-                    key   : resource_key,
-                    op    : null,
-                    value : warnings
-                }
-                manifold.raise_record_event(resource_query.query_uuid, FIELD_STATE_CHANGED, data);
                 break;
         }
 
@@ -1806,6 +1806,9 @@ case TYPE_LIST_OF_VALUES:
         query = query_ext.query;
 
         switch(event_type) {
+            case STATUS_REMOVE_WARNING:
+                record = manifold.query_store.get_record(query_uuid, data.value);
+                this._enforce_constraints(query_ext, record, data.value, STATE_SET_ADD);
 
             // XXX At some point, should be renamed to RECORD_STATE_CHANGED
             case FIELD_STATE_CHANGED:
