@@ -9,7 +9,7 @@
 			 </div>
 		</div>
 	</div>
-
+	
 	{% if errors %}
 	<div class="row">
 		<div class="col-md-12">
@@ -23,27 +23,40 @@
 	{% endif %}
 	
 	<div class="row">
-		<div class="col-md-8 el">
+		<div class="col-md-5 col-md-offset-3">
 			<form role="form" method="post">
 			{% csrf_token %}
-			  <div class="form-group" style="display:none">
-			    <input type="email" class="form-control" id="email" style="width:300px" value="{{ email }}" readonly="readonly">
+			  <div class="form-group">
+			     <input type="hidden" id="email" value="{{ email }}" readonly="readonly">
+			     <label>
+			         Please enter a name for your slice <br />
+			         <span class="sublabel">
+			             The slice name should only contain letters, numbers and the underscore character "_" <br />
+			         </span>
+			     </label>
+			     <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:100%" placeholder="Slice name" value="{{slice_name}}" required="required">
 			  </div>
 			  <div class="form-group">
-			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice name" value="{{slice_name}}" 
-				title="Please enter a name for your slice"required="required">
+			      <label>
+			          Select a project under which you want your slice to be created <br />
+			          If your are not part of any projects you can <a href="/portal/project_request/">join or create one</a>
+			      </label>
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:100%" placeholder="Project" 
+				        title="Select a project under which you want to create your slice. Don't have any project yet! Create/Join project from the dashboard." required="required">
 			  </div>
 			  <div class="form-group">
-				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Project" 
-				title="Select a project under which you want to create your slice. Don't have any project yet! Create/Join project from the dashboard." required="required">
+			      <label>
+			          Provide an URL for your experiment
+			      </label>
+			      <input type="text" class="form-control" name="url" id="url" style="width:100%" placeholder="Experiment URL (if one exists)"
+				        title="Please provide the url of your experiment if you have one." value="{{url}}">
 			  </div>
 			  <div class="form-group">
-			    <input type="text" class="form-control" name="url" id="url" style="width:300px" placeholder="Experiment URL (if one exists)"
-				title="Please provide the url of your experiment if you have one." value="{{url}}">
-			  </div>
-			  <div class="form-group">
-			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
-				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
+			      <label>
+                        Please provide a description of the purpose for your experiment
+                   </label>
+			  	  <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment description" style="width:100%" 
+				        title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
 			  </div>
 			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
 			</form>

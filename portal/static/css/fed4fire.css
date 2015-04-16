@@ -36,6 +36,11 @@ h4 {
     letter-spacing:0.6pt;
     color:#201E62;
 }
+label {
+    font-weight:normal;
+    font-size:13px;
+    color:#201E62;
+}
 input[type=checkbox] {
   min-width:5px !important;
   margin-left:0 !important;
@@ -751,6 +756,15 @@ div.breadcrumbs {
     margin:15px 0;
     color:gray;
     font-size:10pt;
+}
+
+.sublabel {
+    color:gray;
+    font-style:italic;
+    font-weight:normal;
+}
+.tab-pane {
+    padding-top:25px;
 }
 /* Service Directory */
 
