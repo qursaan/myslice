@@ -31,6 +31,11 @@ h3 {
     letter-spacing:0.6pt;
     color:#201E62;
 }
+h4 {
+    font-size:12pt;
+    letter-spacing:0.6pt;
+    color:#201E62;
+}
 input[type=checkbox] {
   min-width:5px !important;
   margin-left:0 !important;
@@ -656,23 +661,70 @@ div.secondary .account a {
 div.dashboard {
 }
 div.dashboard a {
-    color:black;
+    color:#206090;
 }
 div.dashboard a:hover {
+    text-decoration:underline;
+}
+div.dashboard div.projects-tree {
+    margin-left:15px;
 }
 div.dashboard ul {
+    list-style-type:disc;
+    list-style-position:inside;
     text-align:left;
-    margin-left:24px;
+    margin:0 0 15px 4px;
+    padding:0;
+}
+div.dashboard ul ul {
+    margin:5px 0 15px 25px;
     list-style:none;
+}
+div.dashboard li {
+    margin:0 0 5px 0;
+    padding:0;
+}
+div.dashboard ul ul li {
+    margin:0;
+}
+div.dashboard ul ul a {
 }
 div.dashboard h3 {
     border-bottom:0.5px solid #E0E0E0;
     margin-right:15px;
+    margin-bottom:25px;
 }
 div.dashboard h3 img {
     margin:15px 15px 15px 0;
 }
-
+div.dashboard span.glyphicon {
+    text-align:center;
+    width:45px;
+    height:25px;
+}
+div.experiment-tools {
+    
+}
+div.experiment-tools h4 {
+    border-bottom:0.5px solid #E0E0E0;
+    margin:25px 15px 25px 0;
+    padding-bottom:5px;
+}
+div.experiment-tools p {
+    text-align:center;
+}
+#webstart-button {
+    margin-right:25px;
+    width:150px;
+    color:white;
+}
+#webstart-button:hover {
+    text-decoration:none;
+}
+#webstart-button span {
+    width:20px;
+    height:10px;
+}
 
 div.dataTables_filter label{
     float:left;
