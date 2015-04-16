@@ -28,7 +28,12 @@
             <h3>
                 <a href="/portal/slice_request"><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="" /></a>EXPERIMENT
             </h3>
-            
+            <div>
+                
+                <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
+                <br />
+                <span class="glyphicon glyphicon-plus"></span> <a href="/portal/slice_request/">Create slice</a>
+            </div>
             <div class="projects-tree">
                 Your projects and slices
                 <span title="A <b>slice</b> is a set of testbed resources on which you can conduct an experiment. 
@@ -39,19 +44,14 @@
              
                 <div id="home-project-tree"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
             </div>
-            <div>
-                
-                <br />
-                <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
-                <br />
-                <span class="glyphicon glyphicon-plus"></span> <a href="/portal/slice_request/">Create slice</a>
-            </div>
             
-            <div>
-                <h3 title="Some tools do their own slice creation and management.">Experiment now</h3>
-
-                <button id="start" class="btn btn-primary" style="width:150px;" type="button" onclick="launchjFed()"><span class="glyphicon glyphicon-cloud"></span>  Start jFed</button>
+            
+            <div class="experiment-tools">
+                <h4 title="Some tools do their own slice creation and management.">Experiment now</h4>
                 
+                <p class="jfed">
+                    <button id="start" class="btn btn-primary" type="button" onclick="launchjFed()"><span class="glyphicon glyphicon-cloud"></span> Start jFed</button>
+                </p>
                 <div id='java7Dialog' title="Old Java version detected" >
                 <p>The latest version of jFed is only compatible with Java 8 or higher. We detected that you are using an older version.</p>
                 <p>Please upgrade to Java 8 to get access to the newest version of jFed. Otherwise, you can use jFed 5.3.2, which is Java 7-compatible.</p>

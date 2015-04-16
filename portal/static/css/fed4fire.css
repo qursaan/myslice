@@ -718,27 +718,26 @@ div.dashboard span.glyphicon {
     height:25px;
 }
 div.experiment-tools {
-    
 }
 div.experiment-tools h4 {
     border-bottom:1px solid #E0E0E0;
     margin:25px 15px 25px 0;
     padding-bottom:5px;
 }
-div.experiment-tools p {
+div.experiment-tools .jfed {
     text-align:center;
-}
-#webstart-button {
     margin-right:25px;
-    width:150px;
+}
+div.experiment-tools button {
+    margin:0;
+    padding:7px 10px 4px 0;
     color:white;
+    vertical-align:middle;
 }
-#webstart-button:hover {
-    text-decoration:none;
-}
-#webstart-button span {
-    width:20px;
-    height:10px;
+
+div.experiment-tools button span {
+    margin:0;
+    padding:0;
 }
 
 div.dataTables_filter label{
