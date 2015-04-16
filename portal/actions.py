@@ -61,8 +61,8 @@ def get_jfed_identity(request):
             private_key = account_config['user_private_key']
             user_hrn = account_config.get('user_hrn','N/A')
             platform_detail = get_myslice_platform(request)
-            #registry = get_registry_url(request)
-            registry = 'http://sfa-fed4fire.pl.sophia.inria.fr:12345/'
+            registry = get_registry_url(request)
+            #registry = 'http://sfa-fed4fire.pl.sophia.inria.fr:12345/'
             jfed_identity = user_hrn + '\n' + registry + '\n' + private_key 
             return jfed_identity
         else:

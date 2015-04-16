@@ -99,16 +99,29 @@ class Page:
     # needs to be called explicitly and only when metadata is actually required
     # in particular user needs to be logged
     def get_metadata (self):
-        cached_metadata = SessionCache().get_metadata(self.request)
-        if cached_metadata and isinstance(cached_metadata, MetaData):
+        # look in session's cache - we don't want to retrieve this for every request
+        session=self.request.session
+
+        if 'manifold' not in session:
+            session['manifold'] = {}
+        manifold = session['manifold']
+
+        # if cached, use it
+        if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
+
+#         cached_metadata = SessionCache().get_metadata(self.request)
+#         if cached_metadata and isinstance(cached_metadata, MetaData):
             logger.debug("Page.get_metadata: return cached value")
-            return cached_metadata
+            return manifold['metadata']
+#             return cached_metadata
 
         metadata_auth = {'AuthMethod':'anonymous'}
 
         metadata = MetaData (metadata_auth)
         metadata.fetch(self.request)
-        SessionCache().store_metadata(self.request, metadata)
+        # store it for next time
+        manifold['metadata']=metadata
+#         SessionCache().store_metadata(self.request, metadata)
         logger.debug("Page.get_metadata: return new value")
         return metadata
             

@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from manifold.core.result_value import ResultValue
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
 
-from unfold.sessioncache import SessionCache
+# from unfold.sessioncache import SessionCache
 
 from myslice.settings import config, logger
 
@@ -92,8 +92,10 @@ def _execute_query(request, query, manifold_api_session_auth):
         # but most importantly there is a need to refine that test, since 
         # code==2 does not necessarily mean an expired session
         # XXX only if we know it is the issue
-        SessionCache().end_session(request)
+        #SessionCache().end_session(request)
         # Flush django session
+        del request.session['manifold']
+
         request.session.flush()
         #raise Exception, 'Error running query: {}'.format(result)
     
@@ -107,13 +109,18 @@ def _execute_query(request, query, manifold_api_session_auth):
 
 def execute_query(request, query):
     
-    manifold_api_session_auth = SessionCache().get_auth(request)
-    if not manifold_api_session_auth:
+    logger.debug("EXECUTE QUERY: request - {}".format(request.session.items()))
+    
+    if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
+    #manifold_api_session_auth = SessionCache().get_auth(request)
+    #if not manifold_api_session_auth:
         request.session.flush()
         #raise Exception, "User not authenticated"
         host = request.get_host()
         return redirect('/')
     
+    manifold_api_session_auth = request.session['manifold']['auth']
+
     return _execute_query(request, query, manifold_api_session_auth)
 
 def execute_admin_query(request, query):
