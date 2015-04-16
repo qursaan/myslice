@@ -31,7 +31,8 @@
             <div>
                 
                 <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
-                <br />
+            </div>
+            <div class="dashboard-create-slice">
                 <span class="glyphicon glyphicon-plus"></span> <a href="/portal/slice_request/">Create slice</a>
             </div>
             <div class="projects-tree">
@@ -42,7 +43,7 @@
                 those slices will not appear here. <br /><br /> A <b>project</b> is a sub-authority under the responsability of your institution gathering users, 
                 who will be able to create slices for their experiments." class="glyphicon glyphicon-info-sign">&nbsp;</span> 
              
-                <div id="home-project-tree"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
+                <div id="home-project-tree"><img class="projects-loading" src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
             </div>
                         
             <div class="experiment-tools">

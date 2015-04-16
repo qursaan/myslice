@@ -76,12 +76,12 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            drawSlices(slices);
+            //drawSlices(slices);
         }
         {% if theme == "fed4fire" %}
         p = myslice.projects();
         if(p != null){
-            drawProjects(p);
+            //drawProjects(p);
             drawProjectsTree(p,slices);
         }
         {% endif %}
@@ -126,7 +126,14 @@ $(document).ready(function() {
             items_sl = [];
         });
         $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
+        if (projects.length > 0) {
+            $('.dashboard-create-slice').show();
+        }
     }
+    
+    window.setTimeout(function() {
+        $('.projects-loading').hide();
+    },10000);
     {% endif %}
 {% endif %}
 	jQuery('[title!=""]').qtip();

@@ -717,6 +717,9 @@ div.dashboard span.glyphicon {
     width:45px;
     height:25px;
 }
+div.dashboard-create-slice {
+    display:none;
+}
 div.experiment-tools {
 }
 div.experiment-tools h4 {
