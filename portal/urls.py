@@ -59,6 +59,7 @@ from portal.views                   import PresViewView, pres_view_static, pres_
 from portal.django_passresetview    import password_reset, password_reset_done, password_reset_confirm, password_reset_complete 
 
 from portal.reputationview      import ReputationView
+from portal.unboundreservationview_b import UnboundReservationView
 
 # DEPRECATED #named_register_forms = (
 # DEPRECATED #    ("step1", RegisterUserForm),
@@ -137,7 +138,12 @@ urlpatterns = patterns('',
 
     url(r'^reputation/?$', ReputationView.as_view(), name='reputation'),
     url(r'^reputation/submit_eval/?$', ReputationView.as_view(), name='reputation_submit_eval'),
-    
+    url(r'^unbound_reservation_b/?$', UnboundReservationView.as_view(), name='unbound_reservation_b'),
+    #url(r'^time/$', current_datetime),
+    #url(r'^unbound_reservation/?$', unb.as_view(), name='papa'),
+    #url(r'^unbound_reservation/calculate_links/?$', UnboundReservationView.as_view(), name='unbound_reservation_calculate_links'),
+    #url(r'^unb/calculate_links/?$', unb.as_view(), name='unb_reservation_calculate_links'),
+    url(r'^create_post/?$', UnboundReservationView.as_view(), name='create_post'),   
     
 )
 # (r'^accounts/', include('registration.backends.default.urls')),

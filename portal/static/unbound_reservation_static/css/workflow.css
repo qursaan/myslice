@@ -1,0 +1,151 @@
+li{ list-style: none !important; }
+ul{ margin-left: -30px; }
+
+.top-header{ margin-bottom: 5px; margin-top: 5px; }
+.border-editor{ border: 1px solid #CCC; overflow: hidden; background-color:rgb(255,165,0); }
+.heigh-editor{ height: 800px; }
+.content-editor{ margin-bottom: 50px; }
+.border-right-editor{ border-right: 1px solid #CCC; }
+.top-label{ margin-top: 20px; display: block; padding: 14px; font-weight: bold; background-color:#42403F; }
+.tool-panel{ margin-top: 20px; background-color:rgb(255,165,0); }
+
+.css-editor{ width: 100%; height: 92%; border: 1px dashed #D9534F; }
+#editor{ background: url('../img/workflow/bg-editor.jpg')}
+.ui-menu {
+    width: 100px;
+}
+
+.DCon {
+	background: url(../img/workflow/images.jpg);
+	background-size: 100% 100%;
+    cursor:pointer;
+	background-repeat: no-repeat;
+	height: 15px;
+	width: 15px;
+}
+.diagrama {
+	width: 150px;
+	height: 50px; 	
+	padding:16px;
+	position:absolute;
+	border: 1px solid black;
+	z-index:4;
+	border-radius:1em;
+	border:1px solid #2e6f9a;
+	box-shadow: 2px 2px 19px #e0e0e0;
+	-o-box-shadow: 2px 2px 19px #e0e0e0;
+	-webkit-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-border-radius:8px;
+	border-radius:8px;
+	opacity:0.8;
+	filter:alpha(opacity=80);
+	cursor:move;
+	background-color:white;
+	font-size:11px;
+	-webkit-transition:background-color 0.25s ease-in;
+	-moz-transition:background-color 0.25s ease-in;
+	transition:background-color 0.25s ease-in;
+	text-align: center;
+	min-width: 150px;
+	min-height: 50px;	
+}
+
+.objeto:hover > .connect{
+	display: block;
+}
+
+
+.connect {
+    width: 10px;
+    height:0;
+    padding-bottom: 10px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background: #4679BD;
+    float: right;
+    position: relative;
+    right: -10px;
+    top: -0px;
+    display: none;
+}
+.msglabel {
+position: relative;
+width: 30px;
+height:10;
+right:-25px;
+top:-50px;
+font-size: 10px;
+color: #000000;
+}
+.actor{ 
+	background: url('../img/workflow/vm.png') no-repeat;
+	background-size: 64px 64px;
+	width: 64px;
+	height: 64px;
+}
+.actor span{ margin-top: 68px; display: block; }
+.actor:hover > .objeto{ background: none !important; }
+.actor:hover > .connect{
+	right: 5px;
+	top: -60px;
+}
+.actor:hover > .connect .msglabel{
+	right: 0px;
+	top: -50px;
+}
+.wireless{ 
+	background: url('../img/workflow/wireless.png') no-repeat;
+	background-size: 64px 64px;
+	width: 64px;
+	height: 64px;
+}
+.wireless span{ margin-top: 68px; display: block; }
+.wireless:hover > .objeto{ background: none !important; }
+.wireless:hover > .connect{
+	right: 5px;
+	top: -60px;
+}
+.wireless:hover > .msglabel{
+	right: 5px;
+	top: -60px;
+}
+.openflow{ 
+	background: url('../img/workflow/open_flow.png') no-repeat;
+	background-size: 64px 64px;
+	width: 64px;
+	height: 64px;
+}
+.openflow span{ margin-top: 68px; display: block; }
+.openflow:hover > .objeto{ background: none !important; }
+.openflow:hover > .connect{
+	right: 5px;
+	top: -60px;
+}
+.openflow:hover > .msglabel{
+	right: 5px;
+	top: -60px;
+}
+.custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+}
+
+.custom-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
+.context-menu-list{ z-index: 9999 !important; }
