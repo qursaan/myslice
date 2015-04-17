@@ -60,6 +60,7 @@ def timestamp_to_unix(timest):
 def slice_to_exp(slices_users):
     experiments = {}
     testbeds = {}
+    start_t= {}
     wildcard_testbeds = {}
    
     
@@ -130,11 +131,11 @@ def slice_to_exp(slices_users):
                 for resource in slice['resource']:
                     testbed_start = resource.index('IDN+')+4
                     testbed_end = resource.index('+node+')
-                    tb = resource[testbed_start:testbed_end]
-                    if 'ple:' in tb:
-                        tb = 'ple'
-                    if 'omf:nitos' in tb:
-                        tb = 'omf:nitos'
+                    testbed = resource[testbed_start:testbed_end]
+                    if 'ple:' in testbed:
+                        testbed = 'ple'
+                    if 'omf:nitos' in testbed:
+                        testbed = 'omf:nitos'
                     node = resource[testbed_end+6:]
                     
                     if testbed in testbeds:
