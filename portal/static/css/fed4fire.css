@@ -27,7 +27,18 @@ h2 {
     color:#333333;
 }
 h3 {
-    font-size:13pt;
+    font-size:12pt;
+    letter-spacing:0.6pt;
+    color:#201E62;
+}
+h4 {
+    font-size:12pt;
+    letter-spacing:0.6pt;
+    color:#201E62;
+}
+label {
+    font-weight:normal;
+    font-size:13px;
     color:#201E62;
 }
 input[type=checkbox] {
@@ -651,17 +662,97 @@ div.secondary .account span {
 div.secondary .account a {
     color:black;
 }
-div.dashboard div {
-    margin:25px 0;
+
+div.home {
+    padding-top:50px;
+}
+div.home h1 {
+    font-size:22pt;
+    border:0;
+}
+div.home h3, div.home h4 {
+    color:#424242;
+    line-height:1.4em;
+}
+
+div.home h3 a {
+    color:#FD6D2C;
 }
 div.dashboard {
-    text-align:center;
+}
+div.dashboard a {
+    color:#206090;
+}
+
+div.dashboard a:hover {
+    text-decoration:underline;
+}
+div.dashboard div.projects-tree {
+    margin-left:49px;
 }
 div.dashboard ul {
+    list-style-type:disc;
+    list-style-position:inside;
     text-align:left;
-    margin-left:24px;
+    margin:0 0 15px 0;
+    padding:0;
+    
+}
+div.dashboard ul ul {
+    margin:5px 0 15px 25px;
     list-style:none;
 }
+div.dashboard li {
+    margin:0 0 5px 0;
+    padding:0;
+}
+div.dashboard ul ul li {
+    margin:0;
+}
+div.dashboard ul ul a {
+}
+div.dashboard h3 {
+    border-bottom:1px solid #E0E0E0;
+    margin-right:15px;
+    margin-bottom:25px;
+}
+div.dashboard h3 a {
+     color:#201E62;
+}
+div.dashboard h3 img {
+    margin:15px 15px 15px 0;
+}
+div.dashboard span.glyphicon {
+    text-align:center;
+    width:45px;
+    height:25px;
+}
+div.dashboard-create-slice {
+    display:none;
+}
+div.experiment-tools {
+}
+div.experiment-tools h4 {
+    border-bottom:1px solid #E0E0E0;
+    margin:25px 15px 25px 0;
+    padding-bottom:5px;
+}
+div.experiment-tools .jfed {
+    text-align:center;
+    margin-right:25px;
+}
+div.experiment-tools button {
+    margin:0;
+    padding:7px 10px 4px 0;
+    color:white;
+    vertical-align:middle;
+}
+
+div.experiment-tools button span {
+    margin:0;
+    padding:0;
+}
+
 div.dataTables_filter label{
     float:left;
     width:400px;
@@ -670,6 +761,15 @@ div.breadcrumbs {
     margin:15px 0;
     color:gray;
     font-size:10pt;
+}
+
+.sublabel {
+    color:gray;
+    font-style:italic;
+    font-weight:normal;
+}
+.tab-pane {
+    padding-top:25px;
 }
 /* Service Directory */
 

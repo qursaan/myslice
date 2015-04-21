@@ -25,6 +25,51 @@ import activity.slice
 # XXX tmp sfa dependency, should be moved to SFA gateway
 #from sfa.util.xrn                import Xrn 
 
+def get_myslice_platform(request):
+    platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled','config').filter_by('platform','==','myslice')
+    platform_details = execute_query(request, platform_query)
+    for platform_detail in platform_details:
+        return platform_detail
+
+def get_myslice_account(request):
+    platform_myslice = get_myslice_platform(request)
+    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
+    account_details = execute_query(request, account_query)
+    for account_detail in account_details:
+        return account_detail
+
+def get_registry_url(request):
+    try:
+        platform_detail = get_myslice_platform(request)
+        platform_config = json.loads(platform_detail['config'])
+        import socket
+        hostname = socket.gethostbyaddr(socket.gethostname())[0]
+        registry = platform_config.get('registry','N/A')
+        if 'localhost' in registry:
+            port = registry.split(':')[-1:][0]
+            registry = "http://" + hostname +':'+ port
+        return registry
+    except Exception as e:
+        print e
+        return None
+
+def get_jfed_identity(request):
+    try:
+        account_detail = get_myslice_account(request)
+        account_config = json.loads(account_detail['config'])
+        if 'user_private_key' in account_config:
+            private_key = account_config['user_private_key']
+            user_hrn = account_config.get('user_hrn','N/A')
+            platform_detail = get_myslice_platform(request)
+            registry = get_registry_url(request)
+            #registry = 'http://sfa-fed4fire.pl.sophia.inria.fr:12345/'
+            jfed_identity = user_hrn + '\n' + registry + '\n' + private_key 
+            return jfed_identity
+        else:
+            return None
+    except Exception as e:
+        print e
+        return None
 
 # Get the list of pis in a given authority
 def authority_get_pis(request, authority_hrn):

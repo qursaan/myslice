@@ -109,9 +109,13 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                     'project_name'      : wsgi_request.POST.get('project_name', ''),
                     'purpose'           : wsgi_request.POST.get('purpose', ''),
                 }
+                
+                # for new projects max project_name length is 10
+                if (len(post['project_name']) >10):
+                    errors.append('Project name can be maximum 10 characters long')
 
-                if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
-                    errors.append('Organization is mandatory')
+                #if (post['authority_hrn'] is None or post['authority_hrn'] == ''):
+                #    errors.append('Organization is mandatory')
     
                 if (post['purpose'] is None or post['purpose'] == ''):
                     errors.append('Project purpose is mandatory')
@@ -121,12 +125,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
 
             # What kind of project name is valid?
             if (post['project_name'] is None or post['project_name'] == ''):
-                errors.append('Project name is mandatory')
-
-            # max project_name length is 10
-            if (len(post['project_name']) >10):
-                errors.append('Project name can be maximum 10 characters long')
-
+                errors.append('Project name is mandatory')   
             
             if not errors:
                 logger.info("is_pi on auth_hrn = {}".format(user_authority))

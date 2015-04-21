@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//forge/forms.py=utf-8
+encoding//forge/views.py=utf-8
 encoding//portal/django_passresetview.py=utf-8
 encoding//portal/forms.py=utf-8
 encoding//portal/migrations/0002_extend_slice.py=utf-8
@@ -6,6 +8,8 @@ encoding//portal/migrations/0005_extend_user.py=utf-8
 encoding//portal/migrations/0008_extend_user.py=utf-8
 encoding//portal/migrations/0009_initial.py=utf-8
 encoding//portal/migrations/0010_project.py=utf-8
+encoding//portal/migrations/0011_join.py=utf-8
 encoding//portal/models.py=utf-8
 encoding//portal/urls.py=utf-8
 encoding//portal/validationview.py=utf-8
+encoding//portal/views/__init__.py=utf-8

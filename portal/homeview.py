@@ -21,7 +21,7 @@ from myslice.theme                      import ThemeView
 
 from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
-from portal.actions                     import authority_check_pis
+from portal.actions                     import authority_check_pis, get_jfed_identity
 
 import activity.user
 
@@ -57,7 +57,6 @@ class HomeView (FreeAccessView, ThemeView):
             # let's use ManifoldResult.__repr__
             env['state']="%s"%manifoldresult
 
-            return render_to_response(self.template,env, context_instance=RequestContext(request))
         # user was authenticated at the backend
         elif auth_result is not None:
             user=auth_result
@@ -117,25 +116,40 @@ class HomeView (FreeAccessView, ThemeView):
                     env['user_cred'] = user_cred
                 else:
                     env['person'] = None
-                return render_to_response(self.template,env, context_instance=RequestContext(request))
             else:
                 # log user activity
                 activity.user.login(self.request, "notactive")
                 env['state'] = "Your account is not active, please contact the site admin."
                 env['layout_1_or_2']="layout-unfold2.html"
 
-                return render_to_response(self.template,env, context_instance=RequestContext(request))
+            jfed_identity = get_jfed_identity(request)
+            if jfed_identity is not None:
+                import base64
+                encoded_jfed_identity = base64.b64encode(jfed_identity)
+                env['jfed_identity'] = encoded_jfed_identity 
+            else:
+                env['jfed_identity'] = None
+
         # otherwise
         else:
             # log user activity
             activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
 
-            return render_to_response(self.template, env, context_instance=RequestContext(request))
+        return render_to_response(self.template,env, context_instance=RequestContext(request))
 
     def get (self, request, state=None):
         env = self.default_env()
         acc_auth_cred={}
+
+        jfed_identity = get_jfed_identity(request)
+        if jfed_identity is not None:
+            import base64
+            encoded_jfed_identity = base64.b64encode(jfed_identity)
+            env['jfed_identity'] = encoded_jfed_identity 
+        else:
+            env['jfed_identity'] = None
+
         if request.user.is_authenticated():
 
             ## check user is pi or not
@@ -196,48 +210,6 @@ class HomeView (FreeAccessView, ThemeView):
         if state: env['state'] = state
         elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
-
-#         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-#         account_details = execute_query(self.request, account_query)
-#         for account_detail in account_details:
-#             account_config = json.loads(account_detail['config'])
-#             platform_name = platform_detail['platform']
-#             if 'myslice' in platform_detail['platform']:
-#                 acc_user_cred = account_config.get('delegated_user_credential','N/A')
-#                 acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
-#                 acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-#
-#                 if 'N/A' not in acc_user_cred:
-#                     exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
-#                     if exp_date:
-#                         user_exp_date = exp_date.group(1)
-#                         user_cred_exp_list.append(user_exp_date)
-#
-#                     my_users = [{'cred_exp': t[0]}
-#                         for t in zip(user_cred_exp_list)]
-#
-#
-#                 if 'N/A' not in acc_slice_cred:
-#                     for key, value in acc_slice_cred.iteritems():
-#                         slice_list.append(key)
-#                         # get cred_exp date
-#                         exp_date = re.search('<expires>(.*)</expires>', value)
-#                         if exp_date:
-#                             exp_date = exp_date.group(1)
-#                             slice_cred_exp_list.append(exp_date)
-#
-#                     my_slices = [{'slice_name': t[0], 'cred_exp': t[1]}
-#                         for t in zip(slice_list, slice_cred_exp_list)]
-#
-#                 if 'N/A' not in acc_auth_cred:
-#                     for key, value in acc_auth_cred.iteritems():
-#                         auth_list.append(key)
-#                         #get cred_exp date
-#                         exp_date = re.search('<expires>(.*)</expires>', value)
-#                         if exp_date:
-#                             exp_date = exp_date.group(1)
-#                             auth_cred_exp_list.append(exp_date)
-
 
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
