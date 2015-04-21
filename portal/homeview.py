@@ -135,7 +135,7 @@ class HomeView (FreeAccessView, ThemeView):
             # log user activity
             activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
-
+        env['request'] = request
         return render_to_response(self.template,env, context_instance=RequestContext(request))
 
     def get (self, request, state=None):
@@ -204,12 +204,11 @@ class HomeView (FreeAccessView, ThemeView):
         env['theme'] = self.theme
         env['section'] = "Dashboard"
 
-
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
+        env['request'] = request
         if state: env['state'] = state
         elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
-
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 

@@ -23,6 +23,8 @@ from sfa.planetlab.plxrn import hash_loginbase
 import urllib2,json
 
 class ExperimentView (FreeAccessView, ThemeView):
+    # parent View is portal/sliceview.py
+
     template_name = 'slice-tab-experiment.html'
 
     def get (self, request, slicename, state=None):
@@ -99,6 +101,16 @@ class ExperimentView (FreeAccessView, ThemeView):
         for user in all_users:
             if user['email'] == username:
                 iot_login = user['login']
-            
-        return render_to_response(self.template, { 'theme' : self.theme,'slicename':slicename, 'ple_slicename':ple_slicename, 'username':username, 'ple_resources':ple_resource_list, 'nitos_resources': nitos_resource_list, 'nitos_paris_resources':nitos_paris_resource_list, 'iotlab_resources':iotlab_resource_list, 'iot_login':iot_login }, context_instance=RequestContext(request))
+        env = { 'theme' : self.theme,
+                'slicename':slicename, 
+                'ple_slicename':ple_slicename, 
+                'username':username, 
+                'ple_resources':ple_resource_list, 
+                'nitos_resources': nitos_resource_list, 
+                'nitos_paris_resources':nitos_paris_resource_list, 
+                'iotlab_resources':iotlab_resource_list, 
+                'iot_login':iot_login,
+                'request':self.request,
+              }
+        return render_to_response(self.template, env, context_instance=RequestContext(request))
 

@@ -19,9 +19,9 @@
 							</ul>
 					</div>
 				</li>
-				{%if 'is_pi'  in pi %}	
+                {% if request.session.user.pi %}
 				<li id="nav-institution" class=""><a href="/institution">MANAGEMENT</a></li>
-				 {%endif%}
+				{%endif%}
 				<li><a href="/support/">SUPPORT</a></li>
 			</ul>
 		</div>

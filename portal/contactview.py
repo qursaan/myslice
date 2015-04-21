@@ -72,7 +72,7 @@ class ContactView (FreeAccessView, ThemeView):
                 username = None
             # log user activity
             activity.user.contact(self.request)
-            return render(request,'contact_sent.html', { 'theme' : self.theme,  'username': username}) # Redirect after POST
+            return render(request,'contact_sent.html', { 'theme' : self.theme,  'username': username, 'request':request}) # Redirect after POST
         else:
             return self._display (request, form)
 
@@ -82,23 +82,6 @@ class ContactView (FreeAccessView, ThemeView):
     def _display (self, request, form):
         if request.user.is_authenticated():
             username = request.user.email
-            ## check user is pi or not
-            platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-            account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-            platform_details = execute_query(self.request, platform_query)
-            account_details = execute_query(self.request, account_query)
-            for platform_detail in platform_details:
-                for account_detail in account_details:
-                    if platform_detail['platform_id'] == account_detail['platform_id']:
-                        if 'config' in account_detail and account_detail['config'] is not '':
-                            account_config = json.loads(account_detail['config'])
-                            if 'myslice' in platform_detail['platform']:
-                                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-            # assigning values
-            if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-                pi = "is_not_pi"
-            else:
-                pi = "is_pi"
         else :
             username = None
             pi = "is_not_pi"
@@ -107,6 +90,6 @@ class ContactView (FreeAccessView, ThemeView):
                 'topmenu_items': topmenu_items('Contact', request),
                 'theme' : self.theme,
                 'username': username,
-                'pi': pi,
-                'section': "Contact"
+                'section': "Contact",
+                'request': request,
                 })

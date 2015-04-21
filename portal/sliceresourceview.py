@@ -413,27 +413,11 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        #     username            = request.user,
        # )
        # 
-        ## check user is pi or not
-        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-        platform_details = execute_query(self.request, platform_query)
-        account_details = execute_query(self.request, account_query)
-
-        # XXX When session has expired, this is None and thus not iterable
-        for platform_detail in platform_details:
-            for account_detail in account_details:
-                if platform_detail['platform_id'] == account_detail['platform_id']:
-                    if 'config' in account_detail and account_detail['config'] is not '':
-                        account_config = json.loads(account_detail['config'])
-                        if 'myslice' in platform_detail['platform']:
-                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-        # assigning values
-        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-            pi = "is_not_pi"
-        else:
-            pi = "is_pi"
-        
+                
         template_env = {}
+
+        template_env['request'] = self.request       
+
         template_env['list_resources'] = list_resources.render(self.request)
         template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
         template_env['list_reserved_leases'] = list_reserved_leases.render(self.request)
@@ -457,11 +441,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        # template_env['vms_list'] = univbrisvtamplugin.render(self.request)
        # template_env['vm_form'] = univbrisvtamform.render(self.request)
 
-#        template_env['pending_resources'] = pending_resources.render(self.request)
+       # template_env['pending_resources'] = pending_resources.render(self.request)
        # template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
-        template_env["pi"] = pi
         template_env["slice"] = slicename
         template_env["section"] = "resources"
         template_env["msg"] = msg
