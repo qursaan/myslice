@@ -55,6 +55,7 @@ $(document).ready(function() {
 			  <li class="active"><a href="#resourcelist" role="tab" data-toggle="tab">Table</a></li>
 			  <li> <a href="#resourcemap" role="tab" data-toggle="tab">Map</a></li>
 			  <li> <a href="#resourcescheduler" role="tab" data-toggle="tab">Scheduler</a></li>
+              <li> <a href="#resourcesla" role="tab" data-toggle="tab">SLA offers</a></li>
 			</ul>
 			</div>
 		</div>
@@ -89,6 +90,9 @@ $(document).ready(function() {
 				</div>
 				<div class="tab-pane" id="resourcemap">
 	                {{map_resources}}
+				</div>
+                <div class="tab-pane" id="resourcesla">
+	                {{sla_dialog}}
 				</div>
 				<div class="tab-pane" id="resourcescheduler">
 	                {{scheduler}}

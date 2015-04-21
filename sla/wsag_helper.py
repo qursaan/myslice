@@ -1,5 +1,6 @@
 import re
 import datetime
+from myslice.settings import logger
 
 from slaclient import wsag_model
 from slaclient.wsag_model import AgreementStatus
@@ -103,6 +104,8 @@ class AgreementAnnotator(object):
             (wsag_model.Violation[])
         """
         a = agreement
+
+        logger.debug("SLA STATUS: {}".format(status))
 
         if status is not None:
             a.guaranteestatus = status.guaranteestatus

@@ -177,6 +177,10 @@ var CONSTRAINT_RESERVABLE_LEASE     = 0;
 
 var CONSTRAINT_RESERVABLE_LEASE_MSG = "Configuration required: this resource needs to be scheduled";
 
+var CONSTRAINT_SLA                  = 1;
+
+var CONSTRAINT_SLA_MSG              = "SLA acceptance required: testbed offers SLA for its resources"
+
 // A structure for storing queries
 
 function QueryExt(query, parent_query_ext, main_query_ext, update_query_ext, disabled, domain_query_ext) {
@@ -1684,6 +1688,15 @@ case TYPE_LIST_OF_VALUES:
     {
         var query, data;
 
+        // JGLL: TODO These lines should be moved to a different part of the code
+        // to avoid a call every time a resource is selected or deselected -> where?
+        function get_testbeds_with_sla() {
+            return $.ajax({
+                url: '/sla/testbeds/',
+                async: true
+            });
+        }
+
         query = query_ext.query;
 
         switch(query.object) {
@@ -1729,8 +1742,44 @@ case TYPE_LIST_OF_VALUES:
                     }
                 }
 
+                // JGLL: SLA code
+                /*get_testbeds_with_sla()
+                    .done( function(testbeds) {
+                        var urn_regexp = /\+(.*?)\+/;
+                        var testbed_urn = urn_regexp.exec(record.urn)[1];
+
+                        var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
+
+                        if ($.inArray(testbed_urn, testbeds) != -1) {
+                            // JGLL: Set a warning on resources covered by testbeds offering SLAs
+                            // CONSTRAINT_SLA
+
+                            if (event_type == STATE_SET_ADD) {
+                                var warn = CONSTRAINT_SLA_MSG;
+                                warnings[CONSTRAINT_SLA] = warn;
+                            } else {
+                                delete warnings[CONSTRAINT_SLA]
+                            }
+                        }
+
+                        manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
+
+                        // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                        data = {
+                            state:  STATE_WARNINGS,
+                            key   : record_key,
+                            op    : null,
+                            value : warnings
+                        }
+
+                        manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
+                    })
+                    .fail( function(err) {
+                       console.log("SLA - Error retrieving testbeds that support SLAs");
+                    });*/
+
                 /* This was redundant */
-                // manifold.query_store.recount(query.query_uuid); 
+                // manifold.query_store.recount(query.query_uuid);
 
                 break;
 

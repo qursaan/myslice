@@ -3,6 +3,7 @@
 import requests
 
 from requests.auth import HTTPBasicAuth
+from myslice.settings import logger
 
 import xmlconverter
 import wsag_model
@@ -38,17 +39,17 @@ _TEMPLATES_PATH = "templates"
 _VIOLATIONS_PATH = "violations"
 _ENFORCEMENTJOBS_PATH = "enforcements"
 
-rooturl = settings.SLA_MANAGER_URL
+rooturl = settings.SLA_COLLECTOR_URL
 
 
 class Factory(object):
     @staticmethod
-    def agreements(path=_AGREEMENTS_PATH):
+    def agreements():
         """Returns a REST client for Agreements
 
         :rtype : Agreements
          """
-        return Agreements(rooturl, path)
+        return Agreements(rooturl)
 
     @staticmethod
     def providers():
@@ -111,23 +112,26 @@ class Client(object):
             c = Client("http://localhost:8080/service")
             c.get("/resource", headers = { "accept": "application/json" })
         """
-        url = _buildpath_(self.rooturl, path)
+        url = _buildpath(self.rooturl, path)
         if "testbed" in kwargs:
             url = url + "?testbed=" + kwargs["testbed"]
 
         if "headers" not in kwargs:
             kwargs["headers"] = {"accept": "application/xml"}
 
-        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-                                       settings.SLA_MANAGER_PASSWORD)
+
+        kwargs["auth"] = HTTPBasicAuth(settings.SLA_COLLECTOR_USER,
+                                       settings.SLA_COLLECTOR_PASSWORD)
 
         # for key, values in kwargs.iteritems():
         #     print key, values
 
+        logger.debug('SLA GET {}'.format(url))
         result = requests.get(url, **kwargs)
-        print "GET {} {} {}".format(
-            result.url, result.status_code, result.text[0:70])
-        print result.encoding
+        logger.debug('SLA GET {} - result: {}'.format(result.url, result.status_code))
+        # print "GET {} {} {}".format(
+        #     result.url, result.status_code, result.text[0:70])
+        # print result.encoding
 
         return result
 
@@ -150,17 +154,18 @@ class Client(object):
                 }
             )
         """
-        url = _buildpath_(self.rooturl, path)
+        url = _buildpath(self.rooturl, path)
 
         if "testbed" in kwargs:
             url = url + "?testbed=" + kwargs["testbed"]
+            del kwargs["testbed"]
 
         if "headers" not in kwargs:
             kwargs["headers"] = {"accept": "application/xml",
                                  "content-type": "application/xml"}
 
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-                                       settings.SLA_MANAGER_PASSWORD)
+                                      settings.SLA_MANAGER_PASSWORD)
 
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
@@ -228,13 +233,11 @@ class _Resource(object):
         resource = _Resource._processresult(r, self.converter)
         return resource, r
 
-    def get(self, path, params):
+    def get(self, path="", params={}):
         """Generic query over resource: GET /resource?q1=v1&q2=v2...
 
         :param dict[str,str] params: values to pass as get parameters
         """
-        if path is None:
-            path = ""
 
         r = self.client.get(path, params=params)
         resources = self._processresult(r, self.listconverter)
@@ -262,9 +265,9 @@ class Agreements(object):
 
         The final url to the resource is root_url + "/" + path
         """
-        resourceurl = _buildpath_(root_url, path)
-        converter = xmlconverter.AgreementConverter()
-        self.res = _Resource(resourceurl, converter)
+        self.resourceurl = _buildpath(root_url, path)
+        self.converter = xmlconverter.AgreementConverter()
+        self.res = _Resource(self.resourceurl, self.converter)
 
     def getall(self):
         """
@@ -301,12 +304,12 @@ class Agreements(object):
         :param str agreementid :
         :rtype : wsag_model.AgreementStatus
         """
-        path = _buildpath_(_AGREEMENTS_PATH, agreementid, "guaranteestatus")
+        # path = _buildpath(_AGREEMENTS_PATH, agreementid, "guaranteestatus")
+        path = _buildpath(agreementid, "guaranteestatus")
         r = self.res.client.get(path, headers={'accept': 'application/json'},
                                 params={'testbed': testbed})
 
         json_obj = r.json()
-
         status = wsag_model.AgreementStatus.json_decode(json_obj)
 
         return status, r
@@ -316,7 +319,9 @@ class Agreements(object):
 
         :rtype : list[wsag_model.Agreement]
         """
-        return self.res.get(slicename, dict())
+        self.resourceurl = _buildpath(rooturl, 'slice')
+        self.res = _Resource(self.resourceurl, self.converter)
+        return self.res.get(slicename)
 
     def create(self, agreement, testbed):
         """Create a new agreement
@@ -335,7 +340,7 @@ class Templates(object):
 
         The final url to the resource is root_url + "/" + path
         """
-        resourceurl = _buildpath_(root_url, path)
+        resourceurl = _buildpath(root_url, path)
         converter = xmlconverter.AgreementConverter()
         self.res = _Resource(resourceurl, converter)
 
@@ -370,7 +375,7 @@ class Providers(object):
 
         The final url to the resource is root_url + "/" + path
         """
-        resourceurl = _buildpath_(root_url, path)
+        resourceurl = _buildpath(root_url, path)
         converter = xmlconverter.ProviderConverter()
         self.res = _Resource(resourceurl, converter)
 
@@ -406,7 +411,7 @@ class Violations(object):
 
         The final url to the resource is root_url + "/" + path
         """
-        resourceurl = _buildpath_(root_url, path)
+        resourceurl = _buildpath(root_url, path)
         converter = xmlconverter.ViolationConverter()
         self.res = _Resource(resourceurl, converter)
 
@@ -445,7 +450,7 @@ class Enforcements(object):
 
         The final url to the resource is root_url + "/" + path
         """
-        resourceurl = _buildpath_(root_url, path)
+        resourceurl = _buildpath(root_url, path)
         converter = xmlconverter.EnforcementConverter()
         self.res = _Resource(resourceurl, converter)
 
@@ -465,7 +470,7 @@ class Enforcements(object):
         return self.res.getbyid(agreement_id, params={"testbed": testbed})
 
 
-def _buildpath_(*paths):
+def _buildpath(*paths):
     if "" in paths:
         paths = [path for path in paths if path != ""]
 

@@ -21,6 +21,7 @@ root = ElementTree.parse("file.xml")
 c.convert(root.getroot())
 
 """
+from myslice.settings import logger
 
 try:
     # Much faster and lighter library (C implementation)
@@ -201,7 +202,8 @@ class AgreementConverter(Converter):
         :rtype: wsag_model.Agreement
         """
         for name, value in xmlroot.attrib.items():
-            print '{0}="{1}"'.format(name, value)
+            logger.debug('SLA xmlconverter: {} = {}'.format(name, value))
+            # print '{0}="{1}"'.format(name, value)
 
         if xmlroot.tag in self.agreement_tags:
             result = Agreement()
@@ -280,7 +282,7 @@ class AgreementConverter(Converter):
         nss = self._namespaces
         for element in elements:
             servicename = _get_attribute(element, "ServiceName")
-            for var in element.findall("wsag:Variables/wsag:Variable", nss):
+            for var in element.findall("wsag:VariableSet/wsag:Variable", nss):
                 key, value = self._parse_property(var, servicename)
                 result[key] = value
 

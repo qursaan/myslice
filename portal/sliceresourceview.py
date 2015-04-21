@@ -398,21 +398,21 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        #         },
        # )
 
-       # # --------------------------------------------------------------------------
-       # # SLA View and accept dialog
-       # 
-       # sla_dialog = SlaDialog(
-       #     page                = page,
-       #     title               = 'sla dialog',
-       #     query               = main_query,
-       #     togglable           = False,
-       #     # start turned off, it will open up itself when stuff comes in
-       #     toggled             = True,
-       #     domid               = 'sla_dialog',
-       #     outline_complete    = True,
-       #     username            = request.user,
-       # )
-       # 
+        # --------------------------------------------------------------------------
+        # SLA View and accept dialog
+
+        sla_dialog = SlaDialog(
+           page                = page,
+           title               = 'sla dialog',
+           query               = main_query,
+           #togglable           = False,
+           # start turned off, it will open up itself when stuff comes in
+           #toggled             = True,
+           domid               = 'sla_dialog',
+           #outline_complete    = True,
+           username            = request.user,
+        )
+
         ## check user is pi or not
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
@@ -458,7 +458,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        # template_env['vm_form'] = univbrisvtamform.render(self.request)
 
 #        template_env['pending_resources'] = pending_resources.render(self.request)
-       # template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
+        template_env['sla_dialog'] = sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
         template_env["pi"] = pi

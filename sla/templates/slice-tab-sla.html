@@ -1,8 +1,8 @@
 
-<div class="col-md-2">
+<div class="col-md-1">
 </div>
 
- <div class="col-md-9">
+ <div class="col-md-10">
    <div class="row" id="agreements" style="padding-top:1em;">
     
         
@@ -37,6 +37,12 @@
                 <dd>{{ row.agreement.context.testbed_formatted }}</dd>
                 <dt>Expiration date:</dt>
                 <dd>{{ row.date|default:"&nbsp;" }}</dd>
+
+                <dt>Covered slivers:</dt>
+                {% for sliver in row.slivers %}
+                <dd>{{ sliver|default:"&nbsp;" }}</dd>
+                {% endfor %}
+
 			</div>
 			<div class="modal-footer">
  				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -66,7 +72,7 @@
         	
           <td>{{ row.provider }}</td>
 
-          <td><a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{row.agreement.agreement_id}}">{{ row.agreement.context.template_id }}</a></td>
+          <td><a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{row.agreement.agreement_id}}">{{ row.agreement.agreement_id }}</a></td>
     		  
           <td>{{ row.date }}</td>
           <td>{{ row.status }}</td>

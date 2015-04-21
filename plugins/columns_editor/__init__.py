@@ -41,6 +41,18 @@ class ColumnsEditor(Plugin):
         metadata = self.page.get_metadata()
         md_fields = metadata.details_by_object('resource')
 
+        sla_column_info = {
+            'name': 'sla_supported',
+            'default': '',
+            'is_array': False,
+            'description': '',
+            'type': 'bool',
+            'qualifier': None
+        }
+
+        if sla_column_info not in md_fields['column']:
+            md_fields['column'].append(sla_column_info)
+
         # XXX use django templating system here
         for md_field in sorted(md_fields['column']):
             if md_field['type'] == 'string':

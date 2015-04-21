@@ -256,6 +256,8 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    #SLA
+    #'sla',
 ]
 # with django-1.7 we leave south and use native migrations
 # managing database migrations
@@ -357,7 +359,6 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 ####SLA#####
 
-SLA_MANAGER_URL = "http://157.193.215.125:4001/sla-collector/sla"
-#SLA_MANAGER_URL = "http://172.24.76.28:8000/sla"
-SLA_MANAGER_USER = "portal"
-SLA_MANAGER_PASSWORD = "password"
+SLA_COLLECTOR_URL = "http://157.193.215.125:4001/sla-collector/sla"
+SLA_COLLECTOR_USER = "portal"
+SLA_COLLECTOR_PASSWORD = "password"

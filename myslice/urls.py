@@ -126,7 +126,7 @@ urls = [
     url(r'^portal/', include('portal.urls')),
 
     # SLA
-#    url(r'^sla/', include('sla.urls')),
+    #url(r'^sla/', include('sla.urls')),
 ]
 
 urls.extend( components.urls() )
