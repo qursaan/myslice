@@ -260,6 +260,7 @@
 					<th>Slice Name</th> 
 		     		<th>Expiration Date</th>
 					<th>Download</th>
+                    <th>Delete</th>
 		    	</tr>
 				{% for row in my_slices %}     
 		    	<tr class="border_bottom">
@@ -270,6 +271,11 @@
 							<span class="glyphicon glyphicon-download"></span> Download
 						</button> 
 					</td>
+                    <td class="odd"> 
+                        <button class="btn btn-danger btn-xs" name= "del_{{row.slice_name}}" type="submit" title="Download Slice Credentials" onclick="return confirm('Are you sure? If you do so, the slice will be permanently deleted.'); javascript:document.getElementById('button_value').value='del_{{row.slice_name}}';">
+                            <span class="glyphicon glyphicon-remove"></span> Delete
+                        </button> 
+                    </td>
 		    	</tr>
 		    	{%endfor%}
 		  	</table>
