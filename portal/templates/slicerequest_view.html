@@ -79,6 +79,9 @@ jQuery(document).ready(function(){
       minLength: 0,
       select: function( event, ui ) {console.log(jQuery(this));}
     });
+    $('input[name=slice_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
+    });
 });
 </script>
 {% endblock %}

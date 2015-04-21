@@ -119,6 +119,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if project is not None and project != '':
                 authority_hrn = project
 
+            slice_name = wsgi_request.POST.get('slice_name', '')
+            if not slice_name or len(slice_name) == 0 :
+                errors.append('Slice name can\'t be empty')
+
+            # accept only lowercase names
+            slice_name = slice_name.lower()
+
             slice_request = {
                 'type'              : 'slice',
                 'id'                : None,
@@ -127,16 +134,14 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'timestamp'         : time.time(),
                 'authority_hrn'     : authority_hrn,
                 'organization'      : wsgi_request.POST.get('org_name', ''),
-                'slice_name'        : wsgi_request.POST.get('slice_name', ''),
+                'slice_name'        : slice_name,
                 'url'               : wsgi_request.POST.get('url', ''),
                 'purpose'           : wsgi_request.POST.get('purpose', ''),
                 'current_site'      : current_site
             }
-            
-            # create slice_hrn based on authority_hrn and slice_name
-            slice_name = slice_request['slice_name']
+
             # slice name is unique among all authorities 
-            slice_query  = Query().get('myslice:slice').select('slice_hrn')
+            slice_query = Query().get('myslice:slice').select('slice_hrn')
             slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
             for _slice in slice_details_sfa:
                 split_list = _slice['slice_hrn'].split('.')
@@ -146,18 +151,18 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             
 
             # What kind of slice name is valid?
-            if (slice_name is None or slice_name == ''):
+            if slice_name is None or slice_name == '':
                 errors.append('Slice name is mandatory')
             
-            if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
+            if re.search(r'^[A-Za-z0-9_]*$', slice_name) is None:
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
             
             organization = slice_request['organization']
             if theme.theme == 'fed4fire':
-                if (organization is None or organization == ''):
+                if organization is None or organization == '':
                     errors.append('Selecting project is mandatory')
             else:
-                if (organization is None or organization == ''):
+                if organization is None or organization == '':
                     errors.append('Organization is mandatory')
 
             slice_length= len(slice_request['slice_name'])
@@ -167,7 +172,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
     
             purpose = slice_request['purpose']
-            if (purpose is None or purpose == ''):
+            if purpose is None or purpose == '':
                 errors.append('Experiment purpose is mandatory')
 
             url = slice_request['url']

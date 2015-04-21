@@ -125,10 +125,8 @@
 <script>
 $(document).ready(function() {
     var myprojects = JSON.parse(localStorage.getItem('projects'));
-    console.log(myprojects);
     if (myprojects) {
         $.each(myprojects, function (i, val){
-            console.log(val);
             $('.project-list').append('<tr><td>'+ val +'</td></tr>');
         });
     } else {
@@ -204,6 +202,9 @@ $(document).ready(function() {
 	// auto-complete the form
     jQuery("#org_name").combobox();
 
+    $('input[name=project_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
+    });
 });
 </script>
 {% endblock %}

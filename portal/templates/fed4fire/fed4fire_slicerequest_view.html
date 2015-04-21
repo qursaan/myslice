@@ -79,39 +79,10 @@ jQuery(document).ready(function(){
                 }
         }
     }).bind('focus', function(){ $(this).autocomplete("search"); } );
+    $('input[name=slice_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
+    });
 });
-
-/*function draw_projects(authority_hrn){
-
-    var projects = [];
-    project_row = "<option value=''> - </option>";
-    projects.push(project_row);
-
-    if(authority_hrn.length > 0){
-        // Not for root authority
-        if(authority_hrn.split('.').length > 1){
-            $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
-               
-                $.each( data, function( key, val ) {
-                    project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
-                    projects.push(project_row);
-                });
-                $("#project").html(projects.join( "" ));
-            });
-        }else{
-            $("#project").html(projects.join( "" ));
-        }
-    }else{
-        my_projects = JSON.parse(localStorage.getItem('projects'));
-        $.each( my_projects, function( i, val ) {
-            project_row = "<option value='"+val+"'>"+val+"</option>";
-            projects.push(project_row);
-        });
-        $("#project").html(projects.join( "" ));
-    }
-    $("#project").show();
-    $("#project_loading").hide();
-}*/
 </script>
 {% endblock %}
 
