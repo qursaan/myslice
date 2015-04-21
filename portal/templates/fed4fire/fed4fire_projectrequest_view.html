@@ -157,6 +157,12 @@ $(document).ready(function() {
         $("#project_loading").hide();
         $("#projects").html(projects.join( "" ));
         $("#projects").combobox();
+        var $s = jQuery("#projects").next().attr('id','listProjects');
+        jQuery('#listProjects').bind("click",function(){
+            // show all items click
+            this.childNodes[1].click();
+        });
+
     });
 /*
 	

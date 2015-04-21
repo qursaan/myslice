@@ -33,6 +33,7 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
     def post (self,request):
         env = self.default_env()
         env['theme'] = self.theme
+        env['request'] = request
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
     def get (self, request, authority_hrn=None, state=None):
@@ -85,6 +86,6 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
         # use one or two columns for the layout - not logged in users will see the login prompt
         env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
         
-        
+        env['request'] = request
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 

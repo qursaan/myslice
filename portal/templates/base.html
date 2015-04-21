@@ -66,7 +66,7 @@ This list of slices should go into SESSION !
 $(document).ready(function() {
 {% if username %}
     myslice.login(function(){
-        user = myslice.user();
+        user = myslice.get_user();
 
         var slices = [];
         if($.isEmptyObject(user)){
@@ -76,10 +76,12 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            //drawSlices(slices);
+            {% if theme != "fed4fire" %}
+            drawSlices(slices);
+            {% endif %}
         }
         {% if theme == "fed4fire" %}
-        p = myslice.projects();
+        p = myslice.get_projects();
         if(p != null){
             //drawProjects(p);
             drawProjectsTree(p,slices);

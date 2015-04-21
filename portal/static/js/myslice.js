@@ -107,7 +107,7 @@ user.prototype.list = function() {
 var myslice = {
 	user: {},
 	
-	user: function() {
+	get_user: function() {
 		if ($.isEmptyObject(this.user)) {
 			//this.login(function() { return this.user; });
             if(localStorage.getItem('user')!='undefined'){
@@ -120,7 +120,7 @@ var myslice = {
 	},
 	projects: {},
 	
-	projects: function() {
+	get_projects: function() {
 		if ($.isEmptyObject(this.projects)) {
 			//this.login(function() { return this.user; });
             if(localStorage.getItem('projects')!='undefined'){
@@ -208,7 +208,6 @@ var myslice = {
                 fn();
             }
         }
-
 	},
 
 

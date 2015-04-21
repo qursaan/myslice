@@ -32,13 +32,13 @@
 				title="Please enter a name for your slice"required="required">
 			  </div>
 			  <div class="form-group">
-				{%if 'is_pi'  in pi %}
-				<input type="text" class="form-control" id="authority_hrn" name="authority_hrn" style="width:300px" placeholder="Authority" 
+                {% if request.session.user.pi %}
+                <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" style="width:300px" placeholder="Authority" 
 				title="An authority responsible for vetting your slice" required="required">
-				{%else%}
-			    <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" placeholder="Authority" style="width:300px; display:none;" 
+                {% else %}
+                <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" placeholder="Authority" style="width:300px; display:none;" 
 				title="An authority responsible for vetting your slice" required="required" readonly="readonly">
-				{%endif%}
+                {% endif %}
 			  </div>
 			  <div class="form-group">
 			    <input type="number" class="form-control" name="number_of_nodes" id="number_of_nodes" style="width:300px" placeholder="Number of nodes"
