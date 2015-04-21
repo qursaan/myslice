@@ -35,13 +35,17 @@ def get_myslice_platform(request):
         return None
 
 def get_myslice_account(request):
-    platform_myslice = get_myslice_platform(request)
-    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
-    account_details = execute_query(request, account_query)
-    if isinstance(account_details,list):
-        for account_detail in account_details:
-            return account_detail
-    else:
+    try:
+        platform_myslice = get_myslice_platform(request)
+        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
+        account_details = execute_query(request, account_query)
+        if isinstance(account_details,list):
+            for account_detail in account_details:
+                return account_detail
+        else:
+            return None
+    except Exception as e:
+        print e
         return None
 
 def get_registry_url(request):
