@@ -21,7 +21,7 @@ from myslice.theme                      import ThemeView
 
 from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
-from portal.actions                     import authority_check_pis, get_jfed_identity
+from portal.actions                     import authority_check_pis, get_jfed_identity, get_myslice_account
 
 import activity.user
 
@@ -71,23 +71,14 @@ class HomeView (FreeAccessView, ThemeView):
                     activity.user.login(self.request)
 
                     ## check user is pi or not
-                    platform_details = {}
-                    account_details = {}
                     acc_auth_cred = {}
                     acc_user_cred = {}
-                    platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-                    account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-                    platform_details = execute_query(self.request, platform_query)
-                    account_details = execute_query(self.request, account_query)
-                    if platform_details is not None and platform_details != {}:
-                        for platform_detail in platform_details:
-                            for account_detail in account_details:
-                                if platform_detail['platform_id'] == account_detail['platform_id']:
-                                    if 'config' in account_detail and account_detail['config'] is not '':
-                                        account_config = json.loads(account_detail['config'])
-                                        if 'myslice' in platform_detail['platform']:
-                                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-                                            acc_user_cred = account_config.get('delegated_user_credential','N/A')
+
+                    account_detail = get_myslice_account(self.request)
+                    if 'config' in account_detail and account_detail['config'] is not '':
+                        account_config = json.loads(account_detail['config'])
+                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                        acc_user_cred = account_config.get('delegated_user_credential','N/A')
                     # assigning values
                     #if acc_auth_cred=={} or acc_auth_cred=='N/A':
                     #    pi = "is_not_pi"
@@ -135,22 +126,23 @@ class HomeView (FreeAccessView, ThemeView):
             # log user activity
             activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
-
+        env['request'] = request
         return render_to_response(self.template,env, context_instance=RequestContext(request))
 
     def get (self, request, state=None):
         env = self.default_env()
         acc_auth_cred={}
 
-        jfed_identity = get_jfed_identity(request)
-        if jfed_identity is not None:
-            import base64
-            encoded_jfed_identity = base64.b64encode(jfed_identity)
-            env['jfed_identity'] = encoded_jfed_identity 
-        else:
-            env['jfed_identity'] = None
+
 
         if request.user.is_authenticated():
+            jfed_identity = get_jfed_identity(request)
+            if jfed_identity is not None:
+                import base64
+                encoded_jfed_identity = base64.b64encode(jfed_identity)
+                env['jfed_identity'] = encoded_jfed_identity 
+            else:
+                env['jfed_identity'] = None
 
             ## check user is pi or not
             platform_details = {}
@@ -160,18 +152,12 @@ class HomeView (FreeAccessView, ThemeView):
             platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
             account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
             # XXX Something like an invalid session seems to make the execute fail sometimes, and thus gives an error on the main page
-            platform_details = execute_query(self.request, platform_query)
-            account_details = execute_query(self.request, account_query)
-            if platform_details is not None and platform_details != {}:
-                for platform_detail in platform_details:
-                    for account_detail in account_details:
-                        if 'platform_id' in platform_detail:
-                            if platform_detail['platform_id'] == account_detail['platform_id']:
-                                if 'config' in account_detail and account_detail['config'] is not '':
-                                    account_config = json.loads(account_detail['config'])
-                                    if 'myslice' in platform_detail['platform']:
-                                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-                                        acc_user_cred = account_config.get('delegated_user_credential','N/A')
+
+            account_detail = get_myslice_account(self.request)
+            if 'config' in account_detail and account_detail['config'] is not '':
+                account_config = json.loads(account_detail['config'])
+                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                acc_user_cred = account_config.get('delegated_user_credential','N/A')
             # assigning values
             #if acc_auth_cred=={} or acc_auth_cred=='N/A':
             #    pi = "is_not_pi"
@@ -204,12 +190,11 @@ class HomeView (FreeAccessView, ThemeView):
         env['theme'] = self.theme
         env['section'] = "Dashboard"
 
-
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
+        env['request'] = request
         if state: env['state'] = state
         elif not env['username']: env['state'] = None
         # use one or two columns for the layout - not logged in users will see the login prompt
-
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 

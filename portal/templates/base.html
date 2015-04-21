@@ -76,7 +76,9 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            //drawSlices(slices);
+            {% if theme != "fed4fire" %}
+            drawSlices(slices);
+            {% endif %}
         }
         {% if theme == "fed4fire" %}
         p = myslice.get_projects();

@@ -7,6 +7,8 @@ from manifold.core.query        import Query
 
 from myslice.settings import config, logger, DEBUG
 
+from portal.actions import authority_check_pis
+
 # from unfold.sessioncache import SessionCache
 
 # Name my backend 'ManifoldBackend'
@@ -78,6 +80,8 @@ class ManifoldBackend:
         if 'lastname' in person:
             user.last_name = person['lastname']
 
+        user.pi = authority_check_pis (request, user.email)
+        request.session['user'] = {'email':user.email,'pi':user.pi,'firstname':user.first_name,'lastname':user.last_name}
         return user
 
     # Required for your backend to work properly - unchanged in most scenarios

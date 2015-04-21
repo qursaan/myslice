@@ -34,6 +34,7 @@ except:
 # DEBUG
 if config.myslice.debug :
     DEBUG = True
+    INTERNAL_IPS = ("127.0.0.1","132.227.84.195","132.227.78.191","132.227.84.191")
 else :
     DEBUG = False
 
@@ -256,8 +257,7 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
-    #SLA
-    #'sla',
+    #'debug_toolbar',
 ]
 # with django-1.7 we leave south and use native migrations
 # managing database migrations
