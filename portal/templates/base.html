@@ -114,7 +114,6 @@ $(document).ready(function() {
         var items_sl = [];
         $.each( projects, function(i, p) {
             $.each( slices, function(y, s) {
-                console.log(escapeRegExp(p));
                 if (s.match('^' + escapeRegExp(p))) {
                      items_sl.push( "<li><a href=\"/resources/" + s + "\">" + s.replace(p + '.','') + "</a></li>" );
                 }
