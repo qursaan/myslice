@@ -28,15 +28,21 @@ import activity.slice
 def get_myslice_platform(request):
     platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled','config').filter_by('platform','==','myslice')
     platform_details = execute_query(request, platform_query)
-    for platform_detail in platform_details:
-        return platform_detail
+    if isinstance(platform_details,list):
+        for platform_detail in platform_details:
+            return platform_detail
+    else:
+        return None
 
 def get_myslice_account(request):
     platform_myslice = get_myslice_platform(request)
     account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
     account_details = execute_query(request, account_query)
-    for account_detail in account_details:
-        return account_detail
+    if isinstance(account_details,list):
+        for account_detail in account_details:
+            return account_detail
+    else:
+        return None
 
 def get_registry_url(request):
     try:
