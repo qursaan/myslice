@@ -37,10 +37,6 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     def get_or_post  (self, request, method):
         """
         """
-        from django.conf import settings
-        print "_"*80
-        print settings.TEMPLATE_CONTEXT_PROCESSORS
-        print "_"*80
 
         errors = []
         slice_name =''
@@ -126,7 +122,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             if project is not None and project != '':
                 authority_hrn = project
 
-            slice_name = wsgi_request.POST.get('slice_name', '')
+            slice_name = request.POST.get('slice_name', '')
             if not slice_name or len(slice_name) == 0 :
                 errors.append('Slice name can\'t be empty')
 
@@ -149,7 +145,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
             # slice name is unique among all authorities 
             slice_query = Query().get('myslice:slice').select('slice_hrn')
-            slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
+            slice_details_sfa = execute_admin_query(request, slice_query)
             for _slice in slice_details_sfa:
                 split_list = _slice['slice_hrn'].split('.')
                 sfa_slice_name = split_list[-1]

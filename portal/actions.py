@@ -39,11 +39,8 @@ def get_myslice_account(request):
         platform_myslice = get_myslice_platform(request)
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config').filter_by('platform_id','==',platform_myslice['platform_id'])
         account_details = execute_query(request, account_query)
-        if isinstance(account_details,list):
-            for account_detail in account_details:
-                return account_detail
-        else:
-            return None
+        for account_detail in account_details:
+            return account_detail
     except Exception as e:
         print e
         return None
@@ -141,8 +138,9 @@ def authority_check_pis(request, user_email):
         return None
 
 
-def authority_add_pis(request, authority_hrn,user_hrn):
+def authority_add_pis(request, authority_hrn, user_hrn):
     try:
+        pi_list = []
         # getting pis of the authority of the user
         pis = authority_get_pis (request, authority_hrn)
         for pi in pis:
@@ -152,27 +150,55 @@ def authority_add_pis(request, authority_hrn,user_hrn):
         query = Query.update('myslice:authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
         results = execute_query(request,query)
         newpis = authority_get_pis (request, authority_hrn)
+       
+        # Add the user to the slices of the project he/she joined
+        if len(authority_hrn.split('.')) > 2:
+            # this authority_hrn is a project
+            query_slices = Query.get('myslice:slice').filter_by('parent_authority', '==', authority_hrn).select('slice_hrn')
+            results_slices = execute_query(request,query_slices)
+            for s in results_slices:
+                sfa_add_user_to_slice(request, user_hrn, s['slice_hrn'])
+        # Clear Credentials of the user 
+        user_email = get_user_email(request, user_hrn)
+        clear_user_creds(request, user_email)
+
         return newpis
     except Exception as e: 
         logger.error("Exception in actions.py in authority_add_pis {}".format(e))
-        return None
+        raise Exception, "Exception in actions.py in authority_add_pis {}".format(e)
 
-
-def authority_remove_pis(request, authority_hrn,user_hrn):
+def authority_remove_pis(request, authority_hrn, user_hrn):
     try:
+        print "-"*80
+        print "remove_pis"
+        pi_list = []
         # getting pis of the authority of the user
         pis = authority_get_pis (request, authority_hrn)
         for pi in pis:
             pi_list = pi['pi_users']
  
         updated_pi_list = pi_list.remove(user_hrn) 
-        query = Query.update('authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
+        query = Query.update('myslice:authority').filter_by('authority_hrn', '==', authority_hrn).set({'pi_users':pi_list})
         results = execute_query(request,query)
         newpis = authority_get_pis (request, authority_hrn)
+
+        # Remove the user from the slices of the project he/she left
+        if len(authority_hrn.split('.')) > 2:
+            # this authority_hrn is a project
+            query_slices = Query.get('myslice:slice').filter_by('parent_authority', '==', authority_hrn).select('slice_hrn')
+            results_slices = execute_query(request,query_slices)
+            for s in results_slices:
+                print 'remove from slice %s' % s
+                sfa_remove_user_from_slice(request, user_hrn, s['slice_hrn'])
+
+        # Clear Credentials of the user 
+        user_email = get_user_email(request, user_hrn)
+        clear_user_creds(request, user_email)
+
         return newpis
     except Exception as e: 
         logger.error("Exception in actions.py in authority_remove_pis {}".format(e))
-        return None
+        raise Exception, "Exception in actions.py in authority_remove_pis {}".format(e)
 
 
 def authority_get_pi_emails(request, authority_hrn):
@@ -193,6 +219,11 @@ def authority_get_pi_emails(request, authority_hrn):
         query = Query.get('myslice:user').filter_by('user_hrn', 'included', pi_user_hrns).select('user_email')
         results = execute_admin_query(request, query)
         return [result['user_email'] for result in results]
+
+def get_user_email(request, user_hrn):
+    query = Query.get('myslice:user').filter_by('user_hrn', '==', user_hrn).select('user_email')
+    results = execute_admin_query(request, query)
+    return results[0]['user_email'] 
 
 #clear user credentials
 def clear_user_creds(request, user_email):
@@ -283,21 +314,43 @@ def sfa_add_authority(request, authority_params):
         raise Exception, "Could not create %s. Already exists ?" % authority_params['hrn']
     return results
 
-def sfa_add_user_to_slice(request, user_hrn, slice_params):
-# UPDATE myslice:slice SET researcher=['ple.upmc.jordan_auge','ple.inria.thierry_parmentelat','ple.upmc.loic_baron','ple.upmc.ciro_scognamiglio','ple.upmc.mohammed-yasin_rahman','ple.upmc.azerty'] where slice_hrn=='ple.upmc.myslicedemo'
-
+def sfa_add_user_to_slice(request, user_hrn, slice_hrn):
+# UPDATE myslice:slice SET users = ['fed4fire.upmc.loic_baron', 'fed4fire.upmc.mohammed-yasin_rahman', 'fed4fire.upmc.demo'] WHERE slice_hrn == 'fed4fire.upmc.project_y.test_under' SELECT slice_hrn, slice_urn
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query_current_users = Query.get('myslice:slice').select('user').filter_by('slice_hrn','==',slice_params['hrn'])
+    query_current_users = Query.get('myslice:slice').select('users').filter_by('slice_hrn','==',slice_hrn)
     results_current_users = execute_query(request, query_current_users)
-    slice_params['researcher'] = slice_params['researcher'] | results_current_users
+    current_users = list()
+    for r in results_current_users:
+        current_users.extend(r['users'])
+    users = list(set([user_hrn]) | set(current_users))
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query = Query.update('myslice:slice').filter_by('user_hrn', '==', user_hrn).set(slice_params).select('slice_hrn')
+    query = Query.update('myslice:slice').filter_by('slice_hrn', '==', slice_hrn).set({'users':users}).select('slice_hrn')
     results = execute_query(request, query)
 # Also possible but not supported yet
 # UPDATE myslice:user SET slice=['ple.upmc.agent','ple.upmc.myslicedemo','ple.upmc.tophat'] where user_hrn=='ple.upmc.azerty'
     if not results:
-        raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
+        raise Exception, "Could not add user %s to slice %s" % (user_hrn, slice_hrn)
+    return results
+
+def sfa_remove_user_from_slice(request, user_hrn, slice_hrn):
+# UPDATE myslice:slice SET users = ['fed4fire.upmc.loic_baron', 'fed4fire.upmc.demo'] WHERE slice_hrn == 'fed4fire.upmc.project_y.test_under' SELECT slice_hrn, slice_urn
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query_current_users = Query.get('myslice:slice').select('users').filter_by('slice_hrn','==',slice_hrn)
+    results_current_users = execute_query(request, query_current_users)
+    current_users = list()
+    for r in results_current_users:
+        current_users.extend(r['users'])
+    if user_hrn in current_users:
+        current_users.remove(user_hrn)
+
+    # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+    query = Query.update('myslice:slice').filter_by('slice_hrn', '==', slice_hrn).set({'users':current_users}).select('slice_hrn')
+    results = execute_query(request, query)
+# Also possible but not supported yet
+# UPDATE myslice:user SET slice=['ple.upmc.agent','ple.upmc.myslicedemo','ple.upmc.tophat'] where user_hrn=='ple.upmc.azerty'
+    if not results:
+        raise Exception, "Could not remove user %s to slice %s" % (user_hrn, slice_hrn)
     return results
 
 # Propose hrn
@@ -645,15 +698,13 @@ def portal_validate_request(wsgi_request, request_ids):
                     'authority_hrn'        : hrn
                 }
                 sfa_add_authority(wsgi_request, sfa_authority_params)
-                request_status['SFA project'] = {'status': True }
-                PendingProject.objects.get(id=request['id']).delete()
                 
                 # Add user as a PI of the project
+                # Clear user's Credentials
                 authority_add_pis(wsgi_request, hrn , request['user_hrn'])
 
-                # Clear user's Credentials
-                #sfa_user = sfa_get_user(wsgi_request, request['user_hrn'])
-                clear_user_creds(wsgi_request,request['email'])
+                request_status['SFA project'] = {'status': True }
+                PendingProject.objects.get(id=request['id']).delete()
 
             except Exception, e:
                 request_status['SFA project'] = {'status': False, 'description': str(e)}
@@ -661,13 +712,11 @@ def portal_validate_request(wsgi_request, request_ids):
         elif request['type'] == 'join':
             try:
                 # Add user as a PI of the project
+                # Clear user's Credentials
                 authority_add_pis(wsgi_request, request['authority_hrn'] , request['user_hrn'])
 
                 request_status['SFA join'] = {'status': True }
                 PendingJoin.objects.get(id=request['id']).delete()
-
-                # Clear user's Credentials
-                clear_user_creds(wsgi_request,request['email'])
 
             except Exception, e:
                 request_status['SFA join'] = {'status': False, 'description': str(e)+' - '+str(request)}
@@ -885,6 +934,14 @@ def create_slice(wsgi_request, request):
     if not 'number_of_nodes' in request:
         request['number_of_nodes']=""
 
+    # Slice is under a project
+    if len(request['authority_hrn'].split('.')) > 2:
+        pi_list = []
+        pis = authority_get_pis(wsgi_request, request['authority_hrn'])
+        for pi in pis:
+            pi_list = pi['pi_users']
+        user_hrns.extend(pi_list)
+
     # XXX We should create a slice with Manifold terminology
     slice_params = {
         'slice_hrn'        : hrn, 
@@ -902,7 +959,13 @@ def create_slice(wsgi_request, request):
     if not results:
         raise Exception, "Could not create %s. Already exists ?" % slice_params['hrn']
     else:
-        clear_user_creds(wsgi_request,user_email)
+        try:
+            for u_hrn in user_hrns:
+                u_email = get_user_email(wsgi_request, u_hrn)
+                clear_user_creds(wsgi_request, u_email)
+        except Exception as e:
+            logger.error("Failed clear credentials for all users")
+            clear_user_creds(wsgi_request,user_email)
         # log user activity
         activity.slice.validate(request, { "slice" : hrn })
         try:

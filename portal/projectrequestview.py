@@ -139,8 +139,10 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                 if is_pi(wsgi_request, user_hrn, user_authority):
                     # PIs can directly create/join project in their own authority...
                     if 'join' in wsgi_request.POST:
+                        # join existing project
                         authority_add_pis(wsgi_request, post['project_name'], user_hrn)
                     else:
+                        # Create project
                         hrn = post['authority_hrn'] + '.' + post['project_name']
                         sfa_add_authority(wsgi_request, {'authority_hrn':hrn})
                         authority_add_pis(wsgi_request, hrn, user_hrn)
