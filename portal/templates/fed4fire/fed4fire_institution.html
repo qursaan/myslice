@@ -288,6 +288,8 @@ $(document).ready(function() {
                 if(this.checked){
                     var record_id = this.id;
                     pi_users.push(record_id)
+                    $.post("/credentials/clear/",{'emails':[this.dataset['email']]}, function(data) {
+                    }); // post credentials clear
                     flag = true;                
                 }
             });
@@ -318,9 +320,11 @@ $(document).ready(function() {
 					for (var i=pi_users.length-1; i>=0; i--) {
     					if (pi_users[i] === record_id) {
         					pi_users.splice(i, 1);
+                            $.post("/credentials/clear/",{'emails':[this.dataset['email']]}, function(data) {
+                            }); // post credentials clear
+                            flag = true;                
     					}
 					}
-                    flag = true;                
                 }
             });
             if(flag == true){
@@ -343,6 +347,8 @@ $(document).ready(function() {
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
                 });
+            }else{
+                mysliceAlert('No action: User had no rights on: {{user_details.parent_authority}}','success', true);
             }
         });
     });

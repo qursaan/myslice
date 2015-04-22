@@ -186,7 +186,6 @@ var myslice = {
                             // What are the projects under this authority?
                             $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+auth}}, function( data ) {
     			                $.each(data, function(idx, project) {
-                                    console.log(project.authority_hrn);
                                     if($.inArray(project.authority_hrn,projects) == -1){
                                         projects.push(project.authority_hrn);
                                     }
