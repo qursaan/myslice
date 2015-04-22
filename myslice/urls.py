@@ -88,6 +88,7 @@ urls = [
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
     (r'^cache/(?P<action>[^/]+)/?$', 'rest.cache.dispatch'),
     (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
+    (r'^authority/(?P<action>[^/]+)/?$', 'rest.authority.dispatch'),
     #
     # REST monitoring
     (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
