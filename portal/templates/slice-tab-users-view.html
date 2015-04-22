@@ -9,7 +9,7 @@
     	var slice_users_removed = [];
  	  	var slice_users_emails = [];
     	var slice_users_emails_removed = [];
-    	$.post("/rest/user/",{'filters':{'parent_authority': authority_hrn}}, function( data ) {
+    	$.post("/rest/myslice:user/",{'filters':{'parent_authority': authority_hrn}}, function( data ) {
         	var list_users = [];
         	var table_users = [];
     		/* Available fields
@@ -68,7 +68,7 @@
      	}); // post rest/use
 
 	 	$('button#addusers').click(function() {
-     		$.post("/update/slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
+     		$.post("/update/myslice:slice/",{'filters':{'slice_hrn':'{{slice}}'},'params':{'users':slice_users}}, function(data) {
          		if(data.success){
              		// TODO: highlight row after success
              		//$('tr[id="'+record_id+'"]').highlight();
@@ -87,7 +87,7 @@
 
     $(document).ready(function() {
             // TODO: Add a filter based on the list of authorities
-        	$.post("/rest/authority/",{'fields':['authority_hrn']}, function( data ) {
+        	$.post("/rest/myslice:authority/",{'fields':['authority_hrn']}, function( data ) {
                 var list_authorities = [];
                 $.each( data, function( key, val ) {
                     auth_hrn = val.authority_hrn;
