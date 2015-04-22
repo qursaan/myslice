@@ -164,8 +164,8 @@ class Client(object):
             kwargs["headers"] = {"accept": "application/xml",
                                  "content-type": "application/xml"}
 
-        kwargs["auth"] = HTTPBasicAuth(settings.SLA_MANAGER_USER,
-                                      settings.SLA_MANAGER_PASSWORD)
+        kwargs["auth"] = HTTPBasicAuth(settings.SLA_COLLECTOR_USER,
+                                      settings.SLA_COLLECTOR_PASSWORD)
 
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
