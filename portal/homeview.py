@@ -64,47 +64,52 @@ class HomeView (FreeAccessView, ThemeView):
                 login(request, user)
 
                 if request.user.is_authenticated():
-                    env['person'] = self.request.user
-                    env['username'] = self.request.user
+                    try:
+                        env['person'] = self.request.user
+                        env['username'] = self.request.user
 
-                    # log user activity
-                    activity.user.login(self.request)
+                        # log user activity
+                        activity.user.login(self.request)
 
-                    ## check user is pi or not
-                    acc_auth_cred = {}
-                    acc_user_cred = {}
+                        ## check user is pi or not
+                        acc_auth_cred = {}
+                        acc_user_cred = {}
 
-                    account_detail = get_myslice_account(self.request)
-                    if 'config' in account_detail and account_detail['config'] is not '':
-                        account_config = json.loads(account_detail['config'])
-                        acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-                        acc_user_cred = account_config.get('delegated_user_credential','N/A')
-                    # assigning values
-                    #if acc_auth_cred=={} or acc_auth_cred=='N/A':
-                    #    pi = "is_not_pi"
-                    #else:
-                    #    pi = "is_pi"
-                    user_email = str(self.request.user)
-                    pi = authority_check_pis(self.request, user_email)
+                        account_detail = get_myslice_account(self.request)
+                        if 'config' in account_detail and account_detail['config'] is not '':
+                            account_config = json.loads(account_detail['config'])
+                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                            acc_user_cred = account_config.get('delegated_user_credential','N/A')
+                        # assigning values
+                        #if acc_auth_cred=={} or acc_auth_cred=='N/A':
+                        #    pi = "is_not_pi"
+                        #else:
+                        #    pi = "is_pi"
+                        user_email = str(self.request.user)
+                        pi = authority_check_pis(self.request, user_email)
 
-                    # check if the user has creds or not
-                    if acc_user_cred == {} or acc_user_cred == 'N/A':
-                        user_cred = 'no_creds'
-                    else:
-                        exp_date = get_expiration(acc_user_cred, 'timestamp')
-                        if exp_date < time.time():
-                            user_cred = 'creds_expired'
+                        # check if the user has creds or not
+                        if acc_user_cred == {} or acc_user_cred == 'N/A':
+                            user_cred = 'no_creds'
                         else:
-                            user_cred = 'has_creds'
+                            exp_date = get_expiration(acc_user_cred, 'timestamp')
+                            if exp_date < time.time():
+                                user_cred = 'creds_expired'
+                            else:
+                                user_cred = 'has_creds'
 
-                    # list the pending slices of this user
-                    pending_slices = []
-                    for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
-                        pending_slices.append(slices.slice_name)
+                        # list the pending slices of this user
+                        pending_slices = []
+                        for slices in PendingSlice.objects.filter(type_of_nodes__iexact=self.request.user).all():
+                            pending_slices.append(slices.slice_name)
 
-                    env['pending_slices'] = pending_slices
-                    env['pi'] = pi
-                    env['user_cred'] = user_cred
+                        env['pending_slices'] = pending_slices
+                        env['pi'] = pi
+                        env['user_cred'] = user_cred
+                    except Exception as e:
+                        print e
+                        env['person'] = None
+                        env['state'] = "Your session has expired"
                 else:
                     env['person'] = None
             else:
