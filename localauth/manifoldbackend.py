@@ -33,7 +33,7 @@ class ManifoldBackend:
             sessions = sessions_result.ok_value()
             if not sessions:
                 logger.error("GetSession failed: {}".format(sessions_result.error()))
-                return
+                return None
             session = sessions[0]
             logger.debug("SESSION : {}".format(session.keys()))
             
@@ -48,7 +48,7 @@ class ManifoldBackend:
             persons = persons_result.ok_value()
             if not persons:
                 logger.error("GetPersons failed: {}".format(persons_result.error()))
-                return
+                return None
             person = persons[0]
             logger.debug("PERSON : {}".format(person))
             

@@ -60,7 +60,7 @@ class HomeView (FreeAccessView, ThemeView):
         # user was authenticated at the backend
         elif auth_result is not None:
             user=auth_result
-            if user.is_active:
+            if user is not None and user.is_active:
                 login(request, user)
 
                 if request.user.is_authenticated():
