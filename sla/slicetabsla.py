@@ -413,7 +413,7 @@ class CreateAgreement(LoginRequiredView, ThemeView):
         logger.debug("SLA Agreement parameters: {}".format(data))
 
         try:
-            response = c.post("agreements/create/", data=data, testbed=testbed_urn)
+            response = c.post("agreementslist/", data=data, testbed=testbed_urn)
         except Exception as e:
             import traceback, sys
 
