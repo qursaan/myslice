@@ -190,10 +190,10 @@ class HomeView (FreeAccessView, ThemeView):
                 env['person'] = self.request.user
             else:
                 env['person'] = None
-       except Exception as e:
-           print e
-           env['person'] = None
-           env['state'] = "Your session has expired"
+        except Exception as e:
+            print e
+            env['person'] = None
+            env['state'] = "Your session has expired"
 
         env['theme'] = self.theme
         env['section'] = "Dashboard"
