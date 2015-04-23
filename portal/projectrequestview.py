@@ -20,7 +20,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'projectrequest_view.html'
     
     def getAuthorities(self, request):
-        if theme.theme == 'fed4fire':
+        if self.theme == 'fed4fire':
             authorities_query = Query.get('myslice:authority').select('name', 'authority_hrn')
         else:
             authorities_query = Query.get('authority').select('name', 'authority_hrn')
