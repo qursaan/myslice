@@ -45,7 +45,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
-        authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        if self.theme == 'fed4fire':
+            authorities_query = Query.get('myslice:authority').select('name', 'authority_hrn')
+        else:
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
