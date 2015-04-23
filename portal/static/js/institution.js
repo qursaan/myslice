@@ -1,3 +1,17 @@
+function unspin_all(){
+    $('input:checkbox').each(function (index) {
+        if(this.checked){
+            this.nextElementSibling.style.display = "none";
+        }
+    });
+}
+function spin_all(){
+    $('input:checkbox').each(function (index) {
+        if(this.checked){
+            this.nextElementSibling.style.display = "inline";
+        }
+    });
+}
 $(document).ready(function() {
 	loadedTabs = [];
 	
@@ -17,6 +31,7 @@ $(document).ready(function() {
 	});
 
     $('button#deleteusers').click(function() {
+        spin_all();
         $('input:checkbox.user').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
@@ -40,6 +55,7 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }   
+                    unspin_all();
                 });
             } 
         });
@@ -47,10 +63,12 @@ $(document).ready(function() {
 
     /* TODO: factorize into functions */
     $('button#deleteslices').click(function() {
+        spin_all();
         var flag = false;
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
+                $('#'+record_id+'-loading').spin();
                 $.post("/delete/slice/",{'filters':{'slice_hrn':this.id}}, function(data) {
                     if(data.success){
                         localStorage.clear();
@@ -61,11 +79,13 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
+                    unspin_all();
                 });
             }
         });
     });
     $('button#renewslices').click(function() {
+        spin_all();
         var now = new Date();
         /* In Javascript getMonth() gives month[0] = january, month[1] = february, and so on...  */
         var month = now.getMonth()+2;
@@ -73,6 +93,7 @@ $(document).ready(function() {
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
+                $('#'+record_id+'-loading').spin();
                 $.post("/update/slice/",{'filters':{'slice_hrn':this.id},'params':{'expires':one_month_later}}, function(data) {
                     if(data.success){
                         // TODO: highlight row after success
@@ -82,6 +103,7 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
+                    unspin_all();
                 });
                 
             }
@@ -90,10 +112,12 @@ $(document).ready(function() {
         //window.location="/portal/institution#slices";
     });
     $('button#deleteprojects').click(function() {
+        spin_all();
         var flag = false;
         $('input:checkbox.project').each(function (index) {
             if(this.checked){
                 var record_id = this.id;
+                $('#'+record_id+'-loading').spin();
                 console.log(record_id);
                 $.post("/delete/myslice:authority/",{'filters':{'authority_hrn':this.id}}, function(data) {
                     if(data.success){
@@ -105,6 +129,7 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
+                    unspin_all();
                 });
             }
         });
