@@ -20,7 +20,10 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'projectrequest_view.html'
     
     def getAuthorities(self, request):
-        authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        if theme.theme == 'fed4fire':
+            authorities_query = Query.get('myslice:authority').select('name', 'authority_hrn')
+        else:
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             # Remove the root authority from the list
