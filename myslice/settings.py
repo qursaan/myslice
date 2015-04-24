@@ -360,5 +360,6 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 ####SLA#####
 
 SLA_COLLECTOR_URL = "http://157.193.215.125:4001/sla-collector/sla"
+#SLA_COLLECTOR_URL = "http://172.24.76.19:8000/sla"
 SLA_COLLECTOR_USER = "portal"
 SLA_COLLECTOR_PASSWORD = "password"

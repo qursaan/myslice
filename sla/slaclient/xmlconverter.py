@@ -201,9 +201,8 @@ class AgreementConverter(Converter):
         :param Element xmlroot: root element of xml to convert.
         :rtype: wsag_model.Agreement
         """
-        for name, value in xmlroot.attrib.items():
-            logger.debug('SLA xmlconverter: {} = {}'.format(name, value))
-            # print '{0}="{1}"'.format(name, value)
+        # for name, value in xmlroot.attrib.items():
+        #      logger.debug('SLA xmlconverter: {} = {}'.format(name, value))
 
         if xmlroot.tag in self.agreement_tags:
             result = Agreement()

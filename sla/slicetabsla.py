@@ -3,6 +3,7 @@ from __future__ import print_function
 # this somehow is not used anymore - should it not be ?
 import ast
 from datetime import datetime
+import json
 import pytz
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -117,7 +118,8 @@ class SLAView(FreeAccessView, ThemeView):
             row.append(agreement.context.time_formatted())  # Date
 
             enf = _get_enforcement(agreement.agreement_id, provider)
-            logger.debug("SLA AAAAA: {}".format(agreement.guaranteestatus))
+            # logger.debug("SLA guarantee status {}: {}".format(agreement.agreement_id,
+            #                                                   agreement.guaranteestatus))
 
             if enf.enabled == 'true':
                 row.append('Evaluating')  # Status
@@ -402,22 +404,30 @@ class CreateAgreement(LoginRequiredView, ThemeView):
         pattern = re.compile(testbed_urn_regex)
         testbed_urn = pattern.search(data["SLIVER_INFO_AGGREGATE_URN"]).group(1)
 
+        # Fix for django QueryDict list parameters
+        slivers = data.getlist("SLIVER_INFO_URN[]")
+        data["SLIVER_INFO_URN"] = slivers
+        del data["SLIVER_INFO_URN[]"]
+
+        # Timestamp to ISO date + timezone
         tstmp = data["SLIVER_INFO_EXPIRATION"]
-
         dt = datetime.fromtimestamp(float(tstmp))
-        gmt_2 = pytz.timezone("Etc/GMT-2") # FIXME: hardcoded for demo purposes
-        dlocal = gmt_2.localize(dt).isoformat()
-
+        # gmt_2 = pytz.timezone("Etc/GMT-2")
+        # dlocal = gmt_2.localize(dt).isoformat()
+        dlocal = dt.isoformat() + "CET" # FIXME: hardcoded for demo purposes
         data["SLIVER_INFO_EXPIRATION"] = dlocal
 
-        logger.debug("SLA Agreement parameters: {}".format(data))
+        # logger.debug("SLA Agreement parameters: {}".format(data.dict()))
+        # import pdb; pdb.set_trace()
 
         try:
-            response = c.post("agreementslist/", data=data, testbed=testbed_urn)
+            response = c.post("agreementslist/", data=json.dumps(data),
+                              headers={"accept": "application/json",
+                                 "content-type": "application/json"})
         except Exception as e:
-            import traceback, sys
-
-            traceback.print_exc(file=sys.stdout)
-            logger.debug("SLA ERROR {}".format(e.message))
+            # import traceback, sys
+            #
+            # traceback.print_exc(file=sys.stdout)
+            logger.debug("SLA Error: CreateAgreement {}".format(e.message))
 
         return HttpResponse(response.text, status=response.status_code)
