@@ -126,7 +126,6 @@ class Client(object):
         # for key, values in kwargs.iteritems():
         #     print key, values
 
-        logger.debug('SLA GET {}'.format(url))
         result = requests.get(url, **kwargs)
         logger.debug('SLA GET {} - result: {}'.format(result.url, result.status_code))
         # print "GET {} {} {}".format(
@@ -170,7 +169,7 @@ class Client(object):
         result = requests.post(url, data, **kwargs)
         location = result.headers["location"] \
             if "location" in result.headers else "<null>"
-        print "POST {} {} Location: {}".format(
+        print "POST {} {} - Location: {}".format(
             result.url, result.status_code, location)
         return result
 

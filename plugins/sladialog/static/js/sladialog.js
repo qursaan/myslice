@@ -98,13 +98,14 @@
 
             var urns = [];
 
-            record.resource.forEach(function(r) {
-                if ($.inArray(r.component_id, record.resource) == -1) { // if not already selected
-                    urns.push(r.component_id);
-                }
-            });
+            if (record.resource.length != 0 && typeof record.resource[0] === "object") {
 
-            if (record.resource.length != 0 && typeof record.resource[0] !== "undefined") {
+                record.resource.forEach(function(r) {
+                    if ($.inArray(r.component_id, record.resource) == -1) { // if not already selected
+                        urns.push(r.component_id);
+                    }
+                });
+
                 var data = {
                     "SLIVER_INFO_AGGREGATE_URN": record.resource[0].component_manager_id,
                     "SLIVER_INFO_EXPIRATION": record.lease[0].end_time,     // FIXME: only working with leases

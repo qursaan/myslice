@@ -105,8 +105,6 @@ class AgreementAnnotator(object):
         """
         a = agreement
 
-        logger.debug("SLA STATUS: {}".format(status))
-
         if status is not None:
             a.guaranteestatus = status.guaranteestatus
             a.statusclass = self._get_statusclass(status.guaranteestatus)
