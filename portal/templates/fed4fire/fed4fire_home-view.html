@@ -158,8 +158,10 @@
 	$(document).ready(function() {
 	    {%if 'no_creds' in user_cred or 'creds_expired' in user_cred %}
         localStorage.clear();
+        /*
         $.post("/cache/clear/", function( data ) {
         });
+        */
         {% endif %}
 		$('a.home-tab').click(function() {
 			$('ul.nav-tabs li').removeClass('active');
