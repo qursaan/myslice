@@ -21,7 +21,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     
     def getAuthorities(self, request):
         if self.theme == 'fed4fire':
-            authorities_query = Query.get('myslice:authority').select('name', 'authority_hrn')
+            authorities_query = Query.get('myslice:authority').select('authority_hrn')
         else:
             authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
@@ -29,7 +29,8 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
             # Remove the root authority from the list
             matching = [s for s in authorities if "." in s['authority_hrn']]
             authorities = sorted(matching, key=lambda k: k['authority_hrn'])
-            authorities = sorted(matching, key=lambda k: k['name'])
+            if self.theme != 'fed4fire':
+                authorities = sorted(matching, key=lambda k: k['name'])
         return authorities
     
     def getUserAuthority(self, request):
@@ -90,9 +91,9 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
         user_authority = self.getUserAuthority(wsgi_request)
         
         # getting the org from authority
-        for authority in authorities:
-            if authority['authority_hrn'] == user_authority:
-                authority_name = authority['name']
+        #for authority in authorities:
+        #    if authority['authority_hrn'] == user_authority:
+        #        authority_name = authority['name']
         
         if method == 'POST' :
 
