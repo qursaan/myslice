@@ -86,7 +86,7 @@ class HomeView (FreeAccessView, ThemeView):
                         #else:
                         #    pi = "is_pi"
                         user_email = str(self.request.user)
-                        pi = authority_check_pis(self.request, user_email)
+                        #pi = authority_check_pis(self.request, user_email)
 
                         # check if the user has creds or not
                         if acc_user_cred == {} or acc_user_cred == 'N/A':
@@ -104,7 +104,7 @@ class HomeView (FreeAccessView, ThemeView):
                             pending_slices.append(slices.slice_name)
 
                         env['pending_slices'] = pending_slices
-                        env['pi'] = pi
+                        #env['pi'] = pi
                         env['user_cred'] = user_cred
                     except Exception as e:
                         print e
@@ -168,7 +168,7 @@ class HomeView (FreeAccessView, ThemeView):
                 #else:
                 #    pi = "is_pi"
                 user_email = str(self.request.user)
-                pi = authority_check_pis(self.request, user_email)
+                #pi = authority_check_pis(self.request, user_email)
                 # check if the user has creds or not
                 if acc_user_cred == {} or acc_user_cred == 'N/A':
                     user_cred = 'no_creds'
@@ -185,7 +185,7 @@ class HomeView (FreeAccessView, ThemeView):
                     pending_slices.append(slices.slice_name)
 
                 env['pending_slices'] = pending_slices
-                env['pi'] = pi
+                #env['pi'] = pi
                 env['user_cred'] = user_cred
                 env['person'] = self.request.user
             else:

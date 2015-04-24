@@ -200,9 +200,12 @@ var myslice = {
                     if(isFunction(fn)){
                         fn();
                     }
+                }else{
+                    $('#credentials_msg').css('display','block');
                 }
 		    });
         }else{
+            $('#credentials_msg').css('display','block');
             if(isFunction(fn)){
                 fn();
             }
