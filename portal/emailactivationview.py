@@ -17,7 +17,7 @@ from unfold.loginrequired               import FreeAccessView
 from portal.actions                     import (
     manifold_update_user, manifold_update_account, manifold_add_account,
     manifold_delete_account, sfa_update_user, authority_get_pi_emails,
-    make_request_user, create_user)
+    make_request_user, create_user, send_email_to_pis)
 from portal.models                      import PendingUser, PendingAuthority
 
 from unfold.page                        import Page    
@@ -62,8 +62,11 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         for key, value in kwargs.iteritems():
             if key == "hash_code":
                 hash_code=value
+
         if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
             activation = 'success'
+            pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
+            pending_user = pending_users[0]
 
             # AUTO VALIDATION of PLE enabled users (only for OneLab Portal)
             if self.theme == "onelab":
@@ -72,14 +75,11 @@ class ActivateEmailView(FreeAccessView, ThemeView):
                 # as we currently need to do a Resolve on each user_hrn of the Registry in order to get its email
                 # TODO in SFA XXX We need a Resolve based on email
                 # TODO maybe we can use MyPLC API for PLE
-                pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
 
                 # by default user is not in PLE
                 ple_user_enabled = False
 
-                if pending_users:
-                    pending_user = pending_users[0]
-                    
+                if pending_user:
                     # Auto Validation 
                     if self.is_ple_enabled(pending_user):
                         pending_user_request = make_request_user(pending_user)
@@ -90,30 +90,17 @@ class ActivateEmailView(FreeAccessView, ThemeView):
 
                         # template user auto validated
                         activation = 'validated'
-
-                        # sending email after activation success
-                        #try:
-                        #    # Send an email: the recipient is the user
-                        #    recipients = pending_user_eamil 
-                        #    theme.template_name = 'user_request_email.html'
-                        #    html_content = render_to_string(theme.template, request)
-                        #    theme.template_name = 'user_request_email.txt'
-                        #    text_content = render_to_string(theme.template, request)
-                        #    theme.template_name = 'user_request_email_subject.txt'
-                        #    subject = render_to_string(theme.template, request)
-                        #    subject = subject.replace('\n', '')
-                        #    theme.template_name = 'email_default_sender.txt'
-                        #    sender =  render_to_string(theme.template, request)
-                        #    sender = sender.replace('\n', '')
-                        #    msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
-                        #    msg.attach_alternative(html_content, "text/html")
-                        #    msg.send()
-                        #except Exception as e:
-                        #    logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
-                        #    import traceback
-                        #    logger.error(traceback.format_exc())
             
             PendingUser.objects.filter(email_hash__iexact = hash_code).update(status='True')
+            u = {}
+            u['first_name']    =  pending_user.first_name   
+            u['last_name']     =  pending_user.last_name    
+            u['authority_hrn'] =  pending_user.authority_hrn
+            u['email']         =  pending_user.email        
+            u['user_hrn']      =  pending_user.user_hrn     
+            u['pi']            =  pending_user.pi           
+
+            send_email_to_pis(self.request, u, 'user')
         else:
             activation = 'failed'
         
