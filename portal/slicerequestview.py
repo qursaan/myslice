@@ -111,11 +111,12 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
-            
-            # getting the authority_hrn from the selected organization
-            for authority in authorities:
-                if authority['name'] == request.POST.get('org_name', ''):
-                    authority_hrn = authority['authority_hrn']
+           
+            if theme.theme != 'fed4fire':
+                # getting the authority_hrn from the selected organization
+                for authority in authorities:
+                    if authority['name'] == request.POST.get('org_name', ''):
+                        authority_hrn = authority['authority_hrn']
 
             # Handle the case when we use only hrn and not name
             if authority_hrn is None:
