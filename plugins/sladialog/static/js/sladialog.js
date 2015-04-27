@@ -16,6 +16,7 @@
     var SlaDialog = Plugin.extend({
 
         accepted_slas: {},
+        queries: [],
 
         /** XXX to check
          * @brief Plugin constructor
@@ -45,6 +46,20 @@
             // call function
             this.button_binding();
 
+            // Get testbeds with sla and store them in localStorage
+            //this.get_testbeds_with_sla();
+
+        },
+
+        get_testbeds_with_sla: function () {
+            return $.get('/sla/testbeds/', function(data) {
+                if (typeof(Storage) !== "undefined") {
+                    if (!localStorage.getItem("sla_testbeds")) {
+                        var testbeds = data;
+                        localStorage.setItem("sla_testbeds", testbeds);
+                    }
+                }
+            });
         },
 
         find_row: function(key)
@@ -86,10 +101,18 @@
                 self.accepted_slas[id] = true;
                 var is_ok = self.check_template_status();
 
+                $(".sla-alert").show();
+                $(this).button("complete");
+                $(this).prop("disabled", true);
+
                 if (is_ok) {
                     // remove warnings
                     // var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
                 }
+            });
+
+            $(".sla-alert-close").click(function() {
+                $(this).closest(".sla-alert").hide();
             });
         },
 
@@ -219,6 +242,8 @@
                                             if ($("#" + id_ref).data("urns").length == 0) {
                                                 $("#" + id_ref).hide();
                                                 delete self.accepted_slas[id_ref];
+                                                $(".sla-accept-button").button("reset");
+                                                $(".sla-accept-button").prop("disabled", false);
                                             }
                                             //$( "#sla_offers_list" ).append(
                                             //    $("<li>").text("Testbed " + testbeds[pos] + " offers SLA for its resources")

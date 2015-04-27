@@ -1688,27 +1688,20 @@ case TYPE_LIST_OF_VALUES:
     {
         var query, data;
 
-        // JGLL: TODO These lines should be moved to a different part of the code
-        // to avoid a call every time a resource is selected or deselected -> where?
-        function get_testbeds_with_sla() {
-            return $.ajax({
-                url: '/sla/testbeds/',
-                async: true
-            });
-        }
-
         query = query_ext.query;
 
         switch(query.object) {
 
             case 'resource':
+
+                var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
                 // CONSTRAINT_RESERVABLE_LEASE
                 // 
                 // +) If a reservable node is added to the slice, then it should have a corresponding lease
                 // XXX Not always a resource
                 var is_reservable = (record.exclusive == true);
                 if (is_reservable) {
-                    var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
+                    // var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
 
                     if (event_type == STATE_SET_ADD) {
                         // We should have a lease_query associated
@@ -1722,7 +1715,7 @@ case TYPE_LIST_OF_VALUES:
                             var warn = CONSTRAINT_RESERVABLE_LEASE_MSG;
                             warnings[CONSTRAINT_RESERVABLE_LEASE] = warn;
 
-                            manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
+                            /*manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
                             // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
                             data = {
                                 state:  STATE_WARNINGS,
@@ -1730,7 +1723,7 @@ case TYPE_LIST_OF_VALUES:
                                 op    : null,
                                 value : warnings
                             }
-                            manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
+                            manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);*/
 
                         } else {
                             // Lease are defined, delete the warning in case it was set previously
@@ -1741,6 +1734,31 @@ case TYPE_LIST_OF_VALUES:
                         delete warnings[CONSTRAINT_RESERVABLE_LEASE];
                     }
                 }
+
+                /*var urn_regexp = /\+(.*?)\+/;
+                var testbed_urn = urn_regexp.exec(record.urn)[1];
+                var has_sla = $.inArray(testbed_urn, localStorage.getItem("sla_testbeds").split(",")) != -1;
+
+                if (has_sla) {
+                    // var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
+
+                    if (event_type == STATE_SET_ADD) {
+                        var warn = CONSTRAINT_SLA_MSG;
+                        warnings[CONSTRAINT_SLA] = warn;
+                    } else {
+                        delete warnings[CONSTRAINT_SLA];
+                    }
+                }*/
+
+                manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
+                // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)
+                data = {
+                    state:  STATE_WARNINGS,
+                    key   : record_key,
+                    op    : null,
+                    value : warnings
+                }
+                manifold.raise_record_event(query.query_uuid, FIELD_STATE_CHANGED, data);
 
                 // JGLL: SLA code
                 /*get_testbeds_with_sla()
@@ -1857,7 +1875,8 @@ case TYPE_LIST_OF_VALUES:
         switch(event_type) {
             case STATUS_REMOVE_WARNING:
                 record = manifold.query_store.get_record(query_uuid, data.value);
-                this._enforce_constraints(query_ext, record, data.value, STATE_SET_ADD);
+                this._enforce_constraints(query_ext, record, data.value, STATE_SET_REMOVE);
+                break;
 
             // XXX At some point, should be renamed to RECORD_STATE_CHANGED
             case FIELD_STATE_CHANGED:
