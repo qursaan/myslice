@@ -1055,6 +1055,7 @@ def send_email_to_pis(wsgi_request, request, obj_type):
 
         theme.template_name = 'email_default_sender.txt'
         sender =  render_to_string(theme.template, request)
+        sender = sender.replace('\n', '')
 
         msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
         msg.attach_alternative(html_content, "text/html")
