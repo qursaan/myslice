@@ -1,0 +1,15 @@
+Dear Fed4FIRE user,
+
+You have recently requested a project in the Fed4FIRE portal.
+
+Project name  : {{project_name}}
+Authority     : {{authority_hrn}}
+Email         : {{email}}
+Purpose       : {{purpose}}
+
+We are pleased to inform you that a manager from your institution has validated your project request on the Fed4FIRE portal. You can now create slices and start experimenting.
+
+We wish you a fruitful user experience with the Fed4FIRE portal.
+
+Yours sincerely,
+The Fed4FIRE team

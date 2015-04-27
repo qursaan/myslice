@@ -14,7 +14,7 @@
 {% widget "_widget-no_credentials.html" %}
 <div class="container dashboard">
 	<div class="row">
-	    <div class="col-md-12">
+	    <div class="col-md-12" id="credentials_msg" style="display:none;">
 	{%if 'no_creds'  in user_cred %}
       	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
   	{%endif%}
@@ -158,8 +158,10 @@
 	$(document).ready(function() {
 	    {%if 'no_creds' in user_cred or 'creds_expired' in user_cred %}
         localStorage.clear();
+        /*
         $.post("/cache/clear/", function( data ) {
         });
+        */
         {% endif %}
 		$('a.home-tab').click(function() {
 			$('ul.nav-tabs li').removeClass('active');

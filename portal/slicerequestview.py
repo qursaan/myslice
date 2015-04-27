@@ -46,13 +46,14 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authority_name = None
         # Retrieve the list of authorities
         if self.theme == 'fed4fire':
-            authorities_query = Query.get('myslice:authority').select('name', 'authority_hrn')
+            authorities_query = Query.get('myslice:authority').select('authority_hrn')
         else:
             authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            authorities = sorted(authorities, key=lambda k: k['name'])
+            if self.theme != 'fed4fire':
+                authorities = sorted(authorities, key=lambda k: k['name'])
 
         # Get user_email (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email','config')
@@ -64,7 +65,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             user_authority = user_config.get('authority','N/A')              
         # getting the org from authority        
         for authority in authorities:
-            if authority['authority_hrn'] == user_authority:
+            if 'name' in authority and authority['authority_hrn'] == user_authority:
                 authority_name = authority['name']
 
         # Handle the case when we use only hrn and not name
@@ -110,11 +111,12 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
-            
-            # getting the authority_hrn from the selected organization
-            for authority in authorities:
-                if authority['name'] == request.POST.get('org_name', ''):
-                    authority_hrn = authority['authority_hrn']
+           
+            if theme.theme != 'fed4fire':
+                # getting the authority_hrn from the selected organization
+                for authority in authorities:
+                    if authority['name'] == request.POST.get('org_name', ''):
+                        authority_hrn = authority['authority_hrn']
 
             # Handle the case when we use only hrn and not name
             if authority_hrn is None:

@@ -76,8 +76,11 @@ def topmenu_items_live (current, page):
     # We might use local storage instead
 
     # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-    query_pi_auths = Query.get('myslice:user').filter_by('user_hrn', '==', '$user_hrn' ).select('user_hrn','pi_authorities')
-    page.enqueue_query(query_pi_auths)
+    if request.user.is_authenticated ():
+        query_pi_auths = Query.get('myslice:user').filter_by('user_hrn', '==', '$user_hrn' ).select('user_hrn','pi_authorities')
+        page.enqueue_query(query_pi_auths)
+    else:
+        query_pi_auths = Query()
 #        # even though this plugin does not have any html materialization, the corresponding domid
 #        # must exist because it is searched at init-time to create the JS plugin
 #        # so we simply piggy-back the target button created in the topmenu
