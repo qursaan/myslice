@@ -59,6 +59,10 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         #page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
         #page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
 
+        # get the domain url
+        current_site = Site.objects.get_current()
+        current_site = current_site.domain
+
         for key, value in kwargs.iteritems():
             if key == "hash_code":
                 hash_code=value
@@ -99,15 +103,13 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             u['email']         =  pending_user.email        
             u['user_hrn']      =  pending_user.user_hrn     
             u['pi']            =  pending_user.pi           
+            u['public_key']    =  pending_user.public_key
+            u['current_site']  = current_site
 
             send_email_to_pis(self.request, u, 'user')
         else:
             activation = 'failed'
         
-        # get the domain url
-        current_site = Site.objects.get_current()
-        current_site = current_site.domain
-
         
         context = super(ActivateEmailView, self).get_context_data(**kwargs)
         context['activation_status'] = activation
@@ -121,10 +123,8 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         #context['first_name'] = first_name
         #context['last_name'] = last_name
         #context['authority_hrn'] = authority_hrn
-        #context['public_key'] = public_key
         #context['email'] = email
         #context['user_hrn'] = user_hrn
-        #context['current_site'] = current_site
         context['theme'] = self.theme
 #        context ['firstname'] = config['firstname']
         prelude_env = page.prelude_env()
