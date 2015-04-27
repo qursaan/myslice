@@ -686,6 +686,10 @@ def portal_validate_request(wsgi_request, request_ids):
                 user_email = a.email
 
                 PendingAuthority.objects.get(id=request['id']).delete()
+                
+                # Clear Admin Cache as it is used to display the list of authorities in Registration page
+                query = Query.update('myslice:authority').filter_by('authority_hrn', '==', sfa_authority_params['authority_hrn']).set({'authority_hrn':sfa_authority_params['authority_hrn']}).select('authority_hrn')
+                res = execute_admin_query(request, query)
 
             elif request['type'] == 'project':
                 hrn = request['authority_hrn'] + '.' + request['project_name']
@@ -711,6 +715,11 @@ def portal_validate_request(wsgi_request, request_ids):
                 user_email = p.email
 
                 PendingProject.objects.get(id=request['id']).delete()
+
+                # Clear Admin Cache as it is used to display the list of projects in Slice request page
+                query = Query.update('myslice:authority').filter_by('authority_hrn', '==', sfa_authority_params['authority_hrn']).set({'authority_hrn':sfa_authority_params['authority_hrn']}).select('authority_hrn')
+                res = execute_admin_query(request, query)
+
 
             elif request['type'] == 'join':
                 # Add user as a PI of the project
