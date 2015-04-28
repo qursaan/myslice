@@ -891,6 +891,7 @@ def send_status_email(ctx, user_email, obj_type, status):
         theme.template_name = obj_type + '_request_' + status + '.html'
         html_content = render_to_string(theme.template, ctx)
         theme.template_name = 'email_default_sender.txt'
+
         sender =  render_to_string(theme.template, ctx)
         sender = sender.replace('\n', '')
                        
@@ -900,6 +901,7 @@ def send_status_email(ctx, user_email, obj_type, status):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception as e:
+        print e
         logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
 
@@ -1049,9 +1051,10 @@ def send_email_to_pis(wsgi_request, request, obj_type):
         theme.template_name = obj_type + '_request_email.html' 
         html_content = render_to_string(theme.template, request)
 
-        theme.template_name = obj_type + '_request_email_subject.txt'
-        subject = render_to_string(theme.template, request)
-        subject = subject.replace('\n', '')
+        #theme.template_name = obj_type + '_request_email_subject.txt'
+        #subject = render_to_string(theme.template, request)
+        #subject = subject.replace('\n', '')
+        subject = "New "+obj_type+" request"
 
         theme.template_name = 'email_default_sender.txt'
         sender =  render_to_string(theme.template, request)
@@ -1061,6 +1064,7 @@ def send_email_to_pis(wsgi_request, request, obj_type):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
     except Exception, e:
+        print e
         print "Failed to send email, please check the mail templates and the SMTP configuration of your server"
 
 
