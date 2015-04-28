@@ -140,7 +140,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
             
             if not errors:
                 logger.info("is_pi on auth_hrn = {}".format(user_authority))
-                if is_pi(wsgi_request, user_hrn, user_authority):
+                if is_pi(wsgi_request, user_hrn, post['authority_hrn']):
                     # PIs can directly create/join project in their own authority...
                     if 'join' in wsgi_request.POST:
                         # join existing project
