@@ -16,7 +16,7 @@
     {%endif%}
 
 	<div class="row">
-		{% if pi %}
+        {% if request.session.user.pi %}
 		<div class="col-md-3">
 			<h3>
 				EXPERIMENT
