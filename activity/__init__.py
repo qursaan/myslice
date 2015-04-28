@@ -14,6 +14,8 @@ import base64
 import time
 import datetime
 from myslice.configengine import ConfigEngine
+from myslice.settings import logger
+
 
 config = ConfigEngine()
 if config.activity and config.activity.apikey :
@@ -37,10 +39,10 @@ else :
 def logWrite(request, action, message, objects = None):
     
     if not apikey :
-        print "===============>> activity: no apikey"
+        logger.info("===============>> activity: no apikey")
         return
     if not secret :
-        print "===============>> activity: no secret"
+        logger.info("===============>> activity: no secret")
         return
     
     timestamp = time.mktime(datetime.datetime.today().timetuple())
@@ -69,12 +71,11 @@ def logWrite(request, action, message, objects = None):
     
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
-        print "===============>> activity: %s <%s> %s" % (action, request.user,message)
+        logger.info("===============>> activity: {} <{}> {}".format(action, request.user,message))
         content = result.read()
     except urllib2.URLError as e:
-        print "===============>> activity: connection to " + server + " impossible, could not log action"
-        print e.strerror
-        print ""
+        logger.error("===============>> activity: connection to {} impossible, could not log action".format(server))
+        logger.error(e.strerror)
 
 def log(request, action, message, objects = None):
     # Create a new thread in Daemon mode to send the log entry
@@ -83,10 +84,10 @@ def log(request, action, message, objects = None):
     t.start()
 
 def getClientIp(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
+    try :
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         ip = x_forwarded_for.split(',')[0]
-    else:
+    except:
         ip = request.META.get('REMOTE_ADDR')
     return ip
 

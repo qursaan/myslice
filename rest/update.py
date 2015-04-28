@@ -1,18 +1,15 @@
+from rest import ObjectRequest, error, success
+
 from django.views.generic.base      import TemplateView
 from django.shortcuts               import render_to_response
+from django.http                    import HttpResponse
 
 from unfold.loginrequired           import LoginRequiredView
-from django.http                    import HttpResponse
 
 from manifold.core.query            import Query, AnalyzedQuery
 from manifoldapi.manifoldapi        import execute_query
 
-from rest import ObjectRequest, error, success
-
-from string import join
-
-import json
-
+from myslice.settings import logger
 
 def dispatch(request, object_type, object_name):
     
@@ -23,15 +20,15 @@ def dispatch(request, object_type, object_name):
     elif request.method == 'GET':
         #return error('only post request is supported')
         req_items = request.GET
-    print req_items
+    logger.debug(req_items)
     for el in req_items.items():
         
-        print "#===============>",el
+        logger.debug("#===============> {}".format(el))
         if el[0].startswith('filters'):
             o.filters[el[0][8:-1]] = el[1]
         elif el[0].startswith('params'):
-            print "#======> 0 ", el[0]
-            print "#======> 1 ", req_items.getlist(el[0])
+            logger.debug("#======> 0 {}".format(el[0]))
+            logger.debug("#======> 1 {}".format(req_items.getlist(el[0])))
 
             if (el[0][-2:] == '[]') :
                 # when receiving params[key][] = 'value1' ...
@@ -41,7 +38,7 @@ def dispatch(request, object_type, object_name):
                 # when receiving params[key] = 'value'
                 o.params.append({el[0][7:-1]:el[1]})
             
-            print "o.params = ",o.params
+            logger.debug("o.params = {}".format(o.params))
             
         elif el[0].startswith('fields'):
             o.fields=req_items.getlist('fields[]')

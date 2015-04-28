@@ -9,8 +9,10 @@ from django.template.loader import render_to_string
 from manifoldapi.metadata import MetaData
 
 from unfold.prelude import Prelude
-
+from unfold.sessioncache import SessionCache
+    
 from myslice.configengine import ConfigEngine
+from myslice.settings import logger
 
 # decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
@@ -106,16 +108,21 @@ class Page:
 
         # if cached, use it
         if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
-            if debug: print "Page.get_metadata: return cached value"
+
+#         cached_metadata = SessionCache().get_metadata(self.request)
+#         if cached_metadata and isinstance(cached_metadata, MetaData):
+            logger.debug("Page.get_metadata: return cached value")
             return manifold['metadata']
+#             return cached_metadata
 
         metadata_auth = {'AuthMethod':'anonymous'}
 
-        metadata=MetaData (metadata_auth)
+        metadata = MetaData (metadata_auth)
         metadata.fetch(self.request)
         # store it for next time
         manifold['metadata']=metadata
-        if debug: print "Page.get_metadata: return new value"
+#         SessionCache().store_metadata(self.request, metadata)
+        logger.debug("Page.get_metadata: return new value")
         return metadata
             
     def expose_js_metadata (self):

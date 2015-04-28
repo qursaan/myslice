@@ -9,6 +9,8 @@ from unfold.page import Page
 
 from ui.topmenu import topmenu_items_live, the_user
 
+from myslice.settings import logger
+
 class TopmenuValidationView (TemplateView):
 
     # mention a user name in the URL as .../trash/simpletopmenuvalidation/ple.inria.thierry_parmentelat
@@ -35,9 +37,9 @@ class TopmenuValidationView (TemplateView):
         # define {js,css}_{files,chunks}
         prelude_env = page.prelude_env()
 
-#        print prelude_env.keys()
+#        logger.info(prelude_env.keys())
 #        for k in [ 'js_files' ] :
-#            print 'prelude_env',prelude_env,k,prelude_env[k]
+#            logger.info('prelude_env {} {} {}'.format(prelude_env,k,prelude_env[k]))
 
         template_env.update(prelude_env)
         result=render_to_response ('view-unfold1.html',template_env,

@@ -1,3 +1,5 @@
+import json
+
 from django.core.context_processors import csrf
 from django.http                    import HttpResponseRedirect
 from django.contrib.auth            import authenticate, login, logout
@@ -16,7 +18,8 @@ from myslice.configengine           import ConfigEngine
 
 from portal.actions                 import is_pi, authority_check_pis
 from myslice.theme                  import ThemeView
-import json
+from myslice.settings               import logger
+
 
 class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'institution.html'
@@ -30,6 +33,7 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
     def post (self,request):
         env = self.default_env()
         env['theme'] = self.theme
+        env['request'] = request
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 
     def get (self, request, authority_hrn=None, state=None):
@@ -66,12 +70,12 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
                 env['project'] = True
                 env['user_details'] = {'parent_authority': authority_hrn}
 
+            logger.debug("BEFORE  ####------####  is_pi")
+            logger.debug("is_pi = {}".format(is_pi))
+            pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
         else: 
             env['person'] = None
-        print "BEFORE  ####------####  is_pi"
-        pi = is_pi(self.request, '$user_hrn', env['user_details']['parent_authority']) 
-        print "is_pi = ",is_pi
-
+            pi = False
         env['theme'] = self.theme
         env['section'] = "Institution"
         env['pi'] = pi 
@@ -82,6 +86,6 @@ class InstitutionView (LoginRequiredAutoLogoutView, ThemeView):
         # use one or two columns for the layout - not logged in users will see the login prompt
         env['layout_1_or_2']="layout-unfold2.html" if not env['username'] else "layout-unfold1.html"
         
-        
+        env['request'] = request
         return render_to_response(self.template, env, context_instance=RequestContext(request))
 

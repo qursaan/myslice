@@ -11,7 +11,9 @@ from unfold.loginrequired        import LoginRequiredAutoLogoutView
 
 from ui.topmenu                  import topmenu_items_live, the_user
 
-from myslice.theme import ThemeView
+from myslice.theme               import ThemeView
+from myslice.settings            import logger
+
 
 #This view requires login 
 class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
@@ -25,7 +27,7 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
         #messages.info(self.request, 'You have logged in')
         page = Page(self.request)
 
-        print "Dashboard page"
+        logger.info("Dashboard page")
         # Slow...
         #slice_query = Query().get('slice').filter_by('user.user_hrn', 'contains', user_hrn).select('slice_hrn')
         testbed_query  = Query().get('network').select('network_hrn','platform','version')
@@ -47,8 +49,8 @@ class DashboardView (LoginRequiredAutoLogoutView, ThemeView):
 #            root_authority = sub_authority[0]
 #            slice_query = Query().get(root_authority+':user').filter_by('user_hrn', '==', '$user_hrn').select('user_hrn', 'slice.slice_hrn')
 #        else:
-        print "SLICE QUERY"
-        print "-" * 80
+        logger.debug("SLICE QUERY")
+        logger.debug("-" * 80)
         slice_query = Query().get('myslice:user').filter_by('user_hrn', '==', '$user_hrn').select('slices.slice_hrn')
         page.enqueue_query(slice_query)
         page.enqueue_query(testbed_query)

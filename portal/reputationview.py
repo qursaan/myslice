@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http                  import *
 
 
-def response_mimetype(request):
+def response_content_type(request):
         
     if "application/json" in request.META['HTTP_ACCEPT']:
         return "application/json"
@@ -233,7 +233,7 @@ class ReputationView (LoginRequiredAutoLogoutView, ThemeView):
             
             slicedata_received = json_to_rest('http://survivor.lab.netmode.ntua.gr:4567/reputation/json', dict_to_send )
                         
-            return HttpResponse(json.dumps(slicedata_received), content_type = response_mimetype(self.request))
+            return HttpResponse(json.dumps(slicedata_received), content_type = response_content_type(self.request))
 
                 
         slices_users = []

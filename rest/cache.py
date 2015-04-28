@@ -9,7 +9,7 @@ import json
 def dispatch(request, action):
     
     if (action == 'clear') :
-        query = Query.update('myslice:user').filter_by('user_hrn', '==', '$user_hrn').set({'user_email':str(request.user)})
+        query = Query.update('myslice:user').filter_by('user_hrn', '==', '$user_hrn').set({'user_email':str(request.user)}).select('user_hrn')
         try:
             res = execute_query(request, query)
         except Exception, e:

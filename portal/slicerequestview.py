@@ -1,6 +1,11 @@
-from django.shortcuts           import render
-from django.contrib.sites.models import Site
+import json
+import time
+import re
 
+from django.shortcuts           import render
+from django.shortcuts           import render_to_response
+from django.template                    import RequestContext
+from django.contrib.sites.models import Site
 
 from unfold.page                import Page
 
@@ -13,10 +18,10 @@ from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
 
 from myslice.theme import ThemeView
-
-import json, time, re
+from myslice.settings import logger
 
 import activity.user
+theme = ThemeView()
 
 class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'slicerequest_view.html'
@@ -29,9 +34,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
     def get (self, request):
         return self.get_or_post (request, 'GET')
 
-    def get_or_post  (self, wsgi_request, method):
+    def get_or_post  (self, request, method):
         """
         """
+
         errors = []
         slice_name =''
         purpose=''
@@ -39,15 +45,19 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
-        authorities_query = Query.get('authority').select('name', 'authority_hrn')
-        authorities = execute_admin_query(wsgi_request, authorities_query)
+        if self.theme == 'fed4fire':
+            authorities_query = Query.get('myslice:authority').select('authority_hrn')
+        else:
+            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            authorities = sorted(authorities, key=lambda k: k['name'])
+            if self.theme != 'fed4fire':
+                authorities = sorted(authorities, key=lambda k: k['name'])
 
         # Get user_email (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email','config')
-        user_details = execute_query(wsgi_request, user_query)
+        user_details = execute_query(request, user_query)
         user_email = user_details[0].get('email')
         # getting user_hrn
         for user_detail in user_details:
@@ -55,7 +65,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             user_authority = user_config.get('authority','N/A')              
         # getting the org from authority        
         for authority in authorities:
-            if authority['authority_hrn'] == user_authority:
+            if 'name' in authority and authority['authority_hrn'] == user_authority:
                 authority_name = authority['name']
 
         # Handle the case when we use only hrn and not name
@@ -63,10 +73,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             authority_name = user_authority
         
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-        account_details = execute_query(wsgi_request, account_query)
+        account_details = execute_query(request, account_query)
         
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        platform_details = execute_query(wsgi_request, platform_query)
+        platform_details = execute_query(request, platform_query)
         user_hrn = None
         #getting user_hrn from local:account
         for account_detail in account_details:
@@ -86,11 +96,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         #else:
         #    pi = "is_pi"
 
-        pi = authority_check_pis (wsgi_request, user_email)
-        print "SLICEREQUESTVIEW.PY -----  pi=",pi
+        pi = authority_check_pis (request, user_email)
+        logger.debug("SLICEREQUESTVIEW.PY -----  pi= {}".format(pi))
 
         # Page rendering
-        page = Page(wsgi_request)
+        page = Page(request)
         page.add_js_files  ( [ "js/jquery.validate.js", "js/jquery-ui.js" ] )
         page.add_css_files ( [ "css/jquery-ui.css" ] )
         page.expose_js_metadata()
@@ -101,20 +111,28 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             # get the domain url
             current_site = Site.objects.get_current()
             current_site = current_site.domain
-            
-            # getting the authority_hrn from the selected organization
-            for authority in authorities:
-                if authority['name'] == wsgi_request.POST.get('org_name', ''):
-                    authority_hrn = authority['authority_hrn']
+           
+            if theme.theme != 'fed4fire':
+                # getting the authority_hrn from the selected organization
+                for authority in authorities:
+                    if authority['name'] == request.POST.get('org_name', ''):
+                        authority_hrn = authority['authority_hrn']
 
             # Handle the case when we use only hrn and not name
             if authority_hrn is None:
-                authority_hrn = wsgi_request.POST.get('org_name', '')
+                authority_hrn = request.POST.get('org_name', '')
 
             # Handle project if used
-            project = wsgi_request.POST.get('project', None)
+            project = request.POST.get('project', None)
             if project is not None and project != '':
                 authority_hrn = project
+
+            slice_name = request.POST.get('slice_name', '')
+            if not slice_name or len(slice_name) == 0 :
+                errors.append('Slice name can\'t be empty')
+
+            # accept only lowercase names
+            slice_name = slice_name.lower()
 
             slice_request = {
                 'type'              : 'slice',
@@ -123,63 +141,70 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'email'             : user_email,
                 'timestamp'         : time.time(),
                 'authority_hrn'     : authority_hrn,
-                'organization'      : wsgi_request.POST.get('org_name', ''),
-                'slice_name'        : wsgi_request.POST.get('slice_name', ''),
-                'url'               : wsgi_request.POST.get('url', ''),
-                'purpose'           : wsgi_request.POST.get('purpose', ''),
+                'organization'      : request.POST.get('org_name', ''),
+                'slice_name'        : slice_name,
+                'url'               : request.POST.get('url', ''),
+                'purpose'           : request.POST.get('purpose', ''),
                 'current_site'      : current_site
             }
-            
-            # create slice_hrn based on authority_hrn and slice_name
-            slice_name = slice_request['slice_name']
-            req_slice_hrn = authority_hrn + '.' + slice_name
-            # comparing requested slice_hrn with the existing slice_hrn 
-            slice_query  = Query().get('myslice:slice').select('slice_hrn','parent_authority').filter_by('parent_authority','==',authority_hrn)
-            slice_details_sfa = execute_admin_query(wsgi_request, slice_query)
+
+            # slice name is unique among all authorities 
+            slice_query = Query().get('myslice:slice').select('slice_hrn')
+            slice_details_sfa = execute_admin_query(request, slice_query)
             for _slice in slice_details_sfa:
-                if _slice['slice_hrn'] == req_slice_hrn:
+                split_list = _slice['slice_hrn'].split('.')
+                sfa_slice_name = split_list[-1]
+                if sfa_slice_name == slice_name:
                     errors.append('Slice already exists. Please use a different slice name.')
             
 
             # What kind of slice name is valid?
-            if (slice_name is None or slice_name == ''):
+            if slice_name is None or slice_name == '':
                 errors.append('Slice name is mandatory')
             
-            if (re.search(r'^[A-Za-z0-9_]*$', slice_name) == None):
+            if re.search(r'^[A-Za-z0-9_]*$', slice_name) is None:
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
             
-            organization = slice_request['organization']    
-            if (organization is None or organization == ''):
-                errors.append('Organization is mandatory')
+            organization = slice_request['organization']
+            if theme.theme == 'fed4fire':
+                if organization is None or organization == '':
+                    errors.append('Selecting project is mandatory')
+            else:
+                if organization is None or organization == '':
+                    errors.append('Organization is mandatory')
+
+            slice_length= len(slice_request['slice_name'])
+            if slice_length >19:
+                errors.append('Slice name can be maximum 19 characters long')
 
 
     
             purpose = slice_request['purpose']
-            if (purpose is None or purpose == ''):
+            if purpose is None or purpose == '':
                 errors.append('Experiment purpose is mandatory')
 
             url = slice_request['url']
 
             if not errors:
-                if is_pi(wsgi_request, user_hrn, authority_hrn):
+                if is_pi(request, user_hrn, authority_hrn):
                     # PIs can directly create slices in their own authority...
-                    create_slice(wsgi_request, slice_request)
-                    clear_user_creds(wsgi_request, user_email)
+                    create_slice(request, slice_request)
+                    clear_user_creds(request, user_email)
                     self.template_name = 'slice-request-done-view.html'
                 else:
-                    # Otherwise a wsgi_request is sent to the PI
-                    create_pending_slice(wsgi_request, slice_request, user_email)
+                    # Otherwise a request is sent to the PI
+                    create_pending_slice(request, slice_request, user_email)
                     self.template_name = 'slice-request-ack-view.html'
                 
                 # log user activity
-                activity.user.slice(wsgi_request)
-                
-                return render(wsgi_request, self.template, {'theme': self.theme}) # Redirect after POST
+                activity.user.slice(request)
+                return render_to_response(self.template, {'theme': self.theme, 'request':request}, context_instance=RequestContext(request))
+                #return render(request, self.template, {'theme': self.theme}) # Redirect after POST
         else:
             slice_request = {}
 
         template_env = {
-            'username': wsgi_request.user.email,
+            'username': request.user.email,
             'topmenu_items': topmenu_items_live('Request a slice', page),
             'errors': errors,
             'slice_name': slice_name,
@@ -193,8 +218,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'cc_myself': True,
             'authorities': authorities,
             'theme': self.theme,
-            'section': "Slice request"
+            'section': "Slice request",
+            'request': request,
         }
         template_env.update(slice_request)
         template_env.update(page.prelude_env())
-        return render(wsgi_request, self.template, template_env)
+
+        return render_to_response(self.template,template_env, context_instance=RequestContext(request))
+        #return render(request, self.template, template_env)

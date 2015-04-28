@@ -12,7 +12,7 @@ Email        : {{email}}
 User hrn     : {{user_hrn}}
 Portal url   : {{ current_site }}
 
-You can see new user request in the portal: {{current_site}}/portal/validate
+You can see new user request in the portal: {{current_site}}/portal/institution#requests
 
 Please note that the request will only become visible to you on the OneLab portal once the user has confirmed his/her email address.
 

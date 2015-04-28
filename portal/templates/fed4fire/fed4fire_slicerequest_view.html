@@ -9,7 +9,7 @@
 			 </div>
 		</div>
 	</div>
-
+	
 	{% if errors %}
 	<div class="row">
 		<div class="col-md-12">
@@ -23,47 +23,42 @@
 	{% endif %}
 	
 	<div class="row">
-		<div class="col-md-8 el">
+		<div class="col-md-5 col-md-offset-3">
 			<form role="form" method="post">
 			{% csrf_token %}
-			  <div class="form-group" style="display:none">
-			    <input type="email" class="form-control" id="email" style="width:300px" value="{{ email }}" readonly="readonly">
+			  <div class="form-group">
+			     <input type="hidden" id="email" value="{{ email }}" readonly="readonly">
+			     <label>
+			         Please enter a name for your slice <br />
+			         <span class="sublabel">
+			             The slice name should only contain letters, numbers and the underscore "_" (19 max length) <br />
+			         </span>
+			     </label>
+			     <input type="text" class="form-control" name="slice_name" id="slice_name" maxlength="19" style="width:100%" placeholder="Slice name" value="{{slice_name}}" required="required">
 			  </div>
 			  <div class="form-group">
-			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice name" value="{{slice_name}}" 
-				title="Please enter a name for your slice"required="required">
+			      <label>
+			          Select a project under which you want your slice to be created <br />
+			          If your are not part of any projects you can <a href="/portal/project_request/">join or create one</a>
+			      </label>
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:100%" placeholder="Project" 
+				        title="Select a project under which you want to create your slice" required="required">
 			  </div>
 			  <div class="form-group">
-				{% if pi %}
-				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:300px" placeholder="Organization" 
-				title="An authority responsible for vetting your slice" required="required">
-				{% else %}
-			    <input type="hidden" class="form-control" id="authority_hrn" name="org_name" placeholder="Organization" style="width:300px;" 
-				title="An authority responsible for vetting your slice" required="required" readonly>
-                <span style="float:left;">Authority: &nbsp;</span>
-                <div id="authority_display">
-                <img src="{{ STATIC_URL }}img/loading.gif" alt="Loading authority" />
-                </div>
-				{% endif %}
+			      <label>
+			          Provide an URL for your experiment (not required)
+			      </label>
+			      <input type="text" class="form-control" name="url" id="url" style="width:100%" placeholder="Experiment URL (if one exists)"
+				        title="Please provide the url of your experiment" value="{{url}}">
 			  </div>
 			  <div class="form-group">
-                Project: <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
-                <select id="project" name="project" style="display:none;">
-                </select>
-              </div>
-			  <div class="form-group">
-			    <input type="text" class="form-control" name="url" id="url" style="width:300px" placeholder="Experiment URL (if one exists)"
-				title="Please provide the url of your experiment if you have one." value="{{url}}">
+			      <label>
+                        Please provide a description of the purpose for your experiment
+                   </label>
+			  	  <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment description" style="width:100%" 
+				        title="Description of your experiment" required="required">{{ purpose }}</textarea>
 			  </div>
-			  <div class="form-group">
-			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
-				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
-			  </div>
-			  {% if pi %}	
 			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
-			  {% else %}
-			  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Request slice</button>
-			  {% endif %}	
 			</form>
 	
 		</div>
@@ -71,88 +66,23 @@
 		
 <script>
 jQuery(document).ready(function(){
-	
-	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
-		var jsonData = JSON.parse(data);
-        $(this).attr("value", jsonData[0]['parent_authority']);
-	    {% if pi %}
-        draw_projects(jsonData[0]['parent_authority']);
-        {% else %}
-        $('#authority_display').html(jsonData[0]['parent_authority']);
-        draw_projects('');
-        {% endif %}
-    });
-
-	{% if pi %}
-	$("#authority_hrn").val("{{authority_name}}");
-	var availableTags = [
-    {% if authorities %}
-        {% for authority in authorities %}
-            {% if authority.name %}
-                {value:"{{ authority.name }}",label:"{{authority.name}}"},
-			// to show only full name
-            {% else %}
-                {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
-            {% endif %}
-        {% endfor %}    
-    {% else %}
-        {value:"",label:"No authority found !!!"}
-    {% endif %}
-    ];
-	// sorting the list
-	availableTags.sort(function(a,b){
-		var nameA=a.value.toLowerCase(), nameB=b.value.toLowerCase();
-		if (nameA < nameB) {
-    		return -1;
-		}
-		if (nameA > nameB) {
-    		return 1;
-		}
-	return 0;
-	}); 
+    var myprojects = JSON.parse(localStorage.getItem('projects'));
     $( "#authority_hrn" ).autocomplete({
-      source: availableTags,
-      minLength: 0,
-      select: function( event, ui ) {
-        $("#project").hide();
-        $("#project_loading").css('display', 'inline-block');
-        draw_projects(jQuery('.ui-state-focus').html());
-      },
-    });
-    {% endif %}
-});
-
-function draw_projects(authority_hrn){
-
-    var projects = [];
-    project_row = "<option value=''> - </option>";
-    projects.push(project_row);
-
-    if(authority_hrn.length > 0){
-        // Not for root authority
-        if(authority_hrn.split('.').length > 1){
-            $.post("/rest/myslice:authority/",{'fields':['authority_hrn','pi_users'],'filters':{'authority_hrn':'CONTAINS'+authority_hrn}}, function( data ) {
-               
-                $.each( data, function( key, val ) {
-                    project_row = "<option value='"+val.authority_hrn+"'>"+val.authority_hrn+"</option>";
-                    projects.push(project_row);
-                });
-                $("#project").html(projects.join( "" ));
-            });
-        }else{
-            $("#project").html(projects.join( "" ));
+        minLength: 0,
+        source: myprojects,
+        change: function (event, ui) {
+                if(!ui.item){
+                    //http://api.jqueryui.com/autocomplete/#event-change -
+                    // The item selected from the menu, if any. Otherwise the property is null
+                    //so clear the item for force selection
+                    $("#authority_hrn").val("");
+                }
         }
-    }else{
-        my_projects = JSON.parse(localStorage.getItem('projects'));
-        $.each( my_projects, function( i, val ) {
-            project_row = "<option value='"+val+"'>"+val+"</option>";
-            projects.push(project_row);
-        });
-        $("#project").html(projects.join( "" ));
-    }
-    $("#project").show();
-    $("#project_loading").hide();
-}
+    }).bind('focus', function(){ $(this).autocomplete("search"); } );
+    $('input[name=slice_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
+    });
+});
 </script>
 {% endblock %}
 

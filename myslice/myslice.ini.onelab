@@ -1,2 +1,28 @@
 [manifold]
 url = https://portal.onelab.eu:7080/
+admin_user = 
+admin_password = 
+
+[myslice]
+theme = onelab
+debug = true
+httproot =
+dataroot =
+components = sla,influxdb,forge
+
+[database]
+# postgresql_psycopg2, mysql, sqlite3 or oracle
+engine = sqlite3
+#name = myslice
+name = /Users/parmentelat/git/myslice/unfold.sqlite3
+server = 
+port = 
+user =
+password =
+
+
+
+[activity]
+#server = http://athos.ipv6.lip6.fr/activity/push/log
+#apikey = 
+#secret = 

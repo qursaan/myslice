@@ -139,7 +139,7 @@ def pres_view_methods(request, type):
         config.close()
     else:
         return 0
-    return HttpResponse (json_answer, mimetype="application/json")
+    return HttpResponse (json_answer, content_type="application/json")
 
 def pres_view_animation(request, constraints, id):
 
@@ -184,7 +184,7 @@ def pres_view_animation(request, constraints, id):
     }]
 
     json_answer = json.dumps(cmd)
-    return HttpResponse (json_answer, mimetype="application/json")
+    return HttpResponse (json_answer, content_type="application/json")
 
 def pres_view_static(request, constraints, id):
     #constraints = "']date_created':1262325600"
@@ -221,4 +221,4 @@ def pres_view_static(request, constraints, id):
     }]
 
     json_answer = json.dumps(cmd)
-    return HttpResponse (json_answer, mimetype="application/json")
+    return HttpResponse (json_answer, content_type="application/json")

@@ -8,7 +8,7 @@ try:
     ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
 except:
     import traceback
-    traceback.print_exc()
+    logger.error(traceback.format_exc())
 
 
 from myslice.configengine import ConfigEngine
@@ -34,6 +34,7 @@ except:
 # DEBUG
 if config.myslice.debug :
     DEBUG = True
+    INTERNAL_IPS = ("127.0.0.1","132.227.84.195","132.227.78.191","132.227.84.191")
 else :
     DEBUG = False
 
@@ -242,15 +243,13 @@ INSTALLED_APPS = [
     # our django project
     'myslice',
     # the core of the UI
-    'auth', 
+    'localauth', 
     'manifoldapi',
     'unfold',
     # plugins
     'plugins',
     # views - more or less stable 
     'ui',
-    # managing database migrations
-    'south', 
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
 	# FORGE Plugin app
@@ -258,9 +257,18 @@ INSTALLED_APPS = [
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    #'debug_toolbar',
 ]
+# with django-1.7 we leave south and use native migrations
+# managing database migrations
+import django
+major, minor, _, _, _ = django.VERSION
+if major == 1 and minor <= 6:
+    INSTALLED_APPS.append('south')
+
 # this app won't load in a build environment
-if not building: INSTALLED_APPS.append ('rest')
+if not building:
+    INSTALLED_APPS.append ('rest')
 
 for component in components.list() :
     INSTALLED_APPS.append(component)
@@ -269,7 +277,7 @@ BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
 
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print("Using devel auxiliary",aux)
+        logger.info("Using devel auxiliary {}".format(aux))
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
@@ -336,7 +344,7 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ('auth.manifoldbackend.ManifoldBackend',
+AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
                            'django.contrib.auth.backends.ModelBackend')
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
@@ -351,7 +359,6 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 ####SLA#####
 
-SLA_MANAGER_URL = "http://157.193.215.125:4001/sla-collector/sla"
-#SLA_MANAGER_URL = "http://172.24.76.28:8000/sla"
-SLA_MANAGER_USER = "portal"
-SLA_MANAGER_PASSWORD = "password"
+SLA_COLLECTOR_URL = "http://157.193.215.125:4001/sla-collector/sla"
+SLA_COLLECTOR_USER = "portal"
+SLA_COLLECTOR_PASSWORD = "password"

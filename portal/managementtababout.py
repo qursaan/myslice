@@ -1,3 +1,4 @@
+import json
 # this somehow is not used anymore - should it not be ?
 from django.core.context_processors import csrf
 from django.http import HttpResponseRedirect
@@ -11,10 +12,10 @@ from unfold.loginrequired import FreeAccessView
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
 from manifoldapi.manifoldresult import ManifoldResult
-from myslice.configengine import ConfigEngine
 
+from myslice.configengine import ConfigEngine
 from myslice.theme import ThemeView
-import json
+from myslice.settings import logger
 
 class ManagementAboutView (FreeAccessView, ThemeView):
     template_name = 'management-tab-about.html'
@@ -27,7 +28,7 @@ class ManagementAboutView (FreeAccessView, ThemeView):
             user_local_query  = Query().get('local:user').select('config').filter_by('email','==',str(self.request.user))
             user_local_details = execute_query(self.request, user_local_query)
             user_authority = json.loads(user_local_details[0]['config']).get('authority')
-            print "**************________    management about  = ",user_authority
+            logger.info("**************________    management about  = {}".format(user_authority))
             # XXX Should be done using Metadata
             # select column.name from local:object where table=='authority'
             authority_query = Query().get('authority').select('authority_hrn', 'name', 'address', 'enabled','description', 

@@ -2,6 +2,7 @@
 
 {% block head %} 
 <script type="text/javascript" src="{{STATIC_URL}}/js/institution.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/requests.js"></script>
 {% endblock head %}
 
 {% block content %}
@@ -26,8 +27,9 @@
 				<li><a href="#users">Users</a></li>
                 {% if not project %}
 				<li><a href="#projects">Projects</a></li>
-                {% endif %}
+                {% else %}
 				<li><a href="#slices">Slices</a></li>
+                {% endif %}
 				<li><a href="#requests">Requests</a></li>
 			</ul>
 	    </div>
@@ -42,7 +44,7 @@
 	
 	<div class="tab-pane row" id="users" data-authority="{{user_details.parent_authority}}">
 		<div class="col-md-12 el">
-			<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+			<div id="user-tab-loading" style="padding-bottom:10px;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 				<div id="user-tab-loaded" style="display:none;">
     				<table id="user-tab" class="table">
         				<tr>
@@ -77,7 +79,7 @@
     {% if not project %}
 	<div class="tab-pane row" id="projects" data-authority="{{user_details.parent_authority}}">
 		<div class="col-md-12 el">
-			<div id="project-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Projects" /></div>
+			<div id="project-tab-loading" style="padding-bottom:10px;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Projects" /></div>
 				<div id="project-tab-loaded" style="display:none;">
     				<table id="project-tab" class="table">
         				<tr>
@@ -100,7 +102,7 @@
    {% endif %}
 	<div class="tab-pane row" id="slices">
 		<div class="col-md-12 el">
-	    <div id="slice-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
+	    <div id="slice-tab-loading" style="padding-bottom:10px;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Slices" /></div>
 	    <div id="slice-tab-loaded" style="display:none;">
 	        <table id="slice-tab" class="table">
 	            <tr>
@@ -125,13 +127,15 @@
 	   </div>
 	</div>
 	<div class="tab-pane row" id="requests">
+        <div id="spinner" style="padding-top:40px; padding-left:40px;"></div>
 	</div>
 </div>
 <script>
 $(document).ready(function() {
     {% if person %}
     {% if user_details.parent_authority %}
-
+        $('#spinner').spin();
+        
         $.post("/rest/myslice:slice/",{'fields':['slice_hrn','users','url','slice_date_created'],'filters':{'parent_authority':'{{user_details.parent_authority}}'}}, function( data ) {
             var list_slices = [];
             var table_slices = [];
@@ -143,7 +147,6 @@ $(document).ready(function() {
                 }else{
                     nodes_length=val.nodes.length;
                 }
-                //console.log(val);
                 if(val.users=="undefined" || val.users==null){
                     users_length=0;
                 }else{
@@ -157,7 +160,7 @@ $(document).ready(function() {
                 }
                 
                 slice_row = "<tr id='"+val.slice_hrn+"'>";
-                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'></td>";
+                slice_row += "<td><input type='checkbox' class='slice' id='"+val.slice_hrn+"'><div id='"+val.slice_hrn+"-loading' style='display:none;padding-left:3px;'><img src='{{ STATIC_URL }}img/loading.gif'></div></td>";
 
                 // filter links to slices, only those that the user has credentials for
                 s = myslice.user.slices;
@@ -186,9 +189,8 @@ $(document).ready(function() {
            
             var table_users = [];
             $.each( data[0].pi_users, function( key, val ) {
-                //console.log(val);
                 user_row = "<tr id='"+val+"'>";
-                user_row += "<td><input type='checkbox' class='user' id='"+val+"'></td>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val+"'><div id='"+val+"-loading' style='display:none;padding-left:3px;'><img src='{{ STATIC_URL }}img/loading.gif'></div></td>";
                 user_row += "<td>"+val+"</td>";
                 user_row += "</tr>";
                 table_users.push(user_row);
@@ -209,7 +211,7 @@ $(document).ready(function() {
             $.each( data, function( key, val ) {
                 list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
                 user_row = "<tr id='"+val.user_hrn+"'>";
-                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"' data-email='"+val.user_email+"'></td>";
+                user_row += "<td><input type='checkbox' class='user' id='"+val.user_hrn+"' data-email='"+val.user_email+"'><div id='"+val.user_hrn+"-loading' style='display:none;padding-left:3px;'><img src='{{ STATIC_URL }}img/loading.gif'></div></td>";
                 user_row += "<td>"+val.user_email+"</td>";
                 user_row += "<td>"+val.user_hrn+"</td>";
                 /*
@@ -228,9 +230,8 @@ $(document).ready(function() {
            
             var table_projects = [];
             $.each( data, function( key, val ) {
-                console.log(val);
                 project_row = "<tr id='"+val.authority_hrn+"'>";
-                project_row += "<td><input type='checkbox' class='project' id='"+val.authority_hrn+"'></td>";
+                project_row += "<td><input type='checkbox' class='project' id='"+val.authority_hrn+"'><div id='"+val.authority_hrn+"-loading' style='display:none;padding-left:3px;'><img src='{{ STATIC_URL }}img/loading.gif'></div></td>";
 
                 // filter links to projects, only those that the user has credentials for
                 p = myslice.projects;
@@ -273,11 +274,10 @@ $(document).ready(function() {
 	} else {
 		$('.nav-tabs a[href=#about]').click();
 	}
-});
 
-//upgrade users to PI
-$(document).ready(function() {
+    //upgrade users to PI
     $('button#makepi').click(function() {
+        spin_all();
         var flag = false;
         var pi_users = [];
         $.post("/rest/myslice:authority/",{'filters':{'authority_hrn': '{{user_details.parent_authority}}'}}, function( data ) {
@@ -286,6 +286,8 @@ $(document).ready(function() {
                 if(this.checked){
                     var record_id = this.id;
                     pi_users.push(record_id)
+                    $.post("/credentials/clear/",{'emails':[this.dataset['email']]}, function(data) {
+                    }); // post credentials clear
                     flag = true;                
                 }
             });
@@ -297,14 +299,14 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
+                    unspin_all();
                 });
             }
         });
     });
-});
 //downgrade to user [in projects:remove from project]
-$(document).ready(function() {
     $('button#removepi').click(function() {
+        spin_all();
         var flag = false;
         var pi_users = [];
         $.post("/rest/myslice:authority/",{'filters':{'authority_hrn': '{{user_details.parent_authority}}'}}, function( data ) {
@@ -316,9 +318,11 @@ $(document).ready(function() {
 					for (var i=pi_users.length-1; i>=0; i--) {
     					if (pi_users[i] === record_id) {
         					pi_users.splice(i, 1);
+                            $.post("/credentials/clear/",{'emails':[this.dataset['email']]}, function(data) {
+                            }); // post credentials clear
+                            flag = true;                
     					}
 					}
-                    flag = true;                
                 }
             });
             if(flag == true){
@@ -340,7 +344,11 @@ $(document).ready(function() {
                         mysliceAlert('Rest Error for: '+data.error,'warning', true);
                         //alert("Rest Error for "+record_id+": "+data.error);
                     }
+                    unspin_all();
                 });
+            }else{
+                mysliceAlert('No action: User had no rights on: {{user_details.parent_authority}}','success', true);
+                unspin_all();
             }
         });
     });

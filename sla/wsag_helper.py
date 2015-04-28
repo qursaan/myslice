@@ -1,5 +1,6 @@
 import re
 import datetime
+from myslice.settings import logger
 
 from slaclient import wsag_model
 from slaclient.wsag_model import AgreementStatus

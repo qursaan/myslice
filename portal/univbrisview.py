@@ -30,7 +30,6 @@ class UnivbrisView (LoginRequiredAutoLogoutView):
     def get_context_data(self, **kwargs):
         
         page = Page(self.request)
-        #print "UNIVBRIS page"
         metadata = page.get_metadata()
         page.expose_js_metadata()
     

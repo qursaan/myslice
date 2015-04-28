@@ -1,19 +1,24 @@
+import os
+import re
+import itertools
+import json
+
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
-#
+
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
 from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
-from portal.actions                     import sfa_update_user, authority_get_pis, authority_add_pis, authority_remove_pis,authority_check_pis ,clear_user_creds
-#
+from portal.actions                     import (
+    sfa_update_user, authority_get_pis, authority_add_pis,
+    authority_remove_pis,authority_check_pis ,clear_user_creds )
+
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
-#
+
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 from myslice.theme import ThemeView
-#
-import json, os, re, itertools
 
 # requires login
 class UserView(LoginRequiredAutoLogoutView, ThemeView):
@@ -29,7 +34,6 @@ class UserView(LoginRequiredAutoLogoutView, ThemeView):
         page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css","css/jquery-ui.css" ] )
 
         for key, value in kwargs.iteritems():
-            #print "%s = %s" % (key, value)
             if key == "email":
                 selected_email=value
     

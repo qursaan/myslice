@@ -16,12 +16,15 @@ from myslice.configengine import ConfigEngine
 
 from myslice.theme import ThemeView
 from myslice.configengine import ConfigEngine
+from myslice.settings import logger
 
 from sfa.planetlab.plxrn import hash_loginbase
 
 import urllib2,json
 
 class ExperimentView (FreeAccessView, ThemeView):
+    # parent View is portal/sliceview.py
+
     template_name = 'slice-tab-experiment.html'
 
     def get (self, request, slicename, state=None):
@@ -43,12 +46,8 @@ class ExperimentView (FreeAccessView, ThemeView):
         try:
             for resources in current_resources:
                 list_res = resources['resource']
-                #print "list_b4"
-                #print list_res
                 for res in list_res:
                     split_list = res.split('+') # split the resource urn
-                    #print "list_after"
-                    #print split_list
                     if [s for s in split_list if 'ple' in s]: # find ple resources
                         res_hrn = split_list[-1] # last element is resource hrn
                         ple_resource_list.append(res_hrn)
@@ -66,17 +65,17 @@ class ExperimentView (FreeAccessView, ThemeView):
                         nitos_resource_list.append(res_hrn)
 
 
-        except Exception,e:
-            print "Exception in slicetabexperiment.py in OneLab resource search %s" % e
+        except Exception as e:
+            logger.error("Exception in slicetabexperiment.py in OneLab resource search {}".format(e))
         
-        #print "list of ple res hrns"
-        #print ple_resource_list
-        #print "list of nit_paris res hrns"
-        #print nitos_paris_resource_list
-        #print "list of iotLab res hrns"
-        #print iotlab_resource_list
-        #print "list of nitos res hrns"
-        #print nitos_resource_list
+        #logger.debug("list of ple res hrns")
+        #logger.debug(ple_resource_list)
+        #logger.debug("list of nit_paris res hrns")
+        #logger.debug(nitos_paris_resource_list)
+        #logger.debug("list of iotLab res hrns")
+        #logger.debug(iotlab_resource_list)
+        #logger.debug("list of nitos res hrns")
+        #logger.debug(nitos_resource_list)
 
         all_users = list() 
         #get all  iotlab users
@@ -92,7 +91,7 @@ class ExperimentView (FreeAccessView, ThemeView):
             res = urllib2.urlopen(req)
             all_users = json.load(res) 
         except urllib2.URLError as e:
-            print "There is a problem in getting iotlab users %s" % e.reason
+            logger.error("There is a problem in getting iotlab users {}".format(e.reason))
        
 
         #getting the login from email
@@ -102,6 +101,16 @@ class ExperimentView (FreeAccessView, ThemeView):
         for user in all_users:
             if user['email'] == username:
                 iot_login = user['login']
-            
-        return render_to_response(self.template, { 'theme' : self.theme,'slicename':slicename, 'ple_slicename':ple_slicename, 'username':username, 'ple_resources':ple_resource_list, 'nitos_resources': nitos_resource_list, 'nitos_paris_resources':nitos_paris_resource_list, 'iotlab_resources':iotlab_resource_list, 'iot_login':iot_login }, context_instance=RequestContext(request))
+        env = { 'theme' : self.theme,
+                'slicename':slicename, 
+                'ple_slicename':ple_slicename, 
+                'username':username, 
+                'ple_resources':ple_resource_list, 
+                'nitos_resources': nitos_resource_list, 
+                'nitos_paris_resources':nitos_paris_resource_list, 
+                'iotlab_resources':iotlab_resource_list, 
+                'iot_login':iot_login,
+                'request':self.request,
+              }
+        return render_to_response(self.template, env, context_instance=RequestContext(request))
 

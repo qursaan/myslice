@@ -56,6 +56,12 @@ h4 {
     font-size:12pt;
     color:#333333;
 }
+ul {
+    margin:0 0 0 15px;
+    padding:0;
+}
+li {
+}
 span.subtitle {
     color:#454545;
     font-size:9pt;
@@ -121,7 +127,6 @@ div.breadcrumbs a:hover {
     text-decoration:underline;
 }
 .tab-pane {
-    padding-top:15px;
 }
 /* buttons */
 button.btn, input.btn {
@@ -389,6 +394,31 @@ div.sl-filter-facilities {
 div.sl-filter-facilities h4 {
     margin-bottom:15px;
     
+}
+.sl-menu {
+    padding:0;
+}
+.sl-menu h4 {
+    margin:0 0 15px 0;
+    padding:0;
+}
+.sl-menu ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+.sl-menu li {
+    color:gray;
+    cursor:pointer;
+    padding:4px 8px;
+}
+.sl-menu li img {
+    vertical-align:top;
+}
+.sl-menu li.active {
+    color:black;
+}
+.sl-menu-item {
 }
 img.sl-image {
     margin:0 5px 5px 0;

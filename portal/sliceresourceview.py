@@ -1,16 +1,16 @@
-from django.template                    import RequestContext
-from django.shortcuts                   import render_to_response
-
-from manifold.core.query                import Query, AnalyzedQuery
-from manifoldapi.manifoldapi            import execute_query
 import json
 
+from django.template                    import RequestContext
+from django.shortcuts                   import render_to_response
 from django.views.generic.base          import TemplateView
-
-from unfold.loginrequired               import LoginRequiredView
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from manifold.core.query                import Query, AnalyzedQuery
+from manifoldapi.manifoldapi            import execute_query
+
+
+from unfold.loginrequired               import LoginRequiredView
 from unfold.page                        import Page
 
 from myslice.configengine               import ConfigEngine
@@ -30,7 +30,7 @@ from plugins.univbrisfv                 import UnivbrisFv
 from plugins.univbrisfvf                import UnivbrisFvf
 from plugins.univbrisfvfo           	import UnivbrisFvfo
 from plugins.univbristopo               import UnivbrisTopo
-from plugins.univbrisvtam 	            import UnivbrisVtam as UnivbrisVtamPlugin
+from plugins.univbrisvtam               import UnivbrisVtam as UnivbrisVtamPlugin
 from plugins.univbrisvtamform 	        import UnivbrisVtamForm
 
 from plugins.columns_editor             import ColumnsEditor
@@ -38,6 +38,7 @@ from plugins.sladialog                  import SlaDialog
 from plugins.lists.simplelist           import SimpleList
 
 from myslice.theme import ThemeView
+from myslice.settings import logger
 
 class SliceResourceView (LoginRequiredView, ThemeView):
     template_name = "slice-resource-view.html"
@@ -71,7 +72,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         slice_md = metadata.details_by_object('slice')
         slice_fields = [column['name'] for column in slice_md['column']]
-        print "SLICE RES VIEW fields = %s" % slice_fields
+        logger.debug("SLICE RES VIEW fields = {}".format(slice_fields))
         # TODO The query to run is embedded in the URL
         # Example: select slice_hrn, resource.urn, lease.resource, lease.start_time, lease.end_time from slice where slice_hrn == "ple.upmc.myslicedemo"
         main_query = Query.get('slice').filter_by('slice_hrn', '=', slicename)
@@ -282,6 +283,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             page            = page,
             domid           = "filter-status",
             query           = sq_resource,
+            query_lease     = sq_lease,
         )
         apply = ApplyPlugin(
             page            = page,
@@ -396,42 +398,25 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        #         },
        # )
 
-       # # --------------------------------------------------------------------------
-       # # SLA View and accept dialog
-       # 
-       # sla_dialog = SlaDialog(
-       #     page                = page,
-       #     title               = 'sla dialog',
-       #     query               = main_query,
-       #     togglable           = False,
-       #     # start turned off, it will open up itself when stuff comes in
-       #     toggled             = True,
-       #     domid               = 'sla_dialog',
-       #     outline_complete    = True,
-       #     username            = request.user,
-       # )
-       # 
-        ## check user is pi or not
-        platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
-        account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
-        platform_details = execute_query(self.request, platform_query)
-        account_details = execute_query(self.request, account_query)
+        # --------------------------------------------------------------------------
+        # SLA View and accept dialog
 
-        # XXX When session has expired, this is None and thus not iterable
-        for platform_detail in platform_details:
-            for account_detail in account_details:
-                if platform_detail['platform_id'] == account_detail['platform_id']:
-                    if 'config' in account_detail and account_detail['config'] is not '':
-                        account_config = json.loads(account_detail['config'])
-                        if 'myslice' in platform_detail['platform']:
-                            acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-        # assigning values
-        if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-            pi = "is_not_pi"
-        else:
-            pi = "is_pi"
+        sla_dialog = SlaDialog(
+           page                = page,
+           title               = 'sla dialog',
+           query               = main_query,
+           #togglable           = False,
+           # start turned off, it will open up itself when stuff comes in
+           #toggled             = True,
+           domid               = 'sla_dialog',
+           #outline_complete    = True,
+           username            = request.user,
+        )
         
         template_env = {}
+
+        template_env['request'] = self.request       
+
         template_env['list_resources'] = list_resources.render(self.request)
         template_env['list_reserved_resources'] = list_reserved_resources.render(self.request)
         template_env['list_reserved_leases'] = list_reserved_leases.render(self.request)
@@ -455,11 +440,10 @@ class SliceResourceView (LoginRequiredView, ThemeView):
        # template_env['vms_list'] = univbrisvtamplugin.render(self.request)
        # template_env['vm_form'] = univbrisvtamform.render(self.request)
 
-#        template_env['pending_resources'] = pending_resources.render(self.request)
-       # template_env['sla_dialog'] = '' # sla_dialog.render(self.request)
+       # template_env['pending_resources'] = pending_resources.render(self.request)
+        template_env['sla_dialog'] = sla_dialog.render(self.request)
         template_env["theme"] = self.theme
         template_env["username"] = request.user
-        template_env["pi"] = pi
         template_env["slice"] = slicename
         template_env["section"] = "resources"
         template_env["msg"] = msg

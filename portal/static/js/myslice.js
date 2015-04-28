@@ -107,7 +107,7 @@ user.prototype.list = function() {
 var myslice = {
 	user: {},
 	
-	user: function() {
+	get_user: function() {
 		if ($.isEmptyObject(this.user)) {
 			//this.login(function() { return this.user; });
             if(localStorage.getItem('user')!='undefined'){
@@ -120,7 +120,7 @@ var myslice = {
 	},
 	projects: {},
 	
-	projects: function() {
+	get_projects: function() {
 		if ($.isEmptyObject(this.projects)) {
 			//this.login(function() { return this.user; });
             if(localStorage.getItem('projects')!='undefined'){
@@ -186,7 +186,6 @@ var myslice = {
                             // What are the projects under this authority?
                             $.post("/rest/myslice:authority/",{'fields':['authority_hrn'],'filters':{'authority_hrn':'CONTAINS'+auth}}, function( data ) {
     			                $.each(data, function(idx, project) {
-                                    console.log(project.authority_hrn);
                                     if($.inArray(project.authority_hrn,projects) == -1){
                                         projects.push(project.authority_hrn);
                                     }
@@ -201,14 +200,16 @@ var myslice = {
                     if(isFunction(fn)){
                         fn();
                     }
+                }else{
+                    $('#credentials_msg').css('display','block');
                 }
 		    });
         }else{
+            $('#credentials_msg').css('display','block');
             if(isFunction(fn)){
                 fn();
             }
         }
-
 	},
 
 

@@ -12,7 +12,12 @@ import components
 # admin.autodiscover()
 
 # to enable insert_above stuff
-from django.template.loader import add_to_builtins
+# add_to_builtins has changed location with django-1.7
+# also note this will probably go away some day
+try:
+    from django.template.loader import add_to_builtins
+except:
+    from django.template.base import add_to_builtins
 add_to_builtins('insert_above.templatetags.insert_tags')
 
 from settings import auxiliaries, INSTALLED_APPS
@@ -65,7 +70,7 @@ urls = [
     # seems to be what login_required uses to redirect ...
     (r'^accounts/login/$', portal.homeview.HomeView.as_view()),
     (r'^login/?$', portal.homeview.HomeView.as_view()),
-    (r'^logout/?$', 'auth.views.logout_user'),
+    (r'^logout/?$', 'localauth.views.logout_user'),
     #
     # the manifold proxy
     (r'^manifold/proxy/(?P<format>\w+)/?$', 'manifoldapi.manifoldproxy.proxy'),
@@ -83,6 +88,7 @@ urls = [
     (r'^credentials/(?P<action>[^/]+)/?$', 'rest.credentials.dispatch'),
     (r'^cache/(?P<action>[^/]+)/?$', 'rest.cache.dispatch'),
     (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
+    (r'^authority/(?P<action>[^/]+)/?$', 'rest.authority.dispatch'),
     #
     # REST monitoring
     (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
@@ -121,7 +127,7 @@ urls = [
     url(r'^portal/', include('portal.urls')),
 
     # SLA
-#    url(r'^sla/', include('sla.urls')),
+    #url(r'^sla/', include('sla.urls')),
 ]
 
 urls.extend( components.urls() )

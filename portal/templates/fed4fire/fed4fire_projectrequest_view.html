@@ -1,17 +1,24 @@
 {% extends "layout.html" %}
 {% load i18n %}
-
-{% block content %}
+{% block head %}
 <script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
 <script src="{{ STATIC_URL }}js/jquery-ui-combobox.js"></script>
-<link rel='stylesheet' type='text/css' href="{{ STATIC_URL }}css/jquery-ui.css">
+<link rel='stylesheet' type='text/css' href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.ui.combobox.css">
-<br />
+{% endblock head %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+         <div class="breadcrumbs" style="line-height: 3;">
+             Experiment &nbsp;>&nbsp; Create or join a Project
+         </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs nav-section">
-            <li class="active"><a href="#existing">Join existing Project</a></li>
-            <li><a href="#new">Create new Project</a></li>
+            <li class="active"><a href="#new">Create new Project</a></li>
+            <li><a href="#existing">Join existing Project</a></li>
             
         </ul>
     </div>
@@ -30,8 +37,57 @@
 {% endif %}
 
 <div class="container tab-content">
+
+    <div class="tab-pane active" id="new"> 
+        
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <form role="form" method="post" action="/portal/project_request">
+                {% csrf_token %}
+                    <label>
+                        Please insert a name for your project under which you will be able to create slices <br />
+                        <span class="sublabel">
+                         The project name should only contain letters, numbers and the underscore "_"  (10 max length)<br />
+                        </span>
+                    </label>
+                    <div class="form-group">
+                        <input type="text" name="project_name" value="" class="form-control" maxlength="10"  style="width:100%;" title="The project name should not contain spaces but only letters, numbers and the underscore character" placeholder="Project name" required>
+                    </div>
+                    
+                    <label>
+                        The authority under which your project will be managed <br />
+                        <span class="sublabel">
+                        Before you can access your project a manager of this authority should approve the request
+                        </span>
+                    </label>
+                    <div class="form-group">
+                        <select id="org_name" name="authority_name" class="form-control" style="width:100%" value="{{ organization }}" required> 
+                        {% if authorities %}
+                            {% for authority in authorities %}
+                                {% if authority.name %}
+                                    <option value="{{ authority.authority_hrn }}" {% if authority.authority_hrn == authority_hrn %}selected{% endif %}>{{authority.name}}</option>
+                                {% else %}
+                                    <option value="{{ authority.authority_hrn }}" {% if authority.authority_hrn == authority_hrn %}selected{% endif %}>{{authority.authority_hrn}}</option>
+                                {% endif %}
+                            {% endfor %} 
+                        {% endif %}
+                        </select>
+                    </div>
+                  
+                    <label>
+                        Please provide a description of the purpose for your project
+                    </label>
+                    <div class="form-group">
+                        <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Project description" style="width:100%" title="Purpose of your project (informative)" required="required"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Send Request</button>
+                </form>
+        
+            </div>
+        </div>
+    </div>
     
-	<div class="tab-pane active" id="existing"> 
+	<div class="tab-pane" id="existing"> 
         <div class="row">
             <div class="col-md-6">
                  <h3>Join an existing Project</h3>
@@ -45,7 +101,10 @@
                 <form role="form" method="post" action="/portal/project_request">
                 {% csrf_token %}
                 <div id="project_loading" style="display:inline;"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div> 
-                <select id="projects" name="project_name" style="display:none;"></select> <div style="display:none;" id="projects_button"><input type="submit" id="join" name="join" value="Join" class="btn"/></div>
+                <select id="projects" name="project_name" style="display:none;"></select> 
+                <div style="display:none;" id="projects_button">
+                    <input type="submit" id="join" name="join" value="Join" class="btn"/>
+                </div>
                 </form>
             </div>
             <div class="col-md-6">
@@ -61,56 +120,13 @@
             </div>
         </div>
     </div>
-    
-    <div class="tab-pane" id="new"> 
-        <div class="row">
-            <div class="col-md-12">
-                 <h3>Create a new Project</h3>
-            </div>
-        </div>
-    
-        
-        <div class="row">
-            <div class="col-md-12">
-                <form role="form" method="post" action="/portal/project_request">
-                {% csrf_token %}
-                  <div class="form-group">
-                    <input type="text" name="project_name" value="" style="width:380px;" placeholder="Name" required>
-                  </div>
-                  <div class="form-group">
-                    <select id="org_name" name="authority_name" class="form-control" style="width:380px" value="{{ organization }}" required> 
-                    {% if authorities %}
-                        {% for authority in authorities %}
-                            {% if authority.name %}
-                                <option value="{{ authority.authority_hrn }}">{{authority.name}}</option>
-                            {% else %}
-                                <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
-                            {% endif %}
-                        {% endfor %} 
-                    {% endif %}
-                    </select>
-                  </div>
-                  
-                  
-                  <div class="form-group">
-                    <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Description" style="width:380px" title="Purpose of your project (informative)" required="required"></textarea>
-                  </div>
-                  <button type="submit" class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Send Request</button>
-                </form>
-        
-            </div>
-        </div>
-    </div>
-    
 </div>
 		
 <script>
 $(document).ready(function() {
     var myprojects = JSON.parse(localStorage.getItem('projects'));
-    console.log(myprojects);
     if (myprojects) {
         $.each(myprojects, function (i, val){
-            console.log(val);
             $('.project-list').append('<tr><td>'+ val +'</td></tr>');
         });
     } else {
@@ -141,10 +157,16 @@ $(document).ready(function() {
         $("#project_loading").hide();
         $("#projects").html(projects.join( "" ));
         $("#projects").combobox();
+        var $s = jQuery("#projects").next().attr('id','listProjects');
+        jQuery('#listProjects').bind("click",function(){
+            // show all items click
+            this.childNodes[1].click();
+        });
+
     });
 /*
 	
-	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
+	$("#authority_hrn").load("/rest/myslice:user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
 		var jsonData = JSON.parse(data);
         $(this).attr("value", jsonData[0]['parent_authority']);
     });
@@ -186,6 +208,9 @@ $(document).ready(function() {
 	// auto-complete the form
     jQuery("#org_name").combobox();
 
+    $('input[name=project_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
+    });
 });
 </script>
 {% endblock %}

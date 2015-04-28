@@ -1,47 +1,95 @@
 <div id={{ domid }}>
-<div class="modal fade" id="slamodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
-		data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="myModalLabel">Selected testbed(s) provide the following SLAs</h4>
-      </div>
-      <div class="modal-body"  id="modal-body">
-        <table class="table" id="sla-modal-table">
-          <thead>
-          <tr>
-            <th>Testbed</th>
-            <th>SLA Description</th>
-            <th>Accept</th>
-          </tr>
-          </thead>
-          <tbody id="sla-table-body">
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="cancel_sla" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" id="submit_sla" class="btn btn-primary">Submit</button>
-      </div>
+    <div id="sla_template_modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">SLA Template description</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Testbed offers:</p>
+                    <p>99% availability for 99% of the selected resources</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-<!-- <div class="modal fade" id="slamodal-virtualwall" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
-    data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modalTitleId">Provider iMinds offers the following SLA</h4>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <p>SLA description</p>
-        <p>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the VirtualWall resources during the sliver lifetime</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="dismiss_sla_vwall" class="btn btn-default" data-dismiss="modal">Dismiss</button>
-        <button type="button" id="accept_sla_vwall" class="btn btn-primary">Accept</button>
-      </div>
+    <div class="sla-alert" hidden="hidden">
+        <div class="alert alert-success fade in">
+            <a href="#" class="sla-alert-close">&times;</a>
+            <strong>Accepted!</strong> The SLA has been accepted.
+        </div>
     </div>
-  </div>
-</div> -->
+    <div id="sla_offers" class="container">
+        <div id="fuseco-fokus-fraunhofer-de" class="row" data-urns="[]" style="display: none">
+            <div class="col-md-6">
+                <p>Testbed <span class="provider">fuseco.fokus.fraunhofer.de</span> offers the following SLA for its resources</p>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Details
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Accept
+                </button>
+            </div>
+        </div>
+        <div id="omf-netmode" class="row" data-urns="[]" style="display: none">
+            <div class="col-md-6">
+                <p>Testbed <span class="provider">omf:netmode</span> offers the following SLA for its resources</p>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Details
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Accept
+                </button>
+            </div>
+        </div>
+        <div id="wilab2-ilabt-iminds-be" class="row" data-urns="[]" style="display: none">
+            <div class="col-md-6">
+                <p>Testbed <span class="provider">wilab2.ilabt.iminds.be</span> offers the following SLA for its resources</p>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Details
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Accept
+                </button>
+            </div>
+        </div>
+        <div id="wall2-ilabt-iminds-be" class="row" data-urns="[]" style="display: none">
+            <div class="col-md-6">
+                <p>Testbed <span class="provider">wall2.ilabt.iminds.be</span> offers the following SLA for its resources</p>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Details
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Accept
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

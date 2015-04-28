@@ -204,7 +204,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                     resourceData['type'] = 'node ( Hardware: <a target="_blank" href="https://www.iot-lab.info/hardware/'+n[0]+'/">'+n[0]+'</a> )';
                     var coordinates = resourceData['testbed'];
                 } else {
-                    var logo = network_hrn;
+                    var logo = resourceData['testbed'];
                     var resourceLocation = {
                         'longitude' : aData[13],
                         'latitude' : aData[23],
@@ -533,11 +533,11 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                             this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
                             break;
                         case STATE_SET_IN_PENDING:
-                            this.set_checkbox_from_data(data.key, true);
+                            this.set_checkbox_from_data(data.value, true);
                             this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
                             break;  
                         case STATE_SET_OUT_PENDING:
-                            this.set_checkbox_from_data(data.key, false);
+                            this.set_checkbox_from_data(data.value, false);
                             this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
                             break;
                     }

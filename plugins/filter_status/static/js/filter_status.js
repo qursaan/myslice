@@ -28,6 +28,7 @@
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
+            this.listen_query(options.query_lease_uuid, 'leases');
 
             /* Setup click handlers */
             this.elts('list-group-item').click({'instance': this}, this._on_click);
@@ -66,6 +67,11 @@
         // XXX
     },
 
+    on_leases_field_state_changed: function(data) 
+    {
+        console.log('leases_field_state_changed');
+        this.on_field_state_changed(data);
+    },
     on_field_state_changed: function(data) 
     {
         var query_ext;

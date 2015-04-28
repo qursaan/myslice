@@ -96,6 +96,9 @@ redo-templates: clean-templates templates
 myfiles: force
 	@git ls-files | egrep -v 'insert(_|-)above|third-party/|to-be-integrated/'
 
+pyfiles: force
+	@git ls-files | grep '\.py$$'
+
 # in general it's right to rely on the contents as reported by git
 tags: force
 	$(MAKE-SILENT) myfiles | xargs etags

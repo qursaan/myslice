@@ -165,10 +165,13 @@ class AgreementStatus(object):
             s = "<GuaranteeTermStatus(name='{}' status='{}')>"
             return s.format(self.name, self.status)
 
-    def __init__(self):
+    def __init__(self, lst=None):
         self.agreement_id = ""
         self.guaranteestatus = ""
-        self.guaranteeterms = []
+        if lst is None:
+            self.guaranteeterms = []
+        else:
+            self.guaranteeterms = lst
 
     def __repr__(self):
         return (

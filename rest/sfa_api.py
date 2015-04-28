@@ -1,25 +1,23 @@
+import os
+import json
+import ConfigParser 
+
+from django.shortcuts           import render_to_response
+from django.http import HttpResponse
+
 from sfa.trust.certificate      import Keypair, Certificate
 from sfa.client.sfaserverproxy  import SfaServerProxy
 from sfa.client.return_value    import ReturnValue
 from sfa.util.xrn               import Xrn, get_leaf, get_authority, hrn_to_urn, urn_to_hrn
+
 from manifold.core.query        import Query
 from manifold.models            import db
 from manifold.models.platform   import Platform
 from manifold.models.user       import User
 
-from django.shortcuts           import render_to_response
-
 from unfold.loginrequired       import LoginRequiredView
 
-from rest import ObjectRequest, error
-
-from string import join
-
-from django.http import HttpResponse
-from rest import error
-import os,json
-
-import ConfigParser 
+from myslice.settings import logger
 
 def dispatch(request, method):
     Config = ConfigParser.ConfigParser()
@@ -58,15 +56,15 @@ def dispatch(request, method):
     from manifoldapi.manifoldapi    import execute_admin_query
     for pf in platforms:
         platform = get_platform_config(pf)
-        print platform
+        logger.debug("platform={}".format(platform))
         if 'sm' in platform and len(platform['sm']) > 0:
-            print 'sm'
+            logger.debug('sm')
             server_url = platform['sm']
         if 'rm' in platform and len(platform['rm']) > 0:
-            print 'rm'
+            logger.debug('rm')
             server_url = platform['rm']
         if 'registry' in platform and len(platform['registry']) > 0:
-            print 'registry'
+            logger.debug('registry')
             server_url = platform['registry']
     
         if not Config.has_option('monitor', 'cert') :

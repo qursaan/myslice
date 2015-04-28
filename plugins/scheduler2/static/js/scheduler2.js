@@ -196,11 +196,29 @@ var SCHEDULER_COLWIDTH = 50;
                 op   : STATE_SET_ADD,
                 value: new_lease
             }
+            prev_state = manifold.query_store.get_record_state($scope.instance.options.query_uuid, resource_urn, STATE_SET);
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
+
             /* Add to local cache also, unless we listen to events from outside */
-            if (!(resource_urn in $scope._leases_by_resource))
+            if (!(resource_urn in $scope._leases_by_resource)){
                 $scope._leases_by_resource[resource_urn] = [];
+                /* Add the resource of the selected timeslot to the pending list */
+                data_resource = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : STATE_SET_ADD,
+                    value: resource_urn
+                };
+                /* Send the message to the list of resources, depending on the previous state */
+                prev_state = manifold.query_store.get_record_state($scope.instance.options.query_uuid, data_resource.value, STATE_SET);
+                if(jQuery.inArray(prev_state,[STATE_SET_OUT,STATE_SET_OUT_SUCCESS,STATE_SET_OUT_PENDING,STATE_SET_IN_FAILURE])>-1){
+                    manifold.raise_event($scope.instance.options.query_uuid, FIELD_STATE_CHANGED, data_resource);
+                }
+                /* Remove the warning on resource as we have added Leases to it */
+                //manifold.raise_event($scope.instance.options.query_uuid, STATUS_REMOVE_WARNING, data_resource);
+            }
             $scope._leases_by_resource[resource_urn].push(new_lease);
+
         }
 
         $scope._remove_lease = function(other)
@@ -224,10 +242,30 @@ var SCHEDULER_COLWIDTH = 50;
                 op   : STATE_SET_REMOVE,
                 value: other_key
             }
+            prev_state = manifold.query_store.get_record_state($scope.instance.options.query_uuid, other.resource, STATE_SET);
             manifold.raise_event($scope.instance.options.query_lease_uuid, FIELD_STATE_CHANGED, data);
-            /* Remove from local cache also, unless we listen to events from outside */
+            /* Remove Lease from local cache also, unless we listen to events from outside */
             $scope._leases_by_resource[other.resource] = $.grep($scope._leases_by_resource[other.resource], function(x) { return x != other; });
+            /* Last lease removed for this resource -> remove the resource from the list */
+            if($scope._leases_by_resource.hasOwnProperty(other.resource) && $scope._leases_by_resource[other.resource].length == 0){
+                /* remove resource from the list of selected resources */
+                 data_resource = {
+                    state: STATE_SET,
+                    key  : null,
+                    op   : STATE_SET_REMOVE,
+                    value: other.resource
+                };
 
+                prev_state = manifold.query_store.get_record_state($scope.instance.options.query_uuid, data_resource.value, STATE_SET);
+                /* Remove Resource from local cache */
+                delete $scope._leases_by_resource[data_resource.value]
+                /* Send the message to the list of resources, depending on the previous state */
+                if(jQuery.inArray(prev_state,[STATE_SET_IN,STATE_SET_IN_SUCCESS,STATE_SET_IN_PENDING,STATE_SET_OUT_FAILURE])>-1){
+                    manifold.raise_event($scope.instance.options.query_uuid, FIELD_STATE_CHANGED, data_resource);
+                    //manifold.raise_event($scope.instance.options.query_uuid, STATUS_REMOVE_WARNING, data_resource);
+                }
+               
+            }
         }
 
         $scope.select = function(index, model_lease, model_resource)
@@ -676,26 +714,42 @@ var SCHEDULER_COLWIDTH = 50;
             on_leases_filter_removed:    function(filter) { this._get_scope().$apply(); },
             on_leases_filter_clear:      function()       { this._get_scope().$apply(); },
 
-            on_field_state_changed: function(data)
+            on_resources_field_state_changed: function(data)
             {
-                /*
-                this._set_lease_slots(lease_key, lease);
-
+                console.log('on_resources_field_state_changed');
+                console.log(data);
                 switch(data.state) {
                     case STATE_SET:
                         switch(data.op) {
+                            /*
                             case STATE_SET_IN:
                             case STATE_SET_IN_SUCCESS:
                             case STATE_SET_OUT_FAILURE:
-                                this.set_checkbox_from_data(data.value, true);
-                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                //this.set_checkbox_from_data(data.value, true);
+                                //this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
                                 break;  
+                            */
                             case STATE_SET_OUT:
                             case STATE_SET_OUT_SUCCESS:
                             case STATE_SET_IN_FAILURE:
-                                this.set_checkbox_from_data(data.value, false);
-                                this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                                // A resource has been removed
+                                console.log(this._get_scope()._leases_by_resource);
+                                s = this._get_scope();
+                                // loop over the list of leases by resource cached
+                                $.each(this._get_scope()._leases_by_resource, function(k,v){
+                                    // if the resource removed is in the list
+                                    // we need to remove all the leases corresponding to that resoruce
+                                    if(k == data.value){
+                                        console.log(k,v);
+                                        // loop each lease should be removed
+                                        $.each(v, function(i,lease){
+                                            console.log(i,lease);
+                                            s._remove_lease(lease);
+                                        });
+                                    }
+                                });
                                 break;
+                            /*
                             case STATE_SET_IN_PENDING:
                                 this.set_checkbox_from_data(data.key, true);
                                 this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
@@ -704,14 +758,15 @@ var SCHEDULER_COLWIDTH = 50;
                                 this.set_checkbox_from_data(data.key, false);
                                 this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
                                 break;
+                            */
                         }
                         break;
-
+                    /*
                     case STATE_WARNINGS:
                         this.change_status(data.key, data.value);
                         break;
+                    */
                 }
-                */
             },
 
 
