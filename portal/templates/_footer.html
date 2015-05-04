@@ -8,9 +8,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 copy">
+        <div class="col-md-10 copy">
             Copyright © UPMC Sorbonne Universités, on behalf of the OneLab consortium
+        </div>
+        <div id="portal_version" class="col-md-2 copy">
         </div>
     </div>
 </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.post("/portal_version/", function( data ) {
+            console.log(data);
+            $("#portal_version").html(data);
+        });
+    });
+</script>

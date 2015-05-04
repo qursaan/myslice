@@ -1,5 +1,6 @@
 import os.path
 import logging
+import subprocess
 
 logger = logging.getLogger('myslice')
 
@@ -17,8 +18,6 @@ config = ConfigEngine()
 
 import myslice.components as components
 
-
-
 # import djcelery
 # djcelery.setup_loader()
 
@@ -29,7 +28,16 @@ try:
 except:
     building=True
 
+if not config.myslice.portal_version:
+    try:
+        PORTAL_VERSION = subprocess.check_output(["git", "describe"])
+    except:
+        PORTAL_VERSION = 'not using git' 
 
+print 'x'*100
+print PORTAL_VERSION
+print 'x'*100
+logger.debug('PORTAL_VERSION = ',PORTAL_VERSION)
 
 # DEBUG
 if config.myslice.debug :

@@ -8,9 +8,16 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 copy">
-            
-        </div>
+        <div class="col-md-10 copy"></div>
+        <div id="portal_version" class="col-md-2 copy"></div>
     </div>
 </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.post("/portal_version/", function( data ) {
+            console.log(data);
+            $("#portal_version").html(data);
+        });
+    });
+</script>

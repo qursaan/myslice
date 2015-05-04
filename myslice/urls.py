@@ -89,6 +89,7 @@ urls = [
     (r'^cache/(?P<action>[^/]+)/?$', 'rest.cache.dispatch'),
     (r'^initscript/(?P<action>[^/]+)/?$', 'rest.initscript.dispatch'),
     (r'^authority/(?P<action>[^/]+)/?$', 'rest.authority.dispatch'),
+    (r'^portal_version/?$', 'rest.portal_version.dispatch'),
     #
     # REST monitoring
     (r'^monitor/services/?$', 'rest.monitor.servicesStatus'),
