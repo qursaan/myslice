@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block head %}
+<script type="text/javascript" src="//goessner.net/download/prj/jsonxml/json2xml.js"></script>
+<script type="text/javascript" src="//goessner.net/download/prj/jsonxml/xml2json.js"></script>
+{% endblock head %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="List of Resources" /> Resources List</h1>
+		</div>
+	</div>
+
+	{% if errors %}
+	<div class="row">
+		<div class="col-md-12">
+		<ul>
+		  {% for error in errors %}
+		  <li>{{ error }}</li>
+		  {% endfor %}
+		</ul>
+		</div>
+	</div>
+	{% endif %}
+	
+	<div class="row" id="table">
+	</div>
+		
+<script>
+jQuery(document).ready(function(){
+    /*
+    // sfa/Describe?hrn=onelab.upmc.projectx.slicex&type=slice
+    $.post("/sfa/Describe",{'hrn':'{{slicename}}','type':'slice','platform':['ple'],'display':'table'}, function( data ) {
+        console.log(data);
+        $('#table').html(data);
+    });
+    */
+    $.post("/sfa/ListResources",{'platform':['ple'],'display':'table'}, function( data ) {
+    //$.post("/sfa/ListResources",{'display':'table'}, function( data ) {
+        console.log(data);
+        $('#table').html(data);
+    });
+
+    /*
+    //$.post("/sfa/ListResources",{'platform':['ple'],'display':'table'}, function( data ) {
+    $.post("/sfa/ListResources",{}, function( data ) {
+        console.log(data);
+        $.each(data, function(key) {
+            if(key=='nitos'){
+                $('#table').html(data[key]['value']);
+            }
+        });
+    });
+    $.post("/sfa/Renew",{'hrn':'{{slicename}}','type':'slice'}, function( data ) {
+        console.log(data);
+    });
+    */
+
+});
+</script>
+{% endblock %}
+

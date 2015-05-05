@@ -42,6 +42,9 @@ platforms_view=portal.platformsview.PlatformsView.as_view()
 import portal.sliceview
 import portal.sliceresourceview
 
+# Testing sfa rest
+import portal.resources
+
 import portal.slicetabexperiment
 import portal.slicetabinfo
 import portal.slicetabtestbeds
@@ -104,6 +107,9 @@ urls = [
     (r'^news/?$', portal.newsview.NewsView.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
     (r'^users/(?P<slicename>[^/]+)/?$', portal.slicetabusers.SliceUserView.as_view()),
+
+    # Testing sfa rest
+    (r'^sfa_resources/(?P<slicename>[^/]+)/?$', portal.resources.ResourcesView.as_view()),
     
     (r'^slice/(?P<slicename>[^/]+)/?$', portal.sliceview.SliceView.as_view()),
     (r'^info/(?P<slicename>[^/]+)/?$', portal.slicetabinfo.SliceInfoView.as_view()),

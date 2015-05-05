@@ -3,6 +3,7 @@ import json
 import ConfigParser 
 import datetime
 from time                       import mktime
+import xmltodict
 
 from django.shortcuts           import render_to_response
 from django.http                import HttpResponse
@@ -37,6 +38,7 @@ def dispatch(request, method):
     urn = ''
     hrn = ''
     object_type = ''
+    display = None
 
     if request.method == 'POST':
         req_items = request.POST
@@ -56,6 +58,8 @@ def dispatch(request, method):
             urn = el[1]
         elif el[0].startswith('type'):
             object_type = el[1]
+        elif el[0].startswith('display'):
+            display = el[1]
 
     if method not in ['GetVersion','ListResources']:
         try:
@@ -73,8 +77,12 @@ def dispatch(request, method):
     #results = {'method':method,'platforms':platforms,'rspec':rspec,'options':options}
 
     result = []
+    dict_result = {}
+    data = []
+    columns = []
     api_options = {}
     api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
+    api_options['list_leases'] = 'all'
     server_am = False
     from manifoldapi.manifoldapi    import execute_admin_query
     for pf in platforms:
@@ -131,13 +139,39 @@ def dispatch(request, method):
                 if server_am:
                     if method == "ListResources":
                         result = server.ListResources([user_cred], api_options)
+                        logger.debug(result.keys())
+                        dict_result = xmltodict.parse(result['value'])
+                        result['json'] = json.dumps(dict_result)
+                        if isinstance(dict_result['rspec']['node'], list):
+                            columns.extend(dict_result['rspec']['node'][0].keys())
+                        else:
+                            columns.extend(dict_result['rspec']['node'].keys())
+
                     elif method == "Describe":
+                        version = server.GetVersion()
+                        logger.debug(version['geni_api'])
                         # if GetVersion = v2
-                        # ListResources(slice_hrn)
+                        if version['geni_api'] == 2:
+                            # ListResources(slice_hrn)
+                            api_options['geni_slice_urn'] = urn
+                            result = server.ListResources([object_cred], api_options)
+                            dict_result = xmltodict.parse(result['value'])
                         # else GetVersion = v3
-                        result = server.Describe([urn] ,[object_cred], api_options)
+                        else:
+                            result = server.Describe([urn] ,[object_cred], api_options)
+                            dict_result = xmltodict.parse(result['value']['geni_rspec'])
+
+                        result['json'] = json.dumps(dict_result)
+                        if isinstance(dict_result['rspec']['node'], list):
+                            columns.extend(dict_result['rspec']['node'][0].keys())
+                        else:
+                            columns.extend(dict_result['rspec']['node'].keys())
+
                     elif method == 'Renew':
-                        result = server.Renew([urn] ,[object_cred], api_options)
+                        # Renew till 1 month from now
+                        d = datetime.datetime.utcnow() + datetime.timedelta(365/12)
+                        date = d.isoformat("T") + "Z"
+                        result = server.Renew([urn] ,[object_cred], date, api_options)
                     elif method == 'Delete':
                         result = server.Delete([urn] ,[object_cred], api_options)
                     elif method == 'Allocate':
@@ -170,6 +204,7 @@ def dispatch(request, method):
                         logger.debug('method %s not handled by AM' % method)
                         result = []
                 else:
+                    record_dict = {'urn': urn, 'hrn': hrn, 'type': object_type}
                     if method == "List":
                         # hrn is required
                         result = server.List(hrn, user_cred, options)
@@ -200,13 +235,21 @@ def dispatch(request, method):
                         result = []
 
             results[pf] = result
+            if dict_result:
+                if isinstance(dict_result['rspec']['node'], list):
+                    data = data + dict_result['rspec']['node']
+                else:
+                    data.append(dict_result['rspec']['node'])
         except Exception,e:
             import traceback
             logger.error(traceback.format_exc())
             logger.error(e)
             results[pf] = {'error':'-3', 'error_msg': str(e)}
-
-    return HttpResponse(json.dumps(results, cls=MyEncoder), content_type="application/json")
+    if display == 'table':
+        return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
+    else:
+        results['columns'] = columns
+        return HttpResponse(json.dumps(results, cls=MyEncoder), content_type="application/json")
 
 def get_user_account(user_email, platform_name):
     """
@@ -231,7 +274,7 @@ def get_user_config(user_email, platform_name):
 
 def get_platforms():
     ret = list()
-    platforms = db.query(Platform).all()
+    platforms = db.query(Platform).filter(Platform.gateway_type == 'sfa', Platform.disabled == 0).all()
     for p in platforms:
         ret.append(p.platform)
     return ret
