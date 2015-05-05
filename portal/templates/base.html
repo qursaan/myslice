@@ -76,11 +76,11 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            {% if theme != "fed4fire" %}
+            {% if theme != "fed4fire" or  "onelab" in theme %}
             drawSlices(slices);
             {% endif %}
         }
-        {% if theme == "fed4fire" %}
+        {% if theme == "fed4fire" or "onelab" in theme%}
         p = myslice.get_projects();
         if(p != null){
             //drawProjects(p);
@@ -93,18 +93,18 @@ $(document).ready(function() {
         var items = [];
 		
         $.each( slices, function(i, val) {
-            items.push( "<li><a href=\"/resources/"+val+"\">" + val + "</a></li>" );
+            items.push( "<li><a href=\"/resources/"+val+"\" title='Add resources to slice "+val+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>" + val + "</a></li>" );
         });
         $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
     
-    {% if theme == "fed4fire" %}
+    {% if theme == "fed4fire" or "onelab" in theme%}
     function drawProjects(projects){
         var items = [];
 		
         $.each( projects, function(i, val) {
-            items.push( "<li><a href=\"/portal/project/"+val+"\">" + val + "</a></li>" );
+            items.push( "<li><a href=\"/portal/project/"+val+"\" title='Manage project "+val+"'>" + val + "</a></li>" );
         });
         $("div#home-project-list").html($( "<ul/>", { html: items.join( "" ) }));
         $("ul#dropdown-project-list").append(items.join( "" ));
@@ -115,10 +115,11 @@ $(document).ready(function() {
         $.each( projects, function(i, p) {
             $.each( slices, function(y, s) {
                 if (s.match('^' + escapeRegExp(p))) {
-                     items_sl.push( "<li><a href=\"/resources/" + s + "\">" + s.replace(p + '.','') + "</a></li>" );
+                     slicename = s.replace(p + '.','')
+                     items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
                 }
             });
-            el = "<li><a href=\"/portal/project/" + p + "\">" + p + "</a>";
+            el = "<li><a href=\"/portal/project/" + p + "\" title='Manage project "+p+"' >" + p + "</a>";
             if (items_sl.length > 0) {
                 el += "<ul>" + items_sl.join( "" ) + "</ul>";
             }
