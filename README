@@ -33,15 +33,11 @@ git checkout onelab
 
 edit/create myslice/myslice.ini and enter the details of your manifold backend
 
-mkdir /var/unfold
-copy unfold.sqlite3 to /var/unfold
-
 $ ./manage.py syncdb
 $ ./manage.py migrate
+$ ./manage.py collectstatic
 
-use the unfold.sqlite3 i gave to u
-
-$ make redo
+Run the development server
 $ ./devel/server-loop.sh
 
 MANIFOLD
