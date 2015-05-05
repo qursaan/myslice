@@ -39,6 +39,7 @@ def dispatch(request, method):
     hrn = ''
     object_type = ''
     display = None
+    recursive = False
 
     if request.method == 'POST':
         req_items = request.POST
@@ -58,6 +59,11 @@ def dispatch(request, method):
             urn = el[1]
         elif el[0].startswith('type'):
             object_type = el[1]
+        elif el[0].startswith('recursive'):
+            if el[1] == '1':
+                recursive = True
+            else:
+                recursive = False
         elif el[0].startswith('display'):
             display = el[1]
 
@@ -135,11 +141,10 @@ def dispatch(request, method):
             if method == "GetVersion": 
                 result = server.GetVersion()
             else:
-                # AM V3
+                # AM API Calls
                 if server_am:
                     if method == "ListResources":
                         result = server.ListResources([user_cred], api_options)
-                        logger.debug(result.keys())
                         dict_result = xmltodict.parse(result['value'])
                         result['json'] = json.dumps(dict_result)
                         if isinstance(dict_result['rspec']['node'], list):
@@ -203,18 +208,23 @@ def dispatch(request, method):
                         #return HttpResponse(json.dumps({'error' : '-3','msg':'method not supported by AM'}), content_type="application/json")
                         logger.debug('method %s not handled by AM' % method)
                         result = []
+
+                # Registry API Calls 
                 else:
                     record_dict = {'urn': urn, 'hrn': hrn, 'type': object_type}
                     if method == "List":
                         # hrn is required
+                        options['recursive'] = recursive
                         result = server.List(hrn, user_cred, options)
-                        logger.debug(result)
+                        if object_type:
+                            result = filter_records(object_type, result)
                     elif method == "Resolve":
                         # hrn is required
                         # details can be True or False
                         options['details']=True
                         result = server.Resolve(hrn, user_cred, options)
-                        logger.debug(result)
+                        if object_type:
+                            result = filter_records(object_type, result)
                     elif method == "Register":
                         # record_dict must be crafted
                         # auth_cred must be selected in the list of auth_creds from user's account
@@ -283,3 +293,10 @@ def get_platforms():
 def get_platform_config(platform_name):
     platform = db.query(Platform).filter(Platform.platform == platform_name).one()
     return json.loads(platform.config) if platform.config else {}
+
+def filter_records(type, records):
+    filtered_records = []
+    for record in records:
+        if (record['type'] == type) or (type == "all"):
+            filtered_records.append(record)
+    return filtered_records
