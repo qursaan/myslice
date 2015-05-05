@@ -34,11 +34,6 @@ if not config.myslice.portal_version:
     except:
         PORTAL_VERSION = 'not using git' 
 
-print 'x'*100
-print PORTAL_VERSION
-print 'x'*100
-logger.debug('PORTAL_VERSION = ',PORTAL_VERSION)
-
 # DEBUG
 if config.myslice.debug :
     DEBUG = True
