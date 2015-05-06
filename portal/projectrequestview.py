@@ -20,17 +20,17 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'projectrequest_view.html'
     
     def getAuthorities(self, request):
-        if self.theme == 'fed4fire':
-            authorities_query = Query.get('myslice:authority').select('authority_hrn')
-        else:
-            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        #if self.theme == 'fed4fire':
+        authorities_query = Query.get('myslice:authority').select('authority_hrn')
+        #else:
+        #    authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             # Remove the root authority from the list
             matching = [s for s in authorities if "." in s['authority_hrn']]
             authorities = sorted(matching, key=lambda k: k['authority_hrn'])
-            if self.theme != 'fed4fire':
-                authorities = sorted(matching, key=lambda k: k['name'])
+            #if self.theme != 'fed4fire':
+            #    authorities = sorted(matching, key=lambda k: k['name'])
         return authorities
     
     def getUserAuthority(self, request):

@@ -5,7 +5,6 @@ import re
 from django.shortcuts           import render
 from django.shortcuts           import render_to_response
 from django.template                    import RequestContext
-from django.contrib.sites.models import Site
 
 from unfold.page                import Page
 
@@ -45,15 +44,15 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
-        if self.theme == 'fed4fire':
-            authorities_query = Query.get('myslice:authority').select('authority_hrn')
-        else:
-            authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        #if self.theme == 'fed4fire' or self.theme == 'onelab':
+        authorities_query = Query.get('myslice:authority').select('authority_hrn')
+        #else:
+        #    authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(request, authorities_query)
         if authorities is not None:
             authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            if self.theme != 'fed4fire':
-                authorities = sorted(authorities, key=lambda k: k['name'])
+            #if self.theme != 'fed4fire' or  self.theme != 'onelab':
+            #    authorities = sorted(authorities, key=lambda k: k['name'])
 
         # Get user_email (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email','config')
@@ -64,13 +63,13 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             user_config = json.loads(user_detail['config'])
             user_authority = user_config.get('authority','N/A')              
         # getting the org from authority        
-        for authority in authorities:
-            if 'name' in authority and authority['authority_hrn'] == user_authority:
-                authority_name = authority['name']
+       # for authority in authorities:
+       #     if 'name' in authority and authority['authority_hrn'] == user_authority:
+       #         authority_name = authority['name']
 
         # Handle the case when we use only hrn and not name
-        if authority_name is None:
-            authority_name = user_authority
+        #if authority_name is None:
+        #    authority_name = user_authority
         
         account_query  = Query().get('local:account').select('user_id','platform_id','auth_type','config')
         account_details = execute_query(request, account_query)
@@ -108,25 +107,26 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         if method == 'POST':
             # The form has been submitted
 
-            # get the domain url
-            current_site = Site.objects.get_current()
-            current_site = current_site.domain
-           
-            if theme.theme != 'fed4fire':
+            if request.is_secure():
+                current_site = 'https://'
+            else:
+                current_site = 'http://'
+            current_site += request.META['HTTP_HOST']
+
+            #if theme.theme != 'fed4fire' or  self.theme != 'onelab':
                 # getting the authority_hrn from the selected organization
-                for authority in authorities:
-                    if authority['name'] == request.POST.get('org_name', ''):
-                        authority_hrn = authority['authority_hrn']
+            #    for authority in authorities:
+             #       if authority['name'] == request.POST.get('org_name', ''):
+              #          authority_hrn = authority['authority_hrn']
 
             # Handle the case when we use only hrn and not name
             if authority_hrn is None:
                 authority_hrn = request.POST.get('org_name', '')
 
             # Handle project if used
-            project = request.POST.get('project', None)
+            project = request.POST.get('org_name', None)
             if project is not None and project != '':
                 authority_hrn = project
-
             slice_name = request.POST.get('slice_name', '')
             if not slice_name or len(slice_name) == 0 :
                 errors.append('Slice name can\'t be empty')
@@ -166,7 +166,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 errors.append('Slice name may contain only letters, numbers, and underscore.')
             
             organization = slice_request['organization']
-            if theme.theme == 'fed4fire':
+            if theme.theme == 'fed4fire' or  self.theme == 'onelab':
                 if organization is None or organization == '':
                     errors.append('Selecting project is mandatory')
             else:

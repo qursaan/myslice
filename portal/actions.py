@@ -7,14 +7,14 @@ from unfold.page                    import Page
 import json
 
 from django.contrib.auth.models     import User
-from django.contrib.sites.models    import Site
 from django.contrib.auth            import get_user_model
 from django.template.loader         import render_to_string
 from django.core.mail               import EmailMultiAlternatives, send_mail
 
 from myslice.theme                  import ThemeView
 from myslice.configengine           import ConfigEngine
-from myslice.settings               import logger
+
+from myslice.settings import logger
 
 theme = ThemeView()
 
@@ -741,7 +741,7 @@ def portal_validate_request(wsgi_request, request_ids):
                 raise Exception, 'unknown type of request %s' % request['type']
             # XXX Remove from Pendings in database
 
-            send_status_email(ctx, user_email, request['type'], 'validated')
+            send_status_email(wsgi_request, ctx, user_email, request['type'], 'validated')
         except Exception, e:
             request_status['SFA '+request['type']] = {'status': False, 'description': str(e)}
 
@@ -762,14 +762,17 @@ def reject_action(request, **kwargs):
     json_answer = json.dumps(status)
     return HttpResponse (json_answer, content_type="application/json")
 
+def get_current_site(request):
+    if request.is_secure():
+        current_site = 'https://'
+    else:
+        current_site = 'http://'
+    current_site += request.META['HTTP_HOST']
+    return current_site
 
 def portal_reject_request(wsgi_request, request_ids):
     status = {}
-    # get the domain url    
-    current_site = Site.objects.get_current()
-    current_site = current_site.domain
-
-
+    current_site = get_current_site(wsgi_request)
     if not isinstance(request_ids, list):
         request_ids = [request_ids]
 
@@ -876,7 +879,7 @@ def portal_reject_request(wsgi_request, request_ids):
             else:
                 raise Exception, 'unknown type of request %s' % request['type']
 
-            send_status_email(ctx, user_email, request['type'], 'denied')
+            send_status_email(wsgi_request, ctx, user_email, request['type'], 'denied')
         except Exception, e:
             request_status['SFA '+request['type']] = {'status': False, 'description': str(e)}
 
@@ -884,8 +887,11 @@ def portal_reject_request(wsgi_request, request_ids):
 
     return status
 
-def send_status_email(ctx, user_email, obj_type, status):
+def send_status_email(request, ctx, user_email, obj_type, status):
     try:
+        ctx['current_site'] = get_current_site(request)
+        ctx['theme'] = theme
+
         theme.template_name = obj_type + '_request_' + status + '.txt'
         text_content = render_to_string(theme.template, ctx)
         theme.template_name = obj_type + '_request_' + status + '.html'
@@ -1040,16 +1046,18 @@ def create_pending_join(wsgi_request, request):
 # SEND EMAILS
 #-------------------------------------------------------------------------------
 
-def send_email_to_pis(wsgi_request, request, obj_type):
+def send_email_to_pis(request, context, obj_type):
     try:
+        context['current_site'] = get_current_site(request)
+        context['theme'] = theme
         # Send an email: the recipients are the PIs of the authority
-        recipients = authority_get_pi_emails(wsgi_request, request['authority_hrn'])
+        recipients = authority_get_pi_emails(request, context['authority_hrn'])
 
         theme.template_name = obj_type + '_request_email.txt' 
-        text_content = render_to_string(theme.template, request)
+        text_content = render_to_string(theme.template, context)
 
         theme.template_name = obj_type + '_request_email.html' 
-        html_content = render_to_string(theme.template, request)
+        html_content = render_to_string(theme.template, context)
 
         #theme.template_name = obj_type + '_request_email_subject.txt'
         #subject = render_to_string(theme.template, request)
@@ -1057,7 +1065,7 @@ def send_email_to_pis(wsgi_request, request, obj_type):
         subject = "New "+obj_type+" request"
 
         theme.template_name = 'email_default_sender.txt'
-        sender =  render_to_string(theme.template, request)
+        sender =  render_to_string(theme.template, context)
         sender = sender.replace('\n', '')
 
         msg = EmailMultiAlternatives(subject, text_content, sender, recipients)
@@ -1234,6 +1242,8 @@ def create_pending_user(wsgi_request, request, user_detail):
     )
     b.save()
     # sends email to user to activate the email
+    request['current_site'] = get_current_site(request)
+    request['theme'] = theme
     theme.template_name = 'activate_user.html'
     html_content = render_to_string(theme.template, request)
     theme.template_name = 'activate_user.txt'

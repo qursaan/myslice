@@ -2,6 +2,7 @@ import os.path
 import logging
 import subprocess
 
+
 logger = logging.getLogger('myslice')
 
 # ROOT
@@ -46,6 +47,16 @@ if config.myslice.theme :
     theme = config.myslice.theme
 else :
     theme = None
+
+if config.myslice.theme_label :
+    theme_label = config.myslice.theme_label
+else :
+    theme_label = theme
+
+if config.myslice.theme_logo :
+    theme_logo = config.myslice.theme_logo
+else :
+    theme_logo = theme + '.png'
 
 # HTTPROOT
 if config.myslice.httproot :
@@ -160,10 +171,6 @@ MEDIA_URL = ''
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(HTTPROOT,'static')
 
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
-
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -189,18 +196,14 @@ STATICFILES_FINDERS = (
 ###    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-#TEMPLATE_CONTEXT_PROCESSORS = (
-#    'django.contrib.auth.context_processors.auth',
-#    'django.core.context_processors.debug',
-#    'django.core.context_processors.i18n',
-#    'django.core.context_processors.media',
-#    'django.core.context_processors.static',
-#    'django.core.context_processors.request',
-#    'django.contrib.messages.context_processors.messages',
-#)
+if config.myslice.secret_key:
+    # Make this unique, and don't share it with anybody.
+    SECRET_KEY = config.myslice.secret_key
+else:
+    raise Exception, "SECRET_KEY Not defined: Please setup a secret_key value in myslice.ini"
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 't%n(3h)&amp;r^n8(+8)(sp29t^$c2#t(m3)e2!02l8w1#36tl#t27'
+AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
+                           'django.contrib.auth.backends.ModelBackend')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -347,9 +350,6 @@ LOGGING = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
-                           'django.contrib.auth.backends.ModelBackend')
-
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
 # if you need to see the error message then use this setting
@@ -365,3 +365,10 @@ CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 SLA_COLLECTOR_URL = "http://157.193.215.125:4001/sla-collector/sla"
 SLA_COLLECTOR_USER = "portal"
 SLA_COLLECTOR_PASSWORD = "password"
+
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
+
+

@@ -9,7 +9,6 @@ from django.template.loader     import render_to_string
 
 from django.shortcuts           import render
 from django.contrib.auth        import get_user_model
-from django.contrib.sites.models import Site
 
 from unfold.page                import Page
 from unfold.loginrequired       import FreeAccessView
@@ -68,10 +67,13 @@ class RegistrationView (FreeAccessView, ThemeView):
             reg_form = {}
             # The form has been submitted
             
-            # get the domain url
-            current_site = Site.objects.get_current()
-            current_site = current_site.domain
-           
+            if wsgi_request.is_secure():
+                current_site = 'https://'
+            else:
+                current_site = 'http://'
+            current_site += wsgi_request.META['HTTP_HOST']
+
+
             logger.debug("############ BREAKPOINT 3 #################")
             post_email = wsgi_request.POST.get('email','').lower()
             salt = randint(1,100000)

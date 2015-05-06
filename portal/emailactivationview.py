@@ -7,7 +7,6 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
 from django.core.mail                   import EmailMultiAlternatives, send_mail
-from django.contrib.sites.models        import Site
 
 from manifold.core.query                import Query
 from manifoldapi.manifoldapi            import execute_query, execute_admin_query
@@ -24,8 +23,7 @@ from unfold.page                        import Page
 from ui.topmenu                         import topmenu_items_live, the_user
 
 from myslice.theme                      import ThemeView
-from myslice.settings                   import logger
-
+from myslice.settings import logger
 
 def ValuesQuerySetToDict(vqs):
     return [item for item in vqs]
@@ -58,10 +56,11 @@ class ActivateEmailView(FreeAccessView, ThemeView):
         page = Page(self.request)
         #page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
         #page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
-
-        # get the domain url
-        current_site = Site.objects.get_current()
-        current_site = current_site.domain
+        if self.request.is_secure():
+            current_site = 'https://'
+        else:
+            current_site = 'http://'
+        current_site += self.request.META['HTTP_HOST']
 
         for key, value in kwargs.iteritems():
             if key == "hash_code":

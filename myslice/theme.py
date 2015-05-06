@@ -9,7 +9,19 @@ class ThemeView (object):
         self.config = ConfigEngine()
         if self.config.myslice.theme :
             return self.config.myslice.theme
-    
+
+    @property
+    def label(self):
+        self.config = ConfigEngine()
+        if self.config.myslice.theme_label :
+            return self.config.myslice.theme_label
+
+    @property
+    def logo(self):
+        self.config = ConfigEngine()
+        if self.config.myslice.theme_logo :
+            return self.config.myslice.theme_logo
+  
     @property
     def template(self):
         # Load a template from the theme directory if it exists
