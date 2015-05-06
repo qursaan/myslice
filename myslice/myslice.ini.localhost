@@ -5,3 +5,9 @@ admin_password = admin
 
 [myslice]
 theme = onelab
+# label and logo are used in emails
+# by default theme_label = theme
+theme_label=OneLab
+# by default theme_logo = theme.png
+theme_logo=onelab-portal.png
+secret_key = random_value 
