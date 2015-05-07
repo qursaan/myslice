@@ -1,6 +1,6 @@
-Dear Fed4FIRE user,
+Dear {{theme.label}} user,
 
-You have recently requested a project in the Fed4FIRE portal.
+You have recently requested a project in the {{theme.label}} portal.
 
 Project name  : {{project_name}}
 Authority     : {{authority_hrn}}
@@ -9,8 +9,8 @@ Purpose       : {{purpose}}
 
 We regret to inform you that, a manager of your institution has rejected your request. Please contact the manager of your institution for further information. For any other queries, please contact us by replying to this email.
 
-We wish you a fruitful user experience on Fed4FIRE.
+We wish you a fruitful user experience on {{theme.label}}.
 
 Yours sincerely,
-The Fed4FIRE team
+The {{theme.label}} team
 
