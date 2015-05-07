@@ -26,7 +26,7 @@
     <div class="row">
         <div class="col-sm-4">
             <h3>
-                <img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="" />EXPERIMENT
+                <a href="/portal/slice_request/"><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="" />EXPERIMENT</a>
             </h3>
             <div>
                 <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
@@ -44,24 +44,7 @@
              
                 <div id="home-project-tree"><img class="projects-loading" src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
             </div>
-                        
-            <div class="experiment-tools">
-                <h4 title="Some tools do their own slice creation and management.">Experiment now</h4>
-                
-                <p class="jfed">
-                    <button id="start" class="btn btn-primary" type="button" onclick="launchjFed()"><span class="glyphicon glyphicon-cloud"></span> Start jFed</button>
-                </p>
-                <div id='java7Dialog' title="Old Java version detected" >
-                <p>The latest version of jFed is only compatible with Java 8 or higher. We detected that you are using an older version.</p>
-                <p>Please upgrade to Java 8 to get access to the newest version of jFed. Otherwise, you can use jFed 5.3.2, which is Java 7-compatible.</p>
-                </div>
-                
-                <div id='noJavaDialog' title="No Java detected" >
-                <p>jFed requires Java to run. We however couldn't detect a Java installation in your browser.</p>
-                <p>Please install the latest version of Java to continue.</p>
-                </div>
-
-            </div>
+            {% include theme|add:"_jfed_button.html" %}
         </div>
         <div class="col-sm-4">
             <div class="row">
@@ -100,41 +83,16 @@
                     <p>
                         <span class="glyphicon glyphicon-envelope"></span> <a href="/portal/contact/">Contact</a>
                     </p>
-                    <p>
-                        <span class="glyphicon glyphicon-stats"></span> <a target="_blank" href="https://flsmonitor.fed4fire.eu">Testbeds' status</a>
-                        </br />
-                        <span class="glyphicon glyphicon-stats"></span> <a href="/portal/reputation">Testbeds' reputation</a>
-                        
-                    </p>
-                    <p>
-                        <span class="glyphicon glyphicon-book"></span> <a target="_blank" href="http://doc.fed4fire.eu/">Documentation</a>
-                    </p>
+                    {% include theme|add:"_dashboard_links.html" %}
                 </div>
             </div>            
         </div>
     </div>
 </div>
 {% else %}
-<div class="container home">
+<div class="container-fluid home">
 	<div class="">
-		<div class="col-sm-4 col-sm-offset-1 slogan">
-			<h1>
-				Fed4FIRE Portal
-			</h1>
-			<h3>
-				Your easy access to Future Internet Research and Experimentation testbeds belonging to the 
-				<a target="_blank" href="http://www.fed4fire.eu/">Fed4FIRE</a> federation.
-			</h3>
-			<br />
-			<h4>
-				 <a href='http://doc.fed4fire.eu'>Want to learn more?</a>
-			</h4>
-		</div>
-		<div class="col-sm-4 col-sm-offset-1" style="width:400px; top:16px; float:left;">
-   			<div class="row">
-				{% widget '_widget-login-user.html' %}
-			</div>
-		</div>
+        {% include theme|add:"_login.html" %}
 	</div>
 </div>
 
