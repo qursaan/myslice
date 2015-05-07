@@ -45,7 +45,6 @@ class RegistrationView (FreeAccessView, ThemeView):
         # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
         authorities_query = Query.get('authority').select('name', 'authority_hrn')
         authorities = execute_admin_query(wsgi_request, authorities_query)
-        logger.info("RegistrationView authorities = {}".format(authorities))
         if authorities is not None:
             # Remove the root authority from the list
             matching = [s for s in authorities if "." in s['authority_hrn']]
@@ -72,7 +71,6 @@ class RegistrationView (FreeAccessView, ThemeView):
             else:
                 current_site = 'http://'
             current_site += wsgi_request.META['HTTP_HOST']
-
 
             logger.debug("############ BREAKPOINT 3 #################")
             post_email = wsgi_request.POST.get('email','').lower()
