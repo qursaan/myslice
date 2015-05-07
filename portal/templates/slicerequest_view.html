@@ -4,14 +4,16 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<h1><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="Request a Slice" /> Request a new slice</h1>
+			 <div class="breadcrumbs" style="line-height: 3;">
+			 	 Experiment &nbsp;>&nbsp; Request a new Slice
+			 </div>
 		</div>
 	</div>
-
+	
 	{% if errors %}
 	<div class="row">
 		<div class="col-md-12">
-		<ul>
+		<ul class="error">
 		  {% for error in errors %}
 		  <li>{{ error }}</li>
 		  {% endfor %}
@@ -21,34 +23,42 @@
 	{% endif %}
 	
 	<div class="row">
-		<div class="col-md-8 el">
+		<div class="col-md-5 col-md-offset-3">
 			<form role="form" method="post">
 			{% csrf_token %}
-			  <div class="form-group" style="display:none">
-			    <input type="email" class="form-control" id="email" style="width:300px" value="{{ email }}" readonly="readonly">
+			  <div class="form-group">
+			     <input type="hidden" id="email" value="{{ email }}" readonly="readonly">
+			     <label>
+			         Please enter a name for your slice <br />
+			         <span class="sublabel">
+			             The slice name should only contain letters, numbers and the underscore "_" (19 max length) <br />
+			         </span>
+			     </label>
+			     <input type="text" class="form-control" name="slice_name" id="slice_name" maxlength="19" style="width:100%" placeholder="Slice name" value="{{slice_name}}" required="required">
 			  </div>
 			  <div class="form-group">
-			    <input type="text" class="form-control" name="slice_name" id="slice_name" style="width:300px" placeholder="Slice name" 
-				title="Please enter a name for your slice"required="required">
+			      <label>
+			          Select a project under which you want your slice to be created <br />
+			          If your are not part of any projects you can <a href="/portal/project_request/">join or create one</a>
+			      </label>
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:100%" placeholder="Project" 
+				        title="Select a project under which you want to create your slice" required="required">
 			  </div>
 			  <div class="form-group">
-                {% if request.session.user.pi %}
-                <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" style="width:300px" placeholder="Authority" 
-				title="An authority responsible for vetting your slice" required="required">
-                {% else %}
-                <input type="text" class="form-control" id="authority_hrn" name="authority_hrn" placeholder="Authority" style="width:300px; display:none;" 
-				title="An authority responsible for vetting your slice" required="required" readonly="readonly">
-                {% endif %}
+			      <label>
+			          Provide an URL for your experiment (not required)
+			      </label>
+			      <input type="text" class="form-control" name="url" id="url" style="width:100%" placeholder="Experiment URL (if one exists)"
+				        title="Please provide the url of your experiment" value="{{url}}">
 			  </div>
 			  <div class="form-group">
-			    <input type="number" class="form-control" name="number_of_nodes" id="number_of_nodes" style="width:300px" placeholder="Number of nodes"
-				title="Number of nodes you expect to request (informative)">
+			      <label>
+                        Please provide a description of the purpose for your experiment
+                   </label>
+			  	  <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment description" style="width:100%" 
+				        title="Description of your experiment" required="required">{{ purpose }}</textarea>
 			  </div>
-			  <div class="form-group">
-			  	<textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment purpose" style="width:300px" 
-				title="Purpose of your experiment (informative)" required="required">{{ purpose }}</textarea>
-			  </div>
-			  <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Request Slice</button>
+			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
 			</form>
 	
 		</div>
@@ -56,29 +66,19 @@
 		
 <script>
 jQuery(document).ready(function(){
-	
-	$("#authority_hrn").load("/rest/user/", {"fields" : ["parent_authority"], "filters": {"user_hrn": "{{ user_hrn }}"}}, function(data) {
-		var jsonData = JSON.parse(data);
-        $(this).attr("value", jsonData[0]['parent_authority']);
-    });
-    var availableTags = [
-     {% if authorities %}
-         {% for authority in authorities %}
-             {% if authority.name %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
-             {% else %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
-             {% endif %}
-         {% endfor %}    
-     {% else %}
-         {value:"",label:"No authority found !!!"}
-     {% endif %}
-    ];
+    var myprojects = JSON.parse(localStorage.getItem('projects'));
     $( "#authority_hrn" ).autocomplete({
-      source: availableTags,
-      minLength: 0,
-      select: function( event, ui ) {console.log(jQuery(this));}
-    });
+        minLength: 0,
+        source: myprojects,
+        change: function (event, ui) {
+                if(!ui.item){
+                    //http://api.jqueryui.com/autocomplete/#event-change -
+                    // The item selected from the menu, if any. Otherwise the property is null
+                    //so clear the item for force selection
+                    $("#authority_hrn").val("");
+                }
+        }
+    }).bind('focus', function(){ $(this).autocomplete("search"); } );
     $('input[name=slice_name]').keyup(function(){
         this.value = this.value.toLowerCase();
     });
