@@ -744,6 +744,9 @@ def portal_validate_request(wsgi_request, request_ids):
             send_status_email(wsgi_request, ctx, user_email, request['type'], 'validated')
         except Exception, e:
             request_status['SFA '+request['type']] = {'status': False, 'description': str(e)}
+            logger.error('ERROR - actions.py - portal_validate_request: %s' % e)
+            import traceback
+            logger.error(traceback.format_exc())
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
 
@@ -882,6 +885,9 @@ def portal_reject_request(wsgi_request, request_ids):
             send_status_email(wsgi_request, ctx, user_email, request['type'], 'denied')
         except Exception, e:
             request_status['SFA '+request['type']] = {'status': False, 'description': str(e)}
+            logger.error('ERROR - actions.py - portal_reject_request: %s' % e)
+            import traceback
+            logger.error(traceback.format_exc())
 
         status['%s__%s' % (request['type'], request['id'])] = request_status
 
@@ -1242,7 +1248,7 @@ def create_pending_user(wsgi_request, request, user_detail):
     )
     b.save()
     # sends email to user to activate the email
-    request['current_site'] = get_current_site(request)
+    request['current_site'] = get_current_site(wsgi_request)
     request['theme'] = theme
     theme.template_name = 'activate_user.html'
     html_content = render_to_string(theme.template, request)
