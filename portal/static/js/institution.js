@@ -12,6 +12,49 @@ function spin_all(){
         }
     });
 }
+function post_renew(obj){
+    var record_id = obj.id;
+    $.post("/sfa/Renew/",{'hrn':record_id,'type':'slice'}, function(data) {
+        txt = '';
+        errors = '';
+        $.each(data, function (index, val) {
+            console.log(index, val);
+            if (index != 'columns' && !('error' in val)){
+                if('code' in val && val['code']['geni_code']==0){
+                    if('output' in val && val['output']!=''){
+                        txt += index+': '+val['output']+'<br>';
+                    }
+                    if('value' in val && val['value']!=''){
+                        if(typeof val['value'] == 'string' || val['value'] instanceof String){
+                            txt += index+': '+val['value']+'<br>';
+                        }else{
+                            txt += index+': expiration = '+val['value'][0]['geni_expires']+'<br>';
+                        }
+                    }
+                }else{
+                    if('output' in val && val['output']!=''){
+                        errors += index+': '+val['output']+'<br>';
+                    }
+                    if('value' in val && val['value']!=''){
+                        errors += index+': '+val['value']+'<br>';
+                    }
+                }
+            }
+            if('error' in val){
+                errors += index+': '+val['error_msg']+'<br>';
+            } 
+        });
+        console.log(txt);
+        console.log(record_id);
+        if(txt != ''){
+            mysliceAlert('Success: '+record_id+'<br>'+txt,'success', false, record_id);
+        }
+        if(errors != ''){
+            mysliceAlert('Warning: '+record_id+'<br>'+errors,'warning', false, record_id);
+        }
+        unspin_all();
+    });
+}
 $(document).ready(function() {
 	loadedTabs = [];
 	
@@ -85,6 +128,7 @@ $(document).ready(function() {
         });
     });
     $('button#renewslices').click(function() {
+        var record_id;
         spin_all();
         var now = new Date();
         /* In Javascript getMonth() gives month[0] = january, month[1] = february, and so on...  */
@@ -92,20 +136,11 @@ $(document).ready(function() {
         var one_month_later = now.getFullYear()+"-"+month+"-"+now.getDate()+" "+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
         $('input:checkbox.slice').each(function (index) {
             if(this.checked){
-                var record_id = this.id;
-                $('#'+record_id+'-loading').spin();
-                $.post("/update/slice/",{'filters':{'slice_hrn':this.id},'params':{'expires':one_month_later}}, function(data) {
-                    if(data.success){
-                        // TODO: highlight row after success
-                        //$('tr[id="'+record_id+'"]').highlight();
-                        mysliceAlert('Success: slice renewed','success', true);
-                    }else{
-                        mysliceAlert('Rest Error for: '+data.error,'warning', true);
-                        //alert("Rest Error for "+record_id+": "+data.error);
-                    }
-                    unspin_all();
-                });
-                
+                console.log(this.id);
+                record_id = $(this).attr('id');
+                $('#'+this.id+'-loading').spin();
+                // /sfa/Renew?hrn=onelab.upmc.projectx.slicex&type=slice
+                post_renew(this);
             }
         });
         // TODO: refresh table

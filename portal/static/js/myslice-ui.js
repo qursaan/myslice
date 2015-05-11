@@ -2,16 +2,30 @@
 /*
  * Call it with level: success, info, warning, danger
  */
-function mysliceAlert(msg, level, timeout) {
+function mysliceAlert(msg, level, timeout, id) {
 	level = typeof level !== 'undefined' ? level : 'success';
 	timeout = typeof timeout !== 'undefined' ? timeout : false;
+	id = typeof id !== 'undefined' ? id : '';
+
+    // onelab.upmc.slice the dot is causing a pb in the jQuery selector, so replace it !
+    id = id.replace(/\./g,'');
+
 	var el = $('#myslice-message');
-	el.find('.message').text(msg);
-	el.addClass('alert-' + level);
+    el.append("<div id='msg-"+level+"-"+id+"'></div>");
+    var msg_div = $('#msg-'+level+'-'+id);
+    msg_div.addClass('alert alert-dismissable myslice-message');
+    msg_div.append("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>");
+    msg_div.append("<span class='glyphicon glyphicon-exclamation-sign'></span>");
+    msg_div.append("<span class='message'></span>");
+	msg_div.find('.message').html(msg);
+	msg_div.addClass('alert-' + level);
     el.fadeIn('fast');
 	el.parent().fadeIn('fast');
 	if (timeout) {
-		setTimeout(function(){el.hide();},5000);
+		setTimeout(function(){
+            el.hide();
+            msg_div.remove();
+        },5000);
 	}
 };
 /* Table initialisation */
