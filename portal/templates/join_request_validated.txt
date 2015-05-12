@@ -1,0 +1,14 @@
+Dear {{theme.label}} user,
+
+You have recently requested to join a project in the {{theme.label}} portal.
+
+Project name  : {{project_name}}
+Authority     : {{authority_hrn}}
+Email         : {{email}}
+
+We are pleased to inform you that a project manager has validated your request on the {{theme.label}} portal. You have automatically been added to all existing slices in this project. You may also create new slices in this project and start experimenting.
+
+We wish you a fruitful user experience with the {{theme.label}} portal.
+
+Yours sincerely,
+The {{theme.label}} team
