@@ -2,7 +2,7 @@ We have received a user signup request for your email address at {{current_site}
 
 You have the following user details:
 
-Organization: {{organization}}
+Authority: {{authority_hrn}}
 First name: {{first_name}}
 Last name: {{last_name}}
 Email: {{email}}
@@ -17,8 +17,8 @@ You may now log in to the portal using your email address and the password that 
 
 	2. A manager from your organization must also validate your request. Upon confirmation of your signup request, we will send an email to the managers at your organization with a validation request.
 
-We look forward to welcoming you to OneLab. 
-Please don't hesitate to contact us at support@onelab.eu with any additional questions that you might have.
+We look forward to welcoming you to {{theme.label}}. 
+Please don't hesitate to contact us at support@{{theme.theme}}.eu with any additional questions that you might have.
 
 
 
