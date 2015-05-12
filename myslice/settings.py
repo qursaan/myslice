@@ -90,7 +90,9 @@ MANAGERS = ADMINS
 #DEFAULT_FROM_EMAIL = "root@theseus.ipv6.lip6.fr"
 #EMAIL_HOST_PASSWORD = "mypassword"
 
-DEFAULT_FROM_EMAIL = "OneLab Support <support@onelab.eu>"
+if config.myslice.default_sender:
+    DEFAULT_FROM_EMAIL = config.myslice.default_sender
+
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
