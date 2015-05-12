@@ -1,7 +1,0 @@
-email           : {{email}}
-
-Query Details:
-
-Subject         : {{subject}}
-Description     : {{description}}
-
