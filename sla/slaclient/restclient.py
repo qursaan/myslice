@@ -126,7 +126,7 @@ class Client(object):
         # for key, values in kwargs.iteritems():
         #     print key, values
 
-        result = requests.get(url, **kwargs)
+        result = requests.get(url, verify=False, **kwargs)
         logger.debug('SLA GET {} - result: {}'.format(result.url, result.status_code))
         # print "GET {} {} {}".format(
         #     result.url, result.status_code, result.text[0:70])
