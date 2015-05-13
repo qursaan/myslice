@@ -31,7 +31,7 @@ except:
 
 if not config.myslice.portal_version:
     try:
-        PORTAL_VERSION = subprocess.check_output(["git", "describe"])
+        PORTAL_VERSION = subprocess.check_output(["git", "--git-dir", ROOT + "/.git", "describe"])
     except:
         PORTAL_VERSION = 'not using git' 
 
