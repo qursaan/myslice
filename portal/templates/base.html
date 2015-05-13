@@ -119,7 +119,7 @@ $(document).ready(function() {
                 if (s.match('^' + escapeRegExp(p))) {
                     slicename = s.replace(p + '.','')
                     items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
-                }else{
+                }else if(s.split('.').length < 4){
                      slices_no_project.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+s+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + s + "</a></li>" );
                 }
             });
