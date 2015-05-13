@@ -131,12 +131,16 @@ $(document).ready(function() {
             items.push(el);
             items_sl = [];
         });
-
-        elm = '<li>other slices <span class="glyphicon glyphicon-info-sign" title="these are <b>legacy slices</b> from now on, slices must be created within a project">&nbsp;</span>';
-        if (slices_no_project.length > 0) {
-            elm += "<ul>" + slices_no_project.join( "" ) + "</ul>";
+        if (projects.length == 0){
+            $.each( slices, function(y, s) {
+                slices_no_project.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+s+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + s + "</a></li>" );
+            });
         }
-        elm += "</li>";
+        if (slices_no_project.length > 0) {
+            elm = '<li>other slices <span class="glyphicon glyphicon-info-sign" title="these are <b>legacy slices</b> from now on, slices must be created within a project">&nbsp;</span>';
+            elm += "<ul>" + slices_no_project.join( "" ) + "</ul>";
+            elm += "</li>";
+        }
         items.push(elm);
 
         $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
