@@ -77,7 +77,7 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            {% if theme != "fed4fire" or  "onelab" in theme %}
+            {% if theme != "fed4fire" or "onelab" in theme %}
             drawSlices(slices);
             {% endif %}
         }
@@ -92,7 +92,7 @@ $(document).ready(function() {
 
     function drawSlices(slices){
         var items = [];
-		
+        console.log(slices);
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\" title='Add resources to slice "+val+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>" + val + "</a></li>" );
         });
@@ -113,11 +113,14 @@ $(document).ready(function() {
     function drawProjectsTree(projects,slices) {
         var items = [];
         var items_sl = [];
+        var slices_no_project = [];
         $.each( projects, function(i, p) {
             $.each( slices, function(y, s) {
                 if (s.match('^' + escapeRegExp(p))) {
-                     slicename = s.replace(p + '.','')
-                     items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
+                    slicename = s.replace(p + '.','')
+                    items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
+                }else{
+                     slices_no_project.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+s+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + s + "</a></li>" );
                 }
             });
             el = "<li><a href=\"/portal/project/" + p + "\" title='Manage project "+p+"' >" + p + "</a>";
@@ -128,6 +131,14 @@ $(document).ready(function() {
             items.push(el);
             items_sl = [];
         });
+
+        elm = '<li>other slices <span class="glyphicon glyphicon-info-sign" title="these are <b>legacy slices</b> from now on, slices must be created within a project">&nbsp;</span>';
+        if (slices_no_project.length > 0) {
+            elm += "<ul>" + slices_no_project.join( "" ) + "</ul>";
+        }
+        elm += "</li>";
+        items.push(elm);
+
         $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
         if (projects.length > 0) {
             $('.dashboard-create-slice').show();
