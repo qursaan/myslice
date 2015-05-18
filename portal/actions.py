@@ -908,7 +908,7 @@ def send_status_email(request, ctx, user_email, obj_type, status):
         sender =  render_to_string(theme.template, ctx)
         sender = sender.replace('\n', '')
                        
-        subject = obj_type + ' request '+ status +'.'
+        subject = obj_type.title() + ' request '+ status
     
         msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
         msg.attach_alternative(html_content, "text/html")
