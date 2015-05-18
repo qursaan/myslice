@@ -677,13 +677,14 @@ def portal_validate_request(wsgi_request, request_ids):
                 a = PendingAuthority.objects.get(id=request['id'])
                 ctx = { 
                     'site_name'     : a.site_name,
-                    'short_name'    : a.short_name,
-                    'url'           : a.url,
-                    'city'          : a.city,
-                    'country'       : a.country,                          
-                    'portal_url'    : a.current_site,
+                    #'short_name'    : a.short_name,
+                    #'url'           : a.url,
+                    'city'          : a.address_city,
+                    'country'       : a.address_country,                          
+                    #'portal_url'    : a.current_site,
                 }
-                user_email = a.email
+                # address_line1 contains the email of the user in pending_authority table
+                user_email = a.address_line1
 
                 PendingAuthority.objects.get(id=request['id']).delete()
                 
