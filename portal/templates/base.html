@@ -140,8 +140,8 @@ $(document).ready(function() {
             elm = '<li>other slices <span class="glyphicon glyphicon-info-sign" title="these are <b>legacy slices</b> from now on, slices must be created within a project">&nbsp;</span>';
             elm += "<ul>" + slices_no_project.join( "" ) + "</ul>";
             elm += "</li>";
+            items.push(elm);
         }
-        items.push(elm);
 
         $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
         if (projects.length > 0) {
