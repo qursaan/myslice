@@ -20,5 +20,8 @@ You may now log in to the portal using your email address and the password that 
 We look forward to welcoming you to {{theme.label}}. 
 Please don't hesitate to contact us at support@{{theme.theme}}.eu with any additional questions that you might have.
 
+Yours sincerely,
+The {{theme.label}} team
+
 
 
