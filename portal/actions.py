@@ -445,7 +445,8 @@ def delete_local_user(wsgi_request, user_email):
         user_config = json.loads(user[0]['config'])
         authority_hrn = user_config.get('authority', None)
         
-        if is_pi(wsgi_request, '$user_hrn', authority_hrn):
+        #if is_pi(wsgi_request, '$user_hrn', authority_hrn):
+        try:
             # removing from Django auth_user
             UserModel = get_user_model()
             UserModel._default_manager.filter(email__iexact = user_email).delete()
@@ -455,9 +456,9 @@ def delete_local_user(wsgi_request, user_email):
                      
             # removing manifold user
             manifold_delete_user(wsgi_request, user_id)
-        else:
-            return False
-            #raise Exception, "No sufficient rights on authority = ",authority_hrn
+        except Exception, e:
+            #return False
+            print "No sufficient rights on authority = ",authority_hrn
 
     return True      
 
