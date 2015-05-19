@@ -48,6 +48,7 @@ from portal.univbrisview            import UnivbrisView
 from portal.univbrisvtam            import UnivbrisVtam
 
 from portal.manualdelegationview    import ManualDelegationView
+from portal.releasenotesview       import ReleaseNotesView
 
 from portal.servicedirectory        import ServiceDirectoryView
 
@@ -104,6 +105,7 @@ urlpatterns = patterns('',
     url(r'^project_request/?$', ProjectRequestView.as_view(), name='project_request'),
     url(r'^terms/?$', TermsView.as_view(), name='terms'),
     url(r'^manual_delegation/?$', ManualDelegationView.as_view(), name='manual_delegation'),
+    url(r'^release_notes/?$', ReleaseNotesView.as_view(), name='release_notes'),
     # Validate pending requests
     url(r'^validate/?$', ValidatePendingView.as_view()),
     # http://stackoverflow.com/questions/2360179/django-urls-how-to-pass-a-list-of-items-via-clean-urls
