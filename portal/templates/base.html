@@ -77,17 +77,12 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            {% if theme != "fed4fire" or "onelab" in theme %}
-            drawSlices(slices);
-            {% endif %}
         }
-        {% if theme == "fed4fire" or "onelab" in theme%}
         p = myslice.get_projects();
         if(p != null){
             //drawProjects(p);
             drawProjectsTree(p,slices);
         }
-        {% endif %}
     });
 
     function drawSlices(slices){
@@ -100,7 +95,6 @@ $(document).ready(function() {
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
     
-    {% if theme == "fed4fire" or "onelab" in theme%}
     function drawProjects(projects){
         var items = [];
 		
@@ -152,7 +146,6 @@ $(document).ready(function() {
     window.setTimeout(function() {
         $('.projects-loading').hide();
     },20000);
-    {% endif %}
 {% endif %}
 	jQuery('[title!=""]').qtip();
 });
