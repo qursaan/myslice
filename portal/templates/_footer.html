@@ -8,8 +8,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-9 copy">
-            Copyright © UPMC Sorbonne Universités, on behalf of the OneLab consortium
+        <div class="col-md-9 copy" style="text-align:left;">
+            Copyright © UPMC Sorbonne Universités
         </div>
         <div class="col-md-3 copy">
         powerd by &nbsp;<a href="http://myslice.info" target="_blank"><img src="//myslice.info/images/logo.png" style="width:50px;"></a>&nbsp;&nbsp;
@@ -21,7 +21,6 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $.post("/portal_version/", function( data ) {
-            console.log(data);
             $("#portal_version").html(data);
         });
     });
