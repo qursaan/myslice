@@ -18,7 +18,7 @@ from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
 
 from portal.models              import PendingUser
-from portal.actions             import create_pending_user
+from portal.actions             import create_pending_user, getAuthorities
 
 from myslice.theme import ThemeView
 from myslice.settings import logger
@@ -41,15 +41,18 @@ class RegistrationView (FreeAccessView, ThemeView):
         """
         """
         errors = []
-        authority_hrn = None
-        # REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
-        authorities_query = Query.get('authority').select('name', 'authority_hrn')
-        authorities = execute_admin_query(wsgi_request, authorities_query)
-        if authorities is not None:
-            # Remove the root authority from the list
-            matching = [s for s in authorities if "." in s['authority_hrn']]
-            authorities = sorted(matching, key=lambda k: k['authority_hrn'])
-            authorities = sorted(matching, key=lambda k: k['name'])
+
+        authorities = getAuthorities(wsgi_request, admin = True)
+
+        #authority_hrn = None
+        ## REGISTRY ONLY TO BE REMOVED WITH MANIFOLD-V2
+        #authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        #authorities = execute_admin_query(wsgi_request, authorities_query)
+        #if authorities is not None:
+        #    # Remove the root authority from the list
+        #    matching = [s for s in authorities if "." in s['authority_hrn']]
+        #    authorities = sorted(matching, key=lambda k: k['authority_hrn'])
+        #    authorities = sorted(matching, key=lambda k: k['name'])
         
         logger.debug("############ BREAKPOINT 1 #################")
         # Page rendering

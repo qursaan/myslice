@@ -16,6 +16,8 @@ from myslice.configengine           import ConfigEngine
 
 from myslice.settings import logger
 
+from rest.sfa_api import sfa_client
+
 theme = ThemeView()
 
 import activity.slice
@@ -77,6 +79,14 @@ def get_jfed_identity(request):
     except Exception as e:
         print e
         return None
+
+def getAuthorities(request, admin = False):
+    result = sfa_client(request,'List',hrn='onelab',object_type='authority',platforms=['myslice'],admin=admin)
+    authorities = list()
+    for item in result['myslice']:
+        authorities.append({'authority_hrn':item['hrn']})    
+    return sorted(authorities)
+
 
 # Get the list of pis in a given authority
 def authority_get_pis(request, authority_hrn):

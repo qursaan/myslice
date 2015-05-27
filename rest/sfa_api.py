@@ -20,26 +20,22 @@ from manifold.models.user       import User
 
 from unfold.loginrequired       import LoginRequiredView
 
-from myslice.settings           import logger
+from myslice.settings           import logger, config
 
 from rest.json_encoder          import MyEncoder
 
 def dispatch(request, method):
-    Config = ConfigParser.ConfigParser()
-    Config.read(os.getcwd() + "/myslice/monitor.ini")
 
-    #logger.debug(request.session['user']['email'])
-    user_email = request.session['user']['email']
-
-    platforms = list()
-    options   = dict()
-    rspec = ''
-    results = dict()
-    urn = ''
     hrn = ''
+    urn = ''
     object_type = ''
-    display = None
+    rspec = ''
     recursive = False
+    options   = dict()
+    platforms = list()
+
+    results = dict()
+    display = None
 
     if request.method == 'POST':
         req_items = request.POST
@@ -66,6 +62,58 @@ def dispatch(request, method):
                 recursive = False
         elif el[0].startswith('display'):
             display = el[1]
+
+    results = sfa_client(request, method, hrn, urn, object_type, recursive, options, platforms)
+
+    if display == 'table':
+        return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
+    else:
+        return HttpResponse(json.dumps(results, cls=MyEncoder), content_type="application/json")
+
+def get_user_account(user_email, platform_name):
+    """
+    Returns the user configuration for a given platform.
+    This function does not resolve references.
+    """
+    user = db.query(User).filter(User.email == user_email).one()
+    platform = db.query(Platform).filter(Platform.platform == platform_name).one()
+    accounts = [a for a in user.accounts if a.platform == platform]
+    if not accounts:
+        raise Exception, "this account does not exist"
+
+    if accounts[0].auth_type == 'reference':
+        pf = json.loads(accounts[0].config)['reference_platform']
+        return get_user_account(user_email, pf)
+
+    return accounts[0]
+
+def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None, recursive=None, options=None, platforms=None, admin=False):
+
+    Config = ConfigParser.ConfigParser()
+    Config.read(os.getcwd() + "/myslice/monitor.ini")
+
+    if admin:
+        user_email, admin_password = config.manifold_admin_user_password()
+    else:
+        #logger.debug(request.session['user']['email'])
+        user_email = request.session['user']['email']
+
+    results = dict()
+
+    if hrn is None:
+        hrn = ''
+    if urn is None:
+        urn = ''
+    if object_type is None:
+        object_type = ''
+    if rspec is None:
+        rspec = ''
+    if recursive is None:
+        recursive = False
+    if options is None:
+        options  = dict()
+    if platforms is None:
+        platforms = list()
 
     if method not in ['GetVersion','ListResources']:
         try:
@@ -128,12 +176,18 @@ def dispatch(request, method):
             user_config = get_user_config(user_email, pf)
             if 'delegated_user_credential' in user_config:
                 user_cred = user_config['delegated_user_credential']
+            elif 'user_credential' in user_config:
+                user_cred = user_config['user_credential']
             else:
                 user_cred = {}
 
             if object_type:
                 if 'delegated_%s_credentials'%object_type in user_config:
                     for obj_name, cred in user_config['delegated_%s_credentials'%object_type].items():
+                        if obj_name == hrn:
+                            object_cred = cred
+                elif '%s_credentials'%object_type in user_config:
+                    for obj_name, cred in user_config['%s_credentials'%object_type].items():
                         if obj_name == hrn:
                             object_cred = cred
 
@@ -214,15 +268,15 @@ def dispatch(request, method):
                     record_dict = {'urn': urn, 'hrn': hrn, 'type': object_type}
                     if method == "List":
                         # hrn is required
-                        options['recursive'] = recursive
-                        result = server.List(hrn, user_cred, options)
+                        api_options['recursive'] = recursive
+                        result = server.List(hrn, user_cred, api_options)
                         if object_type:
                             result = filter_records(object_type, result)
                     elif method == "Resolve":
                         # hrn is required
                         # details can be True or False
-                        options['details']=True
-                        result = server.Resolve(hrn, user_cred, options)
+                        api_options['details']=True
+                        result = server.Resolve(hrn, user_cred, api_options)
                         if object_type:
                             result = filter_records(object_type, result)
                     elif method == "Register":
@@ -255,28 +309,9 @@ def dispatch(request, method):
             logger.error(traceback.format_exc())
             logger.error(e)
             results[pf] = {'error':'-3', 'error_msg': str(e)}
-    if display == 'table':
-        return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
-    else:
-        results['columns'] = columns
-        return HttpResponse(json.dumps(results, cls=MyEncoder), content_type="application/json")
 
-def get_user_account(user_email, platform_name):
-    """
-    Returns the user configuration for a given platform.
-    This function does not resolve references.
-    """
-    user = db.query(User).filter(User.email == user_email).one()
-    platform = db.query(Platform).filter(Platform.platform == platform_name).one()
-    accounts = [a for a in user.accounts if a.platform == platform]
-    if not accounts:
-        raise Exception, "this account does not exist"
-
-    if accounts[0].auth_type == 'reference':
-        pf = json.loads(accounts[0].config)['reference_platform']
-        return get_user_account(user_email, pf)
-
-    return accounts[0]
+    results['columns'] = columns
+    return results
 
 def get_user_config(user_email, platform_name):
     account = get_user_account(user_email, platform_name)

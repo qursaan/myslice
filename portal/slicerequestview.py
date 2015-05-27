@@ -11,7 +11,7 @@ from unfold.page                import Page
 from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
-from portal.actions             import is_pi, create_slice, create_pending_slice, clear_user_creds, authority_check_pis
+from portal.actions             import is_pi, create_slice, create_pending_slice, clear_user_creds, authority_check_pis, getAuthorities
 #from portal.forms               import SliceRequestForm
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 from ui.topmenu                 import topmenu_items_live, the_user
@@ -44,15 +44,18 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
-        #if self.theme == 'fed4fire' or self.theme == 'onelab':
-        authorities_query = Query.get('myslice:authority').select('authority_hrn')
-        #else:
-        #    authorities_query = Query.get('authority').select('name', 'authority_hrn')
-        authorities = execute_admin_query(request, authorities_query)
-        if authorities is not None:
-            authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
-            #if self.theme != 'fed4fire' or  self.theme != 'onelab':
-            #    authorities = sorted(authorities, key=lambda k: k['name'])
+
+        authorities = getAuthorities(request, admin=True)
+
+        ##if self.theme == 'fed4fire' or self.theme == 'onelab':
+        #authorities_query = Query.get('myslice:authority').select('authority_hrn')
+        ##else:
+        ##    authorities_query = Query.get('authority').select('name', 'authority_hrn')
+        #authorities = execute_admin_query(request, authorities_query)
+        #if authorities is not None:
+        #    authorities = sorted(authorities, key=lambda k: k['authority_hrn'])
+        #    #if self.theme != 'fed4fire' or  self.theme != 'onelab':
+        #    #    authorities = sorted(authorities, key=lambda k: k['name'])
 
         # Get user_email (XXX Would deserve to be simplified)
         user_query  = Query().get('local:user').select('email','config')
@@ -88,15 +91,7 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                         user_hrn = account_config.get('user_hrn','N/A')
         #                acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
 
-
-        # checking if pi or not
-        #if acc_auth_cred == {} or acc_auth_cred == 'N/A':
-        #    pi = "is_not_pi"
-        #else:
-        #    pi = "is_pi"
-
-        pi = authority_check_pis (request, user_email)
-        logger.debug("SLICEREQUESTVIEW.PY -----  pi= {}".format(pi))
+        pi = request.session['user']['pi']
 
         # Page rendering
         page = Page(request)
