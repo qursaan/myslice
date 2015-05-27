@@ -64,7 +64,7 @@ def dispatch(request, method):
             display = el[1]
 
     results = sfa_client(request, method, hrn, urn, object_type, recursive, options, platforms)
-
+    logger.debug(results)
     if display == 'table':
         return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
     else:
@@ -90,7 +90,7 @@ def get_user_account(user_email, platform_name):
 def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None, recursive=None, options=None, platforms=None, admin=False):
 
     Config = ConfigParser.ConfigParser()
-    Config.read(os.getcwd() + "/myslice/monitor.ini")
+    Config.read(os.getcwd() + "/myslice/myslice/monitor.ini")
 
     if admin:
         user_email, admin_password = config.manifold_admin_user_password()
@@ -156,18 +156,22 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
             server_url = platform['registry']
     
         if not Config.has_option('monitor', 'cert') :
-             return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+             #return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+             return {'error' : '-1', 'msg': 'monitor.ini has no cert configured'}
 
         cert = os.path.abspath(Config.get('monitor', 'cert'))
         if not os.path.isfile(cert) :
-             return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+             #return HttpResponse(json.dumps({'error' : '-1'}), content_type="application/json")
+             return {'error' : '-1', 'msg': 'check cert file at %s'%cert}
 
         if not Config.has_option('monitor', 'pkey') :
-             return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+             #return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+             return {'error' : '-2'}
 
         pkey = os.path.abspath(Config.get('monitor', 'pkey'))
         if not os.path.isfile(pkey) :
-             return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+             #return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
+             return {'error' : '-2'}
  
         server = SfaServerProxy(server_url, pkey, cert)
 
