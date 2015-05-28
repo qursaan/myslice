@@ -195,7 +195,7 @@ class UserView(LoginRequiredAutoLogoutView, ThemeView):
             for t in itertools.izip_longest(total_platform_list)]
 
         ## check pi or no
-        pi_status = request.session['user']['pi']
+        pi_status = self.request.session['user']['pi']
 
         context = super(UserView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list

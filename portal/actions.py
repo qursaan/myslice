@@ -392,7 +392,7 @@ def manifold_add_user(wsgi_request, request):
     if not results:
         raise Exception, "Failed creating manifold user: %s" % user_params['email']
     result = results[0]
-    return result['email']
+    return result['user_id']
 
 def manifold_update_user(request, email, user_params):
     # user_params: password, config e.g., 
@@ -1293,8 +1293,6 @@ def create_pending_user(wsgi_request, request, user_detail):
     }
     if request['private_key']:
         account_config['user_private_key'] = request['private_key']
-
-    user_id = user_detail['user_id'] + 1 # the user_id for the newly created user in local:user
 
     # XXX TODO: Require a myslice platform
     # ALERT: this will disapear with ROUTERV2 of Manifold
