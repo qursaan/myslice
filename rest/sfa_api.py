@@ -46,7 +46,7 @@ def dispatch(request, method):
         if el[0].startswith('rspec'):
             rspec += el[1]
         elif el[0].startswith('platform'):
-            platforms += req_items.getlist('platform[]')
+            platforms = req_items.getlist('platform[]')
         #elif el[0].startswith('options'):
         #    options += req_items.getlist('options[]')
         elif el[0].startswith('hrn'):
@@ -63,8 +63,7 @@ def dispatch(request, method):
         elif el[0].startswith('display'):
             display = el[1]
 
-    results = sfa_client(request, method, hrn, urn, object_type, recursive, options, platforms)
-    logger.debug(results)
+    results = sfa_client(request, method, hrn=hrn, urn=urn, object_type=object_type, recursive=recursive, options=options, platforms=platforms)
     if display == 'table':
         return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
     else:
@@ -90,7 +89,8 @@ def get_user_account(user_email, platform_name):
 def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None, recursive=None, options=None, platforms=None, admin=False):
 
     Config = ConfigParser.ConfigParser()
-    Config.read(os.getcwd() + "/myslice/myslice/monitor.ini")
+    monitor_file = os.path.abspath(os.path.dirname(__file__) + '/../myslice/monitor.ini')
+    Config.read(monitor_file)
 
     if admin:
         user_email, admin_password = config.manifold_admin_user_password()
@@ -225,10 +225,11 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                             dict_result = xmltodict.parse(result['value']['geni_rspec'])
 
                         result['json'] = json.dumps(dict_result)
-                        if isinstance(dict_result['rspec']['node'], list):
-                            columns.extend(dict_result['rspec']['node'][0].keys())
-                        else:
-                            columns.extend(dict_result['rspec']['node'].keys())
+                        if 'rspec' in dict_result and 'node' in dict_result['rspec']:
+                            if isinstance(dict_result['rspec']['node'], list):
+                                columns.extend(dict_result['rspec']['node'][0].keys())
+                            else:
+                                columns.extend(dict_result['rspec']['node'].keys())
 
                     elif method == 'Renew':
                         # Renew till 1 month from now
@@ -304,10 +305,11 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
             results[pf] = result
             if dict_result:
-                if isinstance(dict_result['rspec']['node'], list):
-                    data = data + dict_result['rspec']['node']
-                else:
-                    data.append(dict_result['rspec']['node'])
+                if 'rspec' in dict_result and 'node' in dict_result['rspec']:
+                    if isinstance(dict_result['rspec']['node'], list):
+                        data = data + dict_result['rspec']['node']
+                    else:
+                        data.append(dict_result['rspec']['node'])
         except Exception,e:
             import traceback
             logger.error(traceback.format_exc())

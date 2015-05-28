@@ -7,7 +7,8 @@ import ConfigParser
 
 def servicesStatus(request):
     Config = ConfigParser.ConfigParser()
-    Config.read(os.getcwd() + "/myslice/myslice/monitor.ini")
+    monitor_file = os.path.abspath(os.path.dirname(__file__) + '/../myslice/monitor.ini')
+    Config.read(monitor_file)
     
     result = {}
     
