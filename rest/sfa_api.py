@@ -204,7 +204,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                     if method == "ListResources":
                         result = server.ListResources([user_cred], api_options)
                         dict_result = xmltodict.parse(result['value'])
-                        result['json'] = json.dumps(dict_result)
+                        result['parsed'] = dict_result
                         if isinstance(dict_result['rspec']['node'], list):
                             columns.extend(dict_result['rspec']['node'][0].keys())
                         else:
@@ -224,7 +224,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                             result = server.Describe([urn] ,[object_cred], api_options)
                             dict_result = xmltodict.parse(result['value']['geni_rspec'])
 
-                        result['json'] = json.dumps(dict_result)
+                        result['parsed'] = dict_result
                         if 'rspec' in dict_result and 'node' in dict_result['rspec']:
                             if isinstance(dict_result['rspec']['node'], list):
                                 columns.extend(dict_result['rspec']['node'][0].keys())
