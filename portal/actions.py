@@ -84,7 +84,11 @@ def getAuthorities(request, admin = False):
     result = sfa_client(request,'List',hrn='onelab',object_type='authority',platforms=['myslice'],admin=admin)
     authorities = list()
     for item in result['myslice']:
-        authorities.append({'authority_hrn':item['hrn']})    
+        t_hrn = item['hrn'].split('.')
+        if 'name' in item:
+            authorities.append({'authority_hrn':item['hrn'], 'name':item['name'], 'shortname':t_hrn[-1].upper()})    
+        else:
+            authorities.append({'authority_hrn':item['hrn']})    
     return sorted(authorities)
 
 
