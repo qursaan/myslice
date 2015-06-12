@@ -130,7 +130,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
             raise Exception, "Provide urn OR hrn + type as parameters of method %s" % method
 
     if len(platforms)==0:
-        platforms = get_platforms()
+        platforms = get_platforms(request)
         #platforms.append('myslice')
     #results = {'method':method,'platforms':platforms,'rspec':rspec,'options':options}
 
@@ -143,7 +143,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     api_options['list_leases'] = 'all'
     server_am = False
     for pf in platforms:
-        platform = get_platform_config(pf)
+        platform = get_platform_config(request, pf)
         logger.debug("platform={}".format(platform))
         if 'sm' in platform and len(platform['sm']) > 0:
             logger.debug('sm')
@@ -326,7 +326,7 @@ def get_user_config(request, user_email, platform_name):
     account = get_user_account(request, user_email, platform_name)
     return json.loads(account['config']) if account['config'] else {}
 
-def get_platforms():
+def get_platforms(request):
     ret = list()
     platform_query  = Query().get('local:platform').filter_by('gateway_type', '==', 'sfa').filter_by('disabled','==',0).select('platform')
     platforms = execute_admin_query(request, platform_query)
@@ -335,8 +335,7 @@ def get_platforms():
         ret.append(p['platform'])
     return ret
 
-
-def get_platform_config(platform_name):
+def get_platform_config(request, platform_name):
     platform_query  = Query().get('local:platform').filter_by('platform', '==', platform_name).select('platform', 'config')
     platforms = execute_admin_query(request, platform_query)
 
