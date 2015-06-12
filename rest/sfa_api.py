@@ -14,9 +14,8 @@ from sfa.client.return_value    import ReturnValue
 from sfa.util.xrn               import Xrn, get_leaf, get_authority, hrn_to_urn, urn_to_hrn
 
 from manifold.core.query        import Query
-from manifold.models            import db
-from manifold.models.platform   import Platform
-from manifold.models.user       import User
+
+from manifoldapi.manifoldapi    import execute_admin_query
 
 from unfold.loginrequired       import LoginRequiredView
 
@@ -69,20 +68,25 @@ def dispatch(request, method):
     else:
         return HttpResponse(json.dumps(results, cls=MyEncoder), content_type="application/json")
 
-def get_user_account(user_email, platform_name):
+def get_user_account(request, user_email, platform_name):
     """
     Returns the user configuration for a given platform.
     This function does not resolve references.
     """
-    user = db.query(User).filter(User.email == user_email).one()
-    platform = db.query(Platform).filter(Platform.platform == platform_name).one()
-    accounts = [a for a in user.accounts if a.platform == platform]
+    user_query  = Query().get('local:user').filter_by('email', '==', user_email).select('user_id')
+    user_details = execute_admin_query(request, user_query)
+    platform_query  = Query().get('local:platform').filter_by('platform', '==', platform_name).select('platform_id')
+    platform_details = execute_admin_query(request, platform_query)
+
+    account_query  = Query().get('local:account').filter_by('platform_id','==',platform_details[0]['platform_id']).filter_by('user_id', '==', user_details[0]['user_id']).select('user_id','platform_id','auth_type','config')
+    accounts = execute_admin_query(request, account_query)
+
     if not accounts:
         raise Exception, "this account does not exist"
 
-    if accounts[0].auth_type == 'reference':
-        pf = json.loads(accounts[0].config)['reference_platform']
-        return get_user_account(user_email, pf)
+    if accounts[0]['auth_type'] == 'reference':
+        pf = json.loads(accounts[0]['config'])['reference_platform']
+        return get_user_account(request, user_email, pf)
 
     return accounts[0]
 
@@ -138,7 +142,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
     api_options['list_leases'] = 'all'
     server_am = False
-    from manifoldapi.manifoldapi    import execute_admin_query
     for pf in platforms:
         platform = get_platform_config(pf)
         logger.debug("platform={}".format(platform))
@@ -177,7 +180,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
         try:
             # Get user config from Manifold
-            user_config = get_user_config(user_email, pf)
+            user_config = get_user_config(request, user_email, pf)
             if 'delegated_user_credential' in user_config:
                 user_cred = user_config['delegated_user_credential']
             elif 'user_credential' in user_config:
@@ -319,21 +322,25 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     results['columns'] = columns
     return results
 
-def get_user_config(user_email, platform_name):
-    account = get_user_account(user_email, platform_name)
-    return json.loads(account.config) if account.config else {}
+def get_user_config(request, user_email, platform_name):
+    account = get_user_account(request, user_email, platform_name)
+    return json.loads(account['config']) if account['config'] else {}
 
 def get_platforms():
     ret = list()
-    platforms = db.query(Platform).filter(Platform.gateway_type == 'sfa', Platform.disabled == 0).all()
+    platform_query  = Query().get('local:platform').filter_by('gateway_type', '==', 'sfa').filter_by('disabled','==',0).select('platform')
+    platforms = execute_admin_query(request, platform_query)
+
     for p in platforms:
-        ret.append(p.platform)
+        ret.append(p['platform'])
     return ret
 
 
 def get_platform_config(platform_name):
-    platform = db.query(Platform).filter(Platform.platform == platform_name).one()
-    return json.loads(platform.config) if platform.config else {}
+    platform_query  = Query().get('local:platform').filter_by('platform', '==', platform_name).select('platform', 'config')
+    platforms = execute_admin_query(request, platform_query)
+
+    return json.loads(platforms[0]['config']) if platforms[0]['config'] else {}
 
 def filter_records(type, records):
     filtered_records = []
