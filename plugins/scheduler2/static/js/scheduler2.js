@@ -877,7 +877,6 @@ var SCHEDULER_COLWIDTH = 50;
                 var scope = self._get_scope();
 
                 var num_hidden_cells;
-
                 $("#DateToRes").datepicker({
                 	dateFormat: "D, d M yy",
                     onRender: function(date) {

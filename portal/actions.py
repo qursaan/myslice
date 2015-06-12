@@ -674,19 +674,17 @@ def portal_validate_request(wsgi_request, request_ids):
             elif request['type'] == 'authority':
                 #hrn = "%s.%s" % (request['authority_hrn'], request['site_authority'])
                 hrn = request['site_authority']
+                name = request['site_name']
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
                 
                 # Only hrn is required for Manifold Query 
                 sfa_authority_params = {
-                    'authority_hrn'        : hrn,
-                    #'authority_urn'        : urn,
-                    #'type'       : request['type'],
-                    #'pi'        : None,
-                    #'enabled'    : True
+                    'authority_hrn' : hrn,
+                    'name'          : name       
                 }
-                logger.info("ADD Authority")
+                #logger.info("ADD Authority")
                 sfa_add_authority(wsgi_request, sfa_authority_params)
                 request_status['SFA authority'] = {'status': True }
                 a = PendingAuthority.objects.get(id=request['id'])
