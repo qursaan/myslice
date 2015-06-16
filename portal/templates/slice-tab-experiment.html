@@ -1,62 +1,33 @@
-<div class="col-md-10 col-md-offset-1">
 <script type="text/javascript">
-    $(document).ready(function() {
-        console.log('{{platforms}}');
-	    {% for platform in platforms %}
-        // /sfa/Describe?hrn=onelab.upmc.projectx.slicex&platform[]={{platform}}&type=slice
-        $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
-            if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
-                rspec = data['{{platform}}']['parsed']['rspec'];
-                if('node' in rspec){
+// Specific DIVs for each type of testbed
+$(document).ready(function() {
+    console.log('{{platforms}}');
+    {% for platform in platforms %}
+    // /sfa/Describe?hrn=onelab.upmc.projectx.slicex&platform[]={{platform}}&type=slice
+    $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
+        console.log(data);
+        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
+            rspec = data['{{platform}}']['parsed']['rspec'];
+            console.log(rspec);
+            if('node' in rspec){
+                if(rspec['node'] instanceof Array) {
                     jQuery.each( rspec['node'], function( i, node ) {
                         render_node('{{platform}}',node);
                     });
+                }else{
+                    render_node('{{platform}}',rspec['node']);
                 }
             }
-        });
-	    {% endfor %}
+        }
     });
-    
-    function render_node(platform, node){
-        console.log(platform,node);
-        if('@component_manager_id' in node){
-            // urn:publicid:IDN+ple+authority+cm
-            t_urn = node['@component_manager_id'].split('+');
-            //if(t_urn[1].indexOf(":") > -1)
-            testbed = t_urn[1];
-            if(!$('#'+testbed).length){
-                testbed = 'default';
-            }
-        }else{
-            testbed = 'default';
-        }
-        if('services' in node && 'login' in node['services']){
-            console.log(node['services']['login']);
-            login = node['services']['login'];
-            if('@port' in login && login['@port']!='22'){
-                $('#'+testbed).append("<p class='command'>$ ssh "+login['@username']+"@"+login['@hostname']+" -p "+login['@port']+"</p>");
-            }else{
-                $('#'+testbed).append("<p class='command'>$ ssh "+login['@username']+"@"+login['@hostname']+"</p>");
-            }
-	
-        }else if('@component_name' in node){
-            console.log(node['@component_name']);
-        }else{
-            console.log(node);
-        }
-        $("#access").show();
-
-        $('#'+testbed).show();
-        if($('#'+testbed+'_header').length){
-            $('#'+testbed+'_header').show();
-        }
-        if($('#'+testbed+'_footer').length){
-            $('#'+testbed+'_footer').show();
-        }
-    }
+    {% endfor %}
+});
 </script>
-<div id="access" style="display:none;">
+
+<div class="col-md-10 col-md-offset-1">
+<div id="access">
     <h2>How to access your reserved resources</h2>
+    <img src="{{ STATIC_URL }}img/loading.gif" id="loading" alt="Loading reserved resources" />
 </div>
 <div id="default">
 </div>
@@ -147,46 +118,11 @@
 	 You will find the ssh commands to connect to NITOS nodes below:
 	</p>
 	<h4>NITLab</h4>
-	<p class="command">
-	    $ ssh {{slicename}}@nitlab.inf.uth.gr #nodes 001-040<br>
-        $ ssh {{slicename}}@nitlab2.inf.uth.gr #nodes 041-049<br>
-        $ ssh {{slicename}}@nitlab3.inf.uth.gr #nodes > 049
-    </p>
 </div>
 <div id="nitos" style="display:none;">
-	<p>Loading an OMF-compatible image on your resource:</p>
-	<p class="command">
-		<b>Resource</b><br>
-        $ omf6 stat -t {{resource}} #check the status of the node<br>
-        $ omf6 tell -a on -t {{resource}}  #turn on/off the node <br>
-    	$ omf6 load -i baseline.ndz -t {{resource}}  #for orbit-like node (002-009) use "baseline_orbit.ndz"<br>
-	</p>
 </div>
 <div id="nitos_footer" style="display:none;">
     <p><b>NOTE:</b> Nodes 002-009 are orbit-like nodes. For these nodes use "baseline_orbit.ndz". All these images come with OMF5.4 resource controller. To do OMF6 experiments use "baseline_omf6_1_1.ndz" and  "baseline_orbit_omf6_1_1.ndz" for grid nodes and orbit nodes respectively. </p>
-</div>
-	{% if nitos_paris_resources %}
-	<h4>FIT NITOS-Lab Paris</h4>
-	 <p class="command">
- 		$ ssh {{slicename}}@griffin.ipv6.lip6.fr
-	 </p>
-	<p>For each of the reserved nodes, follo the steps given below:</p>
-	<p class="command">
-	{%for resource in nitos_paris_resources %}
-		<b>Resource</b><br>
-    	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
-    	$ omf tell -a on -t {{resource}}  #turn on the node <br>
-    	$ ssh root@{{resource}}  #ssh to the node<br><br>
-	{%endfor%}
-	</p>
-
-	<p>
-		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
-		restart the OMF Resource Controller and finally execute the experiment:
-	</p>
-	<p class="command">
-		$ omf exec --slice {{slicename}} your_exp.rb
-	</p>
 	<p>
 	The complete tutorial on NITOS nodes:
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
@@ -194,8 +130,30 @@
     <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
 	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
 
-	{% endif %}
-	
+</div>
+
+<div id="paris.fit-nitos.fr_header" style="display:none;">
+	<h4>FIT NITOS-Lab Paris</h4>
+</div>
+<div id="paris.fit-nitos.fr" style="display:none;">
+</div>
+<div id="paris.fit-nitos.fr_footer" style="display:none;">
+	<p>
+		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
+		restart the OMF Resource Controller and finally execute the experiment:
+	</p>
+	<p class="command">
+		$ omf exec --slice {{slicename}} your_exp.rb
+	</p>
+
+	<p>
+	The complete tutorial on NITOS nodes:
+	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
+	</p>
+    <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
+	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
+</div>
+<div style="padding-top:20px;">	
 	<h2>Available Tools</h2>
 	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"> <b>SSH</b></p>
 	<p>
@@ -220,4 +178,5 @@
 	</p>
 	<p>In addition to the main OMF software, this site also hosts OMF sub-projects addressing various related aspects of a testbed's control, measurement, and management.</p>
 	<p>More Info: <a href="http://mytestbed.net/projects/omf" target="_blank">http://mytestbed.net/projects/omf</a></p>
+</div>
 </div>

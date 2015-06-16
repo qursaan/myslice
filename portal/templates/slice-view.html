@@ -1,26 +1,19 @@
 {% extends "layout_wide.html" %}
-{% load portal_filters %}
 
 {% block head %}
-
+<script type="text/javascript" src="{{STATIC_URL}}/js/experiment.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			{% widget "_widget-slice-sections.html" %}
-	    </div>
-	</div>
-</div>
+{% include theme|add:"_widget-slice-sections.html" %}
 <div class="container-fluid tab-content">
-  <div class="tab-pane active row" id="info"></div>
-  <div class="tab-pane row" id="testbeds"></div>
-  <div class="tab-pane row" id="resources"></div>
+  <!-- <div class="tab-pane row" id="testbeds"></div> -->
+  <div class="tab-pane active row" id="resources"></div>
   <div class="tab-pane row" id="users"></div>
+  <div class="tab-pane row" id="info"></div>
   <!-- <div class="tab-pane row" id="statistics">...</div> -->
-  <div class="tab-pane row" id="measurements"></div>
+  <!-- <div class="tab-pane row" id="measurements"></div> -->
   <div class="tab-pane row" id="experiment"></div>
-  <div class="tab-pane row" id="sla"></div>
+  <!-- <div class="tab-pane row" id="sla"></div> -->
 </div> 	
 {% endblock %}
