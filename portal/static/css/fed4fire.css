@@ -754,6 +754,7 @@ div.experiment-tools button {
     padding:7px 10px 4px 0;
     color:white;
     vertical-align:middle;
+    height: 35px;
 }
 
 div.experiment-tools button span {
