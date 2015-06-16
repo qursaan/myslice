@@ -1,25 +1,39 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			 <div class="breadcrumbs">
+			 	 Experiment &nbsp;>&nbsp; Slice: {{ slice }}
+			 </div>
+		</div>
+	</div>
+</div>
+<div class="container-fluid container-slice">
+<div class="row">
+		<div class="col-md-12">
 {% if section == "resources" %}
 <ul class="nav nav-tabs nav-section">
-	<li><a href="/slice/{{ slice }}#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
-	<li><a href="/slice/{{ slice }}#testbeds">Testbeds</a></li>
+	
+	<!-- <li><a href="/slice/{{ slice }}#testbeds">Testbeds</a></li> -->
 	<li class="active"><a class="link" href="/resources/{{ slice }}">Resources</a></li>
 	<li><a href="/slice/{{ slice }}#users">Users</a></li>
-	<li><a href="/slice/{{ slice }}#statistics">Statistics</a></li>
-	<li><a href="/slice/{{ slice }}#measurements">Measurements</a></li>
-	<li><a href="/slice/{{ slice }}#experiment" data-toggle="tab">Experiment</a></li>
-	<li><a href="/slice/{{ slice }}#sla">SLA</a></li>
+	<li><a href="/slice/{{ slice }}#info">Information</a></li>
+	<!-- <li><a href="/slice/{{ slice }}#experiment">Statistics</a></li> -->
+	<!-- <li><a href="/slice/{{ slice }}#measurements">Measurements</a></li> -->
+	<li><a href="/slice/{{ slice }}#experiment">Tools</a></li>
+	<!-- <li><a href="/slice/{{ slice }}#studentslabs">Students Labs</a></li> -->
 </ul>
 {% else %}
 <ul class="nav nav-tabs nav-section">
-	<li class="active"><a href="#info"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About MySlice" /> {{ slice }}</a></li>
-	<li class="testbeds"><a href="#testbeds">Testbeds</a></li>
+	<!-- <li class="testbeds"><a href="#testbeds">Testbeds</a></li> -->
 	<li><a class="link" href="/resources/{{ slice }}">Resources</a></li>
 	<li class="users"><a href="#users">Users</a></li>
-	<li class="statistics"><a href="#statistics">Statistics</a></li>
-	<li class="measurements"><a href="#measurements">Measurements</a></li>
-	<li class="experiment"><a href="#experiment" data-toggle="tab">Experiment</a></li>
-	<li class="sla"><a href="#sla" data-toggle="tab">SLA</a></li>
+	<li class="active"><a href="#info">Information</a></li>
+	<!-- <li class="statistics"><a href="#experiment">Statistics</a></li> -->
+	<!-- <li class="measurements"><a href="#measurements">Measurements</a></li> -->
+	<li class="experiment"><a href="#experiment">Tools</a></li>
+	<!-- <li class="studentslabs"><a href="#studentslabs">Students Labs</a></li> -->
 </ul>
+
 <script>
 $(document).ready(function() {
 	$('.nav-tabs a').click(function (e) {
@@ -29,7 +43,16 @@ $(document).ready(function() {
     	var id = $(this).attr('href').substr(1);    	
     	$("#" + id).load('/' + id + '/{{ slice }}/');
 	});
-	$('div#info').load('/info/{{ slice }}/');
+	
+	var hash = window.location.hash;
+	if (hash) {
+		$('.nav-tabs a[href='+hash+']').click();
+	} else {
+		$('div#info').load('/info/{{ slice }}/');
+	}
 });
 </script>
 {% endif %}
+</div>
+</div>
+</div>

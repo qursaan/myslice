@@ -1,12 +1,12 @@
 {% extends "layout_wide.html" %}
+{% load portal_filters %}
 
 {% block head %}
 <script type="text/javascript" src="{{STATIC_URL}}/js/experiment.js"></script>
 {% endblock %}
 
+{% widget "_widget-slice-sections.html" %}
 {% block content %}
-{% include theme|add:"_widget-slice-sections.html" %}
-	  
 <div class="container-fluid tab-content container-slice">
   <!-- <div class="tab-pane row" id="testbeds">...</div> -->
   <div class="tab-pane active row" id="resources">...</div>
