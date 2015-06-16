@@ -206,6 +206,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                 if server_am:
                     if method == "ListResources":
                         result = server.ListResources([user_cred], api_options)
+                        logger.debug(result)
                         dict_result = xmltodict.parse(result['value'])
                         result['parsed'] = dict_result
                         if isinstance(dict_result['rspec']['node'], list):
@@ -242,28 +243,35 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                     elif method == 'Delete':
                         result = server.Delete([urn] ,[object_cred], api_options)
                     elif method == 'Allocate':
-                        # if GetVersion = v2
-                        # CreateSliver(slice_hrn)
-                        # else GetVersion = v3
                         api_options['call_id']    = unique_call_id()
                         # List of users comes from the Registry
                         api_options['sfa_users']  = sfa_users
                         api_options['geni_users'] = geni_users
-                        result = server.Allocate([urn] ,[object_cred], rspec, api_options)
+                        # if GetVersion = v2
+                        version = server.GetVersion()
+                        if version['geni_api'] == 2:
+                            result = server.CreateSliver([urn] ,[object_cred], rspec, api_options)
+                        # else GetVersion = v3
+                        else:
+                            result = server.Allocate([urn] ,[object_cred], rspec, api_options)
                     elif method == 'Provision':
                         # if GetVersion = v2
                         # Nothing it is not supported by v2 AMs
-                        api_options['call_id']    = unique_call_id()
-                        # List of users comes from the Registry
-                        api_options['sfa_users']  = sfa_users
-                        api_options['geni_users'] = geni_users
-                        result = server.Provision([urn] ,[object_cred], api_options)
+                        version = server.GetVersion()
+                        if version['geni_api'] == 3:
+                            api_options['call_id']    = unique_call_id()
+                            # List of users comes from the Registry
+                            api_options['sfa_users']  = sfa_users
+                            api_options['geni_users'] = geni_users
+                            result = server.Provision([urn] ,[object_cred], api_options)
                     elif method == 'Status':
                         result = server.Status([urn] ,[object_cred], api_options)
                     elif method == 'PerformOperationalAction':
                         # if GetVersion = v2
                         # Nothing it is not supported by v2 AMs
-                        result = server.PerformOperationalAction([urn] ,[object_cred], action, api_options)
+                        version = server.GetVersion()
+                        if version['geni_api'] == 3:
+                            result = server.PerformOperationalAction([urn] ,[object_cred], action, api_options)
                     elif method == 'Shutdown':
                         result = server.Shutdown(urn ,[object_cred], api_options)
                     else:
