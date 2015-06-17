@@ -84,12 +84,15 @@ def getAuthorities(request, admin = False):
     # XXX theme has to be the same as the root authority 
     result = sfa_client(request,'List',hrn=theme.theme,object_type='authority',platforms=['myslice'],admin=admin)
     authorities = list()
-    for item in result['myslice']:
-        t_hrn = item['hrn'].split('.')
-        if 'name' in item:
-            authorities.append({'authority_hrn':item['hrn'], 'name':item['name'], 'shortname':t_hrn[-1].upper()})    
-        else:
-            authorities.append({'authority_hrn':item['hrn']})    
+    try:
+        for item in result['myslice']:
+            t_hrn = item['hrn'].split('.')
+            if 'name' in item:
+                authorities.append({'authority_hrn':item['hrn'], 'name':item['name'], 'shortname':t_hrn[-1].upper()})    
+            else:
+                authorities.append({'authority_hrn':item['hrn']})    
+    except:
+        logger.error(result)
     return sorted(authorities)
 
 
