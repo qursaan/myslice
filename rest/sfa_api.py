@@ -226,7 +226,9 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                         # else GetVersion = v3
                         else:
                             result = server.Describe([urn] ,[object_cred], api_options)
-                            dict_result = xmltodict.parse(result['value']['geni_rspec'])
+                            if isinstance(result, dict):
+                                if result['value'] != 0:
+                                    dict_result = xmltodict.parse(result['value']['geni_rspec'])
 
                         result['parsed'] = dict_result
                         if 'rspec' in dict_result and 'node' in dict_result['rspec']:
