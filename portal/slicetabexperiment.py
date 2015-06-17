@@ -34,6 +34,7 @@ class ExperimentView (FreeAccessView, ThemeView):
         pf_query = Query().get('local:platform').filter_by('disabled', '==', '0').filter_by('gateway_type', '==', 'sfa').select('platform')
         res_platforms = execute_query(request, pf_query)
         platforms = [p['platform'] for p in res_platforms]
+        len_platforms = len(platforms)
         #query_current_resources = Query.get('slice').select('resource','parent_authority').filter_by('slice_hrn','==',slicename)
         #current_resources = execute_query(request, query_current_resources)
 
@@ -107,6 +108,7 @@ class ExperimentView (FreeAccessView, ThemeView):
         env = { 'theme' : self.theme,
                 'slicename':slicename, 
                 'platforms':platforms,
+                'len_platforms': len_platforms,
                 #'ple_slicename':ple_slicename, 
                 #'username':username, 
                 #'ple_resources':ple_resource_list, 
