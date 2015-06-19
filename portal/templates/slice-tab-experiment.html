@@ -11,14 +11,11 @@ function is_finished(len_platforms, pf_status){
 $(document).ready(function() {
     var platform_status = Array();
     var platform_empty = Array();
-    console.log('{{platforms}}');
     {% for platform in platforms %}
     // /sfa/Describe?hrn=onelab.upmc.projectx.slicex&platform[]={{platform}}&type=slice
     $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
-        console.log(data);
         if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
             rspec = data['{{platform}}']['parsed']['rspec'];
-            console.log(rspec);
             if('node' in rspec){
                 if(rspec['node'] instanceof Array) {
                     jQuery.each( rspec['node'], function( i, node ) {
@@ -27,6 +24,8 @@ $(document).ready(function() {
                 }else{
                     render_node('{{platform}}',rspec['node']);
                 }
+            }else{
+                platform_empty.push('{{platform}}');
             }
         }else{
             platform_empty.push('{{platform}}');
@@ -34,7 +33,7 @@ $(document).ready(function() {
         platform_status.push('{{platform}}');
         if(is_finished({{len_platforms}},platform_status.length)){
             $("#loading").hide();
-            if(platform_empty.length > 0){
+            if(platform_empty.length == {{len_platforms}}){
                 $("#warning_message").show();
             }
         }
@@ -42,7 +41,6 @@ $(document).ready(function() {
     {% endfor %}
 });
 </script>
-
 <div class="col-md-10 col-md-offset-1">
 <div id="access">
     <h2>How to access your reserved resources?</h2>
@@ -91,15 +89,12 @@ Please add resources to your slice from the left tab <a href="/resources/{{slice
     <script type="text/javascript">
     $(document).ready(function() {
         $.post("/initscript/get/",{'slice_hrn':'{{slicename}}'}, function( data ) {
-            console.log(data);
             jQuery('#initscript_code').val(data['initscript_code']);
         });
     });
     function deploy(slice_hrn){
-        console.log("deploy = "+slice_hrn);
         var initscript_code = jQuery('#initscript_code').val()
         $.post("/initscript/update/",{'slice_hrn':slice_hrn, 'initscript_code':initscript_code}, function( data ) {
-            console.log(data);
             if (data['ret'] == 0) {
                 mysliceAlert('Success: initscript deployed','success', true);
             }else{
@@ -109,9 +104,7 @@ Please add resources to your slice from the left tab <a href="/resources/{{slice
         });
     }
     function del(slice_hrn){
-        console.log("delete");
         $.post("/initscript/delete/",{'slice_hrn':slice_hrn}, function( data ) {
-            console.log(data);
             if (data['ret'] == 0) {
                 mysliceAlert('Success: initscript deleted','success', true);
                 jQuery('#initscript_code').val('');
@@ -175,8 +168,8 @@ Please add resources to your slice from the left tab <a href="/resources/{{slice
 	</p>
 
 	<p>
-	The complete tutorial on NITOS nodes:
-	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
+	The complete tutorial on FIT NITOS nodes:
+	<a target="_blank" href="http://doc.onelab.eu/nitos.html">basic tutorial</a>
 	</p>
     <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
 	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>

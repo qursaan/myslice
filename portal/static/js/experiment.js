@@ -1,5 +1,5 @@
 function render_node(platform, node){
-    console.log(platform,node);
+    //console.log(platform,node);
     nitos = false;
     if('@component_manager_id' in node){
         // urn:publicid:IDN+ple+authority+cm
@@ -23,7 +23,7 @@ function render_node(platform, node){
     elm = document.getElementById(testbed);
     newElement = document.createElement('p');
     if('services' in node && 'login' in node['services']){
-        console.log(node['services']['login']);
+        //console.log(node['services']['login']);
         login = node['services']['login'];
         // TODO: Check if this login info has already been printed or not
         // Ex: IoT-Lab 1 ssh gateway per site, but info is per node in the RSpec
