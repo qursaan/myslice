@@ -164,7 +164,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
             $('table.dataTable').delegate('a.resource-info','click',function() {
                 var aPos = sTable.fnGetPosition( this.parentNode );
                 var aData = sTable.fnGetData( aPos[0] );
-                //console.log(aData);
+                console.log(aData);
 
                 var index = {}
                 // XXX Loic @ Hardcoded !!! Maybe a loop over all fields would be better 
@@ -206,16 +206,17 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 } else {
                     var logo = resourceData['testbed'];
                     var resourceLocation = {
-                        'longitude' : aData[13],
-                        'latitude' : aData[23],
+                        'longitude' : aData[20],
+                        'latitude' : aData[17],
                     };
                     var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
+                    console.log(coordinates);
                 }
                 
                 var modal = $('#resource-info-modal');
                 modal.find('.modal-title').text(resourceData['testbed'] + ': ' +resourceData['hostname']);
                 table = modal.find('.modal-resource-info');
-                table.html('<tr><td colspan="2"><img class="img-responsive" src="/static/img/testbeds/'+logo+'.png" alt="'+resourceData['facility']+' - '+resourceData['testbed']+'" /></td></tr>');
+                table.html('<tr><td colspan="2"><center><img class="img-responsive" src="/static/img/testbeds/'+logo+'.png" alt="'+resourceData['facility']+' - '+resourceData['testbed']+'" /></center></td></tr>');
                 for (var j in resourceData) {
                     table.append('<tr><td>' + j + '</td><td>' + resourceData[j] + '</td></tr>');
                 }

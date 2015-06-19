@@ -6,12 +6,10 @@
     <div class="col-md-12" style="height:30px">
         <div id="asap_msg">&nbsp;</div>
     </div>
-    <div class="col-md-2">From: <input type="text" value="Now" disabled style="min-width: 10px !important; width: 50px;"></div>
-    <div class="col-md-4">To: <input id="DateAsap" type="text" placeholder="Reservation Date">
-        <span class="glyphicon glyphicon-calendar" style="position:absolute;margin-left:-20px;margin-top:4px;"></span>
-        <input type="number" id="hours" name="hours" size="2" style="width: 42px; min-width: 10px !important; margin-right: 2px; text-align: center;" placeholder="HH" min="00" max="23">:<input type="number" id="minutes" name="minutes"  size="2" style="width: 42px; min-width: 10px !important; margin-left: 2px; text-align: center;" placeholder="MM" min="00" max="59">
+    <div class="col-md-3"> As soon as possible for 
+        <input type="number" id="duration" name="duration"  size="3" style="width: 42px; min-width: 10px !important; margin-left: 2px; text-align: center;" min="1"> minutes
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <button id="asap_schedule" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-time"></span> Schedule</button>
     </div>
     <div class="col-md-10" id="resources" style="padding-top:20px;"></div>

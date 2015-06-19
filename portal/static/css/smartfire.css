@@ -26,3 +26,9 @@ div.home {
     background-image: url('../img/bg-smartfire.png');
     background-color:#FFFFFF;
 }
+div.slogan {
+    text-align:center;
+    color:white;
+    padding-top:60px;
+    text-shadow: 1px 1px #013540;
+}

@@ -19,19 +19,7 @@ body {
     height: 100%;
     letter-spacing:0.3px;
 }
-a, a:active, a:focus {
-    outline: 0;
-    text-decoration:none;
-    color:#760073;
-}
-a:hover {
-    color:#0D0049;
-}
 
-a.current {
-    text-decoration:underline;
-    color:#333333;
-}
 p.command {
     padding:15px;
     margin:15px 0;
@@ -766,11 +754,6 @@ div.home {
     line-height:1.2em;
     letter-spacing:0.3pt;
     min-height:500px;
-    background-image: url('../img/bg-experiment.jpg');
-    background-repeat:no-repeat;
-    background-size:cover;
-    background-position:center top;
-    background-color:#086274;
     padding:100px 0;
 }
 div.home h2 {
@@ -881,49 +864,6 @@ div.registration-form {
 .login-submit {
     vertical-align:middle;
     padding:0;
-}
-.lost-password {
-    font-size:10pt;
-    color:black;
-    text-align:right;
-    padding:0px;
-}
-.lost-password a {
-    color:white;
-    text-shadow:0.5px 0.5px black;
-}
-.login-signup {
-    font-size:12pt;
-    color:white;
-    text-shadow:0.5px 0.5px black;
-    margin-top:45px;
-    padding:5px 0 0 4px;
-    
-}
-.login-signup a {
-    color:white;
-    text-shadow:0.5px 0.5px black;
-    padding-bottom:2px;
-    border-bottom:2pt solid white;
-}
-.login-signup a:hover {
-    text-decoration:none;
-}
-.login-signup button {
-    padding:8px;
-    border:0;
-    border-bottom:2px solid #540086;
-    background-color:#302562;
-    color:white;
-    width:100px;
-    border-radius:5px;
-    font-size:12pt;
-}
-div.slogan {
-    text-align:center;
-    color:white;
-    padding-top:60px;
-    text-shadow: 1px 1px #013540;
 }
 
 th {

@@ -36,6 +36,14 @@ h4 {
     letter-spacing:0.6pt;
     color:#201E62;
 }
+div.slogan {
+    margin-left: 0px;
+}
+div.login-widget{
+    width:400px; 
+    top:16px; 
+    float:left;
+}
 label {
     font-weight:normal;
     font-size:13px;
@@ -746,6 +754,7 @@ div.experiment-tools button {
     padding:7px 10px 4px 0;
     color:white;
     vertical-align:middle;
+    height: 35px;
 }
 
 div.experiment-tools button span {

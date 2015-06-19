@@ -50,7 +50,7 @@ var AsapDateSelected = new Date();
         /* PLUGIN EVENTS */
         // on_show like in querytable
 
-        remove(id) {
+        remove: function(id) {
             return (elem=document.getElementById(id)).parentNode.removeChild(elem);
         },
         /* GUI EVENTS */
@@ -60,17 +60,14 @@ var AsapDateSelected = new Date();
         _initUI: function() 
         {
             var self = this;
+
+            /*
             dateToday = new Date();
 
             $("#DateAsap").datepicker({
             	//dateFormat: "D, d M yy",
                 minDate: dateToday,
                 defaultDate: dateToday,
-                /*
-                onRender: function(date) {
-                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
-                },
-                */
             }).on('changeDate', function(ev) {
                 if(ev.date < dateToday){
                     $("#asap_msg").show();
@@ -82,43 +79,32 @@ var AsapDateSelected = new Date();
                     AsapDateSelected = ev.date;
                 }
             }).datepicker('setValue', AsapDateSelected);
-            /*
-            .on('changeDate', function(ev) {
-                AsapDateSelected = new Date(ev.date);
-                AsapDateSelected.setHours(0,0,0,0);
-                // Set slider to origin
-                //$('#tblSlider').slider('setValue', 0); // XXX
-                // Refresh leases
-                self._scope_clear_leases();
-                self._set_all_lease_slots();
-                // Refresh display
-                self._get_scope().$apply();
-            }).datepicker('setValue', AsapDateSelected); //.data('datepicker');
             */
             $("#asap_schedule").click(function() {
-                dateNow = new Date();
                 r = document.getElementById("resources");
                 if(r.childNodes.length == 0){
                     $("#asap_msg").show();
                     $("#asap_msg").css("color","orange");
-                    $("#asap_msg").html("Please select at least one resource");
+                    $("#asap_msg").html("Please select at least one IoTLab resource");
                     $("#asap_msg").fadeOut(4000);
                 }else{
                     start_time = 0;
-                    hours = $("#hours").val();
-                    minutes = $("#minutes").val();
-                    AsapDateSelected.setHours(hours,minutes,0,0);
-                    if(AsapDateSelected <= dateNow){
+                    duration = $("#duration").val();
+                    if(!parseInt(duration)){
                         $("#asap_msg").show();
                         $("#asap_msg").css("color","red");
-                        $("#asap_msg").html("Please select a correct end time");
+                        $("#asap_msg").html("Please set the duration with a number");
                         $("#asap_msg").fadeOut(4000);
                     }else{
-                        $.each(r.childNodes, function(i, el){
+                        elements = r.childNodes;
+                        // length of elements changes during loop as we remove elements one by one
+                        var size = elements.length;
+                        for (i = 0; i < size; i++) { 
+                            // lets take the first element
+                            el = elements[0];
                             t_id = el.id.split("_");
-                            console.log(t_id[1]);
-                            self.send_lease(t_id[1], start_time, AsapDateSelected);
-                        });
+                            self.send_lease(t_id[1], String(start_time), duration);
+                        }
                     }
                 }
             });
@@ -126,7 +112,7 @@ var AsapDateSelected = new Date();
 
         // a function to bind events here: click change
         // how to raise manifold events
-        send_lease: function(resource_urn, start_time, end_time)
+        send_lease: function(resource_urn, start_time, duration)
         {
             var lease_key, new_lease, data;
 
@@ -135,7 +121,8 @@ var AsapDateSelected = new Date();
             new_lease = {
                 resource:   resource_urn,
                 start_time: start_time,
-                end_time:   end_time.getTime()/1000,
+                duration: duration,
+                //end_time:   end_time.getTime()/1000,
             };
 
             // This is needed to create a hashable object
@@ -188,29 +175,40 @@ var AsapDateSelected = new Date();
         
         on_resources_field_state_changed: function(record)
         {
-            console.log("on_resources_field_state_changed ---- ");
-            console.log(record);
-            if(record['op']==2){
-                var elm = document.createElement('div');
-                elm.innerHTML = record['value'];
-                elm.id = "asap_"+record['value'];
-                r = document.getElementById("resources");
-                r.appendChild(elm);
-            }else if(record['op']==1){
-                this.remove("asap_"+record['value']);
+            if(record["op"] != null){
+                resource = manifold.query_store.get_record(this.options.query_uuid,record['value']);
+                console.log(resource);
+                // TODO: Define which facilities support ASAP
+                if(resource["authority_id"]=="iotlab"){
+                    // TODO: use filters Pending or Unconfigured
+                    if(record['op']==2){
+                        var elm = document.createElement('div');
+                        elm.innerHTML = record['value'];
+                        elm.id = "asap_"+record['value'];
+                        r = document.getElementById("resources");
+                        r.appendChild(elm);
+                    }else if(record['op']==1){
+                        this.remove("asap_"+record['value']);
+                    }
+                }
             }
         },
         on_leases_field_state_changed: function(record)
         {
-            console.log(record);
-            if(record['op']==2){
-                this.remove("asap_"+record['value']['resource']);
-            }else if(record['op']==1){
-                var elm = document.createElement('div');
-                elm.innerHTML = record['value']['resource'];
-                elm.id = "asap_"+record['value']['resource'];
-                r = document.getElementById("resources");
-                r.appendChild(elm);
+            resource = manifold.query_store.get_record(this.options.query_uuid,record['value']['resource']);
+            console.log(resource);
+            // TODO: Define which facilities support ASAP
+            if(resource["authority_id"]=="iotlab"){
+                // TODO: use filters Pending or Unconfigured
+                if(record['op']==2){
+                    this.remove("asap_"+record['value']['resource']);
+                }else if(record['op']==1){
+                    var elm = document.createElement('div');
+                    elm.innerHTML = record['value']['resource'];
+                    elm.id = "asap_"+record['value']['resource'];
+                    r = document.getElementById("resources");
+                    r.appendChild(elm);
+                }
             }
         },
 
