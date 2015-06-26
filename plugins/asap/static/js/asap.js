@@ -50,7 +50,7 @@ var AsapDateSelected = new Date();
         /* PLUGIN EVENTS */
         // on_show like in querytable
 
-        remove(id) {
+        remove: function(id) {
             return (elem=document.getElementById(id)).parentNode.removeChild(elem);
         },
         /* GUI EVENTS */
