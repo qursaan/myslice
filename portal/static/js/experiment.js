@@ -44,8 +44,8 @@ function render_node(platform, node){
         newElement = document.createElement('p');
         var commands = "$ omf stat -t "+node['@component_name']+" # check the status of the node <br>"; 
         commands += "$ omf tell -a on -t "+node['@component_name']+" # turn on the node <br>";
-        commands += "$ omf load -i baseline_grid.nzb -t "+node['@component_name']+" # loading OMF image on the node <br>";
-        commands += "$ omf root@"+node['@component_name']+" # ssh to the node";
+        commands += "$ omf load -i baseline.ndz -t "+node['@component_name']+" # loading OMF image on the node <br>";
+        commands += "$ ssh root@"+node['@component_name']+" # ssh to the node";
 
         newElement.innerHTML = "<p class='command'>"+commands+"</p>";
         elm.appendChild(newElement); 
