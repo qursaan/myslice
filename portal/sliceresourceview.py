@@ -245,14 +245,14 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         # Select an end_time for all unconfigured resources
         # start_time is as soon as possible
 
-        resources_as_asap = AsapPlugin( 
-            page       = page,
-            domid      = 'asap',
-            title      = 'Asap',
-            # this is the query at the core of the slice list
-            query = sq_resource,
-            query_lease = sq_lease,
-        )
+        #resources_as_asap = AsapPlugin( 
+        #    page       = page,
+        #    domid      = 'asap',
+        #    title      = 'Asap',
+        #    # this is the query at the core of the slice list
+        #    query = sq_resource,
+        #    query_lease = sq_lease,
+        #)
 
         # --------------------------------------------------------------------------
         # QueryUpdater (Pending Operations)
@@ -444,7 +444,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
-        template_env['asap'] = resources_as_asap.render(self.request)
+        #template_env['asap'] = resources_as_asap.render(self.request)
 
         # Bristol plugin
        # template_env['welcome'] = univbriswelcome.render(self.request)
