@@ -6,19 +6,27 @@
      style='display: inline-block !important; font-size: inherit;' 
      id="{{ domid }}__all" 
      data-status="all"
+	 title="View all resources."
+	 rel='tooltip'>
+  	All
+  </a>
+  <a href="#" 
+     class="list-group-item sl-resources" 
+     style='display: inline-block !important; font-size: inherit;' 
+     id="{{ domid }}__available" 
+     data-status="available"
 	 title="View resources that are available to be reserved."
 	 rel='tooltip'>
   	Available
   </a>
-  
-  <a href="#"
+   <a href="#" 
      class="list-group-item sl-resources" 
      style='display: inline-block !important; font-size: inherit;' 
-     id="{{ domid }}__reserved" 
-     data-status="reserved"
-     title="View resources that you have previously reserved for the slice."
+     id="{{ domid }}__unavailable" 
+     data-status="unavailable"
+	 title="View resources that are NOT available to be reserved."
 	 rel='tooltip'>
-  	Reserved
+  	Unavailable
   </a>
   
   <a href="#" class="list-group-item sl-resources"
@@ -40,4 +48,15 @@
   	Pending
   	<span class="badge" id="badge-pending" style="display:none;"></span>
   </a>
+ 
+  <a href="#"
+     class="list-group-item sl-resources" 
+     style='display: inline-block !important; font-size: inherit;' 
+     id="{{ domid }}__reserved" 
+     data-status="reserved"
+     title="View resources that you have previously reserved for the slice."
+	 rel='tooltip'>
+  	Reserved
+  </a>
+
 </div> 

@@ -174,14 +174,16 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 index['hostname'] = self.getColIndex('hostname',cols);
                 index['urn'] = self.getColIndex('urn',cols);
                 index['type'] = self.getColIndex('type',cols);
-                index['status'] = self.getColIndex('boot_state',cols);
+                //index['status'] = self.getColIndex('boot_state',cols);
+                index['available'] = self.getColIndex('available',cols);
                 index['testbed'] = self.getColIndex('testbed_name',cols);
                 index['facility'] = self.getColIndex('facility_name',cols);
                 var resourceData = {
                     'hostname' : strip(aData[index['hostname']]),
                     'urn' : aData[index['urn']],
                     'type' : aData[index['type']],
-                    'status' : aData[index['status']],
+                    //'status' : aData[index['status']],
+                    'available' : aData[index['available']],
                     'testbed' : aData[index['testbed']],
                     'facility' : aData[index['facility']],
                 };

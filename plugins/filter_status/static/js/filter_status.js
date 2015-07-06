@@ -128,11 +128,12 @@
                 manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, filter);
             }
             // XXX The datatables will be refreshed twice !
-            if (filter_status != 'all') {
-                // No filter for 'all'
-                var filter = ['manifold:status', '==', filter_status];
-                manifold.raise_event(self.options.query_uuid, FILTER_ADDED, filter);
-            }
+            //if (filter_status != 'all') {
+            // No filter for 'all'
+            // Changed since we have available/unavailable status
+            var filter = ['manifold:status', '==', filter_status];
+            manifold.raise_event(self.options.query_uuid, FILTER_ADDED, filter);
+            //}
 
             self.prev_filter_status = filter_status;
         },

@@ -516,7 +516,7 @@ function QueryStore() {
     this.recount = function(query_uuid)
     {
         var query_ext;
-        var is_reserved, is_pending, in_set,  is_unconfigured;
+        var is_reserved, is_pending, in_set, is_unconfigured, is_unavailable, is_available;
 
         query_ext = manifold.query_store.find_analyzed_query_ext(query_uuid);
         query_ext.num_pending = 0;
@@ -525,6 +525,8 @@ function QueryStore() {
         this.iter_records(query_uuid, function(record_key, record) {
             var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
             var record_warnings = manifold.query_store.get_record_state(query_uuid, record_key, STATE_WARNINGS);
+            is_unavailable = (record.available == 'false'); 
+            is_available = (record.available == 'true'); 
 
             is_reserved = (record_state == STATE_SET_IN) 
                        || (record_state == STATE_SET_OUT_PENDING)
@@ -564,13 +566,16 @@ function QueryStore() {
         // Adapted from querytable._querytable_filter()
 
         this.iter_records(query_uuid, function(record_key, record) {
-            var is_reserved, is_pending, in_set,  is_unconfigured;
+            var is_reserved, is_pending, in_set, is_unconfigured, is_unavailable, is_available;
 
             /* By default, a record is visible unless a filter says the opposite */
             var visible = true;
 
             var record_state = manifold.query_store.get_record_state(query_uuid, record_key, STATE_SET);
             var record_warnings = manifold.query_store.get_record_state(query_uuid, record_key, STATE_WARNINGS);
+
+            is_unavailable = (record.available == 'false'); 
+            is_available = (record.available == 'true'); 
 
             is_reserved = (record_state == STATE_SET_IN) 
                        || (record_state == STATE_SET_OUT_PENDING)
@@ -609,6 +614,12 @@ function QueryStore() {
                             // true  => ~ continue
                             // false => ~ break
                             visible = is_reserved;
+                            return visible;
+                        case 'available':
+                            visible = is_available;
+                            return visible;
+                        case 'unavailable':
+                            visible = is_unavailable;
                             return visible;
                         case 'unconfigured':
                             visible = is_unconfigured;

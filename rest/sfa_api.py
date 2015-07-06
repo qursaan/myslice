@@ -186,6 +186,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
             elif 'user_credential' in user_config:
                 user_cred = user_config['user_credential']
             else:
+                logger.error("no user credentials for user = ", user_email)
                 user_cred = {}
 
             if object_type:
@@ -197,6 +198,11 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                     for obj_name, cred in user_config['%s_credentials'%object_type].items():
                         if obj_name == hrn:
                             object_cred = cred
+                else:
+                    logger.error("no credentials for object")
+                    logger.error(object_type)
+                    logger.error(object_name)
+                    object_cred = {}
 
             # Both AM & Registry
             if method == "GetVersion": 

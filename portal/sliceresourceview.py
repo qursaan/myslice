@@ -80,17 +80,17 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         main_query.select(slice_fields)
 
         # Columns shown by default in Query_table plugin
-        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Status':'boot_state'}")
+        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Available':'available'}")
        
         # Columns checked by default in Columns_selector plugin
-        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'boot_state']
+        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'available']
 
         QUERYTABLE_MAP = { 
             'hostname'      :   'Resource name',
             'type'          :   'Type',
             'facility_name' :   'Facility',
             'testbed_name'  :   'Testbed',
-            'boot_state'    :   'Status',
+            'available'     :   'Available',
         }
 
 
