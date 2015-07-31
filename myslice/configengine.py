@@ -19,7 +19,7 @@ from myslice.settings import ROOT
 #api_key=theapikeyasprovidedbygoogle
 
 # use a singleton instead of staticmethods
-from manifold.util.singleton    import Singleton
+from myslice.util.singleton    import Singleton
 
 class ConfigEngine(object):
     __metaclass__ = Singleton
