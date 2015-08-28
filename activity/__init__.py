@@ -56,7 +56,7 @@ def logWrite(request, action, message, objects = None):
         "client_ip" : ip,
         "host"      : request.get_host(),
         "referrer"  : request.META.get('HTTP_REFERER'),
-        "user"      : request.user,
+        "user"      : request.user.username,
         "action"    : action,
         "message"   : message,
         "apikey"    : apikey,
