@@ -46,7 +46,6 @@
                 }
             }).done(function(data) {
                 self.get_sla_templates(data);
-                alert("sla templates recovered: " + data);
             });
         },
 
