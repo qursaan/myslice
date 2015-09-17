@@ -54,8 +54,8 @@
 {% insert_str prelude "css/slider.css" %}
 {% insert_str prelude "css/topmenu.css" %}
 {% insert_str prelude "js/logout.js" %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/myslice.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ theme }}.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.qtip.min.css">
 
 
@@ -77,22 +77,17 @@ $(document).ready(function() {
             slices.push("no slice");
         }else{
             slices = user.slices;
-            {% if theme != "fed4fire" or  "onelab" in theme %}
-            drawSlices(slices);
-            {% endif %}
         }
-        {% if theme == "fed4fire" or "onelab" in theme%}
         p = myslice.get_projects();
         if(p != null){
             //drawProjects(p);
             drawProjectsTree(p,slices);
         }
-        {% endif %}
     });
 
     function drawSlices(slices){
         var items = [];
-		
+        console.log(slices);
         $.each( slices, function(i, val) {
             items.push( "<li><a href=\"/resources/"+val+"\" title='Add resources to slice "+val+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>" + val + "</a></li>" );
         });
@@ -100,7 +95,6 @@ $(document).ready(function() {
         $("ul#dropdown-slice-list").append(items.join( "" ));
     }
     
-    {% if theme == "fed4fire" or "onelab" in theme%}
     function drawProjects(projects){
         var items = [];
 		
@@ -113,11 +107,12 @@ $(document).ready(function() {
     function drawProjectsTree(projects,slices) {
         var items = [];
         var items_sl = [];
+        var slices_no_project = [];
         $.each( projects, function(i, p) {
             $.each( slices, function(y, s) {
                 if (s.match('^' + escapeRegExp(p))) {
-                     slicename = s.replace(p + '.','')
-                     items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
+                    slicename = s.replace(p + '.','')
+                    items_sl.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+slicename+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + slicename + "</a></li>" );
                 }
             });
             el = "<li><a href=\"/portal/project/" + p + "\" title='Manage project "+p+"' >" + p + "</a>";
@@ -128,6 +123,19 @@ $(document).ready(function() {
             items.push(el);
             items_sl = [];
         });
+
+        $.each( slices, function(y, s) {
+            if(s.split('.').length < 4){
+                slices_no_project.push( "<li><a href=\"/resources/" + s + "\" title='Add resources to slice "+s+"'><img src='/static/img/icon_slices_small.png' style='width: 12px;'>  " + s + "</a></li>" );
+            }
+        });
+        if (slices_no_project.length > 0) {
+            elm = '<li>other slices <span class="glyphicon glyphicon-info-sign" title="these are <b>legacy slices</b> from now on, slices must be created within a project">&nbsp;</span>';
+            elm += "<ul>" + slices_no_project.join( "" ) + "</ul>";
+            elm += "</li>";
+            items.push(elm);
+        }
+
         $("div#home-project-tree").html($( "<ul/>", { html: items.join( "" ) }));
         if (projects.length > 0) {
             $('.dashboard-create-slice').show();
@@ -137,7 +145,6 @@ $(document).ready(function() {
     window.setTimeout(function() {
         $('.projects-loading').hide();
     },20000);
-    {% endif %}
 {% endif %}
 	jQuery('[title!=""]').qtip();
 });

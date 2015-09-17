@@ -1,20 +1,68 @@
+<script type="text/javascript">
+function is_finished(len_platforms, pf_status){
+    if(len_platforms == pf_status){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+// Specific DIVs for each type of testbed
+$(document).ready(function() {
+    var platform_status = Array();
+    var platform_empty = Array();
+    {% for platform in platforms %}
+    // /sfa/Describe?hrn=onelab.upmc.projectx.slicex&platform[]={{platform}}&type=slice
+    $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
+        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
+            rspec = data['{{platform}}']['parsed']['rspec'];
+            if('node' in rspec){
+                if(rspec['node'] instanceof Array) {
+                    jQuery.each( rspec['node'], function( i, node ) {
+                        render_node('{{platform}}',node);
+                    });
+                }else{
+                    render_node('{{platform}}',rspec['node']);
+                }
+            }else{
+                platform_empty.push('{{platform}}');
+            }
+        }else{
+            platform_empty.push('{{platform}}');
+        }
+        platform_status.push('{{platform}}');
+        if(is_finished({{len_platforms}},platform_status.length)){
+            $("#loading").hide();
+            if(platform_empty.length == {{len_platforms}}){
+                $("#warning_message").show();
+            }
+        }
+    });
+    {% endfor %}
+});
+</script>
 <div class="col-md-10 col-md-offset-1">
-	{% if ple_resources or iotlab_resources or nitos_resources or nitos_paris_resources%}
-		<h2>How to access your reserved resources</h2>
-	{% endif %}
-	{% if ple_resources %}
+<div id="access">
+    <h2>How to access your reserved resources?</h2>
+    <img src="{{ STATIC_URL }}img/loading.gif" id="loading" alt="Loading reserved resources" />
+</div>
+<div id="warning_message" style="display:none; color:orange; font-weigh:bold;">
+Please add resources to your slice from the left tab <a href="/resources/{{slicename}}">"Resources"</a>
+</div>
+<div id="default">
+</div>
+{% if "ple" in platforms %}
+<div id="ple_header" style="display:none;">
 	<h3>PlanetLab Europe</h3>
 	
 	<p>
 		PlanetLab Europe resources are accessible directly via SSH. Your SSH public key is deployed automatically
 		on the reserved nodes. To access your slice on a resource just type the following command:
 	</p>
-	<p class="command">
-	{%for resource in ple_resources %}
-		<b>Resource</b><br>
-		$ ssh {{ple_slicename}}@{{resource}}<br>
-	{%endfor%}
-	</p>
+</div>
+<div id="ple" style="display:none;">
+</div>
+<div id="ple_footer" style="display:none;">
 	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
 	<p>
 		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
@@ -26,21 +74,27 @@
             <i>This bash script will be deployed on all PLE nodes of your slice</i>
         </div>
         <textarea style="width:100%; height:100px;" id="initscript_code"></textarea><br>
+<!-- TODO !!!
+        <div>
+            <select>
+                <option>All</option>
+                <option>node1</option>
+                <option>node2</option>
+            </select>
+        </div>
+-->
         <button name="deploy" class="btn btn-success btn-sm" onclick="deploy('{{slicename}}');">Deploy</button>
         <button name="delete" class="btn btn-danger btn-xs" onclick="del('{{slicename}}');">Delete</button>
     </div>
     <script type="text/javascript">
     $(document).ready(function() {
-        $.post("/initscript/get/",{'slice_hrn':'onelab.upmc.express'}, function( data ) {
-            console.log(data);
+        $.post("/initscript/get/",{'slice_hrn':'{{slicename}}'}, function( data ) {
             jQuery('#initscript_code').val(data['initscript_code']);
         });
     });
     function deploy(slice_hrn){
-        console.log("deploy = "+slice_hrn);
         var initscript_code = jQuery('#initscript_code').val()
         $.post("/initscript/update/",{'slice_hrn':slice_hrn, 'initscript_code':initscript_code}, function( data ) {
-            console.log(data);
             if (data['ret'] == 0) {
                 mysliceAlert('Success: initscript deployed','success', true);
             }else{
@@ -50,9 +104,7 @@
         });
     }
     function del(slice_hrn){
-        console.log("delete");
         $.post("/initscript/delete/",{'slice_hrn':slice_hrn}, function( data ) {
-            console.log(data);
             if (data['ret'] == 0) {
                 mysliceAlert('Success: initscript deleted','success', true);
                 jQuery('#initscript_code').val('');
@@ -64,70 +116,33 @@
     }
     </script>
     <br>
-	{% endif %}
-
-	{% if iotlab_resources %}	
+</div>
+{% endif %}
+{% if "iotlab" in platforms %}
+<div id="iotlab_header" style="display:none;">
 	<h3>FIT IoT-Lab</h3>
-	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://devgrenoble.senslab.info/testbed/" target="_blank">web GUI.</a>
+	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://www.iot-lab.info/testbed/" target="_blank">web GUI.</a>
 		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
 		the following command:
 	</p>
-	<p class="command">
-		ssh {{iot_login}}@grenoble.iot-lab.info
-	</p>
-	{% endif %}
-	{% if nitos_resources or nitos_paris_resources %}
-	<h3>NITOS</h3>
+</div>
+<div id="iotlab" style="display:none;">
+</div>
+{% endif %}
+{% if "nitos" in platforms %}
+<div id="nitos_header" style="display:none;">
+	<h3>NITOS Volos (Greece)</h3>
 	
 	<p>
 	 NITOS resources are not directly accessible. You will need to log in on a gateway server and from there access the node.
 	 You will find the ssh commands to connect to NITOS nodes below:
 	</p>
-
-	{% if nitos_resources %}	
 	<h4>NITLab</h4>
-	<p class="command">
-	    $ ssh {{slicename}}@nitlab.inf.uth.gr #nodes 001-040<br>
-        $ ssh {{slicename}}@nitlab2.inf.uth.gr #nodes 041-049<br>
-        $ ssh {{slicename}}@nitlab3.inf.uth.gr #nodes > 049
-    </p>
-	
-	<p>Loading an OMF-compatible image on your resource:</p>
-	<p class="command">
-	{%for resource in nitos_resources %}
-		<b>Resource</b><br>
-        $ omf6 stat -t {{resource}} #check the status of the node<br>
-        $ omf6 tell -a on -t {{resource}}  #turn on/off the node <br>
-    	$ omf6 load -i baseline.ndz -t {{resource}}  #for orbit-like node (002-009) use "baseline_orbit.ndz"<br>
-		$ ssh root@{{resource}}  #ssh to the node<br>
-	{%endfor%}
-	</p>
+</div>
+<div id="nitos" style="display:none;">
+</div>
+<div id="nitos_footer" style="display:none;">
     <p><b>NOTE:</b> Nodes 002-009 are orbit-like nodes. For these nodes use "baseline_orbit.ndz". All these images come with OMF5.4 resource controller. To do OMF6 experiments use "baseline_omf6_1_1.ndz" and  "baseline_orbit_omf6_1_1.ndz" for grid nodes and orbit nodes respectively. </p>
-	{% endif %}
-
-	{% if nitos_paris_resources %}
-	<h4>FIT NITOS-Lab Paris</h4>
-	 <p class="command">
- 		$ ssh {{slicename}}@griffin.ipv6.lip6.fr
-	 </p>
-	<p>For each of the reserved nodes, follo the steps given below:</p>
-	<p class="command">
-	{%for resource in nitos_paris_resources %}
-		<b>Resource</b><br>
-    	$ omf load -i baseline_grid.ndz -t {{resource}}  #loading OMF image on the node<br>
-    	$ omf tell -a on -t {{resource}}  #turn on the node <br>
-    	$ ssh root@{{resource}}  #ssh to the node<br><br>
-	{%endfor%}
-	</p>
-	{%endif%}
-
-	<p>
-		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
-		restart the OMF Resource Controller and finally execute the experiment:
-	</p>
-	<p class="command">
-		$ omf exec --slice {{slicename}} your_exp.rb
-	</p>
 	<p>
 	The complete tutorial on NITOS nodes:
 	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
@@ -135,8 +150,32 @@
     <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
 	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
 
-	{% endif %}
-	
+</div>
+{% endif %}
+{% if "nitos-paris" in platforms %}
+<div id="paris.fit-nitos.fr_header" style="display:none;">
+	<h4>FIT NITOS-Lab Paris</h4>
+</div>
+<div id="paris.fit-nitos.fr" style="display:none;">
+</div>
+<div id="paris.fit-nitos.fr_footer" style="display:none;">
+	<p>
+		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
+		restart the OMF Resource Controller and finally execute the experiment:
+	</p>
+	<p class="command">
+		$ omf exec --slice {{slicename}} your_exp.rb
+	</p>
+
+	<p>
+	The complete tutorial on FIT NITOS nodes:
+	<a target="_blank" href="http://doc.onelab.eu/nitos.html">basic tutorial</a>
+	</p>
+    <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
+	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
+</div>
+{% endif %}
+<div style="padding-top:20px;">	
 	<h2>Available Tools</h2>
 	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"> <b>SSH</b></p>
 	<p>
@@ -161,4 +200,5 @@
 	</p>
 	<p>In addition to the main OMF software, this site also hosts OMF sub-projects addressing various related aspects of a testbed's control, measurement, and management.</p>
 	<p>More Info: <a href="http://mytestbed.net/projects/omf" target="_blank">http://mytestbed.net/projects/omf</a></p>
+</div>
 </div>

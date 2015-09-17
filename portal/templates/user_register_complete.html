@@ -3,20 +3,19 @@
 {% block content %}
 
 <div class="row">
-	<div class="col-md-12">
-	<h1><img src="{{ STATIC_URL }}icons/user-xs.png" alt="User Registration" />User sign-up</h1>
-	</div>
+	<h1><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="User Registration" /> User sign-up</h1>
 </div>
 <div class="row">
-	<div class="col-md-12">
-	  <h3>Sign up information received.</h3>
-	  <p>You can now <a href="/">log in</a> to the portal. You will have limited access. </p>
-	  <p>To gain full access, two steps are required:</p>
-	  <ul style="list-style-type:decimal;">
-		<li>You confirm your signup request by clicking on the link in the email that we have sent to your email address.</li>
-		<li>A manager from your organization validates your request. (We have sent email to your organisation's registered managers.)</li>
-	  </ul>
-  	</div>
+  <h3>Sign up information received.</h3>
+  <p>You can now log in to the portal. You will have limited access. </p>
+  <p>To gain full access, two steps are required:</p>
+  <ul>
+	<li>1. You confirm your signup request by clicking on the link in the email that we have sent to your email address.<br>
+		Please be aware that it can happen that this email was automatically filtered to your spam box.<br>
+		Please check your spam box if you do not receive the email in a few minutes</li>
+	<li>2. A manager from your organization validates your request. Upon confirmation of your signup request,<br> 
+		we will send an email to the managers at your organization with a validation request.</li>
+  </ul>		
 </div>
 
 {% endblock %}

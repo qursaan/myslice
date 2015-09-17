@@ -22,6 +22,7 @@ from plugins.googlemap                  import GoogleMap
 from plugins.filter_status              import FilterStatusPlugin
 from plugins.testbeds                   import TestbedsPlugin
 from plugins.scheduler2                 import Scheduler2
+from plugins.asap                       import AsapPlugin
 
 # Bristol plugin
 from plugins.univbris                   import Univbris
@@ -79,17 +80,17 @@ class SliceResourceView (LoginRequiredView, ThemeView):
         main_query.select(slice_fields)
 
         # Columns shown by default in Query_table plugin
-        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Status':'boot_state'}")
+        page.expose_js_var("QUERYTABLE_MAP","{'Resource name': 'hostname', 'Type': 'type', 'Facility': 'facility_name','Testbed': 'testbed_name', 'Available':'available'}")
        
         # Columns checked by default in Columns_selector plugin
-        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'boot_state']
+        query_default_fields = ['hostname', 'type', 'facility_name', 'testbed_name', 'available']
 
         QUERYTABLE_MAP = { 
             'hostname'      :   'Resource name',
             'type'          :   'Type',
             'facility_name' :   'Facility',
             'testbed_name'  :   'Testbed',
-            'boot_state'    :   'Status',
+            'available'     :   'Available',
         }
 
 
@@ -238,6 +239,20 @@ class SliceResourceView (LoginRequiredView, ThemeView):
             query = sq_resource,
             query_lease = sq_lease,
         )
+
+        # --------------------------------------------------------------------------
+        # LEASES Asap Scheduler
+        # Select an end_time for all unconfigured resources
+        # start_time is as soon as possible
+
+        #resources_as_asap = AsapPlugin( 
+        #    page       = page,
+        #    domid      = 'asap',
+        #    title      = 'Asap',
+        #    # this is the query at the core of the slice list
+        #    query = sq_resource,
+        #    query_lease = sq_lease,
+        #)
 
         # --------------------------------------------------------------------------
         # QueryUpdater (Pending Operations)
@@ -429,6 +444,7 @@ class SliceResourceView (LoginRequiredView, ThemeView):
 
         template_env['map_resources'] = map_resources.render(self.request)
         template_env['scheduler'] = resources_as_scheduler2.render(self.request)
+        #template_env['asap'] = resources_as_asap.render(self.request)
 
         # Bristol plugin
        # template_env['welcome'] = univbriswelcome.render(self.request)

@@ -1,3 +1,4 @@
+import requests
 import json
 import time
 import re
@@ -10,7 +11,7 @@ from manifoldapi.manifoldapi    import execute_admin_query, execute_query
 
 from unfold.loginrequired       import LoginRequiredAutoLogoutView
 
-from portal.actions import create_pending_project, create_pending_join, sfa_add_authority, authority_add_pis, is_pi
+from portal.actions import create_pending_project, create_pending_join, sfa_add_authority, authority_add_pis, is_pi, getAuthorities
 from portal.models import PendingProject, PendingJoin
 
 from myslice.theme import ThemeView
@@ -18,20 +19,6 @@ from myslice.settings import logger
 
 class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = 'projectrequest_view.html'
-    
-    def getAuthorities(self, request):
-        #if self.theme == 'fed4fire':
-        authorities_query = Query.get('myslice:authority').select('authority_hrn')
-        #else:
-        #    authorities_query = Query.get('authority').select('name', 'authority_hrn')
-        authorities = execute_admin_query(request, authorities_query)
-        if authorities is not None:
-            # Remove the root authority from the list
-            matching = [s for s in authorities if "." in s['authority_hrn']]
-            authorities = sorted(matching, key=lambda k: k['authority_hrn'])
-            #if self.theme != 'fed4fire':
-            #    authorities = sorted(matching, key=lambda k: k['name'])
-        return authorities
     
     def getUserAuthority(self, request):
         # Get user_email (XXX Would deserve to be simplified)
@@ -86,7 +73,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
 
         user_email = self.getUserEmail(wsgi_request)
         
-        authorities = self.getAuthorities(wsgi_request)
+        authorities = getAuthorities(wsgi_request)
         
         user_authority = self.getUserAuthority(wsgi_request)
         

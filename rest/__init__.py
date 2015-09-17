@@ -7,8 +7,6 @@ from django.http                    import HttpResponse
 from manifold.core.query            import Query
 from manifoldapi.manifoldapi        import execute_query
 
-from portal.actions                 import is_pi
-
 from myslice.settings               import logger
 
 # handles serialization of datetime in json

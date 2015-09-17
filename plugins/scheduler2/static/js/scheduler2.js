@@ -637,12 +637,17 @@ var SCHEDULER_COLWIDTH = 50;
                 // Setup leases with a default free status...
                 $.each(this.scope_resources_by_key, function(resource_key, resource) {
                     resource.leases = [];
+                    if(resource.available == 'false' || resource.boot_state == 'disabled'){
+                        state = 'maintenance';
+                    }else{
+                        state = 'free';
+                    }
                     var colspan_lease = resource.granularity / self._slot_length; //eg. 3600 / 1800 => 2 cells
                     time = SchedulerDateSelected.getTime();
                     for (i=0; i < self._all_slots.length / colspan_lease; i++) { // divide by granularity
                         resource.leases.push({
                             id:     'coucou',
-                            status: (time < now) ? 'disabled':  'free', // 'selected', 'reserved', 'maintenance' XXX pending ??
+                            status: (time < now) ? 'disabled':  state, //'free', // 'selected', 'reserved', 'maintenance' XXX pending ??
                         });
                         time += resource.granularity * 1000;
                     }
@@ -872,7 +877,6 @@ var SCHEDULER_COLWIDTH = 50;
                 var scope = self._get_scope();
 
                 var num_hidden_cells;
-
                 $("#DateToRes").datepicker({
                 	dateFormat: "D, d M yy",
                     onRender: function(date) {

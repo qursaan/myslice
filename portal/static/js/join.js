@@ -40,9 +40,9 @@ jQuery(document).ready(function(){
           pi_title: {
               required: true
           },
-          pi_phone: {
+          /*pi_phone: {
               required: true
-          },
+          },*/
           pi_email: {
               required: true
           },

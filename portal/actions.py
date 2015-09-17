@@ -16,6 +16,8 @@ from myslice.configengine           import ConfigEngine
 
 from myslice.settings import logger
 
+from rest.sfa_api import sfa_client
+
 theme = ThemeView()
 
 import activity.slice
@@ -77,6 +79,22 @@ def get_jfed_identity(request):
     except Exception as e:
         print e
         return None
+
+def getAuthorities(request, admin = False):
+    # XXX theme has to be the same as the root authority 
+    result = sfa_client(request,'List',hrn=theme.theme,object_type='authority',platforms=['myslice'],admin=admin)
+    authorities = list()
+    try:
+        for item in result['myslice']:
+            t_hrn = item['hrn'].split('.')
+            if 'name' in item:
+                authorities.append({'authority_hrn':item['hrn'], 'name':item['name'], 'shortname':t_hrn[-1].upper()})    
+            else:
+                authorities.append({'authority_hrn':item['hrn']})    
+    except:
+        logger.error(result)
+    return sorted(authorities)
+
 
 # Get the list of pis in a given authority
 def authority_get_pis(request, authority_hrn):
@@ -382,7 +400,7 @@ def manifold_add_user(wsgi_request, request):
     if not results:
         raise Exception, "Failed creating manifold user: %s" % user_params['email']
     result = results[0]
-    return result['email']
+    return result['user_id']
 
 def manifold_update_user(request, email, user_params):
     # user_params: password, config e.g., 
@@ -445,7 +463,8 @@ def delete_local_user(wsgi_request, user_email):
         user_config = json.loads(user[0]['config'])
         authority_hrn = user_config.get('authority', None)
         
-        if is_pi(wsgi_request, '$user_hrn', authority_hrn):
+        #if is_pi(wsgi_request, '$user_hrn', authority_hrn):
+        try:
             # removing from Django auth_user
             UserModel = get_user_model()
             UserModel._default_manager.filter(email__iexact = user_email).delete()
@@ -455,9 +474,9 @@ def delete_local_user(wsgi_request, user_email):
                      
             # removing manifold user
             manifold_delete_user(wsgi_request, user_id)
-        else:
-            return False
-            #raise Exception, "No sufficient rights on authority = ",authority_hrn
+        except Exception, e:
+            #return False
+            print "No sufficient rights on authority = ",authority_hrn
 
     return True      
 
@@ -659,31 +678,30 @@ def portal_validate_request(wsgi_request, request_ids):
             elif request['type'] == 'authority':
                 #hrn = "%s.%s" % (request['authority_hrn'], request['site_authority'])
                 hrn = request['site_authority']
+                name = request['site_name']
                 # XXX tmp sfa dependency
                 from sfa.util.xrn import Xrn 
                 urn = Xrn(hrn, request['type']).get_urn()
                 
                 # Only hrn is required for Manifold Query 
                 sfa_authority_params = {
-                    'authority_hrn'        : hrn,
-                    #'authority_urn'        : urn,
-                    #'type'       : request['type'],
-                    #'pi'        : None,
-                    #'enabled'    : True
+                    'authority_hrn' : hrn,
+                    'name'          : name       
                 }
-                logger.info("ADD Authority")
+                #logger.info("ADD Authority")
                 sfa_add_authority(wsgi_request, sfa_authority_params)
                 request_status['SFA authority'] = {'status': True }
                 a = PendingAuthority.objects.get(id=request['id'])
                 ctx = { 
                     'site_name'     : a.site_name,
-                    'short_name'    : a.short_name,
-                    'url'           : a.url,
-                    'city'          : a.city,
-                    'country'       : a.country,                          
-                    'portal_url'    : a.current_site,
+                    #'short_name'    : a.short_name,
+                    #'url'           : a.url,
+                    'city'          : a.address_city,
+                    'country'       : a.address_country,                          
+                    #'portal_url'    : a.current_site,
                 }
-                user_email = a.email
+                # address_line1 contains the email of the user in pending_authority table
+                user_email = a.address_line1
 
                 PendingAuthority.objects.get(id=request['id']).delete()
                 
@@ -907,7 +925,7 @@ def send_status_email(request, ctx, user_email, obj_type, status):
         sender =  render_to_string(theme.template, ctx)
         sender = sender.replace('\n', '')
                        
-        subject = obj_type + ' request '+ status +'.'
+        subject = obj_type.title() + ' request '+ status
     
         msg = EmailMultiAlternatives(subject, text_content, sender, [user_email])
         msg.attach_alternative(html_content, "text/html")
@@ -1281,8 +1299,6 @@ def create_pending_user(wsgi_request, request, user_detail):
     }
     if request['private_key']:
         account_config['user_private_key'] = request['private_key']
-
-    user_id = user_detail['user_id'] + 1 # the user_id for the newly created user in local:user
 
     # XXX TODO: Require a myslice platform
     # ALERT: this will disapear with ROUTERV2 of Manifold

@@ -10,7 +10,6 @@ from manifold.core.query        import Query
 from manifold.core.result_value import ResultValue
 from manifoldapi                import ManifoldAPI
 from manifoldresult             import ManifoldException
-from manifold.util.log          import Log
 
 # from unfold.sessioncache import SessionCache
 

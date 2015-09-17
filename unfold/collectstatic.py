@@ -52,7 +52,7 @@ class ThirdPartyFinder(BaseFinder):
         # PREFIX : EXTENSIONS
 # third party stuff is not expected to provide templates,
 #        ''   : ('.html',),
-        'js' : ('.js',),
+        'js' : ('.js','.map',),
         'css': ('.css',),
         'img': ('.png', '.ico',),
         'fonts' : ('.svg', '.eot', '.ttf', '.woff'),

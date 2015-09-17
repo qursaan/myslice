@@ -40,7 +40,7 @@
                 {% if authorities %}
                     {% for authority in authorities %}
                         {% if authority.name %}
-                                <option value="{{ authority.authority_hrn }}">{{authority.name}}</option>
+                                <option value="{{ authority.authority_hrn }}">{{authority.shortname}} - {{authority.name}}</option>
                         {% else %}
                             <option value="{{ authority.authority_hrn }}">{{authority.authority_hrn}}</option>
                         {% endif %}

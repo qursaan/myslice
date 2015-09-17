@@ -31,7 +31,8 @@ except:
 
 if not config.myslice.portal_version:
     try:
-        PORTAL_VERSION = subprocess.check_output(["git", "describe"])
+        v = subprocess.check_output(["git", "--git-dir", ROOT + "/.git", "describe"])
+        PORTAL_VERSION = '-'.join(v.split('-')[:-1])
     except:
         PORTAL_VERSION = 'not using git' 
 
@@ -89,6 +90,9 @@ MANAGERS = ADMINS
 # Mail configuration
 #DEFAULT_FROM_EMAIL = "root@theseus.ipv6.lip6.fr"
 #EMAIL_HOST_PASSWORD = "mypassword"
+
+if config.myslice.default_sender:
+    DEFAULT_FROM_EMAIL = config.myslice.default_sender
 
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
