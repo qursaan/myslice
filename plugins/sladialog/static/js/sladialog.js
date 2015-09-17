@@ -1,13 +1,10 @@
 /**
- * MyPlugin:    demonstration plugin
- * Version:     0.1
- * Description: Template for writing new plugins and illustrating the different
- *              possibilities of the plugin API.
- *              This file is part of the Manifold project 
+ * SlaDialog
+ * Description: Plugin to allow SLA acceptance and creation to MySlice portal
+ *              in Fed4FIRE
  * Requires:    js/plugin.js
- * URL:         http://www.myslice.info
- * Author:      Jordan Augé <jordan.auge@lip6.fr>
- * Copyright:   Copyright 2012-2013 UPMC Sorbonne Universités
+ * Author:      Javier García Lloreda <javier.garcial.external@atos.net>
+ * Copyright:   Copyright Atos Spain S.A.
  * License:     GPLv3
  */
 
@@ -18,17 +15,8 @@
         accepted_slas: {},
         queries: [],
 
-        /** XXX to check
-         * @brief Plugin constructor
-         * @param options : an associative array of setting values
-         * @param element : 
-         * @return : a jQuery collection of objects on which the plugin is
-         *     applied, which allows to maintain chainability of calls
-         */
         init: function(options, element) {
-	    // for debugging tools
-	    this.classname="SlaDialog";
-            // Call the parent constructor, see FAQ when forgotten
+	        this.classname = "SlaDialog";
             this._super(options, element);
 
             /* Member variables */
@@ -36,22 +24,19 @@
             /* Plugin events */
 
             /* Setup query and record handlers */
-
-            // Explain this will allow query events to be handled
-            // What happens when we don't define some events ?
-            // Some can be less efficient
             this.listen_query(options.query_uuid);
             
             /* GUI setup and event binding */
+
             // call function
             this.button_binding();
 
             // Get testbeds with sla and store them in localStorage
-            //this.get_testbeds_with_sla();
-
+            this.get_testbeds_with_sla();
         },
 
         get_testbeds_with_sla: function () {
+            var self = this;
             return $.get('/sla/testbeds/', function(data) {
                 if (typeof(Storage) !== "undefined") {
                     if (!localStorage.getItem("sla_testbeds")) {
@@ -59,24 +44,44 @@
                         localStorage.setItem("sla_testbeds", testbeds);
                     }
                 }
+            }).done(function(data) {
+                self.get_sla_templates(data);
+                alert("sla templates recovered: " + data);
             });
         },
 
-        find_row: function(key)
-        {
-            // key in third position, column id = 2
-            var KEY_POS = 2;
+        get_sla_templates: function (testbeds) {
 
-            var cols = $.grep(this.table.fnSettings().aoData, function(col) {
-                return (col._aData[KEY_POS] == key);
-            } );
+            testbeds.forEach(function(testbed, index, array) {
 
-            if (cols.length == 0)
-                return null;
-            if (cols.length > 1)
-                throw "Too many same-key rows in ResourceSelected plugin";
+                if(testbed!="omf:netmode") { return } // TODO: remove
 
-            return cols[0];
+                $.get('/sla/agreements/templates/' + testbed, function(slo) {
+
+                    $(".modal-body #sla_template").append(slo);
+
+                    var content =
+                    "<div id=" + testbed + " class='row' data-urns='[]' style='display: none'>" +
+                        "<div class='col-md-6'>" +
+                            "<p>Testbed <span class='provider'>" + testbed + "</span> offers the following SLA for its resources</p>" +
+                        "/div>" +
+                        "<div class='col-md-1'>" +
+                            "<button class='sla-info-button btn btn-default' data-toggle='modal' data-target='#sla_template_modal'>" +
+                            "<span class='glyphicon glyphicon-info-sign'></span>" +
+                                "Details" +
+                            "</button>" +
+                        "</div>" +
+                        "<div class='col-md-1'>" +
+                            "<button class='sla-accept-button btn btn-default' data-complete-text='Accepted' autocomplete='off'>" +
+                            "<span class='glyphicon glyphicon-ok'></span>" +
+                                "Accept" +
+                            "</button>" +
+                        "</div>" +
+                    "</div>";
+
+                    $("#sla_offers").append(content);
+                });
+            });
         },
 
         check_template_status: function() {
@@ -88,8 +93,6 @@
         },
 
         /* PLUGIN EVENTS */
-        // on_show like in querytable
-
 
         /* GUI EVENTS */
 
@@ -107,7 +110,16 @@
 
                 if (is_ok) {
                     // remove warnings
-                    // var warnings = manifold.query_store.get_record_state(resource_query.query_uuid, resource_key, STATE_WARNINGS);
+                    $('#' + id).data("urns").forEach(function (urn, index, array) {
+                        data = {
+                            state: STATE_SET,
+                            key  : "resource",
+                            op   : STATE_SET_REMOVE,
+                            value: urn
+                        }
+
+                        manifold.raise_event(self.query_uuid, STATUS_REMOVE_WARNING, data);
+                    });
                 }
             });
 
@@ -131,7 +143,7 @@
 
                 var data = {
                     "SLIVER_INFO_AGGREGATE_URN": record.resource[0].component_manager_id,
-                    "SLIVER_INFO_EXPIRATION": record.lease[0].end_time,     // FIXME: only working with leases
+                    "SLIVER_INFO_EXPIRATION": record.lease[0].end_time,  // FIXME: only working with leases
                     "SLIVER_INFO_SLICE_URN": record.slice_urn,
                     "SLIVER_INFO_CREATOR_URN": record.users[0],
                     "SLIVER_INFO_URN": urns,
@@ -155,43 +167,6 @@
 //            });
         },
 
-        // a function to bind events here: click change
-        // how to raise manifold events
-        set_state: function(data, username)
-        {
-            
-        },
-
-        post_agreement: function()
-        {
-            console.log(this.options.user);
-        },
-
-        /* GUI MANIPULATION */
-
-        // We advise you to write function to change behaviour of the GUI
-        // Will use naming helpers to access content _inside_ the plugin
-        // always refer to these functions in the remaining of the code
-
-        show_hide_button: function() 
-        {
-            // this.id, this.el, this.cl, this.elts
-            // same output as a jquery selector with some guarantees
-        },
-
-        /* TEMPLATES */
-
-        // see in the html template
-        // How to load a template, use of mustache
-
-        /* QUERY HANDLERS */
-
-        // How to make sure the plugin is not desynchronized
-        // He should manifest its interest in filters, fields or records
-        // functions triggered only if the proper listen is done
-
-        // no prefix
-
         on_filter_added: function(filter)
         {
 
@@ -200,6 +175,10 @@
         on_field_state_changed: function(data)
         {
             var self = this;
+            self.query_uuid = self.options.query_uuid;
+
+            var testbeds = localStorage.getItem("sla_testbeds").split(",");
+            var urn_regexp = /\+(.*?)\+/;
             // this.set_state(result, this.options.username);
 
              switch(data.state) {
@@ -208,48 +187,40 @@
                         case STATE_SET_IN_PENDING:
                             if (typeof(data.value) == 'string') {
                                 // data.value = urn
-                                this._supports_sla(data.value)
-                                    .done( function(testbeds) {
-                                        var urn_regexp = /\+(.*?)\+/;
-                                        var urn = urn_regexp.exec(data.value)[1];
-                                        var pos = $.inArray(urn, testbeds);
-                                        if ( pos != -1) {
-                                            var id_ref = testbeds[pos].replace(/\.|:/g, "-");
-                                            $("#" + id_ref).data("urns").push(data.value);
-                                            $("#" + id_ref).show();
-                                            self.accepted_slas[id_ref] = false;
-                                            //$( "#sla_offers_list" ).append(
-                                            //    $("<li>").text("Testbed " + testbeds[pos] + " offers SLA for its resources")
-                                            //);
-                                        }
-                                    });
+                                var urn = urn_regexp.exec(data.value)[1];
+                                var pos = $.inArray(urn, testbeds);
+                                if ( pos != -1) {
+                                    var id_ref = testbeds[pos].replace(/\.|:/g, "-");
+                                    $("#" + id_ref).data("urns").push(data.value);
+                                    $("#" + id_ref).show();
+                                    self.accepted_slas[id_ref] = false;
+                                    //$( "#sla_offers_list" ).append(
+                                    //    $("<li>").text("Testbed " + testbeds[pos] + " offers SLA for its resources")
+                                    //);
+                                }
                             }
                             break;
                         case STATE_SET_OUT:
                             // data.value = urn
                             if (typeof(data.value) == 'string') {
                                 // data.value = urn
-                                this._supports_sla(data.value)
-                                    .done( function(testbeds) {
-                                        var urn_regexp = /\+(.*?)\+/;
-                                        var urn = urn_regexp.exec(data.value)[1];
-                                        var pos = $.inArray(urn, testbeds);
-                                        if ( pos != -1) {
-                                            var id_ref = testbeds[pos].replace(/\.|:/g, "-");
-                                            var array = $("#" + id_ref).data("urns");
-                                            array.splice(array.indexOf(data.value), 1);
+                                var urn = urn_regexp.exec(data.value)[1];
+                                var pos = $.inArray(urn, testbeds);
+                                if ( pos != -1) {
+                                    var id_ref = testbeds[pos].replace(/\.|:/g, "-");
+                                    var array = $("#" + id_ref).data("urns");
+                                    array.splice(array.indexOf(data.value), 1);
 
-                                            if ($("#" + id_ref).data("urns").length == 0) {
-                                                $("#" + id_ref).hide();
-                                                delete self.accepted_slas[id_ref];
-                                                $(".sla-accept-button").button("reset");
-                                                $(".sla-accept-button").prop("disabled", false);
-                                            }
-                                            //$( "#sla_offers_list" ).append(
-                                            //    $("<li>").text("Testbed " + testbeds[pos] + " offers SLA for its resources")
-                                            //);
-                                        }
-                                    });
+                                    if ($("#" + id_ref).data("urns").length == 0) {
+                                        $("#" + id_ref).hide();
+                                        delete self.accepted_slas[id_ref];
+                                        $(".sla-accept-button").button("reset");
+                                        $(".sla-accept-button").prop("disabled", false);
+                                    }
+                                    //$( "#sla_offers_list" ).append(
+                                    //    $("<li>").text("Testbed " + testbeds[pos] + " offers SLA for its resources")
+                                    //);
+                                }
                             }
                             break;
                     }
@@ -264,8 +235,6 @@
              }
         }, 
 
-        // ... be sure to list all events here
-
         /* RECORD HANDLERS */
         on_all_new_record: function(record)
         {
@@ -278,15 +247,10 @@
         },
 
         /* INTERNAL FUNCTIONS */
-        _dummy: function() {
-            // only convention, not strictly enforced at the moment
-        },
 
         _supports_sla: function(resource_urn) {
             return $.ajax("/sla/testbeds/");
         },
-
-
 
         _getUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -299,7 +263,5 @@
 
     /* Plugin registration */
     $.plugin('SlaDialog', SlaDialog);
-
-    // TODO Here use cases for instanciating plugins in different ways like in the pastie.
 
 })(jQuery);
