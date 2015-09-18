@@ -27,12 +27,11 @@
             this.listen_query(options.query_uuid);
             
             /* GUI setup and event binding */
-
-            // call function
-            this.button_binding();
-
             // Get testbeds with sla and store them in localStorage
             this.get_testbeds_with_sla();
+
+            // call function
+            //this.button_binding();
         },
 
         get_testbeds_with_sla: function () {
@@ -50,36 +49,40 @@
         },
 
         get_sla_templates: function (testbeds) {
+            var self = this;
 
             testbeds.forEach(function(testbed, index, array) {
 
-                if(testbed!="omf:netmode") { return } // TODO: remove
+                if(testbed=="omf:netmode") { // TODO: Remove
 
-                $.get('/sla/agreements/templates/' + testbed, function(slo) {
+                    $.ajax('/sla/agreements/templates/' + testbed)
+                     .always(function(data) {
+                        $(".modal-body #sla_template").html(data.responseText.replace(/<|>/g, ""));
 
-                    $(".modal-body #sla_template").append(slo);
+                        var content =
+                        "<div id=" + testbed.replace(/\.|:/g, "-") + " class='row' data-urns='[]' style='display: none'>" +
+                            "<div class='col-md-6'>" +
+                                "<p>Testbed <span class='provider'>" + testbed + "</span> offers the following SLA for its resources</p>" +
+                            "</div>" +
+                            "<div class='col-md-1'>" +
+                                "<button class='sla-info-button btn btn-default' data-toggle='modal' data-target='#sla_template_modal'>" +
+                                "<span class='glyphicon glyphicon-info-sign'></span>" +
+                                    "Details" +
+                                "</button>" +
+                            "</div>" +
+                            "<div class='col-md-1'>" +
+                                "<button class='sla-accept-button btn btn-default' data-complete-text='Accepted' autocomplete='off'>" +
+                                "<span class='glyphicon glyphicon-ok'></span>" +
+                                    "Accept" +
+                                "</button>" +
+                            "</div>" +
+                        "</div>";
 
-                    var content =
-                    "<div id=" + testbed + " class='row' data-urns='[]' style='display: none'>" +
-                        "<div class='col-md-6'>" +
-                            "<p>Testbed <span class='provider'>" + testbed + "</span> offers the following SLA for its resources</p>" +
-                        "/div>" +
-                        "<div class='col-md-1'>" +
-                            "<button class='sla-info-button btn btn-default' data-toggle='modal' data-target='#sla_template_modal'>" +
-                            "<span class='glyphicon glyphicon-info-sign'></span>" +
-                                "Details" +
-                            "</button>" +
-                        "</div>" +
-                        "<div class='col-md-1'>" +
-                            "<button class='sla-accept-button btn btn-default' data-complete-text='Accepted' autocomplete='off'>" +
-                            "<span class='glyphicon glyphicon-ok'></span>" +
-                                "Accept" +
-                            "</button>" +
-                        "</div>" +
-                    "</div>";
+                        $("#sla_offers").append(content);
 
-                    $("#sla_offers").append(content);
-                });
+                        self.button_binding();
+                    });
+                }
             });
         },
 

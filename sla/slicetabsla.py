@@ -250,11 +250,12 @@ class AgreementTemplates(FreeAccessView, ThemeView):
         #logger.debug("BBBBB templates: {}".format(templates))
 
         for template in templates:
-            service_level_objectives.append(template.GuaranteeTerm.ServiceLevelObjective)
+            service_level_objectives.append(
+                [v.servicelevelobjective for v in template.guaranteeterms.values()])
 
-        #logger.debug("CCCCC slo: {}".format(service_level_objectives))
+        logger.debug("CCCCC slo: {}".format(service_level_objectives))
 
-        return HttpResponse(service_level_objectives, content_type="application/xml")
+        return HttpResponse(service_level_objectives, content_type="application/json", status=response.status_code)
 
 class CreateAgreement(LoginRequiredView, ThemeView):
     def post(self, request, *args, **kwargs):
