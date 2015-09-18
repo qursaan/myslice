@@ -166,7 +166,7 @@ class Client(object):
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_COLLECTOR_USER,
                                       settings.SLA_COLLECTOR_PASSWORD)
 
-        result = requests.post(url, data, **kwargs)
+        result = requests.post(url, data, verify=False, **kwargs)
         location = result.headers["location"] \
             if "location" in result.headers else "<null>"
         print "POST {} {} - Location: {}".format(

@@ -242,18 +242,12 @@ class AgreementTemplates(FreeAccessView, ThemeView):
         c = restclient.Templates(SLA_COLLECTOR_URL)
         testbed = kwargs.get('testbed', None)
 
-        #logger.debug("AAAAA testbed: {}".format(testbed))
-
         templates, response = c.getall(testbed)
         service_level_objectives = []
-
-        #logger.debug("BBBBB templates: {}".format(templates))
 
         for template in templates:
             service_level_objectives.append(
                 [v.servicelevelobjective for v in template.guaranteeterms.values()])
-
-        logger.debug("CCCCC slo: {}".format(service_level_objectives))
 
         return HttpResponse(service_level_objectives, content_type="application/json", status=response.status_code)
 
@@ -277,7 +271,7 @@ class CreateAgreement(LoginRequiredView, ThemeView):
         dt = datetime.fromtimestamp(float(tstmp))
         # gmt_2 = pytz.timezone("Etc/GMT-2")
         # dlocal = gmt_2.localize(dt).isoformat()
-        dlocal = dt.isoformat() + "CET" # FIXME: hardcoded for demo purposes
+        dlocal = dt.isoformat() + "CET"
         data["SLIVER_INFO_EXPIRATION"] = dlocal
 
         # logger.debug("SLA Agreement parameters: {}".format(data.dict()))
