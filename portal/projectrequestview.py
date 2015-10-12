@@ -106,6 +106,7 @@ class ProjectRequestView(LoginRequiredAutoLogoutView, ThemeView):
                     'authority_hrn'     : wsgi_request.POST.get('authority_name', ''),
                     'project_name'      : project_name,
                     'purpose'           : wsgi_request.POST.get('purpose', ''),
+                    'url'               : wsgi_request.POST.get('url', ''),
                 }
 
                 # for new projects max project_name length is 10
