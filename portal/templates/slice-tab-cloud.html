@@ -1,0 +1,244 @@
+{% extends "layout_wide.html" %}
+
+{% block head %}
+<script type="text/javascript">
+
+var global_list = {};
+
+/* render_flavor & render_image */
+function render_option(obj){
+    var option = document.createElement("option");
+    option.text = obj["@name"];
+    option.value = obj["@name"];
+    return option;
+}
+function render_description(platform, obj, type){
+    if($('#'+platform+'_'+type).length==0){
+        $('#'+platform+'_add').append("<div id='"+platform+"_"+type+"'>");
+    }
+    var d = platform+'_'+type+'_'+obj['@name'];
+    d = d.replace(/ /g, '');
+    id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
+    if($('#'+id).length==0){
+        $('#'+platform+'_'+type).append("<div id='"+d+"' class='alert-success col-md-5' style='margin-top:10px;display:none;border-style:solid;border-color:white;border-width:2px;'></div>");
+    }
+    if($('#'+id+' div').length==0){
+        jQuery.each(obj, function(key,val){
+            if (key != 'openstack:image'){
+                $('#'+id).append("<div>"+key.replace('@','')+": "+val+"</div>");
+            }
+        });
+    }
+}
+function toogle_div(platform, value, type){
+    $("#"+platform+"_add").show();
+    $("[id^='"+platform+"_"+type+"_"+"']").hide();
+    d = platform+'_'+type+'_'+value;
+    d = d.replace(/ /g, '');
+    id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
+    $('#'+id).show();
+}
+function render_cloud(platform, node){
+    elm = document.getElementById(platform+'_select');
+    //newElement = document.createElement('p');
+    //elm.appendChild(newElement); 
+    global_list[platform]={};
+    if('openstack:sliver' in node){
+        selectFlavor = document.createElement('select');
+        selectFlavor.id = platform+"_selectFlavor";
+        selectFlavor.name = platform+"_selectFlavor";
+        selectFlavor.onchange = function(){
+            /* 1) Display corresponding Flavor div - hide others - reset selectImage value */
+            toogle_div(platform, this.value, 'flavor');
+            /* 3) Disable Images, Enable only compatible ones in selectImage */
+            console.log(this.value);
+            console.log(global_list[platform][this.value]);
+            $("#"+platform+"_selectImage option[value=0]").prop('selected', true);
+            $("[id^='"+platform+"_image_"+"']").hide();
+            $("#"+platform+"_selectImage option").attr("disabled",true);
+            $.each(global_list[platform][this.value], function (i,v){
+                $("#"+platform+"_selectImage option[value='" + v + "']").attr("disabled",false);
+            });
+        }
+        var option = document.createElement("option");
+        option.text = "-- select a flavor --";
+        option.value = 0;
+        selectFlavor.appendChild(option);
+        jQuery.each( node['openstack:sliver'], function( i, sliver ) {
+            if('openstack:flavor' in sliver){
+                f = render_option(sliver['openstack:flavor']);
+                selectFlavor.appendChild(f);
+                flavor = sliver["openstack:flavor"];
+                /* 1) create hidden div to explain caracteristics of the flavor */
+                render_description(platform, flavor, 'flavor');
+                flavor_name = flavor['@name'];
+                global_list[platform][flavor_name]=[];
+                if ("openstack:image" in flavor){
+                    selectImage = document.createElement('select');
+                    selectImage.id = platform+"_selectImage";
+                    selectImage.name = platform+"_selectImage";
+                    selectImage.onchange = function(){
+                        /* 2) display corresponding Image div - hide others */
+                        toogle_div(platform, this.value, 'image');
+                    }
+                    var option = document.createElement("option");
+                    option.text = "-- select an image --";
+                    option.value = 0;
+                    selectImage.appendChild(option);
+                    if(flavor["openstack:image"] instanceof Array){
+                        jQuery.each( flavor["openstack:image"], function( i, img ) {
+                           image = render_option(img);
+                           selectImage.appendChild(image);
+                           /* 2) create hidden div to explain caracteristics of the image */
+                           render_description(platform, img, 'image');
+                           global_list[platform][flavor_name].push(img['@name']);
+                        });
+                    }else{
+                        image = render_option(flavor["openstack:image"]);
+                        selectImage.appendChild(image);
+                        /* 2) create hidden div to explain caracteristics of the image */
+                        render_description(platform, flavor["openstack:image"], 'image');
+                        global_list[platform][flavor_name].push(flavor['openstack:image']['@name']);
+                    }
+                }
+
+            }
+        });
+        elm.appendChild(selectFlavor); 
+        elm.appendChild(selectImage); 
+    }
+    //$("#"+platform+"_selectFlavor").css("width","50%");
+    //$("#"+platform+"_selectImage").css("width","50%");
+}
+function is_finished(len_platforms, pf_status){
+    if(len_platforms == pf_status){
+        return true;
+    }else{
+        return false;
+    }
+}
+function send_delete(platform, sliver_name){
+    jQuery('#'+platform+'_vm').val(sliver_name);
+    jQuery('#'+platform+'_form_delete').submit();
+}
+function render_node(platform, node){
+    if('openstack:sliver' in node){
+        sliver = node['openstack:sliver']
+        var d = platform+'_existing_'+sliver['@sliver_name'];
+        d = d.replace(/ /g, '');
+        id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
+        $("#"+platform+"_existing").append("<div id='"+platform+'_existing_'+sliver['@sliver_name']+"' class='row'></div>");
+        //$("#"+id).append("<input type='hidden' name='"+platform+"_"+sliver['@sliver_name']+"' value='"+sliver['@sliver_name']+"'>");
+        $("#"+id).append("<div class='col-md-2' style='margin-left:15px;'>"+sliver['@sliver_name']+"</div>");
+        $("#"+id).append("<div class='col-md-4'>"+sliver['openstack:flavor']['@name']+"</div>");
+        $("#"+id).append("<div class='col-md-4'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
+        $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_delete_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_delete' value='Delete' onclick=send_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+        /*
+        sliver['openstack:address']
+        sliver['openstack:flavor']
+        */
+    }
+}
+
+$(document).ready(function() {
+    var data = Array(); 
+    var platform_status = Array();
+    var platform_empty = Array();
+{% for platform in platforms %}
+    console.log('{{platform}}');
+    {% if platform in cloud_platforms %}
+    $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
+        console.log(data);
+        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
+           rspec = data['{{platform}}']['parsed']['rspec'];
+           if('node' in rspec){
+               if(rspec['node'] instanceof Array) {
+                   jQuery.each( rspec['node'], function( i, node ) {
+                       render_node('{{platform}}',node);
+                   });
+               }else{
+                   render_node('{{platform}}',rspec['node']);
+               }
+           }
+        }
+    });
+    $.post("/sfa/ListResources",{'platform':['{{platform}}']}, function( d ) {
+        $.extend(data,d);
+        console.log(data);
+        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
+           rspec = data['{{platform}}']['parsed']['rspec'];
+           if('node' in rspec){
+               if(rspec['node'] instanceof Array) {
+                   jQuery.each( rspec['node'], function( i, node ) {
+                       render_cloud('{{platform}}',node);
+                   });
+               }else{
+                   render_cloud('{{platform}}',rspec['node']);
+               }
+           }else{
+               platform_empty.push('{{platform}}');
+           }
+        }else{
+            platform_empty.push('{{platform}}');
+        }
+        platform_status.push('{{platform}}');
+        if(is_finished({{len_platforms}},platform_status.length)){
+            $("#loading").hide();
+            if(platform_empty.length == {{len_platforms}}){
+                $("#warning_message").show();
+            }
+        }
+    });
+
+    {% endif %}
+{% endfor %}
+});
+</script>
+{% endblock %}
+
+{% block content %}
+{{post_values}}
+{% for platform in platforms %}
+    {% if platform in cloud_platforms %}
+    <div style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;width:700px;">
+        <h2>{{ platform }}</h2>
+        <form id="{{platform}}_form_add" method="post">
+        {% csrf_token %}
+        <div id="{{platform}}_input" class="row">
+            <div class="col-md-1">
+            <input type="text" maxlength="2" id="{{platform}}_number" name="{{platform}}_number" style="width:2.2em;min-width:2.2em;">
+            </div>
+            <div id="{{platform}}_select" class="col-md-11"></div>
+        </div>
+        <div id="{{platform}}_add" class="row" style="display:none;">
+            <div class="col-md-1" style="padding-top:50px;">
+            <input type="hidden" name="action" id="action" value="add">
+            <input type="hidden" name="platform" id="platform" value="{{platform}}">
+            <input type="submit" form="{{platform}}_form_add" value="Add" onclick="this.form.submit();">
+            </div>
+        </div>
+        </form>
+        <br>
+        // display only if VMs already in slice
+        <form id="{{platform}}_form_delete" method="post">
+        {% csrf_token %}
+        <div id="{{platform}}_existing" class="row">
+        <input type="hidden" name="{{platform}}_vm" id="{{platform}}_vm">
+        <input type="hidden" name="action" id="action" value="delete">
+        <input type="hidden" name="platform" id="platform" value="{{platform}}">
+        </div> 
+        </form>
+        <br>
+        // display only pending changes
+        <br>
+        <form id="{{platform}}_form_reserve" method="post">
+        {% csrf_token %}
+        <div id="{{platform}}_pending" class="row"></div> 
+        <input type="hidden" name="action" id="action" value="reserve">
+        <input type="hidden" name="platform" id="platform" value="{{platform}}">
+        <input type="submit" form="{{platform}}_form_reserve" value="Reserve" onclick="this.form.submit();">
+        </form>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}
