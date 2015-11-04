@@ -139,22 +139,21 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     data = []
     columns = []
     api_options = {}
-    api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
     api_options['list_leases'] = 'all'
     server_am = False
     for pf in platforms:
         platform = get_platform_config(request, pf)
-        logger.debug("platform={}".format(platform))
+        if 'rspec_type' in platform and 'rspec_version' in platform:
+            api_options['geni_rspec_version'] = {'type': platform['rspec_type'],'version': platform['rspec_version']}
+        else:
+            api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
         if 'sm' in platform and len(platform['sm']) > 0:
-            logger.debug('sm')
             server_am = True
             server_url = platform['sm']
         if 'rm' in platform and len(platform['rm']) > 0:
-            logger.debug('rm')
             server_am = False
             server_url = platform['rm']
         if 'registry' in platform and len(platform['registry']) > 0:
-            logger.debug('registry')
             server_am = False
             server_url = platform['registry']
     
@@ -212,7 +211,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                 if server_am:
                     if method == "ListResources":
                         result = server.ListResources([user_cred], api_options)
-                        logger.debug(result)
                         dict_result = xmltodict.parse(result['value'])
                         result['parsed'] = dict_result
                         if isinstance(dict_result['rspec']['node'], list):
@@ -222,7 +220,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
                     elif method == "Describe":
                         version = server.GetVersion()
-                        logger.debug(version['geni_api'])
                         # if GetVersion = v2
                         if version['geni_api'] == 2:
                             # ListResources(slice_hrn)
