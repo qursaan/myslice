@@ -4,6 +4,14 @@
 <script type="text/javascript">
 
 var global_list = {};
+var data = Array(); 
+var ad_rspec = Array(); 
+var request_rspec = Array(); 
+var manifest_rspec = Array(); 
+var deleted_nodes = {}; 
+var added_nodes = {}; 
+
+var len_platforms = {{len_platforms}};
 
 /* render_flavor & render_image */
 function render_option(obj){
@@ -20,7 +28,7 @@ function render_description(platform, obj, type){
     d = d.replace(/ /g, '');
     id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
     if($('#'+id).length==0){
-        $('#'+platform+'_'+type).append("<div id='"+d+"' class='alert-success col-md-5' style='margin-top:10px;display:none;border-style:solid;border-color:white;border-width:2px;'></div>");
+        $('#'+platform+'_'+type).append("<div id='"+d+"' class='alert-success col-md-5' style='margin-top:10px;display:none;border-style:solid;border-color:#f1f1f1;border-width:2px;'></div>");
     }
     if($('#'+id+' div').length==0){
         jQuery.each(obj, function(key,val){
@@ -32,6 +40,12 @@ function render_description(platform, obj, type){
 }
 function toogle_div(platform, value, type){
     $("#"+platform+"_add").show();
+    // show the add button only if image is selected
+    if($("#"+platform+"_selectImage").val()!=null && $("#"+platform+"_selectImage").val()!=0 && value!=0){
+        $("#"+platform+"_add_button").show();
+    }else{
+        $("#"+platform+"_add_button").hide();
+    }
     $("[id^='"+platform+"_"+type+"_"+"']").hide();
     d = platform+'_'+type+'_'+value;
     d = d.replace(/ /g, '');
@@ -49,16 +63,15 @@ function render_cloud(platform, node){
         selectFlavor.name = platform+"_selectFlavor";
         selectFlavor.onchange = function(){
             /* 1) Display corresponding Flavor div - hide others - reset selectImage value */
+            $("#"+platform+"_selectImage option[value=0]").prop('selected', true);
             toogle_div(platform, this.value, 'flavor');
             /* 3) Disable Images, Enable only compatible ones in selectImage */
-            console.log(this.value);
-            console.log(global_list[platform][this.value]);
-            $("#"+platform+"_selectImage option[value=0]").prop('selected', true);
             $("[id^='"+platform+"_image_"+"']").hide();
             $("#"+platform+"_selectImage option").attr("disabled",true);
             $.each(global_list[platform][this.value], function (i,v){
                 $("#"+platform+"_selectImage option[value='" + v + "']").attr("disabled",false);
             });
+            $("#"+platform+"_selectImage").attr("disabled",false);
         }
         var option = document.createElement("option");
         option.text = "-- select a flavor --";
@@ -88,6 +101,7 @@ function render_cloud(platform, node){
                     if(flavor["openstack:image"] instanceof Array){
                         jQuery.each( flavor["openstack:image"], function( i, img ) {
                            image = render_option(img);
+                           image.disabled = true;
                            selectImage.appendChild(image);
                            /* 2) create hidden div to explain caracteristics of the image */
                            render_description(platform, img, 'image');
@@ -95,6 +109,7 @@ function render_cloud(platform, node){
                         });
                     }else{
                         image = render_option(flavor["openstack:image"]);
+                        image.disabled = true;
                         selectImage.appendChild(image);
                         /* 2) create hidden div to explain caracteristics of the image */
                         render_description(platform, flavor["openstack:image"], 'image');
@@ -107,8 +122,10 @@ function render_cloud(platform, node){
         elm.appendChild(selectFlavor); 
         elm.appendChild(selectImage); 
     }
-    //$("#"+platform+"_selectFlavor").css("width","50%");
-    //$("#"+platform+"_selectImage").css("width","50%");
+    $("#"+platform+"_selectFlavor").css("width","100px");
+    $("#"+platform+"_selectFlavor").css("height","30px");
+    $("#"+platform+"_selectImage").css("width","30px");
+    $("#"+platform+"_selectImage").css("height","30px");
 }
 function is_finished(len_platforms, pf_status){
     if(len_platforms == pf_status){
@@ -117,22 +134,191 @@ function is_finished(len_platforms, pf_status){
         return false;
     }
 }
-function send_delete(platform, sliver_name){
-    jQuery('#'+platform+'_vm').val(sliver_name);
-    jQuery('#'+platform+'_form_delete').submit();
+function sliver_name_exists(sliver_name){
+    if(sliver_name in added_nodes){
+        return true;
+    }
+    /*
+    if (sliver_name in deleted_nodes){
+        return true;
+    }
+    */
+    return false;
 }
-function render_node(platform, node){
+function find_sliver_name(sliver_name, num){
+    for (j=Object.keys(added_nodes).length; j<Object.keys(added_nodes).length+num; i++){
+        vm_name = sliver_name+'_'+j;
+        if(!sliver_name_exists(vm_name)){
+            return vm_name
+        }
+    }
+}
+
+function send_add(platform){ 
+    $('#'+platform+'_pending_add').show();
+    sliver_name = $('#'+platform+'_sliver_name').val();
+    sliver_name = sliver_name.replace(' ','_');
+    flavor_name = $('#'+platform+'_selectFlavor').val();
+    image_name = $('#'+platform+'_selectImage').val();
+
+    num = $('#'+platform+'_number').val();
+    if (num > 1){
+        for (i = 0; i < num; i++){
+            // XXX Check if the name already exist in existing VMs and added_nodes
+            vm_name = sliver_name+"_"+i;
+            if (sliver_name_exists(vm_name)){
+                vm_name = find_sliver_name(sliver_name, num);
+            }
+            node = get_node(vm_name, flavor_name, image_name);
+            request_rspec['rspec']['node'].push(node);
+            render_node(platform, node, 'pending_add');
+            added_nodes[vm_name]=node;
+        }
+    }else{
+        if (sliver_name_exists(sliver_name)){
+            sliver_name = find_sliver_name(sliver_name, num);
+        }
+        node = get_node(sliver_name, flavor_name, image_name);
+        request_rspec['rspec']['node'].push(node);
+        render_node(platform, node, 'pending_add');
+        added_nodes[sliver_name]=node;
+    }
+    toogle_div(platform, flavor_name, 'flavor');
+    toogle_div(platform, image_name, 'image');
+    flavor_name = $('#'+platform+'_selectFlavor').val(0);
+    image_name = $('#'+platform+'_selectImage').val(0);
+    $('#'+platform+'_add').hide();
+    $('#'+platform+'_add_button').hide();
+    $('#'+platform+'_div_pending').show();
+    console.log(request_rspec);
+    //jQuery('#'+platform+'_form_delete').submit();
+}
+function get_node(vm_name, flavor_name, image_name){
+        var node = {};
+        if(ad_rspec['rspec']['node'] instanceof Array) {
+            // Deep copy of the Array to avoid reference
+            node = jQuery.extend(true, {}, ad_rspec['rspec']['node'][0]);
+        }else{
+            // Deep copy of the Array to avoid reference
+            node = jQuery.extend(true, {}, ad_rspec['rspec']['node']);
+        }
+        if(node['openstack:sliver'] instanceof Array) {
+            node['openstack:sliver'] = node['openstack:sliver'][0];
+        }
+        node['openstack:sliver']['@sliver_name'] = vm_name;
+        console.log(vm_name);
+
+        if(node['openstack:sliver']['openstack:flavor'] instanceof Array) {
+            node['openstack:sliver']['openstack:flavor'] = node['openstack:sliver']['openstack:flavor'][0];
+        }
+        node['openstack:sliver']['openstack:flavor'] = Array();
+        node['openstack:sliver']['openstack:flavor'] = {'@name':flavor_name,'openstack:image':{'@name':image_name}};
+
+        $.each(node['openstack:sliver']['openstack:security_group'], function(i, group){
+            if(group['@name']=='default'){
+                node['openstack:sliver']['openstack:security_group'] = group;
+                return false;
+            }
+        });
+        return node;
+
+}
+function send_delete(platform, sliver_name){
+    $('#'+platform+'_pending_delete').show();
+    jQuery('#'+platform+'_vm').val(sliver_name);
+    jQuery('#'+platform+'_existing_'+sliver_name).hide();
+    node = remove_node_from_request_rspec(sliver_name);
+    deleted_nodes[sliver_name]=node;
+    render_node(platform, node, 'pending_delete');
+    $('#'+platform+'_div_pending').show();
+    console.log(request_rspec);
+}
+function remove_node_from_request_rspec(sliver_name){
+    var save_node = Array();
+    jQuery.each( request_rspec['rspec']['node'], function( i, node ) {
+        if(node['openstack:sliver']['@sliver_name']==sliver_name){
+            request_rspec['rspec']['node'].splice(i,1);
+            save_node = node;
+            return false;
+        }
+    });
+    return save_node;
+}
+function cancel_add(platform,sliver_name){
+    // remove the canceled node from the pending list
+    $('#'+platform+'_pending_add_'+sliver_name).remove();
+    // remove the canceled node from the request rspec
+    node = remove_node_from_request_rspec(sliver_name);
+    delete added_nodes[sliver_name];
+    // hide the pending div if there are no more nodes
+    if ($('#'+platform+'_pending_add div').length==0){
+        $('#'+platform+'_pending_add').hide();
+        if ($('#'+platform+'_pending_delete div').length==0){
+            $('#'+platform+'_div_pending').hide();
+        }
+    }
+}
+function cancel_delete(platform,sliver_name){
+    // display the canceled node back in existing nodes
+    $('#'+platform+'_existing_'+sliver_name).show();
+    // remove the canceled node from the pending list
+    $('#'+platform+'_pending_delete_'+sliver_name).remove();
+    // Cancel the deletion of an existing node -> push it back to the request rspec
+    request_rspec['rspec']['node'].push(deleted_nodes[sliver_name]);
+    delete deleted_nodes[sliver_name];
+    // hide the pending div if there are no more nodes
+    if ($('#'+platform+'_pending_delete div').length==0){
+        $('#'+platform+'_pending_delete').hide();
+        if ($('#'+platform+'_pending_add div').length==0){
+            $('#'+platform+'_div_pending').hide();
+        }
+    }
+}
+
+function public_ip(platform,sliver_name,is_public){
+    // XXX Change ip status in request_rspec
+    if(is_public){
+        // external_ip="true"
+        node = remove_node_from_request_rspec(sliver_name);
+        node['external_ip']="true";
+        added_nodes[sliver_name]['external_ip']="true";
+        request_rspec['rspec']['node'].push(node);        
+    }else{
+        console.log(sliver_name+' NOT public ');
+        // external_ip="false"
+        node = remove_node_from_request_rspec(sliver_name);
+        node['external_ip']="false";
+        added_nodes[sliver_name]['external_ip']="false";
+        request_rspec['rspec']['node'].push(node);        
+    }
+}
+
+function render_node(platform, node, state){
     if('openstack:sliver' in node){
         sliver = node['openstack:sliver']
-        var d = platform+'_existing_'+sliver['@sliver_name'];
+        var d = platform+'_'+state+'_'+sliver['@sliver_name'];
         d = d.replace(/ /g, '');
         id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
-        $("#"+platform+"_existing").append("<div id='"+platform+'_existing_'+sliver['@sliver_name']+"' class='row'></div>");
+        $("#"+platform+"_"+state).append("<div id='"+platform+'_'+state+'_'+sliver['@sliver_name']+"' class='row'></div>");
         //$("#"+id).append("<input type='hidden' name='"+platform+"_"+sliver['@sliver_name']+"' value='"+sliver['@sliver_name']+"'>");
-        $("#"+id).append("<div class='col-md-2' style='margin-left:15px;'>"+sliver['@sliver_name']+"</div>");
-        $("#"+id).append("<div class='col-md-4'>"+sliver['openstack:flavor']['@name']+"</div>");
-        $("#"+id).append("<div class='col-md-4'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
-        $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_delete_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_delete' value='Delete' onclick=send_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+        if(state=='pending_add'){
+            $("#"+id).append("<div class='col-md-1' style='margin-left:0px;!important;'><input type='checkbox' id='publicip_"+platform+"_"+sliver['@sliver_name']+"' onclick=public_ip('"+platform+"','"+sliver['@sliver_name']+"',this.checked);></div>");
+        }else{
+            $("#"+id).append("<div class='col-md-1' style='margin-left:0px;!important;'>&nbsp;</div>");
+        }
+        $("#"+id).append("<div class='col-md-2' style='padding-left:0px;'>"+sliver['@sliver_name']+"</div>");
+        $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['@name']+"</div>");
+        $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
+
+        if(state=='existing'){
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_delete_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_delete' value='Delete' onclick=send_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+        }else if(state=='pending_add'){
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_add('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+        }else if (state=='pending_delete'){
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+        }else{
+            console.log("state: "+state+" not impemented");
+        }
         /*
         sliver['openstack:address']
         sliver['openstack:flavor']
@@ -140,56 +326,77 @@ function render_node(platform, node){
     }
 }
 
-$(document).ready(function() {
-    var data = Array(); 
+function allocate(platform, slicename){
+    $.post("/sfa/Allocate",{'hrn':slicename, 'type':'slice', 'platform':[platform], 'rspec':JSON.stringify(request_rspec)}, function( result ) {
+        console.log(result);
+        clear_data(platform);
+        load_data(platform,slicename);
+        mysliceAlert('Success: changes applied','success', true);
+    });
+}
+function clear_data(platform){
+    $('#'+platform+'_existing').children().remove();
+    $('#'+platform+'_pending_delete').children().remove();
+    $("#"+platform+"_selectFlavor").remove();
+    $("#"+platform+"_selectImage").remove();
+    $('#'+platform+'_pending_add').children().remove();
+    $('#'+platform+'_div_pending').hide();
+}
+function load_data(platform, slicename){
     var platform_status = Array();
     var platform_empty = Array();
-{% for platform in platforms %}
-    console.log('{{platform}}');
-    {% if platform in cloud_platforms %}
-    $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
+
+    $.post("/sfa/Describe",{'hrn':slicename, 'type':'slice', 'platform':[platform]}, function( d ) {
+        data = d;
         console.log(data);
-        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
-           rspec = data['{{platform}}']['parsed']['rspec'];
-           if('node' in rspec){
-               if(rspec['node'] instanceof Array) {
-                   jQuery.each( rspec['node'], function( i, node ) {
-                       render_node('{{platform}}',node);
+        if('parsed' in data[platform] && 'rspec' in data[platform]['parsed']){
+           manifest_rspec = data[platform]['parsed']['rspec'];
+           request_rspec = data[platform]['parsed'];
+           request_rspec['rspec']['@type']='request';
+           if('node' in manifest_rspec){
+               if(manifest_rspec['node'] instanceof Array) {
+                   jQuery.each( manifest_rspec['node'], function( i, node ) {
+                       render_node(platform,node, 'existing');
                    });
                }else{
-                   render_node('{{platform}}',rspec['node']);
+                   render_node(platform,manifest_rspec['node'], 'existing');
                }
+               $('#'+platform+'_existing').show();
            }
         }
     });
-    $.post("/sfa/ListResources",{'platform':['{{platform}}']}, function( d ) {
-        $.extend(data,d);
-        console.log(data);
-        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
-           rspec = data['{{platform}}']['parsed']['rspec'];
-           if('node' in rspec){
-               if(rspec['node'] instanceof Array) {
-                   jQuery.each( rspec['node'], function( i, node ) {
-                       render_cloud('{{platform}}',node);
+    $.post("/sfa/ListResources",{'platform':[platform]}, function( d ) {
+        //$.extend(data,d);
+        //console.log(data);
+        if('parsed' in d[platform] && 'rspec' in d[platform]['parsed']){
+           ad_rspec = d[platform]['parsed'];
+           if('node' in ad_rspec['rspec']){
+               if(ad_rspec['rspec']['node'] instanceof Array) {
+                   jQuery.each( ad_rspec['rspec']['node'], function( i, node ) {
+                       render_cloud(platform,node);
                    });
                }else{
-                   render_cloud('{{platform}}',rspec['node']);
+                   render_cloud(platform,ad_rspec['rspec']['node']);
                }
            }else{
-               platform_empty.push('{{platform}}');
+               platform_empty.push(platform);
            }
         }else{
-            platform_empty.push('{{platform}}');
+            platform_empty.push(platform);
         }
-        platform_status.push('{{platform}}');
-        if(is_finished({{len_platforms}},platform_status.length)){
+        platform_status.push(platform);
+        if(is_finished(len_platforms,platform_status.length)){
             $("#loading").hide();
-            if(platform_empty.length == {{len_platforms}}){
+            if(platform_empty.length == len_platforms){
                 $("#warning_message").show();
             }
         }
     });
-
+}
+$(document).ready(function() {
+{% for platform in platforms %}
+    {% if platform in cloud_platforms %}
+    load_data('{{platform}}', '{{slicename}}');
     {% endif %}
 {% endfor %}
 });
@@ -202,42 +409,61 @@ $(document).ready(function() {
     {% if platform in cloud_platforms %}
     <div style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;width:700px;">
         <h2>{{ platform }}</h2>
-        <form id="{{platform}}_form_add" method="post">
-        {% csrf_token %}
-        <div id="{{platform}}_input" class="row">
-            <div class="col-md-1">
-            <input type="text" maxlength="2" id="{{platform}}_number" name="{{platform}}_number" style="width:2.2em;min-width:2.2em;">
-            </div>
-            <div id="{{platform}}_select" class="col-md-11"></div>
-        </div>
-        <div id="{{platform}}_add" class="row" style="display:none;">
-            <div class="col-md-1" style="padding-top:50px;">
-            <input type="hidden" name="action" id="action" value="add">
-            <input type="hidden" name="platform" id="platform" value="{{platform}}">
-            <input type="submit" form="{{platform}}_form_add" value="Add" onclick="this.form.submit();">
-            </div>
-        </div>
-        </form>
-        <br>
         // display only if VMs already in slice
+        <h4>VMs in slice {{slicename}}</h4>
         <form id="{{platform}}_form_delete" method="post">
         {% csrf_token %}
-        <div id="{{platform}}_existing" class="row">
+        <div id="{{platform}}_existing" class="row alert alert-info" style="display:none;">
         <input type="hidden" name="{{platform}}_vm" id="{{platform}}_vm">
         <input type="hidden" name="action" id="action" value="delete">
         <input type="hidden" name="platform" id="platform" value="{{platform}}">
         </div> 
         </form>
+        <h4><a href="#" onclick="$('#{{platform}}_div_add').toggle();"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create new VMs</a></h4>
+        <div id="{{platform}}_div_add" class="alert" style="background-color:#f1f1f1;display:none;margin-bottom:0px !important;padding-bottom:6px !important;">
+        <form id="{{platform}}_form_add" method="post" class="form-inline">
+        {% csrf_token %}
+        <div id="{{platform}}_input" class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-3"><label for="{{platform}}_number">number:</label>
+            <input type="text" maxlength="2" id="{{platform}}_number" name="{{platform}}_number" style="width:2.2em;min-width:2.2em;height:30px;" value="1" class="form-control" required>
+            </div>
+            <div class="col-md-8"><label for="{{platform}}_sliver_name">name:</label>
+            <div class="form-group">
+            <input type="text" name="{{platform}}_sliver_name" id="{{platform}}_sliver_name" value="VM" maxlength="12" class="form-control" style="height:30px;" required>
+            </div>
+            </div>
+            <div class="col-md-1"></div>
+            <div id="{{platform}}_select" class="col-md-11"></div>
+        </div>
+        <div id="{{platform}}_add" class="row">
+            <div class="col-md-1">&nbsp; 
+            <input type="hidden" name="action" id="action" value="add">
+            <input type="hidden" name="platform" id="platform" value="{{platform}}">
+            </div>
+        </div>
+        <div class="row" style="padding-top:6px;">
+            <div class="col-md-1">&nbsp;</div>
+            <div class="col-md-11" id="{{platform}}_add_button" style="display:none;">
+            <input type="submit" form="{{platform}}_form_add" value="Add" onclick="send_add('{{platform}}');">
+            </div>
+        </div>
+        </form>
+        </div>
         <br>
+        <div id="{{platform}}_div_pending" style="display:none;">
         // display only pending changes
-        <br>
+        <h4>Pending changes</h4>
         <form id="{{platform}}_form_reserve" method="post">
         {% csrf_token %}
-        <div id="{{platform}}_pending" class="row"></div> 
+        <div id="{{platform}}_pending_add" class="row alert alert-success" style="display:none;margin-bottom:3px !important;"></div> 
+        <div id="{{platform}}_pending_delete" class="row alert alert-danger" style="display:none;margin-bottom:3px !important;"></div> 
+        <br>
         <input type="hidden" name="action" id="action" value="reserve">
         <input type="hidden" name="platform" id="platform" value="{{platform}}">
-        <input type="submit" form="{{platform}}_form_reserve" value="Reserve" onclick="this.form.submit();">
+        <input type="submit" form="{{platform}}_form_reserve" value="Apply changes" onclick="allocate('{{platform}}','{{slicename}}');">
         </form>
+        </div>
     </div>
     {% endif %}
 {% endfor %}

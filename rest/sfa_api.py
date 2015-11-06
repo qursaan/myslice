@@ -14,6 +14,7 @@ from sfa.client.return_value    import ReturnValue
 from sfa.util.xrn               import Xrn, get_leaf, get_authority, hrn_to_urn, urn_to_hrn
 
 from manifold.core.query        import Query
+from manifold.operators.rename  import do_rename
 
 from manifoldapi.manifoldapi    import execute_admin_query
 
@@ -23,12 +24,15 @@ from myslice.settings           import logger, config
 
 from rest.json_encoder          import MyEncoder
 
+import uuid
+def unique_call_id(): return uuid.uuid4().urn
+
 def dispatch(request, method):
 
     hrn = ''
     urn = ''
     object_type = ''
-    rspec = ''
+    rspec = None
     recursive = False
     options   = dict()
     platforms = list()
@@ -41,28 +45,39 @@ def dispatch(request, method):
     elif request.method == 'GET':
         req_items = request.GET
 
-    for el in req_items.items():
-        if el[0].startswith('rspec'):
-            rspec += el[1]
-        elif el[0].startswith('platform'):
-            platforms = req_items.getlist('platform[]')
-        #elif el[0].startswith('options'):
-        #    options += req_items.getlist('options[]')
-        elif el[0].startswith('hrn'):
-            hrn = el[1]
-        elif el[0].startswith('urn'):
-            urn = el[1]
-        elif el[0].startswith('type'):
-            object_type = el[1]
-        elif el[0].startswith('recursive'):
-            if el[1] == '1':
+    logger.debug("dispatch got = %s" % req_items.dict())
+    #t = dict(req_items.iterlists())
+    #rspec = req_items.getlist('rspec')
+    #logger.debug("dispatch got = %s" % t)
+
+    platforms = req_items.getlist('platform[]')
+    logger.debug("req_items type = %s" % type(req_items.dict()))
+    for k in req_items.dict():
+        logger.debug(k)
+        if k == 'rspec':
+            rspec = req_items.get(k)
+        if k == 'hrn':
+            hrn = req_items.get(k)
+        if k == 'urn':
+            urn = req_items.get(k)
+        if k == 'type':
+            object_type = req_items.get(k)
+        if k == 'recursive':
+            if v == '1':
                 recursive = True
             else:
                 recursive = False
-        elif el[0].startswith('display'):
-            display = el[1]
+        if k == 'display':
+            display = req_items.get(k)
 
-    results = sfa_client(request, method, hrn=hrn, urn=urn, object_type=object_type, recursive=recursive, options=options, platforms=platforms)
+    if rspec is not None:
+        try:
+            rspec = json.loads(rspec)
+        except Exception,e:
+            logger.debug("rspec type = %s" % type(rspec))
+        if type(rspec) is dict:
+            rspec = xmltodict.unparse(rspec)
+    results = sfa_client(request, method, hrn=hrn, urn=urn, object_type=object_type, rspec=rspec, recursive=recursive, options=options, platforms=platforms)
     if display == 'table':
         return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
     else:
@@ -112,6 +127,8 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
         object_type = ''
     if rspec is None:
         rspec = ''
+    else:
+        logger.debug("RSPEC = %s" % rspec)
     if recursive is None:
         recursive = False
     if options is None:
@@ -250,24 +267,26 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                     elif method == 'Allocate':
                         api_options['call_id']    = unique_call_id()
                         # List of users comes from the Registry
-                        api_options['sfa_users']  = sfa_users
-                        api_options['geni_users'] = geni_users
+                        users = get_users_in_slice(request, hrn)
+                        api_options['sfa_users']  = users
+                        api_options['geni_users'] = users
                         # if GetVersion = v2
                         version = server.GetVersion()
                         if version['geni_api'] == 2:
                             result = server.CreateSliver([urn] ,[object_cred], rspec, api_options)
                         # else GetVersion = v3
                         else:
-                            result = server.Allocate([urn] ,[object_cred], rspec, api_options)
+                            result = server.Allocate(urn ,[object_cred], rspec, api_options)
                     elif method == 'Provision':
                         # if GetVersion = v2
                         # Nothing it is not supported by v2 AMs
                         version = server.GetVersion()
+                        # List of users comes from the Registry
+                        users = get_users_in_slice(request, hrn)
+                        api_options['sfa_users']  = users
+                        api_options['geni_users'] = users
                         if version['geni_api'] == 3:
                             api_options['call_id']    = unique_call_id()
-                            # List of users comes from the Registry
-                            api_options['sfa_users']  = sfa_users
-                            api_options['geni_users'] = geni_users
                             result = server.Provision([urn] ,[object_cred], api_options)
                     elif method == 'Status':
                         result = server.Status([urn] ,[object_cred], api_options)
@@ -334,6 +353,30 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
     results['columns'] = columns
     return results
+
+def rename(self,key,new_key):
+    ind = self._keys.index(key)  #get the index of old key, O(N) operation
+    self._keys[ind] = new_key    #replace old key with new key in self._keys
+    self[new_key] = self[key]    #add the new key, this is added at the end of self._keys
+    self._keys.pop(-1)           #pop the last item in self._keys
+
+def get_users_in_slice(request, slice_hrn):
+    # select users.user_hrn, users.user_email, users.keys  
+    # from myslice:slice 
+    # where slice_hrn=='onelab.upmc.r2d2.slice1'
+    users_query  = Query().get('myslice:slice').filter_by('slice_hrn', '==', slice_hrn).select('users.user_hrn', 'users.user_urn', 'users.user_email','users.keys')
+    users = execute_admin_query(request, users_query)
+    rmap = {'user_urn':'urn','user_email':'email','user_hrn':'hrn'}
+    res = list()
+    for u in users[0]['users']:
+        r_user = dict()
+        for k,v in u.items():
+            if k in rmap.keys():
+                r_user[rmap[k]] = v
+            else:
+                r_user[k]=v
+        res.append(r_user)
+    return res
 
 def get_user_config(request, user_email, platform_name):
     account = get_user_account(request, user_email, platform_name)

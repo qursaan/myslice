@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.shortcuts import render
 
-from unfold.loginrequired import FreeAccessView
+from unfold.loginrequired import LoginRequiredView
 
 from manifold.core.query        import Query
 from manifoldapi.manifoldapi    import execute_query
@@ -22,7 +22,7 @@ from sfa.planetlab.plxrn import hash_loginbase
 
 import urllib2,json
 
-class CloudView (FreeAccessView, ThemeView):
+class CloudView (LoginRequiredView, ThemeView):
     # parent View is portal/sliceview.py
 
     def get_platforms (self, request):
