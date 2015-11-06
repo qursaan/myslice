@@ -1,6 +1,14 @@
 {% extends "layout_wide.html" %}
 
 {% block head %}
+<style>
+.disabled {
+    z-index: 1000;
+    background-color: #999999;
+    opacity: 0.3;
+    pointer-events: none;
+}
+</style>
 <script type="text/javascript">
 
 var global_list = {};
@@ -327,10 +335,15 @@ function render_node(platform, node, state){
 }
 
 function allocate(platform, slicename){
+    $("#"+platform+"_main").addClass("disabled");
+    $("#"+platform+"_wait").show();
+    $("#"+platform+"_wait").spin();
     $.post("/sfa/Allocate",{'hrn':slicename, 'type':'slice', 'platform':[platform], 'rspec':JSON.stringify(request_rspec)}, function( result ) {
         console.log(result);
         clear_data(platform);
         load_data(platform,slicename);
+        $("#"+platform+"_main").removeClass("disabled");
+        $("#"+platform+"_wait").hide();
         mysliceAlert('Success: changes applied','success', true);
     });
 }
@@ -407,7 +420,8 @@ $(document).ready(function() {
 {{post_values}}
 {% for platform in platforms %}
     {% if platform in cloud_platforms %}
-    <div style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;width:700px;">
+    <div id="{{platform}}_wait" style="display:none;margin-top:20px;position:absolute;margin-left:300px;"></div>
+    <div id="{{platform}}_main" style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;width:700px;">
         <h2>{{ platform }}</h2>
         // display only if VMs already in slice
         <h4>VMs in slice {{slicename}}</h4>
