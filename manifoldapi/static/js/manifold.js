@@ -1703,6 +1703,8 @@ case TYPE_LIST_OF_VALUES:
 
         query = query_ext.query;
 
+        var testbeds_with_sla = localStorage.getItem("sla_testbeds").split(",");
+
         switch(query.object) {
 
             case 'resource':
@@ -1748,9 +1750,9 @@ case TYPE_LIST_OF_VALUES:
                     }
                 }
 
-                /*var urn_regexp = /\+(.*?)\+/;
+                var urn_regexp = /\+(.*?)\+/;
                 var testbed_urn = urn_regexp.exec(record.urn)[1];
-                var has_sla = $.inArray(testbed_urn, localStorage.getItem("sla_testbeds").split(",")) != -1;
+                var has_sla = $.inArray(testbed_urn, testbeds_with_sla) != -1;
 
                 if (has_sla) {
                     // var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
@@ -1761,7 +1763,7 @@ case TYPE_LIST_OF_VALUES:
                     } else {
                         delete warnings[CONSTRAINT_SLA];
                     }
-                }*/
+                }
 
                 manifold.query_store.set_record_state(query.query_uuid, record_key, STATE_WARNINGS, warnings);
                 // Signal the change to plugins (even if the constraint does not apply, so that the plugin can display a checkmark)

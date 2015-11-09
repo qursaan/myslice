@@ -26,6 +26,9 @@ from myslice.settings               import logger, config
 from repoze.lru                     import lru_cache
 from rest.json_encoder              import MyEncoder
 
+import uuid
+def unique_call_id(): return uuid.uuid4().urn
+
 def dispatch(request, method):
 
     hrn = None
@@ -46,34 +49,44 @@ def dispatch(request, method):
     elif request.method == 'GET':
         req_items = request.GET
 
-    logger.debug("URL = %s" % request.build_absolute_uri())
+    logger.debug("dispatch got = %s" % req_items.dict())
+    #t = dict(req_items.iterlists())
+    #rspec = req_items.getlist('rspec')
+    #logger.debug("dispatch got = %s" % t)
 
-    for el in req_items.items():
-        if el[0].startswith('rspec'):
-            rspec += el[1]
-        elif el[0].startswith('platform'):
-            platforms = frozenset(req_items.getlist('platform[]'))
-        elif el[0].startswith('options'):
-            options_url = el[1] #req_items.getlist('options')
-            options = QueryDict(options_url)
-        elif el[0].startswith('output_format'):
-            output_format = el[1] #req_items.getlist('options')
-        elif el[0].startswith('hrn'):
-            hrn = el[1]
-        elif el[0].startswith('urn'):
-            urn = el[1]
-        elif el[0].startswith('type'):
-            object_type = el[1]
-        elif el[0].startswith('recursive'):
-            if el[1] == '1':
+    platforms = req_items.getlist('platform[]')
+    for k in req_items.dict():
+        logger.debug("key = %s - value = %s" % (k,req_items.get(k)))
+        if k == 'rspec':
+            rspec = req_items.get(k)
+        if k == 'options':
+            options = req_items.get(k)
+        if k == 'output_format':
+            output_format = req_items.get(k)
+        if k == 'hrn':
+            hrn = req_items.get(k)
+        if k == 'urn':
+            urn = req_items.get(k)
+        if k == 'type':
+            object_type = req_items.get(k)
+        if k == 'recursive':
+            if v == '1':
                 recursive = True
             else:
                 recursive = False
-        elif el[0].startswith('display'):
-            display = el[1]
+        if k == 'display':
+            display = req_items.get(k)
+
+    if rspec is not None:
+        try:
+            rspec = json.loads(rspec)
+        except Exception,e:
+            logger.debug("rspec type = %s" % type(rspec))
+        if type(rspec) is dict:
+            rspec = xmltodict.unparse(rspec)
 
     start_time = time.time()
-    results = sfa_client(request, method, hrn, urn, object_type, rspec, recursive, options, platforms, output_format, False)
+    results = sfa_client(request, method, hrn=hrn, urn=urn, object_type=object_type, rspec=rspec, recursive=recursive, options=options, platforms=platforms, output_format=output_format, admin=False)
     logger.debug("EXEC TIME - sfa_client() - %s sec." % (time.time() - start_time))
     if display == 'table':
         return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
@@ -125,6 +138,8 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
         object_type = ''
     if rspec is None:
         rspec = ''
+    else:
+        logger.debug("RSPEC = %s" % rspec)
     if recursive is None:
         recursive = False
     if options is None:
@@ -156,17 +171,17 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     server_am = False
     for pf in platforms:
         platform = get_platform_config(request, pf)
-        logger.debug("platform={}".format(platform))
+        if 'rspec_type' in platform and 'rspec_version' in platform:
+            api_options['geni_rspec_version'] = {'type': platform['rspec_type'],'version': platform['rspec_version']}
+        else:
+            api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
         if 'sm' in platform and len(platform['sm']) > 0:
-            logger.debug('sm')
             server_am = True
             server_url = platform['sm']
         if 'rm' in platform and len(platform['rm']) > 0:
-            logger.debug('rm')
             server_am = False
             server_url = platform['rm']
         if 'registry' in platform and len(platform['registry']) > 0:
-            logger.debug('registry')
             server_am = False
             server_url = platform['registry']
     
@@ -196,8 +211,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
             start_time = time.time()
             result = server.GetVersion()
             logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
-            logger.debug(result)
-            logger.debug(result['value'])
             if 'geni_ad_rspec_versions' in result['value']:
                 for v in result['value']['geni_ad_rspec_versions']:
                     if v['type'] == options['geni_rspec_version']:
@@ -295,24 +308,26 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                     elif method == 'Allocate':
                         api_options['call_id']    = unique_call_id()
                         # List of users comes from the Registry
-                        api_options['sfa_users']  = sfa_users
-                        api_options['geni_users'] = geni_users
+                        users = get_users_in_slice(request, hrn)
+                        api_options['sfa_users']  = users
+                        api_options['geni_users'] = users
                         # if GetVersion = v2
                         version = server.GetVersion()
                         if version['geni_api'] == 2:
                             result = server.CreateSliver([urn] ,[object_cred], rspec, api_options)
                         # else GetVersion = v3
                         else:
-                            result = server.Allocate([urn] ,[object_cred], rspec, api_options)
+                            result = server.Allocate(urn ,[object_cred], rspec, api_options)
                     elif method == 'Provision':
                         # if GetVersion = v2
                         # Nothing it is not supported by v2 AMs
                         version = server.GetVersion()
+                        # List of users comes from the Registry
+                        users = get_users_in_slice(request, hrn)
+                        api_options['sfa_users']  = users
+                        api_options['geni_users'] = users
                         if version['geni_api'] == 3:
                             api_options['call_id']    = unique_call_id()
-                            # List of users comes from the Registry
-                            api_options['sfa_users']  = sfa_users
-                            api_options['geni_users'] = geni_users
                             result = server.Provision([urn] ,[object_cred], api_options)
                     elif method == 'Status':
                         result = server.Status([urn] ,[object_cred], api_options)
@@ -364,6 +379,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                         logger.debug('method %s not handled by Registry' % method)
                         result = []
             if output_format is not None:
+                logger.debug("result = " % result)
                 if 'value' in result:
                     # TODO Python Caching 
                     # to avoid translating the same RSpec in the same format several times
@@ -398,6 +414,30 @@ def translate(rspec, output_format):
     req = urllib2.Request(url, data)
     response = urllib2.urlopen(req)
     return response.read()
+
+def rename(self,key,new_key):
+    ind = self._keys.index(key)  #get the index of old key, O(N) operation
+    self._keys[ind] = new_key    #replace old key with new key in self._keys
+    self[new_key] = self[key]    #add the new key, this is added at the end of self._keys
+    self._keys.pop(-1)           #pop the last item in self._keys
+
+def get_users_in_slice(request, slice_hrn):
+    # select users.user_hrn, users.user_email, users.keys  
+    # from myslice:slice 
+    # where slice_hrn=='onelab.upmc.r2d2.slice1'
+    users_query  = Query().get('myslice:slice').filter_by('slice_hrn', '==', slice_hrn).select('users.user_hrn', 'users.user_urn', 'users.user_email','users.keys')
+    users = execute_admin_query(request, users_query)
+    rmap = {'user_urn':'urn','user_email':'email','user_hrn':'hrn'}
+    res = list()
+    for u in users[0]['users']:
+        r_user = dict()
+        for k,v in u.items():
+            if k in rmap.keys():
+                r_user[rmap[k]] = v
+            else:
+                r_user[k]=v
+        res.append(r_user)
+    return res
 
 def get_user_config(request, user_email, platform_name):
     account = get_user_account(request, user_email, platform_name)

@@ -166,7 +166,7 @@ class Client(object):
         kwargs["auth"] = HTTPBasicAuth(settings.SLA_COLLECTOR_USER,
                                       settings.SLA_COLLECTOR_PASSWORD)
 
-        result = requests.post(url, data, **kwargs)
+        result = requests.post(url, data, verify=False, **kwargs)
         location = result.headers["location"] \
             if "location" in result.headers else "<null>"
         print "POST {} {} - Location: {}".format(
@@ -343,12 +343,12 @@ class Templates(object):
         converter = xmlconverter.AgreementConverter()
         self.res = _Resource(resourceurl, converter)
 
-    def getall(self):
+    def getall(self, provider_id):
         """ Get all templates
 
         :rtype : list[wsag_model.Template]
         """
-        return self.res.getall()
+        return self.res.get(path="", params={"testbed": provider_id})
 
     def getbyid(self, provider_id):
         """Get a template

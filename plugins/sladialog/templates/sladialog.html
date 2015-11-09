@@ -8,7 +8,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Testbed offers:</p>
-                    <p>99% availability for 99% of the selected resources</p>
+                    <p id="sla_template"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -22,74 +22,5 @@
             <strong>Accepted!</strong> The SLA has been accepted.
         </div>
     </div>
-    <div id="sla_offers" class="container">
-        <div id="fuseco-fokus-fraunhofer-de" class="row" data-urns="[]" style="display: none">
-            <div class="col-md-6">
-                <p>Testbed <span class="provider">fuseco.fokus.fraunhofer.de</span> offers the following SLA for its resources</p>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Details
-                </button>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Accept
-                </button>
-            </div>
-        </div>
-        <div id="omf-netmode" class="row" data-urns="[]" style="display: none">
-            <div class="col-md-6">
-                <p>Testbed <span class="provider">omf:netmode</span> offers the following SLA for its resources</p>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Details
-                </button>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Accept
-                </button>
-            </div>
-        </div>
-        <div id="wilab2-ilabt-iminds-be" class="row" data-urns="[]" style="display: none">
-            <div class="col-md-6">
-                <p>Testbed <span class="provider">wilab2.ilabt.iminds.be</span> offers the following SLA for its resources</p>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Details
-                </button>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Accept
-                </button>
-            </div>
-        </div>
-        <div id="wall2-ilabt-iminds-be" class="row" data-urns="[]" style="display: none">
-            <div class="col-md-6">
-                <p>Testbed <span class="provider">wall2.ilabt.iminds.be</span> offers the following SLA for its resources</p>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-info-button btn btn-default" data-toggle="modal" data-target="#sla_template_modal">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Details
-                </button>
-            </div>
-            <div class="col-md-1">
-                <button class="sla-accept-button btn btn-default" data-complete-text="Accepted" autocomplete="off">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Accept
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="sla_offers" class="container"></div>
 </div>
