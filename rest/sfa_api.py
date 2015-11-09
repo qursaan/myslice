@@ -2,36 +2,41 @@ import os
 import json
 import ConfigParser 
 import datetime
-from time                       import mktime
+from time                           import mktime
+import time
 import xmltodict
 
-from django.shortcuts           import render_to_response
-from django.http                import HttpResponse
+from django.shortcuts               import render_to_response
+from django.http                    import HttpResponse,QueryDict
 
-from sfa.trust.certificate      import Keypair, Certificate
-from sfa.client.sfaserverproxy  import SfaServerProxy
-from sfa.client.return_value    import ReturnValue
-from sfa.util.xrn               import Xrn, get_leaf, get_authority, hrn_to_urn, urn_to_hrn
+from sfa.trust.certificate          import Keypair, Certificate
+from sfa.client.sfaserverproxy      import SfaServerProxy
+from manifold.gateways.sfa.proxy    import SFAProxy
+from sfa.client.return_value        import ReturnValue
+from sfa.util.xrn                   import Xrn, get_leaf, get_authority, hrn_to_urn, urn_to_hrn
 
-from manifold.core.query        import Query
+from manifold.core.query            import Query
 
-from manifoldapi.manifoldapi    import execute_admin_query
+from manifoldapi.manifoldapi        import execute_admin_query
 
-from unfold.loginrequired       import LoginRequiredView
+from unfold.loginrequired           import LoginRequiredView
 
-from myslice.settings           import logger, config
+from myslice.settings               import logger, config
 
-from rest.json_encoder          import MyEncoder
+from repoze.lru                     import lru_cache
+from rest.json_encoder              import MyEncoder
 
 def dispatch(request, method):
 
-    hrn = ''
-    urn = ''
-    object_type = ''
-    rspec = ''
+    hrn = None
+    urn = None
+    object_type = None
+    rspec = None
+    output_format = None
     recursive = False
-    options   = dict()
-    platforms = list()
+    # Have to be hashable for lru_cache
+    options   = frozenset() # dict()
+    platforms = frozenset() # list()
 
     results = dict()
     display = None
@@ -41,13 +46,18 @@ def dispatch(request, method):
     elif request.method == 'GET':
         req_items = request.GET
 
+    logger.debug("URL = %s" % request.build_absolute_uri())
+
     for el in req_items.items():
         if el[0].startswith('rspec'):
             rspec += el[1]
         elif el[0].startswith('platform'):
-            platforms = req_items.getlist('platform[]')
-        #elif el[0].startswith('options'):
-        #    options += req_items.getlist('options[]')
+            platforms = frozenset(req_items.getlist('platform[]'))
+        elif el[0].startswith('options'):
+            options_url = el[1] #req_items.getlist('options')
+            options = QueryDict(options_url)
+        elif el[0].startswith('output_format'):
+            output_format = el[1] #req_items.getlist('options')
         elif el[0].startswith('hrn'):
             hrn = el[1]
         elif el[0].startswith('urn'):
@@ -62,7 +72,9 @@ def dispatch(request, method):
         elif el[0].startswith('display'):
             display = el[1]
 
-    results = sfa_client(request, method, hrn=hrn, urn=urn, object_type=object_type, recursive=recursive, options=options, platforms=platforms)
+    start_time = time.time()
+    results = sfa_client(request, method, hrn, urn, object_type, rspec, recursive, options, platforms, output_format, False)
+    logger.debug("EXEC TIME - sfa_client() - %s sec." % (time.time() - start_time))
     if display == 'table':
         return render_to_response('table-default.html', {'data' : data, 'fields' : columns, 'id' : '@component_id', 'options' : None})
     else:
@@ -90,7 +102,8 @@ def get_user_account(request, user_email, platform_name):
 
     return accounts[0]
 
-def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None, recursive=None, options=None, platforms=None, admin=False):
+#@lru_cache(100)
+def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None, recursive=False, options=None, platforms=None, output_format=None, admin=False):
 
     Config = ConfigParser.ConfigParser()
     monitor_file = os.path.abspath(os.path.dirname(__file__) + '/../myslice/monitor.ini')
@@ -139,7 +152,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
     data = []
     columns = []
     api_options = {}
-    api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
     api_options['list_leases'] = 'all'
     server_am = False
     for pf in platforms:
@@ -177,13 +189,33 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
              return {'error' : '-2'}
  
         server = SfaServerProxy(server_url, pkey, cert)
+        #server = SFAProxy(server_url, pkey, cert)
+        if 'geni_rspec_version' in options:
+            # GetVersion to know if the AM supports the requested version
+            # if not ask for the default GENI v3
+            start_time = time.time()
+            result = server.GetVersion()
+            logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
+            logger.debug(result)
+            logger.debug(result['value'])
+            if 'geni_ad_rspec_versions' in result['value']:
+                for v in result['value']['geni_ad_rspec_versions']:
+                    if v['type'] == options['geni_rspec_version']:
+                        api_options['geni_rspec_version'] = {'type': options['geni_rspec_version']}
+                        break
+                    else:
+                        api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
+        else:
+            api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
 
         try:
             # Get user config from Manifold
             user_config = get_user_config(request, user_email, pf)
             if 'delegated_user_credential' in user_config:
+                logger.debug('delegated_user_credential')
                 user_cred = user_config['delegated_user_credential']
             elif 'user_credential' in user_config:
+                logger.debug('user_credential')
                 user_cred = user_config['user_credential']
             else:
                 logger.error("no user credentials for user = ", user_email)
@@ -191,10 +223,12 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
             if object_type:
                 if 'delegated_%s_credentials'%object_type in user_config:
+                    logger.debug('delegated_%s_credentials'%object_type)
                     for obj_name, cred in user_config['delegated_%s_credentials'%object_type].items():
                         if obj_name == hrn:
                             object_cred = cred
                 elif '%s_credentials'%object_type in user_config:
+                    logger.debug('%s_credentials'%object_type)
                     for obj_name, cred in user_config['%s_credentials'%object_type].items():
                         if obj_name == hrn:
                             object_cred = cred
@@ -206,13 +240,19 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
 
             # Both AM & Registry
             if method == "GetVersion": 
+                start_time = time.time()
                 result = server.GetVersion()
+                logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
             else:
                 # AM API Calls
                 if server_am:
                     if method == "ListResources":
+                        logger.debug(api_options)
+                        #logger.debug(user_cred)
+                        start_time = time.time()
                         result = server.ListResources([user_cred], api_options)
-                        logger.debug(result)
+                        logger.debug("EXEC TIME - ListResources() - %s sec." % (time.time() - start_time))
+                        #logger.debug(result)
                         dict_result = xmltodict.parse(result['value'])
                         result['parsed'] = dict_result
                         if isinstance(dict_result['rspec']['node'], list):
@@ -221,7 +261,9 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                             columns.extend(dict_result['rspec']['node'].keys())
 
                     elif method == "Describe":
+                        start_time = time.time()
                         version = server.GetVersion()
+                        logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
                         logger.debug(version['geni_api'])
                         # if GetVersion = v2
                         if version['geni_api'] == 2:
@@ -321,6 +363,13 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                         #return HttpResponse(json.dumps({'error' : '-3','msg':'method not supported by Registry'}), content_type="application/json")
                         logger.debug('method %s not handled by Registry' % method)
                         result = []
+            if output_format is not None:
+                if 'value' in result:
+                    # TODO Python Caching 
+                    # to avoid translating the same RSpec in the same format several times
+                    start_time = time.time()
+                    result = translate(result['value'],output_format)
+                    logger.debug("EXEC TIME - translate() - %s sec." % (time.time() - start_time))
 
             results[pf] = result
             if dict_result:
@@ -333,10 +382,22 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
             import traceback
             logger.error(traceback.format_exc())
             logger.error(e)
-            results[pf] = {'error':'-3', 'error_msg': str(e)}
+            results[pf] = {'error':'-3', 'result':result,'error_msg': str(e)}
 
     results['columns'] = columns
     return results
+
+@lru_cache(100)
+def translate(rspec, output_format):
+    import urllib
+    import urllib2
+
+    values = {'content' : rspec}
+    url = 'https://demo.fiteagle.org/omnweb/convert/to/' + output_format
+    data = urllib.urlencode(values)
+    req = urllib2.Request(url, data)
+    response = urllib2.urlopen(req)
+    return response.read()
 
 def get_user_config(request, user_email, platform_name):
     account = get_user_account(request, user_email, platform_name)
