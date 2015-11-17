@@ -1,0 +1,482 @@
+/* ---------------------------------------------------------------------------
+   (c) Telef�nica I+D, 2013
+   Author: Paulo Villegas
+   ------------------------------------------------------------------------- */
+
+
+body {
+    background-color: #f6f6f6;
+}
+
+/* HREF links */
+
+a {
+    color: blue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: blue;
+}
+
+/* .......................................................................*/
+/* Container Class */
+#plugin_container{
+	width:99%;
+	/*max-width:1000px;
+	max-width:1170px;*/	
+	
+}
+
+
+/* Container Class End ................................................... */
+
+
+#area51{
+    display: table;
+    background-color:black;
+    color:white;
+    width:500px;
+    height:400px;
+    clear:both;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:100px;
+    padding:10px 10px 10px 10px;
+}
+
+/* ....................................................................... */
+/* SidePanel-Left*/
+.sidepanel-left{ 
+	display:inline-block;  
+	min-width:851px; 
+    width:80%;
+ /*    background-color:rgb(255,165,0);*/
+    padding-left:20px;
+    padding-right:20px;
+    padding-top:10px;
+    padding-bottom:20px;
+}
+
+#testbed_bound_text, #unbound_text{
+    background-color:white;
+    text-align:justify;
+    padding: 5px 7px 5px 7px;
+    margin: 5px 5px 5px 5px; 
+}
+
+#node_num_Slider .tooltip, #node_num_Slider2 .tooltip{
+	display:none;
+}
+
+.control-label{
+    display:inline-block;
+    float:left;
+    width:40%;
+   <!-- margin-right:0px;-->
+   margin-left:0px;
+}
+
+.form-control{
+    display:inline-block;
+    margin-left:20px;
+    width:20% !important;
+   <!-- margin-right:16px;-->
+}
+
+#node_numSliderVal, #node_numSliderVal2{
+    display:inline-block;
+    margin-left:20px;
+}
+
+#node_num_Slider, #node_num_Slider2{
+    display:inline-block;
+    margin-top:6px;
+    margin-right:28px;
+    margin-left:-10px;
+    width:100px !important;
+    float:right;
+}
+
+#unbound_req, #testbed_bound{
+    width:325px;
+    border: 1px solid lightgrey;
+    background:lightgrey;
+    color:black !important;
+    
+}
+
+#b_ver .btn-group, #t_ver .btn-group{
+    margin-left:50px;
+    width:100px;
+}
+
+#unbound_text
+{
+	color:black !important;
+}
+/* SidePanel-Left End .......................................................... */
+/* Network Canvas */
+
+
+#netcanvas{
+    display:inline-block;
+    float:right;
+    top:61px;
+    width:100%;
+    left:360px;
+    /*right:0px;*/
+    height:680px;
+    /*min-width:700px;*/
+    min-height:680px;
+    overflow:auto;
+    position:absolute;
+  /*  z-index: -1;*/
+    
+    
+}
+
+/* ....................................................................... */
+/* The top-right side panel and its title child */
+
+div#sidepanel {
+    position: absolute;
+    pointer-events: none;
+    top: 0px;
+    right: 200px;
+}
+
+div#title {
+    margin: 4px 2px 6px 0px;
+    border-width: 0px;
+    padding: 0px;
+    text-align: right;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 18px;    
+    line-height: 18px;
+    color: #5D1D4D;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+div#title img {
+    border-width: 0px;
+    margin: 0px;
+}
+
+
+img#helpIcon {
+    position: absolute; 
+    right: 6px; 
+    top: 100px; 
+    pointer-events: all; 
+    cursor: help;
+} 
+
+
+/* ....................................................................... */
+/* On/off toggles for the help/info panels */
+
+div.panel_off {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+div.panel_on {
+    visibility: visible;
+    pointer-events: all;
+}
+
+
+/* ....................................................................... */
+/* Help boxes */
+
+div#help {
+    margin: 6px;
+    padding: 4px;
+    background-color: #DEDFA3;
+    position: absolute;
+    width: 420px;
+    right: 0px;
+    z-index: 1001;
+    border: 1px solid #989970;
+
+    font-family: Georgia, Times New Roman, Times, serif;
+    font-size: 11pt;
+
+    -moz-transition: visibility 1.2s;
+    -o-transition: visibility 1.2s;
+    -webkit-transition: visibility 1.2s;
+    transition: visibility 1.2s;
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+div#help ul {
+    margin: 0.5em 0em 0.5em 0em;
+    padding-left: 1.5em;
+    
+}
+
+div#help li {
+    margin: 0em;
+    padding: 0px;
+}
+
+div#faq {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 4px;
+    width: 860px;
+    height: 600px;
+    overflow-y: auto;
+    z-index: 1002;
+    background: #E5E4D6;
+
+    font-size: 11pt;
+
+    border: solid 1px #aaa;
+    border-radius: 8px;    
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+div#faq dt {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 13pt;    
+    color: #5D1D4D;
+    font-weight: bold;
+    margin-top: .4em;
+}
+
+div#faq dd {
+    font-family: Georgia, Times New Roman, Times, serif;
+    padding-left: 0px;
+    margin-left: 0.7em;
+}
+
+div#close_faq {
+    position: fixed; 
+    margin-left: 820px; 
+    margin-top: 0px;
+    padding: 0px;
+}
+
+
+/* ....................................................................... */
+
+div#nocontent {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    width: 600px;
+    height: 200px;
+    top: 200px;
+    left: 200px;
+    background: #C3B091;
+    border: solid 2px #a00;
+    border-radius: 8px;    
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 20px;    
+    text-align: center;
+    vertical-align: center;
+    padding: 12px;
+}
+
+div#nocontent h1 {
+    margin: 1em;
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* ....................................................................... */
+/* Node details panel */
+
+div#nodeInfo {
+    position: relative;
+    right: 4px;
+    cursor: text;
+    width: 300px;
+    z-index: 1000;
+    background: #E5E4D6;
+    border: solid 1px #aaa;
+    border-radius: 8px;    
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;    
+    padding: 4px;
+    text-align: right;
+    color:black;
+}
+
+div#nodeInfo div#cover {
+    text-align: left; 
+    height: 300px;
+}
+
+div#nodeInfo div.t {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+div#nodeInfo img.cover {
+    margin-bottom: 6px;
+    position: absolute;
+    right: 3px;
+}
+
+div#nodeInfo img.action {
+    cursor: pointer;
+    position: absolute;
+}
+
+div#nodeInfo div.f {
+    border-top: 1px dotted #8E5981;
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+
+div#nodeInfo span.d {
+    font-weight: bold;
+}
+
+div#nodeInfo span.c {
+    font-style: italic;
+}
+
+div#nodeInfo span.l {
+    font-size: 11px;
+    color: #24553E;
+    font-variant: small-caps;
+}
+
+/* ....................................................................... */
+/* SVG elements */
+
+div#netcanvas svg {
+    background-color: white;
+    cursor: move;
+}
+
+line.link {
+    stroke: #B2D9D8;
+}
+
+circle {
+    cursor: crosshair;
+    fill: #EBC763;
+}
+
+circle.level1 {
+    stroke: #f00;
+}
+
+circle.level2 {
+    fill-opacity: 0.8;
+    stroke-opacity: 0.8;
+    stroke: #777;
+}
+
+circle.level3 {
+    fill-opacity: 0.5;
+    stroke-opacity: 0.5;
+}
+
+circle.sibling {
+    /*fill: blue;*/
+    fill: #455EE8;
+}
+
+circle.main {
+    /*fill: red;*/
+    fill: #732A9A;
+    fill-opacity: 1.0;
+}
+
+/* ....................................................................... */
+/* Graph labels */
+
+g.gLabel {
+    font: 10px sans-serif;
+    font-weight: normal;
+    visibility: hidden;
+}
+
+g.on {
+    visibility: visible;    
+}
+
+g.zoomed {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    color: #000;
+    border: none;
+    z-index: 0;
+}
+
+text {
+    font: 10px sans-serif;
+    font-weight: normal;
+    stroke-opacity: 1.0;
+}
+
+text.nlabel {
+    /*stroke: #000000;*/
+}
+
+text.nshadow {
+    stroke: #fff;
+    stroke-width: 3px;
+    /*stroke-opacity: 0.5;*/
+    /*visibility: hidden;*/
+}
+
+text.main {
+    font: 12px sans-serif;
+    font-weight: bold;
+}
+
+
+/* ....................................................................... */
+
+/* no longer used */
+
+.nlabel_on {
+    visibility: visible;
+    font-size: 12px;
+    opacity: 1.0;
+    fill: #101000;
+    stroke: #ffffff;
+    font-weight: bold;
+}
+
+.tooltip{
+    position: absolute;
+    width: 200px;
+    height: 50px;
+    padding: 8px;
+    font: 15px Helvetica Neue;
+    background: #FFF;
+    border: solid 1px #aaa;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index:1000;
+    text-align:center;
+    background: rgba(222,223,163,0.8);
+}
+
+

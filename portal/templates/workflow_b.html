@@ -1,0 +1,543 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block unfold_main %}
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/fed4fire.css" />
+<!-- unbound Specific -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/css/workflow.css">
+	
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/css/dhtmlxform.css"/>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/css/rmenu_styles.css"/>
+<style>
+		div.dhxform_item_label_left.button_save div.dhxform_btn_txt {
+			background-image: url(../common/imgs/save.gif);
+			background-repeat: no-repeat;
+			background-position: 0px 3px;
+			padding-left: 22px;
+			margin: 0px 15px 0px 12px;
+		}
+		div.dhxform_item_label_left.button_cancel div.dhxform_btn_txt {
+			background-image: url(../common/imgs/cancel.gif);
+			background-repeat: no-repeat;
+			background-position: 0px 3px;
+			padding-left: 22px;
+			margin: 0px 15px 0px 12px;
+		}
+	</style>
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/css/dhtmlx.css"/>
+	<script src="{{STATIC_URL}}unbound_reservation_static/lib/jsBezier-0.6.js"></script>     
+    <script src="{{STATIC_URL}}unbound_reservation_static/lib/jsplumb-geom-0.1.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/util.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/dom-adapter.js"></script>        
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/jsPlumb.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/endpoint.js"></script>                
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/connection.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/anchors.js"></script>        
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/defaults.js"></script>
+    <script src="{{STATIC_URL}}unbound_reservation_static/src/connectors-bezier.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/connectors-statemachine.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/connectors-flowchart.js"></script>
+    <script src="{{STATIC_URL}}unbound_reservation_static/src/connector-editors.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/renderers-svg.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/renderers-canvas.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/renderers-vml.js"></script>
+	<script src="{{STATIC_URL}}unbound_reservation_static/src/jquery.jsPlumb.js"></script>
+
+
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/main.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/createpost.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/script.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/contextmenu/contextMenu.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/contextmenu/contextMenu.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/js/contextmenu/contextMenu.css">
+
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/menu/jquery.contextMenu.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}unbound_reservation_static/js/menu/jquery.ui.position.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}unbound_reservation_static/js/menu/jquery.contextMenu.css">
+	
+	<script src="{{STATIC_URL}}unbound_reservation_static/lib/dhtmlx.js"></script>
+	
+
+	<script> 
+	s=myslice.user().slices;
+	console.log(s);
+	//console.log(myslice.user.slices);
+	$('input').bind('input', function() {
+    alert($(this).value);
+});
+	var myForm, myForm2, formData,str;
+var columns = {};
+var columns_unsaved = {};
+var myAcc;
+var myCalendar;
+
+
+document.body.onload = function(){
+
+     var d = new Date();
+		
+		myCalendar1 = new dhtmlXCalendarObject(["fromdate"]);
+		myCalendar2 = new dhtmlXCalendarObject(["todate"]);
+		if (d.getDate()<10) {
+		var ndate="0"+(d.getDate()).toString();
+		}
+		else {
+		var ndate=(d.getDate()).toString();
+		}
+		if (d.getMonth()+1<10) {
+		var n=(d.getMonth()+1).toString();
+		var nmonth="0"+n;
+		} else {
+		var nmonth=(d.getMonth()+1).toString();
+		}
+		var today=d.getFullYear()+"-"+nmonth+"-"+ndate;
+		//console.log("today:"+today);
+		myCalendar1.setSensitiveRange( today, null);
+		myCalendar1.setDateFormat("%D %M %j %H:%i:%s EET %Y");
+		myCalendar2.setSensitiveRange(today, null);
+		myCalendar2.setDateFormat("%D %M %j %H:%i:%s EET %Y");
+		
+		d.setDate(d.getDate());
+		d.setHours(d.getHours());
+		d.setMinutes(d.getMinutes());
+		
+		document.getElementById("fromdate").value = myCalendar1.getFormatedDate(null,d);
+		
+		//d.setDate(14);
+		//d.setHours(10);
+		//d.setMinutes(0);
+		document.getElementById("todate").value = myCalendar2.getFormatedDate(null,d);
+		
+		doOnLoad();
+		
+  }
+
+
+
+	
+	function setSens(inputId,mezh){
+	var d1 = new Date();
+		//if(mezh=="min"){
+		//myCalendar1.setSensitiveRange(null,d1.getDate());
+			//
+		//}else{
+		//myCalendar.setSensitiveRange(null,"2015-04-14");
+			
+		//}
+	}
+	
+
+		
+		function doOnLoad() {
+		//myAcc = new dhtmlXAccordion({
+		//		parent: "accObj",
+		//		items: [
+		//			{id: "a1", text: "General"},
+			//		{id: "a2", text: "ExoGeni"},
+			//		{id: "a3", text: "c"}
+			//	]
+			//});
+			
+			var sel = document.getElementById('user_slices');
+for(var i = 0; i < s.length; i++) {
+    var opt = document.createElement('option');
+    opt.innerHTML = s[i];
+    opt.value = s[i];
+    sel.appendChild(opt);
+}
+		
+		
+		
+			formData = [
+				
+				
+				{type: "combo", name:"testbed", label: "Select testbed", name: "testbed", options:[
+					{text: "Netmode",  value: "Netmode", selected: true},
+					{text: "Nitos",  value: "Nitos"},
+					{text: "Wilabt", value: "wilabt"}
+					
+				]}];
+formData1 = [
+				{type: "combo", name:"exogeni", label: "ExoGeni Resource Type", name: "exogeni", options:[
+					{text: "xo.small", value: "xo.small", selected: true},
+					{text: "xo.medium", value: "xo.medium"},
+					{text: "xo.large", value: "xo.large"},
+					{text: "xo.xlarge", value: "xo.xlarge"},
+					{text: "exogeni-m4", value: "exogeni-m4"}
+				]},
+				{type: "combo", name:"wftestbeds", label: "Select testbed", comboType: "checkbox", name: "wftestbeds", options:[
+					{text: "iMinds WiLab 2", value: "iMinds WiLab 2", selected: true},
+					{text: "clab", value: "clab"}
+				]}];
+	str = [			
+
+    {type: "button", name: "form_button_3", value: "Save changes"}
+			];
+
+//renderForm();
+		//	myForm = new dhtmlXForm("myForm", formData);
+			
+			//document.getElementsByName("form_button_3").addEventListener('click', getItemsList);
+		
+			
+		}
+
+function nodeid(sour,target,id) {
+
+document.getElementById("elemid").value=id;
+//document.disableItem("elemid");
+
+
+}
+function renderForm() {
+//myForm = myAcc.cells("a1").attachForm();
+	//		myForm.loadStruct(formData);
+//myForm2 = myAcc.cells("a2").attachForm();
+//myForm2.loadStruct(formData1);
+myForm = new dhtmlXForm("myForm", formData);
+myForm.disableItem("elemid");
+    for (var i in str) {
+        var element_spec = str[i];
+        var form_wrapper = document.getElementById('myForm');
+        renderElement(form_wrapper, element_spec);
+		
+    }
+}
+
+function renderElement(container, spec) {
+
+  switch (spec.type) {
+        case 'fieldset1':
+            renderFieldset(container, spec);
+            break;
+        default:
+            renderInputElement(container, spec);
+            break;
+    }
+
+}
+
+function renderInputElement(container, spec) {
+    if (spec.label) {
+        renderInputLabel(container, spec.label);
+    }
+    
+    var input_element = document.createElement('input');
+    
+    if (spec.type === 'input') {
+        var input_type = 'text';
+    } else {
+        var input_type = spec.type;
+    }
+    
+    input_element.setAttribute('type', input_type);
+    input_element.setAttribute('name', spec.name);
+    
+    if (spec.value) {
+        input_element.setAttribute('value', spec.value);
+    }
+    
+    container.appendChild(input_element);
+    
+    attachAnyEventHandlers(input_element);
+}
+
+function renderInputLabel(container, labelText) {
+    var label =  document.createElement('label');
+    var labelText = document.createTextNode(labelText);
+    
+    container.appendChild(label);
+    label.appendChild(labelText);
+}
+
+function renderFieldset(container, spec) {
+    var fieldset = document.createElement('fieldset');
+    var label = document.createElement('legend');
+    var labelText = document.createTextNode(spec.label);
+    
+    fieldset.setAttribute('name', spec.name);
+    
+    if (spec.list) {
+        for (var j in spec.list) {
+            renderElement(fieldset, spec.list[j]);
+        }
+    }
+    
+    container.appendChild(fieldset);
+    fieldset.appendChild(label);
+    label.appendChild(labelText);
+}
+
+function attachAnyEventHandlers(element) {
+    switch(element.getAttribute('name')) {
+        case 'form_button_1':
+            element.addEventListener('click', addFieldset);
+            break;
+        case 'form_button_2':
+            element.addEventListener('click', resetForm);
+            break;
+        case 'form_button_3':
+          //  element.addEventListener('click', getItemsList(document.getElementById('elemid').value));
+            break;
+        case 'form_button_4':
+            element.addEventListener('click', getItemsString);
+            break;
+    }
+}
+
+function addFieldset() {
+    var itemData = {
+        type:"fieldset",
+        name:"form_fieldset_" + k,
+        label:"Fieldset" + k,
+        list:[
+            {type:"input", name:"form_input_" + k + "_1", label:"Input"},
+            {type:"input", name:"form_input_" + k + "_2", label:"Input"}
+        ]
+    };
+    
+    str.splice(k, 0, itemData);
+    k++;
+    
+    resetForm();
+}
+
+function removeFieldset() {
+    if (k === 1) { // Don't delete buttons
+        return;
+    }
+    
+    k--;
+    str.splice(k, 1);
+    
+    resetForm();
+}
+
+function resetForm(k,colid) {
+//var elemid=document.getElementByName('elemid').value;
+//console.log(columns)
+var a=[];
+if (colid){
+console.log('1'+jsondata);
+delete columns[colid];
+console.log('2'+jsondata);
+}
+for(var m in columns) {
+    var value = columns[m];
+	var test = value.data;
+//alert(value.valid_from+" " +value.valid_until + " " + test);
+//a[m]="{valid_from:"+value.valid_from+"{," +value.valid_until + " " +value.type;
+var myEvent =JSON.stringify(test);
+//myEvent=myEvent.substring(2);
+myEvent=myEvent.replace("}}","}");
+a.push(myEvent);
+//console.log("*****************"+myEvent);
+//console.log( a.toString() );
+
+}
+var jsondata="{\"resources\":["+a.toString()+"]}";
+console.log(jsondata);
+document.getElementById("jsondata").value=jsondata;
+
+var myEvent2 =JSON.stringify(a);
+//var myEvent =JSON.stringify(value.data);
+//console.log(myEvent2);
+var myEvent1 = {"resources":[{"type": "Node"},{"type": "Node"}]};
+
+  //create_post();
+ }
+
+function emptyForm(id) {
+console.log('empty'+id);
+delete columns[id];
+for(var m in columns) {
+    var value = columns[m];
+	var test = value.data;
+
+
+}
+	
+
+  
+}
+function readItemsList(id) {
+var value = columns[id];
+if (value.domain) {
+
+var testbed_value = "<li data-action = 'first'><a href='#' class='selector'><span>"+value.domain+"</span></a></li>";
+} else {
+var testbed_value = "<li data-action = 'first'><a href='#' class='selector'><span>ANY</span></a></li>";
+
+}
+var html_memu="<ul><li class='active'><span>Properties</span></li><li class='has-sub'><a href='#'><span>Testbed</span></a><ul>"+testbed_value+"<li data-action = 'first'><a href='#'><span>ANY</span></a></li><li data-action = 'second' ><a href='#' ><span>Netmode</span></a></li><li data-action = 'third'><a href='#'><span>Nitos</span></a></li><li class='last' data-action = 'forth'><a href='#'><span>Wilabt</span></a></li></ul></li><li class='last'><a href='#'><span>kati allo</span></a></li></ul>";
+//	$('#cssmenu').empty().append(html_memu);
+	console.log("testbed"+testbed_value);
+
+}
+function getItemsList(id,nodetype,testbed) {
+console.log(s);
+console.log(s.length);
+
+if (testbed){
+document.getElementById('testbet').value=testbed;
+}
+    var items = document.querySelectorAll('[type=text]');
+  
+var key = id;
+from=document.getElementById("fromdate").value;
+to=document.getElementById("todate").value ;
+console.log("nikos"+id+$( "#testbet option:selected" ).text + from+to);
+domaintyp=document.getElementById('testbet').value;
+if (id){
+if (domaintyp){
+ columns_unsaved[key] = {
+ type:'Node',
+ name:id,
+ exclusive:nodetype,
+ valid_from:from,
+		valid_until:to,
+		 domain:document.getElementById('testbet').value
+		}
+		} else {
+		columns_unsaved[key] = {
+ type:'Node',
+ name:id,
+ exclusive:nodetype,
+ valid_from:from,
+		valid_until:to
+		}
+		} 
+    columns[key] = {
+        valid_from:from,
+		valid_until:to,
+		type:'Node',
+        domain:document.getElementById('testbet').value,
+        exclusive: nodetype,
+		saved:true,
+		data: columns_unsaved[key]
+    };
+
+resetForm(columns);
+}
+}
+
+function getItemsString() {
+var serv_response = jQuery.parseJSON('{{ responsejson }}');
+    alert('{{ responsejson }}' + "****" +serv_response );
+//test[document.getElementByName('elemid')]=JSON.stringify(formData);
+}
+	</script>
+
+<div class="container">
+	<div class="row clearfix top-header">
+		<div class="col-md-12 column">
+			
+			
+		</div>
+	</div>
+	<div class="row border-editor content-editor">
+		<div class="col-md-2 column heigh-editor border-right-editor">
+			 <span class="label label-info top-label">Select Node Type</span>
+			 <ul class="tool-panel" id="sortable-element">
+			 	<li attr-type="actor"> <img src="{{STATIC_URL}}unbound_reservation_static/img/workflow/vm_icon.png">Virtual machine</li>
+			 	<li attr-type="wireless"> <img src="{{STATIC_URL}}unbound_reservation_static/img/workflow/wireless_icon.png">Wireless</li>
+				<!--<li attr-type="openflow"> <img src="{{STATIC_URL}}unbound_reservation_static/img/workflow/open_flow_icon.png">Open Flow</li>-->
+			 </ul>
+		
+
+		</div>
+		<div class="col-md-7 column heigh-editor">
+			 <span class="label label-danger top-label">Slice Editor</span>
+			 <div class="css-editor" id="editor"><ul id="menu" style="position: relative; top: 0px; left: 0px;"></ul> <ul class='custom-menu'>
+  <li data-action = "first">ANY</li>
+  <li data-action = "second">Netmode</li>
+  <li data-action = "third">Third thing</li>
+</ul>
+<div id='cssmenu'>
+<ul>
+   <li class='active'><span>Properties</span></li>
+   <li class='has-sub'><a href='#'><span>Testbed</span></a>
+      <ul>
+         <li data-action = "first"><a href='#'><span>ANY</span></a></li>
+		 <!--<li data-action = "second" class='selector'><a href='#' ><span>Netmode</span></a></li>-->
+         <li data-action = "second" ><a href='#' ><span>Netmode</span></a></li>
+         <li  class='last' data-action = "third"><a href='#'><span>Nitos</span></a></li>
+		 <!--<li  class='last' data-action = "fifth"><a href='#'><span>PLE</span></a></li> -->
+		<!-- <li class='last' data-action = "forth"><a href='#'><span>Wilabt</span></a></li> -->
+      </ul>
+   </li>
+   
+  <!--    <li class='last'><a href='#'><span>kati allo</span></a></li> -->
+</ul>
+</div>
+<div id='cssmenu_'>
+<ul>
+   <li class='active'><span>Properties</span></li>
+   <li class='has-sub'><a href='#'><span>Testbed</span></a>
+      <ul>
+         
+		 <li  class='last' data-action = "fifth"><a href='#'><span>PLE</span></a></li>
+		<!-- <li class='last' data-action = "forth"><a href='#'><span>Wilabt</span></a></li> -->
+   </ul>
+  </li>
+   
+ <!--    <li class='last'><a href='#'><span>kati allo</span></a></li> -->
+</ul>
+</div>
+</div>
+		</div>
+		<div class="col-md-3 column heigh-editor">
+			 <span class="label label-danger top-label">Node Properties</span>
+
+			 <div class="css-editor" id="editor"><br><br><div  align="center"><button type="button" id="b1" name="b1" class="btn btn-warning">Send request</button><br><br><button type="button" id="b2" name="b2" class="btn btn-warning" style="display:none;">Reserve request</button><div id="but"></div></div><br><br>
+			<div style="position:relative;margin-bottom:30px;"><input type="hidden" name="jsondata" id="jsondata" value="">
+	<label style="position:absolute;top:5px;left:5px; for="fromdate">from:</label><input style="position:absolute;top:5px;left:45px;width:180px;font-size:12px;text-align:center;"  onclick="setSens('todate','max')" value="" id="fromdate" readonly>
+	<br><label  style="position:absolute;top:45px;left:5px; for="todate">to:</label><input style="position:absolute;top:45px;left:45px;width:180px;font-size:12px;text-align:center;" onchange="getItemsList(document.getElementById('elemid').value)" onclick="setSens('fromdate','min')" value="" id="todate" readonly>
+	<div style="display: none;><br><label  style="position:absolute;top:85px; for="elemid">NodeId</label><input type="hidden" style="position:absolute;top:85px;left:45px;width:180px;font-size:12px;text-align:center; value="" id="elemid" name="elemid" readonly>
+<br><select style="position:absolute;top:160px;width:180px;"  id="testbet" class="form-control input-sm col-md-1" type="hidden">
+    <option value="">ANY</option>
+	<option value="omf:netmode">Netmode</option>
+    <option value="omf:nitos.outdoor">Nitos</option>
+    <option value="ple">PLE</option>
+    
+</select><br></div>
+
+<label  style="position:absolute;top:130px;left:65px;"> Select Slice</label>
+<select style="position:absolute;top:150px;width:180px;" id="user_slices" name="user_slices_list"></select>
+<!--<select style="position:absolute;top:150px;width:180px;" id="user_slices" name="user_slices_list" >
+
+{% for user_slices in slice %}
+   <option value="{{user_slices}}"
+       {% if user_slices == current_org %}selected="selected"{% endif %}>
+       {{user_slices|capfirst}}
+   </option>
+{% endfor %}
+
+</select>-->
+</div>
+		<span></span><br><br>
+	<div id="form_wrapper"><table>
+		
+		<tr>
+			<td valign="top"><div id="myForm" style="height:200px;"></div></td>
+			
+		</tr>
+	</table></div> </div>
+		</div>
+	</div>
+</div>
+
+
+<!-- END of Reputation Specific -->
+
+{% endblock %}
