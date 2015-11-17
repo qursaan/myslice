@@ -28,7 +28,7 @@ from django.views.decorators.csrf import csrf_exempt
 import time
 import datetime
 import calendar
-# splitting the 2 functions done here
+# splitting the 2 functions done hereiii
 # GET is for displaying the empty form
 # POST is to process it once filled - or show the form again if anything is missing
 def create_post(request):
