@@ -1,0 +1,578 @@
+
+.jacks {
+    background-color: #ddd;
+	color: #2E3436;
+	position: absolute;
+  top: 170;
+  left: 0;
+}
+#containerjacks {
+	 position: absolute;
+  top: 170;
+  left: 0;
+  height: 100%;
+  width: 100%;
+	 background-color: #fff;
+}
+.jacks .list-group-item.active {
+	background-color: #204a87;
+}
+.jacks .btn-primary {
+	background-color: #3465a4;
+}
+.jacks .btn-danger {
+	background-color: #ef2929;
+}
+.jacks .btn-danger:hover,
+.jacks .btn-danger:focus,
+.jacks .btn-danger:active,
+.jacks .btn-danger.active,
+.jacks .open .dropdown-toggle.btn-danger {
+	background-color: #cc0000;
+}
+.jacks .list-group-item.active:hover,
+.jacks .list-group-item.active:focus,
+.jacks a.list-group-item:hover,
+.jacks a.list-group-item:focus {
+	color: #eeeeec;
+	background-color: #3465a4;
+}
+.jacks .navbar {
+  background-color: #0092BC;
+}
+.jacks .logo-container {
+  padding: 10px;
+}
+.jacks .row.loading {
+  display: table;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.jacks .row {
+  opacity: 1;
+  -webkit-transition: opacity 500ms ease 0s;
+  -moz-transition: opacity 500ms ease 0s;
+  -o-transition: opacity 500ms ease 0s;
+  transition: opacity 500ms ease 0s;
+}
+.jacks .container {
+  opacity: 1;
+  -webkit-transition: opacity 500ms ease 0s;
+  -moz-transition: opacity 500ms ease 0s;
+  -o-transition: opacity 500ms ease 0s;
+  transition: opacity 500ms ease 0s;
+}
+.jacks .row.loading #title {
+  display: table-cell; 
+  vertical-align: middle; 
+  text-align: center;
+}
+.jacks #socketPool {
+  opacity: 0;
+}
+.jacks .brand {
+  margin: 5px auto;
+  color: white;
+  font-weight: bold;
+}
+.jacks #large .btn.pull-right {
+	margin: 20px 20px 0 0;
+}
+.jacks #large .btn.pull-left {
+	margin: 20px 0 0 20px;
+}
+.jacks #large .brand {
+  width: 170px;
+}
+.jacks #large .brand span {
+  font-size: 44px;
+}
+.jacks #small {
+  min-height: 40px; 
+  margin-bottom: 0px;
+}
+.jacks #small .btn.pull-right {
+	margin: 12px 20px 0 0;
+}
+.jacks #small .btn.pull-left {
+	margin: 12px 0 0 20px;
+}
+.jacks #small .brand {
+  width: 66px;
+}
+.jacks #small .brand span {
+  font-size: 24px;
+  line-height: 28px;
+}
+.jacks .recSAImages {
+	width: 100%;
+	height: 80px;
+}
+.jacks .SAImage {
+	width: 50%;
+	padding: 0;
+	margin: 0;
+}
+.jacks .SAImage img {
+	width: 90%;
+	margin: 5px 0 0 5%;
+	cursor: pointer;
+}
+.jacks #collapseOne {
+	position: relative;
+}
+.jacks .windowOpen {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	background: rgba(0, 0, 0, 0.5);
+}
+.jacks .windowOpen > div {
+	text-align: center;
+	position: absolute;
+	top: 273px;
+	width: 553px;
+	left: 50%;
+	margin-left: -276px;
+	color: #333;
+	background-color: #f5f5f5;
+	border-color: #DDD;
+}
+.jacks .panel {
+  -webkit-transition: opacity 500ms ease 0s;
+  -moz-transition: opacity 500ms ease 0s;
+  -o-transition: opacity 500ms ease 0s;
+  transition: opacity 500ms ease 0s;
+  opacity: 1;
+}
+.jacks .alert-danger {
+  background-color: #f2cece;
+  border-color: #fec3c7;
+}
+.jacks .alert-info {
+  background-color: #c9ddf7;
+}
+.jacks .panel-body {
+  background-color: #EEEEEE;
+}
+.jacks .panel-body .panel-body {
+	background-color: #FFF;
+}
+.jacks .panel-body .tab {
+	border: 1px solid #DDD;
+	border-top: 0;
+	display: none;
+}
+.jacks .panel-body .panel-body.active {
+	display: block;
+}
+.jacks #loginContainer h5 {
+	margin-top: 0;
+}
+.jacks #userGroup {
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+.jacks #userName {
+	width: 75%;
+}
+.jacks #passBack {
+	width: 23%;
+}
+.jacks #passGroup {
+	margin-top: 60px;
+	padding-top: 0;
+}
+.jacks #passphrase #currentSA,
+.jacks #passphrase #userName {
+	cursor: default;
+	margin-bottom: 15px;
+}
+.jacks #passphrase #passError {
+	margin-top: 15px;
+	margin-bottom: 0;
+}
+.jacks .nav-tabs a {
+  outline: none;
+}
+.jacks .hides {
+  -webkit-transition: opacity 500ms ease 0s;
+  -moz-transition: opacity 500ms ease 0s;
+  -o-transition: opacity 500ms ease 0s;
+  transition: opacity 500ms ease 0s;
+  opacity: 0;
+}
+.jacks .panel-body #passForm {
+  margin-top: 15px;
+}
+.jacks .xmlrpc .panel-body button {
+	line-height: 1.8;
+}
+.jacks .panel-default > a > .panel-heading {
+  background-color: #F5F5F5;
+  border-color: #DDDDDD;
+  color: #333333;
+}
+.jacks .panel-default > a {
+	outline: none;
+	text-decoration: none;
+}
+.jacks .tooltip .tooltip-inner {
+	text-align: left;
+	max-width: 500px;
+}
+.jacks .afterHide,
+.jacks #certValues {
+  display: none;
+}
+.jacks #canvasContainer {
+	position: relative;
+	overflow: hidden;
+	top: 0;
+	left: 0;
+	padding: 0;
+	max-width: 100%;
+	width: 100%;
+	height: 100%;
+}
+.jacks #leftNav > div {
+	position: absolute;
+	top: 100;
+	margin: 0;
+	
+}
+.jacks #leftNav .fromLeft {
+	width: 300px;
+	top: 0;
+	bottom: 0;
+	left: -300px;
+	background-color: #eeeeee;
+	z-index: 2;
+	-webkit-transition: left 300ms ease 0s;
+  -moz-transition: left 300ms ease 0s;
+  -o-transition: left 300ms ease 0s;
+  transition: left 300ms ease 0s;
+}
+.jacks #leftNav #viewer-default {
+	width: 300px;
+	top: 40px;
+	bottom: 0;
+	background-color: #eeeeee;
+	z-index: 1;
+}
+.jacks #leftNav #viewer-default h1 {
+    margin: 30px;
+    margin-top: 100px;
+    text-align: center;
+    color: #888888;
+    font-weight: bold;
+}
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+.jacks .nodeAttr {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 20px;
+}
+.jacks #leftNav .fromRight {
+    width: 300px;
+    top: 0;
+    bottom: 0;
+    left: -300px;
+    margin: 40px 0 0 0;
+    -webkit-transition: left 300ms ease 0s;
+    -moz-transition: left 300ms ease 0s;
+    -o-transition: left 300ms ease 0s;
+    transition: left 300ms ease 0s;
+}
+.jacks #leftNav .fromRight.show {
+	left: 0;
+	-webkit-transition: left 300ms ease 0s;
+  -moz-transition: left 300ms ease 0s;
+  -o-transition: left 300ms ease 0s;
+  transition: left 300ms ease 0s;
+}
+.jacks #leftNav .fromRight > .panel,
+.jacks #leftNav .fromRight > .panel > .panel-body {
+    height: 100%;
+}
+.jacks #leftNav .fromBottom {
+	width: 100%;
+	height: 100%;
+	left: 0px;
+	top: 40px;
+	bottom: 0px;
+	display: none;
+}
+.jacks #leftNav .fromBottom #lnRspec {
+  margin-bottom: 40px;
+  margin-right: 40px;
+}
+.jacks #leftNav .fromBottom #hideRspec {
+  position: absolute;
+  right: 33px;
+  top: 16px;
+}
+.jacks #leftNav .fromLeft:focus, .jacks #leftNav .fromLeft.show {
+	left: 0;
+}
+.jacks #leftNav .fromBottom:focus, .jacks #leftNav .fromBottom.show {
+	bottom: 0;
+}
+.jacks #lnTopo {
+	width: 70px;
+	float: left;
+	cursor: pointer;
+	margin: 0 15px 0 0;
+}
+.jacks #lnTopo img {
+	float: left;
+}
+.jacks #lnTopo span {
+	float: left;
+	width: 100%;
+	text-align: center;
+}
+.jacks #leftNav > div > .panel,
+.jacks #leftNav > div > .panel > .panel-body {
+	margin: 0;
+}
+.jacks .navRspec > .panel > .panel-body {
+	height: 100%;
+}
+.jacks #leftNav > .navRspec > .panel > .panel-body {
+	overflow-y: scroll;
+}
+.jacks #leftNav > .navRspec > .panel > .panel-body > .form-group {
+    margin-right: 20px;
+}
+.jacks #leftNav > .navRspec > .panel > .panel-body > button#hideRspec {
+    margin-top: 0;
+}
+.jacks #leftNav pre {
+	background-color: white;
+}
+.jacks #leftNav .form-group,
+.jacks #leftNav .list-group,
+.jacks #sliceListContainer .form-group,
+.jacks #sliceListContainer .list-group {
+	margin-bottom: 0;
+}
+.jacks #leftNav .fromLeft > .form-group hr {
+    border-color: #333;
+}
+.jacks .naOpenflowGroup {
+    margin-top: 10px;
+}
+.jacks #openflowField {
+    margin-left: 20px;
+}
+.jacks #topoContainer {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    margin: 0;
+    background-color: #fff;
+}
+.jacks #topoContainer.showLeft {
+    left: 0px;
+}
+.jacks #topoButtons {
+    margin: 3px;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+.jacks #topoButtons > button {
+	margin: 0 10px 0 0;
+}
+.jacks .navRspec, .jacks .navTopo, .jacks .navSlices {
+    z-index: 50;
+}
+.jacks .linktext {
+    fill: blue;
+    font-family: 'Helvetica';
+    font-size: 10pt;
+    font-weight: bold;
+    text-anchor: middle;
+}
+.jacks .nodetext, .jacks .sitetext, .jacks .nodetextpalette {
+    fill: black;
+    font-family: 'Helvetica';
+    font-size: 10pt;
+    font-weight: bold;
+    text-anchor: middle;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+}
+.jacks .sitetext {
+    font-size: 12pt;
+}
+.jacks .nodetextpalette {
+    font-size: 8pt;
+    font-weight: normal;
+}
+.jacks .dragtext {
+    fill: black;
+    font-family: 'Helvetica';
+    font-size: 24pt;
+    font-weight: bold;
+    text-anchor: middle;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+}
+.jacks .linkline {
+    fill: black;
+    fill-opacity: 1.0;
+    stroke: black;
+    stroke-opacity: 1.0;
+    stroke-width: 2;
+    stroke-linecap: square;
+}
+.jacks .linkline.dragline {
+    stroke-width: 5;
+}
+.jacks .linkbox {
+    fill: #eee;
+    fill-opacity: 1.0;
+    stroke: black;
+    strock-opacity: 1.0;
+    stroke-width: 1;
+    stroke-linecap: square;
+}
+.jacks .nodebox {
+    fill: #ddd;
+    fill-opacity: 1.0;
+    stroke: black;
+    stroke-width: 1px;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    stroke-opacity: 1.0;
+}
+.jacks .invalid .nodebox {
+    fill: #d66;
+}
+.jacks .nodebackground {
+    fill: black;
+    fill-opacity: 0.0;
+    stroke: white;
+    stroke-opacity: 0.0;
+}
+.jacks .checkbox {
+    fill: #dfd;
+    fill-opacity: 1.0;
+    stroke: green;
+    stroke-width: 5px;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    stroke-opacity: 1.0;
+}
+.jacks .warningbox {
+    fill: #f88;
+    fill-opacity: 1.0;
+}
+.jacks .warningboxtext {
+    font-weight: bold;
+}
+svg:not(.active):not(.ctrl) .link, svg:not(.active):not(.ctrl) .node {
+  cursor: pointer;
+}
+.jacks .popover .tour-buttons {
+	min-height: 46px !important;
+}
+.jacks .popover .btn-close {
+    right: 3px !important;
+    top: 3px !important;
+}
+.jacks #leftNav button {
+	margin: 10px 0;
+}
+.select2-disabled {
+    background-color: #fee !important;
+}
+.jacks #versionNumber {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	opacity: .5;
+	z-index: 60;
+}
+.jacks #leftNav .fromLeft.withButtonBar,
+.jacks #topoContainer.withButtonBar {
+    top: 40px;
+}
+.jacks .labelbox {
+  fill: #FFF;
+  fill-opacity: .8;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-opacity: .8;
+}
+.jacks input[readonly] {
+  cursor: default;
+}
+.jacks .sitelabelgroup .labelbox {
+  fill: #000;
+  fill-opacity: .4;
+}
+.jacks .sitelabelgroup .sitetext {
+  fill: white;
+}
+.jacks .sitelabelgroup .checkbox {
+  fill: #262;
+}
+.jacks .checkboxContainer {
+  position: relative;
+}
+.jacks .checkboxContainer .checkboxLabel {
+  position: absolute;
+  top: 0;
+  left: 20px;
+}
+.jacks #leftNav .form-group #add {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  padding: 4px 12px;
+}
+.jacks #leftNav .form-group .list .btn {
+  padding: 4px 12px;
+}
+.jacks .info-list-item .panel-body {
+  background-color: #fafaff;
+}
+.jacks #leftNav .form-group > div {
+  position: relative;
+}
+.jacks #leftNav .closeContainer {
+  background: none;
+  height: 0;
+  z-index: 10;
+}
+.jacks #leftNav #hideLeftPane {
+  position: absolute;
+  font-size: 17px;
+  top: -7px;
+  right: 23px;
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" id="svg2" viewBox="0 0 535 531" version="1.1">
+  <defs id="defs4">
+    <filter id="filter5927" width="1.5" y="-.25" x="-.25" height="1.5" color-interpolation-filters="sRGB">
+      <feGaussianBlur id="feGaussianBlur5929" in="SourceAlpha" stdDeviation="4,000000" result="blur"/>
+      <feColorMatrix id="feColorMatrix5931" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0,500000 0 " result="bluralpha"/>
+      <feOffset id="feOffset5933" dy="8,000000" in="bluralpha" dx="8,000000" result="offsetBlur"/>
+      <feMerge id="feMerge5935" result="fbSourceGraphic">
+        <feMergeNode id="feMergeNode5937" in="offsetBlur"/>
+        <feMergeNode id="feMergeNode5939" in="SourceGraphic"/>
+      </feMerge>
+      <feColorMatrix id="feColorMatrix6004" in="fbSourceGraphic" values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0" result="fbSourceGraphicAlpha"/>
+      <feGaussianBlur id="feGaussianBlur6006" result="result8" stdDeviation="10" in="fbSourceGraphic"/>
+      <feComposite id="feComposite6008" operator="in" result="result6" in2="result8" in="fbSourceGraphic"/>
+      <feComposite id="feComposite6010" operator="in" in2="result6" result="result11"/>
+      <feFlood id="feFlood6012" result="result10" in="result11" flood-color="rgb(255,222,85)"/>
+      <feBlend id="feBlend6014" mode="normal" in="result11" in2="result10" result="result12"/>
+      <feComposite id="feComposite6016" operator="in" result="fbSourceGraphic" in2="fbSourceGraphic" in="result12"/>
+      <feColorMatrix id="feColorMatrix2845" in="fbSourceGraphic" values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0" result="fbSourceGraphicAlpha"/>
+      <feGaussianBlur id="feGaussianBlur2847" in="fbSourceGraphicAlpha" stdDeviation="4,000000" result="blur"/>
+      <feColorMatrix id="feColorMatrix2849" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0,500000 0 " result="bluralpha"/>
+      <feOffset id="feOffset2851" dy="8,000000" in="bluralpha" dx="8,000000" result="offsetBlur"/>
+      <feMerge id="feMerge2853">
+        <feMergeNode id="feMergeNode2855" in="offsetBlur"/>
+        <feMergeNode id="feMergeNode2857" in="fbSourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g id="layer2" stroke="#000" transform="translate(0 -521.36)">
+    <path id="rect2816" stroke-linejoin="round" stroke-width="55" fill="none" d="m139.59 551.39h252.13c61.025 0 110.15 44.742 110.15 100.32v271.8c0 55.577-49.129 100.32-110.15 100.32h-252.13c-61.025 0-110.15-44.742-110.15-100.32v-271.8c0-55.577 49.129-100.32 110.15-100.32z"/>
+    <g id="layer1-3" filter="url(#filter5927)" stroke-width="4.9118" fill="#00dc00" transform="matrix(.98914 0 0 1.0476 1237 562.46)">
+      <g id="layer1-2" stroke="#000" stroke-width="10.229" fill="#00dc00" transform="matrix(.48018 0 0 .48018 -316.23 468.11)">
+        <path id="path4068" stroke="#000" stroke-width="10.229" fill="#00dc00" d="m-1747.2-549.3 287.72 333.9c146.6-298.83 326.06-573.74 614.52-834.75-215.89 121.82-453.86 353.14-657.14 639.38l-245.1-138.53z"/>
+      </g>
+    </g>
+  </g>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>checkbox checked</dc:title>
+        <dc:date>2010-11-17T19:43:57</dc:date>
+        <dc:description>clip art, clipart, user interface, </dc:description>
+        <dc:source>http://openclipart.org/detail/96259/checkbox-checked-by-skind</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>skind</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>clip art</rdf:li>
+            <rdf:li>clipart</rdf:li>
+            <rdf:li>user interface</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>
