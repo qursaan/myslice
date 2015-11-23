@@ -56,7 +56,7 @@ def logWrite(request, action, message, objects = None):
         "client_ip" : ip,
         "host"      : request.get_host(),
         "referrer"  : request.META.get('HTTP_REFERER'),
-        "user"      : request.user,
+        "user"      : request.user.username,
         "action"    : action,
         "message"   : message,
         "apikey"    : apikey,
@@ -67,12 +67,12 @@ def logWrite(request, action, message, objects = None):
         "facility"      : None,
         "testbed"       : None,
     }
-    
+   
     if objects is not None:
         for o in objects :
             if (o in log) :
                 log[o] = objects[o]
-    
+
     try :
         result = urllib2.urlopen(server, urllib.urlencode(log))
         logger.info("===============>> activity: {} <{}> {}".format(action, request.user,message))
