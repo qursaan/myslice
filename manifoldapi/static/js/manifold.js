@@ -1702,9 +1702,10 @@ case TYPE_LIST_OF_VALUES:
         var query, data;
 
         query = query_ext.query;
-
-        var testbeds_with_sla = localStorage.getItem("sla_testbeds").split(",");
-
+        var testbeds_with_sla = Array();
+        if(localStorage.getItem("sla_testbeds")!=null){
+            testbeds_with_sla = localStorage.getItem("sla_testbeds").split(",");
+        }
         switch(query.object) {
 
             case 'resource':
