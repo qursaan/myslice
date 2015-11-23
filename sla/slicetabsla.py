@@ -26,62 +26,6 @@ from django.http import HttpResponse
 
 from myslice.settings import logger, SLA_COLLECTOR_URL
 
-
-# class AgreementsFilter(object):
-# def __init__(self, status=None, provider=None, consumer=None):
-#         self.status = status
-#         self.provider = provider
-#         self.consumer = consumer
-#
-#     def __repr__(self):
-#         return "<AgreementsFilter(status={}, provider={}, consumer={})>".format(
-#             self.status, self.provider, self.consumer
-#         )
-#
-#     @staticmethod
-#     def _check(expectedvalue, actualvalue):
-#         if expectedvalue is None or expectedvalue == '':
-#             return True
-#         else:
-#             return actualvalue == expectedvalue
-#
-#     def check(self, agreement):
-#         """Check if this agreement satisfy the filter.
-#
-#         The agreement must be previously annotated
-#         """
-#         guaranteestatus = agreement.guaranteestatus
-#         provider = agreement.context.provider
-#         consumer = agreement.context.consumer
-#         return (
-#             AgreementsFilter._check(self.status, guaranteestatus) and
-#             AgreementsFilter._check(self.provider, provider) and
-#             AgreementsFilter._check(self.consumer, consumer)
-#         )
-
-
-# class FilterForm(forms.Form):
-#     _attrs = {'class': 'form-control'}
-#     exclude = ()
-#     status = forms.ChoiceField(
-#         choices=[
-#             ('', 'All'),
-#             (wsag_model.AgreementStatus.StatusEnum.FULFILLED, 'Fulfilled'),
-#             (wsag_model.AgreementStatus.StatusEnum.VIOLATED, 'Violated'),
-#             (wsag_model.AgreementStatus.StatusEnum.NON_DETERMINED, 'Non determined')],
-#         widget=forms.Select(attrs=_attrs),
-#         required=False
-#     )
-#     provider = forms.CharField(
-#         widget=forms.TextInput(attrs=_attrs),
-#         required=False
-#     )
-#     consumer = forms.CharField(
-#         widget=forms.TextInput(attrs=_attrs),
-#         required=False
-#     )
-
-
 class SLAView(FreeAccessView, ThemeView):
     template_name = 'slice-tab-sla.html'
 
@@ -89,9 +33,6 @@ class SLAView(FreeAccessView, ThemeView):
 
         page = Page(request)
 
-        # logger.debug("SLA slice name: {}".format(slicename))
-
-        # consumer_id = None
         agreement_id = None
         enforcements = {}
         violations = {}
@@ -100,14 +41,6 @@ class SLAView(FreeAccessView, ThemeView):
                 'ok', 'slivers']
         ag_info = []
 
-        # filter_ = None
-        # form = FilterForm(request.GET)
-        # if form.is_valid():
-        #     filter_ = _get_filter_from_form(form)
-
-        # consumer_id = _get_consumer_id(request)
-
-        # agreements = _get_agreements(agreement_id, consumer_id=consumer_id, filter_=filter_)
         agreements = _get_agreements_by_slice(slicename)
 
         for agreement in agreements:
@@ -118,8 +51,6 @@ class SLAView(FreeAccessView, ThemeView):
             row.append(agreement.context.time_formatted())  # Date
 
             enf = _get_enforcement(agreement.agreement_id, provider)
-            # logger.debug("SLA guarantee status {}: {}".format(agreement.agreement_id,
-            #                                                   agreement.guaranteestatus))
 
             if enf.enabled == 'true':
                 row.append('Evaluating')  # Status
@@ -178,46 +109,6 @@ class SLAView(FreeAccessView, ThemeView):
         return render_to_response(self.template_name, template_env, context_instance=RequestContext(request))
 
 
-# class AgreementsFilter(object):
-#     def __init__(self, status=None, provider=None, consumer=None):
-#         self.status = status
-#         self.provider = provider
-#         self.consumer = consumer
-#
-#     def __repr__(self):
-#         return "<AgreementsFilter(status={}, provider={}, consumer={})>".format(
-#             self.status, self.provider, self.consumer
-#         )
-#
-#     @staticmethod
-#     def _check(expectedvalue, actualvalue):
-#         if expectedvalue is None or expectedvalue == '':
-#             return True
-#         else:
-#             return actualvalue == expectedvalue
-#
-#     def check(self, agreement):
-#         """Check if this agreement satisfy the filter.
-#
-#         The agreement must be previously annotated
-#         """
-#         guaranteestatus = agreement.guaranteestatus
-#         provider = agreement.context.provider
-#         consumer = agreement.context.consumer
-#         return (
-#             AgreementsFilter._check(self.status, guaranteestatus) and
-#             AgreementsFilter._check(self.provider, provider) and
-#             AgreementsFilter._check(self.consumer, consumer)
-#         )
-
-
-# class ContactForm(forms.Form):
-#     subject = forms.CharField(max_length=100)
-#     message = forms.CharField()
-#     sender = forms.EmailField()
-#     cc_myself = forms.BooleanField(required=False)
-
-
 def _get_agreements_client():
     return restclient.Factory.agreements()
 
@@ -245,13 +136,6 @@ def _get_enforcement(agreement_id, testbed):
     enforcement, response = enforcements_client.getbyagreement(agreement_id, testbed)
     return enforcement
 
-
-# def _get_filter_from_form(form):
-#
-#     data = form.cleaned_data
-#     result = AgreementsFilter(
-#         data["status"], data["provider"], data["consumer"])
-#     return result
 
 def agreement_term_violations(request, agreement_id, guarantee_name):
     page = Page(request)
@@ -290,9 +174,6 @@ def agreement_term_violations(request, agreement_id, guarantee_name):
     return render_to_response('violations_template.html', context, context_instance=RequestContext(request))
 
 
-#     return render(request, 'violations_template.html', context)
-
-
 # TODO Change function to class
 def agreement_details(request, agreement_id):
     page = Page(request)
@@ -318,38 +199,6 @@ def agreement_details(request, agreement_id):
     #return render(request, 'agreement_detail.html', context)
 
 
-# def _get_agreements(agreement_id, slice=None, provider_id=None, consumer_id=None, filter_=None):
-#
-#     agreements_client = _get_agreements_client()
-#     if agreement_id is None:
-#         if consumer_id is not None:
-#             agreements, response = agreements_client.getbyconsumer(consumer_id)
-#         elif provider_id is not None:
-#             agreements, response = agreements_client.getbyprovider(provider_id)
-#         elif slice is not None:
-#             agreements_client = _get_agreements_client("slice")
-#             agreements, response = agreements_client.getbyslice(slice)
-#         else:
-#             raise ValueError(
-#                 "Invalid values: consumer_id and provider_id are None")
-#     else:
-#         agreement, response = agreements_client.getbyid(agreement_id)
-#         agreements = [agreement]
-#
-#     annotator = wsag_helper.AgreementAnnotator()
-#     for agreement in agreements:
-#         id_ = agreement.agreement_id
-#         testbed = agreement.context.provider
-#         status = _get_agreement_status(id_, testbed)
-#         annotator.annotate_agreement(agreement, status)
-#
-#     if filter_ is not None:
-#         print "FILTERING ", repr(filter_)
-#         agreements = filter(filter_.check, agreements)
-#     else:
-#         print "NOT FILTERING"
-#     return agreements
-
 def _get_agreements_by_slice(slice):
     agreements_client = _get_agreements_client()
     agreements, response = agreements_client.getbyslice(slice)
@@ -363,12 +212,6 @@ def _get_agreements_by_slice(slice):
 
     return agreements
 
-
-# def _get_agreements_by_consumer(consumer_id):
-#
-#     agreements_client = _get_agreements_client()
-#     agreements, response = agreements_client.getbyconsumer(consumer_id)
-#     return agreements
 
 def _get_agreement_status(agreement_id, testbed):
     agreements_client = _get_agreements_client()
@@ -394,6 +237,20 @@ class Testbeds(FreeAccessView, ThemeView):
         return HttpResponse(SLAtestbeds.text, content_type="application/json", status=SLAtestbeds.status_code)
 
 
+class AgreementTemplates(FreeAccessView, ThemeView):
+    def get(self, request, *args, **kwargs):
+        c = restclient.Templates(SLA_COLLECTOR_URL)
+        testbed = kwargs.get('testbed', None)
+
+        templates, response = c.getall(testbed)
+        service_level_objectives = []
+
+        for template in templates:
+            service_level_objectives.append(
+                [v.servicelevelobjective for v in template.guaranteeterms.values()])
+
+        return HttpResponse(service_level_objectives, content_type="application/json", status=response.status_code)
+
 class CreateAgreement(LoginRequiredView, ThemeView):
     def post(self, request, *args, **kwargs):
 
@@ -414,7 +271,7 @@ class CreateAgreement(LoginRequiredView, ThemeView):
         dt = datetime.fromtimestamp(float(tstmp))
         # gmt_2 = pytz.timezone("Etc/GMT-2")
         # dlocal = gmt_2.localize(dt).isoformat()
-        dlocal = dt.isoformat() + "CET" # FIXME: hardcoded for demo purposes
+        dlocal = dt.isoformat() + "CET"
         data["SLIVER_INFO_EXPIRATION"] = dlocal
 
         # logger.debug("SLA Agreement parameters: {}".format(data.dict()))

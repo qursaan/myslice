@@ -46,6 +46,7 @@ import portal.sliceresourceview
 import portal.resources
 
 import portal.slicetabexperiment
+import portal.slicetabcloud
 import portal.slicetabinfo
 import portal.slicetabtestbeds
 import portal.slicetabusers
@@ -116,6 +117,7 @@ urls = [
     (r'^testbeds/(?P<slicename>[^/]+)/?$', portal.slicetabtestbeds.SliceTabTestbeds.as_view()),
     (r'^measurements/(?P<slicename>[^/]+)/?$', portal.slicetabmeasurements.SliceTabMeasurements.as_view()),
     (r'^experiment/(?P<slicename>[^/]+)/?$', portal.slicetabexperiment.ExperimentView.as_view()),
+    (r'^cloud/(?P<slicename>[^/]+)/?$', portal.slicetabcloud.CloudView.as_view()),
     
     
     url(r'^about/?$', portal.about.AboutView.as_view(), name='about'),
