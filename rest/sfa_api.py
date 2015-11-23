@@ -228,6 +228,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                             # ListResources(slice_hrn)
                             api_options['geni_slice_urn'] = urn
                             result = server.ListResources([object_cred], api_options)
+                            logger.debug(result)
                             dict_result = xmltodict.parse(result['value'])
                         # else GetVersion = v3
                         else:
