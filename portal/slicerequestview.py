@@ -39,8 +39,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
         errors = []
         slice_name =''
-        purpose=''
-        url=''
+        #purpose=''
+        #url=''
         authority_hrn = None
         authority_name = None
         # Retrieve the list of authorities
@@ -138,8 +138,8 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
                 'authority_hrn'     : authority_hrn,
                 'organization'      : request.POST.get('org_name', ''),
                 'slice_name'        : slice_name,
-                'url'               : request.POST.get('url', ''),
-                'purpose'           : request.POST.get('purpose', ''),
+                #'url'               : request.POST.get('url', ''),
+                #'purpose'           : request.POST.get('purpose', ''),
                 'current_site'      : current_site
             }
 
@@ -174,11 +174,11 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
 
 
     
-            purpose = slice_request['purpose']
-            if purpose is None or purpose == '':
-                errors.append('Experiment purpose is mandatory')
+           # purpose = slice_request['purpose']
+           # if purpose is None or purpose == '':
+           #     errors.append('Experiment purpose is mandatory')
 
-            url = slice_request['url']
+            #url = slice_request['url']
 
             if not errors:
                 if is_pi(request, user_hrn, authority_hrn):
@@ -203,10 +203,10 @@ class SliceRequestView (LoginRequiredAutoLogoutView, ThemeView):
             'topmenu_items': topmenu_items_live('Request a slice', page),
             'errors': errors,
             'slice_name': slice_name,
-            'purpose': purpose,
+            #'purpose': purpose,
             'email': user_email,
             'user_hrn': user_hrn,
-            'url': url,
+            #'url': url,
             'pi': pi,
             'authority_name': authority_name,        
             'authority_hrn': user_authority,        
