@@ -1,0 +1,25 @@
+{% extends "layout_wide.html" %}
+{% block head %}
+<style></style>
+<script type="text/javascript">
+function load_ontology(platform, format){
+    $.post("/sfa/ListResources",{'output_format':format, 'platform':[platform]}, function( result ) {
+        data=result['netmode'];
+        data=data.replace(/>/g,'&gt;').
+         replace(/</g,'&lt;').
+         replace(/"/g,'&quot;');
+        $("#data").html(data);
+        $("#welcome").html("Loaded netmode RDF:");
+    });
+}
+$(document).ready(function() {
+    console.log("{{my_var}}");
+    load_ontology("netmode","ttl");
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="welcome">Netmode RDF data: {{my_var}}</div>
+<pre><code id="data"></code></pre>
+{% endblock %}
