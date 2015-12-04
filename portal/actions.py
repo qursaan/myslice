@@ -1114,7 +1114,6 @@ def manifold_add_reference_user_accounts(wsgi_request, request):
         .select('user_id', 'config', 'email', 'status') \
         .filter_by('email', '==', request['email'])
     user_details = execute_admin_query(wsgi_request, user_query)
-
     # USER MAIN ACCOUNT != reference
     #print 'USER MAIN ACCOUNT != reference'
     list_accounts_query = Query().get('local:account')              \
@@ -1286,7 +1285,7 @@ def create_pending_user(wsgi_request, request, user_detail):
     msg.send()
    
     # saves the user to django auth_user table [needed for password reset]
-    user = User.objects.create_user(request['email'], request['email'], request['password'])
+    user = User.objects.create_user(request['email'].split('@')[-1], request['email'], request['password'])
 
     # Creating a manifold user
     user_id = manifold_add_user(wsgi_request, request)
