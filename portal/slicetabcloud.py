@@ -18,6 +18,8 @@ from myslice.theme import ThemeView
 from myslice.configengine import ConfigEngine
 from myslice.settings import logger
 
+from rest.sfa_api import sfa_client
+
 from sfa.planetlab.plxrn import hash_loginbase
 
 import urllib2,json
@@ -41,7 +43,7 @@ class CloudView (LoginRequiredView, ThemeView):
 
         username = self.request.user    
         platforms = self.get_platforms(request)
-        cloud_platforms = ["onelab-cloud"]
+        cloud_platforms = ["onelab-cloud","fuseco"]
         len_platforms = len(platforms)
 
         #if 'action' in request.POST:
@@ -72,12 +74,20 @@ class CloudView (LoginRequiredView, ThemeView):
   
         username = self.request.user    
         platforms = self.get_platforms(request)
-        cloud_platforms = ["onelab-cloud"]
+        cloud_platforms = ["onelab-cloud","fuseco"]
         len_platforms = len(platforms)
+        result = sfa_client(request,'ListResources',platforms=cloud_platforms)
+
+        # Handle errors in ListResources, example AM is down
+        for key, value in result.iteritems():
+            logger.debug("key in result = %s" % key)
+            if 'error' in value:
+                cloud_platforms.remove(key)
 
         env = { 'theme' : self.theme,
                 'slicename':slicename, 
                 'platforms':platforms,
+                'result':result,
                 'cloud_platforms':cloud_platforms,
                 'len_platforms': len_platforms,
                 'request':self.request,
