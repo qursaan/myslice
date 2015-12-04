@@ -203,7 +203,7 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
              #return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
              return {'error' : '-2'}
  
-        server = SfaServerProxy(server_url, pkey, cert)
+        server = SfaServerProxy(server_url, pkey, cert, verbose=False, timeout=5)
         #server = SFAProxy(server_url, pkey, cert)
         if 'geni_rspec_version' in options:
             # GetVersion to know if the AM supports the requested version
