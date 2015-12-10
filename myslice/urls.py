@@ -22,6 +22,8 @@ add_to_builtins('insert_above.templatetags.insert_tags')
 
 from settings import auxiliaries, INSTALLED_APPS
 
+from unfold.loginrequired import LoginRequiredView
+
 import portal.about
 import portal.institution
 import portal.registrationview
@@ -29,6 +31,7 @@ import portal.accountview
 import portal.contactview
 import portal.termsview
 import portal.supportview
+import portal.omn
 
 import portal.platformsview
 import portal.dashboardview
@@ -108,6 +111,8 @@ urls = [
     (r'^news/?$', portal.newsview.NewsView.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
     (r'^users/(?P<slicename>[^/]+)/?$', portal.slicetabusers.SliceUserView.as_view()),
+    (r'^my_url/?$', portal.omn.OMNView.as_view()),
+    (r'^ontology/?$', portal.omn.OMNView.as_view()),
 
     # Testing sfa rest
     (r'^sfa_resources/(?P<slicename>[^/]+)/?$', portal.resources.ResourcesView.as_view()),
