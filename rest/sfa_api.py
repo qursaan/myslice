@@ -203,23 +203,23 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
              #return HttpResponse(json.dumps({'error' : '-2'}), content_type="application/json")
              return {'error' : '-2'}
  
-        server = SfaServerProxy(server_url, pkey, cert, verbose=False, timeout=5)
+        server = SfaServerProxy(server_url, pkey, cert, verbose=False)#, timeout=5)
         #server = SFAProxy(server_url, pkey, cert)
-        if 'geni_rspec_version' in options:
-            # GetVersion to know if the AM supports the requested version
-            # if not ask for the default GENI v3
-            start_time = time.time()
-            result = server.GetVersion()
-            logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
-            if 'geni_ad_rspec_versions' in result['value']:
-                for v in result['value']['geni_ad_rspec_versions']:
-                    if v['type'] == options['geni_rspec_version']:
-                        api_options['geni_rspec_version'] = {'type': options['geni_rspec_version']}
-                        break
-                    else:
-                        api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
-        else:
-            api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
+        #if 'geni_rspec_version' in api_options:
+        #    # GetVersion to know if the AM supports the requested version
+        #    # if not ask for the default GENI v3
+        #    start_time = time.time()
+        #    result = server.GetVersion()
+        #    logger.debug("EXEC TIME - GetVersion() - %s sec." % (time.time() - start_time))
+        #    if 'geni_ad_rspec_versions' in result['value']:
+        #        for v in result['value']['geni_ad_rspec_versions']:
+        #            if v['type'] == api_options['geni_rspec_version']:
+        #                api_options['geni_rspec_version'] = {'type': api_options['geni_rspec_version']}
+        #                break
+        #            else:
+        #                api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
+        #else:
+        #    api_options['geni_rspec_version'] = {'type': 'GENI', 'version': '3'}
 
         try:
             # Get user config from Manifold
@@ -260,12 +260,9 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                 # AM API Calls
                 if server_am:
                     if method == "ListResources":
-                        logger.debug(api_options)
-                        #logger.debug(user_cred)
                         start_time = time.time()
                         result = server.ListResources([user_cred], api_options)
                         logger.debug("EXEC TIME - ListResources() - %s sec." % (time.time() - start_time))
-                        #logger.debug(result)
                         dict_result = xmltodict.parse(result['value'])
                         result['parsed'] = dict_result
                         if isinstance(dict_result['rspec']['node'], list):
@@ -379,7 +376,6 @@ def sfa_client(request, method, hrn=None, urn=None, object_type=None, rspec=None
                         logger.debug('method %s not handled by Registry' % method)
                         result = []
             if output_format is not None:
-                logger.debug("result = " % result)
                 if 'value' in result:
                     # TODO Python Caching 
                     # to avoid translating the same RSpec in the same format several times
