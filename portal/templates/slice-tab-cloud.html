@@ -401,7 +401,11 @@ function render_node(platform, node, state){
         if(sliver instanceof Array){
             client_id = sliver['@name'];
         }else{
-            client_id = node['@client_id'];
+            if ('@sliver_name' in sliver){
+                client_id = sliver['@sliver_name'];
+            }else{
+                client_id = node['@client_id'];
+            }
         }
         if ('@component_name' in node){
             node_name = node['@component_name']
@@ -417,10 +421,10 @@ function render_node(platform, node, state){
         if(state=='pending_add'){
             $("#"+id).append("<div class='col-md-1' style='width:40px;margin-left:0px;!important;'><input type='checkbox' id='publicip_"+platform+"_"+client_id+"' onclick=public_ip('"+platform+"','"+client_id+"',this.checked);></div>");
         }else{
-            $("#"+id).append("<div class='col-md-1' style='margin-left:0px;!important;'>&nbsp;</div>");
+            $("#"+id).append("<div class='col-md-1' style='width:40px;margin-left:0px;!important;'>&nbsp;</div>");
         }
-        $("#"+id).append("<div class='col-md-2' style='padding-left:0px;'>"+node_name+"</div>");
-        $("#"+id).append("<div class='col-md-2' style='padding-left:0px;'>"+client_id+"</div>");
+        $("#"+id).append("<div class='col-md-2'>"+node_name+"</div>");
+        $("#"+id).append("<div class='col-md-2'>"+client_id+"</div>");
         if('openstack:flavor' in node[key_sliver]){
             $("#"+id).append("<div class='col-md-2'>"+sliver['openstack:flavor']['@name']+"</div>");
             $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
@@ -561,7 +565,7 @@ $(document).ready(function() {
         <h2>{{ platform }}</h2>
         // display only if VMs already in slice
         <h4>VMs in slice {{slicename}}</h4>
-        <div id="{{platform}}_existing" class="row alert alert-info" style="display:none;">
+        <div id="{{platform}}_existing" class="row alert alert-info" style='display:none;margin-left:0px;!important;margin-right:0px;!important;'>
         <input type="hidden" name="{{platform}}_vm" id="{{platform}}_vm">
         <input type="hidden" name="action" id="action" value="delete">
         <input type="hidden" name="platform" id="platform" value="{{platform}}">
@@ -593,8 +597,8 @@ $(document).ready(function() {
             <h4>Pending changes</h4>
             <form id="{{platform}}_form_reserve" method="post">
             {% csrf_token %}
-            <div id="{{platform}}_pending_add" class="row alert alert-success" style="display:none;margin-bottom:3px !important;"></div> 
-            <div id="{{platform}}_pending_delete" class="row alert alert-danger" style="display:none;margin-bottom:3px !important;"></div> 
+            <div id="{{platform}}_pending_add" class="row alert alert-success" style="display:none;margin-bottom:3px !important;margin-left:0px;!important;margin-right:0px;!important;"></div> 
+            <div id="{{platform}}_pending_delete" class="row alert alert-danger" style="display:none;margin-bottom:3px !important;margin-left:0px;!important;margin-right:0px;!important;"></div> 
             <br>
             <input type="hidden" name="action" id="action" value="reserve">
             <input type="hidden" name="platform" id="platform" value="{{platform}}">
