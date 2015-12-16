@@ -27,11 +27,10 @@ class ManifoldAPI:
         
         # Manifold uses a self signed certificate
         # https://www.python.org/dev/peps/pep-0476/
-        if hasattr(ssl, '_create_unverified_context'): 
-            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True,
-                                           context=ssl._create_unverified_context())
-        else :
-            self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True)
+        try:    turn_off_server_verify = { 'context' : ssl._create_unverified_context() } 
+        except: turn_off_server_verify = {}
+        self.server = xmlrpclib.Server(self.url, verbose=False, allow_none=True,
+                                       **turn_off_server_verify)
 
     # xxx temporary code for scaffolding a ManifolResult on top of an API that does not expose error info
     # as of march 2013 we work with an API that essentially either returns the value, or raises 
