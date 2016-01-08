@@ -23,11 +23,12 @@ class ManifoldBackend:
         person = {}
 
         try:
-            username = token['username']
+            email = token['username']
+            username = email.split('@')[-1]
             password = token['password']
             request = token['request']
 
-            auth = {'AuthMethod': 'password', 'Username': username, 'AuthString': password}
+            auth = {'AuthMethod': 'password', 'Username': email, 'AuthString': password}
             api = ManifoldAPI(auth)
             sessions_result = api.forward(Query.create('local:session').to_dict())
             sessions = sessions_result.ok_value()
@@ -69,10 +70,10 @@ class ManifoldBackend:
 
         try:
             # Check if the user exists in Django's local database
-            user = User.objects.get(username=username)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             # Create a user in Django's local database
-            user = User.objects.create_user(username, username, 'passworddoesntmatter')
+            user = User.objects.create_user(username, email, 'passworddoesntmatter')
             user.email = person['email']
 
         if 'firstname' in person:

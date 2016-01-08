@@ -48,3 +48,11 @@ def file_exists(filepath):
         index = filepath.rfind('/')
         new_filepath = filepath[:index] + '/image.png'
         return new_filepath
+
+@register.filter
+def get_type(value):
+    return type(value).__name__
+
+@register.filter
+def get_name_from_urn(value):
+    return value.split("+")[-1]

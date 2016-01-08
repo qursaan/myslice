@@ -1,0 +1,56 @@
+{% extends "layout_wide.html" %}
+{% block head %}
+
+<script type="text/javascript">
+function load_ontology(platform, format){
+    $.post("/sfa/ListResources",{'output_format':format, 'platform':[platform]}, function( result ) {
+        data=result['netmode'];
+        data=data.replace(/>/g,'&gt;').
+         replace(/</g,'&lt;').
+         replace(/"/g,'&quot;');
+        $("#data").html(data);
+        $("#welcome").html("Loaded netmode RDF:");
+    });
+}
+$(document).ready(function() {   
+   load_ontology("netmode","ttl");
+   console.log("{{my_var}}");
+   $.getScript("/static/js/omn.js")
+});
+</script>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/g/yasqe@2.2(yasqe.min.css),yasr@2.4(yasr.min.css)" />
+<script src='http://cdn.jsdelivr.net/yasqe/2.2/yasqe.bundled.min.js'></script>
+<script src='http://cdn.jsdelivr.net/yasr/2.4/yasr.bundled.min.js'></script>
+<style>
+h2 {padding-top:1em; border-bottom:1px solid #333;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<br/>
+
+<h1>Fed4FIRE Ontology Plugin</h1>
+<h2>Intro</h2>
+Todo.
+
+<h2>Generated World Map</h2>
+Todo.
+
+<h2>Queries</h2>
+
+<h3>Examples</h3>
+<ul>
+<li><a href="http://portal.fed4fire.eu:8181/ontology?query=SELECT+%3Fname+%3Fam+%3Fendpoint+WHERE+%7B%0A++%3Finfra+%3Chttp%3A%2F%2Fopen-multinet.info%2Fontology%2Fomn%23hasService%3E+%3Fam+%3B%0A++++rdfs%3Alabel+%3Fname+.+%0A++%3Fam+rdf%3Atype+%3Chttp%3A%2F%2Fopen-multinet.info%2Fontology%2Fomn-domain-geni-fire%23AMService%3E+%3B%0A++++%3Chttp%3A%2F%2Fopen-multinet.info%2Fontology%2Fomn%23hasEndpoint%3E+%3Fendpoint+.%0A%7D+LIMIT+100%0A">
+Find all Aggregate Manager API's</a>
+</ul>
+
+<h3>User</h3>
+<div id="yasqe"></div>
+<div id="yasr"></div>
+
+<h2>Direct RDF stream</h2>
+<div id="welcome">Netmode RDF data: {{my_var}}</div>
+<pre><code id="data"></code></pre>
+{% endblock %}

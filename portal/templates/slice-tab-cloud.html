@@ -1,58 +1,80 @@
 {% extends "layout_wide.html" %}
+{% load portal_filters %}
 
 {% block head %}
 <style>
 .disabled {
     z-index: 1000;
     background-color: #999999;
-    opacity: 0.3;
-    pointer-events: none;
+opacity: 0.3;
+         pointer-events: none;
 }
 </style>
 <script type="text/javascript">
 
 var global_list = {};
 var data = Array(); 
-var ad_rspec = Array(); 
-var request_rspec = Array(); 
-var manifest_rspec = Array(); 
+var ad_rspec = Object(); 
+var request_rspec = Object();
+var manifest_rspec = Object(); 
 var deleted_nodes = {}; 
 var added_nodes = {}; 
-
 var len_platforms = {{len_platforms}};
+
+var key_sliver = '';
+var key_slivername = '';
+var key_image = '';
 
 /* render_flavor & render_image */
 function render_option(obj){
     var option = document.createElement("option");
-    option.text = obj["@name"];
-    option.value = obj["@name"];
+    if(obj instanceof Object){
+        obj_name = obj["@name"];
+    }else{
+        obj_name = obj;
+    }
+    option.text = obj_name;
+    option.value = obj_name;
     return option;
 }
-function render_description(platform, obj, type){
+function render_description(platform, obj, type, node_name){
     if($('#'+platform+'_'+type).length==0){
-        $('#'+platform+'_add').append("<div id='"+platform+"_"+type+"'>");
+        $('#'+platform+'_add_'+node_name).append("<div id='"+platform+"_"+type+"'>");
     }
-    var d = platform+'_'+type+'_'+obj['@name'];
+    if(obj instanceof Array){
+        obj_name = obj["@name"];
+    }else{
+        obj_name = obj;
+    }
+    var d = platform+'_'+type+'_'+obj_name;
     d = d.replace(/ /g, '');
     id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
     if($('#'+id).length==0){
         $('#'+platform+'_'+type).append("<div id='"+d+"' class='alert-success col-md-5' style='margin-top:10px;display:none;border-style:solid;border-color:#f1f1f1;border-width:2px;'></div>");
     }
     if($('#'+id+' div').length==0){
-        jQuery.each(obj, function(key,val){
-            if (key != 'openstack:image'){
-                $('#'+id).append("<div>"+key.replace('@','')+": "+val+"</div>");
-            }
-        });
+        if(obj instanceof Array){
+             jQuery.each(obj, function(key,val){
+                    if (key != 'openstack:image' && key != 'disk_image'){
+                        $('#'+id).append("<div>"+key.replace('@','')+": "+val+"</div>");
+                    }
+            });
+        }else{
+            // What do we do?
+        }
     }
 }
-function toogle_div(platform, value, type){
-    $("#"+platform+"_add").show();
-    // show the add button only if image is selected
-    if($("#"+platform+"_selectImage").val()!=null && $("#"+platform+"_selectImage").val()!=0 && value!=0){
-        $("#"+platform+"_add_button").show();
+function toogle_div(platform, value, type, node_name){
+    $("#"+platform+"_add_"+node_name).show();
+    if ( $("#"+platform+"_selectImage_"+node_name).length ) {
+        // show the add button only if image is selected
+        if($("#"+platform+"_selectImage_"+node_name).val()!=null && $("#"+platform+"_selectImage").val()!=0 && value!=0){
+            $("#"+platform+"_add_button_"+node_name).show();
+        }else{
+            $("#"+platform+"_add_button_"+node_name).hide();
+        }
     }else{
-        $("#"+platform+"_add_button").hide();
+        $("#"+platform+"_add_button_"+node_name).show();
     }
     $("[id^='"+platform+"_"+type+"_"+"']").hide();
     d = platform+'_'+type+'_'+value;
@@ -61,79 +83,122 @@ function toogle_div(platform, value, type){
     $('#'+id).show();
 }
 function render_cloud(platform, node){
-    elm = document.getElementById(platform+'_select');
+    console.log(node);
+    if ('@component_name' in node){
+        node_name = node['@component_name']
+    }else{
+        node_name = node['@component_id'].split('+').pop();
+    }
+    elm = document.getElementById(platform+'_select_'+node_name);
     //newElement = document.createElement('p');
     //elm.appendChild(newElement); 
-    global_list[platform]={};
+    global_list[platform][node_name]={};
     if('openstack:sliver' in node){
+        key_sliver = 'openstack:sliver';
+        key_slivername = '@sliver_name';
+    }else if('sliver_type' in node){
+        key_sliver = 'sliver_type';
+        key_slivername = '@name';
+    }
+    if (key_sliver != ''){
         selectFlavor = document.createElement('select');
-        selectFlavor.id = platform+"_selectFlavor";
-        selectFlavor.name = platform+"_selectFlavor";
+        selectFlavor.id = platform+"_selectFlavor_-_"+node_name;
+        selectFlavor.name = platform+"_selectFlavor_-_"+node_name;
         selectFlavor.onchange = function(){
             /* 1) Display corresponding Flavor div - hide others - reset selectImage value */
-            $("#"+platform+"_selectImage option[value=0]").prop('selected', true);
-            toogle_div(platform, this.value, 'flavor');
-            /* 3) Disable Images, Enable only compatible ones in selectImage */
-            $("[id^='"+platform+"_image_"+"']").hide();
-            $("#"+platform+"_selectImage option").attr("disabled",true);
-            $.each(global_list[platform][this.value], function (i,v){
-                $("#"+platform+"_selectImage option[value='" + v + "']").attr("disabled",false);
-            });
-            $("#"+platform+"_selectImage").attr("disabled",false);
+            name = this.id.split("_-_").pop();
+            toogle_div(platform, this.value, 'flavor', name);
+            if ( $("#"+platform+"_selectImage_"+name).length ) {
+                $("#"+platform+"_selectImage_"+name+" option[value=0]").prop('selected', true);
+                /* 3) Disable Images, Enable only compatible ones in selectImage */
+                $("[id^='"+platform+"_image_"+name+"']").hide();
+                $("#"+platform+"_selectImage_"+name+" option").attr("disabled",true);
+                $.each(global_list[platform][name][this.value], function (i,v){
+                    $("#"+platform+"_selectImage_"+name+" option[value='" + v + "']").attr("disabled",false);
+                });
+                $("#"+platform+"_selectImage_"+name).attr("disabled",false);
+            }
         }
         var option = document.createElement("option");
         option.text = "-- select a flavor --";
         option.value = 0;
         selectFlavor.appendChild(option);
-        jQuery.each( node['openstack:sliver'], function( i, sliver ) {
-            if('openstack:flavor' in sliver){
-                f = render_option(sliver['openstack:flavor']);
+        jQuery.each( node[key_sliver], function( i, sliver ) {
+                flavor = get_flavor(sliver);
+                f = render_option(flavor);
                 selectFlavor.appendChild(f);
-                flavor = sliver["openstack:flavor"];
                 /* 1) create hidden div to explain caracteristics of the flavor */
-                render_description(platform, flavor, 'flavor');
-                flavor_name = flavor['@name'];
-                global_list[platform][flavor_name]=[];
-                if ("openstack:image" in flavor){
+                render_description(platform, flavor, 'flavor', node_name);
+                if(flavor instanceof Object){
+                    flavor_name = flavor['@name'];
+                }else{
+                    flavor_name = flavor;
+                }
+                global_list[platform][node_name][flavor_name]=[];
+                if(flavor instanceof Object){
+                    if ("openstack:image" in flavor){
+                        images = flavor['openstack:image'];
+                        key_image = 'openstack:image';
+                    }else if("disk_image" in flavor){
+                        images = flavor['disk_image'];
+                        key_image = 'disk_image';
+                    }else{
+                        key_image = false;
+                    }
+                }else{
+                    key_image = false;
+                }
+                if(key_image){
                     selectImage = document.createElement('select');
-                    selectImage.id = platform+"_selectImage";
-                    selectImage.name = platform+"_selectImage";
+                    selectImage.id = platform+"_selectImage_"+node_name;
+                    selectImage.name = platform+"_selectImage_"+node_name;
                     selectImage.onchange = function(){
                         /* 2) display corresponding Image div - hide others */
-                        toogle_div(platform, this.value, 'image');
+                        toogle_div(platform, this.value, 'image', node_name);
                     }
                     var option = document.createElement("option");
                     option.text = "-- select an image --";
                     option.value = 0;
                     selectImage.appendChild(option);
-                    if(flavor["openstack:image"] instanceof Array){
-                        jQuery.each( flavor["openstack:image"], function( i, img ) {
-                           image = render_option(img);
-                           image.disabled = true;
-                           selectImage.appendChild(image);
-                           /* 2) create hidden div to explain caracteristics of the image */
-                           render_description(platform, img, 'image');
-                           global_list[platform][flavor_name].push(img['@name']);
+                    if(images instanceof Array){
+                        jQuery.each( images, function( i, img ) {
+                                image = render_option(img);
+                                image.disabled = true;
+                                selectImage.appendChild(image);
+                                /* 2) create hidden div to explain caracteristics of the image */
+                                render_description(platform, img, 'image', node_name);
+                                global_list[platform][node_name][flavor_name].push(img['@name']);
                         });
                     }else{
-                        image = render_option(flavor["openstack:image"]);
+                        image = render_option(images);
                         image.disabled = true;
                         selectImage.appendChild(image);
                         /* 2) create hidden div to explain caracteristics of the image */
-                        render_description(platform, flavor["openstack:image"], 'image');
-                        global_list[platform][flavor_name].push(flavor['openstack:image']['@name']);
+                        render_description(platform, images, 'image', node_name);
+                        global_list[platform][node_name][flavor_name].push(images['@name']);
                     }
                 }
-
-            }
         });
         elm.appendChild(selectFlavor); 
-        elm.appendChild(selectImage); 
+        if(key_image){
+            elm.appendChild(selectImage); 
+        }
     }
-    $("#"+platform+"_selectFlavor").css("width","100px");
-    $("#"+platform+"_selectFlavor").css("height","30px");
-    $("#"+platform+"_selectImage").css("width","30px");
-    $("#"+platform+"_selectImage").css("height","30px");
+    $("#"+platform+"_selectFlavor_-_"+node_name).css("width","100px");
+    $("#"+platform+"_selectFlavor_-_"+node_name).css("height","30px");
+    if(key_image){
+        $("#"+platform+"_selectImage_"+node_name).css("width","100px");
+        $("#"+platform+"_selectImage_"+node_name).css("height","30px");
+    }
+}
+function get_flavor(sliver){
+    if(typeof sliver === 'string' || sliver instanceof String){
+        return sliver
+    } else if('openstack:flavor' in sliver){
+        return sliver['openstack:flavor'];
+    }else{
+        return sliver;
+    }
 }
 function is_finished(len_platforms, pf_status){
     if(len_platforms == pf_status){
@@ -147,10 +212,10 @@ function sliver_name_exists(sliver_name){
         return true;
     }
     /*
-    if (sliver_name in deleted_nodes){
-        return true;
-    }
-    */
+       if (sliver_name in deleted_nodes){
+       return true;
+       }
+     */
     return false;
 }
 function find_sliver_name(sliver_name, num){
@@ -162,14 +227,14 @@ function find_sliver_name(sliver_name, num){
     }
 }
 
-function send_add(platform){ 
+function send_add(platform, node_name){ 
     $('#'+platform+'_pending_add').show();
-    sliver_name = $('#'+platform+'_sliver_name').val();
+    sliver_name = $('#'+platform+'_sliver_name_'+node_name).val();
     sliver_name = sliver_name.replace(' ','_');
-    flavor_name = $('#'+platform+'_selectFlavor').val();
-    image_name = $('#'+platform+'_selectImage').val();
+    flavor_name = $('#'+platform+'_selectFlavor_-_'+node_name).val();
+    image_name = $('#'+platform+'_selectImage_'+node_name).val();
 
-    num = $('#'+platform+'_number').val();
+    num = $('#'+platform+'_number_'+node_name).val();
     if (num > 1){
         for (i = 0; i < num; i++){
             // XXX Check if the name already exist in existing VMs and added_nodes
@@ -177,8 +242,8 @@ function send_add(platform){
             if (sliver_name_exists(vm_name)){
                 vm_name = find_sliver_name(sliver_name, num);
             }
-            node = get_node(vm_name, flavor_name, image_name);
-            request_rspec['rspec']['node'].push(node);
+            node = get_node(vm_name, flavor_name, image_name, node_name);
+            add_to_request_rspec(node);
             render_node(platform, node, 'pending_add');
             added_nodes[vm_name]=node;
         }
@@ -186,50 +251,67 @@ function send_add(platform){
         if (sliver_name_exists(sliver_name)){
             sliver_name = find_sliver_name(sliver_name, num);
         }
-        node = get_node(sliver_name, flavor_name, image_name);
-        request_rspec['rspec']['node'].push(node);
+        node = get_node(sliver_name, flavor_name, image_name, node_name);
+        add_to_request_rspec(node);
         render_node(platform, node, 'pending_add');
         added_nodes[sliver_name]=node;
     }
-    toogle_div(platform, flavor_name, 'flavor');
-    toogle_div(platform, image_name, 'image');
-    flavor_name = $('#'+platform+'_selectFlavor').val(0);
-    image_name = $('#'+platform+'_selectImage').val(0);
-    $('#'+platform+'_add').hide();
-    $('#'+platform+'_add_button').hide();
+    toogle_div(platform, flavor_name, 'flavor', node_name);
+    toogle_div(platform, image_name, 'image', node_name);
+    flavor_name = $('#'+platform+'_selectFlavor_-_'+node_name).val(0);
+    image_name = $('#'+platform+'_selectImage_'+node_name).val(0);
+    $('#'+platform+'_add_'+node_name).hide();
+    $('#'+platform+'_add_button_'+node_name).hide();
     $('#'+platform+'_div_pending').show();
     console.log(request_rspec);
     //jQuery('#'+platform+'_form_delete').submit();
 }
-function get_node(vm_name, flavor_name, image_name){
-        var node = {};
-        if(ad_rspec['rspec']['node'] instanceof Array) {
-            // Deep copy of the Array to avoid reference
-            node = jQuery.extend(true, {}, ad_rspec['rspec']['node'][0]);
-        }else{
-            // Deep copy of the Array to avoid reference
-            node = jQuery.extend(true, {}, ad_rspec['rspec']['node']);
-        }
-        if(node['openstack:sliver'] instanceof Array) {
-            node['openstack:sliver'] = node['openstack:sliver'][0];
-        }
-        node['openstack:sliver']['@sliver_name'] = vm_name;
-        console.log(vm_name);
-
-        if(node['openstack:sliver']['openstack:flavor'] instanceof Array) {
-            node['openstack:sliver']['openstack:flavor'] = node['openstack:sliver']['openstack:flavor'][0];
-        }
-        node['openstack:sliver']['openstack:flavor'] = Array();
-        node['openstack:sliver']['openstack:flavor'] = {'@name':flavor_name,'openstack:image':{'@name':image_name}};
-
-        $.each(node['openstack:sliver']['openstack:security_group'], function(i, group){
-            if(group['@name']=='default'){
-                node['openstack:sliver']['openstack:security_group'] = group;
-                return false;
+function get_node(vm_name, flavor_name, image_name, node_name){
+    var node = {};
+    if(ad_rspec['rspec']['node'] instanceof Array) {
+        // Deep copy of the Array to avoid reference
+        var i=0;
+        jQuery.each(ad_rspec['rspec']['node'], function(x, n){
+            if(n['@component_name']==node_name){
+                i = x;
+                return;
             }
         });
-        return node;
+        node = jQuery.extend(true, {}, ad_rspec['rspec']['node'][i]);
+    }else{
+        // Deep copy of the Array to avoid reference
+        node = jQuery.extend(true, {}, ad_rspec['rspec']['node']);
+    }
+    if(node[key_sliver] instanceof Array) {
+        node[key_sliver] = node[key_sliver][0];
+    }
+    node[key_sliver][key_slivername] = vm_name;
+    node["@client_id"] = vm_name;
+    console.log(vm_name);
 
+    flavor = Array();
+
+    if('openstack:flavor' in node[key_sliver]){
+        flavor = {'@name':flavor_name,'openstack:image':{'@name':image_name}};
+        node[key_sliver]['openstack:flavor']=flavor;
+    }else{
+        if(typeof image_name === "undefined"){
+            flavor = {'@name':flavor_name};
+        }else{
+            flavor = {'@name':flavor_name,'disk_image':{'@name':image_name}};
+        }
+        node[key_sliver]=flavor;
+    }
+
+    if('openstack:security_group' in node[key_sliver]){
+        $.each(node[key_sliver]['openstack:security_group'], function(i, group){
+                if(group['@name']=='default'){
+                node[key_sliver]['openstack:security_group'] = group;
+                return false;
+                }
+                });
+    }
+    return node;
 }
 function send_delete(platform, sliver_name){
     $('#'+platform+'_pending_delete').show();
@@ -241,15 +323,25 @@ function send_delete(platform, sliver_name){
     $('#'+platform+'_div_pending').show();
     console.log(request_rspec);
 }
+function add_to_request_rspec(node){
+    if(request_rspec['rspec']['node'] instanceof Array) {
+        request_rspec['rspec']['node'].push(node);
+    }else{
+        n = request_rspec['rspec']['node'];
+        request_rspec['rspec']['node'] = Array();
+        request_rspec['rspec']['node'].push(n);
+        request_rspec['rspec']['node'].push(node);
+    }
+}
 function remove_node_from_request_rspec(sliver_name){
     var save_node = Array();
     jQuery.each( request_rspec['rspec']['node'], function( i, node ) {
-        if(node['openstack:sliver']['@sliver_name']==sliver_name){
+            if(node[key_sliver][key_slivername]==sliver_name){
             request_rspec['rspec']['node'].splice(i,1);
             save_node = node;
             return false;
-        }
-    });
+            }
+            });
     return save_node;
 }
 function cancel_add(platform,sliver_name){
@@ -263,6 +355,7 @@ function cancel_add(platform,sliver_name){
         $('#'+platform+'_pending_add').hide();
         if ($('#'+platform+'_pending_delete div').length==0){
             $('#'+platform+'_div_pending').hide();
+            $('#'+platform+'_pending_delete').hide();
         }
     }
 }
@@ -279,6 +372,7 @@ function cancel_delete(platform,sliver_name){
         $('#'+platform+'_pending_delete').hide();
         if ($('#'+platform+'_pending_add div').length==0){
             $('#'+platform+'_div_pending').hide();
+            $('#'+platform+'_pending_add').hide();
         }
     }
 }
@@ -302,35 +396,60 @@ function public_ip(platform,sliver_name,is_public){
 }
 
 function render_node(platform, node, state){
-    if('openstack:sliver' in node){
-        sliver = node['openstack:sliver']
-        var d = platform+'_'+state+'_'+sliver['@sliver_name'];
+    if(key_sliver in node){
+        sliver = node[key_sliver];
+        if(sliver instanceof Array){
+            client_id = sliver['@name'];
+        }else{
+            if ('@sliver_name' in sliver){
+                client_id = sliver['@sliver_name'];
+            }else{
+                client_id = node['@client_id'];
+            }
+        }
+        if ('@component_name' in node){
+            node_name = node['@component_name']
+        }else{
+            node_name = node['@component_id'].split('+').pop();
+        }
+
+        var d = platform+'_'+state+'_'+client_id;
         d = d.replace(/ /g, '');
         id = d.replace( /(:|\.|\[|\])/g, "\\$1" );
-        $("#"+platform+"_"+state).append("<div id='"+platform+'_'+state+'_'+sliver['@sliver_name']+"' class='row'></div>");
-        //$("#"+id).append("<input type='hidden' name='"+platform+"_"+sliver['@sliver_name']+"' value='"+sliver['@sliver_name']+"'>");
+        $("#"+platform+"_"+state).append("<div id='"+platform+'_'+state+'_'+client_id+"' class='row'></div>");
+        //$("#"+id).append("<input type='hidden' name='"+platform+"_"+client_id+"' value='"+client_id+"'>");
         if(state=='pending_add'){
-            $("#"+id).append("<div class='col-md-1' style='margin-left:0px;!important;'><input type='checkbox' id='publicip_"+platform+"_"+sliver['@sliver_name']+"' onclick=public_ip('"+platform+"','"+sliver['@sliver_name']+"',this.checked);></div>");
+            $("#"+id).append("<div class='col-md-1' style='width:40px;margin-left:0px;!important;'><input type='checkbox' id='publicip_"+platform+"_"+client_id+"' onclick=public_ip('"+platform+"','"+client_id+"',this.checked);></div>");
         }else{
-            $("#"+id).append("<div class='col-md-1' style='margin-left:0px;!important;'>&nbsp;</div>");
+            $("#"+id).append("<div class='col-md-1' style='width:40px;margin-left:0px;!important;'>&nbsp;</div>");
         }
-        $("#"+id).append("<div class='col-md-2' style='padding-left:0px;'>"+sliver['@sliver_name']+"</div>");
-        $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['@name']+"</div>");
-        $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
+        $("#"+id).append("<div class='col-md-2'>"+node_name+"</div>");
+        $("#"+id).append("<div class='col-md-2'>"+client_id+"</div>");
+        if('openstack:flavor' in node[key_sliver]){
+            $("#"+id).append("<div class='col-md-2'>"+sliver['openstack:flavor']['@name']+"</div>");
+            $("#"+id).append("<div class='col-md-3'>"+sliver['openstack:flavor']['openstack:image']['@name']+"</div>");
+        }else{
+            $("#"+id).append("<div class='col-md-2'>"+sliver['@name']+"</div>");
+            if('disk_image' in sliver){
+                $("#"+id).append("<div class='col-md-3'>"+sliver['disk_image']['@name']+"</div>");
+            }else{
+                $("#"+id).append("<div class='col-md-3'>&nbsp;</div>");
+            }
+        }
 
         if(state=='existing'){
-            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_delete_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_delete' value='Delete' onclick=send_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_delete_"+client_id+"' type='submit' form='"+platform+"_form_delete' value='Delete' onclick=send_delete('"+platform+"','"+client_id+"');></div>");
         }else if(state=='pending_add'){
-            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_add('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+client_id+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_add('"+platform+"','"+client_id+"');></div>");
         }else if (state=='pending_delete'){
-            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+sliver['@sliver_name']+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_delete('"+platform+"','"+sliver['@sliver_name']+"');></div>");
+            $("#"+id).append("<div class='col-md-1'><input id='"+platform+"_cancel_"+client_id+"' type='submit' form='"+platform+"_form_cancel' value='Cancel' onclick=cancel_delete('"+platform+"','"+client_id+"');></div>");
         }else{
             console.log("state: "+state+" not impemented");
         }
         /*
-        sliver['openstack:address']
-        sliver['openstack:flavor']
-        */
+           sliver['openstack:address']
+           sliver['openstack:flavor']
+         */
     }
 }
 
@@ -338,21 +457,33 @@ function allocate(platform, slicename){
     $("#"+platform+"_main").addClass("disabled");
     $("#"+platform+"_wait").show();
     $("#"+platform+"_wait").spin();
+    console.log("allocate rspec = ")
+    console.log(request_rspec);
+    console.log("allocate json = ")
+    console.log(JSON.stringify(request_rspec));
     $.post("/sfa/Allocate",{'hrn':slicename, 'type':'slice', 'platform':[platform], 'rspec':JSON.stringify(request_rspec)}, function( result ) {
-        console.log(result);
-        clear_data(platform);
-        load_data(platform,slicename);
-        $("#"+platform+"_main").removeClass("disabled");
-        $("#"+platform+"_wait").hide();
-        mysliceAlert('Success: changes applied','success', true);
+            console.log(result);
+            clear_data(platform);
+            load_data(platform,slicename);
+            $("#"+platform+"_main").removeClass("disabled");
+            $("#"+platform+"_wait").hide();
+            if('error' in result[platform]){
+                mysliceAlert('Error: '+result[platform]['error_msg'],'danger', true);
+            }else if('code' in result[platform] && result[platform]['code']['am_code']==-1){
+                mysliceAlert('Error: '+result[platform]['output'],'danger', true);
+            }else{
+                mysliceAlert('Success: changes applied','success', true);
+            }
     });
 }
 function clear_data(platform){
     $('#'+platform+'_existing').children().remove();
     $('#'+platform+'_pending_delete').children().remove();
-    $("#"+platform+"_selectFlavor").remove();
-    $("#"+platform+"_selectImage").remove();
+    $('#'+platform+'_pending_delete').hide();
+    $("[id^="+platform+"_selectFlavor]").remove();
+    $("[id^="+platform+"_selectImage]").remove();
     $('#'+platform+'_pending_add').children().remove();
+    $('#'+platform+'_pending_add').hide();
     $('#'+platform+'_div_pending').hide();
 }
 function load_data(platform, slicename){
@@ -360,59 +491,67 @@ function load_data(platform, slicename){
     var platform_empty = Array();
 
     $.post("/sfa/Describe",{'hrn':slicename, 'type':'slice', 'platform':[platform]}, function( d ) {
-        data = d;
-        console.log(data);
-        if('parsed' in data[platform] && 'rspec' in data[platform]['parsed']){
+       console.log(data);
+       $("#"+platform+"_main").spin(false);
+       data = d;
+       if('parsed' in data[platform] && 'rspec' in data[platform]['parsed']){
            manifest_rspec = data[platform]['parsed']['rspec'];
            request_rspec = data[platform]['parsed'];
            request_rspec['rspec']['@type']='request';
            if('node' in manifest_rspec){
                if(manifest_rspec['node'] instanceof Array) {
                    jQuery.each( manifest_rspec['node'], function( i, node ) {
-                       render_node(platform,node, 'existing');
+                       render_node(platform, node, 'existing');
                    });
                }else{
-                   render_node(platform,manifest_rspec['node'], 'existing');
+                   render_node(platform, manifest_rspec['node'], 'existing');
                }
                $('#'+platform+'_existing').show();
            }
-        }
+       }else{
+           // Let's build a default request_rspec
+           request_rspec['rspec']=Object();
+           request_rspec['rspec']['@type']='request';
+           request_rspec['rspec']['node']=Array();
+       }
     });
     $.post("/sfa/ListResources",{'platform':[platform]}, function( d ) {
-        //$.extend(data,d);
-        //console.log(data);
-        if('parsed' in d[platform] && 'rspec' in d[platform]['parsed']){
-           ad_rspec = d[platform]['parsed'];
-           if('node' in ad_rspec['rspec']){
-               if(ad_rspec['rspec']['node'] instanceof Array) {
-                   jQuery.each( ad_rspec['rspec']['node'], function( i, node ) {
-                       render_cloud(platform,node);
-                   });
-               }else{
-                   render_cloud(platform,ad_rspec['rspec']['node']);
-               }
-           }else{
-               platform_empty.push(platform);
-           }
-        }else{
-            platform_empty.push(platform);
-        }
-        platform_status.push(platform);
-        if(is_finished(len_platforms,platform_status.length)){
-            $("#loading").hide();
-            if(platform_empty.length == len_platforms){
-                $("#warning_message").show();
+            //$.extend(data,d);
+            console.log(data);
+            global_list[platform]={};
+            if('parsed' in d[platform] && 'rspec' in d[platform]['parsed']){
+            ad_rspec = d[platform]['parsed'];
+            if('node' in ad_rspec['rspec']){
+            if(ad_rspec['rspec']['node'] instanceof Array) {
+            jQuery.each( ad_rspec['rspec']['node'], function( i, node ) {
+                render_cloud(platform,node);
+                });
+            }else{
+            render_cloud(platform,ad_rspec['rspec']['node']);
             }
-        }
+            }else{
+            platform_empty.push(platform);
+            }
+            }else{
+            platform_empty.push(platform);
+            }
+            platform_status.push(platform);
+            if(is_finished(len_platforms,platform_status.length)){
+                $("#loading").hide();
+                if(platform_empty.length == len_platforms){
+                    $("#warning_message").show();
+                }
+            }
     });
 }
 $(document).ready(function() {
-{% for platform in platforms %}
-    {% if platform in cloud_platforms %}
-    load_data('{{platform}}', '{{slicename}}');
-    {% endif %}
-{% endfor %}
-});
+        {% for platform in platforms %}
+        {% if platform in cloud_platforms %}
+        $("#{{platform}}_main").spin();
+        load_data('{{platform}}', '{{slicename}}');
+        {% endif %}
+        {% endfor %}
+        });
 </script>
 {% endblock %}
 
@@ -420,63 +559,51 @@ $(document).ready(function() {
 {{post_values}}
 {% for platform in platforms %}
     {% if platform in cloud_platforms %}
-    <div id="{{platform}}_wait" style="display:none;margin-top:20px;position:absolute;margin-left:300px;"></div>
-    <div id="{{platform}}_main" style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;width:700px;">
+
+    <div id="{{platform}}_wait" style="display:none;margin-top:35px;position:absolute;margin-left:50%;"></div>
+    <div id="{{platform}}_main" style="padding-left:20px;padding-top:20px;padding-right:20px;padding-bottom:20px;border-style:solid;border-width:1px;">
         <h2>{{ platform }}</h2>
         // display only if VMs already in slice
         <h4>VMs in slice {{slicename}}</h4>
-        <form id="{{platform}}_form_delete" method="post">
-        {% csrf_token %}
-        <div id="{{platform}}_existing" class="row alert alert-info" style="display:none;">
+        <div id="{{platform}}_existing" class="row alert alert-info" style='display:none;margin-left:0px;!important;margin-right:0px;!important;'>
         <input type="hidden" name="{{platform}}_vm" id="{{platform}}_vm">
         <input type="hidden" name="action" id="action" value="delete">
         <input type="hidden" name="platform" id="platform" value="{{platform}}">
         </div> 
-        </form>
-        <h4><a href="#" onclick="$('#{{platform}}_div_add').toggle();"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create new VMs</a></h4>
-        <div id="{{platform}}_div_add" class="alert" style="background-color:#f1f1f1;display:none;margin-bottom:0px !important;padding-bottom:6px !important;">
-        <form id="{{platform}}_form_add" method="post" class="form-inline">
-        {% csrf_token %}
-        <div id="{{platform}}_input" class="row">
-            <div class="col-md-1"></div>
-            <div class="col-md-3"><label for="{{platform}}_number">number:</label>
-            <input type="text" maxlength="2" id="{{platform}}_number" name="{{platform}}_number" style="width:2.2em;min-width:2.2em;height:30px;" value="1" class="form-control" required>
-            </div>
-            <div class="col-md-8"><label for="{{platform}}_sliver_name">name:</label>
-            <div class="form-group">
-            <input type="text" name="{{platform}}_sliver_name" id="{{platform}}_sliver_name" value="VM" maxlength="12" class="form-control" style="height:30px;" required>
-            </div>
-            </div>
-            <div class="col-md-1"></div>
-            <div id="{{platform}}_select" class="col-md-11"></div>
-        </div>
-        <div id="{{platform}}_add" class="row">
-            <div class="col-md-1">&nbsp; 
-            <input type="hidden" name="action" id="action" value="add">
-            <input type="hidden" name="platform" id="platform" value="{{platform}}">
-            </div>
-        </div>
-        <div class="row" style="padding-top:6px;">
-            <div class="col-md-1">&nbsp;</div>
-            <div class="col-md-11" id="{{platform}}_add_button" style="display:none;">
-            <input type="submit" form="{{platform}}_form_add" value="Add" onclick="send_add('{{platform}}');">
-            </div>
-        </div>
-        </form>
+        <div id="{{platform}}_div_nodes">
+        {% for key, value in result.items %} 
+          {% if key == platform %}
+            {% if value.parsed.rspec.node|get_type == 'list' %}
+                {% for node in value.parsed.rspec.node %}
+                    {% for k,node_urn in node.items %} 
+                        {% if k == '@component_id' %}
+                        {% widget '_widget-cloud-node.html' %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% for k,node_urn in value.parsed.rspec.node.items %}
+                    {% if k == '@component_id' %}
+                    {% widget '_widget-cloud-node.html' %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
         </div>
         <br>
         <div id="{{platform}}_div_pending" style="display:none;">
-        // display only pending changes
-        <h4>Pending changes</h4>
-        <form id="{{platform}}_form_reserve" method="post">
-        {% csrf_token %}
-        <div id="{{platform}}_pending_add" class="row alert alert-success" style="display:none;margin-bottom:3px !important;"></div> 
-        <div id="{{platform}}_pending_delete" class="row alert alert-danger" style="display:none;margin-bottom:3px !important;"></div> 
-        <br>
-        <input type="hidden" name="action" id="action" value="reserve">
-        <input type="hidden" name="platform" id="platform" value="{{platform}}">
-        <input type="submit" form="{{platform}}_form_reserve" value="Apply changes" onclick="allocate('{{platform}}','{{slicename}}');">
-        </form>
+            // display only pending changes
+            <h4>Pending changes</h4>
+            <form id="{{platform}}_form_reserve" method="post">
+            {% csrf_token %}
+            <div id="{{platform}}_pending_add" class="row alert alert-success" style="display:none;margin-bottom:3px !important;margin-left:0px;!important;margin-right:0px;!important;"></div> 
+            <div id="{{platform}}_pending_delete" class="row alert alert-danger" style="display:none;margin-bottom:3px !important;margin-left:0px;!important;margin-right:0px;!important;"></div> 
+            <br>
+            <input type="hidden" name="action" id="action" value="reserve">
+            <input type="hidden" name="platform" id="platform" value="{{platform}}">
+            <input type="submit" form="{{platform}}_form_reserve" value="Apply changes" onclick="allocate('{{platform}}','{{slicename}}');">
+            </form>
         </div>
     </div>
     {% endif %}
