@@ -1715,7 +1715,7 @@ case TYPE_LIST_OF_VALUES:
                 // 
                 // +) If a reservable node is added to the slice, then it should have a corresponding lease
                 // XXX Not always a resource
-                var is_reservable = (record.exclusive == 'true');
+                var is_reservable = (record.exclusive == 'true' || record.exclusive == true);
                 if (is_reservable) {
                     // var warnings = manifold.query_store.get_record_state(query.query_uuid, record_key, STATE_WARNINGS);
 
