@@ -1,7 +1,10 @@
 # Manifold API Python interface
 import copy
-import xmlrpclib
 import ssl
+
+# for python3
+try:    import xmlrpclib
+except: import xmlrpc.client as xmlrpclib
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -9,9 +12,13 @@ from django.shortcuts import redirect
 from manifold.core.result_value import ResultValue
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
 
-# from unfold.sessioncache import SessionCache
-
-from myslice.settings import config, logger
+# being available from the outside (r2lab django web site)
+try:
+    from myslice.settings import logger
+except:
+    import logging
+    logger = logging.getLogger('manifoldapi')
+    
 
 class ManifoldAPI:
 
@@ -23,7 +30,11 @@ class ManifoldAPI:
         self.trace = []
         self.calls = {}
         self.multicall = False
-        self.url = config.manifold_url()
+        try:
+            from myslice.settings import config
+            self.url = config.manifold_url()
+        except:
+            self.url = "https://portal.onelab.eu:7080/"
         
         # Manifold uses a self signed certificate
         # https://www.python.org/dev/peps/pep-0476/
@@ -123,6 +134,7 @@ def execute_query(request, query):
     return _execute_query(request, query, manifold_api_session_auth)
 
 def execute_admin_query(request, query):
+    # xxx config
     admin_user, admin_password = config.manifold_admin_user_password()
     if not admin_user or not admin_password:
         logger.error("""CONFIG: you need to setup admin_user and admin_password in myslice.ini
