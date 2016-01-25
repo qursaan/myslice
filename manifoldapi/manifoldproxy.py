@@ -31,7 +31,12 @@ debug_empty=False
 # myslice/urls.py
 # as well as 
 # static/js/manifold.js
-def proxy (request,format):
+def proxy(request, format):
+    from myslice.settings import config
+    url = config.manifold_url()
+    return _proxy(url, request, format)
+
+def _proxy(url, request, format):
     """the view associated with /manifold/proxy/ with the query passed using POST"""
     
     # expecting a POST
@@ -71,7 +76,7 @@ def proxy (request,format):
             return HttpResponse (json.dumps({'code':0,'value':[]}), content_type="application/json")
                 
         # actually forward
-        manifold_api= ManifoldAPI(auth=manifold_api_session_auth)
+        manifold_api= ManifoldAPI(url, auth=manifold_api_session_auth)
 
         # for the benefit of the python code, manifoldAPI raises an exception if something is wrong
         # however in this case we want to propagate the complete manifold result to the js world

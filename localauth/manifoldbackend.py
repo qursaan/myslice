@@ -29,7 +29,7 @@ class ManifoldBackend:
             request = token['request']
 
             auth = {'AuthMethod': 'password', 'Username': email, 'AuthString': password}
-            api = ManifoldAPI(auth)
+            api = ManifoldAPI(config.manifold_url(), auth)
             sessions_result = api.forward(Query.create('local:session').to_dict())
             sessions = sessions_result.ok_value()
             if not sessions:

@@ -13,12 +13,13 @@ debug=False
 
 class MetaData:
 
-    def __init__ (self, auth):
+    def __init__ (self, url, auth):
+        self.url = url
         self.auth=auth
         self.hash_by_object={}
 
     def fetch (self, request):
-        manifold_api = ManifoldAPI(self.auth)
+        manifold_api = ManifoldAPI(self.url, self.auth)
         fields = ['table', 'column.name', 'column.qualifier', 'column.type', 
                   'column.is_array', 'column.description', 'column.default', 'key', 'capability']
         #fields = ['table', 'column.column',
