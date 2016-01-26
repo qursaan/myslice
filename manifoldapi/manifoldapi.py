@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from manifold.core.result_value import ResultValue
-from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
+from manifoldapi.manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
 
 # being available from the outside (r2lab django web site)
 try:
