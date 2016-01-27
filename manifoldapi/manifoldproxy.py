@@ -8,8 +8,8 @@ from django.http                import HttpResponse, HttpResponseForbidden
 #from manifoldapi.manifoldquery import ManifoldQuery
 from manifold.core.query        import Query
 from manifold.core.result_value import ResultValue
-from manifoldapi                import ManifoldAPI
-from manifoldresult             import ManifoldException
+from manifoldapi.manifoldapi    import ManifoldAPI
+from manifoldapi.manifoldresult import ManifoldException
 
 # from unfold.sessioncache import SessionCache
 
