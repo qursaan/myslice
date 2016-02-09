@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from manifold.core.result_value import ResultValue
-from manifoldapi.manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
+from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
 
 # being available from the outside (r2lab django web site)
 try:
@@ -133,12 +133,13 @@ def execute_query(request, query):
 
 def execute_admin_query(request, query):
     # xxx config
+    from myslice.settings import config
+    url = config.manifold_url()
+
     admin_user, admin_password = config.manifold_admin_user_password()
     if not admin_user or not admin_password:
         logger.error("""CONFIG: you need to setup admin_user and admin_password in myslice.ini
 Some functions won't work properly until you do so""")
     admin_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
 
-    from myslice.settings import config
-    url = config.manifold_url()
     return _execute_query(url, request, query, admin_auth)

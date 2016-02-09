@@ -1,8 +1,8 @@
 import json 
 import os.path
 
-from manifoldapi.manifoldresult  import ManifoldResult
-from manifoldapi.manifoldapi     import ManifoldAPI
+from manifoldresult  import ManifoldResult
+from manifoldapi     import ManifoldAPI
 
 from django.contrib     import messages
 
