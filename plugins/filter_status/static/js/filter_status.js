@@ -121,6 +121,9 @@
             filter_status = this.dataset['status'];
             self.select_tab(filter_status);
 
+            // manifoldapi/static/js/manifold.js
+            // See this.apply_filters
+
             // ... and communicate the appropriate filters to the manager
             // NOTE: we use the manifold namespace for internal filters 
             if (self.prev_filter_status) {
