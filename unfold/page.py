@@ -117,7 +117,9 @@ class Page:
 
         metadata_auth = {'AuthMethod':'anonymous'}
 
-        metadata = MetaData (metadata_auth)
+        from myslice.settings import config
+        url = config.manifold_url()
+        metadata = MetaData (url, metadata_auth)
         metadata.fetch(self.request)
         # store it for next time
         manifold['metadata']=metadata

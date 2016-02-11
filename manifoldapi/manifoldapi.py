@@ -1,7 +1,10 @@
 # Manifold API Python interface
 import copy
-import xmlrpclib
 import ssl
+
+# for python3
+try:    import xmlrpclib
+except: import xmlrpc.client as xmlrpclib
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -9,21 +12,25 @@ from django.shortcuts import redirect
 from manifold.core.result_value import ResultValue
 from manifoldresult import ManifoldResult, ManifoldCode, ManifoldException, truncate_result
 
-# from unfold.sessioncache import SessionCache
-
-from myslice.settings import config, logger
+# being available from the outside (r2lab django web site)
+try:
+    from myslice.settings import logger
+except:
+    import logging
+    logger = logging.getLogger('manifoldapi')
+    
 
 class ManifoldAPI:
 
-    def __init__(self, auth=None, cainfo=None):
+    def __init__(self, url, auth=None, cainfo=None):
         
+        self.url = url
         self.auth = auth
         self.cainfo = cainfo
         self.errors = []
         self.trace = []
         self.calls = {}
         self.multicall = False
-        self.url = config.manifold_url()
         
         # Manifold uses a self signed certificate
         # https://www.python.org/dev/peps/pep-0476/
@@ -80,9 +87,9 @@ class ManifoldAPI:
 
         return func
 
-def _execute_query(request, query, manifold_api_session_auth):
+def _execute_query(url, request, query, manifold_api_session_auth):
     
-    manifold_api = ManifoldAPI(auth = manifold_api_session_auth)
+    manifold_api = ManifoldAPI(url, auth = manifold_api_session_auth)
     
     logger.debug("MANIFOLD -> QUERY : {}".format(" ".join(str(query).split())))
     result = manifold_api.forward(query.to_dict())
@@ -120,12 +127,19 @@ def execute_query(request, query):
     
     manifold_api_session_auth = request.session['manifold']['auth']
 
-    return _execute_query(request, query, manifold_api_session_auth)
+    from myslice.settings import config
+    url = config.manifold_url()
+    return _execute_query(url, request, query, manifold_api_session_auth)
 
 def execute_admin_query(request, query):
+    # xxx config
+    from myslice.settings import config
+    url = config.manifold_url()
+
     admin_user, admin_password = config.manifold_admin_user_password()
     if not admin_user or not admin_password:
         logger.error("""CONFIG: you need to setup admin_user and admin_password in myslice.ini
 Some functions won't work properly until you do so""")
     admin_auth = {'AuthMethod': 'password', 'Username': admin_user, 'AuthString': admin_password}
-    return _execute_query(request, query, admin_auth)
+
+    return _execute_query(url, request, query, admin_auth)

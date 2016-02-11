@@ -1,5 +1,3 @@
-import time
-
 from django.contrib.auth.models import User
 
 from manifoldapi.manifoldapi    import ManifoldAPI, ManifoldException, ManifoldResult
@@ -9,9 +7,6 @@ from myslice.settings import config, logger, DEBUG
 
 from portal.actions import authority_check_pis
 
-# from unfold.sessioncache import SessionCache
-
-# Name my backend 'ManifoldBackend'
 class ManifoldBackend:
 
     # Create an authentication method
@@ -29,7 +24,7 @@ class ManifoldBackend:
             request = token['request']
 
             auth = {'AuthMethod': 'password', 'Username': email, 'AuthString': password}
-            api = ManifoldAPI(auth)
+            api = ManifoldAPI(config.manifold_url(), auth)
             sessions_result = api.forward(Query.create('local:session').to_dict())
             sessions = sessions_result.ok_value()
             if not sessions:
