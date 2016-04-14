@@ -1287,7 +1287,7 @@ def create_pending_user(wsgi_request, request, user_detail):
    
     # saves the user to django auth_user table [needed for password reset]
     # Django username must be less than 30 char so we use a hash
-    user = User.objects.create_user(hashlib.sha1(request['email'].hexdigest()), request['email'], request['password'])
+    user = User.objects.create_user(hashlib.sha1(request['email']).hexdigest(), request['email'], request['password'])
 
     # Creating a manifold user
     user_id = manifold_add_user(wsgi_request, request)
