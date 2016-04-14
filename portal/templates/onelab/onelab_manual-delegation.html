@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="col-md-8">
+	<br>
+	<h2>Manual Delegation</h2>
+	<h3>Install SFA</h3>
+	
+	<p>
+		In order to delegate your credentials to the OneLab portal, you need to install SFA tools.<br>
+	</p>
+	<p>
+		<strong>[Requirement: python 2.7 or higher]</strong>
+	</p>
+	<h4>For Mac and Linux</h4>
+	<p class="command">
+		$ sudo easy_install pip<br>
+		$ sudo pip install sfa
+	</p>
+	<h4>For Windows</h4>
+	<p>Please download <a target="_blank" href="https://bootstrap.pypa.io/get-pip.py">get-pip.py</a></p>
+	<p class="command">
+		$ python get-pip.py<br>
+		$ pip install sfa
+	</p>
+
+	<p>
+	To get more information about pip, please visit: <a target="_blank" href="https://pip.pypa.io/en/latest/installing.html">https://pip.pypa.io/en/latest/installing.html</a>
+	</p>
+	<p>
+	More details about SFA is available at the following address:
+	<a target="_blank" href="http://svn.planet-lab.org/wiki/SFATutorialInstall#installingthroughpipfromPyPI">Installing SFA</a>
+	</p>
+	
+	<h3>Configuring SFA</h3>
+	
+	<p>
+		Once SFA tools are successfully installed, you need to configure the SFA client aka SFI
+	</p>
+	<p class="command">
+		$ mkdir ~/.sfi <br>
+		$ cd ~/.sfi <br>
+		$ cp ~/.ssh/id_rsa ~/.sfi/user-hrn.pkey
+	</p>
+	
+	<p>
+		Here, 'user-hrn' is your SFA hrn. If e.g., your OneLab account email is mohammed-yasin.rahman at upmc.fr, then your user-hrn is <b><i>'onelab.upmc.mohammed-yasin_rahman'.</i></b></p>
+	<p>
+		In this example, a user-hrn is built using the root authority i.e, <b><i>'onelab'</i></b> followed by a <b>'.'</b> then the sub authority i.e., <b><i>'upmc'</i></b>
+		followed by a <b>'.'</b> and then the last fragment in the hrn is made of the local part of your email adress i.e., <b><i>'mohammed-yasin_rahman'</i></b> 
+		(with dots replaced with underscores).
+	</p>
+
+	<p>
+		Next, you will setup your ~/.sfi/sfi_config. The following represents the sfi_config file for a OneLab user:
+	</p>
+	
+	<p class="command">
+		[sfi]<br>
+		auth = onelab.upmc<br>
+		user = onelab.upmc.mohammed-yasin_rahman<br>
+		registry = http://portal.onelab.eu:6080/<br>
+		sm = http://sfa3.planet-lab.eu:12346/<br>
+	</p>
+
+	<p>
+		Here again, <b><i>'user'</i></b> is your user-hrn, and <b><i>'auth'</i></b> is the authority that you belong to, in most cases you should just drop the last part of your hrn.
+	</p>
+	<p>
+		Add the the following to sfi_config for delegating credentials to OneLab portal:
+	</p>	
+	<p class="command">
+		[myslice]<br>
+		<br>
+		backend  = http://portal.onelab.eu:7080<br>
+		delegate = onelab.myslice<br>
+		platform = myslice<br>
+		username = mohammed-yasin.rahman@lip6.fr
+	</p>
+	<p>
+		Test the SFA layer:
+	</p>
+	<p class="command">
+		$ sfi.py version
+	</p>
+	<p>
+		And finally delegate your credentials to the portal
+	</p>
+	<p class="command">
+		$ sfi.py myslice
+	</p>
+	<p>
+	The complete tutorial is available at the following address:
+	<a target="_blank" href="http://trac.myslice.info/wiki/InstallSfa">http://trac.myslice.info/wiki/InstallSfa</a>
+	</p>
+	
+	<br />
+	
+</div>
+{% endblock %}
+
