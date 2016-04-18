@@ -4,6 +4,7 @@ from manifoldapi.manifoldapi        import execute_query,execute_admin_query
 from portal.models                  import PendingUser, PendingSlice, PendingAuthority, PendingProject, PendingJoin
 from unfold.page                    import Page
 
+import hashlib
 import json
 
 from django.contrib.auth.models     import User
@@ -1285,7 +1286,8 @@ def create_pending_user(wsgi_request, request, user_detail):
     msg.send()
    
     # saves the user to django auth_user table [needed for password reset]
-    user = User.objects.create_user(request['email'].split('@')[-1], request['email'], request['password'])
+    # Django username must be less than 30 char so we use a hash
+    user = User.objects.create_user(hashlib.sha1(request['email']).hexdigest(), request['email'], request['password'])
 
     # Creating a manifold user
     user_id = manifold_add_user(wsgi_request, request)
