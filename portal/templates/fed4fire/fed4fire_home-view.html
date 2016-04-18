@@ -1,0 +1,151 @@
+{% extends "layout_base.html" %}
+{% load portal_filters %}
+
+{% block content %}
+<!-- <div class="row">
+{% widget '_widget-news.html' %}
+</div> -->
+{% if username %}
+
+{% block head %} 
+<script type="text/javascript" src="https://java.com/js/dtjava.js"></script>
+{% endblock head %}
+
+{% widget "_widget-no_credentials.html" %}
+<div class="container dashboard">
+	<div class="row">
+	    <div class="col-md-12" id="credentials_msg" style="display:none;">
+	{%if 'no_creds'  in user_cred %}
+      	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">NO CREDENTIALS</a> are delegated to the portal!</p>
+  	{%endif%}
+	{%if 'creds_expired'  in user_cred %}
+    	<p class="command"><a href="#" style="color:red" data-toggle="modal" data-target="#myModal">EXPIRED CREDENTIALS</a> Please delegate again your credentials to the portal!</p>
+    {%endif%}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>
+                <a href="/portal/slice_request/"><img src="{{ STATIC_URL }}img/icon_slices_small.png" alt="" />EXPERIMENT</a>
+            </h3>
+            <div>
+                <span class="glyphicon glyphicon-cog"></span> <a href="/portal/project_request/">Create/Join project</a>
+            </div>
+            <div class="dashboard-create-slice">
+                <span class="glyphicon glyphicon-plus"></span> <a href="/portal/slice_request/">Create slice</a>
+            </div>
+            <div class="projects-tree">
+                Your projects and slices
+                <span title="A <b>slice</b> is a set of testbed resources on which you can conduct an experiment. 
+                Either ask your colleagues to give you access to an existing slice or request a new slice by clicking 'Request Slice'. 
+                However, on the Fed4FIRE portal, you will only see slices that you have created through Fed4FIRE. If you have created slices elsewhere, 
+                those slices will not appear here. <br /><br /> A <b>project</b> is a sub-authority under the responsability of your institution gathering users, 
+                who will be able to create slices for their experiments." class="glyphicon glyphicon-info-sign">&nbsp;</span> 
+             
+                <div id="home-project-tree"><img class="projects-loading" src="{{ STATIC_URL }}img/loading.gif" alt="Loading projects" /></div>
+            </div>
+            {% include theme|add:"_jfed_button.html" %}
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>
+                        <a href="/portal/account/"><img src="{{ STATIC_URL }}img/icon_user_small.png" alt="" /></a><a href="/portal/account/">ACCOUNT</a>
+                    </h3>
+                    {% if person.last_name %}
+                    <p>
+                        {{person.first_name}} {{person.last_name}}
+                    </p>
+                    {% endif %}
+                    <p>
+                        <span class="glyphicon glyphicon-user"></span> <a href='/portal/account/' title="Click here to see and edit your account details.">{{person.email}}</a>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>
+                        <a href="/portal/institution"><img src="{{ STATIC_URL }}img/icon_authority_color_small.png" alt="" /></a><a href="/portal/institution">MANAGEMENT</a>
+                    </h3>
+                   
+                    <div>
+                        <span class="glyphicon glyphicon-ok"></span> <a href="/portal/institution#requests">Validate Requests</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>
+                        <a href="/portal/support"><img src="{{ STATIC_URL }}img/icon_support_small.png" alt="" /></a><a href="/portal/support">SUPPORT</a>
+                    </h3>
+                    <p>
+                        <span class="glyphicon glyphicon-envelope"></span> <a href="/portal/contact/">Contact</a>
+                    </p>
+                    <p>
+                        <span class="glyphicon glyphicon-book"></span> <a href="http://doc.fed4fire.eu" target="_blank">Documentation & Tutorials</a>
+                    </p>
+                    {% include theme|add:"_dashboard_links.html" %}
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container-fluid home">
+	<div class="">
+        <div class="col-sm-2"></div>
+        {% widget '_slogan.html' %}
+        <div class="col-sm-5 col-sm-offset-1">
+            <div class="row">
+                {% widget '_widget-login-user.html' %}
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+        	</div>
+        </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+        localStorage.clear();
+    });
+</script>
+
+{% endif %}
+
+
+<script type="text/javascript">
+   var config = {
+       java8_jnlp: 'http://jfed.iminds.be/jfed-f4f-java8.jnlp',
+       java7_jnlp: 'http://jfed.iminds.be/jfed-f4f-java7.jnlp'
+   };
+
+   var certkey = "{{jfed_identity}}";
+
+	$(document).ready(function() {
+	    {%if 'no_creds' in user_cred or 'creds_expired' in user_cred %}
+        localStorage.clear();
+        /*
+        $.post("/cache/clear/", function( data ) {
+        });
+        */
+        {% endif %}
+		$('a.home-tab').click(function() {
+			$('ul.nav-tabs li').removeClass('active');
+			$(this).parent().addClass('active');
+			$('div.home-panel').hide();
+			$('div#'+$(this).data('panel')).show();
+		});
+		
+    });
+</script>
+<script src='https://authority.ilabt.iminds.be/js/jquery/jquery-ui.min.js'></script>
+<script src="//java.com/js/dtjava.js"></script>
+<script src='https://authority.ilabt.iminds.be/js/jfed_webstart_f4fportal.js'></script>
+<link rel='stylesheet' href='https://authority.ilabt.iminds.be/js/jquery/jquery-ui.css' />
+
+{% if theme == 'onelab' %}
+{% widget "_widget-monitor.html" %}
+{% endif %}
+{% endblock %}
