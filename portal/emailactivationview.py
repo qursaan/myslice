@@ -66,7 +66,8 @@ class ActivateEmailView(FreeAccessView, ThemeView):
             if key == "hash_code":
                 hash_code=value
 
-        if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):           
+        #if PendingUser.objects.filter(email_hash__iexact = hash_code).filter(status__iexact = 'False'):
+        if PendingUser.objects.filter(email_hash__iexact = hash_code):
             activation = 'success'
             pending_users = PendingUser.objects.filter(email_hash__iexact = hash_code)
             pending_user = pending_users[0]
