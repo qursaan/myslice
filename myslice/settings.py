@@ -375,4 +375,5 @@ SLA_COLLECTOR_PASSWORD = "password"
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-
+# test
+ALLOWED_HOSTS = '*onelab.eu'
