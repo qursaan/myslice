@@ -125,12 +125,12 @@ class Page:
         manifold['metadata']=metadata.to_json()
 #         SessionCache().store_metadata(self.request, metadata)
         logger.debug("Page.get_metadata: return new value")
-        return metadata.to_json()
+        return metadata
             
     def expose_js_metadata (self):
         # expose global MANIFOLD_METADATA as a js variable
         # xxx this is fetched synchroneously..
-        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata() + ";\n")
+        self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";\n")
 
     def expose_js_var(self, name, value):
         # expose variable as a js value
