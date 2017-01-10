@@ -87,6 +87,7 @@ def logWrite(request, action, message, objects = None):
         logger.error(e.strerror)
 
         dbfile = ''.join([os.path.dirname(os.path.abspath(__file__)), "/errors.db"])
+	logger.error("===============>> activity: database path: " + dbfile)
         conn = None
         try:
             conn = lite.connect(dbfile)
@@ -127,6 +128,7 @@ def sign(secret, message):
 def logCheck():
     """Checking local database for logs adn sending it to monitoring server"""
     dbfile = ''.join([os.path.dirname(os.path.abspath(__file__)), "/errors.db"])
+    logger.error("[activity] database path: " + dbfile)
     conn = None
 
     #trying to connect local db adn pull unsent logs
