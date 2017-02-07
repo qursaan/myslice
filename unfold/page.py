@@ -119,10 +119,10 @@ class Page:
 
         from myslice.settings import config
         url = config.manifold_url()
-        metadata = MetaData (url, metadata_auth)
+        metadata = MetaData(url, metadata_auth)
         metadata.fetch(self.request)
         # store it for next time
-        manifold['metadata']=metadata
+        manifold['metadata']=metadata.to_json()
 #         SessionCache().store_metadata(self.request, metadata)
         logger.debug("Page.get_metadata: return new value")
         return metadata

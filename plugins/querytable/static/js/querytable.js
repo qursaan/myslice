@@ -90,7 +90,7 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
                 sPaginationType: 'bootstrap',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
-                aoColumnDefs: [{sDefaultContent: '', aTargets: [ '_all' ]}],
+                aoColumnDefs: [{sDefaultContent: '', aTargets: [ '_all' ], "sType": "mysort"}],
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */
@@ -668,6 +668,66 @@ QUERYTABLE_BGCOLOR_REMOVED = 2;
         return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
             return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
         });
+    };
+
+    // use sType: "mysort"  for any columns you wish to use these routines
+    // http://datatables.net/forums/discussion/7546/alpha-numeric-sort
+    jQuery.fn.dataTableExt.oSort['mysort-asc']  = function(a,b) {
+      var r = new RegExp("<([a-zA-Z]+).*?>(.*?)</\\1>");
+      if (r.exec(a) != null){
+        a = r.exec(a)[2];
+      }
+      if (r.exec(b) != null){
+        b = r.exec(b)[2];
+      }
+      a = a.replace(/[^A-Za-z0-9]/, "");
+      b = b.replace(/[^A-Za-z0-9]/, "");
+      var re = new RegExp("^([a-zA-Z]*)(.*)");
+      var x = re.exec(a);
+      var y = re.exec(b);
+     
+      // you might want to force the first portion to lowercase
+      // for case insensitive matching
+      // x[1] = x[1].toLowerCase();
+      // y[1] = y[1].toLowerCase();
+     
+      if (x[1] > y[1]) return 1;
+      if (x[1] < y[1]) return -1;
+     
+      // if you want to force the 2nd part to only be numeric:
+      x[2] = parseInt(x[2]);
+      y[2] = parseInt(y[2]);
+     
+      return ((x[2] < y[2]) ? -1 : ((x[2] > y[2]) ?  1 : 0));
+    };
+      
+    jQuery.fn.dataTableExt.oSort['mysort-desc'] = function(a,b) {
+      var r = new RegExp("<([a-zA-Z]+).*?>(.*?)</\\1>");
+      if (r.exec(a) != null){
+        a = r.exec(a)[2];
+      }
+      if (r.exec(b) != null){
+        b = r.exec(b)[2];
+      }
+      a = a.replace(/[^A-Za-z0-9]/, "");
+      b = b.replace(/[^A-Za-z0-9]/, "");
+      var re = new RegExp("^([a-zA-Z]*)(.*)");
+      var x = re.exec(a);
+      var y = re.exec(b);
+     
+      // you might want to force the first portion to lowercase
+      // for case insensitive matching
+      // x[1] = x[1].toLowerCase();
+      // y[1] = y[1].toLowerCase();
+     
+      if (x[1] > y[1]) return -1;
+      if (x[1] < y[1]) return 1;
+     
+      // if you want to force the 2nd part to only be numeric:
+      x[2] = parseInt(x[2]);
+      y[2] = parseInt(y[2]);
+     
+       return ((x[2] < y[2]) ?  1 : ((x[2] > y[2]) ? -1 : 0));
     };
     
     

@@ -25,6 +25,7 @@ from settings import auxiliaries, INSTALLED_APPS
 from unfold.loginrequired import LoginRequiredView
 
 import portal.about
+import portal.certificate
 import portal.institution
 import portal.registrationview
 import portal.accountview
@@ -135,6 +136,7 @@ urls = [
     #
     url(r'^register/?$', portal.registrationview.RegistrationView.as_view(), name='registration'),
     url(r'^account/?$', portal.accountview.AccountView.as_view(), name='account'),
+    url(r'^get_cert/?$', portal.certificate.CertificateView.as_view(), name='certificate'),
     url(r'^account/account_process/?$', portal.accountview.account_process),
     url(r'^contact/?$', portal.contactview.ContactView.as_view(), name='contact'),
     url(r'^terms/?$', portal.termsview.TermsView.as_view(), name='terms'),

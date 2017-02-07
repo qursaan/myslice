@@ -115,7 +115,7 @@ def _execute_query(url, request, query, manifold_api_session_auth):
 
 def execute_query(request, query):
     
-    logger.debug("EXECUTE QUERY: request - {}".format(request.session.items()))
+    #logger.debug("EXECUTE QUERY: request - {}".format(request.session.items()))
     
     if not 'manifold' in request.session or not 'auth' in request.session['manifold']:
     #manifold_api_session_auth = SessionCache().get_auth(request)
