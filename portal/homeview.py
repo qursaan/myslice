@@ -23,6 +23,8 @@ from portal.account                     import Account, get_expiration
 from portal.models                      import PendingSlice
 from portal.actions                     import authority_check_pis, get_jfed_identity, get_myslice_account
 
+from myslice.settings import logger
+
 import activity.user
 
 class HomeView (FreeAccessView, ThemeView):
@@ -131,7 +133,11 @@ class HomeView (FreeAccessView, ThemeView):
             # log user activity
             activity.user.login(self.request, "error")
             env['state'] = "Your username and/or password were incorrect."
+
+        env['next'] = request.POST.get('next',None)
         env['request'] = request
+        if env['next']:
+            return HttpResponseRedirect(env['next'])
         return render_to_response(self.template,env, context_instance=RequestContext(request))
 
     def get (self, request, state=None):
@@ -197,7 +203,8 @@ class HomeView (FreeAccessView, ThemeView):
 
         env['theme'] = self.theme
         env['section'] = "Dashboard"
-
+        logger.debug("homeview called")
+        env['next'] = request.GET.get('next',None)
         env['username']=the_user(request)
         env['topmenu_items'] = topmenu_items(None, request)
         env['request'] = request
