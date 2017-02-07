@@ -37,6 +37,7 @@ import portal.platformsview
 import portal.dashboardview
 import portal.homeview
 import portal.newsview
+import portal.cloudlabview
 import portal.loginwidget
 
 platforms_view=portal.platformsview.PlatformsView.as_view()
@@ -109,6 +110,7 @@ urls = [
     #
     # Portal
     (r'^news/?$', portal.newsview.NewsView.as_view()),
+    (r'^cloudlab/?$', portal.cloudlabview.CloudView.as_view()),
     (r'^resources/(?P<slicename>[^/]+)/?$', portal.sliceresourceview.SliceResourceView.as_view()),
     (r'^users/(?P<slicename>[^/]+)/?$', portal.slicetabusers.SliceUserView.as_view()),
     (r'^my_url/?$', portal.omn.OMNView.as_view()),

@@ -1,0 +1,33 @@
+{% extends "layout_wide.html" %}
+{% block content %}
+<h1>Your name is : {{username}}</h1>
+
+<script src="/static/geni-auth.js"></script>
+<script type="text/plain" id="certificate">
+{{key}}
+{{cert}}
+</script>
+<script>
+  function sendCertificate()
+  {
+    var script = document.getElementById('certificate');
+    genilib.sendCertificate(script.innerHTML);
+  }
+</script>
+
+<center>
+  <h2><br>
+  A tool has requested your private certificate.
+  </h2>
+  <p>If you accept, the tool will be able to act on your behalf. Click confirm below if you wish to proceed or close this window to cancel.
+  </p>
+
+  <form onsubmit="sendCertificate(); return false;" >
+    <b><input type=submit name=confirmed value=Confirm></b>
+<!--    <b><input type=submit name=canceled value=Cancel></b> -->
+  </form>
+
+
+
+{% endblock %}
+
