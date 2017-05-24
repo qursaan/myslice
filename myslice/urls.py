@@ -86,6 +86,7 @@ urls = [
     #
     #
     # RESTful interface
+    (r'^rest/login/$','rest.login.dispatch'),
     (r'^rest/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.get.dispatch'),
     (r'^sfa/(?P<method>[^/]+)/?$', 'rest.sfa_api.dispatch'),
     (r'^table/(?P<object_type>[^/]+)/(?P<object_name>[^/]+)?/?$', 'rest.get.dispatch'),
