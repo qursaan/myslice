@@ -28,6 +28,6 @@ user =
 password =
 
 [activity]
-#server = http://athos.ipv6.lip6.fr/activity/push/log
+#server = http://athos.noc.onelab.eu/activity/push/log
 #apikey = 
 #secret = 

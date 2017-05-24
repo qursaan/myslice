@@ -38,7 +38,7 @@ if config.activity and config.activity.server :
     server = config.activity.server
 else :
     # default log server
-    server = "http://athos.ipv6.lip6.fr/activity/push/log"
+    server = "http://athos.noc.onelab.eu/activity/push/log"
 
 def logWrite(request, action, message, objects = None):
     
