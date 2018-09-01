@@ -1,0 +1,27 @@
+<div class="footer">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <ul>
+                <li><a href="/terms">Terms and Conditions</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9 copy" style="text-align:left;">
+            Copyrights &copy; 2015 UPMC Sorbonne Universit&eacute;s. All rights reserved.
+        </div>
+        <div class="col-md-3 copy">
+        powered by &nbsp;<a href="http://myslice.info" target="_blank"><img src="//www.myslice.info/images/logo.png" style="width:50px;"></a>&nbsp;&nbsp;
+        <a href="/portal/release_notes" id="portal_version"></a>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.post("/portal_version/", function( data ) {
+            $("#portal_version").html(data);
+        });
+    });
+</script>

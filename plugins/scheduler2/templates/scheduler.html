@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div id="plugin-{{ domid }}" class="row">
     <div class="row m-b">
         <div class="col-md-1">
@@ -99,4 +100,145 @@
     <script type="text/javascript">
         //alert("1");
     </script>
+=======
+﻿<div id="plugin-{{ domid }}-loader" style="text-align:center;">
+    <img src="../../static/img/loading-7b6dc55620a355b55b835f6b4c300f9b.gif" alt="loading" style="width:100px;" />
+    <h3>Loading Data...</h3>
+</div>
+<div id="plugin-{{ domid }}-empty" style="text-align: center; display: none;">
+    <img src="../../static/img/no-data.png" alt="no data found" style="width:100px;" />
+    <h3>no data found...</h3>
+</div>
+<div id="plugin-{{ domid }}" class="">
+    <div class="row m-b">
+        <div class="col-md-4">
+        	<div class="row">
+        		<div class="col-md-1">
+            		<label for="inputEmail3" class="control-label">Date:</label>
+        		</div>
+				<div class="col-md-11">
+					<input id="DateToRes" type="text" placeholder="Reservation Date">
+					<span class="glyphicon glyphicon-calendar" style="position:absolute;margin-left:-20px;margin-top:4px;"></span>
+					<!-- <input id="DateToRes" type="text" class="form-control" placeholder="Reservation Date"> -->
+				</div>
+			</div>
+		</div>
+        <div class="col-md-8">
+        	<div class="row">
+        		<div class="col-md-2">
+            		<label for="inputEmail3" class="control-label">Time of day:</label>
+        		</div>
+		        <div class="col-md-10">
+					<div class="sliderContainer">
+						<div id="tblSlider"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    <div id="SchedulerCtrl" ng-controller="SchedulerCtrl" class='query-editor-spacer'>
+        <div class="table-responsive">
+
+            <table id="scheduler-reservation-table" class="table table-bordered table-condensed">
+                <thead>
+                    <tr>
+                        <th>Resource name</th>
+                        <th ng-repeat="slot in slots | offset: from | limitTo: num_visible_cells ">
+                            {[{ slot.time }]}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="resource in resources | filter: filter_visible | offset: (current_page-1) * items_per_page | limitTo: items_per_page" 
+						ng-class-odd="''" 
+						ng-class-even="'even'">
+                        <th data-resourceid="{[{ resource.urn }]}" 
+							data-rowindex="{[{ $index }]}" 
+							data-resourceindex="{[{ resource.index }]}" 
+							style="word-wrap: break-word; word-break: break-all; ">
+							{[{ resource.hostname }]}
+						</th>
+                        <td ng-repeat="lease in resource.leases | offset: from / (resource.granularity / slot_length)  | limitTo: num_visible_cells / (resource.granularity / slot_length)"
+							data-slotid="{[{ lease.id }]}" 
+							data-groupid="{[{ lease.groupid }]}" 
+							ng-class="{{ 'lease.status' }}"
+							ng-class="{{ 'lease.success' }}"
+							colspan="{[{resource.granularity / slot_length}]}"
+							ng-click="select(from+$index, lease, $parent.resource)">
+						</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="col-xs-5">
+                    <div id="resources-list__table_length" class="dataTables_length">
+                        <label>Total pages : {[{page_count()}]}</label>
+                    </div>
+                </div>
+                <div class="col-xs-7">
+                    <div class="dataTables_paginate paging_bootstrap">
+                        <ul class="pagination">
+							<li ng-class="prevPageDisabled()">
+							  <a href ng-click="prevPage()">« Prev</a>
+							</li>
+                            <li ng-repeat="n in range()" 
+							    ng-class="{active: n==current_page}" 
+								ng-click="setPage(n)"><a href="#">{[{n}]}</a></li>
+							<li ng-class="nextPageDisabled()">
+				              <a href ng-click="nextPage()">Next »</a>
+				            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% comment %}
+            <div id="reservation-table-scroll-container">
+                <table id='{{domid}}-reservation-table' class='table table-bordered'>
+                    <thead>
+                        <tr>
+                            {% for ts in time_slots %}
+                            <th class='center info'>{{ ts|safe }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for itms in nodes %}
+                        {% for n in itms.1 %}
+                        <tr data-trindex="">
+                            {% for ts in time_slots %}
+                            {% if n == 'node020' %}
+                            <td class="maintenance closed" data-tdindex="{{forloop.counter}}"></td>
+                            {% elif n == 'node023' or n == 'node030' %}
+                            <td class="closed" data-tdindex="{{forloop.counter}}"></td>
+                            {% else %}
+                            <td class="" data-tdindex="{{forloop.counter}}"></td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endcomment  %}
+
+            <div class="legend">
+                <ol>
+                    <li class="free">Free</li>
+                    <li class="selected">Reserved</li>
+                    <li class="pendingin">Reservation pending</li>
+                    <li class="pendingout">Reservation cancellation pending</li>
+                    <li class="closed">Unavailable</li>
+					<li class="disabled">Forbidden</li>
+                    <li class="maintenance">Maintenance</li>
+                </ol>
+            </div>
+        </div><!-- / scheduler plugin -->
+        <script type="text/javascript">
+            //alert("1");
+        </script>
+    </div>
+>>>>>>> onelab
 </div>

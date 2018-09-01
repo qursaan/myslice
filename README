@@ -1,42 +1,69 @@
+<<<<<<< HEAD
 This file documents the contents of this module
 chang - e
 Last update 4 Dec. 2014
+=======
+Last update 21 MAY. 2015
+>>>>>>> onelab
 
-See the devel/ subdir for more devel-oriented doc.
+Installation
+=================================================================
+Complete Guide: http://trac.myslice.info/wiki/Manifold/Install
 
-==================== 1 minute howto
+Recommended OS
+===============
+Debian GNU/Linux 7.5 (wheezy) x64
 
-*  REQUIREMENTS  is to have python + django (1.5.2) installed django
-** should be straightforward
-** see devel/django-install.txt in case of trouble
-$ apt-get install python-django
+PYTHON DEPENDENCIES
+=====================
+sudo apt-get install python-pip or sudo easy_install pip==1.4.1
+sudo apt-get install python-dev (for paramiko and pyOpenSSL)
+sudo apt-get install libffi-dev (for pyOpenSSL)
+
+$ pip install django=="1.5.2"
 $ apt-get install python-django-south
+$ pip install requests
+$ pip install djangorestframework
+$ pip install django-celery
+$ pip install geopy
+$ pip install paramiko
+$ pip install pyparsing
+$ pip install python-dateutil
+$ pip instal pyOpenSSL
+$ pip install xmltodict
 
-* git clone git://git.onelab.eu/myslice.git
--- or --
-* git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
+MYSLICE
+=======
+git clone ssh://yourlogin@git.onelab.eu/git/myslice.git
+cd myslice
+git checkout onelab
 
-* edit/create myslice/myslice.ini and enter the details of your manifold backend
+edit/create myslice/myslice.ini and enter the details of your manifold backend
 
-$ apt-get install python-django-south
-* init django
-** when django prompts for creating an admin account, create it and 
-** keep the username and password safe
 $ ./manage.py syncdb
 $ ./manage.py migrate
+$ ./manage.py collectstatic
 
-* gather static files
-$ ./manage.py collectstatic 
--- or --
-$ ./manage.py collectstatic --noinput
--- or --
-$ make static (which is a shorthand for cleaning up and run manage collectstatic --noinput)
+Run the development server
+$ ./devel/server-loop.sh
 
-* gather templates files 
-  for now we still seem to rely on a make-based templates-collection process
-  that creates templates/ 
-$ make templates [$ make redo (each time when you pull, do that and restart the server)]
+MANIFOLD
+==========
+git clone git://git.onelab.eu/manifold.git
+cd manifold
+git checkout devel
+make && make install
 
+SFA
+===
+$ git clone -b geni-v3 git://git.onelab.eu/sfa.git
+$ cd sfa 
+$ git checkout geni-v3
+
+$ make version
+$ python ./setup.py install
+
+=====================================================================
 
 ## Whenever doing a git pull the following operations are recommended:
 
@@ -59,6 +86,14 @@ when you just need to hit ^C yourself when your static files need to be refreshe
 * install dependencies 
 $ pip install -r path/to/requirements/file.txt
 Note. not quite sure what this is about, I could not spot this file..
+
+=====APACHE Config=====
+if are running apache please do:
+
+$ chown www-data:www-data /var/myslice-f4f
+
+otherwise you may get the following error:
+"DatabaseError: unable to open database file"
 
 ==================== Status
 
@@ -238,19 +273,11 @@ $python manage.py migrate
 
 As south is already installed , you just have to do:
 
-$./manage.py migrate
-
-if it fails:
-
-1. go to myslice directory
-2. do sqlite3 myslice.sqlite3 [if sqlite3: command not found, do $apt-get install sqlite3]
-3. check the list of tables with sqlite> .tables
-4. if you find those tables that was mentioned in the failure message while running $./manage.py migrate
-	do sqlite> DROP TABLE mentioned_table 
-	[mentioned_table = the tables that was explicity mentioned in the failure message of $./manage.py migrate]
-5. sqlite> .quit
-6. $./manage.py migrate  
-
-
-
-
+# ./manage.py schemamigration portal --initial
+# sqlite3 /var/unfold/unfold.sqlite3
+	sqlite> DROP TABLE "portal_institution";
+	sqlite> DROP TABLE "portal_pendinguser";
+	sqlite> DROP TABLE "portal_pendingauthority";
+	sqlite> DROP TABLE "portal_pendingslice";
+	sqlite> .quit
+# ./manage.py migrate portal

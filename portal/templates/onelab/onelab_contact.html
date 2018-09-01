@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		 <div class="breadcrumbs">
+		 	 Support &nbsp;>&nbsp; Contact
+		 </div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+	<p>If you are having any problems, please read our <a href="/portal/support/">FAQ</a> section as many of them are explained there.</p>
+	<p>
+	If you cannot find the answers to your questions in our FAQ section, please contact us by filling out the form below.<br />
+	You can also <a href="mailto:support@onelab.eu">e-mail</a> us directly.
+	</p>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-4">
+		<form role="form" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+	    <div class="form-group">
+	      	<label for="{{ field.html_name }}" class="control-label">{{ field.label }}</label>
+	      	{{ field.errors }} {{ field }}
+	    </div>
+	    {% endfor %}
+		<button type="submit" class="btn btn-onelab">Create ticket</button>
+		</form>
+	</div>
+</div>
+{% endblock %}
+

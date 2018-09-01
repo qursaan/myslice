@@ -1,5 +1,7 @@
 jQuery(document).ready(function(){
 
+    jQuery('[title!=""]').qtip();
+    
     jQuery("#joinForm").validate({
         rules: {
           pi_password: {
@@ -38,9 +40,9 @@ jQuery(document).ready(function(){
           pi_title: {
               required: true
           },
-          pi_phone: {
+          /*pi_phone: {
               required: true
-          },
+          },*/
           pi_email: {
               required: true
           },

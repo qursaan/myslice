@@ -71,14 +71,17 @@ debian.clean:
 plugins-templates: force
 	@find plugins -type f -name '*.html' 
 local-templates: force
+	@$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),find $(tmpl) -maxdepth 2 -type f -name *.html;)
+local-templates2: force
 	@$(foreach tmpl,$(shell find . -name templates | grep -v '^\./templates$$'),ls -1 $(tmpl)/*;)
+
 
 list-templates: plugins-templates local-templates
 
 #################### manage templates for the plugin area
 templates: force
-	mkdir -p templates
-	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),../$(x)) ./templates
+	@mkdir -p templates
+	ln -sf $(foreach x,$(shell $(MAKE-SILENT) list-templates),"../$(x)") ./templates
 
 clean-templates templates-clean: force
 	rm -rf ./templates
@@ -92,6 +95,9 @@ redo-templates: clean-templates templates
 # list files under git but exclude third-party stuff like bootstrap and jquery
 myfiles: force
 	@git ls-files | egrep -v 'insert(_|-)above|third-party/|to-be-integrated/'
+
+pyfiles: force
+	@git ls-files | grep '\.py$$'
 
 # in general it's right to rely on the contents as reported by git
 tags: force
@@ -107,8 +113,9 @@ ftags: force
 
 #################### sync : push current code on a box running myslice
 # this for now targets deployments based on the debian packaging
-SSHURL:=root@$(MYSLICEBOX):/
-SSHCOMMAND:=ssh root@$(MYSLICEBOX)
+SSHUSER    ?= root
+SSHURL     := $(SSHUSER)@$(MYSLICEBOX):
+SSHCOMMAND := ssh $(SSHUSER)@$(MYSLICEBOX)
 
 ### rsync options
 # the config file should probably not be overridden ??
@@ -159,4 +166,15 @@ ifeq (,$(MYSLICEBOX))
 	@exit 1
 else
 	+$(SSHCOMMAND) apachectl restart
+endif
+
+#SSHUSER=tparment
+#MYSLICEBOX=srv-diana.inria.fr
+sync-devel:
+ifeq (,$(MYSLICEBOX))
+	@echo "you need to set MYSLICEBOX, like in e.g."
+	@echo "  $(MAKE) MYSLICEBOX=srv-diana.inria.fr "$@""
+	@exit 1
+else
+	+$(RSYNC) --relative $$(git ls-files) $(SSHURL)myslice/
 endif

@@ -5,9 +5,10 @@ from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                  import topmenu_items_live, the_user
 
 from plugins.querytable          import QueryTable
+from myslice.theme import ThemeView
 
 # View for platforms
-class PlatformsView(FreeAccessView):
+class PlatformsView(FreeAccessView, ThemeView):
     template_name = "platforms.html"
 
     def get_context_data(self, **kwargs):
@@ -45,7 +46,7 @@ class PlatformsView(FreeAccessView):
         context['topmenu_items'] = topmenu_items_live('Platforms', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-
+        context['theme'] = self.theme
         context.update(page.prelude_env())
 
         context['layout_1_or_2']="layout-unfold2.html" if not context['username'] else "layout-unfold1.html"

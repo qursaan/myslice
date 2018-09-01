@@ -35,7 +35,7 @@
                     // XXX This should be handled by manifold
                     manifold.raise_event(self.options.query_uuid, FILTER_REMOVED, [key, op]);
                 }
-            }
+            };
         },
 
         init: function(options, element) {

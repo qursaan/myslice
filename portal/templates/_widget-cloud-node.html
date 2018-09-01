@@ -1,0 +1,32 @@
+{% load portal_filters %}
+<div>
+    <h4><a href="#" onclick="$('#{{platform}}_div_add_{{node_urn|get_name_from_urn}}').toggle();"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create new VMs on node {{node_urn|get_name_from_urn}}</a></h4>
+    <div id="{{platform}}_div_add_{{node_urn|get_name_from_urn}}" class="alert" style="background-color:#f1f1f1;display:none;margin-bottom:0px !important;padding-bottom:6px !important;">
+        <div id="{{platform}}_input_{{node_urn|get_name_from_urn}}" class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-3"><label for="{{platform}}_number_{{node_urn|get_name_from_urn}}">number:</label>
+            <input type="text" maxlength="2" id="{{platform}}_number_{{node_urn|get_name_from_urn}}" name="{{platform}}_number_{{node_urn|get_name_from_urn}}" style="width:2.2em;min-width:2.2em;height:30px;" value="1" class="form-control" required>
+            </div>
+            <div class="col-md-8"><label for="{{platform}}_sliver_name_{{node_urn|get_name_from_urn}}">name:</label>
+            <div class="form-group">
+            <input type="text" name="{{platform}}_sliver_name_{{node_urn|get_name_from_urn}}" id="{{platform}}_sliver_name_{{node_urn|get_name_from_urn}}" value="VM" maxlength="12" class="form-control" style="height:30px;" required>
+            </div>
+            </div>
+            <div class="col-md-1"></div>
+            <div id="{{platform}}_select_{{node_urn|get_name_from_urn}}" class="col-md-11"></div>
+        </div>
+        <div id="{{platform}}_add_{{node_urn|get_name_from_urn}}" class="row">
+            <div class="col-md-1">&nbsp; 
+            <input type="hidden" name="action" id="action" value="add">
+            <input type="hidden" name="platform" id="platform" value="{{platform}}">
+            </div>
+        </div>
+        <div class="row" style="padding-top:6px;">
+            <div class="col-md-1">&nbsp;</div>
+            <div class="col-md-11" id="{{platform}}_add_button_{{node_urn|get_name_from_urn}}" style="display:none;">
+            <input type="submit" form="{{platform}}_form_add" value="Add" onclick="send_add('{{platform}}','{{node_urn|get_name_from_urn}}');">
+            </div>
+        </div>
+    </div>
+
+</div>

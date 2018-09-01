@@ -1,0 +1,27 @@
+<div id="{{ domid }}" class="sl-filter-facilities" ng-controller="TestbedsCtrl">
+    <h4>
+       Facilities
+    </h4>
+    <div>
+        <div class="sl-facilities" ng-repeat="facility_name in facility_names">
+            <a href="#" 
+               class="sl-facility"
+               ng-class="{active: is_facility_active(facility_name)}"
+               id="facility-filter_{[{ facility_name }]}"
+               ng-click="select_facility(facility_name)"
+               data-platform="{[{ facility_name }]}">
+               <img class="sl-image" src="/static/icons/{[{ tolower(facility_name) }]}.png" /> {[{ facility_name }]}
+            </a>
+            <div class="sl-testbeds" ng-repeat="testbed_name in testbed_names[facility_name]">
+                <a href="#" 
+                   class="sl-testbed"
+                   ng-class="{active: is_testbed_active(facility_name, testbed_name)}"
+                   id="testbeds-filter_{[{ testbed_name }]}"
+                   ng-click="select_testbed(facility_name, testbed_name)"
+                   data-platform="{[{ testbed_name }]}">
+                    <input ng-checked="is_testbed_active(facility_name, testbed_name)" type="checkbox">&nbsp;{[{testbed_name}]}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

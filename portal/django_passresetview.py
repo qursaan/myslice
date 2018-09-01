@@ -72,7 +72,6 @@ import json
 
 from random                     import choice
 
-from django.core.mail           import send_mail
 from django.contrib             import messages
 from django.views.generic       import View
 from django.shortcuts           import render
@@ -81,14 +80,14 @@ from django.http                        import HttpResponse, HttpResponseRedirec
 from unfold.loginrequired       import FreeAccessView
 from ui.topmenu                 import topmenu_items_live
 
-from manifold.manifoldapi       import execute_admin_query
+from manifoldapi.manifoldapi    import execute_admin_query
 from manifold.core.query        import Query
-from portal.actions                     import manifold_update_user
+from portal.actions             import manifold_update_user
 
 from portal.forms               import PassResetForm
 from portal.actions             import manifold_update_user
 
-
+from myslice.theme import ThemeView
 
 # 4 views for password reset:
 # - password_reset sends the mail
@@ -108,6 +107,10 @@ def password_reset(request, is_admin_site=False,
                    from_email=None,
                    current_app=None,
                    extra_context=None):
+    
+    themeview = ThemeView()
+    themeview.template_name = template_name
+    
     if post_reset_redirect is None:
         post_reset_redirect = reverse('portal.django_passresetview.password_reset_done')
     if request.method == "POST":
@@ -126,9 +129,12 @@ def password_reset(request, is_admin_site=False,
                     
             if flag == 0:
                 messages.error(request, 'Sorry, this email is not registered.')
-                return render(request, 'password_reset_form.html', {
+                context = {
                     'form': form,
-                    })
+                    'theme': themeview.theme
+                }   
+                return TemplateResponse(request, themeview.template, context,current_app=current_app)
+
             ### end of email check in manifold  ### 
 
             opts = {
@@ -147,20 +153,25 @@ def password_reset(request, is_admin_site=False,
         form = password_reset_form()
     context = {
         'form': form,
+        'theme': themeview.theme
     }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
+    return TemplateResponse(request, themeview.template, context,
                             current_app=current_app)
 
 
 def password_reset_done(request,
                         template_name='password_reset_done.html',
                         current_app=None, extra_context=None):
-    context = {}
+    themeview = ThemeView()
+    themeview.template_name = template_name
+    context = {
+               'theme' : themeview.theme
+    }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
+    return TemplateResponse(request, themeview.template, context,
                             current_app=current_app)
 
 
@@ -177,6 +188,9 @@ def password_reset_confirm(request, uidb36=None, token=None,
     View that checks the hash in a password reset link and presents a
     form for entering a new password.
     """
+    themeview = ThemeView()
+    themeview.template_name = template_name
+    
     UserModel = get_user_model()
     assert uidb36 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
@@ -217,22 +231,26 @@ def password_reset_confirm(request, uidb36=None, token=None,
     context = {
         'form': form,
         'validlink': validlink,
+        'theme' : themeview.theme
     }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
+    return TemplateResponse(request, themeview.template, context,
                             current_app=current_app)
 
 
 def password_reset_complete(request,
                             template_name='password_reset_complete.html',
                             current_app=None, extra_context=None):
+    themeview = ThemeView()
+    themeview.template_name = template_name
     context = {
-        'login_url': resolve_url(settings.LOGIN_URL)
+        'login_url': resolve_url(settings.LOGIN_URL),
+        'theme' : themeview.theme
     }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
+    return TemplateResponse(request, themeview.template, context,
                             current_app=current_app)
 
 

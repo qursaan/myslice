@@ -1,22 +1,27 @@
+import os
+import re
+import itertools
+import json
+
 from unfold.loginrequired               import LoginRequiredAutoLogoutView
-#
+
 from manifold.core.query                import Query
-from manifold.manifoldapi               import execute_query, execute_admin_query
-from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account, sfa_update_user
-#
+from manifoldapi.manifoldapi            import execute_query, execute_admin_query
+from portal.actions                     import manifold_update_user, manifold_update_account, manifold_add_account, manifold_delete_account
+from portal.actions                     import (
+    sfa_update_user, authority_get_pis, authority_add_pis,
+    authority_remove_pis,authority_check_pis ,clear_user_creds )
+
 from unfold.page                        import Page    
 from ui.topmenu                         import topmenu_items_live, the_user
-#
+
 from django.http                        import HttpResponse, HttpResponseRedirect
 from django.contrib                     import messages
 from django.contrib.auth.decorators     import login_required
-from django.core.mail                   import send_mail
-
-#
-import json, os, re, itertools
+from myslice.theme import ThemeView
 
 # requires login
-class UserView(LoginRequiredAutoLogoutView):
+class UserView(LoginRequiredAutoLogoutView, ThemeView):
     template_name = "manageuserview.html"
     def dispatch(self, *args, **kwargs):
         return super(UserView, self).dispatch(*args, **kwargs)
@@ -25,11 +30,10 @@ class UserView(LoginRequiredAutoLogoutView):
     def get_context_data(self, **kwargs):
 
         page = Page(self.request)
-        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js" ] )
-        page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css" ] )
+        page.add_js_files  ( [ "js/jquery.validate.js", "js/my_account.register.js", "js/my_account.edit_profile.js", "js/jquery-ui.js" ] )
+        page.add_css_files ( [ "css/onelab.css", "css/account_view.css","css/plugin.css","css/jquery-ui.css" ] )
 
         for key, value in kwargs.iteritems():
-            #print "%s = %s" % (key, value)
             if key == "email":
                 selected_email=value
     
@@ -53,6 +57,8 @@ class UserView(LoginRequiredAutoLogoutView):
             #email = user_detail['email']
             if user_detail['config']:
                 config = json.loads(user_detail['config'])
+                authority_hrn = config.get('authority','Unknown Authority')
+                
 
         platform_query  = Query().get('local:platform').select('platform_id','platform','gateway_type','disabled')
         account_query  = Query().get('local:account').filter_by('user_id', '==', user_id).select('user_id','platform_id','auth_type','config')
@@ -97,15 +103,20 @@ class UserView(LoginRequiredAutoLogoutView):
             for account_detail in account_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     platform_name = platform_detail['platform']
-                    account_config = json.loads(account_detail['config'])
-                    account_usr_hrn = account_config.get('user_hrn','N/A')
-                    account_pub_key = account_config.get('user_public_key','N/A')
-                    account_reference = account_config.get ('reference_platform','N/A')
+                    if 'config' in account_detail and account_detail['config'] is not '':
+                        account_config = json.loads(account_detail['config'])
+                        account_usr_hrn = account_config.get('user_hrn','N/A')
+                        account_pub_key = account_config.get('user_public_key','N/A')
+                        account_reference = account_config.get ('reference_platform','N/A')
+
                     # credentials of myslice platform
                     if 'myslice' in platform_detail['platform']:
                         acc_user_cred = account_config.get('delegated_user_credential','N/A')
                         acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
                         acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
+                        #usr_hrn of myslice platform. used to check pi or no
+                        account_usr_hrn_myslice = account_config.get('user_hrn','N/A')
+
 
                         if 'N/A' not in acc_user_cred:
                             exp_date = re.search('<expires>(.*)</expires>', acc_user_cred)
@@ -140,8 +151,7 @@ class UserView(LoginRequiredAutoLogoutView):
 
                             my_auths = [{'auth_name': t[0], 'cred_exp': t[1]}
                                 for t in zip(auth_list, auth_cred_exp_list)]
-
-
+                       
                     # for reference accounts
                     if 'reference' in account_detail['auth_type']:
                         account_type = 'Reference'
@@ -184,6 +194,9 @@ class UserView(LoginRequiredAutoLogoutView):
         platform_list = [{'platform_no_access': t[0]}
             for t in itertools.izip_longest(total_platform_list)]
 
+        ## check pi or no
+        pi_status = self.request.session['user']['pi']
+
         context = super(UserView, self).get_context_data(**kwargs)
         context['principal_acc'] = principal_acc_list
         context['ref_acc'] = ref_acc_list
@@ -198,6 +211,7 @@ class UserView(LoginRequiredAutoLogoutView):
         context['fullname'] = context['firstname'] +' '+ context['lastname']
         context['authority'] = config.get('authority',"Unknown Authority")
         context['user_private_key'] = account_priv_key
+        context['pi'] = pi_status
         
         # XXX This is repeated in all pages
         # more general variables expected in the template
@@ -206,6 +220,7 @@ class UserView(LoginRequiredAutoLogoutView):
         context['topmenu_items'] = topmenu_items_live('My Account', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
+        context['theme'] = self.theme
 #        context ['firstname'] = config['firstname']
         prelude_env = page.prelude_env()
         context.update(prelude_env)
@@ -260,42 +275,37 @@ def user_process(request, **kwargs):
                     account_config = json.loads(account_detail['config'])
                     acc_slice_cred = account_config.get('delegated_slice_credentials','N/A')
                     acc_auth_cred = account_config.get('delegated_authority_credentials','N/A')
-                
-
                     
-    
-    # adding the slices and corresponding credentials to list
-    if 'N/A' not in acc_slice_cred:
-        slice_list = []
-        slice_cred = [] 
-        for key, value in acc_slice_cred.iteritems():
-            slice_list.append(key)       
-            slice_cred.append(value)
-        # special case: download each slice credentials separately 
-        for i in range(0, len(slice_list)):
-            if 'dl_'+slice_list[i] in request.POST:
-                slice_detail = "Slice name: " + slice_list[i] +"\nSlice Credentials: \n"+ slice_cred[i]
-                response = HttpResponse(slice_detail, content_type='text/plain')
-                response['Content-Disposition'] = 'attachment; filename="slice_credential.txt"'
-                return response
+                    # adding the slices and corresponding credentials to list
+                    if 'N/A' not in acc_slice_cred:
+                        slice_list = []
+                        slice_cred = [] 
+                        for key, value in acc_slice_cred.iteritems():
+                            slice_list.append(key)       
+                            slice_cred.append(value)
+                        # special case: download each slice credentials separately 
+                        for i in range(0, len(slice_list)):
+                            if 'dl_'+slice_list[i] in request.POST:
+                                slice_detail = "Slice name: " + slice_list[i] +"\nSlice Credentials: \n"+ slice_cred[i]
+                                response = HttpResponse(slice_detail, content_type='text/plain')
+                                response['Content-Disposition'] = 'attachment; filename="slice_credential.txt"'
+                                return response
 
-    # adding the authority and corresponding credentials to list
-    if 'N/A' not in acc_auth_cred:
-        auth_list = []
-        auth_cred = [] 
-        for key, value in acc_auth_cred.iteritems():
-            auth_list.append(key)       
-            auth_cred.append(value)
-        # special case: download each slice credentials separately
-        for i in range(0, len(auth_list)):
-            if 'dl_'+auth_list[i] in request.POST:
-                auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
-                response = HttpResponse(auth_detail, content_type='text/plain')
-                response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
-                return response
+                    # adding the authority and corresponding credentials to list
+                    if 'N/A' not in acc_auth_cred:
+                        auth_list = []
+                        auth_cred = [] 
+                        for key, value in acc_auth_cred.iteritems():
+                            auth_list.append(key)       
+                            auth_cred.append(value)
+                        # special case: download each slice credentials separately
+                        for i in range(0, len(auth_list)):
+                            if 'dl_'+auth_list[i] in request.POST:
+                                auth_detail = "Authority: " + auth_list[i] +"\nAuthority Credentials: \n"+ auth_cred[i]
+                                response = HttpResponse(auth_detail, content_type='text/plain')
+                                response['Content-Disposition'] = 'attachment; filename="auth_credential.txt"'
+                                return response
 
-
-             
     if 'submit_name' in request.POST:
         edited_first_name =  request.POST['fname']
         edited_last_name =  request.POST['lname']
@@ -403,7 +413,7 @@ def user_process(request, **kwargs):
                             return HttpResponseRedirect(redirect_url)
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
 
     elif 'dl_pubkey' in request.POST:
         for account_detail in account_details:
@@ -437,7 +447,7 @@ def user_process(request, **kwargs):
 
         else:
             messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect("/portal/account/")
+            return HttpResponseRedirect(redirect_url)
     
 #    elif 'delete' in request.POST:
 #        for account_detail in account_details:
@@ -466,27 +476,51 @@ def user_process(request, **kwargs):
 
     #clear all creds
     elif 'clear_cred' in request.POST:
+        clear_user_creds(request, user_email)
+        messages.success(request, 'All Credentials cleared')
+        return HttpResponseRedirect(redirect_url)
+
+    #make a user PI
+    elif 'makepi' in request.POST:
+        # getting user's authority_hrn
+        config={}
+        for user_config in user_details:
+            if user_config['config']:
+                user_config = json.loads(user_config['config'])
+                authority_hrn = user_config.get('authority','Unknown Authority')
+
+        #getting user_hrn
         for account_detail in account_details:
             for platform_detail in platform_details:
                 if platform_detail['platform_id'] == account_detail['platform_id']:
                     if 'myslice' in platform_detail['platform']:
                         account_config = json.loads(account_detail['config'])
-                        user_cred = account_config.get('delegated_user_credential','N/A')
-                        if 'N/A' not in user_cred:
-                            user_hrn = account_config.get('user_hrn','N/A')
-                            user_pub_key = json.dumps(account_config.get('user_public_key','N/A'))
-                            user_priv_key = json.dumps(account_config.get('user_private_key','N/A'))
-                            updated_config = '{"user_public_key":'+ user_pub_key + ', "user_private_key":'+ user_priv_key + ', "user_hrn":"'+ user_hrn + '"}'
-                            user_params = { 'config': updated_config}
-                            manifold_update_account(request, user_id,user_params)
-                            messages.success(request, 'All Credentials cleared')
-                            return HttpResponseRedirect("/portal/account/")
-                        else:
-                            messages.error(request, 'Delete error: Credentials are not stored in the server')
-                            return HttpResponseRedirect(redirect_url)
-        else:
-            messages.error(request, 'Account error: You need an account in myslice platform to perform this action')
-            return HttpResponseRedirect(redirect_url)
+                        user_hrn = account_config.get('user_hrn','N/A')
+    
+        authority_add_pis(request, authority_hrn, user_hrn)
+        clear_user_creds(request, user_email)
+        messages.success(request, 'User upgraded to PI')
+        return HttpResponseRedirect(redirect_url)
+
+    elif 'removepi' in request.POST:
+        # getting user's authority_hrn
+        config={}
+        for user_config in user_details:
+            if user_config['config']:
+                user_config = json.loads(user_config['config'])
+                authority_hrn = user_config.get('authority','Unknown Authority')
+        #getting user_hrn
+        for account_detail in account_details:
+            for platform_detail in platform_details:
+                if platform_detail['platform_id'] == account_detail['platform_id']:
+                    if 'myslice' in platform_detail['platform']:
+                        account_config = json.loads(account_detail['config'])
+                        user_hrn = account_config.get('user_hrn','N/A')
+        authority_remove_pis(request, authority_hrn, user_hrn)
+        clear_user_creds(request, user_email)
+        messages.success(request, 'PI downgraded to user')
+        return HttpResponseRedirect(redirect_url)
+        
 
 
     # Download delegated_user_cred

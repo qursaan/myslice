@@ -1,4 +1,5 @@
 [manifold]
+<<<<<<< HEAD
 url = https://localhost:7080/
 admin_user = xxx
 admin_password = xxx
@@ -30,3 +31,17 @@ password =
 url = https://www.iot-lab.info/rest/admin/users
 admin_user = xxx
 admin_password= xxx
+=======
+url = https://localhost:7080
+admin_user = admin
+admin_password = admin
+
+[myslice]
+theme = onelab
+# label and logo are used in emails
+# by default theme_label = theme
+theme_label=OneLab
+# by default theme_logo = theme.png
+theme_logo=onelab-portal.png
+secret_key = random_value 
+>>>>>>> onelab

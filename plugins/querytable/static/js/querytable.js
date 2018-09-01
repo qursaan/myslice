@@ -4,6 +4,10 @@
  * License: GPLv3
  */
 
+QUERYTABLE_BGCOLOR_RESET   = 0;
+QUERYTABLE_BGCOLOR_ADDED   = 1;
+QUERYTABLE_BGCOLOR_REMOVED = 2;
+
 (function($){
 
     var debug=false;
@@ -12,55 +16,42 @@
     var QueryTable = Plugin.extend({
 
         init: function(options, element) {
-	    this.classname="querytable";
+        this.classname="querytable";
             this._super(options, element);
 
             /* Member variables */
-	    // in general we expect 2 queries here
-	    // query_uuid refers to a single object (typically a slice)
-	    // query_all_uuid refers to a list (typically resources or users)
-	    // these can return in any order so we keep track of which has been received yet
-            this.received_all_query = false;
-            this.received_query = false;
-
-            // We need to remember the active filter for datatables filtering
-            this.filters = Array(); 
-
-            // an internal buffer for records that are 'in' and thus need to be checked 
-            this.buffered_records_to_check = [];
-	    // an internal buffer for keeping lines and display them in one call to fnAddData
-	    this.buffered_lines = [];
+            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
+            this.object = query.object; // XXX
 
             /* Events */
-	    // xx somehow non of these triggers at all for now
             this.elmt().on('show', this, this.on_show);
             this.elmt().on('shown.bs.tab', this, this.on_show);
             this.elmt().on('resize', this, this.on_resize);
 
-            var query = manifold.query_store.find_analyzed_query(this.options.query_uuid);
-            this.object = query.object;
+            //// we need 2 different keys
+            // * canonical_key is the primary key as derived from metadata (typically: urn)
+            //   and is used to communicate about a given record with the other plugins
+            // * init_key is a key that both kinds of records 
+            //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
+            //   in general query_all will return well populated records, but query
+            //   returns records with only the fields displayed on startup
+            var keys = manifold.metadata.get_key(this.object);
+            this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
+            // 
+            this.init_key = this.options.init_key;
+            // have init_key default to canonical_key
+            this.init_key = this.init_key || this.canonical_key;
 
-	    //// we need 2 different keys
-	    // * canonical_key is the primary key as derived from metadata (typically: urn)
-	    //   and is used to communicate about a given record with the other plugins
-	    // * init_key is a key that both kinds of records 
-	    //   (i.e. records returned by both queries) must have (typically: hrn or hostname)
-	    //   in general query_all will return well populated records, but query
-	    //   returns records with only the fields displayed on startup
-	    var keys = manifold.metadata.get_key(this.object);
-	    this.canonical_key = (keys && keys.length == 1) ? keys[0] : undefined;
-	    // 
-	    this.init_key = this.options.init_key;
-	    // have init_key default to canonical_key
-	    this.init_key = this.init_key || this.canonical_key;
-	    // sanity check
-	    if ( ! this.init_key ) messages.warning ("QueryTable : cannot find init_key");
-	    if ( ! this.canonical_key ) messages.warning ("QueryTable : cannot find canonical_key");
-	    if (debug) messages.debug("querytable: canonical_key="+this.canonical_key+" init_key="+this.init_key);
+            /* sanity check */
+            if ( ! this.init_key ) 
+                messages.warning ("QueryTable : cannot find init_key");
+            if ( ! this.canonical_key ) 
+                messages.warning ("QueryTable : cannot find canonical_key");
+            if (debug)
+                messages.debug("querytable: canonical_key="+this.canonical_key+" init_key="+this.init_key);
 
             /* Setup query and record handlers */
             this.listen_query(options.query_uuid);
-            this.listen_query(options.query_all_uuid, 'all');
 
             /* GUI setup and event binding */
             this.initialize_table();
@@ -69,16 +60,16 @@
         /* PLUGIN EVENTS */
 
         on_show: function(e) {
-	    if (debug) messages.debug("querytable.on_show");
+        if (debug) messages.debug("querytable.on_show");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
-	},        
+    },        
 
         on_resize: function(e) {
-	    if (debug) messages.debug("querytable.on_resize");
+        if (debug) messages.debug("querytable.on_resize");
             var self = e.data;
             self.table.fnAdjustColumnSizing();
-	},        
+    },        
 
         /* GUI EVENTS */
 
@@ -91,31 +82,49 @@
             var actual_options = {
                 // Customize the position of Datatables elements (length,filter,button,...)
                 // we use a fluid row on top and another on the bottom, making sure we take 12 grid elt's each time
-                sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
-		// XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
-		// hopefully this would come with dataTables v1.10 ?
-		// in any case, search for 'sPaginationType' all over the code for more comments
+                //sDom: "<'row'<'col-xs-5'l><'col-xs-1'r><'col-xs-6'f>>t<'row'<'col-xs-5'i><'col-xs-7'p>>",
+                sDom: "<'row'<'col-xs-5'f><'col-xs-1'r><'col-xs-6 columns_selector'>>t<'row'<'col-xs-5'l><'col-xs-7'p>>",
+        // XXX as of sept. 2013, I cannot locate a bootstrap3-friendly mode for now
+        // hopefully this would come with dataTables v1.10 ?
+        // in any case, search for 'sPaginationType' all over the code for more comments
                 sPaginationType: 'bootstrap',
                 // Handle the null values & the error : Datatables warning Requested unknown parameter
                 // http://datatables.net/forums/discussion/5331/datatables-warning-...-requested-unknown-parameter/p2
-                aoColumnDefs: [{sDefaultContent: '',aTargets: [ '_all' ]}],
+                aoColumnDefs: [{sDefaultContent: '', aTargets: [ '_all' ], "sType": "mysort"}],
                 // WARNING: this one causes tables in a 'tabs' that are not exposed at the time this is run to show up empty
                 // sScrollX: '100%',       /* Horizontal scrolling */
                 bProcessing: true,      /* Loading */
-                fnDrawCallback: function() { self._querytable_draw_callback.call(self); }
+                fnDrawCallback: function() { self._querytable_draw_callback.call(self); },
+                fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                    // This function is called on fnAddData to set the TR id. What about fnUpdate ?
+
+                    // Get the key from the raw data array aData
+                    var key = self.canonical_key;
+
+                    // Get the index of the key in the columns
+                    var cols = self._get_columns();
+                    var index = self.getColIndex(key, cols);
+                    if (index != -1) {
+                        // The key is found in the table, set the TR id after the data
+                        $(nRow).attr('id', self.id_from_key(key, aData[index]));
+                    }
+
+                    // That's the usual return value
+                    return nRow;
+                }
                 // XXX use $.proxy here !
             };
             // the intention here is that options.datatables_options as coming from the python object take precedence
-	    // xxx DISABLED by jordan: was causing errors in datatables.js
-	    // xxx turned back on by Thierry - this is the code that takes python-provided options into account
-	    // check your datatables_options tag instead 
-	    // however, we have to accumulate in aoColumnDefs from here (above) 
-	    // and from the python wrapper (checkboxes management, plus any user-provided aoColumnDefs)
-	    if ( 'aoColumnDefs' in this.options.datatables_options) {
-		actual_options['aoColumnDefs']=this.options.datatables_options['aoColumnDefs'].concat(actual_options['aoColumnDefs']);
-		delete this.options.datatables_options['aoColumnDefs'];
-	    }
-	    $.extend(actual_options, this.options.datatables_options );
+        // xxx DISABLED by jordan: was causing errors in datatables.js
+        // xxx turned back on by Thierry - this is the code that takes python-provided options into account
+        // check your datatables_options tag instead 
+        // however, we have to accumulate in aoColumnDefs from here (above) 
+        // and from the python wrapper (checkboxes management, plus any user-provided aoColumnDefs)
+        if ( 'aoColumnDefs' in this.options.datatables_options) {
+        actual_options['aoColumnDefs']=this.options.datatables_options['aoColumnDefs'].concat(actual_options['aoColumnDefs']);
+        delete this.options.datatables_options['aoColumnDefs'];
+        }
+        $.extend(actual_options, this.options.datatables_options );
             this.table = this.elmt('table').dataTable(actual_options);
 
             /* Setup the SelectAll button in the dataTable header */
@@ -142,9 +151,83 @@
 
             /* Processing hidden_columns */
             $.each(this.options.hidden_columns, function(i, field) {
-                //manifold.raise_event(self.options.query_all_uuid, FIELD_REMOVED, field);
                 self.hide_column(field);
             });
+            $(".dataTables_filter").append("<div style='display:inline-block;height:27px;width:27px;padding-left:6px;padding-top:4px;'><span class='glyphicon glyphicon-search'></span></div>");
+            $(".dataTables_filter input").css("width","100%");
+            
+            // resource info
+            var sTable = this.table;
+            var oSettings = this.table.fnSettings();
+            var cols = oSettings.aoColumns;
+            var self = this;
+            $('table.dataTable').delegate('a.resource-info','click',function() {
+                var aPos = sTable.fnGetPosition( this.parentNode );
+                var aData = sTable.fnGetData( aPos[0] );
+                console.log(aData);
+
+                var index = {}
+                // XXX Loic @ Hardcoded !!! Maybe a loop over all fields would be better 
+                index['network_hrn'] = self.getColIndex('network_hrn',cols);
+                var network_hrn = aData[index['network_hrn']];
+
+                index['hostname'] = self.getColIndex('hostname',cols);
+                index['urn'] = self.getColIndex('urn',cols);
+                index['type'] = self.getColIndex('type',cols);
+                //index['status'] = self.getColIndex('boot_state',cols);
+                index['available'] = self.getColIndex('available',cols);
+                index['testbed'] = self.getColIndex('testbed_name',cols);
+                index['facility'] = self.getColIndex('facility_name',cols);
+                var resourceData = {
+                    'hostname' : strip(aData[index['hostname']]),
+                    'urn' : aData[index['urn']],
+                    'type' : aData[index['type']],
+                    //'status' : aData[index['status']],
+                    'available' : aData[index['available']],
+                    'testbed' : aData[index['testbed']],
+                    'facility' : aData[index['facility']],
+                };
+                
+                /*
+                //Greece: 37.6687092,22.2282404
+                if (network_hrn == 'omf.nitos') {
+                    var logo = 'nitos';
+                    var resourceLocation = {
+                        'longitude' : '22.2282404',
+                        'latitude' : '37.6687092',
+                    };
+                    var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
+                } else if (network_hrn == 'iotlab') {
+                */
+                if (network_hrn == 'iotlab') {
+                    var logo = network_hrn;
+                    var s = resourceData['hostname'].split(".");
+                    var n = s[0].split("-");
+                    resourceData['type'] = 'node ( Hardware: <a target="_blank" href="https://www.iot-lab.info/hardware/'+n[0]+'/">'+n[0]+'</a> )';
+                    var coordinates = resourceData['testbed'];
+                } else {
+                    var logo = resourceData['testbed'];
+                    var resourceLocation = {
+                        'longitude' : aData[20],
+                        'latitude' : aData[17],
+                    };
+                    var coordinates = resourceLocation['latitude']+','+resourceLocation['longitude'];
+                    console.log(coordinates);
+                }
+                
+                var modal = $('#resource-info-modal');
+                modal.find('.modal-title').text(resourceData['testbed'] + ': ' +resourceData['hostname']);
+                table = modal.find('.modal-resource-info');
+                table.html('<tr><td colspan="2"><center><img class="img-responsive" src="/static/img/testbeds/'+logo+'.png" alt="'+resourceData['facility']+' - '+resourceData['testbed']+'" /></center></td></tr>');
+                for (var j in resourceData) {
+                    table.append('<tr><td>' + j + '</td><td>' + resourceData[j] + '</td></tr>');
+                }
+                if (coordinates != '') {
+                    table.append('<tr><td colspan="2"><img src="http://maps.google.com/maps/api/staticmap?center='+coordinates+'&zoom=6&size=400x400&sensor=false&markers=color:red%7C'+coordinates+'" style="width:400px; height:400px;" /></td></tr>');
+                }
+                modal.modal();
+            });
+            
         }, // initialize_table
 
         /**
@@ -153,29 +236,30 @@
          * @param cols
          */
         getColIndex: function(key, cols) {
-            var tabIndex = $.map(cols, function(x, i) { if (x.sTitle == key) return i; });
+            var self = this;
+            var tabIndex = $.map(cols, function(x, i) { if (self._get_map(x.sTitle) == key) return i; });
             return (tabIndex.length > 0) ? tabIndex[0] : -1;
         }, // getColIndex
 
-	// create a checkbox <input> tag
-	// computes 'id' attribute from canonical_key
-	// computes 'init_id' from init_key for initialization phase
-	// no need to used convoluted ids with plugin-uuid or others, since
-	// we search using table.$ which looks only in this table
+    // create a checkbox <input> tag
+    // computes 'id' attribute from canonical_key
+    // computes 'init_id' from init_key for initialization phase
+    // no need to used convoluted ids with plugin-uuid or others, since
+    // we search using table.$ which looks only in this table
         checkbox_html : function (record) {
             var result="";
             // Prefix id with plugin_uuid
             result += "<input";
             result += " class='querytable-checkbox'";
-	 // compute id from canonical_key
-	    var id = record[this.canonical_key]
-	 // compute init_id form init_key
-	    var init_id=record[this.init_key];
-	 // set id - for retrieving from an id, or for posting events upon user's clicks
-	    result += " id='"+record[this.canonical_key]+"'";
-	 // set init_id
-	    result += "init_id='" + init_id + "'";
-	 // wrap up
+     // compute id from canonical_key
+        var id = record[this.canonical_key]
+     // compute init_id form init_key
+        var init_id=record[this.init_key];
+     // set id - for retrieving from an id, or for posting events upon user's clicks
+        result += " id='"+record[this.canonical_key]+"'";
+     // set init_id
+        result += "init_id='" + init_id + "'";
+     // wrap up
             result += " type='checkbox'";
             result += " autocomplete='off'";
             result += "></input>";
@@ -185,19 +269,27 @@
 
         new_record: function(record)
         {
+            var self = this;
+
             // this models a line in dataTables, each element in the line describes a cell
             line = new Array();
      
             // go through table headers to get column names we want
             // in order (we have temporarily hack some adjustments in names)
-            var cols = this.table.fnSettings().aoColumns;
-            var colnames = cols.map(function(x) {return x.sTitle})
+            var cols = this._get_columns();
+            var colnames = cols.map(function(x) {return self._get_map(x.sTitle)})
             var nb_col = cols.length;
             /* if we've requested checkboxes, then forget about the checkbox column for now */
-            if (this.options.checkboxes) nb_col -= 1;
-
+            //if (this.options.checkboxes) nb_col -= 1;
+            // catch up with the last column if checkboxes were requested 
+            if (this.options.checkboxes) {
+                // Use a key instead of hostname (hard coded...)
+                line.push(this.checkbox_html(record));
+            }
+            line.push('<span id="' + this.id_from_key('status', record[this.init_key]) + '"></span>'); // STATUS
+            
             /* fill in stuff depending on the column name */
-            for (var j = 0; j < nb_col; j++) {
+            for (var j = 2; j < nb_col - 1; j++) { // nb_col includes status
                 if (typeof colnames[j] == 'undefined') {
                     line.push('...');
                 } else if (colnames[j] == 'hostname') {
@@ -205,7 +297,8 @@
                         //TODO: we need to add source/destination for links
                         line.push('');
                     else
-                        line.push(record['hostname']);
+                        //line.push(record['hostname']);
+                        line.push('<a class="resource-info" data-network_hrn="'+record['network_hrn']+'">' + record['hostname'] + '</a>');
 
                 } else if (colnames[j] == this.init_key && typeof(record) != 'undefined') {
                     obj = this.object
@@ -217,10 +310,11 @@
                     }
                     /* XXX TODO: Remove this and have something consistant */
                     if(obj=='resource'){
-                        line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record['urn']+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }else{
-                        line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
+                        //line.push('<a href="../'+obj+'/'+record[this.init_key]+'"><span class="glyphicon glyphicon-search"></span></a> '+record[this.init_key]);
                     }
+                    line.push(record[this.init_key]);
                 } else {
                     if (record[colnames[j]])
                         line.push(record[colnames[j]]);
@@ -229,15 +323,9 @@
                 }
             }
     
-            // catch up with the last column if checkboxes were requested 
-            if (this.options.checkboxes) {
-                // Use a key instead of hostname (hard coded...)
-                line.push(this.checkbox_html(record));
-	        }
-    
-    	    // adding an array in one call is *much* more efficient
-	        // this.table.fnAddData(line);
-	        this.buffered_lines.push(line);
+            // adding an array in one call is *much* more efficient
+            // this.table.fnAddData(line);
+            return line;
         },
 
         clear_table: function()
@@ -268,46 +356,133 @@
                 this.table.fnSetColumnVis(index, false);
         },
 
-	// this is used at init-time, at which point only init_key can make sense
-	// (because the argument record, if it comes from query, might not have canonical_key set
-	set_checkbox_from_record: function (record, checked) {
+        set_checkbox_from_record_key: function (record_key, checked) 
+        {
             if (checked === undefined) checked = true;
-	    var init_id = record[this.init_key];
-	    if (debug) messages.debug("querytable.set_checkbox_from_record, init_id="+init_id);
-	    // using table.$ to search inside elements that are not visible
-	    var element = this.table.$('[init_id="'+init_id+'"]');
-	    element.attr('checked',checked);
-	},
 
-	// id relates to canonical_key
-	set_checkbox_from_data: function (id, checked) {
+            // using table.$ to search inside elements that are not visible
+            var element = this.table.$('[init_id="'+record_key+'"]');
+            element.attr('checked',checked);
+        },
+
+        // id relates to canonical_key
+        set_checkbox_from_data: function (id, checked) 
+        {
             if (checked === undefined) checked = true;
-	    if (debug) messages.debug("querytable.set_checkbox_from_data, id="+id);
-	    // using table.$ to search inside elements that are not visible
-	    var element = this.table.$("[id='"+id+"']");
-	    element.attr('checked',checked);
-	},
+
+            // using table.$ to search inside elements that are not visible
+            var element = this.table.$("[id='"+id+"']");
+            element.attr('checked',checked);
+        },
+
+        /**
+         * Arguments
+         *
+         * key_value: the key from which we deduce the id
+         * request: STATUS_OKAY, etc.
+         * content: some HTML content
+         */
+        change_status: function(key_value, warnings)
+        {
+            var msg;
+            
+            if ($.isEmptyObject(warnings)) { 
+                var state = manifold.query_store.get_record_state(this.options.query_uuid, key_value, STATE_SET);
+                switch(state) {
+                    case STATE_SET_IN:
+                    case STATE_SET_IN_SUCCESS:
+                    case STATE_SET_OUT_FAILURE:
+                    case STATE_SET_IN_PENDING:
+                        // Checkmark sign if no warning for an object in the set
+                        msg = '&#10003;';
+                        break;
+                    default:
+                        // Nothing is the object is not in the set
+                        msg = '';
+                        break;
+                }
+            } else {
+                msg = '<ul class="nav nav-pills">';
+                msg += '<li class="dropdown">';
+                msg += '<a href="#" data-toggle="dropdown" class="dropdown-toggle nopadding"><b>&#9888</b></a>';
+                msg += '  <ul class="dropdown-menu dropdown-menu-right" id="menu1">';
+                $.each(warnings, function(i,warning) {
+                    msg += '<li><a href="#">' + warning + '</a></li>';
+                });
+                msg += '  </ul>';
+                msg += '</li>';
+                msg += '</ul>';
+            }
+
+            $(document.getElementById(this.id_from_key('status', key_value))).html(msg);
+            $('[data-toggle="tooltip"]').tooltip({'placement': 'bottom'});
+
+        },
+
+        set_bgcolor: function(key_value, class_name)
+        {
+            var elt = $(document.getElementById(this.id_from_key(this.canonical_key, key_value)))
+            if (class_name == QUERYTABLE_BGCOLOR_RESET)
+                elt.removeClass('added removed');
+            else
+                elt.addClass((class_name == QUERYTABLE_BGCOLOR_ADDED ? 'added' : 'removed'));
+        },
+
+        populate_table: function()
+        {
+            // Let's clear the table and only add lines that are visible
+            var self = this;
+            this.clear_table();
+
+            lines = Array();
+            var record_keys = [];
+            manifold.query_store.iter_records(this.options.query_uuid, function (record_key, record) {
+                lines.push(self.new_record(record));
+                record_keys.push(record_key);
+            });
+            this.table.fnAddData(lines);
+            $.each(record_keys, function(i, record_key) {
+                var state = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_SET);
+                var warnings = manifold.query_store.get_record_state(self.options.query_uuid, record_key, STATE_WARNINGS);
+                switch(state) {
+                    // XXX The row and checkbox still does not exists !!!!
+                    case STATE_SET_IN:
+                    case STATE_SET_IN_SUCCESS:
+                    case STATE_SET_OUT_FAILURE:
+                        self.set_checkbox_from_record_key(record_key, true);
+                        break;
+                    case STATE_SET_OUT:
+                    case STATE_SET_OUT_SUCCESS:
+                    case STATE_SET_IN_FAILURE:
+                        //self.set_checkbox_from_record_key(record_key, false);
+                        break;
+                    case STATE_SET_IN_PENDING:
+                        self.set_checkbox_from_record_key(record_key, true);
+                        self.set_bgcolor(record_key, QUERYTABLE_BGCOLOR_ADDED);
+                        break;
+                    case STATE_SET_OUT_PENDING:
+                        //self.set_checkbox_from_record_key(record_key, false);
+                        self.set_bgcolor(record_key, QUERYTABLE_BGCOLOR_REMOVED);
+                        break;
+                }
+                self.change_status(record_key, warnings); // XXX will retrieve status again
+            });
+        },
 
         /*************************** QUERY HANDLER ****************************/
 
         on_filter_added: function(filter)
         {
-            this.filters.push(filter);
             this.redraw_table();
         },
 
         on_filter_removed: function(filter)
         {
-            // Remove corresponding filters
-            this.filters = $.grep(this.filters, function(x) {
-                return x != filter;
-            });
             this.redraw_table();
         },
         
         on_filter_clear: function()
         {
-            // XXX
             this.redraw_table();
         },
 
@@ -326,58 +501,7 @@
             alert('QueryTable::clear_fields() not implemented');
         },
 
-        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
-        /*************************** ALL QUERY HANDLER ****************************/
-
-        on_all_filter_added: function(filter)
-        {
-            // XXX
-            this.redraw_table();
-        },
-
-        on_all_filter_removed: function(filter)
-        {
-            // XXX
-            this.redraw_table();
-        },
-        
-        on_all_filter_clear: function()
-        {
-            // XXX
-            this.redraw_table();
-        },
-
-        on_all_field_added: function(field)
-        {
-            this.show_column(field);
-        },
-
-        on_all_field_removed: function(field)
-        {
-            this.hide_column(field);
-        },
-
-        on_all_field_clear: function()
-        {
-            alert('QueryTable::clear_fields() not implemented');
-        },
-
-
         /*************************** RECORD HANDLER ***************************/
-
-        on_new_record: function(record)
-        {
-            if (this.received_all_query) {
-        	// if the 'all' query has been dealt with already we may turn on the checkbox
-                this.set_checkbox_from_record(record, true);
-            } else {
-                this.buffered_records_to_check.push(record);
-            }
-        },
-
-        on_clear_records: function()
-        {
-        },
 
         // Could be the default in parent
         on_query_in_progress: function()
@@ -387,132 +511,81 @@
 
         on_query_done: function()
         {
-            this.received_query = true;
-    	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
+            this.populate_table();
+            this.unspin();
         },
         
         on_field_state_changed: function(data)
         {
-            switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkbox_from_data(data.value, true);
+            // XXX We could get this from data.value
+            // var state = manifold.query_store.get_record_state(this.options.query_uuid, data.value, data.state);
+
+            switch(data.state) {
+                case STATE_SET:
+                    switch(data.op) {
+                        case STATE_SET_IN:
+                        case STATE_SET_IN_SUCCESS:
+                        case STATE_SET_OUT_FAILURE:
+                            this.set_checkbox_from_data(data.value, true);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                            break;  
+                        case STATE_SET_OUT:
+                        case STATE_SET_OUT_SUCCESS:
+                        case STATE_SET_IN_FAILURE:
+                            this.set_checkbox_from_data(data.value, false);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_RESET);
+                            break;
+                        case STATE_SET_IN_PENDING:
+                            this.set_checkbox_from_data(data.value, true);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_ADDED);
+                            break;  
+                        case STATE_SET_OUT_PENDING:
+                            this.set_checkbox_from_data(data.value, false);
+                            this.set_bgcolor(data.value, QUERYTABLE_BGCOLOR_REMOVED);
+                            break;
+                    }
                     break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox_from_data(data.value, false);
-                    break;
-                default:
+
+                case STATE_WARNINGS:
+                    this.change_status(data.key, data.value);
                     break;
             }
         },
-
-        /* XXX TODO: make this generic a plugin has to subscribe to a set of Queries to avoid duplicated code ! */
-        // all
-        on_all_field_state_changed: function(data)
-        {
-            switch(data.request) {
-                case FIELD_REQUEST_ADD:
-                case FIELD_REQUEST_ADD_RESET:
-                    this.set_checkboxfrom_data(data.value, true);
-                    break;
-                case FIELD_REQUEST_REMOVE:
-                case FIELD_REQUEST_REMOVE_RESET:
-                    this.set_checkbox_from_data(data.value, false);
-                    break;
-                default:
-                    break;
-            }
-        },
-
-        on_all_new_record: function(record)
-        {
-            this.new_record(record);
-        },
-
-        on_all_clear_records: function()
-        {
-            this.clear_table();
-
-        },
-
-        on_all_query_in_progress: function()
-        {
-            // XXX parent
-            this.spin();
-        }, // on_all_query_in_progress
-
-        on_all_query_done: function()
-        {
-	    if (debug) messages.debug("1-shot initializing dataTables content with " + this.buffered_lines.length + " lines");
-	    this.table.fnAddData (this.buffered_lines);
-	    this.buffered_lines=[];
-	    
-            var self = this;
-	    // if we've already received the slice query, we have not been able to set 
-	    // checkboxes on the fly at that time (dom not yet created)
-            $.each(this.buffered_records_to_check, function(i, record) {
-		if (debug) messages.debug ("querytable delayed turning on checkbox " + i + " record= " + record);
-                self.set_checkbox_from_record(record, true);
-            });
-	    this.buffered_records_to_check = [];
-
-            this.received_all_query = true;
-	    // unspin once we have received both
-            if (this.received_all_query && this.received_query) this.unspin();
-
-        }, // on_all_query_done
 
         /************************** PRIVATE METHODS ***************************/
 
+        _get_columns: function()
+        {
+            return this.table.fnSettings().aoColumns;
+            // XXX return $.map(table.fnSettings().aoColumns, function(x, i) { return QUERYTABLE_MAP[x]; });
+        },
+
+        _get_map: function(column_title) {
+            return (column_title in QUERYTABLE_MAP) ? QUERYTABLE_MAP[column_title] : column_title;
+        },
         /** 
-         * @brief QueryTable filtering function
+         * @brief QueryTable filtering function, called for every line in the datatable.
+         * 
+         * Return value:
+         *   boolean determining whether the column is visible or not.
          */
         _querytable_filter: function(oSettings, aData, iDataIndex)
         {
-            var ret = true;
-            $.each (this.filters, function(index, filter) { 
-                /* XXX How to manage checkbox ? */
-                var key = filter[0]; 
-                var op = filter[1];
-                var value = filter[2];
+            var self = this;
+            var key_col, record_key_value;
 
-                /* Determine index of key in the table columns */
-                var col = $.map(oSettings.aoColumns, function(x, i) {if (x.sTitle == key) return i;})[0];
+            /* Determine index of key in the table columns */
+            key_col = $.map(oSettings.aoColumns, function(x, i) {if (self._get_map(x.sTitle) == self.canonical_key) return i;})[0];
 
-                /* Unknown key: no filtering */
-                if (typeof(col) == 'undefined')
-                    return;
+            /* Unknown key: no filtering */
+            if (typeof(key_col) == 'undefined') {
+                console.log("Unknown key");
+                return true;
+            }
 
-                col_value=unfold.get_value(aData[col]);
-                /* Test whether current filter is compatible with the column */
-                if (op == '=' || op == '==') {
-                    if ( col_value != value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                }else if (op == '!=') {
-                    if ( col_value == value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='<') {
-                    if ( parseFloat(col_value) >= value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='>') {
-                    if ( parseFloat(col_value) <= value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='<=' || op=='≤') {
-                    if ( parseFloat(col_value) > value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                } else if(op=='>=' || op=='≥') {
-                    if ( parseFloat(col_value) < value || col_value==null || col_value=="" || col_value=="n/a")
-                        ret = false;
-                }else{
-                    // How to break out of a loop ?
-                    alert("filter not supported");
-                    return false;
-                }
+            record_key_value = unfold.get_value(aData[key_col]);
 
-            });
-            return ret;
+            return manifold.query_store.get_record_state(this.options.query_uuid, record_key_value, STATE_VISIBLE);
         },
 
         _querytable_draw_callback: function()
@@ -547,14 +620,18 @@
 
         _check_click: function(e) 
         {
+            var data;
+            var self = e.data;
+
             e.stopPropagation();
 
-            var self = e.data;
-	    var id=this.id;
-
-            // this.id = key of object to be added... what about multiple keys ?
-	    if (debug) messages.debug("querytable._check_click key="+this.canonical_key+"->"+id+" checked="+this.checked);
-            manifold.raise_event(self.options.query_uuid, this.checked?SET_ADD:SET_REMOVED, id);
+            data = {
+                state: STATE_SET,
+                key  : null,
+                op   : this.checked ? STATE_SET_ADD : STATE_SET_REMOVE,
+                value: this.id
+            };
+            manifold.raise_event(self.options.query_uuid, FIELD_STATE_CHANGED, data);
             //return false; // prevent checkbox to be checked, waiting response from manifold plugin api
             
         },
@@ -578,7 +655,6 @@
                 });
             }
         },
-
     });
 
     $.plugin('QueryTable', QueryTable);
@@ -589,10 +665,78 @@
      was in fact given as a third argument, and not second 
      as the various online resources had it - go figure */
     $.fn.dataTableExt.afnSortData['dom-checkbox'] = function  ( oSettings, _, iColumn ) {
-	return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
-	    return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
-	} );
-    }
+        return $.map( oSettings.oApi._fnGetTrNodes(oSettings), function (tr, i) {
+            return result=$('td:eq('+iColumn+') input', tr).prop('checked') ? '1' : '0';
+        });
+    };
+
+    // use sType: "mysort"  for any columns you wish to use these routines
+    // http://datatables.net/forums/discussion/7546/alpha-numeric-sort
+    jQuery.fn.dataTableExt.oSort['mysort-asc']  = function(a,b) {
+      var r = new RegExp("<([a-zA-Z]+).*?>(.*?)</\\1>");
+      if (r.exec(a) != null){
+        a = r.exec(a)[2];
+      }
+      if (r.exec(b) != null){
+        b = r.exec(b)[2];
+      }
+      a = a.replace(/[^A-Za-z0-9]/, "");
+      b = b.replace(/[^A-Za-z0-9]/, "");
+      var re = new RegExp("^([a-zA-Z]*)(.*)");
+      var x = re.exec(a);
+      var y = re.exec(b);
+     
+      // you might want to force the first portion to lowercase
+      // for case insensitive matching
+      // x[1] = x[1].toLowerCase();
+      // y[1] = y[1].toLowerCase();
+     
+      if (x[1] > y[1]) return 1;
+      if (x[1] < y[1]) return -1;
+     
+      // if you want to force the 2nd part to only be numeric:
+      x[2] = parseInt(x[2]);
+      y[2] = parseInt(y[2]);
+     
+      return ((x[2] < y[2]) ? -1 : ((x[2] > y[2]) ?  1 : 0));
+    };
+      
+    jQuery.fn.dataTableExt.oSort['mysort-desc'] = function(a,b) {
+      var r = new RegExp("<([a-zA-Z]+).*?>(.*?)</\\1>");
+      if (r.exec(a) != null){
+        a = r.exec(a)[2];
+      }
+      if (r.exec(b) != null){
+        b = r.exec(b)[2];
+      }
+      a = a.replace(/[^A-Za-z0-9]/, "");
+      b = b.replace(/[^A-Za-z0-9]/, "");
+      var re = new RegExp("^([a-zA-Z]*)(.*)");
+      var x = re.exec(a);
+      var y = re.exec(b);
+     
+      // you might want to force the first portion to lowercase
+      // for case insensitive matching
+      // x[1] = x[1].toLowerCase();
+      // y[1] = y[1].toLowerCase();
+     
+      if (x[1] > y[1]) return -1;
+      if (x[1] < y[1]) return 1;
+     
+      // if you want to force the 2nd part to only be numeric:
+      x[2] = parseInt(x[2]);
+      y[2] = parseInt(y[2]);
+     
+       return ((x[2] < y[2]) ?  1 : ((x[2] > y[2]) ? -1 : 0));
+    };
+    
+    
 
 })(jQuery);
 
+function strip(html)
+{
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent || tmp.innerText || "";
+}

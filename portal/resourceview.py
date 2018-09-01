@@ -10,9 +10,10 @@ from plugins.lists.simplelist   import SimpleList
 from plugins.slicestat          import SliceStat
 
 from myslice.configengine       import ConfigEngine
+from myslice.theme import ThemeView
 
 # View for 1 platform and its details
-class ResourceView(FreeAccessView):
+class ResourceView(FreeAccessView, ThemeView):
     template_name = "resource.html"
 
     def get_context_data(self, **kwargs):
@@ -21,7 +22,6 @@ class ResourceView(FreeAccessView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
-            print "%s = %s" % (key, value)       
             if key == "urn":
                 resource_urn=value
                 
@@ -88,7 +88,7 @@ class ResourceView(FreeAccessView):
         context['topmenu_items'] = topmenu_items_live(None, page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-
+        context['theme'] = self.theme
         context.update(page.prelude_env())
 
         return context

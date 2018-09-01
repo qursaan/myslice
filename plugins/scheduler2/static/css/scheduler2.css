@@ -82,7 +82,19 @@
 }
 
 /** tables css **/
+<<<<<<< HEAD
 #ShedulerNodes-scroll-container {
+=======
+
+#scheduler-reservation-table > tbody > tr > th {
+	font-weight: normal;
+}
+#scheduler-reservation-table > thead > tr > th {
+	font-weight: normal;
+}
+
+/*#ShedulerNodes-scroll-container {
+>>>>>>> onelab
     float: left;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -93,7 +105,11 @@
     border-spacing: 0;
     max-width: 500px;
     width: 450px;
+<<<<<<< HEAD
     margin-top:55px;
+=======
+    margin-top: 6px !important;
+>>>>>>> onelab
 }
 
 #ShedulerNodes th{
@@ -139,6 +155,7 @@
     width: 100%;
 }
 
+<<<<<<< HEAD
 #scheduler-reservation-table tr{
     background-color: #A6C9E2 ;
 }
@@ -148,6 +165,12 @@
 }
 
 /*background: url("../img/opened-lock-15.png") no-repeat scroll 50% 50% transparent;*/
+=======
+
+    */
+/*background: url("../img/opened-lock-15.png") no-repeat scroll 50% 50% transparent;*/
+/*
+>>>>>>> onelab
 #scheduler-reservation-table td {
     border: 1px solid #FFFFFF;
     cursor: pointer;
@@ -184,6 +207,7 @@
     padding: 0 5px;
     width: 3px;
 }
+<<<<<<< HEAD
 
 #scheduler-reservation-table td.free {
 }
@@ -199,6 +223,63 @@
 
 #scheduler-reservation-table td.free:hover ,#scheduler-reservation-table td.selected, #scheduler-reservation-table td.selected_tmp {
     background: #25BA25;
+=======
+    
+*/
+#scheduler-reservation-table {
+    margin-top: 0 !important;
+}
+#scheduler-reservation-table tbody tr {
+    border: none !important;
+}
+#scheduler-reservation-table tbody tr td{
+    background-color: #FFFFFF; /*#A6C9E2 ;*/
+/*    border: 1px solid #111111;*/
+}
+
+#scheduler-reservation-table tbody tr.even td{
+    background-color: #FAFAFA; /*E0E0E0 ;*/
+}
+
+#scheduler-reservation-table tbody tr th::selection {color:	#000000;background:transparent;}
+#scheduler-reservation-table tbody tr th::-moz-selection {color:	#000000;background:transparent;}
+
+#scheduler-reservation-table tbody tr td.free {
+}
+
+#scheduler-reservation-table tbody tr td.reserved {
+    background: url("../img/closed-lock-15.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.disabled {
+    background: url("../img/forbidden.png") no-repeat scroll 50% 50%; /* #DD4444;*/
+    cursor: not-allowed;
+}
+
+#scheduler-reservation-table tbody tr td.success:after {
+	content: "✓";
+}
+#scheduler-reservation-table tbody tr td.failure:after {
+	content: "✗";
+}
+
+#scheduler-reservation-table tbody tr td.maintenance {
+    background: url("../img/tools-15.png") no-repeat scroll 50% 50% #EDA428;
+}
+
+#scheduler-reservation-table tbody tr td.pendingin {
+    background: #FFFF99;
+}
+
+
+#scheduler-reservation-table tbody tr td.pendingout {
+    background: #E8E8E8;
+}
+
+#scheduler-reservation-table tbody tr td.free:hover ,#scheduler-reservation-table tbody tr td.selected, #scheduler-reservation-table tbody tr td.selected_tmp {
+    background: #26c9e2;
+>>>>>>> onelab
 }
 
 td.no-image {
@@ -226,12 +307,29 @@ td.no-image {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6c9e2', endColorstr='#e0e0e0',GradientType=1 ); /* IE6-9 */
 
     padding: 3px 0 3px 30px;
+<<<<<<< HEAD
     width: 109px;
 }
 
 .legend ol li.free{
 
 }
+=======
+    width: 250px;
+}
+
+.legend ol li.free{
+	background: #FFFFFF;
+
+}
+.legend ol li.pendingin{
+background: #FFFF99;
+}
+.legend ol li.pendingout{
+background: #E8E8E8;
+}
+
+>>>>>>> onelab
 
 .legend ol li.closed{
     background: url("../img/closed-lock-15.png") no-repeat scroll 8px 50% #DD4444;
@@ -244,3 +342,27 @@ td.no-image {
 .legend ol li.selected {
     background: #25BA25;
 }
+<<<<<<< HEAD
+=======
+
+.legend ol li.disabled {
+	background: url("../img/forbidden.png") no-repeat scroll 2px 50% #FFFFFF;
+}
+
+/* latest stuff */
+.sliderContainer {
+	margin-left: -15px;
+	margin-right: 15px;
+}
+.table-responsive{
+    overflow: hidden !important;
+}
+input {
+    min-width: 150px !important;
+	margin-left: 5px;
+}
+
+.slider.slider-horizontal {
+	width: 100%;
+}
+>>>>>>> onelab

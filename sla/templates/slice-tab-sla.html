@@ -1,0 +1,137 @@
+
+<div class="col-md-1">
+</div>
+
+ <div class="col-md-10">
+   <div class="row" id="agreements" style="padding-top:1em;">
+    
+        
+{% for row in ag_info %}
+
+<!-- Modal - columns selector -->
+<div class="modal fade" id="agreementModal{{row.agreement.agreement_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			
+<style type="text/css" scoped>
+        .modal-lg {
+          width: 50%;
+        }
+</style>
+			
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+ 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+ 				<h4 class="modal-title" id="myModalAgreement">Agreement details</h4>
+			</div>
+			<div class="modal-body">
+
+                <dt>Agreement Id</dt>
+                <dd>{{ row.agreement.agreement_id|default:"&nbsp;" }}</dd>
+                <dt>Provider</dt>
+                <dd>{{ row.provider|default:"&nbsp;" }}</dd>
+                <dt>Experimenter</dt>
+                <dd>{{ row.agreement.context.consumer|default:"&nbsp;" }}</dd>
+                <dt>Service</dt>
+                <dd>Testbed guarantees 0.99 Uptime rate for 0.99 rate of the selected resources</dd>
+                <dt>Testbed</dt>
+                <dd>{{ row.agreement.context.testbed_formatted }}</dd>
+                <dt>Expiration date:</dt>
+                <dd>{{ row.date|default:"&nbsp;" }}</dd>
+
+                <dt>Covered resources:</dt>
+                {% for sliver in row.slivers %}
+                <dd>{{ sliver|default:"&nbsp;" }}</dd>
+                {% endfor %}
+
+			</div>
+			<div class="modal-footer">
+ 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endfor %}
+
+      <table class="table table-striped table-bordered" id="sla_table">
+      
+        <thead>
+          <tr> 
+            <th>Provider</th>
+            <th>Agreement</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for row in ag_info %}
+
+        <tr>
+        	
+          <td>{{ row.provider }}</td>
+
+          <td><a class="agreement-detail" data-toggle="modal" data-target="#agreementModal{{row.agreement.agreement_id}}">{{ row.agreement.agreement_id }}</a></td>
+    		  
+          <td>{{ row.date }}</td>
+          <td>{{ row.status }}</td>
+          {% if row.ok == "true" %}
+          <td class="success">99% uptime for {{ row.result }}% resources</td>
+          {% elif row.ok == "false" %}
+          <td class="danger">99% uptime for {{ row.result }}% resources</td>
+          {% else %}
+          <td></td>
+          {% endif %}
+          <!-- {% if row.ok == "false" %}
+          <td class="glyphicon glyphicon-remove-sign" style="color:red;"></td>
+          {% elif row.ok == "true" %}
+          <td class="glyphicon glyphicon-ok-sign" style="color:green;"></td>
+          {% else %}
+          <td></td>
+          {% endif %} -->
+
+          
+        </tr>
+        
+        {% endfor %}
+        </tbody>
+
+</table>
+</div>
+</div>
+<!-- <div class="row" style="float:right;">
+    <button id="showEvaluations" type="button" class="btn btn-default"  onclick="displayDate()"><span class="glyphicon"></span>Show Evaluations</button>
+</div> -->
+
+<script>
+$(document).ready(function() {
+
+  $('#sla_table').dataTable({
+        "aoColumns": [
+            null,
+            null,
+            null,
+            null,
+            { "orderSequence": [ "desc", "asc" ] }
+        ]
+    });
+
+	$('a.violation-detail').click(function () {
+		var a = $(this).data('agreement');
+		var v = $(this).data('violation');
+		$("#sla").load('/sla/agreements/' + a + '/guarantees/' + v + '/violations', {'slicename': '{{ slicename }}'});
+	});
+	
+	// $('a.agreement-detail').click(function () {
+	// 	var a = $(this).data('agreement');
+	// 	$("#sla").load('/sla/agreements/' + a + '/detail');
+	// });
+
+	$('tr.header').click(function(){
+		$(this).nextUntil('tr.header').toggle('fast');
+		$('.header .glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+	});
+});
+
+</script>

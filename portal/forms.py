@@ -21,8 +21,9 @@
 # this program; see the file COPYING.  If not, write to the Free Software
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+# TODO: Remove these automated forms and use html templates and views like any other page !
+
 from django import forms
-from portal.models import PendingUser, PendingSlice
 #from crispy_forms.helper import FormHelper
 #from crispy_forms.layout import Submit
 from django.utils.translation import ugettext_lazy as _
@@ -32,8 +33,12 @@ from django.contrib.sites.models import get_current_site
 from django.utils.http import int_to_base36
 from django.template import loader
 
-# TODO: Remove these automated forms and use html templates and views like any other page !
 from django.contrib.auth.hashers import identify_hasher
+
+from portal.models import PendingUser, PendingSlice
+
+from myslice.settings import logger
+
 # adapted from https://sourcegraph.com/github.com/fusionbox/django-authtools/symbols/python/authtools/forms
 
 def is_password_unusable(pw):
@@ -69,18 +74,30 @@ def is_password_unusable(pw):
 #    cc_myself = forms.BooleanField(required=False)
 
 class ContactForm(forms.Form):
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    authority = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+   # first_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("First name"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+   # last_name = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("Last name"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+   # authority = forms.RegexField(widget=forms.TextInput(attrs={'class':'form-control'}),
+   #                             regex=r'^[\w.@+-]+$',
+   #                              max_length=30,
+   #                              label=_("authority"),
+   #                              error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    subject = forms.CharField(max_length=100,widget=forms.TextInput(attrs={'class':'form-control'}))
+    subject = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
     description = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
-    cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
+    #cc_myself = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-control'}))
 
 class PassResetForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
 
-class SliceRequestForm(forms.Form):
+#class SliceRequestForm(forms.Form):
 #    slice_name = forms.CharField()
 #    authority_hrn = forms.ChoiceField(choices=[(1, 'un')])
 #    number_of_nodes  = forms.DecimalField()
@@ -88,52 +105,52 @@ class SliceRequestForm(forms.Form):
 #    purpose = forms.CharField(widget=forms.Textarea)
 #    email = forms.EmailField()
 #    cc_myself = forms.BooleanField(required=False)
-
-    slice_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class':'form-control'}), 
-        help_text="The name for the slice you wish to create")
-    authority_hrn = forms.ChoiceField(
-        widget    = forms.Select(attrs={'class':'form-control'}),
-        choices   = [],
-        help_text = "An authority responsible for vetting your slice")
-    number_of_nodes = forms.DecimalField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "The number of nodes you expect to request (informative)")
-    type_of_nodes = forms.CharField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "The type of nodes you expect to request (informative)")
-    purpose = forms.CharField(
-        widget    = forms.Textarea(attrs={'class':'form-control'}),
-        help_text = "The purpose of your experiment (informative)")
-    email = forms.EmailField(
-        widget    = forms.TextInput(attrs={'class':'form-control'}),
-        help_text = "Your email address")
-    cc_myself = forms.BooleanField(
-        widget    = forms.CheckboxInput(attrs={'class':'form-control'}),
-        required  = False,
-        help_text = "If you'd like to be cc'ed on the request email")
-
-    def __init__(self, *args, **kwargs):
-        initial =  kwargs.get('initial', {})
-        authority_hrn = initial.get('authority_hrn', None)
-
-        # set just the initial value
-        # in the real form needs something like this {'authority_hrn':'a'}
-        # but in this case you want {'authority_hrn':('a', 'letter_a')}
-        if authority_hrn:
-            kwargs['initial']['authority_hrn'] = authority_hrn[0]
-
-        # create the form
-        super(SliceRequestForm, self).__init__(*args, **kwargs)
-
-        # self.fields only exist after, so a double validation is needed
-        if authority_hrn:# and authority_hrn[0] not in (c[0] for c in authority_hrn):
-            # XXX This does not work, the choicefield is not updated...
-            #self.fields['authority_hrn'].choices.extend(authority_hrn)
-            self.fields['authority_hrn'] = forms.ChoiceField(
-                widget    = forms.Select(attrs={'class':'form-control'}),
-                choices   = authority_hrn,
-                help_text = "An authority responsible for vetting your slice")
+#
+#    slice_name = forms.CharField(
+#        widget=forms.TextInput(attrs={'class':'form-control'}), 
+#        help_text="The name for the slice you wish to create")
+#    authority_hrn = forms.ChoiceField(
+#        widget    = forms.Select(attrs={'class':'form-control'}),
+#        choices   = [],
+#        help_text = "An authority responsible for vetting your slice")
+#    number_of_nodes = forms.DecimalField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "The number of nodes you expect to request (informative)")
+#    type_of_nodes = forms.CharField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "The type of nodes you expect to request (informative)")
+#    purpose = forms.CharField(
+#        widget    = forms.Textarea(attrs={'class':'form-control'}),
+#        help_text = "The purpose of your experiment (informative)")
+#    email = forms.EmailField(
+#        widget    = forms.TextInput(attrs={'class':'form-control'}),
+#        help_text = "Your email address")
+#    cc_myself = forms.BooleanField(
+#        widget    = forms.CheckboxInput(attrs={'class':'form-control'}),
+#        required  = False,
+#        help_text = "If you'd like to be cc'ed on the request email")
+#
+#    def __init__(self, *args, **kwargs):
+#        initial =  kwargs.get('initial', {})
+#        authority_hrn = initial.get('authority_hrn', None)
+#
+#        # set just the initial value
+#        # in the real form needs something like this {'authority_hrn':'a'}
+#        # but in this case you want {'authority_hrn':('a', 'letter_a')}
+#        if authority_hrn:
+#            kwargs['initial']['authority_hrn'] = authority_hrn[0]
+#
+#        # create the form
+#        super(SliceRequestForm, self).__init__(*args, **kwargs)
+#
+#        # self.fields only exist after, so a double validation is needed
+#        if authority_hrn:# and authority_hrn[0] not in (c[0] for c in authority_hrn):
+#            # XXX This does not work, the choicefield is not updated...
+#            #self.fields['authority_hrn'].choices.extend(authority_hrn)
+#            self.fields['authority_hrn'] = forms.ChoiceField(
+#                widget    = forms.Select(attrs={'class':'form-control'}),
+#                choices   = authority_hrn,
+#                help_text = "An authority responsible for vetting your slice")
 
 
 class PasswordResetForm(forms.Form):
@@ -170,28 +187,31 @@ class PasswordResetForm(forms.Form):
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        from django.core.mail import send_mail
-        for user in self.users_cache:
-            if not domain_override:
-                current_site = get_current_site(request)
-                site_name = current_site.name
-                domain = current_site.domain
-            else:
-                site_name = domain = domain_override
-            c = {
-                'email': user.email,
-                'domain': domain,
-                'site_name': site_name,
-                'uid': int_to_base36(user.pk),
-                'user': user,
-                'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
-            }
-            subject = loader.render_to_string(subject_template_name, c)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            email = loader.render_to_string(email_template_name, c)
-            send_mail(subject, email, from_email, [user.email])
+        from django.core.mail import send_mail,EmailMultiAlternatives
+        try:        
+            for user in self.users_cache:
+                if not domain_override:
+                    current_site = get_current_site(request)
+                    site_name = current_site.name
+                    domain = current_site.domain
+                else:
+                    site_name = domain = domain_override
+                c = {
+                    'email': user.email,
+                    'domain': domain,
+                    'site_name': site_name,
+                    'uid': int_to_base36(user.pk),
+                    'user': user,
+                    'token': token_generator.make_token(user),
+                    'protocol': use_https and 'https' or 'http',
+                }
+                subject = loader.render_to_string(subject_template_name, c)
+                # Email subject *must not* contain newlines
+                subject = ''.join(subject.splitlines())
+                email = loader.render_to_string(email_template_name, c)
+                send_mail(subject, email, from_email, [user.email])
+        except Exception as e:
+            logger.error("Failed to send email, please check the mail templates and the SMTP configuration of your server")
 
 
 class SetPasswordForm(forms.Form):

@@ -1,0 +1,80 @@
+<div class="container-fluid">
+<div class="col-md-12">
+	<h2>From your authorities</h2>
+</div>
+{% if my_authorities %}
+<div class="col-md-12">
+	<table class="table requests">
+	    <thead>
+        <tr>
+            <th>ID</th>
+            <th></th>
+            <th>Type</th>
+            <th>Authority</th>
+            <th>Info</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+	{% for authority, requests in my_authorities.items %}
+	
+        {% for request in requests %}
+        
+        {% if request.type == 'user' %}
+    	<tr>
+    	{% elif request.type == 'slice' %}
+    	<tr class="info">
+    	{% else %}
+    	<tr class="active">
+    	{% endif %}
+    	    <td><span class="gray small">{{ request.id }}</span></td>
+    	    <td>
+            {% if request.allowed == 'allowed' %}
+            <input class='portal__validate__checkbox' id='portal__validate__checkbox__{{request.type}}__{{request.id}}' type='checkbox'/>
+            {% else %}
+                {% if request.allowed == 'expired' %}expired{% else %}denied{% endif %}
+            {% endif %}
+            </td>
+            <td><span class="type">{{ request.type }}</span></td>
+    	    <td><i>{{authority}}{{request.site_authority}}</i></td>
+    		<td>
+            {% if request.type == 'user' %}
+                <b>{{request.first_name}} {{request.last_name}}</b> &lt;<a href="mailto:{{request.email}}">{{request.email}}</a>&gt;
+            {% elif request.type == 'slice' %}
+            <b>{{request.slice_name}}</b> -- Number of nodes: {{request.number_of_nodes}} -- Type of nodes: {{request.type_of_nodes}} -- Purpose: {{request.purpose}}
+            {% elif request.type == 'project' %}
+            <b>{{request.project_name}}</b>  -- {{ request.user_hrn }} -- Purpose: {{request.purpose}}
+            {% elif request.type == 'join' %}
+            <b>{{request.user_hrn}}</b> --  to join {{ request.authority_hrn }}
+            {% else %}
+            <b>{{request.site_name}}</b> ({{request.site_authority}}) -- {{request.address_city}}, {{request.address_country}}
+            {% endif %}
+    		</td>
+    		<td>{{ request.timestamp }}</td>
+    		
+    		<td>
+            <span id='portal__status__{{request.type}}__{{request.id}}'></span>
+            <div id='{{request.type}}__{{request.id}}-status-loading' style="display:none;"><img src="{{ STATIC_URL }}img/loading.gif"></div>
+            </td>
+    
+        <!--<div class='portal_validate_request {{request.type}} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}'> -->
+    	  </tr>
+    
+        {% endfor %}
+    	
+	{% endfor %}
+	   </tbody>
+    </table>
+   </div>
+{% else %}
+	<div class="col-md-12">
+		<i>There is no pending request waiting for validation.</i>
+	</div>
+{% endif %}
+</div>
+<br />
+<div class="col-md-12">
+	<button class="btn btn-onelab" type="button" id="portal__validate" onclick="on_click_event();"><span class="glyphicon glyphicon-ok"></span> Validate</button>
+	<button class="btn btn-danger" type="button" id="portal__reject" onclick="on_click_reject();"><span class="glyphicon glyphicon-remove"></span> Reject</button>
+</div>

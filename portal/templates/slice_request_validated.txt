@@ -1,0 +1,17 @@
+ne
+Dear {{theme.{{theme.label}}} user,
+
+You have recently requested a slice in the {{theme.label}} portal.
+
+Slice name      : {{slice_name}}
+URL             : {{number_of_nodes}}
+Purpose         : {{purpose}}
+
+
+We are pleased to inform you that a manager from your institution has validated your slice request on the {{theme.label}} portal. You can now add resources to you slice and start experimenting.
+
+We wish you a fruitful user experience with the {{theme.label}} portal.             
+                                                                                    
+Yours sincerely,                                                                
+The {{theme.label}} team                                                       
+

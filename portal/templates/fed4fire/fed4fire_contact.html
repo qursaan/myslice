@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+	<h1><img src="{{ STATIC_URL }}icons/support-xs.png" alt="Open a Ticket" />Contact us</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">&nbsp;</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+	<p>	Please check our <a href="http://doc.fed4fire.eu" target="_blank">documentation.</a> 
+		Most of the basic problems are explained there.	
+	</p>
+	<p>
+		If you have problems using the portal, please check our <a href="/portal/support">FAQ</a> section.
+	</p>	
+	<p>
+		If you haven't find your answes in the FAQ, please contact us by filling the form below.<br />
+		You can also <a href="mailto:contact@fed4fire.eu">e-mail</a> us directly.
+	</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-4">
+		<form role="form" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+	    <div class="form-group">
+	      	<label for="{{ field.html_name }}" class="control-label">{{ field.label }}</label>
+	      	{{ field.errors }} {{ field }}
+	    </div>
+	    {% endfor %}
+		<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+</div>
+{% endblock %}
+

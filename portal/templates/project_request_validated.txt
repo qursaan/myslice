@@ -1,0 +1,15 @@
+Dear {{theme.label}} user,
+
+You have recently requested a project in the {{theme.label}} portal.
+
+Project name  : {{project_name}}
+Authority     : {{authority_hrn}}
+Email         : {{email}}
+Purpose       : {{purpose}}
+
+We are pleased to inform you that a manager from your institution has validated your project request on the {{theme.label}} portal. You can now create slices and start experimenting.
+
+We wish you a fruitful user experience with the {{theme.label}} portal.
+
+Yours sincerely,
+The {{theme.label}} team

@@ -1,8 +1,18 @@
 NEW USER REQUEST
 
-First Name   : {{first_name}}
-Last Name    : {{last_name}} 
+You are receiving this request because we have you listed as a manager at an organization that uses {{theme.label}}. 
+If you believe that you have received this message in error, or if you have any questions, kindly contact support@{{theme.theme}}.eu.
+
+First name   : {{first_name}}
+Last name    : {{last_name}} 
 Authority hrn: {{authority_hrn}}
 Public key   : {{public_key}}
 Email        : {{email}}
-User Hrn     : {{user_hrn}}
+User hrn     : {{user_hrn}}
+Portal url   : {{ current_site }}
+
+You can see new user request in the portal: {{current_site}}/portal/institution#requests
+
+
+Yours sincerely,      
+The {{theme.label}} team

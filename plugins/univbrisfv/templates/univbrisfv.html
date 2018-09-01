@@ -1,0 +1,42 @@
+<html>
+<div id='main-{{ domid }}' class='univbrisfoam-spacer'>
+ <form id="uob_fv_form">
+  <table class='table table-striped table-bordered dataTable' id='{{domid}}__table'>
+    <thead>
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %}
+      </tr>
+    </thead> 
+    <tbody>
+    </tbody> 
+    <tfoot> 
+      <tr>
+        {% for column in columns %} <th>{{ column }}</th> {% endfor %} 
+        {% for column in hidden_columns %} <th>{{ column }}</th> {% endfor %} 
+      </tr>
+    </tfoot> 
+  </table>
+  <table class = 'table tbbuttons' align="center" id='uob_fv_form_buttons'>
+  	<tr>
+		<td align="center"><button id="add_flowspace" type="button" style="height: 25px; width: 300px;" onclick="fnAddflowspace()">Define another packet  flowspace</button></td>
+
+		<td align="center"><button id="add_opt_flowspace" type="button" style="height: 25px; width: 300px" onclick="fnAddcflowspace()">Define another optical  flowspace1111</button></td>'
+
+	</tr>
+
+	<tr>
+
+		<td align="left"><font color="#FF0000">Define controller location</font>
+			<p>input format should be tcp:hostname:port or ssl:hostname:port</p></td>
+		
+		<td align="center"><input type="text" id="controller_loc" style="height: 25px; width: 300px;" title="Input format should be tcp:hostname:port or ssl:hostname:port"></td>
+	</tr>
+	<tr>
+		
+		<td align="center" colspan="2"><button id="submit_flowspace" type="button" style="height: 25px; width: 300px" onclick="fnButsubmit()"> Submit flowspaces</button></td>
+	</tr>
+</table>
+ </form>
+</div>
+</html>

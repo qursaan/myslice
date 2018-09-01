@@ -1,101 +1,87 @@
-{% extends "layout-unfold1.html" %}
+{% extends "layout.html" %}
 {% load i18n %}
 
-{% block head %}
-{{ wizard.form.media }}
-{% endblock %}
-
-{% block unfold_main %}
-
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
-<!-- xxx ideally only onelab.css but ... xxx -->
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/registration.css" />
-
-<div class="onelab-title well-lg">
-  <h2>Request a Slice</h2>
-</div>
-
-{% if errors %}
-<ul>
-  {% for error in errors %}
-  <li>{{ error }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-<div class='well'>
-  <form id="commentForm" class="form-horizontal" action="" method="post" role="form">{% csrf_token %}
-  <fieldset>
-
-   <div class="form-group">
-     <label for="email" class="col-xs-2 control-label">Experimenter</label>
-     <div class="col-xs-4">
-        <label class="col-xs-2 control-label" style="height:34px;">{{ email }}</label>
-     </div>
-     <div class="col-xs-6"> <p class="form-hint">Experimenter requesting a Slice</p> </div>
-   </div>
-
-   <div class="form-group">
-     <label for="slice_name" class="col-xs-2 control-label">Slice Name</label>
-     <div class="col-xs-4">
-        <input type="text" name="slice_name" class="form-control" minlength="2" value="{{ slice_name }}" placeholder="Slice Name" required />
-     </div>
-     <div class="col-xs-6"> <p class="form-hint">The name of the slice you wish to create</p> </div>
-   </div>
-
-   <div class="form-group">
-     <label for="authority_hrn" class="col-xs-2 control-label">Authority</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <input id="authority_hrn" name="authority_hrn" class="form-control" value="{{ authority_hrn }}" placeholder="Authority" required />
-       </div>
-    </div>
-     <div class="col-xs-6"><p class="form-hint">An authority responsible for vetting your slice</p></div>
-   </div>
-
-   <div class="form-group">
-     <label for="number_of_nodes" class="col-xs-2 control-label">Number of nodes</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <input id="number_of_nodes" name="number_of_nodes" class="form-control" value="{{ number_of_nodes }}" />
-       </div>
-    </div>
-     <div class="col-xs-6"><p class="form-hint">Number of nodes you expect to request (informative)</p></div>
-   </div>
-
-   <div class="form-group">
-     <label for="purpose" class="col-xs-2 control-label">Experiment purpose</label>
-     <div class="col-xs-4">
-       <div class="ui-widget">
-           <textarea id="purpose" name="purpose" class="form-control" style="height:110px;" placeholder="Purpose" required>{{ purpose }}</textarea>
-       </div>
-    </div>
-     <div class="col-xs-6"><p class="form-hint">Purpose of your experiment (informative)</p></div>
-   </div>
-
-   <button class="submit btn btn-default col-xs-12" type="submit">Request Slice</button>
-  </fieldset>
-  </form>
-</div>
-
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			 <div class="breadcrumbs" style="line-height: 3;">
+			 	 Experiment &nbsp;>&nbsp; Request a new Slice
+			 </div>
+		</div>
+	</div>
+	
+	{% if errors %}
+	<div class="row">
+		<div class="col-md-12">
+		<ul class="error">
+		  {% for error in errors %}
+		  <li>{{ error }}</li>
+		  {% endfor %}
+		</ul>
+		</div>
+	</div>
+	{% endif %}
+	
+	<div class="row">
+		<div class="col-md-5 col-md-offset-3">
+			<form role="form" method="post">
+			{% csrf_token %}
+			  <div class="form-group">
+			     <input type="hidden" id="email" value="{{ email }}" readonly="readonly">
+			     <label>
+			         Please enter a name for your slice <br />
+			         <span class="sublabel">
+			             The slice name should only contain letters, numbers and the underscore "_" (19 max length) <br />
+			         </span>
+			     </label>
+			     <input type="text" class="form-control" name="slice_name" id="slice_name" maxlength="19" style="width:100%" placeholder="Slice name" value="{{slice_name}}" required="required">
+			  </div>
+			  <div class="form-group">
+			      <label>
+			          Select a project under which you want your slice to be created <br />
+			          If your are not part of any projects you can <a href="/portal/project_request/">join or create one</a>
+			      </label>
+				<input type="text" class="form-control" id="authority_hrn" name="org_name" style="width:100%" placeholder="Project" 
+				        title="Select a project under which you want to create your slice" required="required">
+			  </div>
+              <!--  
+			  <div class="form-group">
+			      <label>
+			          Provide an URL for your experiment (not required)
+			      </label>
+			       <input type="text" class="form-control" name="url" id="url" style="width:100%" placeholder="Experiment URL (if one exists)"
+				        title="Please provide the url of your experiment" value="{{url}}">
+			  </div>
+			  <div class="form-group">
+			      <label>
+                        Please provide a description of the purpose for your experiment
+                   </label>
+			  	  <textarea id="purpose" name="purpose" class="form-control" rows="6" placeholder="Experiment description" style="width:100%" 
+				        title="Description of your experiment" required="required">{{ purpose }}</textarea>
+			  </div> -->
+			  <button type="submit" id=submit_pi class="btn btn-onelab"><span class="glyphicon glyphicon-plus"></span> Create slice</button>
+			</form>
+	
+		</div>
+	</div>
+		
 <script>
 jQuery(document).ready(function(){
-    var availableTags = [
-     {% if authorities %}
-         {% for authority in authorities %}
-             {% if authority.name %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.name}}"},
-             {% else %}
-                 {value:"{{ authority.authority_hrn }}",label:"{{authority.authority_hrn}}"},
-             {% endif %}
-         {% endfor %}    
-     {% else %}
-         {value:"",label:"No authority found !!!"}
-     {% endif %}
-    ];
+    var myprojects = JSON.parse(localStorage.getItem('projects'));
     $( "#authority_hrn" ).autocomplete({
-      source: availableTags,
-      select: function( event, ui ) {console.log(jQuery(this))}
+        minLength: 0,
+        source: myprojects,
+        change: function (event, ui) {
+                if(!ui.item){
+                    //http://api.jqueryui.com/autocomplete/#event-change -
+                    // The item selected from the menu, if any. Otherwise the property is null
+                    //so clear the item for force selection
+                    $("#authority_hrn").val("");
+                }
+        }
+    }).bind('focus', function(){ $(this).autocomplete("search"); } );
+    $('input[name=slice_name]').keyup(function(){
+        this.value = this.value.toLowerCase();
     });
 });
 </script>

@@ -1,11 +1,8 @@
-import json
 from django.template                 import RequestContext
 from django.shortcuts                import render_to_response
 
-from unfold.loginrequired            import LoginRequiredAutoLogoutView
-
-from unfold.page                     import Page
 from manifold.core.query             import Query, AnalyzedQuery
+<<<<<<< HEAD
 from manifold.manifoldapi            import execute_query
 
 from ui.topmenu                      import topmenu_items_live, the_user
@@ -268,10 +265,17 @@ class SliceView (LoginRequiredAutoLogoutView):
             query_all_resources = query_resource_all,
             query_lease = sq_lease,
             )
+=======
+from manifoldapi.manifoldapi         import execute_query
 
-       # with the new 'Filter' stuff on top, no need for anything but the querytable
-        resources_as_list_area = resources_as_list 
+from django.views.generic.base      import TemplateView
+>>>>>>> onelab
 
+from unfold.loginrequired           import LoginRequiredView
+from django.http import HttpResponse
+from django.shortcuts import render
+
+<<<<<<< HEAD
         resources_sons = [
             resources_as_gmap, 
             resources_as_3dmap,
@@ -375,81 +379,22 @@ class SliceView (LoginRequiredAutoLogoutView):
             slicename = slicename,
             o = 'arb'
         )
+=======
+from unfold.page                     import Page
+from manifold.core.query             import Query, AnalyzedQuery
+from manifoldapi.manifoldapi         import execute_query
+import json
+from myslice.theme import ThemeView
+>>>>>>> onelab
 
-        tab_measurements = Tabs ( page=page,
-                                domid = "measurements",
-                                togglable = True,
-                                toggled = 'persistent',
-                                title = "Measurements",
-                                outline_complete=True,
-                                sons = [ measurements_stats_cpu, measurements_stats_mem, measurements_stats_asb, measurements_stats_arb ],
-                                active_domid = 'resources-stats-cpu',
-                                persistent_active = True,
-                                )
-        main_stack.insert (tab_measurements)
-        
-#        tab_measurements = Tabs (
-#            page                = page,
-#            active_domid        = 'measurements-list',
-#            outline_complete    = True,
-#            togglable           = True,
-#            title               = 'Measurements',
-#            domid               = 'measurements',
-#        )
-#        main_stack.insert(tab_measurements)
-#    
-#        tab_measurements.insert(QueryTable( 
-#            page        = page,
-#            title       = 'Measurements',
-#            domid       = 'measurements-list',
-#            # tab's sons preferably turn this off
-#            togglable   = False,
-#            # this is the query at the core of the slice list
-#            query       = sq_measurement,
-#            # do NOT set checkboxes to False
-#            # this table being otherwise empty, it just does not fly with dataTables
-#            checkboxes  = True,
-#            datatables_options = { 
-#                'iDisplayLength' : 25,
-#                'bLengthChange'  : True,
-#                'bAutoWidth'     : True,
-#            },
-#        ))
-#    
-#        # --------------------------------------------------------------------------
-#        # MESSAGES (we use transient=False for now)
-        if insert_messages:
-            main_stack.insert(Messages(
-                    page   = page,
-                    title  = "Runtime messages for slice %s"%slicename,
-                    domid  = "msgs-pre",
-                    levels = "ALL",
-                    # plain messages are probably less nice for production but more reliable for development for now
-                    transient = False,
-                    # these make sense only in non-transient mode..
-                    togglable = True,
-                    toggled = 'persistent',
-                    outline_complete = True,
-                    ))
+class SliceView (LoginRequiredView, ThemeView):
+    template_name = "slice-view.html"
     
-        # variables that will get passed to the view-unfold1.html template
-        template_env = {}
-        
-        # define 'unfold_main' to the template engine - the main contents
-        template_env [ 'unfold_main' ] = main_stack.render(request)
-    
-        # more general variables expected in the template
-        template_env [ 'title' ] = '%(slicename)s'%locals()
-        # the menu items on the top
-        template_env [ 'topmenu_items' ] = topmenu_items_live('Slice', page) 
-        # so we can sho who is logged
-        template_env [ 'username' ] = the_user (request) 
-    
-        # don't forget to run the requests
-        page.expose_js_metadata()
-        # the prelude object in page contains a summary of the requirements() for all plugins
-        # define {js,css}_{files,chunks}
-        template_env.update(page.prelude_env())
+    def get(self, request, slicename):
 
-        return render_to_response ('view-unfold1.html',template_env,
-                                   context_instance=RequestContext(request))
+        return render_to_response(self.template,
+                                  {"slice" : slicename,
+                                   "theme" : self.theme,
+                                   "username" : request.user,
+                                   "section" : "Slice {}".format(slicename),'request':request },
+                                  context_instance=RequestContext(request))

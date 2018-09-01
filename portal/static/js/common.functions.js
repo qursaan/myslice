@@ -19,13 +19,13 @@ function getKeySplitId(id,separator){
 if ( typeof String.prototype.startsWith != 'function' ) {
   String.prototype.startsWith = function( str ) {
     return this.substring( 0, str.length ) === str;
-  }
+  };
 };
 
 if ( typeof String.prototype.endsWith != 'function' ) {
   String.prototype.endsWith = function( str ) {
     return this.substring( this.length - str.length, this.length ) === str;
-  }
+  };
 };
 // http://stackoverflow.com/questions/646628/javascript-startswith
 
@@ -58,15 +58,19 @@ jQuery.fn.spin = function(opts) {
 // FROM Triptych : http://stackoverflow.com/users/43089/triptych
 // http://stackoverflow.com/questions/979256/how-to-sort-an-array-of-javascript-objects
 // data.sort(sort_by('city', false, function(a){return a.toUpperCase()}));
-var sort_by = function(field, reverse, primer){
+var sort_by = function(field, reverse, primer) {
 
-   var key = function (x) {return primer ? primer(x[field]) : x[field]};
+   var key = function(x) { return primer ? primer(x[field]) : x[field]; };
    //var key = primer ? function (x) { return primer(x[field]); } : function (x) { return x[field]; }
    
-   return function (a,b) {
+   return function(a,b) {
        var A = key(a), B = key(b);
        return (A < B ? -1 : (A > B ? 1 : 0)) * [1,-1][+!!reverse];
        //return ((A < B) ? -1 :
        //        (A > B) ? +1 : 0)) * [-1,1][+!!reverse];                  
-   }
+   };
+};
+
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }

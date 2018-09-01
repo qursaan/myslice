@@ -1,0 +1,71 @@
+{% load portal_filters %}
+<div class="header">
+<div class="container">
+	<div class="row">
+		<div class="col-sm-3 col-md-3 logo">
+			<a href="/"><img height="60" src="{{ STATIC_URL }}img/SmartFIRE_logo.png" alt="SmartFIRE | sinis.ipv6.lip6.fr Portal - SmartFIRE" /></a>
+		</div>
+		{% if username %}
+		<div class="col-sm-4 col-md-4 navigation">
+			<ul>
+				<li>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	       				EXPERIMENT <span class="caret"></span>
+	    			</a>
+					
+					<div class="dropdown-menu" style="z-index:99;">
+							<ul id="dropdown-slice-list">
+								<li class="title"><a href="/portal/slice_request/">Request Slice</a></li>
+							</ul>
+					</div>
+				</li>
+                {% if request.session.user.pi %}
+				<li id="nav-institution" class=""><a href="/institution">MANAGEMENT</a></li>
+				 {%endif%}
+				<li><a href="/support/">SUPPORT</a></li>
+			</ul>
+		</div>
+		{% else %}
+		<div class="col-sm-4 col-md-4 navigation">
+		</div>
+		{% endif %}
+		<div class="col-sm-5 col-md-5 secondary">
+			<ul>
+				
+				<!--<li><a target="_blank" href="http://status.testbeds.eu">Services Status</a></li> -->
+				<li><a target="_blank" href="http://eukorea-fire.eu">Web site</a></li>
+			</ul>
+			{% if username %}
+			<div class="account">You are logged in as &nbsp;<a href="/account/">{{ username }}</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a id="logout" style="cursor:pointer;" data-username="{{ username }}"><span class="glyphicon glyphicon-off"></span> Logout</a></div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="row">
+{% widget '_widget-message.html' %}
+</div>
+<script>
+	$(document).ready(function() {
+		$('li.slices').mouseenter(function() {
+			$('div#menu-slice-list').fadeIn(100);
+		});
+		$('div#menu-slice-list').mouseleave(function(e) {
+			if (!$('li.slices').is(":hover")) {
+				$(this).fadeOut(100);
+			}
+		});
+		// var slices = localStorage.getItem('slices');
+		// if (slices.length == 0) {
+			// $.post("/rest/user/",{'filters':{'user_hrn':'$user_hrn'}}, function( data ) {
+		  	// var items = [];
+		  		// localStorage.setItem('slices', data[0].slice);
+			// });
+		// }
+		// $.each(slices, function( key, val ) {
+		  	// items.push( "<li><a href=\"/slice/"+val.slice_hrn+"\">" + val.slice_hrn + "</a></li>" );
+		// });
+		// $("div#home-slice-list").html($( "<ul/>", { html: items.join( "" ) }));
+	});
+</script>

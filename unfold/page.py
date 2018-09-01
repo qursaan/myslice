@@ -6,11 +6,13 @@ import json
 
 from django.template.loader import render_to_string
 
-from manifold.metadata import MetaData
+from manifoldapi.metadata import MetaData
 
 from unfold.prelude import Prelude
-
+from unfold.sessioncache import SessionCache
+    
 from myslice.configengine import ConfigEngine
+from myslice.settings import logger
 
 # decorator to deflect calls on this Page to its prelude
 def to_prelude (method):
@@ -106,22 +108,33 @@ class Page:
 
         # if cached, use it
         if 'metadata' in manifold and isinstance(manifold['metadata'],MetaData):
-            if debug: print "Page.get_metadata: return cached value"
+
+#         cached_metadata = SessionCache().get_metadata(self.request)
+#         if cached_metadata and isinstance(cached_metadata, MetaData):
+            logger.debug("Page.get_metadata: return cached value")
             return manifold['metadata']
+#             return cached_metadata
 
         metadata_auth = {'AuthMethod':'anonymous'}
 
-        metadata=MetaData (metadata_auth)
+        from myslice.settings import config
+        url = config.manifold_url()
+        metadata = MetaData(url, metadata_auth)
         metadata.fetch(self.request)
         # store it for next time
-        manifold['metadata']=metadata
-        if debug: print "Page.get_metadata: return new value"
+        manifold['metadata']=metadata.to_json()
+#         SessionCache().store_metadata(self.request, metadata)
+        logger.debug("Page.get_metadata: return new value")
         return metadata
             
     def expose_js_metadata (self):
         # expose global MANIFOLD_METADATA as a js variable
         # xxx this is fetched synchroneously..
         self.add_js_init_chunks("var MANIFOLD_METADATA =" + self.get_metadata().to_json() + ";\n")
+
+    def expose_js_var(self, name, value):
+        # expose variable as a js value
+        self.add_js_init_chunks("var " + name + "=" + value + ";\n")
 
     def expose_js_manifold_config (self):
         self.add_js_init_chunks(ConfigEngine().manifold_js_export())

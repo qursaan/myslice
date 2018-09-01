@@ -1,38 +1,76 @@
-# Django settings for unfold project.
-
 import os.path
+import logging
+import subprocess
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
-# compute ROOT from where this file is installed
-# should fit every need including developers
-# but you can redefine ROOT if that's not working for you
+logger = logging.getLogger('myslice')
+
+# ROOT
 try:
-    # get the directory where this file is
-    ROOT=os.path.dirname(__file__) or '.'
-    # move one step up
-    ROOT=os.path.realpath(ROOT+'/..')
+    ROOT = os.path.realpath(os.path.dirname(__file__) + '/..')
 except:
-    # something is badly wrong here
-    ROOT=None
     import traceback
-    traceback.print_exc()
+    logger.error(traceback.format_exc())
 
-# find out HTTPROOT, which is different from ROOT 
-# when deployed from a package
-# this code is run by collectstatic too, so we cannot
-# assume we have ./static present already
-HTTPROOT="/usr/share/unfold"
-# the place to store local data, like e.g. the sqlite db
-DATAROOT="/var/unfold"
-# if not there, then we assume it's from a devel tree
-if not os.path.isdir (os.path.join(HTTPROOT,"static")):
-    HTTPROOT=ROOT
-    DATAROOT=ROOT
 
-if not os.path.isdir(ROOT): raise Exception,"Cannot find ROOT %s for unfold"%ROOT
-if not os.path.isdir(HTTPROOT): raise Exception,"Cannot find HTTPROOT %s for unfold"%HTTPROOT
+from myslice.configengine import ConfigEngine
+
+config = ConfigEngine()
+
+import myslice.components as components
+
+# import djcelery
+# djcelery.setup_loader()
+
+### detect if we're in a build environment
+try:
+    import manifold
+    building=False
+except:
+    building=True
+
+if not config.myslice.portal_version:
+    try:
+        v = subprocess.check_output(["git", "--git-dir", ROOT + "/.git", "describe"])
+        PORTAL_VERSION = '-'.join(v.split('-')[:-1])
+    except:
+        PORTAL_VERSION = 'not using git' 
+
+# DEBUG
+if config.myslice.debug :
+    DEBUG = True
+    INTERNAL_IPS = ("127.0.0.1","132.227.84.195","132.227.78.191","132.227.84.191")
+else :
+    DEBUG = False
+
+# theme
+if config.myslice.theme :
+    theme = config.myslice.theme
+else :
+    theme = None
+
+if config.myslice.theme_label :
+    theme_label = config.myslice.theme_label
+else :
+    theme_label = theme
+
+if config.myslice.theme_logo :
+    theme_logo = config.myslice.theme_logo
+else :
+    theme_logo = theme + '.png'
+
+# HTTPROOT
+if config.myslice.httproot :
+    HTTPROOT = config.myslice.httproot
+else :
+    HTTPROOT = ROOT
+
+# DATAROOT
+if config.myslice.httproot :
+    DATAROOT = config.myslice.dataroot
+else :
+    DATAROOT = ROOT
+
 
 # dec 2013 - we currently have 2 auxiliary subdirs with various utilities
 # that we do not wish to package 
@@ -53,6 +91,9 @@ MANAGERS = ADMINS
 #DEFAULT_FROM_EMAIL = "root@theseus.ipv6.lip6.fr"
 #EMAIL_HOST_PASSWORD = "mypassword"
 
+if config.myslice.default_sender:
+    DEFAULT_FROM_EMAIL = config.myslice.default_sender
+
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -69,16 +110,32 @@ EMAIL_USE_TLS = False
 #    EMAIL_USE_TLS = False
 #    DEFAULT_FROM_EMAIL = 'testing@example.com'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(DATAROOT,'unfold.sqlite3'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+if config.database.engine : 
+    DATABASES = {
+        'default': {
+            'ENGINE'    : 'django.db.backends.%s' % config.database.engine,
+            'USER'      : config.database.user or '',
+            'PASSWORD'  : config.database.password or '',
+            'HOST'      : config.database.host or '',
+            'PORT'      : config.database.port or '',
+        }
     }
-}
+    if config.database.engine == 'sqlite3' :
+        DATABASES['default']['NAME'] = os.path.join(DATAROOT,'%s.sqlite3' % config.database.name)
+    else :
+        DATABASES['default']['NAME'] = config.database.name
+else :
+    # default database is sqlite
+    DATABASES = {
+        'default': {
+            'ENGINE'    : 'django.db.backends.sqlite3',
+            'NAME'      : os.path.join(DATAROOT,'myslice.sqlite3'),
+            'USER'      : '',
+            'PASSWORD'  : '',
+            'HOST'      : '',
+            'PORT'      : '',
+        }
+    }
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -118,10 +175,6 @@ MEDIA_URL = ''
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(HTTPROOT,'static')
 
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
-
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -147,18 +200,14 @@ STATICFILES_FINDERS = (
 ###    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-#TEMPLATE_CONTEXT_PROCESSORS = (
-#    'django.contrib.auth.context_processors.auth',
-#    'django.core.context_processors.debug',
-#    'django.core.context_processors.i18n',
-#    'django.core.context_processors.media',
-#    'django.core.context_processors.static',
-#    'django.core.context_processors.request',
-#    'django.contrib.messages.context_processors.messages',
-#)
+if config.myslice.secret_key:
+    # Make this unique, and don't share it with anybody.
+    SECRET_KEY = config.myslice.secret_key
+else:
+    raise Exception, "SECRET_KEY Not defined: Please setup a secret_key value in myslice.ini"
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 't%n(3h)&amp;r^n8(+8)(sp29t^$c2#t(m3)e2!02l8w1#36tl#t27'
+AUTHENTICATION_BACKENDS = ('localauth.manifoldbackend.ManifoldBackend',
+                           'django.contrib.auth.backends.ModelBackend')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -182,14 +231,16 @@ ROOT_URLCONF = 'myslice.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'unfold.wsgi.application'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(HTTPROOT,"templates"),
-)
+TEMPLATE_DIRS = []
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
+if theme is not None:
+    TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"portal/templates", theme) )
+TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"portal/templates") )
+TEMPLATE_DIRS.append( os.path.join(HTTPROOT,"templates") )
 
-INSTALLED_APPS = [
+INSTALLED_APPS = [ 
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -202,22 +253,41 @@ INSTALLED_APPS = [
     # our django project
     'myslice',
     # the core of the UI
-    'auth', 'manifold', 'unfold',
+    'localauth', 
+    'manifoldapi',
+    'unfold',
     # plugins
     'plugins',
     # views - more or less stable 
     'ui',
-    # managing database migrations
-    'south', 
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
+	# FORGE Plugin app
+# 	'djcelery',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'portal',
+    #'debug_toolbar',
 ]
+# with django-1.7 we leave south and use native migrations
+# managing database migrations
+import django
+major, minor, _, _, _ = django.VERSION
+if major == 1 and minor <= 6:
+    INSTALLED_APPS.append('south')
+
+# this app won't load in a build environment
+if not building:
+    INSTALLED_APPS.append ('rest')
+
+for component in components.list() :
+    INSTALLED_APPS.append(component)
+
+BROKER_URL = "amqp://myslice:myslice@localhost:5672/myslice"
+
 for aux in auxiliaries:
     if os.path.isdir(os.path.join(ROOT,aux)): 
-        print "Using devel auxiliary",aux
+        logger.info("Using devel auxiliary {}".format(aux))
         INSTALLED_APPS.append(aux)
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
@@ -250,15 +320,60 @@ LOGGING = {
         },
     }
 }
-
-AUTHENTICATION_BACKENDS = ( 'auth.manifoldbackend.ManifoldBackend','django.contrib.auth.backends.ModelBackend' )
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'debug':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'myslice': {
+            'handlers': ['debug'],
+            'propagate': True,
+            'level': 'DEBUG',
+        }
+    }
+}
 
 ### the view to redirect malformed (i.e. with a wrong CSRF) incoming requests
 # without this setting django will return a 403 forbidden error, which is fine
 # if you need to see the error message then use this setting
-CSRF_FAILURE_VIEW = 'manifold.manifoldproxy.csrf_failure'
+CSRF_FAILURE_VIEW = 'manifoldapi.manifoldproxy.csrf_failure'
 
 #################### for insert_above
 #IA_JS_FORMAT = "<script type='text/javascript' src='{URL}' />"
 # put stuff under static/
 # IA_MEDIA_PREFIX = '/code/'
+
+####SLA#####
+
+SLA_COLLECTOR_URL = "https://157.193.215.125:4001/sla-collector/sla"
+SLA_COLLECTOR_USER = "portal"
+SLA_COLLECTOR_PASSWORD = "password"
+
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
+
+# test
+ALLOWED_HOSTS = '*onelab.eu'

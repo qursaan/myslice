@@ -1,0 +1,12 @@
+#sla_dialog {
+  //margin-top: 2em;
+  margin-left: 1em;
+}
+
+#sla_offers div.row p {
+  line-height: 40px;
+}
+
+span.provider {
+  font-weight: bold;
+}

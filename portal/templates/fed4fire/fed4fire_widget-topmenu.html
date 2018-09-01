@@ -1,0 +1,62 @@
+
+<div id="header">
+    <div class="container">
+    <div class="row">
+        <div class="col-sm-4 col-md-4 logo">
+            <a href="/"><img src="{{ STATIC_URL }}img/f4f-logo.png" alt="Fed4Fire Portal" width="80px" /></a>
+        </div>
+        
+        
+	    <div id="secondary" class="col-sm-8 col-md-8 secondary">
+			<ul>
+				<li><a href="/portal/about">About</a></li>
+				<li><a href="http://doc.fed4fire.eu/">Documentation</a></li>
+				<li><a target="_blank" href="http://www.fed4fire.eu">Project website</a></li>
+			</ul>
+		</div>
+	</div>
+    </div>
+<div id="navigation">
+    <div class="container"> 
+	<div class="row">
+	   {% if username %}
+        <div class="col-md-12 navigation">
+            <ul>
+                <li><a href="/">DASHBOARD</a></li>
+                <li>|</li>
+                <!--<li id="nav-institution" class=""><a href="/portal/institution">AUTHORITY</a></li>-->
+                <li class="slices">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">SLICES <span class="caret"></span></a>
+                    
+                    <div class="dropdown-menu" style="z-index:99;">
+                            <ul id="dropdown-slice-list">
+                                <li><a href="/portal/slice_request/">Request Slice</a></li>
+                            </ul>
+                    </div>
+                    </li>
+                <li id="nav-service"><a href="/portal/servicedirectory">SERVICES</a></li>
+                <li id="nav-support"><a href="http://doc.fed4fire.eu/support.html">SUPPORT</a></li>
+                <li>|</li>
+                <li id="nav-account"><a href="/portal/account/">{{ username }}</a></li>
+                <li id="nav-logout"><span class="glyphicon glyphicon-off iconlogout"></span> <a id="logout" data-username="{{ username }}" href="#">LOGOUT</a></li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="col-sm-4 col-md-4 navigation">
+        </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+<script>
+	$(document).ready(function() {
+		$('li.slices').mouseenter(function() {
+			$('div#menu-slice-list').fadeIn(100);
+		});
+		$('div#menu-slice-list').mouseleave(function(e) {
+			if (!$('li.slices').is(":hover")) {
+				$(this).fadeOut(100);
+			}
+		});
+	});
+</script>

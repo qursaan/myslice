@@ -3,16 +3,19 @@ Maintainer: Thierry Parmentelat <Thierry.Parmentelat@inria.fr>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
+# hopefully we do not need manifold at build-time 
 Build-Depends: devscripts, debhelper (>=7.0.50~), debconf, dpatch, python-setuptools, make, python-django
 X-Python-Version: >= 2.7
-
-Package: myslice
-Architecture: any
-Depends: unfold, python-django-south
-Description: Myslice plugins, based on django and unfold frontend
 
 # Thierry: the recipe I'm using somehow only works with several packages
 Package: unfold
 Architecture: any
 Depends: python, python-django, python-pyparsing, apache2, libapache2-mod-wsgi, openssl
 Description: Generic django-based frontend for manifold backends
+
+#
+Package: myslice
+Architecture: any
+Depends: python-django-south, unfold, manifold
+Description: Myslice plugins, based on django and unfold frontend
+

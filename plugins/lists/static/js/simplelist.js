@@ -138,8 +138,9 @@
 	},
     
 	// hard-wire a separate presentation depending on the key being used....
+   // XXX Hardcoded key
 	_cell: function (key, value) {
-            if (key == 'slice.slice_hrn') {
+            if (key == 'slices.slice_hrn') {
 		return "<i class='icon-play-circle'></i><a href='/portal/slice/" + value + "'>" + value + "</a>";
             } else if (key == 'platform') {
 		return "<i class='icon-play-circle'></i><a href='/portal/platform/" + value + "'>" + value + "</a>";

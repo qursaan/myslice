@@ -1,5 +1,7 @@
 from unfold.plugin import Plugin
 
+from myslice.settings import logger
+
 class QueryTable (Plugin):
 
     """A plugin for displaying a query as a list
@@ -33,6 +35,7 @@ Current implementation makes the following assumptions
   as we use 'aoColumnDefs' instead.
 """
 
+
     def __init__ (self, query=None, query_all=None, 
                   checkboxes=False, columns=None, 
                   init_key=None,
@@ -43,20 +46,38 @@ Current implementation makes the following assumptions
         self.query_all      = query_all
         self.query_all_uuid = query_all.query_uuid if query_all else None
         self.checkboxes     = checkboxes
+
         # XXX We need to have some hidden columns until we properly handle dynamic queries
         if columns is not None:
-            self.columns=columns
-            self.hidden_columns = []
+            _columns = columns
+            _hidden_columns = []
         elif self.query:
-            self.columns = self.query.fields
+            logger.debug("self.query.fields = {}".format(self.query_all.fields))
+            # Columns displayed by default
+            if self.default_fields is not None:
+                _columns = [field for field in self.default_fields if not field == 'urn']
+            else:
+                _columns = [field for field in self.query.fields if not field == 'urn']
             if query_all:
                 # We need a list because sets are not JSON-serializable
-                self.hidden_columns = list(self.query_all.fields - self.query.fields)
+                if self.default_fields is not None:
+                    logger.debug(self.query_all.fields)
+                    _hidden_columns = list(self.query_all.fields - set(self.default_fields))
+                else:
+                    _hidden_columns = list(self.query_all.fields - self.query.fields)
+                _hidden_columns.append('urn')
             else:
-                self.hidden_columns = []
+                _hidden_columns = []
         else:
-            self.columns = []
-            self.hidden_columns = []
+            _columns = []
+            _hidden_columns = []
+
+        logger.debug("_columns={}".format(_columns))
+        self.columns = { self.mapping.get(c, c) : c for c in _columns }
+        self.hidden_columns = { self.mapping.get(c, c) : c for c in _hidden_columns }
+        logger.debug("self.columns {}".format(self.columns))
+        logger.debug("self.hidden_columns {}".format(self.hidden_columns))
+
         self.init_key=init_key
         self.datatables_options=datatables_options
         # if checkboxes were required, we tell datatables about this column's type
@@ -65,13 +86,13 @@ Current implementation makes the following assumptions
         if self.checkboxes:
             # we use aoColumnDefs rather than aoColumns -- ignore user-provided aoColumns
             if 'aoColumns' in self.datatables_options:
-                print 'WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded'
+                logger.warning('WARNING: querytable uses aoColumnDefs, your aoColumns spec. is discarded')
                 del self.datatables_options['aoColumns']
             # set aoColumnDefs in datatables_options - might already have stuff in there
             aoColumnDefs = self.datatables_options.setdefault ('aoColumnDefs',[])
             # here 'checkbox' is the class that we give to the <th> dom elem
             # dom-checkbox is a sorting type that we define in querytable.js
-            aoColumnDefs.append ( {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
+            #aoColumnDefs.insert (0, {'aTargets': ['checkbox'], 'sSortDataType': 'dom-checkbox' } )
 
     def template_file (self):
         return "querytable.html"
@@ -92,10 +113,10 @@ Current implementation makes the following assumptions
                           # dataTableExt.afnSortData
                            "js/querytable.js", 
                            ] ,
-            'css_files': [ "css/dataTables.bootstrap.css",
+            'css_files': [ #"css/dataTables.bootstrap.css",
                            # hopefully temporary, when/if datatables supports sPaginationType=bootstrap3
                            # for now we use full_numbers, with our own ad hoc css 
-                           "css/dataTables.full_numbers.css",
+                           #"css/dataTables.full_numbers.css",
                            "css/querytable.css" , 
                            ],
             }

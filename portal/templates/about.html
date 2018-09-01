@@ -1,0 +1,100 @@
+{% extends "layout_wide.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs nav-section">
+                <li class="active"><a href="#about"><img src="{{ STATIC_URL }}icons/slices-xs.png" alt="About" />About</a></li>
+                <li><a href="#components">Underlying technologies</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container tab-content">
+    <div class="tab-pane active row" id="about">
+		<div class="col-md-12">
+			<p>
+				OneLab Portal is a central place to get acess to all OneLab testbeds.In order to get access to the portal,
+				an experimenter needs to  <a href="/portal/register">register</a> to the portal. The portal administrative body
+				is responsible to accept or reject newly registered users.   
+			</p>
+			<p>
+				To learn more about OneLab visit:  <a href="http://onelab.eu/" target="_blank">http://onelab.eu/</a> 			
+			</p>
+			<p>
+				If you have any questions regarding using the portal visit: <a href="/portal/support">OneLab support</a>
+			</p>
+			<p>
+				OneLab portal is a community effot. To get more information about OneLab portal team visit: 
+				<a href="http://myslice.info/community" target="_blank">http://myslice.info/community</a>
+			</p>
+		</div>
+	</div>
+	<div class="tab-pane row" id="components">
+		<div class="col-md-12">
+ 			<h3>A ready-made and easily customisable user interface for your testbed.</h3>
+				<p>
+					MySlice is an ambitious project aiming to support researchers throughout the lifecycle of experiments that can run on a variety 
+					of testbeds spanning different administrative domains and networking technologies. Its basic principle is to bring together 
+					available resources with useful information (characteristics, performance, network measurements).
+				</p>
+				<p>
+					MySlice inititiave started in Janury 2011 by offering annotation services for the first ederated experimental resources. Today, 
+					MySlice has taken a big step toward becoming a tand-alone web framework, which will present all available resources from testbeds 
+					across the world, interconnected through the Slice-based Facility Architecture (SFA) and annotated by the TopHat measurement system.
+				</p>
+				<p>
+					Our framework is built with standard programming tools (python and javascript for the front-end and python for the back-end) 
+					and has a modular structure based on the concept of plugins for implementing different core functionalities (query editing, 
+					data display, and resource allocation).
+				</p>
+				<p>
+					The goal is to enable developers with expertise on different testbed technologies and different experimental 
+					practices to work in parallel for optimizing the tools presented to the users allowing them for a wide range of choices 
+					according to their own requirements. Opening in this way the development of web-based user tools for experimentation and 
+					sharing effort and information can increase significantly the chances for the achievement of our challenging objective.
+				</p>
+		</div>
+		<div class="col-md-12">
+			<h3>Portal Components</h3>
+				<h5>Myslice (Web Frontend)</h5>
+					<p>
+						A full-fledged and modular web portal for a testbed federation allowing user to register, 
+						request slices and browse and book resources, with a strong emphasis on measurements.
+					</p>
+					<p> More Info: <a href="http://myslice.info/" target="_blank">http://myslice.info/</a></p>
+					<p> Code: <a href="http://git.onelab.eu/?p=myslice.git;a=summary" target="_blank">Git Repository</a> (read only)</p> 
+					<p> 
+						If you need write access to the git repository you need first to send your public key to <a href="mailto:support@onelab.eu">support@onelab.eu</a>.
+					</p>
+
+
+				<h5>Manifold (Portal backend)</h5>
+					<p>
+						Manifold is the backend that is running behind the portal. It is a component allowing the integration of distributed 
+						and heterogeneous data sources, such as measurement platforms or data repositories.
+					</p>
+					<p> Documentation: <a href="http://trac.myslice.info/" target="_blank">http://trac.myslice.info/</a></p>
+					<p> Code: <a href="https://git.top-hat.info/?p=tophat.git;a=shortlog;h=refs/heads/devel" target="_blank">Git Repository</a> (read only)</p>	
+
+				<h5>OneLab Registry</h5>
+					<p>It's a SFA registry. SFA Registry is a specific installation mode of the SFAWrapper (Registry Only mode).</p>
+					<p> More Info: <a href="http://svn.planet-lab.org/wiki/SfaDeveloperRegistryTutorial#RunninginRegistry-Onlymode" target="_blank">SFA Registry</a></p>
+     	</div>
+   </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('.nav-tabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+});
+</script>
+
+
+{% endblock %}

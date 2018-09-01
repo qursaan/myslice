@@ -1,0 +1,17 @@
+<form action="//portal.onelab.eu/login/" method="post" role="form">
+{% csrf_token %}
+<div class="form-group">
+    <input class="input-md" type="email" name="username" placeholder="Enter Email / Username">
+</div>
+<div class="form-group">
+    <input type="password" name="password" placeholder="Password">
+</div>
+<div class="login-submit">
+    <input type="submit" class="btn btn-onelab" value="Sign In" />
+    <span class="lost-password">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="http://portal.onelab.eu/portal/pass_reset/">Can't access your account?</a></span>
+</div>
+<div class="login-signup">
+    You don't have an account yet? 
+    <br /><a href="http://portal.onelab.eu/register">Sign Up!</a>
+</div>
+</form>

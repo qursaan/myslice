@@ -15,9 +15,11 @@ from ui.topmenu                  import topmenu_items_live, the_user
 from plugins.querytable          import QueryTable
 
 from myslice.configengine        import ConfigEngine
+from myslice.theme import ThemeView
+from myslice.settings import logger
 
 # View for 1 platform and its details
-class PlatformView(FreeAccessView):
+class PlatformView(FreeAccessView, ThemeView):
     template_name = "platform.html"
 
     def get_context_data(self, **kwargs):
@@ -25,7 +27,7 @@ class PlatformView(FreeAccessView):
         page.add_js_files  ( [ "js/common.functions.js" ] )
 
         for key, value in kwargs.iteritems():
-            print "%s = %s" % (key, value)       
+            logger.debug("{} = {}".format(key, value))
             if key == "platformname":
                 platformname=value
                 
@@ -140,7 +142,7 @@ class PlatformView(FreeAccessView):
         context['topmenu_items'] = topmenu_items_live('Platforms', page)
         # so we can sho who is logged
         context['username'] = the_user(self.request)
-
+        context['theme'] = self.theme
         context.update(page.prelude_env())
 
         return context

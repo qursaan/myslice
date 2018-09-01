@@ -1,0 +1,73 @@
+
+<div class="col-md-2">
+	<div id="select-platform" class="list-group">
+	</div>
+		
+	<ul class="list-group">
+	  <li class="list-group-item">Authority:<b> {{user_details.parent_authority}}</b>
+		<!--<select id="auth_list">
+			<option value="ple.upmc">UPMC</option>
+			<option value="ple.inria">INRIA</option>
+			<option value="ple.nitos">NITOS</option>
+			<option value="ple.iminds">iMinds</option>
+		</select> -->
+	  </li>
+	  <li class="list-group-item">Filter: slice</li>
+	  
+	</ul>
+
+</div>
+<div class="col-md-10">
+    	<div id="user-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Useres" /></div>
+    	<div id="user-tab-loaded" style="display:none;">
+        	<table id="user-tab" class="table">
+            	<tr>
+                	<th>+/-</th>
+                	<th>Email</th>
+                	<th>User hrn</th>
+                	<th>Enabled</th>
+            	</tr>
+        	</table>
+    	</div>
+</div>
+<script>
+    $(document).ready(function() {
+			//console.log("the value you selected: " + selectedValue);
+        	$.post("/rest/user/",{'filters':{'parent_authority': "{{user_details.parent_authority}}"}}, function( data ) {
+            	var list_users = [];
+            	var table_users = [];
+				/* Available fields
+				user_gid, user_enabled, slices, pi_authorities, keys, parent_authority, user_first_name,
+			    user_urn, user_last_name, user_phone, user_hrn, user_email, user_type
+				*/
+            	$.each( data, function( key, val ) {
+                	//list_users.push( "<li><a href=\"portal/user/"+val.user_email+"\">" + val.user_email + "</a></li>" );
+                	user_row = "<tr>";
+					// checking the box for the users that belong to the selected slice
+					var flag_checkbox = 0;
+					for(var data in val.slices) {
+    					var element = val.slices[data];
+						if (element == "{{slice}}"){
+							//console.log("the slice is: "+ element);	
+							flag_checkbox = 1;
+							user_row += "<td><input type='checkbox' checked='True'></td>";
+						}
+					}
+					if(flag_checkbox != 1){
+                		user_row += "<td><input type='checkbox'></td>";
+					}
+                	user_row += "<td>"+val.user_email+"</td>";
+                	user_row += "<td>"+val.user_hrn+"</td>";
+					user_row += "<td>"+val.user_enabled+"</td>";
+                	user_row += "</tr>";
+                	table_users.push(user_row);
+                
+            	});
+				$("table#user-tab tr:last").after(table_users.join( "" ));
+            	$("div#user-tab-loaded").css("display","block");
+            	$("div#user-tab-loading").css("display","none");
+         	});
+	//	});
+    });
+</script>
+

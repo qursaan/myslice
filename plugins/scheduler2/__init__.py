@@ -5,6 +5,7 @@ from datetime import timedelta
 class Scheduler2 (Plugin):
 
 
+<<<<<<< HEAD
     def __init__ (self, query, query_all_resources, query_lease = None, **settings):
         Plugin.__init__ (self, **settings)
         
@@ -13,6 +14,17 @@ class Scheduler2 (Plugin):
         self.query_all_resources_uuid = query_all_resources.query_uuid
         self.query_lease = query_lease
         query_lease.query_uuid if query_lease else None
+=======
+    def __init__ (self, query, query_lease, **settings):
+        Plugin.__init__ (self, **settings)
+        
+        self.query=query
+
+        self.query_lease = query_lease
+        self.query_lease_uuid = query_lease.query_uuid
+
+        #query_lease.query_uuid if query_lease else None
+>>>>>>> onelab
 
         #granularity in minutes
         granularity = 10
@@ -30,6 +42,7 @@ class Scheduler2 (Plugin):
         reqs = {
             'js_files' : [
                 'js/scheduler2.js',
+<<<<<<< HEAD
                 'js/slider/jquery-ui-1.10.3.slider.min.js',
                 'js/scheduler-helpers.js',
                 'js/table-selector.js',
@@ -37,6 +50,14 @@ class Scheduler2 (Plugin):
             'css_files': [
                 'css/scheduler2.css', 
                 'css/slider/jquery-ui-1.10.3.slider.min.css', 
+=======
+                #'js/slider/jquery-ui-1.10.3.slider.min.js',
+                'js/scheduler-helpers.js',
+            ],
+            'css_files': [
+                'css/scheduler2.css', 
+                #'css/slider/jquery-ui-1.10.3.slider.min.css', 
+>>>>>>> onelab
             ]
         }
         return reqs
@@ -46,7 +67,11 @@ class Scheduler2 (Plugin):
         # query_uuid will pass self.query results to the javascript
         # and will be available as "record" in :
         # on_new_record: function(record)
+<<<<<<< HEAD
         return ['plugin_uuid', 'domid', 'query_uuid', 'time_slots', 'nodes', 'query_lease_uuid', 'query_all_resources_uuid']
+=======
+        return ['plugin_uuid', 'domid', 'query_uuid', 'time_slots', 'nodes', 'query_lease_uuid']
+>>>>>>> onelab
     
 
     def export_json_settings (self):

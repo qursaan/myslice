@@ -1,0 +1,169 @@
+{% extends "layout_wide.html" %}
+
+{% block content %}
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+		    <br />
+			<ul class="nav nav-tabs nav-section-mod">
+				<li class="active"><a href="#appservices"> Application Services </a></li>
+				<li><a href="#fedservices"> Federation Services </a></li>
+			</ul>
+	    </div>
+	</div>
+</div>
+<div class="container tab-content">
+	<div class="tab-pane active row" id="appservices">
+	  	<div class="col-md-12">
+		  	<div id="appservices-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Services" /></div>
+		    <div id="appservices-tab-loaded" style="display:none;">
+            <div class="container" id="appservices-tab">
+
+		        <!-- <table class="table" id="appservices-tab">
+                        <tr>
+                            <th>Name</th>
+                            <th>Provider</th>
+                            <th>Endpoint URL</th>
+                            <th>Protocol</th>
+                            <th>Basic API</th>
+                            <th>Brief Description</th>
+                        </tr>
+                    </table> -->
+              </div>
+		    </div>
+	   </div>
+	</div>
+
+	<div class="tab-pane row" id="fedservices" data-authority="{{user_details.parent_authority}}">
+		<div class="col-md-12">
+			<div id="fedservices-tab-loading"><img src="{{ STATIC_URL }}img/loading.gif" alt="Loading Services" /></div>
+				<div id="fedservices-tab-loaded" style="display:none;">
+    				<table class="table" id="fedservices-tab">
+        				<tr>
+            				<th>Name</th>
+            				<th>Brief Description</th>
+            				<th>URL</th>
+        				</tr>
+    				</table>
+			     </div>
+		</div>
+ 	</div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+
+loadedTabs = [];
+  
+  $('.nav-tabs a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+    // id = $(this).attr('href').substr(1);
+    // if (!(id in loadedTabs)) {
+    //   switch(id) {
+    //     case 'users':
+    //       //loadUsers();
+    //       loadedTabs[id] = true;
+    //     break;
+    //   }
+    // }
+    
+  });
+
+    {% if person %}
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            async: "false",
+            url: "{{ servdirurl }}appservices/",
+            success: function(data, status, jqXHR){
+
+                  function createToggle(name){
+                      return function(){
+                        var icon = $('p#name-' + name + ' span');
+                        icon.toggleClass("glyphicon-chevron-down");
+                        var el = $('p#expandable-' + name);
+                        if(!el.is(':animated')){
+                          $(el).toggle(300);
+                        }
+                      }
+                    }
+
+                  $.each(data, function(i, item){
+
+                    var imgsrc;
+
+			/*
+                    if(item.name.toLowerCase().indexOf("santander") >= 0){
+                      imgsrc = "{{ STATIC_URL }}img/servicedirectory/smartsantander.png";
+                    } else if(item.name.toLowerCase().indexOf("hadoop") >= 0){
+                      imgsrc = "{{ STATIC_URL }}img/servicedirectory/hadoop.png";
+                    } else if(item.name.toLowerCase().indexOf("openstack") >= 0){
+                      imgsrc = "{{ STATIC_URL }}img/servicedirectory/openstack.png";
+                    }
+			*/
+
+                    var row = $('<div class="row">').append(
+                      $('<div>').addClass("col-md-3 portfolio-item").append(
+                        $('<a href="' + item.APILink + '">').append(
+                          $('<img>').attr('src', item.iconURL)
+                        )
+                     ),
+                      $('<div>').addClass("col-md-6 portfolio-item").append(
+                        $('<p id="name-' + item.name.replace(/ /g,'') + '">').append(
+                          $('<span class="glyphicon glyphicon-chevron-right">'), " " + item.name),
+                        $('<p>').text(item.briefDescription),
+                        $('<p>').text("Provider: " + item.provider),
+                        $('<p>').append('Endpoint: <a href="' + item.endPoint + '">' + item.endPoint + "</a>"),
+                        $('<p id="expandable-' + item.name.replace(/ /g,'') + '">').text(item.fullDescription).hide(),
+                        $('<p id="expandable-' + item.name.replace(/ /g,'') + '">').text("Protocol: " + item.protocol).hide(),
+                        $('<p id="expandable-' + item.name.replace(/ /g,'') + '">')
+                              .append('API documentation: <a href="' + item.APILink + '">' + item.APILink + "</a>").hide()
+                      )
+                    );
+                    $('#appservices-tab').append(row);
+                    $('p#name-' + item.name.replace(/ /g,'')).click(createToggle(item.name.replace(/ /g,'')));
+                });
+
+
+                $("div#appservices-tab-loaded").css("display","block");
+                $("div#appservices-tab-loading").css("display","none");
+            },
+            error: function(jqXHR, status){
+                console.log("ERROR: " + status);
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            async: "false",
+            url: "{{ servdirurl }}fedservices/",
+            success: function(data, status, jqXHR){
+                // console.log(data);
+                $.each(data, function(i, item){
+                    console.log(item);
+                    var tr = $('<tr>').append(
+                        $('<td>').text(item.name),
+                        $('<td>').text(item.briefDescription),
+                        $('<td>').append('<a href="' + item.endPoint + '">' + item.endPoint + "</a>")
+                    );
+                    $("#fedservices-tab > tbody:last").append(tr);
+                });
+
+
+                $("div#fedservices-tab-loaded").css("display","block");
+                $("div#fedservices-tab-loading").css("display","none");
+            },
+            error: function(jqXHR, status){
+                console.log("ERROR: " + status);
+            }
+        });
+
+   {% endif %}
+
+}); // end document.ready
+</script>
+{% endblock %}

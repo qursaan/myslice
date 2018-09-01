@@ -26,7 +26,6 @@ import random
 import re
 
 from django.conf              import settings
-from django.core.mail         import send_mail
 from django.db                import models
 from django.db                import transaction
 from django.utils.translation import ugettext_lazy as _
@@ -34,11 +33,11 @@ from django.template.loader   import render_to_string
 
 #from django.core.validators import validate_email
 
-try:
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-except ImportError:
-    from django.contrib.auth.models import User
+#try:
+#    from django.contrib.auth import get_user_model
+#    User = get_user_model()
+#except ImportError:
+#    from django.contrib.auth.models import User
 
 try:
     from django.utils.timezone import now as datetime_now
@@ -60,10 +59,14 @@ class PendingUser(models.Model):
     last_name     = models.TextField()
     email         = models.EmailField() #validators=[validate_email])
     password      = models.TextField()
-    keypair       = models.TextField()
+    user_hrn      = models.TextField()
+    public_key    = models.TextField()
+    private_key   = models.TextField()
     authority_hrn = models.TextField()
     login         = models.TextField()
     pi            = models.TextField()
+    email_hash    = models.TextField()
+    status        = models.TextField()  
     created       = models.DateTimeField(auto_now_add = True)
     # models.ForeignKey(Institution)
 
@@ -92,4 +95,19 @@ class PendingSlice(models.Model):
     number_of_nodes = models.TextField(default=0)
     type_of_nodes   = models.TextField(default='NA')
     purpose         = models.TextField(default='NA')
+    created         = models.DateTimeField(auto_now_add = True)
+    
+class PendingProject(models.Model):
+    project_name    = models.TextField()
+    user_hrn        = models.TextField()
+    email           = models.TextField()
+    authority_hrn   = models.TextField(null=True)
+    purpose         = models.TextField(default='NA')
+    created         = models.DateTimeField(auto_now_add = True)
+
+class PendingJoin(models.Model):
+    user_hrn        = models.TextField()
+    email           = models.TextField()
+    project_name    = models.TextField(null=True)
+    authority_hrn   = models.TextField()
     created         = models.DateTimeField(auto_now_add = True)

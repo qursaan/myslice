@@ -1,0 +1,205 @@
+<script type="text/javascript">
+function is_finished(len_platforms, pf_status){
+    if(len_platforms == pf_status){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+// Specific DIVs for each type of testbed
+$(document).ready(function() {
+    var platform_status = Array();
+    var platform_empty = Array();
+    {% for platform in platforms %}
+    // /sfa/Describe?hrn=onelab.upmc.projectx.slicex&platform[]={{platform}}&type=slice
+    $.post("/sfa/Describe",{'hrn':'{{slicename}}', 'type':'slice', 'platform':['{{platform}}']}, function( data ) {
+        console.log(data);
+        if('parsed' in data['{{platform}}'] && 'rspec' in data['{{platform}}']['parsed']){
+            rspec = data['{{platform}}']['parsed']['rspec'];
+            if('node' in rspec){
+                if(rspec['node'] instanceof Array) {
+                    jQuery.each( rspec['node'], function( i, node ) {
+                        render_node('{{platform}}',node);
+                    });
+                }else{
+                    render_node('{{platform}}',rspec['node']);
+                }
+            }else{
+                platform_empty.push('{{platform}}');
+            }
+        }else{
+            platform_empty.push('{{platform}}');
+        }
+        platform_status.push('{{platform}}');
+        if(is_finished({{len_platforms}},platform_status.length)){
+            $("#loading").hide();
+            if(platform_empty.length == {{len_platforms}}){
+                $("#warning_message").show();
+            }
+        }
+    });
+    {% endfor %}
+});
+</script>
+<div class="col-md-10 col-md-offset-1">
+<div id="access">
+    <h2>How to access your reserved resources?</h2>
+    <img src="{{ STATIC_URL }}img/loading.gif" id="loading" alt="Loading reserved resources" />
+</div>
+<div id="warning_message" style="display:none; color:orange; font-weigh:bold;">
+Please add resources to your slice from the left tab <a href="/resources/{{slicename}}">"Resources"</a>
+</div>
+<div id="default">
+</div>
+{% if "ple" in platforms %}
+<div id="ple_header" style="display:none;">
+	<h3>PlanetLab Europe</h3>
+	
+	<p>
+		PlanetLab Europe resources are accessible directly via SSH. Your SSH public key is deployed automatically
+		on the reserved nodes. To access your slice on a resource just type the following command:
+	</p>
+</div>
+<div id="ple" style="display:none;">
+</div>
+<div id="ple_footer" style="display:none;">
+	<p><strong>NOTE:</strong> Your original slicename <b>{{slicename}}</b> has been converted to PlanetLab specific format <b>{{ple_slicename}}</b> in order to do SSH.</p>
+	<p>
+		Be aware that after you reserve a PlanetLab Europe resource your slice will be deployed with a delay of about 15 minutes, 
+		after witch you will be able to access the resource.
+	</p>
+    <div id="initscript">
+        <div>
+            <h4>Init Script on PLE</h4>
+            <i>This bash script will be deployed on all PLE nodes of your slice</i>
+        </div>
+        <textarea style="width:100%; height:100px;" id="initscript_code"></textarea><br>
+<!-- TODO !!!
+        <div>
+            <select>
+                <option>All</option>
+                <option>node1</option>
+                <option>node2</option>
+            </select>
+        </div>
+-->
+        <button name="deploy" class="btn btn-success btn-sm" onclick="deploy('{{slicename}}');">Deploy</button>
+        <button name="delete" class="btn btn-danger btn-xs" onclick="del('{{slicename}}');">Delete</button>
+    </div>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $.post("/initscript/get/",{'slice_hrn':'{{slicename}}'}, function( data ) {
+            jQuery('#initscript_code').val(data['initscript_code']);
+        });
+    });
+    function deploy(slice_hrn){
+        var initscript_code = jQuery('#initscript_code').val()
+        $.post("/initscript/update/",{'slice_hrn':slice_hrn, 'initscript_code':initscript_code}, function( data ) {
+            if (data['ret'] == 0) {
+                mysliceAlert('Success: initscript deployed','success', true);
+            }else{
+                mysliceAlert('Rest Error for: '+data.error,'warning', true);
+            }
+            //jQuery('#initscript_code').val(data['initscript_code']);
+        });
+    }
+    function del(slice_hrn){
+        $.post("/initscript/delete/",{'slice_hrn':slice_hrn}, function( data ) {
+            if (data['ret'] == 0) {
+                mysliceAlert('Success: initscript deleted','success', true);
+                jQuery('#initscript_code').val('');
+            }else{
+                mysliceAlert('Rest Error for: '+data.error,'warning', true);
+            }
+
+        });
+    }
+    </script>
+    <br>
+</div>
+{% endif %}
+{% if "iotlab" in platforms %}
+<div id="iotlab_header" style="display:none;">
+	<h3>FIT IoT-Lab</h3>
+	<p>FIT IoT-Lab resources are accessible directly via SSH and <a href="https://www.iot-lab.info/testbed/" target="_blank">web GUI.</a>
+		To acess IoT-Lab resources using web GUI, use the same login and  password of OneLab portal. To acess Iot-Lab resources using SSH type
+		the following command:
+	</p>
+</div>
+<div id="iotlab" style="display:none;">
+</div>
+{% endif %}
+{% if "nitos" in platforms %}
+<div id="nitos_header" style="display:none;">
+	<h3>NITOS Volos (Greece)</h3>
+	
+	<p>
+	 NITOS resources are not directly accessible. You will need to log in on a gateway server and from there access the node.
+	 You will find the ssh commands to connect to NITOS nodes below:
+	</p>
+	<h4>NITLab</h4>
+</div>
+<div id="nitos" style="display:none;">
+</div>
+<div id="nitos_footer" style="display:none;">
+    <p><b>NOTE:</b> Nodes 002-009 are orbit-like nodes. For these nodes use "baseline_orbit.ndz". All these images come with OMF5.4 resource controller. To do OMF6 experiments use "baseline_omf6_1_1.ndz" and  "baseline_orbit_omf6_1_1.ndz" for grid nodes and orbit nodes respectively. </p>
+	<p>
+	The complete tutorial on NITOS nodes:
+	<a target="_blank" href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/basic-tutorial">NITOS basic tutorial</a>
+	</p>
+    <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
+	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
+
+</div>
+{% endif %}
+{% if "nitos-paris" in platforms %}
+<div id="paris.fit-nitos.fr_header" style="display:none;">
+	<h4>FIT NITOS-Lab Paris</h4>
+</div>
+<div id="paris.fit-nitos.fr" style="display:none;">
+</div>
+<div id="paris.fit-nitos.fr_footer" style="display:none;">
+	<p>
+		On the node itself you will have to modify the file /etc/omf-resctl-5.3/omf-resctl.yaml (OMF5.4 only) according to your slice settings and then
+		restart the OMF Resource Controller and finally execute the experiment:
+	</p>
+	<p class="command">
+		$ omf exec --slice {{slicename}} your_exp.rb
+	</p>
+
+	<p>
+	The complete tutorial on FIT NITOS nodes:
+	<a target="_blank" href="http://doc.onelab.eu/nitos.html">basic tutorial</a>
+	</p>
+    <p>OMF based experiments' tutorials are available <a href="http://nitlab.inf.uth.gr/NITlab/index.php/testbed/instructions/omf-tutorials-scenarios" target="_blank">here.</a></p> 
+	<p>To learn more about OMF, please click <a href="http://omf.mytestbed.net/projects/omf/wiki/OMF_Main_Page" target="_blank">here.</a></p>
+</div>
+{% endif %}
+<div style="padding-top:20px;">	
+	<h2>Available Tools</h2>
+	<p><img src="{{ STATIC_URL }}img/terminal_icon.png" width="50"> <b>SSH</b></p>
+	<p>
+	Secure Shell (SSH) is a cryptographic network protocol for secure data communication, remote command-line login, remote command execution, and other secure network services between two networked computers that connects, via a secure channel over an insecure network, a server and a client (running SSH server and SSH client programs, respectively). The protocol specification distinguishes between two major versions that are referred to as SSH-1 and SSH-2.
+	</p>
+	<p> More info: <a href="http://en.wikipedia.org/wiki/Secure_Shell" target="_blank">http://en.wikipedia.org/wiki/Secure_Shell</a></p>
+	<br>
+	<p><img src="{{ STATIC_URL }}img/putty-logo.png" width="50"> <b>PuTTY</b></p>
+	<p>
+		PuTTY is an SSH and telnet client, developed originally by Simon Tatham for the Windows platform. PuTTY is open source software that is available with source code and is developed and supported by a group of volunteers.
+	</p>
+	<p>More info: <a href="http://www.putty.org/" target="_blank">http://www.putty.org/</a></p>	
+	<br>
+	<p><img src="{{ STATIC_URL }}img/nepi_logo.png" width="90"></p>
+	<p>NEPI, the Network Experimentation Programming Interface, is a life-cycle management tool for network experiments. The idea behind NEPI is to provide a single tool to design, deploy, and control network experiments, and gather the experiment results. Going further, NEPI was specially conceived to function with arbitrary experimentation platforms, so researchers could use a single tool to work with network simulators, emulators, or physical testbeds, or even a mixture of them. To accomplish this, NEPI provides a high-level interface to describe experiments that is independent from any experimentation platform, but is able to capture platform specific configurations. Experiment definitions can be stored in XML format to be later reproduced, and modified according to experimentation needs. Experiment execution is orchestrated by a global experiment controller, that is platform independent, and different platform-dependent testbed controllers, creating a control hierarchy that is able t adapt to platform specific requirements while providing an integrated control scheme.</p>
+	<p> More info: <a href="http://nepi.inria.fr" target="_blank">http://nepi.inria.fr</a></p>
+	<br>
+	<p><img src="{{ STATIC_URL }}img/omf-logo.png" width="90"></p>
+	<p>OMF is a Testbed Control, Measurement and Management Framework.</p>
+	<p>
+	OMF was originally developed for the ORBIT wireless testbed at Winlab, Rutgers University. Since 2007, OMF has been actively extended to operate on testbeds with many different type of network and resource technologies. It is now deployed and used on different testbeds in Australia, Europe, and in the U.S. OMF is currently being extended further to support exciting new features and technologies. This website is hosting this ongoing activity. OMF development is now conducted essentially within the TEMPO project at NICTA (Australia) in strong collaboration with Winlab (Rutgers University).
+	</p>
+	<p>In addition to the main OMF software, this site also hosts OMF sub-projects addressing various related aspects of a testbed's control, measurement, and management.</p>
+	<p>More Info: <a href="http://mytestbed.net/projects/omf" target="_blank">http://mytestbed.net/projects/omf</a></p>
+</div>
+</div>

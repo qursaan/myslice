@@ -1,0 +1,432 @@
+{% extends "layout-unfold1.html" %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block unfold_main %}
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}/css/onelab.css" />
+
+<!-- Reputation Specific -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}reputation_static/css/main.css" />
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}reputation_static/css/jquery-ui-1.9.2.custom.min.css" />
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}reputation_static/css/jquery.rating.css" /> 
+
+<script src="{{STATIC_URL}}reputation_static/js/jquery-1.9.0.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{STATIC_URL}}reputation_static/js/ui/jquery-ui-1.9.2.custom.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}reputation_static/js/jquery.raty.min.js"></script>
+ <style>
+	#slicelist a {
+		color: rgb(96, 96, 216);
+		width:75% !important;
+	}
+	
+	.ui-accordion-header, .ui-accordion-content {
+		width:120% !important;
+	}
+	
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	ul > li {
+		margin: 0;
+		padding: 0 0 8px 0;
+		height: 25px;
+	}
+	ol > li {
+		height: 60px;
+	}
+	#slicelist li:last-child {
+		padding: 0;
+	}
+	#slicelist {
+		width: 50%;
+	}
+
+	#scoreform {
+		width: 500px;
+	}
+	#submit {
+		text-align: center;
+	}
+	
+	#scoreform > ol > li > div > input:first-child {
+		margin: 4px 3px 0 0;
+	}
+	#scoreform > ol > li > div > input:last-child {
+		margin: 4px 3px 0 10px;
+	}
+</style> 
+
+<div id='rep-container' align="center" style="text-align:left;margin-left:1%;"> 
+
+
+	<div id="tabs">
+	  <ul>
+	    <li><a href="#tabs-1">Testbeds' Reputation</a></li>
+	    <li><a href="#tabs-2">Evaluate your experiments</a></li>
+	  </ul>
+	  <div id="tabs-1">
+	
+	            	  
+	        <table class="reptable table table-bordered table-hover">
+	            <tr class="odd">
+	            		<th> Testbed </th>
+	            		{% for service in rep_serv %}
+	            				<th id='service{{forloop.counter}}' class='{{service}}-class'>Service: {{ service}} </th>
+	            		{%endfor%}
+	            </tr>
+	            
+	            
+	            {% for testbed_rep in reputation %}
+		            <tr class="border_bottom">
+		                <td class="odd">
+							<span> {{ testbed_rep.testbed }} </span>	 
+						</td>
+					
+					{% for tb_serv in testbed_rep.services %}
+						<td>
+							{{tb_serv}}
+						</td>
+					{%endfor%}
+						
+		            </tr>
+	            {%endfor%}
+	                        
+	        </table>    
+	    
+	  </div>
+	  <div id="tabs-2">
+		<h1>Experiment Evaluation</h1>
+		<p><b>List of your unrated experiments</b></p>
+		<div style=" width: 70% !important" id="slicelist">
+			
+			{% for aslice in slicelist %}
+				<h3>Slice <b>{{ aslice.slice_hrn }}</b></h3>
+		        <div style="padding-bottom:0;padding-top:0;">
+		            <ul><li>
+		                    experiment from <b>{{ aslice.start_t }}</b> to <b>{{ aslice.end_t }}</b> | <a href="#" class="rate_button" data-resid={{ aslice.id }}>Rate it</a>
+		   			</ul>
+		        </div>
+		
+		
+			{%endfor%}
+		</div>	
+	
+	  </div>
+	</div>
+
+</div>
+
+
+<div id="scoreform" style="display:none">
+    <ol>
+        <li>
+            <span>How was your overall experience with this Testbed?</span> 
+            <div id="q1">
+            </div>
+        </li>
+	<li>
+            Did you experience any problems during the experiment?
+            <div id="q2">
+                <input type="radio" name="q2" value="1" />Yes
+                <input type="radio" name="q2" value="0" />No
+            </div>
+        </li>
+
+        <li>
+            How would you rate the provided user support (instructions, tutorials, email support)?
+            <div id="q3">
+            </div>
+        </li>
+        <li>
+            Would you use this testbed again?
+            <div id="q4">
+                <input type="radio" name="q4" value="1" />Yes
+                <input type="radio" name="q4" value="0" />No
+            </div>
+        </li>
+        <li>
+            Would you be willing to pay for this service?
+            <div id="q5">
+                <input type="radio" name="q5" value="1" />Yes
+                <input type="radio" name="q5" value="0" />No
+            </div>
+        </li>
+        <li>
+            How would you rate the Node Availability in the experiment?
+            <div id="q6">
+            </div>
+        </li>
+        <li>
+            How would you rate the Link Quality regarding PDR in the experiment (1:Very Low, 5:Very High )?
+            <div id="q7">
+            </div>
+        </li>
+        <li>
+            Rate your level of certainty regarding your answers above?
+            <div id="q8">
+            </div>
+        </li>
+
+    </ol>
+    <div id="submit">
+        <a href="#">Submit &raquo;</a>
+    </div>
+</div>
+
+
+</div>
+
+
+	<div id='temp_log' style="display: none;">
+
+        <table class="mytable table table-bordered table-hover">
+            <tr class="odd">
+            	<th>User Email</th>
+                <th>User HRN</th>
+				<th>Slice HRN</th>
+				<th>Resources</th>
+				<th>Leases</th>
+				
+            </tr>
+            
+            {% for slice in slices_users %}
+            <tr class="border_bottom">
+                <td class="odd">
+					<a href="/portal/user/{{slice.user}}"><span class="glyphicon glyphicon-search"></span></a>	
+					{{ slice.user }} 
+				</td>
+				<td class="odd"> {{ slice.user_hrn }} </td>
+				<td class="even"> {{ slice.slice_hrn }} </td>
+				<td class="even"> {{ slice.resource }} </td>
+				<td class="even"> {{ slice.lease }} </td>
+				
+            </tr>
+            {%endfor%}
+                        
+        </table>
+
+		<div id='logging_out'>{{ logging_test }}</div>
+        
+	</div>
+
+<!-- END of Reputation Specific -->
+
+
+<div class="onelab-title well-lg">
+  <h2>Onelab Support</h2>
+  <h4>If you have already registered, then please send an <a href="mailto:support@myslice.info">e-mail</a>
+  or <a href="http://trac.myslice.info/" >visit us</a></h4>
+</div>
+
+
+<!-- Reputation Specific -->
+
+<script type="text/javascript">
+
+serv_per_tb = jQuery.parseJSON('{{ serv_per_tb|safe }}');
+
+$(function() {
+	$( "#tabs" ).tabs();
+});
+
+var data = jQuery.parseJSON('{{ json_data|safe }}');
+
+var resid = -1;
+var q1 = -1;
+var q2 = -1;
+var q3 = -1;
+var q4 = -1;
+var q5 = -1;
+var q6 = -1;
+var q7 = -1;
+var q8 = -1;
+
+function initDialog() {
+	
+	
+    $("input:radio").removeAttr("checked");
+    $("#submit > a").click(function() {
+        if ($("#q2 input:checked").val()) {
+            q2 = $("#q2 input:checked").val();
+        }
+        if ($("#q4 input:checked").val()) {
+            q4 = $("#q4 input:checked").val();
+        }
+        if ($("#q5 input:checked").val()) {
+            q5 = $("#q5 input:checked").val();
+        }
+
+        $("a[data-resid='"+resid+"']").css("text-decoration", "line-through").unbind("click").removeAttr("href");
+
+        //TODO: validate input before submitting
+
+        sum = q1 + q2 + q3 + q4 + q5 + q6 + q7 +q8;
+
+        if (sum == -8) {
+            alert("Please provide at least one rating to submit");
+        }
+        else {
+            $("#scoreform").dialog("close");
+            slicedata = {};
+        	for(var event in data){
+				if ((data[event]).id == resid) {
+					slicedata = (data[event]);
+				}	
+			}
+			
+			slicedata["user_eval"] = {'overall':q1, 'problems':q2, 'support':q3, 'reuse':q4, 'pay':q5, 'availability':q6, 'link_quality':q7, 'quality':q8};
+			testbeds_str = JSON.stringify(slicedata['testbeds'])
+			delete slicedata['testbeds'];
+            //console.log(JSON.stringify(slicedata))
+                        
+            $.ajax({
+	            type: "GET",
+	            url: "reputation/submit_eval",
+	            data: {slicedata: slicedata, testbeds: testbeds_str},
+	            accepts: "application/json",
+	            success: function (data) {
+	            	var json = $.parseJSON(data);
+	            	console.log(json);
+		        },
+	            error: function(xhr,errmsg,err) {
+	                alert(" X " + errmsg + " X " + err+ ": " + xhr.responseText);
+	            }
+	        });
+        }
+
+        return false;
+    });
+    $("#q1").raty({
+        number: 5,
+        size: 24,
+        starOn: 'static/reputation_static/img/star-on.png',
+        starOff: 'static/reputation_static/img/star-off.png',
+        click: function(score, evt) {
+            q1 = score;
+        }
+    });
+    $("#q3").raty({
+        number: 5,
+        size: 24,
+        starOn: 'static/reputation_static/img/star-on.png',
+        starOff: 'static/reputation_static/img/star-off.png',
+        click: function(score, evt) {
+            q3 = score;
+        }
+    });
+    $("#q6").raty({
+        number: 5,
+        size: 24,
+        starOn: 'static/reputation_static/img/star-on.png',
+        starOff: 'static/reputation_static/img/star-off.png',
+        click: function(score, evt) {
+            q6 = score;
+        }
+    });
+    $("#q7").raty({
+        number: 5,
+        size: 24,
+        starOn: 'static/reputation_static/img/star-on.png',
+        starOff: 'static/reputation_static/img/star-off.png',
+        click: function(score, evt) {
+            q7 = score;
+        }
+    });
+    $("#q8").raty({
+        number: 5,
+        size: 24,
+        starOn: 'static/reputation_static/img/star-on.png',
+        starOff: 'static/reputation_static/img/star-off.png',
+        click: function(score, evt) {
+            q8 = score;
+        }
+    });
+}
+$(function() {
+    /* 
+        vars with answers to questions
+    */
+
+    $("#slicelist").accordion({
+        heightStyle: "content"
+    });
+
+    initDialog();
+		
+    clone = $("#scoreform").clone(true);
+
+    $(".rate_button").click(function() {
+        q1 = -1;
+        q2 = -1;
+        q3 = -1;
+        q4 = -1;
+        q5 = -1;
+        q6 = -1;
+		q7 = -1;
+		q8 = -1;
+        resid = $(this).attr("data-resid"); 
+        
+        slicedata = {};
+    	for(var event in data){
+			if ((data[event]).id == resid) {
+				slicedata = (data[event]);
+			}	
+		}	
+
+		srv_arr = []	        
+        for (var tb in slicedata["testbeds"]){ 
+        	for (var srv in serv_per_tb[tb]){ 
+        		if (srv != 'equals') {
+        			//console.log(serv_per_tb[tb][srv]); 
+        			srv_arr.push(serv_per_tb[tb][srv]) 
+        		} 
+        	} 
+        }     
+        
+        cq1 = "overall";
+        cq6 = "availability";
+        cq7 = "link_quality";
+        
+        q_to_remove = []
+        
+        if ($.inArray(cq1, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+0+')').remove();
+        } 
+        if ($.inArray(cq6, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+5+')').remove();
+        } 
+		if ($.inArray(cq7, srv_arr) == -1 ){
+        	$("#scoreform > ol").children(':eq('+6+')').remove();
+        } 
+        
+        $("#scoreform").dialog({
+            title: "Rate experiment",
+            width: 500,
+            modal: true,
+            draggable: false,
+            resizable: false,
+            hide: "fade",
+            close : function() {
+                $(this).dialog("destroy");
+                $("#scoreform").remove();
+                $("body").append(clone); 
+                initDialog();
+            }
+        });
+        return false;
+    }); 
+    
+
+});
+</script>
+
+<!-- END of Reputation Specific -->
+
+{% endblock %}
